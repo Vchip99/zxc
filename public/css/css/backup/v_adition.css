@@ -1,0 +1,94 @@
+/*-----------------------------------------------------------------------------------
+Margins
+-----------------------------------------------------------------------------------*/
+.mrgn-5-top{margin-top:5px}
+.mrgn-10-top{margin-top:10px}
+.mrgn-15-top{margin-top:15px}
+.mrgn-20-top{margin-top:20px}
+.mrgn-30-top{margin-top:30px}
+.mrgn-40-top{margin-top:40px}
+.mrgn-50-top{margin-top:50px}
+.mrgn-60-top{margin-top:60px}
+.mrgn-70-top{margin-top:70px}
+.mrgn-80-top{margin-top:80px}
+.mrgn-90-top{margin-top:90px}
+.mrgn-100-top{margin-top:100px}
+.mrgn-5-btm{margin-bottom:5px}
+.mrgn-10-btm{margin-bottom:10px}
+.mrgn-20-btm{margin-bottom:20px}
+.mrgn-30-btm{margin-bottom:30px}
+.mrgn-40-btm{margin-bottom:40px}
+.mrgn-50-btm{margin-bottom:50px}
+.mrgn-60-btm{margin-bottom:60px}
+.mrgn-10-top-btm{margin:10px 0}
+.mrgn-20-top-btm{margin:20px 0}
+.mrgn-30-top-btm{margin:30px 0}
+.mrgn-40-top-btm{margin:40px 0}
+.mrgn-50-top-btm{margin:50px 0}
+.mrgn-60-top-btm{margin:60px 0}
+.mrgn-70-top-btm{margin:70px 0}
+.mrgn-80-top-btm{margin:80px 0}
+.mrgn-90-top-btm{margin:90px 0}
+.mrgn-100-top-btm{margin:100px 0}
+.mrgn-160-top-btm{margin:160px 0}
+
+/*-----------------------------------------------------------------------------------
+a
+-----------------------------------------------------------------------------------*/
+a{color:#e91e63}
+a:hover,a:focus{color:#6534ff;text-decoration:underline}
+a:focus{outline:0 auto -webkit-focus-ring-color;outline-offset:-2px}
+
+/*-----------------------------------------------------------------------------------
+3-dots
+-----------------------------------------------------------------------------------*/
+.section-dash-dark{border:0 none;border-top:5px dotted #1c1a24;background:none;height:0;width:25px}
+
+
+/*-----------------------------------------------------------------------------------
+Section Blog Wrapper id
+-----------------------------------------------------------------------------------*/
+section#blog-wrapper{border-bottom:1px solid #f4f7fd;border-top:1px solid #f4f7fd;background:#f8fbfd;padding:50px 0}
+section#blog-wrapper h2.section-title{color:#e91e63;letter-spacing:3px;text-transform:uppercase;font-size:24px;font-weight:600}
+section#blog-wrapper p.section-lead{text-transform:uppercase;color:#1c1a24;letter-spacing:2px;font-weight:600;font-size:21px}
+section#blog-wrapper p.section-lead-sm{color:#1c1a24;font-size:16px}
+section#blog-wrapper h3.service-title{color:#6534ff;letter-spacing:3px;text-transform:uppercase;font-size:18px;font-weight:600}
+section#blog-wrapper p.service-lead-sm{color:#1c1a24;font-size:16px}
+section#blog-wrapper .blog_item{
+	background:#FFF;
+	padding: 10px;
+	-webkit-box-shadow:0 0 5px 0 rgba(130,130,130,0.4);
+	-moz-box-shadow:0 0 5px 0 rgba(130,130,130,0.4);
+	box-shadow:0 0 5px 0 rgba(130,130,130,0.4);
+	margin-bottom:40px;
+	text-align:left
+}
+section#blog-wrapper .blog_item:hover{
+
+  box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+
+}
+section#blog-wrapper .blog_item ul.blog_categories{border-bottom:1px solid #f4f7fd;border-top:1px solid #f4f7fd;padding:0;background:#FFF;margin-left:0}
+section#blog-wrapper .blog_item ul.blog_categories li{text-transform:uppercase;letter-spacing:2px;font-size:12px;font-weight:600;color:#e91e63;padding:10px 10px 7px 22px}
+section#blog-wrapper .blog_item .blog_item_content{padding:10px 20px}
+section#blog-wrapper .blog_item .blog_item_content h2{text-transform:uppercase;font-size:21px;letter-spacing:2px;font-weight:600;margin-top:0}
+section#blog-wrapper .blog_item .blog_item_content .btn-link{text-transform:uppercase;color:#e91e63;letter-spacing:2px;font-weight:600;text-decoration:none}
+section#blog-wrapper .blog_item .blog_item_content .btn-link:hover,section#blog-wrapper .blog_item .blog_item_content .btn-link:focus{text-decoration:none;color:#ac1d4e}
+
+/*-----------------------------------------------------------------------------------
+Section Blog Wrapper class
+-----------------------------------------------------------------------------------*/
+section.blog-wrapper{border-bottom:1px solid #f4f7fd;border-top:1px solid #f4f7fd;background:#f8fbfd;padding:50px 0}
+section.blog-wrapper h2.section-title{color:#e91e63;letter-spacing:3px;text-transform:uppercase;font-size:24px;font-weight:600}
+section.blog-wrapper p.section-lead{text-transform:uppercase;color:#1c1a24;letter-spacing:2px;font-weight:600;font-size:21px}
+section.blog-wrapper p.section-lead-sm{color:#1c1a24;font-size:16px}
+section.blog-wrapper h3.service-title{color:#6534ff;letter-spacing:3px;text-transform:uppercase;font-size:18px;font-weight:600}
+section.blog-wrapper h5.service-title{color:#6534ff;text-transform:uppercase;font-size:12px;font-weight:600}
+section.blog-wrapper p.service-lead-sm{color:#1c1a24;font-size:16px}
+section.blog-wrapper .blog_item{background:#FFF;-webkit-box-shadow:0 0 5px 0 rgba(130,130,130,0.4);-moz-box-shadow:0 0 5px 0 rgba(130,130,130,0.4);box-shadow:0 0 5px 0 rgba(130,130,130,0.4);margin-bottom:40px;text-align:left}
+section.blog-wrapper .blog_item ul.blog_categories{border-bottom:1px solid #f4f7fd;border-top:1px solid #f4f7fd;padding:0;background:#FFF;margin-left:0}
+section.blog-wrapper .blog_item ul.blog_categories li{text-transform:uppercase;letter-spacing:2px;font-size:12px;font-weight:600;color:#e91e63;padding:10px 10px 7px 22px}
+section.blog-wrapper .blog_item .blog_item_content{padding:10px 20px}
+section.blog-wrapper .blog_item .blog_item_content h2{text-transform:uppercase;font-size:21px;letter-spacing:2px;font-weight:600;margin-top:0}
+section.blog-wrapper .blog_item .blog_item_content .btn-link{text-transform:uppercase;color:#e91e63;letter-spacing:2px;font-weight:600;text-decoration:none}
+section.blog-wrapper .blog_item .blog_item_content .btn-link:hover,section#blog-wrapper .blog_item .blog_item_content .btn-link:focus{text-decoration:none;color:#ac1d4e}

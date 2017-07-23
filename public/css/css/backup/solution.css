@@ -1,0 +1,69 @@
+.right-sidebar img{
+   width: 70px;
+  height: 60px;
+}
+.vchip-right-sidebar{
+background: #fff;
+padding: 10px 10px;
+}
+.vchip_list li a {
+  display: inline-block;
+  font-size: 15px;
+  font-weight: normal;
+  padding: 5px 0 5px 15px;
+  position: relative;
+  text-transform: capitalize;
+  -webkit-transition: all 0.5s ease 0s;
+  -moz-transition: all 0.5s ease 0s;
+  -ms-transition: all 0.5s ease 0s;
+  -o-transition: all 0.5s ease 0s;
+  transition: all 0.5s ease 0s;
+}
+
+.vchip_list li a:hover,
+.vchip_list li a:focus {
+  margin-left: 5px;
+        background-color: #ddd;
+
+}
+.vchip_list li a:before {
+  content: "\f101";
+  font-family: FontAwesome;
+  left: 0;
+  position: absolute;
+  top: 5px;
+}
+.img-circle {
+       border-radius:50%;
+       width:250px;
+       height:250px;
+}
+.panel{
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+     border-top: 5px solid #0077b3;
+}
+.thumb img{
+width:100%;
+height: 150px;
+ border-radius:10px;
+    border:dashed 3px #A9A9A9;
+   padding:5px;
+    box-shadow: inset 0 0 0 5px white;
+}
+.pd_img{
+background: #eee;
+}
+
+.pd_img img{
+max-height: 500px;
+width: 700px;
+}
+.pd-img{
+height: 500px;
+}
+@media screen and (max-width: 768px) {
+  .pd_img img{
+max-height: auto;
+width: 100%;
+}
+}

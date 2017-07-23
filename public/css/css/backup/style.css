@@ -1,0 +1,43 @@
+
+.btn-sq-sm {
+  width: 90px !important;
+  height: 30px !important;
+  padding:5px;
+  margin:6px;
+}
+
+.btn {
+	margin :5px;
+}
+
+@media (max-width: 768px) {
+ .btn-sq-xs  {
+    padding:2px 4px;
+    font-size:80%;
+    line-height: 1;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+ .btn-sq-xs {
+    padding:5px;
+    font-size:auto;
+    line-height: 1.2;
+  }
+}
+.bg-warning {
+	  padding:5px;
+      height: 250px;
+      overflow-y: scroll; /* showing scrollbars */
+	  background-color:white;
+	 
+}
+
+
+.btn-sq-xs {
+  width: 30px !important;
+  height: 30px !important;
+  padding:5px;
+  margin:6px;
+}
+

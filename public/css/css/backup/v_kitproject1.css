@@ -1,0 +1,356 @@
+
+/*==================
+ COURSES PAGE
+====================*/
+
+#v_kit {
+  background-color: #f8f8f8;
+  display: inline;
+  float: left;
+  padding: 100px 0;
+  width: 100%;
+}
+#v_kit .v_kit-area {
+  display: inline;
+  float: left;
+  width: 100%;
+
+}
+#v_kit .v_kit-area .v_kit-container {
+  display: inline;
+  float: left;
+  width: 100%;
+      border:1px solid grey;
+
+}
+#v_kit .v_kit-area .v_kit-container .v_kit-single {
+  border: 1px solid #ccc;
+  margin-bottom: 30px;
+}
+#v_kit .v_kit-area .mu-sidebar {
+  display: inline;
+  float: left;
+  width: 100%;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar {
+  background-color: #FFF;
+  display: inline;
+  float: left;
+  margin-bottom: 25px;
+  padding: 0 10px 10px;
+  width: 100%;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-catg {
+  padding-left: 15px;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-catg li a {
+  color: #333;
+  display: inline-block;
+  font-size: 15px;
+  font-weight: normal;
+  padding: 5px 0 5px 15px;
+  position: relative;
+  text-transform: capitalize;
+  -webkit-transition: all 0.5s ease 0s;
+  -moz-transition: all 0.5s ease 0s;
+  -ms-transition: all 0.5s ease 0s;
+  -o-transition: all 0.5s ease 0s;
+  transition: all 0.5s ease 0s;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-catg li a:hover, #v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-catg li a:focus {
+  margin-left: 5px;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-catg li a:before {
+  content: "\f101";
+  font-family: FontAwesome;
+  left: 0;
+  position: absolute;
+  top: 5px;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-popular-courses {
+  display: inline;
+  float: left;
+  margin-top: 10px;
+  width: 100%;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-popular-courses .media .media-left .media-object {
+  width: 70px;
+  height: 60px;
+}
+
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-popular-courses .media .media-body .media-heading {
+  font-size: 16px;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-popular-courses .media .media-body .media-heading a {
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-popular-courses .media .media-body .popular-course-price {
+  font-size: 14px;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-archives li a:before {
+  content: '\f0da';
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .mu-sidebar-archives li a span {
+  margin-left: 5px;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .tag-cloud {
+  display: inline;
+  float: left;
+  margin-top: 5px;
+  width: 100%;
+}
+#v_kit .v_kit-area .mu-sidebar .mu-single-sidebar .tag-cloud a {
+  border-bottom: 1px solid #ccc;
+  display: inline-block;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+  margin: 0 5px 10px;
+  padding: 5px;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+#v_kit .v_kit-area .v_kit-details {
+  background-color: #FFF;
+}
+#v_kit .v_kit-area .v_kit-details .v_kit-single {
+  border: none;
+}
+#v_kit .v_kit-area .v_kit-details .v_kit-single img{
+  width:100%;
+  height: 500px;
+
+}
+
+#v_kit .v_kit-area .v_kit-details .v_kit-single .v_kit-imgcaption {
+  background-color: #FFF;
+}
+#v_kit .v_kit-area .v_kit-details .v_kit-single .v_kit-single-content h2 {
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+#v_kit .v_kit-area .v_kit-details .v_kit-single .v_kit-single-content h4 {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+}
+#v_kit .v_kit-area .v_kit-details .v_kit-single .v_kit-single-content p {
+  font-size: 15px;
+}
+#v_kit .v_kit-area .v_kit-details .v_kit-single .v_kit-single-content ul {
+  margin-bottom: 30px;
+}
+#v_kit .v_kit-area .v_kit-details .v_kit-single .v_kit-single-content ul li {
+  margin-bottom: 10px;
+}
+#v_kit .v_kit-area .v_kit-details .v_kit-single .v_kit-single-content ul li span:first-child {
+  display: inline-block;
+  min-width: 150px;
+  float: left;
+}
+#v_kit .v_kit-area .v_kit-details .v_kit-single .v_kit-single-content .table {
+  margin-top: 10px;
+}
+#v_kit .v_kit-area .v_kit-details .v_kit-single .v_kit-single-content img {
+  width:400px;
+  height:300px;
+ margin-left:20%;
+ border:2px solid grey; 
+ margin-bottom: 10px;
+}
+
+
+.mu-pagination {
+  display: inline;
+  float: left;
+  width: 100%;
+}
+.mu-pagination .pagination li:first-child a {
+  border-radius: 0;
+}
+.mu-pagination .pagination li:first-child a span {
+  margin-right: 5px;
+}
+.mu-pagination .pagination li:last-child a {
+  border-radius: 0;
+}
+.mu-pagination .pagination li:last-child a span {
+  margin-left: 5px;
+}
+.mu-pagination .pagination li a {
+  color: #333;
+  margin: 0 5px;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+.mu-pagination .pagination li a:hover, .mu-pagination .pagination li a:focus {
+  color: #fff;
+}
+.mu-pagination .pagination .active a {
+  color: #fff;
+}
+
+.mu-related-item {
+  display: inline;
+  float: left;
+  margin-top: 30px;
+  width: 100%;
+}
+.mu-related-item .mu-related-item-area {
+  margin-top: 30px;
+}
+.mu-related-item .mu-related-item-area .v_kit-single {
+  border: 1px solid #ccc;
+}
+.mu-related-item .mu-related-item-area .mu-blog-single-item {
+  background-color: #FFF;
+}
+.mu-related-item .mu-related-item-area .mu-blog-single-item .mu-blog-caption {
+  padding: 0 15px;
+}
+.mu-related-item .mu-related-item-area .mu-blog-single-item .mu-blog-meta {
+  padding: 0 15px;
+}
+.mu-related-item .mu-related-item-area .mu-blog-single-item .mu-blog-description {
+  padding: 0 15px 20px;
+}
+.mu-related-item .mu-related-item-area #mu-related-item-slide .slick-prev,
+.mu-related-item .mu-related-item-area #mu-related-item-slide .slick-next {
+  height: 50px;
+  width: 50px;
+    background-color: #01bafd;
+border-radius: 50px;
+}
+
+/*==================
+ LATEST COURSES SECTION
+====================*/
+.courses-fixed-top {
+  margin: 1cm 0cm 0cm 0cm;
+}
+#v_kits {
+  background-color: #333;
+  display: inline;
+  float: left;
+  padding: 100px 0;
+  width: 100%;
+}
+#v_kits .v_kits-area {
+  display: inline;
+  float: left;
+  width: 100%;
+}
+#v_kits .v_kits-area .mu-title h2 {
+  color: #fff;
+}
+#v_kits .v_kits-area .mu-title p {
+  color: #fff;
+}
+#v_kits .v_kits-area .v_kits-content {
+  display: inline;
+  float: left;
+  margin-top: 50px;
+  width: 100%;
+}
+#v_kits .v_kits-area .v_kits-content .slick-slide {
+  outline: none;
+}
+#v_kits .v_kits-area .v_kits-content .slick-dots li {
+  background-color: #fff;
+  border-radius: 4px;
+  height: 8px;
+  width: 20px;
+}
+#v_kits .v_kits-area .v_kits-content .slick-dots li button {
+  display: none;
+}
+
+.v_kit-single {
+  background-color: #fff;
+  display: inline;
+  float: left;
+  width: 100%;
+}
+.v_kit-single .v_kit-img {
+  display: inline;
+  float: left;
+  width: 100%;
+}
+.v_kit-single .v_kit-img a {
+  display: block;
+}
+.v_kit-single .v_kit-img a img {
+  width: 100%;
+}
+.v_kit-single .v_kit-img .v_kit-imgcaption {
+  background-color: #f8f8f8;
+  display: inline;
+  float: left;
+  padding: 10px 15px;
+  width: 100%;
+}
+.v_kit-single .v_kit-img .v_kit-imgcaption a {
+  display: inline-block;
+  float: left;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+.v_kit-single .v_kit-img 
+.v_kit-single .v_kit-single-content {
+  display: inline;
+  float: left;
+  width: 100%;
+  padding: 15px;
+}
+.v_kit-single .v_kit-single-content h4 {
+  color: #333;
+  line-height: 1.4;
+}
+.v_kit-single .v_kit-single-content h4 a {
+  color: #333;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+.v_kit-single .v_kit-single-content p {
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  line-height: 1.7;
+}
+.v_kit-single .v_kit-single-content .v_kit-single-contbottom {
+  border-top: 1px solid #ccc;
+  display: inline;
+  float: left;
+  margin-top: 15px;
+  padding-top: 15px;
+  width: 100%;
+}
+.v_kit-single .v_kit-single-content .v_kit-single-contbottom .v_kit-details {
+  display: inline-block;
+  float: left;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+.v_kit-single .v_kit-single-content .v_kit-single-contbottom .v_kit-details:hover, .v_kit-single .v_kit-single-content .v_kit-single-contbottom .v_kit-details:focus {
+  color: #333;
+}
+.v_kit-single .v_kit-single-content .v_kit-single-contbottom .v_kit-price {
+  display: inline-block;
+  float: right;
+}

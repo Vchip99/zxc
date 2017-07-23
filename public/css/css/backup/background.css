@@ -1,0 +1,104 @@
+
+/*==================
+ Background SECTION
+====================*/
+
+#mu-background{
+  display: inline;
+  float: left;
+  width: 100%;
+}
+#mu-background .mu-background-single {
+  display: inline;
+  float: left;
+  width: 100%;
+  position: relative;
+}
+#mu-background .mu-background-single .mu-background-img {
+  display: inline;
+  float: left;
+  width: 100%;
+  height: 500px;
+
+}/*
+#mu-background .mu-background-single .mu-background-img:after {
+  background-color: rgba(0, 0, 0, 0.2);
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}*/
+#mu-background .mu-background-single .mu-background-img figure {
+  height: 100%;
+  width: 100%;
+}
+#mu-background .mu-background-single .mu-background-img figure img {
+  width: 100%;
+  height: 100%;
+}
+#mu-background .mu-background-single .mu-background-content {
+  color: #fff;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 20%;
+  padding: 0 15%;
+  width: 100%;
+  text-align: center;
+  height: 100%;
+}
+/*Serach Box*/
+#mu-background .mu-background-single .searchBox {
+  color: #fff;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+    padding: 0 15%;
+
+  width: 100%;
+  text-align: center;
+
+}
+#mu-background .mu-background-single .searchBox button, .form-control, .text-muted{
+height: 50px;
+
+}
+
+/*end searchbox*/
+#mu-background .mu-background-single .mu-background-content h4 {
+  letter-spacing: 1px;
+  margin-bottom: 0;
+}
+#mu-background .mu-background-single .mu-background-content span {
+  display: inline-block;
+  height: 1px;
+  width: 100px;
+}
+#mu-background .mu-background-single .mu-background-content h2 {
+  font-size: 50px;
+  line-height: 80px;
+  margin-bottom: 10px;
+}
+#mu-background .mu-background-single .mu-background-content p {
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  line-height: 28px;
+}
+#mu-background .mu-background-single .mu-background-content a {
+  margin-top: 25px;
+}
+
+@media (max-width: 767px) {
+
+#mu-background .mu-background-single .mu-background-content h2 {
+  font-size: 30px;
+  line-height: 80px;
+  margin-bottom: 10px;
+    margin-top: 10px;
+
+}
+
+}

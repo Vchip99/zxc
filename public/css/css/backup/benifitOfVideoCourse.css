@@ -1,0 +1,133 @@
+/*==================
+ live-technology PAGE
+====================*/
+#live-technology {
+  display: inline;
+  float: left;
+  padding: 100px 0;
+  width: 100%;
+}
+#live-technology .live-technology-area {
+  display: inline;
+  float: left;
+  width: 100%;
+  text-align: center;
+}
+ .benefits-icon{
+    color:#000;
+    font-size: 80px;
+    text-align: center;
+      padding: 5px 10px;
+
+}
+ .icon{
+  padding: 5px 10px;
+    display: inline-block;
+    -moz-border-radius: 100px;
+    -webkit-border-radius: 100px;
+    border-radius: 100px;
+    -moz-box-shadow: 0px 0px 2px #888;
+    -webkit-box-shadow: 0px 0px 2px #888;
+    box-shadow: 0px 0px 2px #888;
+}
+#live-technology .live-technology-area p {
+  font-size: 22px;
+  text-align: center;
+}
+#live-technology .live-technology-area h2 {
+  line-height: 1.7;
+  color:#01bafd;
+}
+/*==================
+betterThanRecCourse
+====================*/
+#betterThanRecCourse {
+  display: inline;
+  float: left;
+  padding: 100px 0;
+  width: 100%;
+  height: auto;
+  background-color: #eee;
+}
+#betterThanRecCourse .betterThanRecCourse-area {
+  display: inline;
+  float: left;
+  width: 100%;
+  text-align: center;
+}
+#betterThanRecCourse .betterThanRecCourse-area p {
+  font-size: 22px;
+}
+#betterThanRecCourse .betterThanRecCourse-area h2 {
+  line-height: 1.7;
+  color:#000;
+}
+/*==================
+betterThanRecCourse
+====================*/
+#saveOnTime {
+  display: inline;
+  float: left;
+  padding: 100px 0;
+  width: 100%;
+
+}
+#saveOnTime .saveOnTime-area {
+  display: inline;
+  float: left;
+  width: 100%;
+  text-align: center;
+}
+#saveOnTime .saveOnTime-area p {
+  font-size: 22px;
+}
+#saveOnTime .saveOnTime-area h2 {
+  line-height: 1.7;
+  color:#01bafd;
+}
+/*==================
+ anytimeAnywhereLern PAGE
+====================*/
+#anytimeAnywhereLern {
+  display: inline;
+  float: left;
+  padding: 100px 0;
+  width: 100%;
+    background-color: #eee;
+
+}
+#anytimeAnywhereLern .anytimeAnywhereLern-area {
+  display: inline;
+  float: left;
+  width: 100%;
+  text-align: center;
+}
+#anytimeAnywhereLern .anytimeAnywhereLern-area p {
+  font-size: 22px;
+}
+#anytimeAnywhereLern .anytimeAnywhereLern-area h2 {
+  line-height: 1.7;
+  color:#000;
+}
+/*==================
+ anytimeAnywhereLern PAGE
+====================*/
+#safe {
+  display: inline;
+  float: left;
+  padding: 100px 0;
+  width: 100%;
+}
+#safe .safe-area {
+  display: inline;
+  float: left;
+  width: 100%;
+  text-align: center;
+}
+#safe .safe-area p {
+  font-size: 22px;
+}
+#safe .safe-area h2 {
+  line-height: 1.7;
+  color:#01bafd;
+}

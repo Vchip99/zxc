@@ -1,0 +1,240 @@
+li {list-style-type: none;}
+#feature h2{
+  color:#01bafd;
+font-weight: bold;
+}
+.hr{
+border: 0; height: 1px; background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgb(192,192,192), rgba(0, 0, 0, 0)); 
+}
+/*font Awesome http://fontawesome.io*/
+@import url(//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css);
+/*feature List styles*/
+.feature-list .row {
+  margin-bottom: 50px;
+}
+.panel{
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+     border-top: 5px solid #0077b3;
+
+
+}
+.feature-list .panel .panel-heading {
+  padding: 4px 15px;
+  position: absolute;
+  border:none;
+  /*Panel-heading border radius*/
+  border-top-right-radius:0px;
+  top: 1px;
+
+}
+.feature-list .panel .panel-heading.right {
+  border-right-width: 0px;
+  /*Panel-heading border radius*/
+  border-top-left-radius:0px;
+  right: 16px;
+}
+.feature-list .panel .panel-heading .panel-body {
+  padding-top: 6px;
+}
+ .panel-body h4{
+text-transform: uppercase;}
+.feature-list figcaption {
+  /*For wrapping text in thumbnail*/
+  word-wrap: break-word;
+}
+
+
+.feature-list .thumb img{
+width:100%;
+height: 150px;
+ border-radius:10px;
+    border:dashed 3px #A9A9A9;
+   padding:5px;
+    box-shadow: inset 0 0 0 5px white;
+}
+/* Portrait tablets and medium desktops */
+@media (min-width: 768px) {
+  .feature-list .arrow:after, .feature-list .arrow:before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: transparent;
+  }
+  .feature-list .panel.arrow.left:after, .feature-list .panel.arrow.left:before {
+    border-left: 0;
+  }
+  /*****Left Arrow*****/
+  /*Outline effect style*/
+  .feature-list .panel.arrow.left:before {
+    left: 0px;
+    top: 30px;
+    /*Use boarder color of panel*/
+    border-right-color: inherit;
+    border-width: 16px;
+  }
+  /*Background color effect*/
+  .feature-list .panel.arrow.left:after {
+    left: 1px;
+    top: 31px;
+    /*Change for different outline color*/
+    border-right-color: #FFFFFF;
+    border-width: 15px;
+  }
+  .thumb img{
+    width:300px;
+    height: 170px;
+    border-radius: 50%;
+    border:dashed 3px #A9A9A9;
+    padding:5px;
+    box-shadow: inset 0 0 0 5px white;
+}
+}
+.feature-list .feature-post {
+  margin-top: 6px;
+}
+.btn-sm{
+  background-color: #01bafd;
+}
+.btn-sm:hover{
+    background-color: #01bafd;
+}
+#classconnect {
+  background-color: #f8f8f8;
+  display: inline;
+  float: left;
+  padding: 100px 0;
+  width: 100%;
+}
+#classconnect .classconnect-area {
+  display: inline;
+  float: left;
+  width: 100%;
+
+}
+#classconnect .classconnect-area .classconnect-container {
+  display: inline;
+  float: left;
+  width: 100%;
+
+}
+#classconnect .classconnect-area .classconnect-container .classconnect-single .classconnect-single-content h2{
+  color:#01bafd;
+  font-weight: bold;
+}
+#classconnect .classconnect-area .classconnect-container .classconnect-single .classconnect-single-content p{
+  margin-top:20px;
+  font-family: FontAwesome;
+  margin-top: 20px; 
+ margin-bottom:20px;
+
+}
+#classconnect .classconnect-area .classconnect-container .classconnect-single .keyfeature h2, h3{
+  color:#01bafd;
+  font-weight: bold;
+}
+#classconnect .classconnect-area .classconnect-container .classconnect-single .keyfeature img{margin-top:20px;
+ margin-bottom:20px;
+
+}
+#classconnect .classconnect-area .classconnect-container .classconnect-single .keyfeature  li  {
+  content: '\f0da';
+    font-family: FontAwesome;
+
+}
+/* sidemenu*/
+
+#classconnect .classconnect-area .mu-sidebar {
+  display: inline;
+  float: left;
+  width: 100%;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar {
+  background-color: #FFF;
+  display: inline;
+  float: left;
+  margin-bottom: 25px;
+  padding: 0 10px 10px;
+  width: 100%;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-catg {
+  padding-left: 15px;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-catg li a {
+  color: #333;
+  display: inline-block;
+  font-size: 15px;
+  font-weight: normal;
+  padding: 5px 0 5px 15px;
+  position: relative;
+  text-transform: capitalize;
+  -webkit-transition: all 0.5s ease 0s;
+  -moz-transition: all 0.5s ease 0s;
+  -ms-transition: all 0.5s ease 0s;
+  -o-transition: all 0.5s ease 0s;
+  transition: all 0.5s ease 0s;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-catg li a:hover, #classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-catg li a:focus {
+  margin-left: 5px;
+        background-color: #ddd;
+
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-catg li a:before {
+  content: "\f101";
+  font-family: FontAwesome;
+  left: 0;
+  position: absolute;
+  top: 5px;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-popular-courses {
+  display: inline;
+  float: left;
+  margin-top: 10px;
+  width: 100%;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-popular-courses .media .media-left .media-object {
+  width: 70px;
+  height: 60px;
+}
+
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-popular-courses .media .media-body .media-heading {
+  font-size: 16px;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-popular-courses .media .media-body .media-heading a {
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-popular-courses .media .media-body .popular-course-price {
+  font-size: 14px;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-archives li a:before {
+  content: '\f0da';
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .mu-sidebar-archives li a span {
+  margin-left: 5px;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .tag-cloud {
+  display: inline;
+  float: left;
+  margin-top: 5px;
+  width: 100%;
+}
+#classconnect .classconnect-area .mu-sidebar .mu-single-sidebar .tag-cloud a {
+  border-bottom: 1px solid #ccc;
+  display: inline-block;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+  margin: 0 5px 10px;
+  padding: 5px;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+

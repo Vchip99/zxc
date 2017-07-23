@@ -1,0 +1,162 @@
+div.accordion {
+
+
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-size: 20px;
+    transition: 0.4s;
+      padding: 10px 0px 10px 10px;
+      margin-top: 10px;
+     font-size: 1.1em;
+}
+.accordion-title
+{
+
+
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-size: 30px;
+    transition: 0.4s;
+      padding: 10px 0px 10px 10px;
+      margin-top: 10px;
+     font-size: 1.1em;
+}
+div.accordion:after {
+
+    content: '\002B';/* Unicode character for "plus" sign (+) */
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+    border-radius: 10px;
+font-size:20px;
+color:#0077b3;
+
+}
+
+div.accordion.active:after {
+    content: "\2212";/* Unicode character for "minus" sign (-) */
+}
+
+div.panel {
+    padding:0px;
+    background-color: white;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    border-bottom:2px solid #ddd;
+}
+/*serch box*/
+
+#custom-search-input{
+  margin-top: 100px;
+    padding: 3px;
+    border: solid 1px #E4E4E4;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+#custom-search-input input{
+    border: 0;
+    box-shadow: none;
+}
+
+#custom-search-input button{
+    margin: 2px 0 0 0;
+    background: none;
+    box-shadow: none;
+    border: 0;
+    color: #666666;
+    padding: 0 8px 0 10px;
+    border-left: solid 1px #ccc;
+}
+
+#custom-search-input button:hover{
+    border: 0;
+    box-shadow: none;
+    border-left: solid 1px #ccc;
+}
+
+#custom-search-input .fa-search{
+    font-size: 23px;
+}
+.dropdown{
+  margin-bottom: 20px;
+}
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px;
+    border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+    display: block;
+}
+
+.dropdown-submenu>a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+
+.dropdown-submenu:hover>a:after {
+    border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+    left: -100%;
+    margin-left: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
+}
+.topleft {
+    position: absolute;
+    top: 8px;
+    left: 16px;
+    font-size: 19px;
+  padding: 2px 1px;
+  padding-left: 10px;
+  margin-left: -10px;
+  background: #87CEFA;
+    width:100px;
+}
+.topleft:before {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 9px 9px;
+  border-color: transparent transparent #87CEFA transparent;
+}
+
+@media screen and (max-width: 768px) {
+.topleft {
+display:none;
+}
+/* Style The Dropdown Button */
