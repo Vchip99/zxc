@@ -11,6 +11,7 @@ use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestSubjectPaper;
+use App\Models\ClientInstituteCourse;
 
 class ClientOnlineTestSubjectPaperController extends ClientBaseController
 {
@@ -27,6 +28,7 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validatePaper = [
+        'institute_course' => 'required|integer',
         'category' => 'required|integer',
         'subcategory' => 'required|integer',
         'subject' => 'required|integer',
@@ -50,11 +52,13 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
      *  show create UI for paper
      */
     protected function create(Request $request){
-    	$testCategories    = ClientOnlineTestCategory::showCategories($request);
+        $clientId = Auth::guard('client')->user()->id;
+        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
+    	$testCategories    = new ClientOnlineTestCategory;
 		$testSubCategories = new ClientOnlineTestSubCategory;
 		$testSubjects = new ClientOnlineTestSubject;
 		$paper = new ClientOnlineTestSubjectPaper;
-    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper'));
+    	return view('client.onlineTest.paper.create', compact('instituteCourses','testCategories','testSubCategories','testSubjects', 'paper'));
     }
 
     /**
@@ -92,10 +96,11 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     	if(isset($id)){
     		$paper = ClientOnlineTestSubjectPaper::find($id);
     		if(is_object($paper)){
+                $instituteCourses = ClientInstituteCourse::where('client_id', $paper->client_institute_course_id)->get();
     			$testCategories    = ClientOnlineTestCategory::showCategories($request);
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($paper->category_id, $request);
 				$testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId($paper->category_id, $paper->sub_category_id, $request);
-		    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper'));
+		    	return view('client.onlineTest.paper.create', compact('instituteCourses','testCategories','testSubCategories','testSubjects', 'paper'));
     		}
     	}
 		return Redirect::to('manageOnlineTestSubjectPaper');

@@ -69,7 +69,7 @@
       <div class="container">
         <div class="row text-center">
           <div class="mrgn_20_btm" id="video">
-            <button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_video"><i class="fa fa-book" >
+            <button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_video" onClick="toggleVideo();"><i class="fa fa-book" >
               @if(is_object($selectedStudent) && $selectedStudent->recorded_video)
                 Recorded Video of Student
               @else
@@ -80,11 +80,11 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <button class="close" data-dismiss="modal">×</button>
+                    <button class="close" data-dismiss="modal" onClick="toggleVideo('hide');">×</button>
                     <h2  class="modal-title">Recorded Video</h2>
                   </div>
                   <div class="modal-body">
-                    <div class="iframe-container">
+                    <div id="iframe-video" class="iframe-container">
                       @if(is_object($selectedStudent) && $selectedStudent->recorded_video)
                          {!! $selectedStudent->recorded_video !!}
                       @else
@@ -182,13 +182,13 @@
       var divResume = document.getElementById('resume');
       divResume.innerHTML = '';
       if(msg){
-        var videoInnerHTML = '<button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_video"><i class="fa fa-book" >';
+        var videoInnerHTML = '<button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_video" onClick="toggleVideo();"><i class="fa fa-book" >';
         if(msg.recorded_video){
           videoInnerHTML += 'Recorded Video of Student';
         } else {
           videoInnerHTML += 'Video of Student is not uploaded';
         }
-        videoInnerHTML += '</i></button><div id="student_video" class="modal fade" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button><h2  class="modal-title">Recorded Video</h2></div><div class="modal-body"><div class="iframe-container">';
+        videoInnerHTML += '</i></button><div id="student_video" class="modal fade" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal" onClick="toggleVideo(\'hide\');">×</button><h2  class="modal-title">Recorded Video</h2></div><div class="modal-body"><div class="iframe-container" id="iframe-video">';
         if(msg.recorded_video){
           videoInnerHTML += msg.recorded_video;
         } else {
@@ -216,5 +216,15 @@
 
     });
   }
+
+  function toggleVideo(state) {
+    // if state == 'hide', hide. Else: show video
+    var div = document.getElementById("iframe-video");
+    var iframe = div.getElementsByTagName("iframe")[0].contentWindow;
+    func = state == 'hide' ? 'pauseVideo' : 'playVideo';
+    iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
+  }
 </script>
 @stop
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/9yUAwDjRA54?enablejsapi=1&loop=1&playlist=9yUAwDjRA54" frameborder="0" allowfullscreen></iframe>

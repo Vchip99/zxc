@@ -212,7 +212,21 @@ class AllUsersInfoController extends Controller
     protected function updateStudentVideo(Request $request){
         $student = User::find($request->student);
         if(is_object($student)){
-            $student->recorded_video = $request->recorded_video;
+
+            $dom = new \DOMDocument;
+            $dom->loadHTML($request->recorded_video);
+            $iframes = $dom->getElementsByTagName('iframe');
+            foreach ($iframes as $iframe) {
+                $url =  '?enablejsapi=1';
+                if (strpos($iframe->getAttribute('src'), $url) === false) {
+                    $iframe->setAttribute('src', $iframe->getAttribute('src').$url);
+                }
+            }
+            $html = $dom->saveHTML();
+            $body = explode('<body>', $html);
+            $body = explode('</body>', $body[1]);
+
+            $student->recorded_video = $body[0];
             $student->save();
             Session::set('admin_selected_user', $student->id);
             Session::set('admin_selected_user_type', $student->user_type);

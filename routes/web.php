@@ -221,7 +221,13 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('updateAllSubComment',  'PostCommentController@updateAllSubComment');
 	Route::delete('deleteAllSubComment',  'PostCommentController@deleteAllSubComment');
 
-
+	//Discussion category
+	Route::get('admin/manageDiscussionCategory', 'Discussion\DiscussionCategoryController@show');
+	Route::get('admin/createDiscussionCategory', 'Discussion\DiscussionCategoryController@create');
+	Route::post('admin/createDiscussionCategory', 'Discussion\DiscussionCategoryController@store');
+	Route::get('admin/discussionCategory/{id}/edit', 'Discussion\DiscussionCategoryController@edit');
+	Route::put('admin/updateDiscussionCategory', 'Discussion\DiscussionCategoryController@update');
+	Route::delete('admin/deleteDiscussionCategory', 'Discussion\DiscussionCategoryController@delete');
 
 	// admin  vkit category
 	Route::get('admin/manageVkitCategory', 'Vkit\VkitCategoryController@show');
@@ -440,6 +446,21 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('verifyAccount', 'Client\ClientHomeController@verifyAccount');
   	Route::post('verifyClientEmail', 'Client\ClientHomeController@verifyClientEmail');
 
+  	// client institute courses
+  	Route::get('manageInstituteCourses', 'Client\InstituteCourse\ClientInstituteCourseController@show');
+  	Route::get('createClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@create');
+  	Route::post('createClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@store');
+  	Route::get('clientInstituteCourse/{id}/edit', 'Client\InstituteCourse\ClientInstituteCourseController@edit');
+  	Route::put('updateClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@update');
+  	Route::delete('deleteClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@delete');
+
+  	// client users info
+  	Route::get('allUsers', 'Client\ClientUsersInfoController@allUsers');
+  	Route::post('searchUsers', 'Client\ClientUsersInfoController@searchUsers');
+  	Route::post('changeClientPermissionStatus', 'Client\ClientUsersInfoController@changeClientPermissionStatus');
+  	Route::post('deleteStudent', 'Client\ClientUsersInfoController@deleteStudent');
+
+
 
   	// register client user
   	Route::post('/register', 'ClientuserAuth\RegisterController@register');
@@ -466,6 +487,8 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('onlinesubcategory/{id}/edit', 'Client\OnlineCourse\ClientOnlineSubCategoryController@edit');
   	Route::put('updateOnlineSubCategory', 'Client\OnlineCourse\ClientOnlineSubCategoryController@update');
   	Route::delete('deleteOnlineSubCategory', 'Client\OnlineCourse\ClientOnlineSubCategoryController@delete');
+  	Route::post('getOnlineCategories', 'Client\OnlineCourse\ClientOnlineSubCategoryController@getOnlineCategories');
+
 
   	// Online course
   	Route::get('manageOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@show');
@@ -474,7 +497,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('onlinecourse/{id}/edit', 'Client\OnlineCourse\ClientOnlineCourseController@edit');
   	Route::put('updateOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@update');
   	Route::delete('deleteOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@delete');
-
 
   	// Online video
   	Route::get('manageOnlineVideo', 'Client\OnlineCourse\ClientOnlineVideoController@show');
@@ -499,6 +521,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('onlinetestsubcategory/{id}/edit', 'Client\OnlineTest\ClientOnlineTestSubCategoryController@edit');
   	Route::put('updateOnlineTestSubCategory', 'Client\OnlineTest\ClientOnlineTestSubCategoryController@update');
   	Route::delete('deleteOnlineTestSubCategory', 'Client\OnlineTest\ClientOnlineTestSubCategoryController@delete');
+  	Route::post('getOnlineTestCategories', 'Client\OnlineTest\ClientOnlineTestSubCategoryController@getOnlineTestCategories');
 
   	// test subject
   	Route::get('manageOnlineTestSubject', 'Client\OnlineTest\ClientOnlineTestSubjectController@show');

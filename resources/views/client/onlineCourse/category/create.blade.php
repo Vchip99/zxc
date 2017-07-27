@@ -20,6 +20,24 @@
   @endif
 
     {{ csrf_field() }}
+    <div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
+      <label class="col-sm-2 col-form-label">Institute Course Name:</label>
+      <div class="col-sm-3">
+        <select class="form-control" name="institute_course" required title="Category">
+            <option value="">Select Institute Course ...</option>
+            @if(count($instituteCourses) > 0)
+              @foreach($instituteCourses as $instituteCourse)
+                @if( $category->client_institute_course_id == $instituteCourse->id)
+                  <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
+                @else
+                  <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
+                @endif
+              @endforeach
+            @endif
+          </select>
+          @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
+      </div>
+    </div>
     <div class="form-group row  @if ($errors->has('category')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="category">Category Name:</label>
       <div class="col-sm-3">

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\DiscussionPost;
 use App\Models\DiscussionComment;
 use App\Models\User;
+use App\Models\DiscussionSubCommentLike;
 use Auth;
 
 class DiscussionSubComment extends Model
@@ -49,5 +50,9 @@ class DiscussionSubComment extends Model
         $comment->user_id = Auth::user()->id;
         $comment->save();
         return $comment;
+    }
+
+    public function deleteLikes(){
+        return $this->hasMany(DiscussionSubCommentLike::class, 'discussion_sub_comment_id');
     }
 }

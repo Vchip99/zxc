@@ -10,6 +10,7 @@ use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineSubCategory;
 use App\Models\RegisterClientOnlineCourses;
 use App\Models\ClientOnlineVideo;
+use App\Models\ClientInstituteCourse;
 
 class ClientOnlineCourse extends Model
 {
@@ -21,12 +22,13 @@ class ClientOnlineCourse extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path', 'release_date', 'client_id'];
+    protected $fillable = ['name', 'category_id', 'sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path', 'release_date', 'client_id', 'client_institute_course_id'];
 
     /**
      *  create/update course
      */
     protected static function addOrUpdateCourse(Request $request, $isUpdate = false){
+        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
     	$categoryId = InputSanitise::inputInt($request->get('category'));
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
         $courseName = InputSanitise::inputString($request->get('course'));
@@ -97,6 +99,7 @@ class ClientOnlineCourse extends Model
 
     	$course->release_date = $release_date;
     	$course->client_id = Auth::guard('client')->user()->id;
+        $course->client_institute_course_id = $instituteCourseId;
     	$course->save();
     	return $course;
 
@@ -118,6 +121,10 @@ class ClientOnlineCourse extends Model
 
     public function videos(){
         return $this->hasMany(ClientOnlineVideo::class, 'course_id');
+    }
+
+    public function instituteCourse(){
+        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
     }
 
     protected static function getCourseAssocaitedWithVideos($subdomain){
@@ -182,8 +189,7 @@ class ClientOnlineCourse extends Model
             $client = InputSanitise::getCurrentClient($request);
         }
 
-        $result = DB::connection('mysql2')->table('client_online_courses')
-                ->join('client_online_categories', 'client_online_categories.id', '=', 'client_online_courses.category_id')
+        $result = static::join('client_online_categories', 'client_online_categories.id', '=', 'client_online_courses.category_id')
                 ->join('client_online_sub_categories', 'client_online_sub_categories.id', '=', 'client_online_courses.sub_category_id');
         if($withVideo == true){
             $result->join('client_online_videos', 'client_online_videos.course_id', '=', 'client_online_courses.id');

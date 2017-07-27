@@ -17,6 +17,7 @@ class CreateClientOnlineTestCategoriesTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->integer('client_id')->unsigned();
+            $table->integer('client_institute_course_id')->unsigned();
             $table->timestamps();
         });
     }

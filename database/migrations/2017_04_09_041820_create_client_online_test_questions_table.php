@@ -15,7 +15,7 @@ class CreateClientOnlineTestQuestionsTable extends Migration
     {
         Schema::connection('mysql2')->create('client_online_test_questions', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->text('name');
             $table->text('answer1');
             $table->text('answer2');
             $table->text('answer3');
@@ -35,6 +35,7 @@ class CreateClientOnlineTestQuestionsTable extends Migration
             $table->integer('subject_id')->unsigned();
             $table->integer('paper_id')->unsigned();
             $table->integer('client_id')->unsigned();
+            $table->integer('client_institute_course_id')->unsigned();
             $table->timestamps();
         });
     }

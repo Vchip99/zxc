@@ -34,17 +34,11 @@
           <div class="dropdown mrgn_20_top_btm" id="cat">
             <select id="category" class="form-control" name="category" title="Category" onChange="showPosts(this);" required>
               <option value = "0"> Select Category ...</option>
-              <option value = "1"> Discussion</option>
-              <!-- @if(count($postCategoryIds) > 0)
-                @foreach($postCategoryIds as $postCategoryId)
-                  @if( 1 == $postCategoryId)
-                    <option value = "1"> CERTIFIED-COURSES</option>
-                  @endif
-                  @if( 2 == $postCategoryId)
-                    <option value = "2"> NON-CERTIFIED-COURSES</option>
-                  @endif
+              @if(count($discussionCategories) > 0)
+                @foreach($discussionCategories as $discussionCategory)
+                  <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
                 @endforeach
-              @endif -->
+              @endif
             </select>
           </div>
           <h4 class="v_h4_subtitle mrgn_20_top_btm"> Filter By</h4>
@@ -254,9 +248,11 @@
                     <div class="dropdown selectCategory col-md-6">
                       <select id="post_category" class="form-control" name="post_category" required>
                         <option value = ""> Select Category ...</option>
-                        <option value = "1"> Discussion</option>
-                        <!--<option value = "1"> CERTIFIED-COURSES</option>
-                        <option value = "2"> NON-CERTIFIED-COURSES</option> -->
+                        @if(count($discussionCategories) > 0)
+                          @foreach($discussionCategories as $discussionCategory)
+                            <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
+                          @endforeach
+                        @endif
                       </select>
                     </div>
                     <div class="widget-area ">

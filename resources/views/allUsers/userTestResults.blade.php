@@ -70,10 +70,12 @@
                 <option value="0"> Select User </option>
                  @if(is_object($selectedStudent) && count($students) > 0)
                   @foreach($students as $student)
-                    @if($selectedStudent->id == $student->id)
-                      <option value="{{$student->id}}" selected="true"> {{$student->name}} </option>
-                    @else
-                      <option value="{{$student->id}}"> {{$student->name}} </option>
+                    @if($selectedStudent->year == $student->year)
+                      @if($selectedStudent->id == $student->id)
+                        <option value="{{$student->id}}" selected="true"> {{$student->name}} </option>
+                      @else
+                        <option value="{{$student->id}}"> {{$student->name}} </option>
+                      @endif
                     @endif
                   @endforeach
                 @endif

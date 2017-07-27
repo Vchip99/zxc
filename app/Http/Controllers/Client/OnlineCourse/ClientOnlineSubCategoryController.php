@@ -9,6 +9,7 @@ use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineSubCategory;
+use App\Models\ClientInstituteCourse;
 
 class ClientOnlineSubCategoryController extends ClientBaseController
 {
@@ -25,6 +26,7 @@ class ClientOnlineSubCategoryController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateSubcategory = [
+        'institute_course' => 'required|integer',
         'category' => 'required|integer',
         'subcategory' => 'required|string',
     ];
@@ -45,9 +47,11 @@ class ClientOnlineSubCategoryController extends ClientBaseController
      *  show create category UI
      */
     protected function create(Request $request){
-    	$categories = ClientOnlineCategory::showCategories($request);
+        $clientId = Auth::guard('client')->user()->id;
+        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
+    	$categories = [];
     	$subcategory = new ClientOnlineSubCategory;
-    	return view('client.onlineCourse.subcategory.create', compact('subcategory', 'categories'));
+    	return view('client.onlineCourse.subcategory.create', compact('instituteCourses','subcategory','categories'));
     }
 
     /**
@@ -158,5 +162,9 @@ class ClientOnlineSubCategoryController extends ClientBaseController
     		}
     	}
     	return Redirect::to('manageOnlineSubCategory');
+    }
+
+    protected function getOnlineCategories(Request $request){
+        return ClientOnlineCategory::getCategoriesByInstituteCourseId($request->get('id'));
     }
 }

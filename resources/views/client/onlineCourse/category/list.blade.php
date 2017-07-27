@@ -28,6 +28,7 @@
           <tr>
             <th>#</th>
             <th>Category Name</th>
+            <th>Institute Course Name</th>
             <th>Edit Category</th>
             <th>Delete Category</th>
           </tr>
@@ -38,6 +39,7 @@
             <tr>
               <th scope="row">{{ $index + 1 }}</th>
               <td>{{$category->name}}</td>
+              <td>{{$category->instituteCourse->name}}</td>
               <td>
                 <a href="{{url('onlinecategory')}}/{{$category->id}}/edit"
                       ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$category->name}}" />
@@ -56,7 +58,7 @@
             </tr>
             @endforeach
           @else
-            <tr><td>No categories are created.</td></tr>
+            <tr><td colspan="5">No categories are created.</td></tr>
           @endif
         </tbody>
       </table>

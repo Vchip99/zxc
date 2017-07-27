@@ -45,4 +45,14 @@ class RegisterClientOnlineCourses extends Model
         }
         return 'false';
     }
+
+    protected static function deleteRegisteredOnlineCoursesByUserId($userId,$clientId){
+        $courses = static::where('client_user_id', $userId)->where('client_id', $clientId)->get();
+        if(is_object($courses) && false == $courses->isEmpty()){
+            foreach($courses as $course){
+                $course->delete();
+            }
+        }
+        return;
+    }
 }

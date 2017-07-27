@@ -9,6 +9,7 @@ use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
+use App\Models\ClientInstituteCourse;
 
 class ClientOnlineTestSubCategoryController extends ClientBaseController
 {
@@ -25,12 +26,14 @@ class ClientOnlineTestSubCategoryController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateCreateSubcategory = [
+        'institute_course' => 'required|integer',
         'category' => 'required',
         'name' => 'required',
         'image_path' => 'required',
     ];
 
     protected $validateUpdateSubcategory = [
+        'institute_course' => 'required|integer',
         'category' => 'required',
         'name' => 'required',
     ];
@@ -51,9 +54,11 @@ class ClientOnlineTestSubCategoryController extends ClientBaseController
      *  show create UI for sub category
      */
     protected function create(Request $request){
-        $testCategories = ClientOnlineTestCategory::showCategories($request);
+        $clientId = Auth::guard('client')->user()->id;
+        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
+        $testCategories = new ClientOnlineTestCategory;
         $testSubcategory = new ClientOnlineTestSubCategory;
-        return view('client.onlineTest.subcategory.create', compact('testCategories', 'testSubcategory'));
+        return view('client.onlineTest.subcategory.create', compact('instituteCourses','testCategories', 'testSubcategory'));
     }
 
     /**
@@ -90,8 +95,9 @@ class ClientOnlineTestSubCategoryController extends ClientBaseController
         if(isset($id)){
             $testSubcategory = ClientOnlineTestSubCategory::find($id);
             if(is_object($testSubcategory)){
+                $instituteCourses = ClientInstituteCourse::where('client_id', $testSubcategory->client_institute_course_id)->get();
                 $testCategories = ClientOnlineTestCategory::all();
-                return view('client.onlineTest.subcategory.create', compact('testCategories', 'testSubcategory'));
+                return view('client.onlineTest.subcategory.create', compact('instituteCourses','testCategories', 'testSubcategory'));
             }
         }
         return Redirect::to('manageOnlineTestSubCategory');
@@ -168,5 +174,9 @@ class ClientOnlineTestSubCategoryController extends ClientBaseController
             }
         }
         return Redirect::to('manageOnlineTestSubCategory');
+    }
+
+    protected function getOnlineTestCategories(Request $request){
+        return ClientOnlineTestCategory::getCategoriesByInstituteCourseId($request->get('id'));
     }
 }

@@ -70,10 +70,12 @@
                 <option value="0"> Select User </option>
                  @if(is_object($selectedStudent) && count($students) > 0)
                   @foreach($students as $student)
-                    @if($selectedStudent->id == $student->id)
-                      <option value="{{$student->id}}" selected="true"> {{$student->name}} </option>
-                    @else
-                      <option value="{{$student->id}}"> {{$student->name}} </option>
+                    @if($selectedStudent->year == $student->year)
+                      @if($selectedStudent->id == $student->id)
+                        <option value="{{$student->id}}" selected="true"> {{$student->name}} </option>
+                      @else
+                        <option value="{{$student->id}}"> {{$student->name}} </option>
+                      @endif
                     @endif
                   @endforeach
                 @endif
@@ -86,9 +88,9 @@
       <div class="container">
         <div class="row text-center">
           <div class="mrgn_20_btm" id="video">
-            <button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_video"><i class="fa fa-book" >
+            <button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_video" onClick="toggleVideo();"><i class="fa fa-book" >
               @if(is_object($selectedStudent) && $selectedStudent->recorded_video)
-                Recorded Video of Student
+                Recorded Video of User
               @else
                 Video of User is not uploaded
               @endif
@@ -97,11 +99,11 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <button class="close" data-dismiss="modal">×</button>
+                    <button class="close" data-dismiss="modal" onClick="toggleVideo('hide');">×</button>
                     <h2  class="modal-title">Recorded Video</h2>
                   </div>
                   <div class="modal-body">
-                    <div class="iframe-container">
+                    <div id="iframe-video" class="iframe-container">
                       @if(is_object($selectedStudent) && $selectedStudent->recorded_video)
                         {!! $selectedStudent->recorded_video !!}
                       @else
@@ -166,13 +168,13 @@ function showResult(ele){
       var divResume = document.getElementById('resume');
       divResume.innerHTML = '';
       if(msg){
-        var videoInnerHTML = '<button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_video"><i class="fa fa-book" >';
+        var videoInnerHTML = '<button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_video" onClick="toggleVideo();"><i class="fa fa-book" >';
         if(msg.recorded_video){
           videoInnerHTML += 'Recorded Video of User';
         } else {
           videoInnerHTML += 'Video of User is not uploaded';
         }
-        videoInnerHTML += '</i></button><div id="student_video" class="modal fade" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button><h2  class="modal-title">Recorded Video</h2></div><div class="modal-body"><div class="iframe-container">';
+        videoInnerHTML += '</i></button><div id="student_video" class="modal fade" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal" onClick="toggleVideo(\'hide\');">×</button><h2  class="modal-title">Recorded Video</h2></div><div class="modal-body"><div id="iframe-video" class="iframe-container">';
         if(msg.recorded_video){
           videoInnerHTML += msg.recorded_video;
         } else {
@@ -281,6 +283,14 @@ function showResult(ele){
     opt.value = '0';
     opt.innerHTML = 'Select User';
     select.appendChild(opt);
+  }
+
+  function toggleVideo(state) {
+    // if state == 'hide', hide. Else: show video
+    var div = document.getElementById("iframe-video");
+    var iframe = div.getElementsByTagName("iframe")[0].contentWindow;
+    func = state == 'hide' ? 'pauseVideo' : 'playVideo';
+    iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
   }
 </script>
 @stop

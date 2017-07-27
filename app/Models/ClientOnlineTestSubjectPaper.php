@@ -11,6 +11,7 @@ use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\RegisterClientOnlinePaper;
+use App\Models\ClientInstituteCourse;
 
 class ClientOnlineTestSubjectPaper extends Model
 {
@@ -22,7 +23,7 @@ class ClientOnlineTestSubjectPaper extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'sub_category_id', 'subject_id', 'price', 'date_to_active', 'time','client_id'];
+    protected $fillable = ['name', 'category_id', 'sub_category_id', 'subject_id', 'price', 'date_to_active', 'time','client_id', 'client_institute_course_id'];
 
     /**
      *  add/update paper
@@ -37,6 +38,7 @@ class ClientOnlineTestSubjectPaper extends Model
         $price = InputSanitise::inputInt($request->get('price'));
         $dateToActive = $request->get('date_to_active');
         $time = strip_tags(trim($request->get('time')));
+        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
 
         if( $isUpdate && isset($paperId)){
             $paper = static::find($paperId);
@@ -55,6 +57,7 @@ class ClientOnlineTestSubjectPaper extends Model
         $paper->date_to_active = $dateToActive;
         $paper->time = $time;
         $paper->client_id = Auth::guard('client')->user()->id;
+        $paper->client_institute_course_id = $instituteCourseId;
         $paper->save();
 
         return $paper;
@@ -83,6 +86,10 @@ class ClientOnlineTestSubjectPaper extends Model
 
     public function questions(){
         return $this->hasMany(ClientOnlineTestQuestion::class, 'paper_id');
+    }
+
+    public function instituteCourse(){
+        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
     }
 
     protected static function getOnlinePapersBySubjectId($subjectId){

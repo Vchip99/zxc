@@ -18,7 +18,7 @@ class AdminBlogCategoryController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageBlogCategory')){
+                if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageBlog')){
                     return $next($request);
                 }
             }

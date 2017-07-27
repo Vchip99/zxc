@@ -153,6 +153,20 @@
           </ul>
         </li>
         @endif
+        @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageDiscussion'))
+          <li class="treeview">
+            <a href="#" title="Discussion">
+              <i class="fa fa-comments-o"></i> <span>Discussion</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Manage Discussion Category"><a href="{{ url('admin/manageDiscussionCategory')}}"><i class="fa fa-circle-o"></i> Discussion Category </a></li>
+              <!-- <li title="Manage Discussion"><a href="{{ url('admin/manageDiscussion')}}"><i class="fa fa-circle-o"></i> Manage Discussion </a></li> -->
+            </ul>
+          </li>
+        @endif
         @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageBlog'))
           <li class="treeview">
             <a href="#" title="Blog">

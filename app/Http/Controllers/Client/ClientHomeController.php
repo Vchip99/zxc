@@ -14,6 +14,7 @@ use App\Models\ClientTeam;
 use App\Models\ClientCustomer;
 use App\Models\Clientuser;
 use App\Models\Client;
+use App\Models\ClientInstituteCourse;
 use App\Mail\ClientUserEmailVerification;
 use App\Libraries\InputSanitise;
 
@@ -42,6 +43,7 @@ class ClientHomeController extends Controller
         //     return Redirect::away($subUrl);
         //     // dd(new RedirectResponse($subUrl));
         // }
+
         return view('client.home');
     }
 
@@ -57,8 +59,8 @@ class ClientHomeController extends Controller
             $testimonials = ClientTestimonial::getClientTestimonials($subdomain->subdomain);
             $clientTeam = ClientTeam::getClientTeam($subdomain->subdomain);
             $clientCustomers = ClientCustomer::getClientCustomer($subdomain->subdomain);
-
-            return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers'));
+            $courses = ClientInstituteCourse::where('client_id', $subdomain->client_id)->get();
+            return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers', 'courses'));
         } else {
             return Redirect::away('http://localvchip.com');
         }
@@ -99,4 +101,6 @@ class ClientHomeController extends Controller
         }
         return redirect()->back()->withErrors(['Please enter email id.']);
     }
+
+
 }
