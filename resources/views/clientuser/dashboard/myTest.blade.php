@@ -226,7 +226,7 @@
       }
     }
 
-    function selectSubcategory(ele){
+  function selectSubcategory(ele){
     id = parseInt($(ele).val());
     var userId = parseInt(document.getElementById('user_id').value);
     if( 0 < id && 0 < userId ){

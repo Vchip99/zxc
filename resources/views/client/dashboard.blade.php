@@ -216,6 +216,18 @@
             </ul>
         </li>
         <li class="header">Vchip TECHNOLOGY</li>
+        <li class="treeview">
+          <a href="#" title="Institute Courses">
+            <i class="fa fa-files-o"></i>
+            <span>Institute Courses</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Manage Courses"><a href="{{ url('manageInstituteCourses')}}"><i class="fa fa-circle-o"></i> Manage Courses </a></li>
+          </ul>
+        </li>
         @if(1 == $client->course_permission)
         <li class="treeview ">
           <a href="#" title="Online Courses">
@@ -250,6 +262,19 @@
           </ul>
         </li>
         @endif
+        <li class="treeview">
+            <a href="#" title="Users Info">
+              <i class="fa fa-group"></i> <span>Users Info</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Show All Users "><a href="{{ url('allUsers')}}"><i class="fa fa-circle-o"></i> All Users </a></li>
+              <li title="Show Users Test Results"><a href="{{ url('userTestResults')}}"><i class="fa fa-circle-o"></i> User Test Results </a></li>
+              <li title="Show User Courses"><a href="{{ url('userCourses')}}"><i class="fa fa-circle-o"></i> User Courses </a></li>
+            </ul>
+          </li>
         <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-dashboard"></i> <span>Home</span></a></li>
         <li class="header">LABELS</li>
         <li title="Logout">

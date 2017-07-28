@@ -52,6 +52,7 @@
           $('.alert-success').fadeOut('fast');
         }, 10000);
     });
+
 </script>
 </body>
 </html>

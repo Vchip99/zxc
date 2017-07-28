@@ -1,10 +1,10 @@
 @extends('dashboard.dashboard')
 @section('module_title')
   <section class="content-header">
-    <h1> Courses </h1>
+    <h1> Course Results </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Students Dashboard</li>
-      <li class="active">Courses </li>
+      <li><i class="fa fa-dashboard"></i> Online Courses</li>
+      <li class="active">Course Results </li>
     </ol>
   </section>
   @if(Session::has('message'))

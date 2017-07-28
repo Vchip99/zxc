@@ -18,6 +18,7 @@ class CreateClientOnlineSubCategoriesTable extends Migration
             $table->string('name');
             $table->integer('category_id')->unsigned();
             $table->integer('client_id')->unsigned();
+            $table->integer('client_institute_course_id')->unsigned();
             $table->timestamps();
         });
     }

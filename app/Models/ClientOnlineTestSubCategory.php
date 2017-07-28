@@ -8,6 +8,7 @@ use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubject;
+use App\Models\ClientInstituteCourse;
 
 
 class ClientOnlineTestSubCategory extends Model
@@ -20,7 +21,7 @@ class ClientOnlineTestSubCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id','client_id'];
+    protected $fillable = ['name', 'category_id','client_id', 'client_institute_course_id'];
 
     /**
      *  add/update sub category
@@ -29,6 +30,7 @@ class ClientOnlineTestSubCategory extends Model
         $subcatId = InputSanitise::inputInt($request->get('subcat_id'));
         $catId = InputSanitise::inputInt($request->get('category'));
         $name = InputSanitise::inputString($request->get('name'));
+        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
 
         if( $isUpdate && isset($subcatId)){
             $testSubcategory = static::find($subcatId);
@@ -41,6 +43,7 @@ class ClientOnlineTestSubCategory extends Model
         $testSubcategory->name = $name;
         $testSubcategory->category_id = $catId;
         $testSubcategory->client_id = Auth::guard('client')->user()->id;
+        $testSubcategory->client_institute_course_id = $instituteCourseId;
 
         $subdomainArr = explode('.', Auth::guard('client')->user()->subdomain);
         $clientName = $subdomainArr[0];
@@ -76,6 +79,10 @@ class ClientOnlineTestSubCategory extends Model
 
     public function subjects(){
         return $this->hasMany(ClientOnlineTestSubject::class, 'sub_category_id');
+    }
+
+    public function instituteCourse(){
+        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
     }
 
     protected static function getOnlineTestSubcategoriesByCategoryId($id, Request $request){

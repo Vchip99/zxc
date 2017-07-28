@@ -21,6 +21,7 @@ class CreateClientOnlineVideosTable extends Migration
             $table->string('video_path');
             $table->integer('course_id')->unsigned();
             $table->integer('client_id')->unsigned();
+            $table->integer('client_institute_course_id')->unsigned();
             $table->timestamps();
         });
     }

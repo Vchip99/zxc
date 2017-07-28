@@ -69,6 +69,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $userAnswer = 0;
                 $marks=0;
                 $totalMarks=0;
+                $instituteCourseId = 0;
                 $userAnswers = [];
                 $userId = Auth::guard('clientuser')->user()->id;
 
@@ -81,7 +82,10 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $ids = array_keys($quesResults);
                 $questions = ClientOnlineTestQuestion::getQuestionsByIds($ids);
 
-                foreach($questions as $question){
+                foreach($questions as $index => $question){
+                    if( 0 == $index){
+                        $instituteCourseId = $question->client_institute_course_id;
+                    }
                     if($question->answer == $quesResults[$question->id] && $question->question_type == 1){
                         $rightAnswer++;
                         $marks = $marks + $question->positive_marks;
@@ -116,6 +120,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 }
 
                 $result = [];
+                $result['client_institute_course_id'] = (int) $instituteCourseId;
                 $result['category_id'] = (int) $categoryId;
                 $result['subcat_id'] = (int) $subcategoryId;
                 $result['subject_id'] = (int) $subjectId;

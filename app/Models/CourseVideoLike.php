@@ -48,4 +48,13 @@ class CourseVideoLike extends Model
     protected static function getLikeStatus(Request $request){
         return static::where('course_video_id',$request->get('video_id'))->get();
     }
+
+    protected static function deleteCourseVideoLikesByUserId($userId){
+        $courseVideoLikes = static::where('user_id', $userId)->get();
+        if(is_object($courseVideoLikes) && false == $courseVideoLikes->isEmpty()){
+            foreach($courseVideoLikes as $courseVideoLike){
+                $courseVideoLike->delete();
+            }
+        }
+    }
 }

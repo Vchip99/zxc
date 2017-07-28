@@ -6,6 +6,15 @@ use App\Notifications\ClientuserResetPassword;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
+use App\Libraries\InputSanitise;
+use DB, Auth;
+use App\Models\ClientInstituteCourse;
+use App\Models\ClientUserInstituteCourse;
+use App\Models\RegisterClientOnlinePaper;
+use App\Models\RegisterClientOnlineCourses;
+use App\Models\ClientScore;
+use App\Models\ClientUserSolution;
+
 
 class Clientuser extends Authenticatable
 {
@@ -65,5 +74,91 @@ class Clientuser extends Authenticatable
                 ->where('clients.subdomain', $request->getHost())
                 ->select('clients.*')
                 ->first();
+    }
+
+    protected static function searchUsers($request){
+        $results = [];
+        $institueCourses = [];
+        $courseId = InputSanitise::inputInt($request->get('course_id'));
+        $clientId = Auth::guard('client')->user()->id;
+        $result = static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id')
+                ->join('client_institute_courses', 'client_institute_courses.id', '=', 'client_user_institute_courses.client_institute_course_id');
+        if($courseId > 0){
+            $result->where('client_user_institute_courses.client_institute_course_id', $courseId);
+        }
+        if(!empty($request->get('student'))){
+            $result->where('clientusers.name', 'LIKE', '%'.$request->get('student').'%');
+        }
+        $result->where('client_user_institute_courses.client_id', $clientId);
+
+        $results['users'] = $result->select('clientusers.*', 'client_institute_courses.id as course_id','client_institute_courses.name as courseName')
+                            ->groupBy('clientusers.id')->groupBy('client_institute_courses.id')->get();
+
+        $coursesResult = ClientUserInstituteCourse::join('client_institute_courses', 'client_institute_courses.id', '=', 'client_user_institute_courses.client_institute_course_id')
+                    ->join('clientusers', 'clientusers.id', '=', 'client_user_institute_courses.client_user_id');
+        if($courseId > 0){
+            $coursesResult->where('client_user_institute_courses.client_institute_course_id', $courseId);
+        }
+        if(!empty($request->get('student'))){
+            $coursesResult->where('clientusers.name', 'LIKE', '%'.$request->get('student').'%');
+        }
+        $coursesResult->where('client_user_institute_courses.client_id', $clientId);
+
+        $courses = $coursesResult->select('client_user_institute_courses.*', 'client_institute_courses.name as courseName')->get();
+
+        if(is_object($courses) && false == $courses->isEmpty($courses)){
+            foreach($courses as $course){
+                $institueCourses[$course->client_user_id][$course->client_institute_course_id] = $course;
+            }
+        }
+
+        $results['institueCourses'] = $institueCourses;
+        return $results;
+    }
+
+    protected static function deleteStudent(Request $request){
+        $clientId = InputSanitise::inputInt($request->client_id);
+        $userId = InputSanitise::inputInt($request->client_user_id);
+
+        $student = static::where('id',$userId)->where('client_id',$clientId)->first();
+        if(is_object($student)){
+            $student->deleteOtherInfoByUserId($userId,$clientId);
+            $student->delete();
+            return 'true';
+        }
+        return 'false';
+    }
+
+    protected function deleteOtherInfoByUserId($userId,$clientId){
+        RegisterClientOnlineCourses::deleteRegisteredOnlineCoursesByUserId($userId,$clientId);
+        RegisterClientOnlinePaper::deleteRegisteredPapersByUserId($userId,$clientId);
+        ClientScore::deleteClientUserScores($userId);
+        ClientUserSolution::deleteClientUserSolutions($userId);
+        return;
+    }
+
+    protected static function changeClientUserApproveStatus(Request $request){
+        $clientId = InputSanitise::inputInt($request->client_id);
+        $userId = InputSanitise::inputInt($request->client_user_id);
+
+        $student = static::where('id',$userId)->where('client_id',$clientId)->first();
+        if(is_object($student)){
+            if( 1 == $student->client_approve){
+                $student->client_approve = 0;
+            } else {
+                $student->client_approve = 1;
+            }
+            $student->save();
+            return 'true';
+        }
+        return 'false';
+    }
+
+    protected static function getAllStudentsByClientIdByCourseId($clientId,$courseId){
+        return static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id')
+                ->join('client_institute_courses', 'client_institute_courses.id', '=', 'client_user_institute_courses.client_institute_course_id')
+                ->where('client_user_institute_courses.client_id', $clientId)
+                ->where('client_user_institute_courses.client_institute_course_id', $courseId)
+                ->select('clientusers.*')->get();
     }
 }

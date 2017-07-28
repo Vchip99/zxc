@@ -22,6 +22,24 @@
     <form action="{{url('createOnlineTestSubjectPaper')}}" method="POST">
   @endif
     {{ csrf_field() }}
+  <div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
+    <label class="col-sm-2 col-form-label">Institute Course Name:</label>
+    <div class="col-sm-3">
+      <select class="form-control" name="institute_course" required title="Category" onChange="selectCategory(this);" >
+          <option value="">Select Institute Course ...</option>
+          @if(count($instituteCourses) > 0)
+            @foreach($instituteCourses as $instituteCourse)
+              @if( $paper->client_institute_course_id == $instituteCourse->id)
+                <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
+              @else
+                <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
+              @endif
+            @endforeach
+          @endif
+        </select>
+        @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
+    </div>
+  </div>
   <div class="form-group row @if ($errors->has('category')) has-error @endif">
     <label class="col-sm-2 col-form-label">Category Name:</label>
     <div class="col-sm-3">
@@ -34,10 +52,6 @@
               @else
                 <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
               @endif
-            @endforeach
-          @else
-            @foreach($testCategories as $testCategory)
-                <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
             @endforeach
           @endif
       </select>
@@ -132,6 +146,40 @@
   </div>
 </form>
 <script type="text/javascript">
+  function selectCategory(ele){
+    var id = parseInt($(ele).val());
+    if( 0 < id ){
+      $.ajax({
+              method: "POST",
+              url: "{{url('getOnlineCategories')}}",
+              data: {id:id}
+          })
+          .done(function( msg ) {
+            select = document.getElementById('category');
+            select.innerHTML = '';
+            var opt = document.createElement('option');
+            opt.value = '';
+            opt.innerHTML = 'Select Category ...';
+            select.appendChild(opt);
+            if( 0 < msg.length){
+              $.each(msg, function(idx, obj) {
+                  var opt = document.createElement('option');
+                  opt.value = obj.id;
+                  opt.innerHTML = obj.name;
+                  select.appendChild(opt);
+              });
+            }
+          });
+    } else {
+      select = document.getElementById('category');
+      select.innerHTML = '';
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.innerHTML = 'Select Category ...';
+      select.appendChild(opt);
+    }
+  }
+
   function selectSubcategory(ele){
     id = parseInt($(ele).val());
     if( 0 < id ){
@@ -156,6 +204,13 @@
               });
             }
           });
+    } else {
+      select = document.getElementById('subcategory');
+      select.innerHTML = '';
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.innerHTML = 'Select Sub Category ...';
+      select.appendChild(opt);
     }
   }
 
@@ -184,6 +239,13 @@
               });
             }
           });
+    } else {
+      selectSub = document.getElementById('subject');
+      selectSub.innerHTML = '';
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.innerHTML = 'Select Subject ...';
+      selectSub.appendChild(opt);
     }
   }
 </script>

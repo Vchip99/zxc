@@ -60,7 +60,9 @@
         @endif
       </tbody>
     </table>
-
+    <div style="float: right;">
+      {{$courseVideos->links()}}
+    </div>
   </div>
   </div>
 <script type="text/javascript">

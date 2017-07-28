@@ -10,6 +10,7 @@ use App\Models\DiscussionPostLike;
 use App\Models\DiscussionCommentLike;
 use App\Models\DiscussionSubComment;
 use App\Models\DiscussionSubCommentLike;
+use App\Models\DiscussionCategory;
 use Auth, DB;
 use Validator;
 use Redirect, Session;
@@ -46,6 +47,7 @@ class DiscussionController extends Controller
      */
     protected function discussion(){
         $postCategoryIds = [];
+        $discussionCategories =DiscussionCategory::all();
         $posts = DiscussionPost::orderBy('id', 'desc')->get();
         if(false == $posts->isEmpty()){
             foreach($posts as $post){
@@ -62,7 +64,7 @@ class DiscussionController extends Controller
         } else {
             $currentUser = 0;
         }
-        return view('discussion.discussion', compact('posts', 'user', 'postCategoryIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
+        return view('discussion.discussion', compact('discussionCategories','posts', 'user', 'postCategoryIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
     }
 
     /**
@@ -258,14 +260,19 @@ class DiscussionController extends Controller
     }
 
     protected function deleteSubComment(Request $request){
-        $subComment = DiscussionSubComment::find(json_decode($request->get('subcomment_id')));
-        if(is_object($subComment)){
+        $subcomment = DiscussionSubComment::find(json_decode($request->get('subcomment_id')));
+        if(is_object($subcomment)){
             DB::beginTransaction();
             try
             {
-                Session::put('show_comment_area', $subComment->discussion_comment_id);
+                if(is_object($subcomment->deleteLikes) && false == $subcomment->deleteLikes->isEmpty()){
+                    foreach($subcomment->deleteLikes as $subcommentLike){
+                        $subcommentLike->delete();
+                    }
+                }
+                Session::put('show_comment_area', $subcomment->discussion_comment_id);
                 Session::put('show_post_area', 0);
-                $subComment->delete();
+                $subcomment->delete();
                 DB::commit();
             }
             catch(\Exception $e)
@@ -284,8 +291,18 @@ class DiscussionController extends Controller
             try
             {
                 if(is_object($comment->children) && false == $comment->children->isEmpty()){
-                    foreach($comment->children as $subComment){
-                        $subComment->delete();
+                    foreach($comment->children as $subcomment){
+                        if(is_object($subcomment->deleteLikes) && false == $subcomment->deleteLikes->isEmpty()){
+                            foreach($subcomment->deleteLikes as $subcommentLike){
+                                $subcommentLike->delete();
+                            }
+                        }
+                        $subcomment->delete();
+                    }
+                }
+                if(is_object($comment->commentLikes) && false == $comment->commentLikes->isEmpty()){
+                    foreach($comment->commentLikes as $commentLike){
+                        $commentLike->delete();
                     }
                 }
                 Session::put('show_comment_area', 0);
@@ -309,16 +326,7 @@ class DiscussionController extends Controller
             DB::beginTransaction();
             try
             {
-                if(is_object($post->descComments) && false == $post->descComments->isEmpty()){
-                    foreach($post->descComments as $comment){
-                        if(is_object($comment->children) && false == $comment->children->isEmpty()){
-                            foreach($comment->children as $subComment){
-                                $subComment->delete();
-                            }
-                        }
-                        $comment->delete();
-                    }
-                }
+                $post->deleteCommantsAndSubComments();
                 $post->delete();
                 DB::commit();
                 Session::put('show_comment_area', 0);

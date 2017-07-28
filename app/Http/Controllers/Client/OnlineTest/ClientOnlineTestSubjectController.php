@@ -10,6 +10,7 @@ use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
+use App\Models\ClientInstituteCourse;
 
 class ClientOnlineTestSubjectController extends ClientBaseController
 {
@@ -26,6 +27,7 @@ class ClientOnlineTestSubjectController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateCreateSubject = [
+    	'institute_course' => 'required|integer',
         'category' => 'required|integer',
         'subcategory' => 'required|integer',
         'name' => 'required|string',
@@ -47,10 +49,14 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 	 *	show create UI for subject
 	 */
 	protected function create(Request $request){
-		$testCategories    = ClientOnlineTestCategory::showCategories($request);
+		$clientId = Auth::guard('client')->user()->id;
+        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
+
+		// $testCategories    = ClientOnlineTestCategory::showCategories($request);
+		$testCategories    = new ClientOnlineTestCategory;
 		$testSubCategories = new ClientOnlineTestSubCategory;
 		$subject = new ClientOnlineTestSubject;
-		return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject'));
+		return view('client.onlineTest.subject.create', compact('instituteCourses','testCategories','testSubCategories','subject'));
 	}
 
 	/**
@@ -58,6 +64,7 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 	 */
 	protected function store(Request $request){
 		$v = Validator::make($request->all(), $this->validateCreateSubject);
+
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
@@ -72,7 +79,7 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 	        }
 	    }
         catch(\Exception $e)
-        {
+        {	dd($e->getMessage());
             DB::connection('mysql2')->rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }

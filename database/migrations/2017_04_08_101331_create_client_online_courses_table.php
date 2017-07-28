@@ -28,6 +28,7 @@ class CreateClientOnlineCoursesTable extends Migration
             $table->string('image_path');
             $table->dateTime('release_date');
             $table->integer('client_id')->unsigned();
+            $table->integer('client_institute_course_id')->unsigned();
             $table->timestamps();
         });
     }

@@ -8,6 +8,7 @@ use Redirect;
 use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
+use App\Models\ClientInstituteCourse;
 
 class ClientOnlineTestCategoryController extends ClientBaseController
 {
@@ -24,6 +25,7 @@ class ClientOnlineTestCategoryController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateCreateCategory = [
+        'institute_course' => 'required|integer',
         'category' => 'required|string',
     ];
 
@@ -43,8 +45,10 @@ class ClientOnlineTestCategoryController extends ClientBaseController
      * show UI for create category
      */
     protected function create(){
+        $clientId = Auth::guard('client')->user()->id;
+        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
     	$testCategory = new ClientOnlineTestCategory;
-    	return view('client.onlineTest.category.create', compact('testCategory'));
+    	return view('client.onlineTest.category.create', compact('instituteCourses','testCategory'));
     }
 
     /**
@@ -81,7 +85,8 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     	if(isset($catId)){
     		$testCategory = ClientOnlineTestCategory::find($catId);
     		if(is_object($testCategory)){
-    			return view('client.onlineTest.category.create', compact('testCategory'));
+                $instituteCourses = ClientInstituteCourse::where('client_id', $testCategory->client_institute_course_id)->get();
+    			return view('client.onlineTest.category.create', compact('instituteCourses','testCategory'));
     		}
     	}
 		return Redirect::to('manageOnlineTestCategory');

@@ -11,6 +11,11 @@
 @section('dashboard_content')
 	<script src="{{ asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
 	@php
+		if(Session::has('client_search_selected_institute_category')){
+			$clientSearchSelectedInstituteCategoryId = Session::get('client_search_selected_institute_category');
+		} else {
+			$clientSearchSelectedInstituteCategoryId = 0;
+		}
 		if(Session::has('client_selected_category')){
 			$clientSelectedCategoryId = Session::get('client_selected_category');
 		} else {
@@ -64,6 +69,7 @@
 	  			<li title="No Next Question"><a class="btn" id="next_ques">No Next Question</a></li>
 	  		@endif
 		</ul>
+		<div class="container admin_div">
 		@if(Session::has('message'))
 			<div class="alert alert-success" id="message">
 				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -78,7 +84,33 @@
 			<form id="createForm" name="createQuestion" action="{{url('createOnlineTestQuestion')}}" method="POST">
 		@endif
 		{{csrf_field()}}
-		<div class="container admin_div">
+			<div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
+			    <label class="col-sm-2 col-form-label">Institute Course Name:</label>
+			    <div class="col-sm-3">
+			    	@if(count($instituteCourses) > 0 && isset($testQuestion->id))
+		          		@foreach($instituteCourses as $instituteCourse)
+			              @if( $instituteCourse->id == $testQuestion->category_id )
+			                <input class="form-control"  type="text" name="institute_course_text" value="{{$instituteCourse->name}}" readonly="true">
+			                <input type="hidden" name="institute_course" value="{{$instituteCourse->id}}">
+			              @endif
+			            @endforeach
+		          	@else
+				      	<select class="form-control" name="institute_course" required title="Category" onChange="selectCategory(this);" >
+				          	<option value="">Select Institute Course ...</option>
+				          	@if(count($instituteCourses) > 0)
+				            	@foreach($instituteCourses as $instituteCourse)
+				              		@if( $clientSearchSelectedInstituteCategoryId == $instituteCourse->id)
+				                		<option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
+				              		@else
+				                		<option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
+				              		@endif
+				            	@endforeach
+				          	@endif
+				        </select>
+			        @endif
+			        @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
+			    </div>
+		  	</div>
 			<div class="form-group row @if ($errors->has('category')) has-error @endif">
 			    <label class="col-sm-2 col-form-label">Category Name:</label>
 			    <div class="col-sm-3">
@@ -366,9 +398,9 @@
       				<input type="hidden" name="selected_question_type" id="selected_question_type" value="{{$clientSelectedQuestionType}}">
 			    </div>
 		    </div>
+		</form>
 		</div>
 
-	</form>
 <style>
 ul#ul {
 	width:1200px;
@@ -401,6 +433,32 @@ ul#ul > li > a:hover:not(.active) {
 }
 </style>
 <script type="text/javascript">
+	function selectCategory(ele){
+	    var id = parseInt($(ele).val());
+	    if( 0 < id ){
+	      $.ajax({
+	              method: "POST",
+	              url: "{{url('getOnlineCategories')}}",
+	              data: {id:id}
+	          })
+	          .done(function( msg ) {
+	            select = document.getElementById('category');
+	            select.innerHTML = '';
+	            var opt = document.createElement('option');
+	            opt.value = '';
+	            opt.innerHTML = 'Select Category ...';
+	            select.appendChild(opt);
+	            if( 0 < msg.length){
+	              $.each(msg, function(idx, obj) {
+	                  var opt = document.createElement('option');
+	                  opt.value = obj.id;
+	                  opt.innerHTML = obj.name;
+	                  select.appendChild(opt);
+	              });
+	            }
+	          });
+	    }
+	}
 
   	function selectSubcategory(ele){
 	    id = parseInt($(ele).val());

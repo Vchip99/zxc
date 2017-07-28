@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Models\DiscussionComment;
 use DB;
+use App\Models\DiscussionCommentLike;
+use App\Models\DiscussionPostLike;
 
 class DiscussionPost extends Model
 {
@@ -19,10 +21,10 @@ class DiscussionPost extends Model
     /**
      *  comments of discussion post
      */
-    public function comments()
-    {
-        return $this->hasMany(DiscussionComment::class);
-    }
+    // public function comments()
+    // {
+    //     return $this->hasMany(DiscussionComment::class);
+    // }
 
     /**
      *  create post
@@ -76,5 +78,52 @@ class DiscussionPost extends Model
     public function descComments()
     {
         return $this->hasMany(DiscussionComment::class)->orderBy('id','desc');
+    }
+
+    public function comments(){
+        return $this->hasMany(DiscussionComment::class, 'discussion_post_id');
+    }
+
+    public function deleteLikes(){
+        return $this->hasMany(DiscussionPostLike::class, 'discussion_post_id');
+    }
+
+    public function deleteCommantsAndSubComments(){
+        if(is_object($this->comments) && false == $this->comments->isEmpty()){
+            foreach($this->comments as $comment){
+                if(is_object($comment->children) && false == $comment->children->isEmpty()){
+                    foreach($comment->children as $subcomment){
+                        if(is_object($subcomment->deleteLikes) && false == $subcomment->deleteLikes->isEmpty()){
+                            foreach($subcomment->deleteLikes as $subcommentLike){
+                                $subcommentLike->delete();
+                            }
+                        }
+                        $subcomment->delete();
+                    }
+                }
+
+                if(is_object($comment->commentLikes) && false == $comment->commentLikes->isEmpty()){
+                    foreach($comment->commentLikes as $commentLike){
+                        $commentLike->delete();
+                    }
+                }
+                $comment->delete();
+            }
+        }
+        if(is_object($this->deleteLikes) && false == $this->deleteLikes->isEmpty()){
+            foreach($this->deleteLikes as $postLike){
+                $postLike->delete();
+            }
+        }
+    }
+
+    protected static function deleteAllDiscussionPostsByUserId($userId){
+        $posts = static::where('user_id', $userId)->get();
+        if(is_object($posts) && false == $posts->isEmpty()){
+            foreach($posts as $post){
+                $post->deleteCommantsAndSubComments();
+                $post->delete();
+            }
+        }
     }
 }

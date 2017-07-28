@@ -16,8 +16,11 @@ class CreateClientScoresTable extends Migration
         Schema::connection('mysql2')->create('client_scores', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('client_user_id')->unsigned();
+            $table->integer('client_institute_course_id')->unsigned();
             $table->integer('category_id')->unsigned();
             $table->integer('subcat_id')->unsigned();
+            $table->integer('subject_id')->unsigned();
+            $table->integer('paper_id')->unsigned();
             $table->integer('right_answered')->unsigned();
             $table->integer('wrong_answered')->unsigned();
             $table->integer('unanswered')->unsigned();

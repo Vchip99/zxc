@@ -40,4 +40,13 @@ class LiveCourseComment extends Model
     public function deleteLikes(){
         return $this->hasMany(LiveCourseCommentLike::class);
     }
+
+    protected static function deleteLiveCourseCommentsByUserId($userId){
+        $comments = static::where('user_id', $userId)->get();
+        if(is_object($comments) && false == $comments->isEmpty()){
+            foreach($comments as $comment){
+                $comment->delete();
+            }
+        }
+    }
 }

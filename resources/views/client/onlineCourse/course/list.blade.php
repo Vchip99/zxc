@@ -30,6 +30,7 @@
           <th>Course Name</th>
           <th>Category Name</th>
           <th>Sub Category Name</th>
+          <th>Institute Course Name</th>
           <th>Edit Course</th>
           <th>Delete Course</th>
         </tr>
@@ -42,6 +43,7 @@
             <td>{{$course->name}}</td>
             <td>{{$course->category}}</td>
             <td>{{$course->subcategory}}</td>
+            <td>{{$course->instituteCourse->name}}</td>
             <td>
               <a href="{{url('onlinecourse')}}/{{$course->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$course->name}}" />
@@ -59,7 +61,7 @@
           </tr>
           @endforeach
         @else
-            <tr><td>No courses are created.</td></tr>
+            <tr><td colspan="7">No courses are created.</td></tr>
         @endif
       </tbody>
     </table>

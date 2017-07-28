@@ -19,6 +19,7 @@ class CreateClientOnlineTestSubjectsTable extends Migration
             $table->integer('category_id')->unsigned();
             $table->integer('sub_category_id')->unsigned();
             $table->integer('client_id')->unsigned();
+            $table->integer('client_institute_course_id')->unsigned();
             $table->timestamps();
         });
     }

@@ -19,8 +19,11 @@ class CreateClientOnlineTestSubjectPapersTable extends Migration
             $table->integer('category_id')->unsigned();
             $table->integer('sub_category_id')->unsigned();
             $table->integer('subject_id')->unsigned();
+            $table->integer('price')->unsigned();
+            $table->date('date_to_active');
             $table->char('time');
             $table->integer('client_id')->unsigned();
+            $table->integer('client_institute_course_id')->unsigned();
             $table->timestamps();
         });
     }

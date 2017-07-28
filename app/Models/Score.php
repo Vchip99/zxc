@@ -170,4 +170,14 @@ class Score extends Model
         return $result->select('scores.*', 'test_subjects.name as subject', 'test_subject_papers.name as paper')
                 ->get();
     }
+
+    protected static function deleteUserScoresByUserId($userId){
+        $scores = static::where('user_id', $userId)->get();
+        if(is_object($scores) && false == $scores->isEmpty()){
+            foreach($scores as $score){
+                $score->delete();
+            }
+        }
+        return;
+    }
 }

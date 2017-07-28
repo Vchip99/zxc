@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\DiscussionPost;
 use App\Models\DiscussionSubComment;
 use App\Models\User;
+use App\Models\DiscussionCommentLike;
 use Auth;
 
 class DiscussionComment extends Model
@@ -64,6 +65,11 @@ class DiscussionComment extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+
+    public function commentLikes(){
+        return $this->hasMany(DiscussionCommentLike::class, 'discussion_comment_id');
     }
 
 }

@@ -19,7 +19,7 @@ class ClientOnlineTestQuestion extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', 'answer6', 'answer', 'category_id', 'subcat_id', 'section_type', 'question_type','solution', 'positive_marks', 'negative_marks', 'min', 'max', 'subject_id', 'paper_id', 'client_id'];
+    protected $fillable = ['name', 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', 'answer6', 'answer', 'category_id', 'subcat_id', 'section_type', 'question_type','solution', 'positive_marks', 'negative_marks', 'min', 'max', 'subject_id', 'paper_id', 'client_id','client_institute_course_id'];
 
     /**
      *  add/update question
@@ -30,6 +30,7 @@ class ClientOnlineTestQuestion extends Model
         $questionId = InputSanitise::inputInt($request->get('question_id'));
         $subjectId = InputSanitise::inputInt($request->get('subject'));
         $paperId = InputSanitise::inputInt($request->get('paper'));
+        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
         $ans1 = '';
         $ans2 = '';
         $ans3 = '';
@@ -37,21 +38,32 @@ class ClientOnlineTestQuestion extends Model
         $solution = '';
         $newInstance = new static;
         $question = $newInstance->changeSrc($request->get('question'));
+
         if(!empty($request->get('ans1'))){
-            $ans1 = $newInstance->changeSrc($request->get('ans1'));
+            $ans1 = trim($newInstance->changeSrc($request->get('ans1')), '<p>,<p/>');
+        } else {
+            $ans1 = trim($request->get('ans1'), '<p>,<p/>');
         }
         if(!empty($request->get('ans2'))){
-            $ans2 = $newInstance->changeSrc($request->get('ans2'));
+            $ans2 = trim($newInstance->changeSrc($request->get('ans2')), '<p>,<p/>');
+        } else {
+            $ans2 = trim($request->get('ans2'), '<p>,<p/>');
         }
         if(!empty($request->get('ans3'))){
-            $ans3 = $newInstance->changeSrc($request->get('ans3'));
+            $ans3 = trim($newInstance->changeSrc($request->get('ans3')), '<p>,<p/>');
+        } else {
+            $ans3 = trim($request->get('ans3'), '<p>,<p/>');
         }
         if(!empty($request->get('ans4'))){
-            $ans4 = $newInstance->changeSrc($request->get('ans4'));
+            $ans4 = trim($newInstance->changeSrc($request->get('ans4')), '<p>,<p/>');
+        } else {
+            $ans4 = trim($request->get('ans4'), '<p>,<p/>');
         }
 
         if(!empty($request->get('solution'))){
-            $solution = $newInstance->changeSrc($request->get('solution'));
+            $solution = trim($newInstance->changeSrc($request->get('solution')), '<p>,<p/>');
+        } else {
+            $solution = trim($request->get('solution'), '<p>,<p/>');
         }
 
         $answer = InputSanitise::inputString($request->get('answer'));
@@ -98,6 +110,7 @@ class ClientOnlineTestQuestion extends Model
         $testQuestion->paper_id = $paperId;
         $testQuestion->question_type = $question_type;
         $testQuestion->client_id = Auth::guard('client')->user()->id;
+        $testQuestion->client_institute_course_id = $instituteCourseId;
         $testQuestion->save();
         return $testQuestion;
     }
@@ -162,7 +175,7 @@ class ClientOnlineTestQuestion extends Model
      *  return questions by questions Ids
      */
     protected static function getQuestionsByIds($ids){
-        return DB::connection('mysql2')->table('client_online_test_questions')->select('id','answer', 'question_type', 'min', 'max', 'positive_marks', 'negative_marks')->whereIn('id', $ids)->orderBy('id')->get();
+        return DB::connection('mysql2')->table('client_online_test_questions')->select('id','answer', 'question_type', 'min', 'max', 'positive_marks', 'negative_marks', 'client_institute_course_id')->whereIn('id', $ids)->orderBy('id')->get();
     }
 
     protected static function getClientCurrentQuestionNoByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId){
@@ -203,5 +216,15 @@ class ClientOnlineTestQuestion extends Model
                 $query->where('id', '>', $questionId);
             }
         return $query->first();
+    }
+
+    protected static function getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByClientId($categoryId,$subcategoryId,$subjectId,$paperId,$clientId){
+        return DB::connection('mysql2')->table('client_online_test_questions')
+                    ->where('category_id', $categoryId)
+                    ->where('subcat_id', $subcategoryId)
+                    ->where('subject_id', $subjectId)
+                    ->where('paper_id', $paperId)
+                    ->where('client_id', $clientId)
+                    ->get();
     }
 }

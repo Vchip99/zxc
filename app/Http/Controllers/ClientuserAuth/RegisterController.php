@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ClientuserAuth;
 
 use App\Models\Clientuser;
 use App\Models\Client;
+use App\Models\ClientUserInstituteCourse;
 use Validator, Redirect;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -60,7 +61,8 @@ class RegisterController extends Controller
             'phone' => 'required|regex:/[0-9]{10}/',
             'email' => 'required|max:255',
             'password' => 'required',
-            'confirm_password' => 'required|same:password'
+            'confirm_password' => 'required|same:password',
+            'course' => 'required',
         ]);
     }
 
@@ -78,7 +80,7 @@ class RegisterController extends Controller
             return Redirect::to('/');
         }
 
-        return Clientuser::create([
+        $clientUser = Clientuser::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
@@ -86,6 +88,21 @@ class RegisterController extends Controller
             'password' => bcrypt($data['password']),
             'email_token' => str_random(60),
         ]);
+
+        $courseIds = $data['course'];
+        $arrInsertCourses = [];
+        if(is_array($courseIds)){
+            foreach($courseIds as $courseId){
+                $arrInsertCourses[] = ['client_user_id' => $clientUser->id,
+                    'client_id' => $clientUser->client_id,
+                    'client_institute_course_id' => $courseId,
+                ];
+            }
+            if(is_array($arrInsertCourses)){
+                ClientUserInstituteCourse::insert($arrInsertCourses);
+            }
+        }
+        return $clientUser;
     }
 
     /**
@@ -116,6 +133,7 @@ class RegisterController extends Controller
         {
             $this->throwValidationException($request, $validator);
         }
+
         // Using database transactions is useful here because stuff happening is actually a transaction
         // I don't know what I said in the last line! Weird!
         DB::beginTransaction();

@@ -14,6 +14,28 @@ use App\Models\RegisterLiveCourse;
 use App\Models\RegisterOnlineCourse;
 use App\Models\RegisterPaper;
 use App\Models\RegisterProject;
+use App\Models\BlogComment;
+use App\Models\BlogCommentLike;
+use App\Models\BlogSubComment;
+use App\Models\BlogSubCommentLike;
+use App\Models\CourseComment;
+use App\Models\CourseCommentLike;
+use App\Models\CourseSubComment;
+use App\Models\CourseSubCommentLike;
+use App\Models\CourseVideoLike;
+use App\Models\DiscussionPost;
+use App\Models\LiveCourseComment;
+use App\Models\LiveCourseCommentLike;
+use App\Models\LiveCourseSubComment;
+use App\Models\LiveCourseSubCommentLike;
+use App\Models\LiveCourseVideoLike;
+use App\Models\VkitProjectLike;
+use App\Models\VkitProjectComment;
+use App\Models\VkitProjectCommentLike;
+use App\Models\VkitProjectSubComment;
+use App\Models\VkitProjectSubCommentLike;
+use App\Models\Score;
+use App\Models\UserSolution;
 use Auth;
 
 class User extends Authenticatable
@@ -143,8 +165,10 @@ class User extends Authenticatable
         if($request->year > 0){
             $student->where('users.year', $request->year);
         }
-        return $student->where('users.name', 'LIKE', '%'.$request->student.'%')
-                ->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department')->get();
+        if(!empty($request->student)){
+            $student->where('users.name', 'LIKE', '%'.$request->student.'%');
+        }
+        return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department')->get();
     }
 
     protected static function updateUser(Request $request){
@@ -211,12 +235,34 @@ class User extends Authenticatable
         if(is_dir($userStorage)){
             InputSanitise::delFolder($userStorage);
         }
+        Score::deleteUserScoresByUserId($userId);
+        UserSolution::deleteUserSolutionsByUserId($userId);
         RegisterDocuments::deleteRegisteredDocsByUserId($userId);
         RegisterFavouriteDocuments::deleteRegisteredFavouriteDocumentsByUserId($userId);
         RegisterLiveCourse::deleteRegisteredLiveCourseByUserIdByCourseId($userId);
         RegisterOnlineCourse::deleteRegisteredOnlineCoursesByUserId($userId);
         RegisterPaper::deleteRegisteredPapersByUserId($userId);
         RegisterProject::deleteRegisteredVkitProjectsByUserId($userId);
+        BlogComment::deleteBlogCommentsByUserId($userId);
+        BlogCommentLike::deleteBlogCommentLikesByUserId($userId);
+        BlogSubComment::deleteBlogSubCommentsByUserId($userId);
+        BlogSubCommentLike::deleteBlogSubCommentLikesByUserId($userId);
+        CourseComment::deleteCourseCommentsByUserId($userId);
+        CourseCommentLike::deleteCourseCommentLikesByUserId($userId);
+        CourseSubComment::deleteCourseSubCommentsByUserId($userId);
+        CourseSubCommentLike::deleteCourseSubCommentLikesByUserId($userId);
+        CourseVideoLike::deleteCourseVideoLikesByUserId($userId);
+        DiscussionPost::deleteAllDiscussionPostsByUserId($userId);
+        LiveCourseComment::deleteLiveCourseCommentsByUserId($userId);
+        LiveCourseCommentLike::deleteLiveCourseCommentLikesByUserId($userId);
+        LiveCourseSubComment::deleteLiveCourseSubCommentsByUserId($userId);
+        LiveCourseSubCommentLike::deleteLiveCourseSubCommentLikesByUserId($userId);
+        LiveCourseVideoLike::deleteLiveCourseVideoLikesByUserId($userId);
+        VkitProjectLike::deleteVkitProjectLikesByUserId($userId);
+        VkitProjectComment::deleteVkitProjectCommentsByUserId($userId);
+        VkitProjectCommentLike::deleteVkitProjectCommentLikesByUserId($userId);
+        VkitProjectSubComment::deleteVkitProjectSubCommentsByUserId($userId);
+        VkitProjectSubCommentLike::deleteVkitProjectSubCommentLikesByUserId($userId);
         return;
     }
 

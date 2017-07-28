@@ -8,6 +8,7 @@ use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineTestSubCategory;
+use App\Models\ClientInstituteCourse;
 
 class ClientOnlineTestCategory extends Model
 {
@@ -19,7 +20,7 @@ class ClientOnlineTestCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'client_id'];
+    protected $fillable = ['name', 'client_id', 'client_institute_course_id'];
 
      /**
      *  add/update test category
@@ -27,6 +28,7 @@ class ClientOnlineTestCategory extends Model
     protected static function addOrUpdateCategory( Request $request, $isUpdate=false){
         $categoryName = InputSanitise::inputString($request->get('category'));
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
+        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
         if( $isUpdate && isset($categoryId)){
             $category = static::find($categoryId);
             if(!is_object($category)){
@@ -37,6 +39,7 @@ class ClientOnlineTestCategory extends Model
         }
         $category->name = $categoryName;
         $category->client_id = Auth::guard('client')->user()->id;
+        $category->client_institute_course_id = $instituteCourseId;
         $category->save();
         return $category;
     }
@@ -48,10 +51,10 @@ class ClientOnlineTestCategory extends Model
             $client = InputSanitise::getCurrentClient($request);
         }
 
-        $result = DB::connection('mysql2')->table('client_online_test_categories')
-                ->join('clients', function($join){
+        $result = static::join('clients', function($join){
                     $join->on('clients.id', '=', 'client_online_test_categories.client_id');
-                });
+                })
+                ->join('client_institute_courses', 'client_institute_courses.id', '=', 'client_online_test_categories.client_institute_course_id');
         if(!empty($clientId)){
             $result->where('clients.id', $clientId);
         } else {
@@ -91,6 +94,10 @@ class ClientOnlineTestCategory extends Model
         return $this->hasMany(ClientOnlineTestSubCategory::class, 'category_id');
     }
 
+    public function instituteCourse(){
+        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
+    }
+
     /**
      * return test categopries registered subject papers
      */
@@ -102,5 +109,9 @@ class ClientOnlineTestCategory extends Model
                 ->join('clientusers', 'clientusers.id', '=', 'register_client_online_papers.client_user_id')
                 ->where('register_client_online_papers.client_user_id', $userId)
                 ->select('client_online_test_categories.id', 'client_online_test_categories.name')->groupBy('client_online_test_categories.id')->get();
+    }
+
+    protected static function getCategoriesByInstituteCourseId($id){
+        return static::where('client_institute_course_id', $id)->get();
     }
 }
