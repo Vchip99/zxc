@@ -60,4 +60,13 @@ class BlogSubCommentLike extends Model
     					->where('blog_sub_comment_id', $request->get('sub_comment_id'))
     					->get();
     }
+
+    protected static function deleteBlogSubCommentLikesByUserId($userId){
+        $subcommentLikes = static::where('user_id', $userId)->get();
+        if(is_object($subcommentLikes) && false == $subcommentLikes->isEmpty()){
+            foreach($subcommentLikes as $subcommentLike){
+                $subcommentLike->delete();
+            }
+        }
+    }
 }

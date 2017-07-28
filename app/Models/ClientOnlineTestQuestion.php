@@ -175,7 +175,7 @@ class ClientOnlineTestQuestion extends Model
      *  return questions by questions Ids
      */
     protected static function getQuestionsByIds($ids){
-        return DB::connection('mysql2')->table('client_online_test_questions')->select('id','answer', 'question_type', 'min', 'max', 'positive_marks', 'negative_marks')->whereIn('id', $ids)->orderBy('id')->get();
+        return DB::connection('mysql2')->table('client_online_test_questions')->select('id','answer', 'question_type', 'min', 'max', 'positive_marks', 'negative_marks', 'client_institute_course_id')->whereIn('id', $ids)->orderBy('id')->get();
     }
 
     protected static function getClientCurrentQuestionNoByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId){
@@ -216,5 +216,15 @@ class ClientOnlineTestQuestion extends Model
                 $query->where('id', '>', $questionId);
             }
         return $query->first();
+    }
+
+    protected static function getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByClientId($categoryId,$subcategoryId,$subjectId,$paperId,$clientId){
+        return DB::connection('mysql2')->table('client_online_test_questions')
+                    ->where('category_id', $categoryId)
+                    ->where('subcat_id', $subcategoryId)
+                    ->where('subject_id', $subjectId)
+                    ->where('paper_id', $paperId)
+                    ->where('client_id', $clientId)
+                    ->get();
     }
 }

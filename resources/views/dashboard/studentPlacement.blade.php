@@ -220,11 +220,11 @@
   function toggleVideo(state) {
     // if state == 'hide', hide. Else: show video
     var div = document.getElementById("iframe-video");
-    var iframe = div.getElementsByTagName("iframe")[0].contentWindow;
-    func = state == 'hide' ? 'pauseVideo' : 'playVideo';
-    iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
+    if(div.getElementsByTagName("iframe").length > 0){
+      var iframe = div.getElementsByTagName("iframe")[0].contentWindow;
+      func = state == 'hide' ? 'pauseVideo' : 'playVideo';
+      iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
+    }
   }
 </script>
 @stop
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/9yUAwDjRA54?enablejsapi=1&loop=1&playlist=9yUAwDjRA54" frameborder="0" allowfullscreen></iframe>

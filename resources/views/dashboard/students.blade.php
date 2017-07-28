@@ -150,10 +150,15 @@
   }
   function showStudents(){
     var year = document.getElementById('selected_year').value;
+    if(document.getElementById("dept")){
+        var department = parseInt(document.getElementById("dept").value);
+    } else {
+        var department = 0;
+    }
       $.ajax({
         method: "POST",
         url: "{{url('searchStudent')}}",
-        data: {year:year}
+        data: {year:year, department:department}
       })
       .done(function( msg ) {
         body = document.getElementById('students');

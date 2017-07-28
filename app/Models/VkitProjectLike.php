@@ -48,4 +48,13 @@ class VkitProjectLike extends Model
     protected static function getLikeStatus(Request $request){
         return static::where('vkit_project_id',$request->get('project_id'))->get();
     }
+
+    protected static function deleteVkitProjectLikesByUserId($userId){
+        $vkitProjectLikes = static::where('user_id', $userId)->get();
+        if(is_object($vkitProjectLikes) && false == $vkitProjectLikes->isEmpty()){
+            foreach($vkitProjectLikes as $vkitProjectLike){
+                $vkitProjectLike->delete();
+            }
+        }
+    }
 }

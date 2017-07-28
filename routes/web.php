@@ -459,8 +459,11 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('searchUsers', 'Client\ClientUsersInfoController@searchUsers');
   	Route::post('changeClientPermissionStatus', 'Client\ClientUsersInfoController@changeClientPermissionStatus');
   	Route::post('deleteStudent', 'Client\ClientUsersInfoController@deleteStudent');
-
-
+  	Route::post('changeClientUserApproveStatus', 'Client\ClientUsersInfoController@changeClientUserApproveStatus');
+  	Route::get('userTestResults/{id?}/{course?}', 'Client\ClientUsersInfoController@userTestResults');
+  	Route::post('showUserTestResults', 'Client\ClientUsersInfoController@showUserTestResults');
+  	Route::get('userCourses/{id?}/{course?}', 'Client\ClientUsersInfoController@userCourses');
+  	Route::post('showUserCourses', 'Client\ClientUsersInfoController@showUserCourses');
 
   	// register client user
   	Route::post('/register', 'ClientuserAuth\RegisterController@register');
@@ -598,6 +601,10 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('myCourses', 'Client\ClientUserController@myCourses');
 	Route::get('myCertificate', 'Client\ClientUserController@myCertificate');
 	Route::get('myTest', 'Client\ClientUserController@myTest');
+	Route::get('myCourseResults', 'Client\ClientUserController@myCourseResults');
+	Route::post('getCourseByCatIdBySubCatIdByUserId', 'Client\ClientUserController@getCourseByCatIdBySubCatIdByUserId');
+	Route::get('myTestResults', 'Client\ClientUserController@myTestResults');
+	Route::post('showUserTestResultsByCategoryBySubcategoryByUserId','Client\ClientUserController@showUserTestResultsByCategoryBySubcategoryByUserId');
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');

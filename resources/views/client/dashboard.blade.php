@@ -270,7 +270,9 @@
               </span>
             </a>
             <ul class="treeview-menu">
-              <li title="Show Users Info"><a href="{{ url('allUsers')}}"><i class="fa fa-circle-o"></i> All Users </a></li>
+              <li title="Show All Users "><a href="{{ url('allUsers')}}"><i class="fa fa-circle-o"></i> All Users </a></li>
+              <li title="Show Users Test Results"><a href="{{ url('userTestResults')}}"><i class="fa fa-circle-o"></i> User Test Results </a></li>
+              <li title="Show User Courses"><a href="{{ url('userCourses')}}"><i class="fa fa-circle-o"></i> User Courses </a></li>
             </ul>
           </li>
         <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-dashboard"></i> <span>Home</span></a></li>

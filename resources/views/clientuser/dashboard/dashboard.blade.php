@@ -80,6 +80,7 @@
           </a>
           <ul class="treeview-menu">
             <li title="My Online Courses"><a href="{{ url('myCourses')}}"><i class="fa fa-circle-o"></i> My Online Courses</a></li>
+            <li title="My Course Results"><a href="{{ url('myCourseResults')}}"><i class="fa fa-circle-o"></i> My Course Results</a></li>
             <li title="My Certificate"><a href="{{ url('myCertificate')}}"><i class="fa fa-circle-o"></i> My Certificate</a></li>
             <li title="More Courses"><a href="{{ url('online-courses')}}"><i class="fa fa-circle-o"></i> More Courses</a></li>
           </ul>
@@ -96,6 +97,7 @@
           </a>
           <ul class="treeview-menu">
             <li title="My Test"><a href="{{ url('myTest')}}"><i class="fa fa-circle-o"></i> My Test</a></li>
+            <li title="My Test Results"><a href="{{ url('myTestResults')}}"><i class="fa fa-circle-o"></i> My Test Results</a></li>
             <li title="More Test"><a href="{{ url('online-tests')}}"><i class="fa fa-circle-o"></i> More Test</a></li>
           </ul>
         </li>

@@ -1,4 +1,9 @@
-@extends('dashboard.dashboard')
+@extends('clientuser.dashboard.dashboard')
+@section('dashboard_header')
+  <link href="{{asset('css/sidemenuindex.css?ver=1.0')}}" rel="stylesheet"/>
+  <link href="{{asset('css/v_courses.css?ver=1.0')}}" rel="stylesheet"/>
+  <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
+@stop
 @section('module_title')
   <section class="content-header">
     <h1> Course Results </h1>
@@ -7,12 +12,6 @@
       <li class="active">Course Results </li>
     </ol>
   </section>
-  @if(Session::has('message'))
-    <div class="alert alert-success" id="message">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        {{ Session::get('message') }}
-    </div>
-  @endif
 @stop
 @section('dashboard_content')
 	<div class="content-wrapper v-container tab-content" >
@@ -20,20 +19,20 @@
       <div class="container">
         <div class="row">
           <div class="mrgn_20_btm">
-              <div class="col-md-3 mrgn_10_btm">
-               <select class="form-control" id="category" id="category" name="category" title="Category" onChange="selectSubcategory(this);">
-                <option value="0">Select Category</option>
-                @if(count($categories) > 0)
-                  @foreach($categories as $category)
-                    <option value="{{$category->id}}">{{$category->name}}</option>
-                  @endforeach
-                @endif
-               </select>
+              <div class="col-sm-4 mrgn_10_btm">
+                <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" title="Category">
+                  <option value="">Select Category ...</option>
+                  @if(count($categories) > 0)
+                    @foreach($categories as $category)
+                      <option value="{{$category->id}}">{{$category->name}}</option>
+                    @endforeach
+                  @endif
+                </select>
               </div>
-              <div class="col-md-3 ">
-               <select class="form-control" id="subcategory" name="subcategory" title="Sub Category" onChange="showResult(this);">
-                <option value="0">Select Sub Category</option>
-               </select>
+              <div class="col-sm-4">
+                <select id="subcategory" class="form-control" name="subcategory" onChange="showResult(this);" title="Sub Category">
+                  <option value="">Select Sub Category ...</option>
+                </select>
               </div>
           </div>
           <div class="col-lg-12" id="all-result">
@@ -86,7 +85,7 @@
     var userId = parseInt(document.getElementById('user_id').value);
     $.ajax({
         method: "POST",
-        url: "{{url('getCourseByCatIdBySubCatId')}}",
+        url: "{{url('getCourseByCatIdBySubCatIdByUserId')}}",
         data: {catId:catId, subcatId:subcatId, userId:userId}
     })
     .done(function( msg ) {
@@ -132,30 +131,31 @@
   }
 
   function selectSubcategory(ele){
-    id = parseInt($(ele).val());
-    document.getElementById('subcategory').value = 0;
+    var id = parseInt($(ele).val());
+    var userId = parseInt(document.getElementById('user_id').value);
     document.getElementById('course-result').innerHTML = '';
-    if( 0 < id ){
+
+    if( 0 < id && 0 < userId){
       $.ajax({
-              method: "POST",
-              url: "{{url('getCourseSubCategories')}}",
-              data: {id:id}
-          })
-          .done(function( msg ) {
-            select = document.getElementById('subcategory');
-            select.innerHTML = '';
-            var opt = document.createElement('option');
-            opt.value = '0';
-            opt.innerHTML = 'Select Sub Category';
-            select.appendChild(opt);
-            if( 0 < msg.length){
-              $.each(msg, function(idx, obj) {
-                  var opt = document.createElement('option');
-                  opt.value = obj.id;
-                  opt.innerHTML = obj.name;
-                  select.appendChild(opt);
-              });
-            }
+          method: "POST",
+          url: "{{url('getOnlineSubCategories')}}",
+          data: {id:id, userId:userId}
+      })
+      .done(function( msg ) {
+        select = document.getElementById('subcategory');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = 'Select Sub Category ...';
+        select.appendChild(opt);
+        if( 0 < msg.length){
+          $.each(msg, function(idx, obj) {
+              var opt = document.createElement('option');
+              opt.value = obj.id;
+              opt.innerHTML = obj.name;
+              select.appendChild(opt);
+          });
+        }
       });
     }
   }

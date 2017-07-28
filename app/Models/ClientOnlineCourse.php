@@ -273,4 +273,11 @@ class ClientOnlineCourse extends Model
             InputSanitise::delFolder($courseImageFolder);
         }
     }
+
+    protected static function getRegisteredOnlineCoursesByCourseidByUserId($courseId,$id){
+        return static::join('register_client_online_courses', 'register_client_online_courses.client_online_course_id', '=', 'client_online_courses.id')
+            ->where('client_online_courses.client_institute_course_id', $courseId)
+            ->where('register_client_online_courses.client_user_id', $id)
+            ->get();
+    }
 }

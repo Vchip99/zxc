@@ -50,4 +50,13 @@ class CourseCommentLike extends Model
 	    }
         return $commentLikesCount;
     }
+
+    protected static function deleteCourseCommentLikesByUserId($userId){
+        $commentLikes = static::where('user_id', $userId)->get();
+        if(is_object($commentLikes) && false == $commentLikes->isEmpty()){
+            foreach($commentLikes as $commentLike){
+                $commentLike->delete();
+            }
+        }
+    }
 }

@@ -40,4 +40,13 @@ class VkitProjectComment extends Model
     public function deleteLikes(){
         return $this->hasMany(VkitProjectCommentLike::class);
     }
+
+    protected static function deleteVkitProjectCommentsByUserId($userId){
+        $comments = static::where('user_id', $userId)->get();
+        if(is_object($comments) && false == $comments->isEmpty()){
+            foreach($comments as $comment){
+                $comment->delete();
+            }
+        }
+    }
 }

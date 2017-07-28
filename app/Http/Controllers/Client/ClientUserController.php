@@ -86,4 +86,33 @@ class ClientUserController extends BaseController
         }
         return ClientOnlineVideo::getCoursevideoCount($courseIds);
     }
+
+    protected function myCourseResults(){
+        $user = Auth::guard('clientuser')->user();
+        $categories = ClientOnlineCategory::where('client_id', $user->client_id)->get();
+        $courses = ClientOnlineCourse::getRegisteredOnlineCourses($user->id);
+        return view('clientuser.dashboard.myCourseResult', compact('courses', 'categories'));
+    }
+
+    protected function getCourseByCatIdBySubCatIdByUserId(Request $request){
+        $result = [];
+        $categoryId = $request->get('catId');
+        $subcategoryId = $request->get('subcatId');
+        $userId = $request->get('userId');
+        $result['courses'] = ClientOnlineCourse::getRegisteredOnlineCourseByCatIdBySubCatId($categoryId,$subcategoryId, $userId);
+        return $result;
+    }
+
+    protected function myTestResults(){
+        $user = Auth::guard('clientuser')->user();
+        $categories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($user->id);
+        $results = ClientScore::where('client_user_id', $user->id)->get();
+        $barchartLimits = range(100, 0, 10);
+        return view('clientuser.dashboard.myTestResults', compact('categories','results','barchartLimits'));
+    }
+
+    protected function showUserTestResultsByCategoryBySubcategoryByUserId(Request $request){
+
+        return ClientScore::getUserTestResultsByCategoryBySubcategoryByUserId($request);
+    }
 }

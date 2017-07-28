@@ -51,6 +51,7 @@
                     <tr>
                       <th>Sr. No.</th>
                       <th>Name</th>
+                      <th>Client Approve</th>
                       <th>Course</th>
                       <th>Courses Permission</th>
                       <th>Delete</th>
@@ -109,8 +110,17 @@
         eleTr.appendChild(eleIndex);
 
         var eleName = document.createElement('td');
-        eleName.innerHTML = obj.name;
+        eleName.innerHTML = '<a href="#studentModal_'+obj.id+'" data-toggle="modal">'+obj.name+'</a>';
         eleTr.appendChild(eleName);
+
+        var eleApprove = document.createElement('td');
+        approveInnerHTML = '<input type="checkbox" value="" data-client_user_id="'+ obj.id +'" data-client_id="'+ obj.client_id +'" onclick="changeApproveStatus(this);"';
+        if( 1 == obj.client_approve){
+          approveInnerHTML += 'checked = checked';
+        }
+        approveInnerHTML += '>';
+        eleApprove.innerHTML = approveInnerHTML;
+        eleTr.appendChild(eleApprove);
 
         var eleCourseName = document.createElement('td');
         eleCourseName.innerHTML = obj.courseName;
@@ -123,6 +133,27 @@
         var eleDelete = document.createElement('td');
         eleDelete.innerHTML = '<button class="btn btn-danger btn-xs delet-bt delet-btn" data-title="Delete" data-toggle="modal" data-target="#delete" data-client_user_id="'+ obj.id +'" data-client_id="'+ obj.client_id +'" onclick="deleteStudent(this);" ><span class="fa fa-trash-o" data-placement="top" data-toggle="tooltip" title="Delete"></span></button>';
         eleTr.appendChild(eleDelete);
+
+        var eleModel = document.createElement('div');
+        eleModel.className = 'modal';
+        eleModel.id = 'studentModal_'+obj.id;
+        eleModel.setAttribute('role', 'dialog');
+        var urlStudentTest = "{{url('userTestResults')}}/"+obj.id+'/'+obj.course_id;
+        var urlStudentCourse = "{{url('userCourses')}}/"+obj.id+'/'+obj.course_id;
+        // var urlStudentPlacement = "{{url('userPlacement')}}/"+obj.id+'/'+obj.course_id;
+        // var urlStudentVideo = "{{url('userVideo')}}/"+obj.id+'/'+obj.course_id;
+        var modelInnerHTML = '';
+        modelInnerHTML='<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button>';
+        modelInnerHTML +='<h4 class="modal-title">Student Details</h4>';
+
+        modelInnerHTML +='<div class="form-group"><div class="form-group"><label>Email:</label> '+obj.email+'</div><div class="form-group"><label>Phone:</label> '+obj.phone+'</div><div class="form-group"><a href="'+urlStudentTest+'">Test Result</a></div><div class="form-group"><a href="'+urlStudentCourse+'">Course</a></div>';
+        // modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
+        // modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Student Video Url</a></div>';
+
+        modelInnerHTML +='</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div>';
+        eleModel.innerHTML = modelInnerHTML;
+        eleTr.appendChild(eleModel);
+
         body.appendChild(eleTr);
 
         var elePerTr = document.createElement('tr');
@@ -272,5 +303,47 @@
     }
   }
 
+    function changeApproveStatus(ele){
+    var client_user_id = $(ele).data('client_user_id');
+    var client_id = $(ele).data('client_id');
+    if(client_id > 0 && client_user_id > 0){
+      $.confirm({
+        title: 'Confirmation',
+        content: 'Are you sure. you want to change user approval?',
+        type: 'red',
+        typeAnimated: true,
+        buttons: {
+              Ok: {
+                  text: 'Ok',
+                  btnClass: 'btn-red',
+                  action: function(){
+                    $.ajax({
+                      method: "POST",
+                      url: "{{url('changeClientUserApproveStatus')}}",
+                      data: {client_id:client_id,client_user_id:client_user_id}
+                    })
+                    .done(function( msg ) {
+                      if('false' == msg){
+                        if('checked' == $(ele).attr('checked')){
+                          $(ele).prop('checked', 'checked');
+                        } else {
+                          $(ele).prop('checked', '');
+                        }
+                      }
+                    });
+                  }
+              },
+              Cancle: function () {
+                if('checked' == $(ele).attr('checked')){
+                  $(ele).prop('checked', 'checked');
+                } else {
+                  $(ele).prop('checked', '');
+                }
+              }
+          }
+        });
+
+    }
+  }
 </script>
 @stop

@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Auth;
-use DB, Session;
+use App\Models\ClientOnlineTestSubject;
+use App\Models\ClientOnlineTestSubjectPaper;
+use App\Models\ClientOnlineTestQuestion;
+use App\Libraries\InputSanitise;
+use DB, Session, Auth;
 
 class ClientScore extends Model
 {
@@ -16,7 +19,7 @@ class ClientScore extends Model
      *
      * @var array
      */
-    protected $fillable = ['client_user_id', 'category_id', 'subcat_id','subject_id', 'paper_id', 'right_answered', 'wrong_answered', 'unanswered', 'test_score'];
+    protected $fillable = ['client_user_id', 'client_institute_course_id','category_id', 'subcat_id','subject_id', 'paper_id', 'right_answered', 'wrong_answered', 'unanswered', 'test_score'];
 
     /**
      *  add score
@@ -27,6 +30,7 @@ class ClientScore extends Model
     	$score = new static();
     	$score->client_user_id = $userId;
     	$score->category_id = $result['category_id'];
+        $score->client_institute_course_id = $result['client_institute_course_id'];
     	$score->subcat_id = $result['subcat_id'];
         $score->paper_id = $result['paper_id'];
         $score->subject_id = $result['subject_id'];
@@ -38,17 +42,6 @@ class ClientScore extends Model
 
     	return $score;
     }
-
-    // /**
-    //  *  update score by userId by scoreId
-    //  */
-    // protected function updateScoreByUserIdByScoreId($userId, $scoreId, $result){
-    //     $score = DB::connection('mysql2')->table('client_scores')
-    //         ->where('id', $scoreId)
-    //         ->where('client_user_id', $userId)
-    //         ->update([ 'category_id' => $result['category_id'] ,'subcat_id' => $result['subcat_id'],'subject_id' => $result['subject_id'],'paper_id' => $result['paper_id'] , 'right_answered' => $result['right_answered'], 'wrong_answered' => $result['wrong_answered'], 'unanswered' => $result['unanswered'], 'is_test_given' => $result['is_test_given'], 'test_score' => $result['marks'] ]);
-    //     return $score;
-    // }
 
     protected static function getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds){
         $paperIds = [];
@@ -91,7 +84,7 @@ class ClientScore extends Model
         return $paperIds;
     }
 
-       protected static function getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$testScore){
+   protected static function getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$testScore){
         if(is_object(Auth::guard('clientuser')->user())){
         return static::where('category_id', $categoryId)
                 ->where('subcat_id', $subcategoryId)
@@ -104,15 +97,91 @@ class ClientScore extends Model
         return;
     }
 
-    protected static function getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId){
-        if(is_object(Auth::guard('clientuser')->user())){
-        return static::where('category_id', $categoryId)
+    protected static function getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId, $courseId=NULL){
+        $result = static::where('category_id', $categoryId)
                 ->where('subcat_id', $subcategoryId)
                 ->where('paper_id', $paperId)
-                ->where('subject_id', $subjectId)
-                ->where('client_user_id', Auth::guard('clientuser')->user()->id)
-                ->count();
+                ->where('subject_id', $subjectId);
+        if($courseId > 0){
+            $result->where('client_institute_course_id', $courseId);
+        }
+        if(NULL == $courseId && is_object(Auth::guard('clientuser')->user())){
+            $result->where('client_user_id', Auth::guard('clientuser')->user()->id);
+        }
+        return $result->count();
+    }
+
+    protected static function deleteClientUserScores($userId){
+        $scores = static::where('client_user_id', $userId)->get();
+        if(is_object($scores) && false == $scores->isEmpty()){
+            foreach($scores as $score){
+                $score->delete();
+            }
         }
         return;
+    }
+
+    public function subject(){
+        return $this->belongsTo(ClientOnlineTestSubject::class, 'subject_id');
+    }
+
+    public function paper(){
+        return $this->belongsTo(ClientOnlineTestSubjectPaper::class, 'paper_id');
+    }
+
+    public function rank(){
+        $rank =$this->getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id,$this->test_score);
+        $totalRank =$this->getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id,$this->client_institute_course_id);
+        return ($rank + 1).'/'.$totalRank;
+    }
+    public function totalMarks(){
+        $totalMarks = 0;
+        if(is_object(Auth::guard('client')->user())){
+            $clientId = Auth::guard('client')->user()->id;
+        } else {
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+        }
+        $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByClientId($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id ,$clientId);
+        if( is_object($questions) && false == $questions->isEmpty()){
+            foreach($questions as $question){
+                $totalMarks += $question->positive_marks;
+            }
+        }
+        $percentage = round(($this->test_score/$totalMarks)*100,2);
+        return ['totalMarks' => $totalMarks, 'percentage' => $percentage];
+    }
+
+    public static function getClientScoreByUserIdByScoreId($studentId,$courseId){
+        return static::join('clientusers', 'clientusers.id', '=', 'client_scores.client_user_id')
+                ->join('client_online_test_subjects', 'client_online_test_subjects.id' , '=', 'client_scores.subject_id' )
+                ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.id' , '=', 'client_scores.paper_id' )
+                ->where('client_scores.client_user_id', $studentId)
+                ->where('client_scores.client_institute_course_id', $courseId)
+                ->select('client_scores.*', 'client_online_test_subjects.name as subject', 'client_online_test_subject_papers.name as paper')
+                ->get();
+    }
+
+    public static function getUserTestResultsByCategoryBySubcategoryByUserId(Request $request){
+        $ranks = [];
+        $marks = [];
+        $category = InputSanitise::inputInt($request->get('category'));
+        $subcategory = InputSanitise::inputInt($request->get('subcategory'));
+        $student = InputSanitise::inputInt($request->get('student'));
+        $scores = static::join('clientusers', 'clientusers.id', '=', 'client_scores.client_user_id')
+                ->join('client_online_test_subjects', 'client_online_test_subjects.id' , '=', 'client_scores.subject_id' )
+                ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.id' , '=', 'client_scores.paper_id' )
+                ->where('client_scores.category_id', $category)->where('client_scores.subcat_id', $subcategory)
+                ->where('client_scores.client_user_id', $student)
+                ->select('client_scores.*', 'client_online_test_subjects.name as subject', 'client_online_test_subject_papers.name as paper')->get();
+        if( false == $scores->isEmpty()){
+            foreach($scores as $score){
+                $ranks[$score->id] = $score->rank();
+                $marks[$score->id] = $score->totalMarks();
+            }
+        }
+        $result['scores'] = $scores;
+        $result['ranks'] = $ranks;
+        $result['marks'] = $marks;
+        return $result;
     }
 }

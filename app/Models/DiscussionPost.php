@@ -116,4 +116,14 @@ class DiscussionPost extends Model
             }
         }
     }
+
+    protected static function deleteAllDiscussionPostsByUserId($userId){
+        $posts = static::where('user_id', $userId)->get();
+        if(is_object($posts) && false == $posts->isEmpty()){
+            foreach($posts as $post){
+                $post->deleteCommantsAndSubComments();
+                $post->delete();
+            }
+        }
+    }
 }

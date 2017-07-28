@@ -31,4 +31,14 @@ class UserSolution extends Model
     								->where('paper_id', $paperId)
     								->get();
     }
+
+    protected static function deleteUserSolutionsByUserId($userId){
+        $userSolutions = static::where('user_id', $userId)->get();
+        if(is_object($userSolutions) && false == $userSolutions->isEmpty()){
+            foreach($userSolutions as $userSolution){
+                $userSolution->delete();
+            }
+        }
+        return;
+    }
 }
