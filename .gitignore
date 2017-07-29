@@ -1,0 +1,8 @@
+/node_modules
+/public/LiveCourseImages
+/public/client_images
+/public/courseImages
+/public/documentStorage
+/public/projectStorage
+/vendor
+.env
