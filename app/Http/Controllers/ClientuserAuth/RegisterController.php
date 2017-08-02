@@ -72,19 +72,13 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return Clientuser
      */
-    protected function create(array $data)
+    protected function create(array $data,$clientId)
     {
-        $subdomain = request()->getHost();
-        $client = Client::where('subdomain', $subdomain)->first();
-        if(!is_object($client)){
-            return Redirect::to('/');
-        }
-
         $clientUser = Clientuser::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
-            'client_id' => $client->id,
+            'client_id' => $clientId,
             'password' => bcrypt($data['password']),
             'email_token' => str_random(60),
         ]);
@@ -134,12 +128,20 @@ class RegisterController extends Controller
             $this->throwValidationException($request, $validator);
         }
 
-        // Using database transactions is useful here because stuff happening is actually a transaction
-        // I don't know what I said in the last line! Weird!
+        $subdomain = $request->getHost();
+        $client = Client::where('subdomain', $subdomain)->first();
+        if(!is_object($client)){
+            return Redirect::to('/');
+        }
+        $checkEmail = Clientuser::where('email', $request->get('email'))->where('client_id', $client->id)->first();
+        if(is_object($checkEmail)){
+            return Redirect::to('/')->withErrors('The email id '.$request->get('email').' is already exist.');
+        }
+
         DB::beginTransaction();
         try
         {
-            $user = $this->create($request->all());
+            $user = $this->create($request->all(),$client->id);
             // After creating the user send an email with the random token generated in the create method above
             $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
             Mail::to($user->email)->send($clientUserEmail);
