@@ -44,28 +44,55 @@ trait AuthenticatesUsers
 
             return $this->sendLockoutResponse($request);
         }
-
         $credentials = $this->credentials($request);
         $isValidUser = 'true';
-        if ($this->guard()->attempt($credentials, $request->has('remember'))) {
 
-            if(is_object(Auth::guard('clientuser')->user())){
-                $isValidUser = Clientuser::verifyUserWithSubdomain($request, $this->guard('clientuser')->user()->id);
-            } else if( is_object(Auth::guard('client')->user()) && Auth::guard('client')->user()->subdomain != (string) $request->getHost() ){
-                $isValidUser = 'false';
+        if(empty($request->route()->getParameter('client'))){
+            if ($request->is('admin/login')) {
+                if (!$this->guard('admin')->attempt($credentials, $request->has('remember'))) {
+                    $isValidUser = 'false';
+                }
+            } else {
+                if (!$this->guard('user')->attempt($credentials, $request->has('remember'))) {
+                    if (! $lockedOut) {
+                        $this->incrementLoginAttempts($request);
+                    }
+                    return $this->sendFailedLoginResponse($request, 'true');
+                }
             }
-            if( 'false' == $isValidUser ){
-                $this->guard()->logout();
-                Session::flush();
-                Session::regenerate();
-                return redirect()->back()->withErrors('Given credential doesnot match with subdomain.');
+            if( 'true' == $isValidUser ){
+                return $this->sendLoginResponse($request);
             }
-            return $this->sendLoginResponse($request);
-        } else if($this->guard()->attempt(['email' => $request->email,'password' => $request->password], $request->has('remember'))){
-            $this->guard()->logout();
-            Session::flush();
-            Session::regenerate();
-            return $this->sendFailedLoginResponse($request, 'true');
+        } else {
+            if($request->is('client/login')){
+                if ($this->guard('client')->attempt($credentials, $request->has('remember'))) {
+                    return $this->sendLoginResponse($request);
+                } else {
+                    if (! $lockedOut) {
+                        $this->incrementLoginAttempts($request);
+                    }
+                    return redirect()->back()->withErrors('Given credential doesnot match with subdomain.');
+                }
+            } else {
+                if ($this->guard('clientuser')->attempt($credentials, $request->has('remember'))) {
+                    $clientUser = Auth::guard('clientuser')->user();
+                    if(0 == $clientUser->verified || 0 == $clientUser->client_approve){
+                        $this->guard('clientuser')->logout();
+                        Session::flush();
+                        Session::regenerate();
+                        if (! $lockedOut) {
+                            $this->incrementLoginAttempts($request);
+                        }
+                        return $this->sendFailedLoginResponse($request, 'true');
+                    }
+                    return $this->sendLoginResponse($request);
+                } else {
+                    if (! $lockedOut) {
+                        $this->incrementLoginAttempts($request);
+                    }
+                    return redirect()->back()->withErrors('Given credential doesnot match with subdomain.');
+                }
+            }
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts
@@ -120,13 +147,14 @@ trait AuthenticatesUsers
                         'password' => $request->password,
                         'verified' => 1,
                         'admin_approve' => 1,
+                        'subdomain' => (string) $request->getHost(),
                     ];
             } else {
+                $client = Client::where('subdomain', $request->getHost())->first();
                 return [
                         'email' => $request->email,
                         'password' => $request->password,
-                        'verified' => 1,
-                        'client_approve' => 1,
+                        'client_id' => $client->id,
                     ];
             }
         }
@@ -184,15 +212,14 @@ trait AuthenticatesUsers
                     return redirect()->back()->withErrors([$errorMessage]);
                 }
             } else {
-
-                $userNotVerify = Clientuser::where('email', $request->email)->where('verified', 0)->first();
+                $client = Client::where('subdomain', $request->getHost())->first();
+                $userNotVerify = Clientuser::where('email', $request->email)->where('client_id', $client->id)->where('verified', 0)->first();
                 if(is_object($userNotVerify)){
                     $errorMessage = 'Please verify your account and then login';
                     return redirect()->back()->withErrors([$errorMessage, 'verify_email']);
                 } else {
-                    $adminNotapprove = Clientuser::where('email', $request->email)->where('verified', 1)->where('client_approve', 0)->first();
+                    $adminNotapprove = Clientuser::where('email', $request->email)->where('client_id', $client->id)->where('verified', 1)->where('client_approve', 0)->first();
                     if(is_object($adminNotapprove)){
-                        $client = Clientuser::getClientByClientUserEmail($request, $request->email);
                         if(is_object($client)){
                             $errorMessage = 'Your account is not approve. you can contact at '.$client->email.' to approve your account.';
                         }

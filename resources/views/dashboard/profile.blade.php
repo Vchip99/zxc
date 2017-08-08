@@ -2,10 +2,6 @@
 @section('module_title')
   <section class="content-header">
     <h1> Profile </h1>
-    <!-- <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Online Courses</li>
-      <li class="active">My Certificate </li>
-    </ol> -->
   </section>
 @stop
 @section('dashboard_content')
@@ -16,6 +12,12 @@
           <div class="col-md-7 col-md-offset-2">
             <div class="panel panel-default">
               <div class="panel-heading">
+                @if(Session::has('message'))
+                  <div class="alert alert-success" id="message">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                      {{ Session::get('message') }}
+                  </div>
+                @endif
                 @if(count($errors) > 0)
                   <div class="alert alert-danger">
                       <ul>
@@ -205,7 +207,7 @@
                       <div class="col-xs-10">
                         <div class="row">
                             <div class="col-xs-12 ">
-                              <b><a href="#student_resume" data-toggle="modal" >Resume</a></b>
+                              <b><a href="#student_resume" data-toggle="modal" >Show Resume</a></b>
                             </div>
                         </div>
                       </div>

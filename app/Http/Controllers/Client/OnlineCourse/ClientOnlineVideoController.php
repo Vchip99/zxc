@@ -9,6 +9,7 @@ use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineVideo;
 use App\Models\ClientOnlineCourse;
+use App\Models\ClientInstituteCourse;
 
 class ClientOnlineVideoController extends ClientBaseController
 {
@@ -25,6 +26,7 @@ class ClientOnlineVideoController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateVideo = [
+        'institute_course' => 'required|integer',
         'video' => 'required|string',
         'description' => 'required|string',
         'duration' => 'required|integer',
@@ -48,9 +50,11 @@ class ClientOnlineVideoController extends ClientBaseController
      *  show create course video UI
      */
     protected function create(Request $request){
-    	$courses = ClientOnlineCourse::showCourses($request);
+        $clientId = Auth::guard('client')->user()->id;
+        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
+    	$courses = [];
     	$video = new ClientOnlineVideo;
-    	return view('client.onlineCourse.video.create', compact('courses', 'video'));
+    	return view('client.onlineCourse.video.create', compact('instituteCourses','courses', 'video'));
     }
 
     /**
@@ -87,8 +91,9 @@ class ClientOnlineVideoController extends ClientBaseController
     	if(isset($id)){
     		$video = ClientOnlineVideo::find($id);
     		if(is_object($video)){
+                $instituteCourses = ClientInstituteCourse::where('client_id', $video->client_institute_course_id)->get();
     			$courses = ClientOnlineCourse::showCourses($request);
-    			return view('client.onlineCourse.video.create', compact('courses', 'video'));
+    			return view('client.onlineCourse.video.create', compact('instituteCourses','courses', 'video'));
     		}
     	}
     	return Redirect::to('manageOnlineVideo');

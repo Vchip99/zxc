@@ -230,6 +230,18 @@
                 <li title="Show User Placement"><a href="{{ url('admin/userPlacement')}}"><i class="fa fa-circle-o"></i> User Placement </a></li>
                 <li title="Show User video"><a href="{{ url('admin/userVideo')}}"><i class="fa fa-circle-o"></i> User Video </a></li>
               @endif
+                <li title="Show Un Approve Users"><a href="{{ url('admin/unapproveUsers')}}"><i class="fa fa-circle-o"></i> Un Approve Users </a></li>
+            </ul>
+          </li>
+          <li class="treeview">
+            <a href="#" title="All Test Results">
+              <i class="fa fa-trophy"></i> <span>All Test Results</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Show All Test Results"><a href="{{ url('admin/allTestResults')}}"><i class="fa fa-circle-o"></i> All Test Results </a></li>
             </ul>
           </li>
           <li class="treeview">

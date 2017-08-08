@@ -22,6 +22,7 @@ use App\Models\DiscussionPostLike;
 use App\Models\DiscussionCommentLike;
 use App\Models\DiscussionSubCommentLike;
 use App\Models\CollegeDept;
+use App\Models\College;
 use Auth,Hash,DB, Redirect,Session,Validator;
 
 class AccountController extends Controller
@@ -211,8 +212,10 @@ class AccountController extends Controller
 
     protected function students(Request $request){
         $user = Auth::user();
-        $students = User::getAllStudentsByCollegeIdByDeptId($user->college_id,$user->college_dept_id, self::Student);
-        $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        $collegeDepts = [];
+        if(5 == $user->user_type || 6 == $user->user_type){
+            $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        }
         return view('dashboard.students', compact('students', 'collegeDepts'));
     }
 
@@ -246,9 +249,14 @@ class AccountController extends Controller
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
+            if(4 == $user->user_type){
+                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
+            } else {
+                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
+            }
             $results = Score::where('user_id', $id)->get();
             Session::set('selected_student', $id);
+            Session::set('selected_user_type', $selectedStudent->user_type);
         }
         $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
         $barchartLimits = range(100, 0, 10);
@@ -271,7 +279,11 @@ class AccountController extends Controller
         $result['ranks'] = $ranks;
         $result['marks'] = $marks;
         if($request->student > 0){
-            Session::set('selected_student', $request->student);
+            $selectedStudent = User::find($request->student);
+            if(is_object($selectedStudent)){
+                Session::set('selected_student', $selectedStudent->id);
+                Session::set('selected_user_type', $selectedStudent->user_type);
+            }
         }
         return $result;
     }
@@ -286,8 +298,13 @@ class AccountController extends Controller
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
+            if(4 == $user->user_type){
+                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
+            } else {
+                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
+            }
             Session::set('selected_student', $id);
+            Session::set('selected_user_type', $selectedStudent->user_type);
         } else {
             $students = User::getAllStudentsByCollegeIdByDeptId($user->college_id,$user->college_dept_id);
             $selectedStudent = '';
@@ -311,9 +328,14 @@ class AccountController extends Controller
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
+            if(4 == $user->user_type){
+                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
+            } else {
+                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
+            }
             $courses = CourseCourse::getRegisteredOnlineCourses($id);
             Session::set('selected_student', $id);
+            Session::set('selected_user_type', $selectedStudent->user_type);
         }
         $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
 
@@ -327,7 +349,7 @@ class AccountController extends Controller
             $user = User::updateUser($request);
             if(is_object($user)){
                 DB::commit();
-                return Redirect::to('profile');
+                return Redirect::to('profile')->with('message', 'User profile updated successfully.');
             }
         }
         catch(\Exception $e)
@@ -340,21 +362,30 @@ class AccountController extends Controller
 
     protected function showStudentsByDepartmentByYear(Request $request){
         $user = Auth::user();
-        if($request->department > 0){
-            return User::getAllStudentsByCollegeIdByDeptIdByYear($user->college_id,$request->department, $request->year);
+        if(3 == $user->user_type || 4 == $user->user_type){
+            return User::getAllUsersByCollegeIdByDeptIdByYearByUserType($user->college_id,$user->college_dept_id, $request->year, $request->user_type);
         } else {
-            return User::getAllStudentsByCollegeIdByDeptIdByYear($user->college_id,$user->college_dept_id, $request->year);
+            return User::getAllUsersByCollegeIdByDeptIdByYearByUserType($user->college_id,$request->department, $request->year, $request->user_type);
         }
     }
 
     protected function getStudentById(Request $request){
-        Session::set('selected_student', $request->student);
-        return User::getStudentById($request->student);
+        $selectedStudent = User::getStudentById($request->student);
+        if(is_object($selectedStudent)){
+            Session::set('selected_student', $selectedStudent->id);
+            Session::set('selected_user_type', $selectedStudent->user_type);
+            return $selectedStudent;
+        }
+        return;
     }
 
     protected function showStudentCourses(Request $request){
-        Session::set('selected_student', $request->student);
-        return CourseCourse::getRegisteredOnlineCourses($request->student);
+        $selectedStudent = User::getStudentById($request->student);
+        if(is_object($selectedStudent)){
+            Session::set('selected_student', $selectedStudent->id);
+            Session::set('selected_user_type', $selectedStudent->user_type);
+        }
+        return CourseCourse::getOnlineCoursesByUserIdByCategoryBySubCategory($request->student,$request->category,$request->subcategory);
     }
 
     protected function myCourseResults(){
@@ -388,4 +419,55 @@ class AccountController extends Controller
         $result['marks'] = $marks;
         return $result;
     }
+
+    protected function allTestResults(){
+        $colleges = College::all();
+        $categories = TestCategory::all();
+        $scores =[];
+        return view('dashboard.allTestResults', compact('colleges', 'categories', 'scores'));
+    }
+
+    protected function getSubjectsByCatIdBySubcatId(Request $request){
+        return TestSubject::getSubjectsByCatIdBySubcatid($request->catId, $request->subcatId);
+
+    }
+
+    protected function getPapersBySubjectId(Request $request){
+        return TestSubjectPaper::getSubjectPapersBySubjectId($request->subjectId);
+    }
+
+    protected function getAllTestResults(Request $request){
+        $ranks = [];
+        $marks = [];
+        $colleges = [];
+        $departments = [];
+        $scores = Score::getAllUsersResults($request);
+        if( false == $scores->isEmpty()){
+            foreach($scores as $score){
+                $ranks[$score->id] = $score->rank();
+                $marks[$score->id] = $score->totalMarks();
+                if(is_object($score->user->college) && $score->user->college->id > 0){
+                  $colleges[$score->id] = $score->user->college->name;
+                }else if(is_object($score->user) && 'other' == $score->user->college_id){
+                    $colleges[$score->id] = $score->user->other_source;
+                }else{
+                    $colleges[$score->id] = 'Client';
+                }
+                if(is_object($score->user->department) && $score->user->department->id > 0){
+                  $departments[$score->id] = $score->user->department->name;
+                }else if(is_object($score->user) && 'other' == $score->user->college_id){
+                    $departments[$score->id] = 'Other';
+                }else{
+                    $departments[$score->id] = 'Client';
+                }
+            }
+        }
+        $results['scores'] = $scores;
+        $results['ranks'] = $ranks;
+        $results['marks'] = $marks;
+        $results['colleges'] = $colleges;
+        $results['departments'] = $departments;
+        return $results;
+    }
+
 }

@@ -66,7 +66,7 @@
                   </div>
                 </div>
                 <div class="course-auther">
-                  <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right" aria-hidden="true"> {{$course->author}}</i>
+                  <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
                   </a>
                 </div>
               </div>

@@ -11,8 +11,8 @@
 @section('dashboard_content')
 	<script src="{{ asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
 	@php
-		if(Session::has('client_search_selected_institute_category')){
-			$clientSearchSelectedInstituteCategoryId = Session::get('client_search_selected_institute_category');
+		if(Session::has('client_selected_institute_category')){
+			$clientSearchSelectedInstituteCategoryId = Session::get('client_selected_institute_category');
 		} else {
 			$clientSearchSelectedInstituteCategoryId = 0;
 		}
@@ -438,7 +438,7 @@ ul#ul > li > a:hover:not(.active) {
 	    if( 0 < id ){
 	      $.ajax({
 	              method: "POST",
-	              url: "{{url('getOnlineCategories')}}",
+	              url: "{{url('getOnlineTestCategories')}}",
 	              data: {id:id}
 	          })
 	          .done(function( msg ) {

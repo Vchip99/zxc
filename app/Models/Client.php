@@ -12,6 +12,22 @@ use App\Models\ClientHomePage;
 use App\Models\ClientTestimonial;
 use App\Models\ClientTeam;
 use App\Models\ClientCustomer;
+use App\Models\ClientCourseComment;
+use App\Models\ClientCourseCommentLike;
+use App\Models\ClientCourseSubComment;
+use App\Models\ClientCourseSubCommentLike;
+use App\Models\ClientInstituteCourse;
+use App\Models\ClientOnlineCategory;
+use App\Models\ClientOnlineCourse;
+use App\Models\ClientOnlineSubCategory;
+use App\Models\ClientOnlineTestCategory;
+use App\Models\ClientOnlineTestQuestion;
+use App\Models\ClientOnlineTestSubCategory;
+use App\Models\ClientOnlineTestSubject;
+use App\Models\ClientOnlineTestSubjectPaper;
+use App\Models\ClientOnlineVideo;
+use App\Models\ClientOnlineVideoLike;
+use App\Models\ClientUserInstituteCourse;
 
 class Client extends Authenticatable
 {
@@ -105,29 +121,56 @@ class Client extends Authenticatable
         return 'false';
     }
 
-    protected function deleteOtherInfoByClient($client){
+    public function deleteOtherInfoByClient($client){
         $subdomain = explode('.', $client->subdomain);
         $clientFolderName = $subdomain[0];
         $clientFolder = "client_images/".$clientFolderName;
         if(is_dir($clientFolder)){
             InputSanitise::delFolder($clientFolder);
         }
+        $clientUserFolder = "clientUserStorage/".str_replace(' ', '_', $client->name);
+        if(is_dir($clientUserFolder)){
+            InputSanitise::delFolder($clientUserFolder);
+        }
         $clientHomePage = ClientHomePage::find($client->id);
         if(is_object($clientHomePage)){
             $clientHomePage->delete();
         }
-        $clientTestimonial = ClientTestimonial::find($client->id);
-        if(is_object($clientTestimonial)){
-            $clientTestimonial->delete();
+        $clientTestimonials = ClientTestimonial::where('client_id',$client->id)->get();
+        if(is_object($clientTestimonials) && false == $clientTestimonials->isEmpty()){
+            foreach($clientTestimonials as $clientTestimonial){
+                $clientTestimonial->delete();
+            }
         }
-        $clientTeam = ClientTeam::find($client->id);
-        if(is_object($clientTeam)){
-            $clientTeam->delete();
+        $clientTeams = ClientTeam::where('client_id',$client->id)->get();
+        if(is_object($clientTeams) && false == $clientTeams->isEmpty()){
+            foreach($clientTeams as $clientTeam){
+                $clientTeam->delete();
+            }
         }
-        $clientCustomer = ClientCustomer::find($client->id);
-        if(is_object($clientCustomer)){
-            $clientCustomer->delete();
+        $clientCustomers = ClientCustomer::where('client_id',$client->id)->get();
+        if(is_object($clientCustomers) && false == $clientCustomers->isEmpty()){
+            foreach($clientCustomers as $clientCustomer){
+                $clientCustomer->delete();
+            }
         }
+
+        ClientCourseComment::deleteClientCourseCommentsByClientId($client->id);
+        ClientCourseCommentLike::deleteClientCourseCommentLikesByClientId($client->id);
+        ClientCourseSubComment::deleteClientCourseSubCommentsByUserId($client->id);
+        ClientCourseSubCommentLike::deleteClientCourseSubCommentLikesByUserId($client->id);
+        ClientInstituteCourse::deleteClientInstituteCoursesByClientId($client->id);
+        ClientOnlineCategory::deleteClientOnlineCategoriesByClientId($client->id);
+        ClientOnlineCourse::deleteClientOnlineCoursesByClientId($client->id);
+        ClientOnlineSubCategory::deleteClientOnlineSubCategoriesByClientId($client->id);
+        ClientOnlineTestCategory::deleteClientOnlineTestCategoriesByClientId($client->id);
+        ClientOnlineTestQuestion::deleteClientOnlineTestQuestionsByClientId($client->id);
+        ClientOnlineTestSubCategory::deleteClientOnlineTestSubCategoriesByClientId($client->id);
+        ClientOnlineTestSubject::deleteClientOnlineTestSubjectsByClientId($client->id);
+        ClientOnlineTestSubjectPaper::deleteClientOnlineTestSubjectPapersByClientId($client->id);
+        ClientOnlineVideo::deleteClientOnlineVideosByClientId($client->id);
+        ClientOnlineVideoLike::deleteClientOnlineVideoLikesByClientId($client->id);
+        ClientUserInstituteCourse::deleteClientUserInstituteCourseByClientId($client->id);
         return;
     }
 }

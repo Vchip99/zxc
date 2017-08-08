@@ -48,9 +48,17 @@
           <select class="form-control" id="category_id" name="category_id" onchange="showSubCategories(this);" title="Category">
             <option>Select Category ...</option>
             @if(count($testCategories) > 0)
-              @foreach($testCategories as $testCategory)
-                  <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
-              @endforeach
+              @if(Auth::guard('clientuser')->user())
+                @foreach($testCategories as $testCategory)
+                  @if(in_array($testCategory->client_institute_course_id, $userCategoryPermissionIds))
+                    <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
+                  @endif
+                @endforeach
+              @else
+                @foreach($testCategories as $testCategory)
+                    <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
+                @endforeach
+              @endif
             @endif
           </select>
         </div>
@@ -58,22 +66,43 @@
       <div class="col-sm-9">
         <div class="row" id="testSubCategories">
           @if(count($testSubCategories) > 0)
-            @foreach($testSubCategories as $testSubCategory)
-              <div class=" col-sm-6 slideanim">
-                  <div class="vchip_product_item">
-                    <div class="" title="{{$testSubCategory->name}}">
-                      <img src="{{asset($testSubCategory->image_path)}}" class="img-responsive" width="800" height="400" alt="test "/>
+            @if(Auth::guard('clientuser')->user())
+              @foreach($testSubCategories as $testSubCategory)
+                @if(in_array($testSubCategory->client_institute_course_id, $userSubCategoryPermissionIds))
+                <div class=" col-sm-6 slideanim">
+                    <div class="vchip_product_item">
+                      <div class="" title="{{$testSubCategory->name}}">
+                        <img src="{{asset($testSubCategory->image_path)}}" class="img-responsive" width="800" height="400" alt="test "/>
+                      </div>
+                      <ul class="mrgn_5_top vchip_categories list-inline">
+                        <li>{{$testSubCategory->name}}</li>
+                      </ul>
+                      <div class="vchip_product_content">
+                      <p class="" title="Start Test"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link">Start Test <i  class="fa fa-angle-right" aria-hidden="true"></i></a>
+                        </p>
+                      </div>
                     </div>
-                    <ul class="mrgn_5_top vchip_categories list-inline">
-                      <li>{{$testSubCategory->name}}</li>
-                    </ul>
-                    <div class="vchip_product_content">
-                    <p class="" title="Start Test"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link">Start Test <i  class="fa fa-angle-right" aria-hidden="true"></i></a>
-                      </p>
+                </div>
+                @endif
+              @endforeach
+            @else
+              @foreach($testSubCategories as $testSubCategory)
+                <div class=" col-sm-6 slideanim">
+                    <div class="vchip_product_item">
+                      <div class="" title="{{$testSubCategory->name}}">
+                        <img src="{{asset($testSubCategory->image_path)}}" class="img-responsive" width="800" height="400" alt="test "/>
+                      </div>
+                      <ul class="mrgn_5_top vchip_categories list-inline">
+                        <li>{{$testSubCategory->name}}</li>
+                      </ul>
+                      <div class="vchip_product_content">
+                      <p class="" title="Start Test"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link">Start Test <i  class="fa fa-angle-right" aria-hidden="true"></i></a>
+                        </p>
+                      </div>
                     </div>
-                  </div>
-              </div>
-            @endforeach
+                </div>
+              @endforeach
+            @endif
           @else
             No tests are available.
           @endif

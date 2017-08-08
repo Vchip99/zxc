@@ -29,6 +29,7 @@
           <th>#</th>
           <th>Video Name</th>
           <th>Course Name</th>
+          <th>Institute Course Name</th>
           <th>Edit Video</th>
           <th>Delete Video</th>
         </tr>
@@ -40,6 +41,7 @@
             <th scope="row">{{ $index + 1}}</th>
             <td>{{$video->name}}</td>
             <td>{{$video->course->name}}</td>
+            <td>{{$video->instituteCourse->name}}</td>
             <td>
               <a href="{{url('onlinevideo')}}/{{$video->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$video->name}}"/>

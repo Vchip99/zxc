@@ -218,7 +218,7 @@
         <li class="header">Vchip TECHNOLOGY</li>
         <li class="treeview">
           <a href="#" title="Institute Courses">
-            <i class="fa fa-files-o"></i>
+            <i class="fa fa-university"></i>
             <span>Institute Courses</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
@@ -273,9 +273,22 @@
               <li title="Show All Users "><a href="{{ url('allUsers')}}"><i class="fa fa-circle-o"></i> All Users </a></li>
               <li title="Show Users Test Results"><a href="{{ url('userTestResults')}}"><i class="fa fa-circle-o"></i> User Test Results </a></li>
               <li title="Show User Courses"><a href="{{ url('userCourses')}}"><i class="fa fa-circle-o"></i> User Courses </a></li>
+              <li title="Show User Placement"><a href="{{ url('userPlacement')}}"><i class="fa fa-circle-o"></i> User Placement </a></li>
+              <li title="Show User Video"><a href="{{ url('userVideo')}}"><i class="fa fa-circle-o"></i> User Video </a></li>
             </ul>
           </li>
-        <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-dashboard"></i> <span>Home</span></a></li>
+          <li class="treeview">
+            <a href="#" title="All Test Results">
+              <i class="fa fa-trophy"></i> <span>All Test Results</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Show All Test Results"><a href="{{ url('allTestResults')}}"><i class="fa fa-circle-o"></i> All Test Results </a></li>
+            </ul>
+          </li>
+        <!-- <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li> -->
         <li class="header">LABELS</li>
         <li title="Logout">
           <a href="{{ url('client/logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

@@ -53,4 +53,13 @@ class ClientCourseSubComment extends Model
     public function deleteLikes(){
         return $this->hasMany(ClientCourseSubCommentLike::class);
     }
+
+    protected static function deleteClientCourseSubCommentsByUserId($clientId){
+        $subcomments = static::where('client_id', $clientId)->get();
+        if(is_object($subcomments) && false == $subcomments->isEmpty()){
+            foreach($subcomments as $subcomment){
+                $subcomment->delete();
+            }
+        }
+    }
 }

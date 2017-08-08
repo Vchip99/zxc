@@ -140,15 +140,15 @@
         eleModel.setAttribute('role', 'dialog');
         var urlStudentTest = "{{url('userTestResults')}}/"+obj.id+'/'+obj.course_id;
         var urlStudentCourse = "{{url('userCourses')}}/"+obj.id+'/'+obj.course_id;
-        // var urlStudentPlacement = "{{url('userPlacement')}}/"+obj.id+'/'+obj.course_id;
-        // var urlStudentVideo = "{{url('userVideo')}}/"+obj.id+'/'+obj.course_id;
+        var urlStudentPlacement = "{{url('userPlacement')}}/"+obj.id+'/'+obj.course_id;
+        var urlStudentVideo = "{{url('userVideo')}}/"+obj.id+'/'+obj.course_id;
         var modelInnerHTML = '';
         modelInnerHTML='<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button>';
         modelInnerHTML +='<h4 class="modal-title">Student Details</h4>';
 
         modelInnerHTML +='<div class="form-group"><div class="form-group"><label>Email:</label> '+obj.email+'</div><div class="form-group"><label>Phone:</label> '+obj.phone+'</div><div class="form-group"><a href="'+urlStudentTest+'">Test Result</a></div><div class="form-group"><a href="'+urlStudentCourse+'">Course</a></div>';
-        // modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
-        // modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Student Video Url</a></div>';
+        modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
+        modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Student Video Url</a></div>';
 
         modelInnerHTML +='</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div>';
         eleModel.innerHTML = modelInnerHTML;
@@ -160,7 +160,7 @@
         elePerTr.id = 'user_permission_'+ obj.id +'_'+obj.course_id;
         elePerTr.className = 'hide';
         var elePerTd = document.createElement('td');
-        elePerTd.setAttribute('colspan', '5');
+        elePerTd.setAttribute('colspan', '6');
 
         var eleTable = document.createElement('table');
         var eleThead = document.createElement('thead');

@@ -107,7 +107,7 @@
      <div class="col-md-8 col-md-offset-2 text-center mrgn-60-top">
         <h2 class="v_h2_title">OUR PRODUCT</h2>
         <hr class="section-dash-dark"/>
-        <h3 class="v_h3_title">Digital villege is our dream...</h3>
+        <h3 class="v_h3_title">Digital village is our dream...</h3>
       </div>
   </div>
   <div class="row">
@@ -346,7 +346,7 @@
       <div class="person-detail ">
         <div class="arrow-top"></div>
         <p><strong>Mr. Ajay Jangra</strong></p>
-        <p>Professor</p>
+        <p>Adjunct Professor</p>
         <p>M-Tech: IIT Kharagpur </p>
       </div>
       <div class="person slideanim">
@@ -360,7 +360,7 @@
       <div class="person-detail slideanim">
         <div class="arrow-bottom"></div>
         <p><strong>Mr. Vishal Kumar</strong></p>
-        <p>Adjoint Professor</p>
+        <p>Adjunct Professor</p>
         <p>M-Tech: IIT Kharagpur </p>
       </div>
     </div>
@@ -368,7 +368,7 @@
       <div class="person-detail">
         <div class="arrow-top"></div>
         <p><strong>Mr. Vishal Parvani</strong></p>
-        <p>Adjoint Professor</p>
+        <p>Adjunct Professor</p>
         <p>M-Tech: Bits Pilani </p>
       </div>
       <div class="person slideanim">
@@ -382,7 +382,7 @@
       <div class="person-detail slideanim">
         <div class="arrow-bottom"></div>
         <p><strong>Mr. Vartul Sharma</strong></p>
-        <p>Adjoint Professor</p>
+        <p>Adjunct Professor</p>
         <p>M-Tech: COEP Pune </p>
       </div>
     </div>
@@ -390,7 +390,7 @@
       <div class="person-detail">
         <div class="arrow-top"></div>
         <p><strong>Mr. Aditya Jagtap</strong></p>
-        <p>Adjoint Professor</p>
+        <p>Adjunct Professor</p>
         <p>M-Tech: VIT Vellore </p>
       </div>
       <div class="person slideanim">

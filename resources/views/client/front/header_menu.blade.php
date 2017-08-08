@@ -14,11 +14,12 @@
         <div class="pull-right dropdown " >
           <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><i class="fa fa-user" aria-hidden="true"></i><b class="caret"></b>
           </a>
-          @if(Auth::guard('clientuser')->user())
+
+          @if(is_object(Auth::guard('clientuser')->user()))
             <ul class="dropdown-menu" role="menu">
               <div class="navbar-content">
                 <li>
-                  <a href="{{ url('dashboard')}}" title="Dashbord"><i class="fa fa-tachometer" aria-hidden="true"></i>Dashbord</a>
+                  <a href="{{ url('profile')}}" title="Dashbord"><i class="fa fa-tachometer" aria-hidden="true"></i>Dashbord</a>
                 </li>
                 <!-- <li><a href=""><i class="fa fa-user" aria-hidden="true"></i>My Profile</a></li> -->
                 <li><a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" title="Logout"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
@@ -45,15 +46,28 @@
           <li class="" title="Main Site"><a href="{{ $subdomain->institute_url }}" target="_blank">Main Site</a></li>
           <li class="" title="HOME"><a href="{{ url('/')}}">HOME</a></li>
           @if(1 == $client->course_permission)
-            <li class="" title="Online Course">
-              <a href="{{ url('online-courses')}}"> Online Course </a>
-            </li>
+            @if( is_object(Auth::guard('clientuser')->user()) && Auth::guard('clientuser')->user()::getUserCoursePermissionCount() > 0)
+              <li class="" title="Online Course">
+                <a href="{{ url('online-courses')}}"> Online Course </a>
+              </li>
+            @elseif(!is_object(Auth::guard('clientuser')->user()))
+              <li class="" title="Online Course">
+                <a href="{{ url('online-courses')}}"> Online Course </a>
+              </li>
+            @endif
           @endif
           @if(1 == $client->test_permission)
-            <li class="dropdown" title="Online Tests">
-              <a href="{{ url('online-tests')}}"> Online Tests </a>
-              </a>
-            </li>
+            @if( is_object(Auth::guard('clientuser')->user()) && Auth::guard('clientuser')->user()::getUserTestPermissionCount() > 0)
+              <li class="dropdown" title="Online Tests">
+                <a href="{{ url('online-tests')}}"> Online Tests </a>
+                </a>
+              </li>
+            @elseif(!is_object(Auth::guard('clientuser')->user()))
+              <li class="dropdown" title="Online Tests">
+                <a href="{{ url('online-tests')}}"> Online Tests </a>
+                </a>
+              </li>
+            @endif
           @endif
         </ul>
    </div>

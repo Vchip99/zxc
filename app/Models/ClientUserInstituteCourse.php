@@ -61,4 +61,25 @@ class ClientUserInstituteCourse extends Model
     	}
     	return $isSuccess;
     }
+
+    protected static function getCoursePermissionsByUserByCourseIdsByModule($courseIds, $module){
+    	$user = Auth::guard('clientuser')->user();
+    	$result = static::where('client_id', $user->client_id)->where('client_user_id', $user->id)
+    				->whereIn('client_institute_course_id', $courseIds);
+    	if('course' == $module){
+    		$result->where('course_permission', 1);
+    	} else {
+    		$result->where('test_permission', 1);
+    	}
+		return $result->select('client_institute_course_id')->get();
+    }
+
+    protected static function deleteClientUserInstituteCourseByClientId($clientId){
+        $courses = static::where('client_id', $clientId)->get();
+        if(is_object($courses) && false == $courses->isEmpty()){
+            foreach($courses as $course){
+                $course->delete();
+            }
+        }
+    }
 }

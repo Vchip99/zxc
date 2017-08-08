@@ -212,4 +212,13 @@ class ClientOnlineTestSubjectPaper extends Model
             }
         }
     }
+
+    protected static function deleteClientOnlineTestSubjectPapersByClientId($clientId){
+        $subjectPapers = static::where('client_id', $clientId)->get();
+        if(is_object($subjectPapers) && false == $subjectPapers->isEmpty()){
+            foreach($subjectPapers as $subjectPaper){
+                $subjectPaper->delete();
+            }
+        }
+    }
 }

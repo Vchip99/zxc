@@ -96,7 +96,7 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     	if(isset($id)){
     		$paper = ClientOnlineTestSubjectPaper::find($id);
     		if(is_object($paper)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $paper->client_institute_course_id)->get();
+                $instituteCourses = ClientInstituteCourse::where('client_id', $paper->client_id)->get();
     			$testCategories    = ClientOnlineTestCategory::showCategories($request);
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($paper->category_id, $request);
 				$testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId($paper->category_id, $paper->sub_category_id, $request);

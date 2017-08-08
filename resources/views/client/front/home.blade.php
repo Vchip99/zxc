@@ -280,25 +280,49 @@
         </div>
     @endif
     @if(count($onlineCourses) > 0)
-      @foreach($onlineCourses as $course)
-        <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
-          <div class="vchip_product_itm text-left">
-            <figure>
-              <img src="{{asset($course->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $course->name }}">
-            </figure>
-            <ul class="vchip_categories list-inline">
-              <li>{{ $course->name }}</li>
-            </ul>
-            <div class="vchip_product_content">
-              <p>We provide online courses... </p>
-              <p class="mrgn_20_top" title="Learn More"><a href="{{ url('courseDetails')}}/{{ $course->id }}" class="btn-link">Learn More <i
-                class="fa fa-angle-right"
-                aria-hidden="true"></i></a>
-              </p>
+      @if(Auth::guard('clientuser')->user())
+        @foreach($onlineCourses as $course)
+          @if(in_array($course->client_institute_course_id, $userCoursePermissionIds))
+          <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+            <div class="vchip_product_itm text-left">
+              <figure>
+                <img src="{{asset($course->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $course->name }}">
+              </figure>
+              <ul class="vchip_categories list-inline">
+                <li>{{ $course->name }}</li>
+              </ul>
+              <div class="vchip_product_content">
+                <p>We provide online courses... </p>
+                <p class="mrgn_20_top" title="Learn More"><a href="{{ url('courseDetails')}}/{{ $course->id }}" class="btn-link">Learn More <i
+                  class="fa fa-angle-right"
+                  aria-hidden="true"></i></a>
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      @endforeach
+          @endif
+        @endforeach
+      @else
+        @foreach($onlineCourses as $course)
+          <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+            <div class="vchip_product_itm text-left">
+              <figure>
+                <img src="{{asset($course->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $course->name }}">
+              </figure>
+              <ul class="vchip_categories list-inline">
+                <li>{{ $course->name }}</li>
+              </ul>
+              <div class="vchip_product_content">
+                <p>We provide online courses... </p>
+                <p class="mrgn_20_top" title="Learn More"><a href="{{ url('courseDetails')}}/{{ $course->id }}" class="btn-link">Learn More <i
+                  class="fa fa-angle-right"
+                  aria-hidden="true"></i></a>
+                </p>
+              </div>
+            </div>
+          </div>
+        @endforeach
+      @endif
     @endif
   </div>
 </div>
@@ -335,25 +359,49 @@
         </div>
     @endif
     @if(count($onlineTestSubcategories)>0)
-      @foreach($onlineTestSubcategories as $subcategory)
-        <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
-          <div class="vchip_product_itm text-left">
-            <figure>
-              <img src="{{asset($subcategory->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $subcategory->name }}">
-            </figure>
-            <ul class="vchip_categories list-inline">
-              <li>{{ $subcategory->name }}</li>
-            </ul>
-            <div class="vchip_product_content">
-              <p>We provide online test series... </p>
-              <p class="mrgn_20_top" title="Learn More"><a href="{{url('getTest')}}/{{$subcategory->id}}" class="btn-link">Learn More <i
-                class="fa fa-angle-right"
-                aria-hidden="true"></i></a>
-              </p>
+      @if(Auth::guard('clientuser')->user())
+        @foreach($onlineTestSubcategories as $subcategory)
+          @if(in_array($subcategory->client_institute_course_id, $userSubCategoryPermissionIds))
+          <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+            <div class="vchip_product_itm text-left">
+              <figure>
+                <img src="{{asset($subcategory->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $subcategory->name }}">
+              </figure>
+              <ul class="vchip_categories list-inline">
+                <li>{{ $subcategory->name }}</li>
+              </ul>
+              <div class="vchip_product_content">
+                <p>We provide online test series... </p>
+                <p class="mrgn_20_top" title="Learn More"><a href="{{url('getTest')}}/{{$subcategory->id}}" class="btn-link">Learn More <i
+                  class="fa fa-angle-right"
+                  aria-hidden="true"></i></a>
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      @endforeach
+          @endif
+        @endforeach
+      @else
+        @foreach($onlineTestSubcategories as $subcategory)
+          <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+            <div class="vchip_product_itm text-left">
+              <figure>
+                <img src="{{asset($subcategory->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $subcategory->name }}">
+              </figure>
+              <ul class="vchip_categories list-inline">
+                <li>{{ $subcategory->name }}</li>
+              </ul>
+              <div class="vchip_product_content">
+                <p>We provide online test series... </p>
+                <p class="mrgn_20_top" title="Learn More"><a href="{{url('getTest')}}/{{$subcategory->id}}" class="btn-link">Learn More <i
+                  class="fa fa-angle-right"
+                  aria-hidden="true"></i></a>
+                </p>
+              </div>
+            </div>
+          </div>
+        @endforeach
+      @endif
     @endif
   </div>
   </div>

@@ -200,7 +200,7 @@
     $.ajax({
             method: "POST",
             url: "{{url('admin/showUserTestResults')}}",
-            data: {category:category,subcategory:subcategory,college:college,department:department,student:student,year:year,}
+            data: {category:category,subcategory:subcategory,college:college,department:department,student:student,year:year}
         })
         .done(function( msg ) {
           body = document.getElementById('test-result');

@@ -178,7 +178,7 @@
                       </div>
                     </div>
                     <div class="course-auther">
-                      <a href="{{ url('liveCourse')}}/{{$liveCourse->id}}"><i class="fa fa-long-arrow-right" aria-hidden="true"> {{$liveCourse->author}}</i>
+                      <a href="{{ url('liveCourse')}}/{{$liveCourse->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$liveCourse->author}}"> {{$liveCourse->author}}</i>
                       </a>
                     </div>
                   </div>

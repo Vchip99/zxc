@@ -19,6 +19,24 @@
     <form action="{{url('createOnlineVideo')}}" method="POST" enctype="multipart/form-data">
   @endif
     {{ csrf_field() }}
+    <div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
+      <label class="col-sm-2 col-form-label">Institute Course Name:</label>
+      <div class="col-sm-3">
+        <select class="form-control" name="institute_course" required title="Institute Course" onChange="selectCourse(this);">
+            <option value="">Select Institute Course ...</option>
+            @if(count($instituteCourses) > 0)
+              @foreach($instituteCourses as $instituteCourse)
+                @if( $video->client_institute_course_id == $instituteCourse->id)
+                  <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
+                @else
+                  <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
+                @endif
+              @endforeach
+            @endif
+          </select>
+          @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
+      </div>
+    </div>
     <div class="form-group row @if ($errors->has('course')) has-error @endif">
       <label class="col-sm-2 col-form-label">Course Name</label>
       <div class="col-sm-3">
@@ -84,5 +102,33 @@
   </div>
 </form>
 
+<script type="text/javascript">
+  function selectCourse(ele){
+    var id = parseInt($(ele).val());
+    if( 0 < id ){
+      $.ajax({
+              method: "POST",
+              url: "{{url('getOnlineCourseByInstituteCourseId')}}",
+              data: {id:id}
+          })
+          .done(function( msg ) {
+            select = document.getElementById('course');
+            select.innerHTML = '';
+            var opt = document.createElement('option');
+            opt.value = '';
+            opt.innerHTML = 'Select Course ...';
+            select.appendChild(opt);
+            if( 0 < msg.length){
+              $.each(msg, function(idx, obj) {
+                  var opt = document.createElement('option');
+                  opt.value = obj.id;
+                  opt.innerHTML = obj.name;
+                  select.appendChild(opt);
+              });
+            }
+          });
+    }
+  }
+</script>
 
 @stop

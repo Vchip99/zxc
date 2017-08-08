@@ -75,7 +75,7 @@
 			            </tr>
 			            <tr>
 			                <td class="table-text">Unanswered Questions:</td>
-			                <td class="table-value">{{$score->wrong_answered}}</td>
+			                <td class="table-value">{{$score->unanswered}}</td>
 			            </tr>
 			             <tr>
 			                <td class="table-text">Test Score:</td>

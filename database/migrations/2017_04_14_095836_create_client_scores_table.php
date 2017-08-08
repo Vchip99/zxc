@@ -24,6 +24,7 @@ class CreateClientScoresTable extends Migration
             $table->integer('right_answered')->unsigned();
             $table->integer('wrong_answered')->unsigned();
             $table->integer('unanswered')->unsigned();
+            $table->float('test_score');
             $table->timestamps();
         });
     }

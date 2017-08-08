@@ -213,6 +213,27 @@ class CourseCourse extends Model
     }
 
     /**
+     *  get registered online courses for user by category n sub category
+     */
+    protected static function getOnlineCoursesByUserIdByCategoryBySubCategory($userId,$category,$subcategory){
+        $userId = InputSanitise::inputInt($userId);
+        $result = DB::table('course_courses')
+                ->join('register_online_courses', 'register_online_courses.online_course_id', '=', 'course_courses.id')
+                ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id');
+        if($userId > 0)  {
+            $result->where('register_online_courses.user_id', $userId);
+        }
+        if($category > 0)  {
+            $result->where('course_categories.id', $category);
+        }
+        if($subcategory > 0)  {
+            $result->where('course_sub_categories.id', $subcategory);
+        }
+        return $result->select('course_courses.*', 'course_categories.name as category', 'course_sub_categories.name as subCategory', 'register_online_courses.grade as grade')->get();
+    }
+
+    /**
      *  get category of sub category
      */
     public function category(){

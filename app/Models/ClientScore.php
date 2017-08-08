@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineTestQuestion;
+use App\Models\Clientuser;
 use App\Libraries\InputSanitise;
 use DB, Session, Auth;
 
@@ -85,16 +86,12 @@ class ClientScore extends Model
     }
 
    protected static function getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$testScore){
-        if(is_object(Auth::guard('clientuser')->user())){
         return static::where('category_id', $categoryId)
                 ->where('subcat_id', $subcategoryId)
                 ->where('paper_id', $paperId)
                 ->where('subject_id', $subjectId)
                 ->where('test_score', '>', $testScore)
-                ->where('client_user_id', Auth::guard('clientuser')->user()->id)
                 ->count();
-        }
-        return;
     }
 
     protected static function getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId, $courseId=NULL){
@@ -104,9 +101,6 @@ class ClientScore extends Model
                 ->where('subject_id', $subjectId);
         if($courseId > 0){
             $result->where('client_institute_course_id', $courseId);
-        }
-        if(NULL == $courseId && is_object(Auth::guard('clientuser')->user())){
-            $result->where('client_user_id', Auth::guard('clientuser')->user()->id);
         }
         return $result->count();
     }
@@ -127,6 +121,10 @@ class ClientScore extends Model
 
     public function paper(){
         return $this->belongsTo(ClientOnlineTestSubjectPaper::class, 'paper_id');
+    }
+
+    public function user(){
+        return $this->belongsTo(Clientuser::class, 'client_user_id');
     }
 
     public function rank(){
@@ -183,5 +181,32 @@ class ClientScore extends Model
         $result['ranks'] = $ranks;
         $result['marks'] = $marks;
         return $result;
+    }
+
+    protected static function getAllUsersResults(Request $request){
+        $courseId = $request->get('course');
+        $categoryId = $request->get('category');
+        $subcategoryId = $request->get('subcategory');
+        $subjectId = $request->get('subject');
+        $paperId = $request->get('paper');
+
+        $result = static::join('clientusers', 'clientusers.id', '=', 'client_scores.client_user_id');
+
+        if($courseId > 0){
+            $result->where('client_scores.client_institute_course_id', $courseId);
+        }
+        if($categoryId > 0 ) {
+            $result->where('client_scores.category_id', $categoryId);
+        }
+        if($subcategoryId > 0 ) {
+            $result->where('client_scores.subcat_id', $subcategoryId);
+        }
+        if( $subjectId > 0){
+            $result->where('client_scores.subject_id', $subjectId);
+        }
+        if($paperId > 0){
+            $result->where('client_scores.paper_id', $paperId);
+        }
+        return $result->select('client_scores.*', 'clientusers.name as username')->orderBy('test_score', 'desc')->get();
     }
 }

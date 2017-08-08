@@ -48,7 +48,7 @@ class ClientCourseCommentLike extends Model
                         ->where('client_course_comment_id', $request->get('comment_id'))->get();
     }
 
-     protected static function getLikesByVideoId($id, Request $request){
+    protected static function getLikesByVideoId($id, Request $request){
     	$commentLikesCount = [];
     	$client = InputSanitise::getCurrentClient($request);
     	if($id > 0){
@@ -65,5 +65,14 @@ class ClientCourseCommentLike extends Model
 	        }
 	    }
         return $commentLikesCount;
+    }
+
+    protected static function deleteClientCourseCommentLikesByClientId($clientId){
+        $commentLikes = static::where('client_id', $clientId)->get();
+        if(is_object($commentLikes) && false == $commentLikes->isEmpty()){
+            foreach($commentLikes as $commentLike){
+                $commentLike->delete();
+            }
+        }
     }
 }

@@ -57,7 +57,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/showOtherStudents', 'Admin\AllUsersInfoController@showOtherStudents');
 	Route::post('admin/deleteStudent', 'Admin\AllUsersInfoController@deleteStudent');
 	Route::post('admin/getDepartments', 'Admin\AllUsersInfoController@getDepartments');
-	Route::post('admin/changeOtherStudentApproveStatus', 'Admin\AllUsersInfoController@changeOtherStudentApproveStatus');
+	Route::post('admin/changeUserApproveStatus', 'Admin\AllUsersInfoController@changeUserApproveStatus');
 	Route::post('admin/searchUsers', 'Admin\AllUsersInfoController@searchUsers');
 	Route::get('admin/userTestResults/{id?}', 'Admin\AllUsersInfoController@userTestResults');
 	Route::post('admin/showUserTestResults', 'Admin\AllUsersInfoController@showUserTestResults');
@@ -67,7 +67,11 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/getStudentById', 'Admin\AllUsersInfoController@getStudentById');
 	Route::get('admin/userVideo/{id?}', 'Admin\AllUsersInfoController@userVideo');
 	Route::put('admin/updateStudentVideo', 'Admin\AllUsersInfoController@updateStudentVideo');
-
+	Route::get('admin/unapproveUsers', 'Admin\AllUsersInfoController@unapproveUsers');
+	Route::post('admin/unapproveUsersByCollegeId', 'Admin\AllUsersInfoController@unapproveUsersByCollegeId');
+	Route::post('admin/approveUser', 'Admin\AllUsersInfoController@approveUser');
+	Route::get('admin/allTestResults', 'Admin\AllUsersInfoController@allTestResults');
+	Route::post('admin/getAllTestResults', 'Admin\AllUsersInfoController@getAllTestResults');
 
 	// admin college info
 	Route::get('admin/manageCollegeInfo', 'Test\CollegeInfo@manageCollegeInfo');
@@ -101,16 +105,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/createSubAdmin', 'Admin\SubadminController@store');
 	Route::get('admin/subadmin/{id}/edit', 'Admin\SubadminController@edit');
 	Route::put('admin/updateSubAdmin', 'Admin\SubadminController@update');
-	// Route::get('admin/manageSubAdminHome','Admin\SubadminController@showSubAdminHome');
-	// Route::post('admin/updateSubDomainHome','Admin\SubadminController@updateSubAdminHome');
-
-
-	// // vchip
-	// Route::get('admin', 'Test\AdminController@index');
-	// Route::post('adminLogin', 'Test\AdminController@adminLogin');
-	// Route::post('getAdminData', 'Test\AdminController@getAdminData');
-	// Route::post('adminLogout', 'Test\AdminController@adminLogout');
-
 
 	// admin test category
 	Route::get('admin/manageCategory', 'Test\CategoryController@show');
@@ -159,15 +153,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/getCurrentQuestionCount', [ 'as' => 'admin/getCurrentQuestionCount','uses' => 'Test\QuestionController@getCurrentQuestionCount' ]);
 	Route::post('admin/getPrevQuestion', [ 'as' => 'admin/getPrevQuestion','uses' => 'Test\QuestionController@getPrevQuestion' ]);
 
-
-
-	// // admin  User
-	// Route::get('admin/manageUsers', 'Test\AdminController@show');
-	// Route::get('admin/createUser', 'Test\AdminController@create');
-	// Route::post('admin/createUser', 'Test\AdminController@store');
-	// Route::get('admin/User/{id}/edit', 'Admin\AdminController@edit');
-	// Route::put('admin/updateUser', 'Test\AdminController@update');
-	// Route::delete('admin/deleteUser', 'Test\AdminController@delete');
 
 	// verify account
 	Route::get('verifyAccount', 'HomeController@verifyAccount');
@@ -420,6 +405,11 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('myCourseResults', 'AccountController@myCourseResults');
 	Route::get('myTestResults', 'AccountController@myTestResults');
 	Route::post('showUserTestResultsByCatBySubCat', 'AccountController@showUserTestResultsByCatBySubCat');
+	Route::get('allTestResults', 'AccountController@allTestResults');
+	Route::post('getSubjectsByCatIdBySubcatId', 'AccountController@getSubjectsByCatIdBySubcatId');
+	Route::post('getPapersBySubjectId', 'AccountController@getPapersBySubjectId');
+	Route::post('getAllTestResults', 'AccountController@getAllTestResults');
+
 
 	// like- dis-like count front
 	Route::post('likePost', 'CourseController@likePost');
@@ -464,6 +454,12 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('showUserTestResults', 'Client\ClientUsersInfoController@showUserTestResults');
   	Route::get('userCourses/{id?}/{course?}', 'Client\ClientUsersInfoController@userCourses');
   	Route::post('showUserCourses', 'Client\ClientUsersInfoController@showUserCourses');
+  	Route::get('userPlacement/{id?}/{course?}', 'Client\ClientUsersInfoController@userPlacement');
+  	Route::post('getStudentById', 'Client\ClientUsersInfoController@getStudentById');
+  	Route::get('userVideo/{id?}/{course?}', 'Client\ClientUsersInfoController@userVideo');
+	Route::put('updateUserVideo', 'Client\ClientUsersInfoController@updateUserVideo');
+	Route::get('allTestResults', 'Client\ClientUsersInfoController@allTestResults');
+	Route::post('getAllTestResults', 'Client\ClientUsersInfoController@getAllTestResults');
 
   	// register client user
   	Route::post('/register', 'ClientuserAuth\RegisterController@register');
@@ -500,6 +496,8 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('onlinecourse/{id}/edit', 'Client\OnlineCourse\ClientOnlineCourseController@edit');
   	Route::put('updateOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@update');
   	Route::delete('deleteOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@delete');
+	Route::post('getOnlineCourseByInstituteCourseId', 'Client\OnlineCourse\ClientOnlineCourseController@getOnlineCourseByInstituteCourseId');
+
 
   	// Online video
   	Route::get('manageOnlineVideo', 'Client\OnlineCourse\ClientOnlineVideoController@show');
@@ -508,6 +506,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('onlinevideo/{id}/edit', 'Client\OnlineCourse\ClientOnlineVideoController@edit');
   	Route::put('updateOnlineVideo', 'Client\OnlineCourse\ClientOnlineVideoController@update');
   	Route::delete('deleteOnlineVideo', 'Client\OnlineCourse\ClientOnlineVideoController@delete');
+
 
   	// test category
   	Route::get('manageOnlineTestCategory', 'Client\OnlineTest\ClientOnlineTestCategoryController@show');
@@ -605,6 +604,9 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('getCourseByCatIdBySubCatIdByUserId', 'Client\ClientUserController@getCourseByCatIdBySubCatIdByUserId');
 	Route::get('myTestResults', 'Client\ClientUserController@myTestResults');
 	Route::post('showUserTestResultsByCategoryBySubcategoryByUserId','Client\ClientUserController@showUserTestResultsByCategoryBySubcategoryByUserId');
+  	Route::get('profile', 'Client\ClientUserController@profile');
+  	Route::put('updateProfile', 'Client\ClientUserController@updateProfile');
+
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');
@@ -622,16 +624,3 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('clientLikeComment', 'Client\Front\ClientOnlineCourseFrontController@clientLikeComment');
 	Route::post('clientLikeSubComment', 'Client\Front\ClientOnlineCourseFrontController@clientLikeSubComment');
 });
-// Route::group(['domain' => 'clientuser.' . env('APP_DOMAIN')], function () {
-//   Route::get('/login', 'ClientuserAuth\LoginController@showLoginForm');
-//   Route::post('/login', 'ClientuserAuth\LoginController@login');
-//   	Route::post('/logout', 'ClientuserAuth\LoginController@logout');
-
-//   Route::get('/register', 'ClientuserAuth\RegisterController@showRegistrationForm');
-//   Route::post('/register', 'ClientuserAuth\RegisterController@register');
-
-//   Route::post('/password/email', 'ClientuserAuth\ForgotPasswordController@sendResetLinkEmail');
-//   Route::post('/password/reset', 'ClientuserAuth\ResetPasswordController@reset');
-//   Route::get('/password/reset', 'ClientuserAuth\ForgotPasswordController@showLinkRequestForm');
-//   Route::get('/password/reset/{token}', 'ClientuserAuth\ResetPasswordController@showResetForm');
-// });

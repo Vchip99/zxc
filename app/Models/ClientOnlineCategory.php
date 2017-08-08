@@ -54,7 +54,7 @@ class ClientOnlineCategory extends Model
                         $join->on('clients.id', '=', 'client_online_videos.client_id');
                     })
                     ->where('clients.subdomain', $subdomain)
-                    ->select('client_online_categories.id', 'client_online_categories.name')
+                    ->select('client_online_categories.id', 'client_online_categories.name', 'client_online_categories.client_institute_course_id')
                     ->groupBy('client_online_categories.id')
                     ->get();
     }
@@ -88,5 +88,14 @@ class ClientOnlineCategory extends Model
 
     protected static function getCategoriesByInstituteCourseId($id){
         return static::where('client_institute_course_id', $id)->get();
+    }
+
+    protected static function deleteClientOnlineCategoriesByClientId($clientId){
+        $categories = static::where('client_id', $clientId)->get();
+        if(is_object($categories) && false == $categories->isEmpty()){
+            foreach($categories as $category){
+                $category->delete();
+            }
+        }
     }
 }

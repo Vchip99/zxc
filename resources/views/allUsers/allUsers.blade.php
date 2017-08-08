@@ -479,7 +479,7 @@
                   action: function(){
                     $.ajax({
                       method: "POST",
-                      url: "{{url('admin/changeOtherStudentApproveStatus')}}",
+                      url: "{{url('admin/changeUserApproveStatus')}}",
                       data: {student_id:studentId,college_id:college_id,department_id:department_id,user_type:user_type,selected_year:selected_year}
                     })
                     .done(function( msg ) {

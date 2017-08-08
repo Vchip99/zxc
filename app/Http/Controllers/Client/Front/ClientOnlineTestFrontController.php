@@ -16,6 +16,7 @@ use App\Models\RegisterClientOnlinePaper;
 use App\Models\ClientHomePage;
 use App\Models\ClientScore;
 use App\Models\ClientOnlineTestQuestion;
+use App\Models\ClientUserInstituteCourse;
 
 class ClientOnlineTestFrontController extends ClientHomeController
 {
@@ -25,10 +26,46 @@ class ClientOnlineTestFrontController extends ClientHomeController
 			return Redirect::away('http://localvchip.com');
 		}
 		view::share('subdomain', $subdomain);
+		$testPermission = InputSanitise::checkModulePermission($request, 'test');
+		if( 'false' == $testPermission){
+			return Redirect::to('/');
+		}
+		if(Auth::guard('clientuser')->user() && Auth::guard('clientuser')->user()::getUserTestPermissionCount() == 0){
+			return Redirect::to('/');
+		}
+		$courseIds = [];
+		$userCategoryPermissionIds = [];
+		$userSubCategoryPermissionIds = [];
+		$subCategoryCourseIds = [];
         $testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
+        if(is_object($testCategories) && false == $testCategories->isEmpty()){
+            foreach($testCategories as $testCategory){
+                $courseIds[] = $testCategory->client_institute_course_id;
+            }
+            if(is_object(Auth::guard('clientuser')->user())){
+                $userCoursePermissions = ClientUserInstituteCourse::getCoursePermissionsByUserByCourseIdsByModule($courseIds, 'test');
+                if(is_object($userCoursePermissions) && false == $userCoursePermissions->isEmpty()){
+                    foreach($userCoursePermissions as $userCoursePermission){
+                        $userCategoryPermissionIds[] = $userCoursePermission->client_institute_course_id;
+                    }
+                }
+            }
+        }
         $testSubCategories = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
-
-		return view('client.front.onlineTests.tests', compact('testCategories', 'testSubCategories'));
+        if(is_object($testSubCategories) && false == $testSubCategories->isEmpty()){
+        	foreach($testSubCategories as $testSubCategory){
+        		$subCategoryCourseIds[] = $testSubCategory->client_institute_course_id;
+        	}
+        	if(is_object(Auth::guard('clientuser')->user())){
+                $userCoursePermissions = ClientUserInstituteCourse::getCoursePermissionsByUserByCourseIdsByModule($subCategoryCourseIds, 'test');
+                if(is_object($userCoursePermissions) && false == $userCoursePermissions->isEmpty()){
+                    foreach($userCoursePermissions as $userCoursePermission){
+                        $userSubCategoryPermissionIds[] = $userCoursePermission->client_institute_course_id;
+                    }
+                }
+            }
+        }
+		return view('client.front.onlineTests.tests', compact('testCategories', 'testSubCategories', 'userCategoryPermissionIds', 'userSubCategoryPermissionIds'));
 	}
 
     /**
@@ -47,12 +84,43 @@ class ClientOnlineTestFrontController extends ClientHomeController
 	protected function getTest( $subdomain,$id, Request $request){
 		$subcatId = json_decode($id);
 		$testSubjectPaperIds = [];
+		$courseIds = [];
+		$userCategoryPermissionIds = [];
+		$subCategoryCourseIds = [];
+		$userSubCategoryPermissionIds = [];
 		if(isset($subcatId)){
 			$subcategory = ClientOnlineTestSubCategory::find($subcatId);
 			if(is_object($subcategory)){
 				$catId = $subcategory->category_id;
 				$testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
+				if(is_object($testCategories) && false == $testCategories->isEmpty()){
+		            foreach($testCategories as $testCategory){
+		                $courseIds[] = $testCategory->client_institute_course_id;
+		            }
+		            if(is_object(Auth::guard('clientuser')->user())){
+		                $userCoursePermissions = ClientUserInstituteCourse::getCoursePermissionsByUserByCourseIdsByModule($courseIds, 'test');
+		                if(is_object($userCoursePermissions) && false == $userCoursePermissions->isEmpty()){
+		                    foreach($userCoursePermissions as $userCoursePermission){
+		                        $userCategoryPermissionIds[] = $userCoursePermission->client_institute_course_id;
+		                    }
+		                }
+		            }
+		        }
+
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($catId, $request);
+				if(is_object($testSubCategories) && false == $testSubCategories->isEmpty()){
+		        	foreach($testSubCategories as $testSubCategory){
+		        		$subCategoryCourseIds[] = $testSubCategory->client_institute_course_id;
+		        	}
+		        	if(is_object(Auth::guard('clientuser')->user())){
+		                $userCoursePermissions = ClientUserInstituteCourse::getCoursePermissionsByUserByCourseIdsByModule($subCategoryCourseIds, 'test');
+		                if(is_object($userCoursePermissions) && false == $userCoursePermissions->isEmpty()){
+		                    foreach($userCoursePermissions as $userCoursePermission){
+		                        $userSubCategoryPermissionIds[] = $userCoursePermission->client_institute_course_id;
+		                    }
+		                }
+		            }
+		        }
 				$testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
 				$testSubjectPapers = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
 				if(is_array($testSubjectPapers)){
@@ -66,7 +134,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 				$registeredPaperIds = $this->getRegisteredPaperIds();
 				$alreadyGivenPapers = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 				$currentDate = date('Y-m-d');
-				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate'));
+				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'userCoursePermissionIds'));
 			}
 		}
 		return Redirect::to('/');
@@ -74,12 +142,35 @@ class ClientOnlineTestFrontController extends ClientHomeController
 
 	protected function getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds){
 		return ClientScore::getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
+
 	}
 
 	protected function getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion(Request $request){
 		if($request->ajax()){
+			$result = [];
+			$isLogin = 'false';
+			$userSubCategoryPermissionIds = [];
+			$subCategoryCourseIds = [];
             $id = InputSanitise::inputInt($request->get('id'));
-            return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($id, $request);
+            $testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($id, $request);
+            if(is_object($testSubCategories) && false == $testSubCategories->isEmpty()){
+        	foreach($testSubCategories as $testSubCategory){
+        		$subCategoryCourseIds[] = $testSubCategory->client_institute_course_id;
+        	}
+        	if(is_object(Auth::guard('clientuser')->user())){
+                $userCoursePermissions = ClientUserInstituteCourse::getCoursePermissionsByUserByCourseIdsByModule($subCategoryCourseIds, 'test');
+                if(is_object($userCoursePermissions) && false == $userCoursePermissions->isEmpty()){
+                    foreach($userCoursePermissions as $userCoursePermission){
+                        $userSubCategoryPermissionIds[] = $userCoursePermission->client_institute_course_id;
+                    }
+                }
+                $isLogin = 'true';
+            }
+        }
+        $result['sub_categories'] = $testSubCategories;
+        $result['sub_category_permission'] = $userSubCategoryPermissionIds;
+        $result['isLogin'] = $isLogin;
+        return $result;
         }
 	}
 

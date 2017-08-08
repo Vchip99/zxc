@@ -62,6 +62,9 @@
           @else
             <img src="{{ url('images/user/user.png')}}" class="img-circle" alt="User Image">
           @endif
+          @php
+            $selectedUserType = Session::get('selected_user_type');
+          @endphp
         </div>
         <div class="pull-left info">
           <p>{{ ucfirst(Auth::user()->name)}}</p>
@@ -166,18 +169,29 @@
         @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
           <li class="treeview">
             <a href="#">
-              <i class="fa fa-dashboard"></i> <span>Student Dashboard</span>
+              <i class="fa fa-group"></i> <span>Users Info</span>
               <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
             </a>
             <ul class="treeview-menu">
-              <li><a href="{{ url('students')}}"><i class="fa fa-circle-o"></i>Students</a></li>
+              <li><a href="{{ url('students')}}"><i class="fa fa-circle-o"></i>Users</a></li>
               <li><a href="{{ url('studentTestResults')}}"><i class="fa fa-circle-o"></i>Test Result</a></li>
               <li><a href="{{ url('studentCourses')}}"><i class="fa fa-circle-o"></i>Course</a></li>
+              @if(2 == $selectedUserType)
                 <li><a href="{{ url('studentPlacement')}}"><i class="fa fa-circle-o"></i>Placement</a></li>
-              <!-- @if(5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
-              @endif -->
+              @endif
+            </ul>
+          </li>
+          <li class="treeview">
+            <a href="#" title="All Test Results">
+              <i class="fa fa-trophy"></i> <span>All Test Results</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Show All Test Results"><a href="{{ url('allTestResults')}}"><i class="fa fa-circle-o"></i> All Test Results </a></li>
             </ul>
           </li>
         @endif
@@ -206,7 +220,13 @@
       </div>
     </section>
   </div>
-
+<script type="text/javascript">
+  $(document).ready(function(){
+        setTimeout(function() {
+          $('.alert-success').fadeOut('fast');
+        }, 10000); // <-- time in milliseconds
+    });
+</script>
 
 </body>
 </html>

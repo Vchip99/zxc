@@ -70,11 +70,11 @@ class AllUsersInfoController extends Controller
         return $result;
     }
 
-    protected function changeOtherStudentApproveStatus(Request $request){
+    protected function changeUserApproveStatus(Request $request){
         DB::beginTransaction();
         try
         {
-            User::changeOtherStudentApproveStatus($request);
+            User::changeUserApproveStatus($request);
             DB::commit();
         }
         catch(\Exception $e)
@@ -230,7 +230,65 @@ class AllUsersInfoController extends Controller
             $student->save();
             Session::set('admin_selected_user', $student->id);
             Session::set('admin_selected_user_type', $student->user_type);
+            return Redirect::to('admin/userVideo')->with('message', 'User updated successfully.');
         }
-        return Redirect::to('admin/userVideo')->with('message', 'User updated successfully.');
+        return Redirect::to('admin/userVideo');
+    }
+
+    protected function unapproveUsers(){
+        $colleges = $colleges = College::all();
+        $upApproveUsers = User::unApproveUsers('all');
+        return view('allUsers.unapproveUsers', compact('colleges', 'upApproveUsers'));
+    }
+
+    protected function unapproveUsersByCollegeId(Request $request){
+        return User::unApproveUsers($request->get('college_id'));
+    }
+
+    protected function approveUser(Request $request){
+        User::changeUserApproveStatus($request);
+        return User::unApproveUsers($request->get('selected_college_id'));
+    }
+
+    protected function allTestResults(Request $request){
+        $colleges = College::all();
+        $categories = TestCategory::all();
+        $scores =[];
+        return view('allUsers.allTestResults', compact('colleges', 'categories', 'scores'));
+    }
+
+    protected function getAllTestResults(Request $request){
+        $ranks = [];
+        $marks = [];
+        $colleges = [];
+        $departments = [];
+        $scores = Score::getAllUsersResults($request);
+        if( false == $scores->isEmpty()){
+            foreach($scores as $score){
+                $ranks[$score->id] = $score->rank();
+                $marks[$score->id] = $score->totalMarks();
+                if(is_object($score->user->college) && $score->user->college->id > 0){
+                  $colleges[$score->id] = $score->user->college->name;
+                }else if(is_object($score->user) && 'other' == $score->user->college_id){
+                    $colleges[$score->id] = $score->user->other_source;
+                }else{
+                    $colleges[$score->id] = 'Client';
+                }
+                if(is_object($score->user->department) && $score->user->department->id > 0){
+                  $departments[$score->id] = $score->user->department->name;
+                }else if(is_object($score->user) && 'other' == $score->user->college_id){
+                    $departments[$score->id] = 'Other';
+                }else{
+                    $departments[$score->id] = 'Client';
+                }
+            }
+        }
+        $results['scores'] = $scores;
+        $results['ranks'] = $ranks;
+        $results['marks'] = $marks;
+        $results['colleges'] = $colleges;
+        $results['departments'] = $departments;
+        return $results;
     }
 }
+

@@ -34,9 +34,17 @@
           <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
             <option value="0">Select Category ...</option>
             @if(count($courseCategories) > 0)
-              @foreach($courseCategories as $courseCategory)
-                <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
-              @endforeach
+              @if(Auth::guard('clientuser')->user())
+                @foreach($courseCategories as $courseCategory)
+                  @if(in_array($courseCategory->id, $userCourseCategoryIds))
+                    <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
+                  @endif
+                @endforeach
+              @else
+                @foreach($courseCategories as $courseCategory)
+                  <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
+                @endforeach
+              @endif
             @endif
           </select>
         </div>
@@ -49,45 +57,89 @@
     <div class="col-sm-9 ">
         <div class="row info" id="addCourses">
           @if(count($courses) > 0)
-            @foreach($courses as $course)
-              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim">
-                <div class="course-box">
-                  <a class="img-course-box" href="{{ url('courseDetails')}}/{{$course->id}}" title="{{$course->name}}">
-                    @if(!empty($course->image_path))
-                      <img class="img-responsive " src="{{ asset($course->image_path) }}" alt="course">
-                    @else
-                      <img class="img-responsive " src="{{ asset('images/default_course_image.jpg') }}" alt="course">
-                    @endif
-                  </a>
-                  <div class="topleft">@if( 1 == $course->certified )Certified @else Non Certified @endif</div>
-                  <div class="topright">{{($course->price > 0)? 'Paid' : 'Free' }}</div>
-                  <div class="course-box-content" >
-                     <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
-                     <div class="categoery" title="{{$course->category}}">
-                       <a  href="{{ url('courseDetails')}}/{{$course->id}}"> {{$course->category}}</a>
-                     </div>
-                     <br/>
-                    <p class="block-with-text">
-                      {{$course->description}}
-                      <a type="button" class="show " data-show="{{$course->id}}">Read More</a>
-                    </p>
-                    <div class="corse-detail" id="corse-detail-{{$course->id}}" >
-                        <div class="corse-detail-heder">
-                          <span class="card-title"><b>{{$course->name}}</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="{{$course->id}}"><span aria-hidden="true">×</span></button>
-                        </div><br/>
-                          <p>{{$course->description}}</p>
-                          <div class="text-center corse-detail-footer" >
-                            <a href="{{ url('courseDetails')}}/{{$course->id}}" class="btn btn-primary btn-default" > Start Course</a>
-                          </div>
+            @if(Auth::guard('clientuser')->user())
+              @foreach($courses as $course)
+                @if(in_array($course->client_institute_course_id, $userCoursePermissionIds))
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim">
+                  <div class="course-box">
+                    <a class="img-course-box" href="{{ url('courseDetails')}}/{{$course->id}}" title="{{$course->name}}">
+                      @if(!empty($course->image_path))
+                        <img class="img-responsive " src="{{ asset($course->image_path) }}" alt="course">
+                      @else
+                        <img class="img-responsive " src="{{ asset('images/default_course_image.jpg') }}" alt="course">
+                      @endif
+                    </a>
+                    <div class="topleft">@if( 1 == $course->certified )Certified @else Non Certified @endif</div>
+                    <div class="topright">{{($course->price > 0)? 'Paid' : 'Free' }}</div>
+                    <div class="course-box-content" >
+                       <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
+                       <div class="categoery" title="{{$course->category}}">
+                         <a  href="{{ url('courseDetails')}}/{{$course->id}}"> {{$course->category}}</a>
+                       </div>
+                       <br/>
+                      <p class="block-with-text">
+                        {{$course->description}}
+                        <a type="button" class="show " data-show="{{$course->id}}">Read More</a>
+                      </p>
+                      <div class="corse-detail" id="corse-detail-{{$course->id}}" >
+                          <div class="corse-detail-heder">
+                            <span class="card-title"><b>{{$course->name}}</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="{{$course->id}}"><span aria-hidden="true">×</span></button>
+                          </div><br/>
+                            <p>{{$course->description}}</p>
+                            <div class="text-center corse-detail-footer" >
+                              <a href="{{ url('courseDetails')}}/{{$course->id}}" class="btn btn-primary btn-default" > Start Course</a>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="course-auther">
+                        <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
+                        </a>
                       </div>
                     </div>
-                    <div class="course-auther">
-                      <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right" aria-hidden="true"> {{$course->author}}</i>
-                      </a>
+                  </div>
+                @endif
+              @endforeach
+            @else
+              @foreach($courses as $course)
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim">
+                  <div class="course-box">
+                    <a class="img-course-box" href="{{ url('courseDetails')}}/{{$course->id}}" title="{{$course->name}}">
+                      @if(!empty($course->image_path))
+                        <img class="img-responsive " src="{{ asset($course->image_path) }}" alt="course">
+                      @else
+                        <img class="img-responsive " src="{{ asset('images/default_course_image.jpg') }}" alt="course">
+                      @endif
+                    </a>
+                    <div class="topleft">@if( 1 == $course->certified )Certified @else Non Certified @endif</div>
+                    <div class="topright">{{($course->price > 0)? 'Paid' : 'Free' }}</div>
+                    <div class="course-box-content" >
+                       <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
+                       <div class="categoery" title="{{$course->category}}">
+                         <a  href="{{ url('courseDetails')}}/{{$course->id}}"> {{$course->category}}</a>
+                       </div>
+                       <br/>
+                      <p class="block-with-text">
+                        {{$course->description}}
+                        <a type="button" class="show " data-show="{{$course->id}}">Read More</a>
+                      </p>
+                      <div class="corse-detail" id="corse-detail-{{$course->id}}" >
+                          <div class="corse-detail-heder">
+                            <span class="card-title"><b>{{$course->name}}</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="{{$course->id}}"><span aria-hidden="true">×</span></button>
+                          </div><br/>
+                            <p>{{$course->description}}</p>
+                            <div class="text-center corse-detail-footer" >
+                              <a href="{{ url('courseDetails')}}/{{$course->id}}" class="btn btn-primary btn-default" > Start Course</a>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="course-auther">
+                        <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right" aria-hidden="true"> {{$course->author}}</i>
+                        </a>
+                      </div>
                     </div>
                   </div>
-                </div>
-            @endforeach
+              @endforeach
+            @endif
           @else
             No courses are available.
           @endif
@@ -97,52 +149,51 @@
   </div>
 </section>
 <section id="education" class="v_container" >
-      <div class="container">
-        <div class="row">
-          <div class="col-md-8 col-md-offset-2 text-center mrgn-60-top"">
-            <h2 class="v_h2_title">Education at V-edu</h2>
-            <hr class="section-dash-dark"/>
-            <h3 class="v_h3_title ">Earn a Professional Certificate, Nano degree course...</p>
-            </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2 text-center mrgn-60-top"">
+        <h2 class="v_h2_title">Education at V-edu</h2>
+        <hr class="section-dash-dark"/>
+        <h3 class="v_h3_title ">Earn a Professional Certificate, Nano degree course...</p>
+      </div>
+    </div>
+      <div class="row text-center mrgn_30_top ">
+        <div class="col-md-4 col-sm-12 mrgn_40_top ">
+          <div class="feature-center">
+            <img src="{{ asset('images/courses/univercity-at-home.png')}}" width="100"
+            height="100"
+            class="img-responsive center-block" alt="University at Home"/>
+            <ul class="vchip_categories list-inline">
+              <li>University at Home</li>
+            </ul>
+            <p class="">You can learn a you want at your home.</p>
           </div>
-
-          <div class="row text-center mrgn_30_top ">
-            <div class="col-md-4 col-sm-12 mrgn_40_top ">
-              <div class="feature-center">
-                <img src="{{ asset('images/courses/univercity-at-home.png')}}" width="100"
-                height="100"
-                class="img-responsive center-block" alt="University at Home"/>
-                <ul class="vchip_categories list-inline">
-                  <li>
-                    University at Home</li></ul>
-                    <p class="">You can learn a you want at your home.</p>
-                  </div>
-                </div>
-                <div class="col-md-4 col-sm-12 mrgn_40_top ">
-                  <div class="feature-center">
-                    <img src="{{ asset('images/courses/professional-certificate.png')}}"
-                    width="100" height="100"
-                    class="img-responsive center-block" alt="Professional Certificate"/>
-                    <ul class="vchip_categories list-inline">
-                      <li>Professional Certificate</li></ul>
-                      <p class="">After successfully completion of certificate course, you will get certificate that enhance level of your resumes and accelerate your career.</p>
-                    </div>
-                  </div>
-                  <div class="col-md-4 col-sm-12 mrgn_40_top ">
-                    <div class="feature-center">
-                      <img src="{{ asset('images/courses/nano-degree-course.png')}}" width="100"
-                      height="100"
-                      class="img-responsive center-block" alt="Nano degree course"/>
-                      <ul class="vchip_categories list-inline">
-                        <li>Nano degree course</li></ul>
-                        <p class="">A graduate and master level courses use to get mastery in that field. </p>
-                      </div>
-                    </div>
-
-                  </div>
-                  <!-- /.End Services Row -->
-                </div><!-- /.End Container -->
-              </section>
+        </div>
+        <div class="col-md-4 col-sm-12 mrgn_40_top ">
+          <div class="feature-center">
+            <img src="{{ asset('images/courses/professional-certificate.png')}}"
+            width="100" height="100"
+            class="img-responsive center-block" alt="Professional Certificate"/>
+            <ul class="vchip_categories list-inline">
+              <li>Professional Certificate</li>
+            </ul>
+            <p class="">After successfully completion of certificate course, you will get certificate that enhance level of your resumes and accelerate your career.</p>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-12 mrgn_40_top ">
+          <div class="feature-center">
+            <img src="{{ asset('images/courses/nano-degree-course.png')}}" width="100"
+            height="100"
+            class="img-responsive center-block" alt="Nano degree course"/>
+            <ul class="vchip_categories list-inline">
+              <li>Nano degree course</li>
+            </ul>
+            <p class="">A graduate and master level courses use to get mastery in that field. </p>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
 
 @stop
 @section('footer')

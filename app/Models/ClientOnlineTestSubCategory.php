@@ -182,4 +182,13 @@ class ClientOnlineTestSubCategory extends Model
         }
     }
 
+    protected static function deleteClientOnlineTestSubCategoriesByClientId($clientId){
+        $subcategories = static::where('client_id', $clientId)->get();
+        if(is_object($subcategories) && false == $subcategories->isEmpty()){
+            foreach($subcategories as $subcategory){
+                $subcategory->delete();
+            }
+        }
+    }
+
 }

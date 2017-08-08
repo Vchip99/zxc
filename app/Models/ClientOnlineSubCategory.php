@@ -98,4 +98,13 @@ class ClientOnlineSubCategory extends Model
     public function instituteCourse(){
         return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
     }
+
+    protected static function deleteClientOnlineSubCategoriesByClientId($clientId){
+        $subcategories = static::where('client_id', $clientId)->get();
+        if(is_object($subcategories) && false == $subcategories->isEmpty()){
+            foreach($subcategories as $subcategory){
+                $subcategory->delete();
+            }
+        }
+    }
 }

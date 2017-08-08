@@ -115,7 +115,7 @@ class ClientOnlineCourseController extends ClientBaseController
     	if(isset($id)){
     		$course = ClientOnlineCourse::find($id);
     		if(is_object($course)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $course->client_institute_course_id)->get();
+                $instituteCourses = ClientInstituteCourse::where('client_id', $course->client_id)->get();
     			$categories   = ClientOnlineCategory::showCategories($request);
 				$subCategories = ClientOnlineSubCategory::getOnlineSubCategoriesByCategoryId($course->category_id, $request);
 				return view('client.onlineCourse.course.create', compact('instituteCourses','categories','subCategories','course'));
@@ -180,6 +180,10 @@ class ClientOnlineCourseController extends ClientBaseController
     		}
     	}
     	return Redirect::to('manageOnlineCourse');
+    }
+
+    protected function getOnlineCourseByInstituteCourseId(Request $request){
+        return ClientOnlineCourse::getCoursesByClientInstituteCourseId($request);
     }
 
 }

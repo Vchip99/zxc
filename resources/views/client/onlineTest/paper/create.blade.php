@@ -151,7 +151,7 @@
     if( 0 < id ){
       $.ajax({
               method: "POST",
-              url: "{{url('getOnlineCategories')}}",
+              url: "{{url('getOnlineTestCategories')}}",
               data: {id:id}
           })
           .done(function( msg ) {

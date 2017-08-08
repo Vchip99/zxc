@@ -31,10 +31,10 @@ class ClientBaseController extends BaseController
         $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
         if(is_object($subdomain)){
             view::share('subdomain', $subdomain);
-        }
-        $client = Client::where('subdomain', $subdomain->subdomain)->first();
-        if(is_object($client)){
-            view::share('client', $client);
+            $client = Client::where('subdomain', $subdomain->subdomain)->first();
+            if(is_object($client)){
+                view::share('client', $client);
+            }
         }
     }
 

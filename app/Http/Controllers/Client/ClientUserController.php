@@ -9,13 +9,14 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\ClientHomePage;
 use App\Models\Client;
 use Illuminate\Http\Request;
-use Auth, Redirect, View;
+use Auth, Redirect, View, DB;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineVideo;
 use App\Models\ClientScore;
+use App\Models\Clientuser;
 use App\Models\ClientOnlineTestCategory;
 use App\Libraries\InputSanitise;
 
@@ -32,7 +33,9 @@ class ClientUserController extends BaseController
     {
         $this->middleware('clientuser');
         $client = Client::where('subdomain', $request->getHost())->first();
-        view::share('client', $client);
+        if(is_object($client)){
+            view::share('client', $client);
+        }
     }
 
     protected function showClientUserDashBoard(Request $request){
@@ -114,5 +117,27 @@ class ClientUserController extends BaseController
     protected function showUserTestResultsByCategoryBySubcategoryByUserId(Request $request){
 
         return ClientScore::getUserTestResultsByCategoryBySubcategoryByUserId($request);
+    }
+
+    protected function profile(){
+        return view('clientuser.dashboard.profile');
+    }
+
+    protected function updateProfile(Request $request){
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $user = Clientuser::updateUser($request);
+            if(is_object($user)){
+                DB::connection('mysql2')->commit();
+                return Redirect::to('profile')->with('message', 'Profile updated successfully.');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('profile');
     }
 }

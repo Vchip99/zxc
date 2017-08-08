@@ -109,7 +109,6 @@ class ClientOnlineTestSubject extends Model
         return $result->select('client_online_test_subjects.id','client_online_test_subjects.*')->groupBy('client_online_test_subjects.id')->get();
     }
 
-
     protected static function showSubjects($request){
         if(is_object(Auth::guard('client')->user())){
             $clientId = Auth::guard('client')->user()->id;
@@ -130,5 +129,14 @@ class ClientOnlineTestSubject extends Model
         return DB::connection('mysql2')->table('client_online_test_subjects')->whereIn('id', $ids)
                         ->select('client_online_test_subjects.*')
                         ->get();
+    }
+
+    protected static function deleteClientOnlineTestSubjectsByClientId($clientId){
+        $subjects = static::where('client_id', $clientId)->get();
+        if(is_object($subjects) && false == $subjects->isEmpty()){
+            foreach($subjects as $subject){
+                $subject->delete();
+            }
+        }
     }
 }

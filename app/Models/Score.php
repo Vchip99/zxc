@@ -68,15 +68,12 @@ class Score extends Model
     }
 
     protected static function getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$testScore){
-        // if(is_object(Auth::user())){
         return static::where('category_id', $categoryId)
                 ->where('subcat_id', $subcatId)
                 ->where('paper_id', $paperId)
                 ->where('subject_id', $subjectId)
                 ->where('test_score', '>', $testScore)
                 ->count();
-        // }
-        // return;
     }
 
     protected static function getTestUserScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $userId){
@@ -96,7 +93,6 @@ class Score extends Model
         return $paperIds;
     }
 
-
     protected static function getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId){
         return static::where('category_id', $categoryId)
                 ->where('subcat_id', $subcategoryId)
@@ -111,6 +107,10 @@ class Score extends Model
 
     public function paper(){
         return $this->belongsTo(TestSubjectPaper::class, 'paper_id');
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function rank(){
@@ -151,7 +151,7 @@ class Score extends Model
         }
         return $result->where('users.year', $request->year)
                 ->select('scores.*', 'test_subjects.name as subject', 'test_subject_papers.name as paper')
-                ->get();
+                ->orderBy('test_score', 'desc')->get();
     }
 
     protected static function getUserTestResultsByCatBySubCat(Request $request){
@@ -168,7 +168,7 @@ class Score extends Model
             $result->where('scores.subcat_id', $request->subcategory);
         }
         return $result->select('scores.*', 'test_subjects.name as subject', 'test_subject_papers.name as paper')
-                ->get();
+                ->orderBy('test_score', 'desc')->get();
     }
 
     protected static function deleteUserScoresByUserId($userId){
@@ -179,5 +179,34 @@ class Score extends Model
             }
         }
         return;
+    }
+
+    protected static function getAllUsersResults(Request $request){
+        $collegeId = $request->get('college');
+        $categoryId = $request->get('category');
+        $subcategoryId = $request->get('subcategory');
+        $subjectId = $request->get('subject');
+        $paperId = $request->get('paper');
+
+        $result = static::join('users', 'users.id', '=', 'scores.user_id');
+
+        if($collegeId > 0){
+            $result->where('users.college_id', $collegeId);
+        } else if('other' == $collegeId){
+            $result->where('users.college_id', $collegeId);
+        }
+        if($categoryId > 0 ) {
+            $result->where('scores.category_id', $categoryId);
+        }
+        if($subcategoryId > 0 ) {
+            $result->where('scores.subcat_id', $subcategoryId);
+        }
+        if( $subjectId > 0){
+            $result->where('scores.subject_id', $subjectId);
+        }
+        if($paperId > 0){
+            $result->where('scores.paper_id', $paperId);
+        }
+        return $result->select('scores.*')->orderBy('test_score', 'desc')->get();
     }
 }

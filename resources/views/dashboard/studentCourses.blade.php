@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Courses </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Students Dashboard</li>
+      <li><i class="fa fa-dashboard"></i> Users Info</li>
       <li class="active">Courses </li>
     </ol>
   </section>
@@ -21,10 +21,23 @@
         <div class="container">
           <div class="row">
             <div class="">
+              <input type="hidden" id="login_User_Type" name="login_User_Type" value="{{Auth::user()->user_type}}">
+              @if(4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+              <div class="col-md-3 mrgn_10_btm" id="showUsers">
+                <select class="form-control" id="user" name="user_type" onChange="resetDepartments();" required="true">
+                  <option value="0">Select User Type</option>
+                  <option value="2" @if(is_object($selectedStudent) && '2' == $selectedStudent->user_type) selected="true" @endif >Student</option>
+                  <option value="3" @if(is_object($selectedStudent) && '3' == $selectedStudent->user_type) selected="true" @endif >Lecturer</option>
+                  @if(5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+                    <option value="4" @if(is_object($selectedStudent) && '4' == $selectedStudent->user_type) selected="true" @endif >Hod</option>
+                  @endif
+                </select>
+              </div>
+              @endif
               @if(5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
                 <div class="col-md-3 mrgn_10_btm">
                   <select class="form-control" id="dept" onChange="resetYear(this);">
-                    <option > Select Department </option>
+                    <option value="0"> Select Department </option>
                     @if(count($collegeDepts) > 0)
                       @foreach($collegeDepts as $collegeDept)
                         @if(is_object($selectedStudent) && $selectedStudent->college_dept_id == $collegeDept->id)
@@ -37,7 +50,11 @@
                   </select>
                 </div>
               @endif
-              <div class="col-md-3 mrgn_10_btm">
+              @if((is_object($selectedStudent) && 2 == $selectedStudent->user_type) || 3 == Auth::user()->user_type)
+                <div class="col-md-3 mrgn_10_btm" id="div_year">
+              @else
+                <div class="col-md-3 mrgn_10_btm hide" id="div_year">
+              @endif
                 <select class="form-control" id="selected_year" name="year" onChange="showStudents(this);">
                   <option value="0"> Select Year </option>
                   <option value="1" @if(is_object($selectedStudent) &&'1' == $selectedStudent->year) selected="true" @endif >First Year</option>
@@ -48,13 +65,15 @@
               </div>
               <div class="col-md-3 ">
                 <select class="form-control" id="student" onChange="showResult(this);">
-                  <option value="0">Select Student </option>
+                  <option value="0">Select User </option>
                   @if(is_object($selectedStudent) && count($students) > 0)
                     @foreach($students as $student)
-                      @if(is_object($selectedStudent) && $selectedStudent->id == $student->id)
-                        <option value="{{$student->id}}" selected="true">{{$student->name}}</option>
-                      @else
-                        <option value="{{$student->id}}">{{$student->name}}</option>
+                      @if(is_object($selectedStudent) && $selectedStudent->year == $student->year)
+                        @if($selectedStudent->id == $student->id)
+                          <option value="{{$student->id}}" selected="true">{{$student->name}}</option>
+                        @else
+                          <option value="{{$student->id}}">{{$student->name}}</option>
+                        @endif
                       @endif
                     @endforeach
                   @endif
@@ -78,7 +97,7 @@
                </select>
               </div>
               <div class="col-md-3 ">
-               <select class="form-control" id="subcategory" name="subcategory" title="Sub Category" onChange="showResult(this);">
+               <select class="form-control" id="subcategory" name="subcategory" title="Sub Category" onChange="showResultWithCategorySubCategory(this);">
                 <option value="0">Select Sub Category</option>
                </select>
               </div>
@@ -127,8 +146,38 @@
     </div>
   </div>
 <script type="text/javascript">
+
+  function resetDepartments(){
+    var user_type = parseInt(document.getElementById('user').value);
+    var login_User_Type = parseInt(document.getElementById('login_User_Type').value);
+    if(document.getElementById('dept')){
+      document.getElementById('dept').value = 0;
+    }
+    document.getElementById('student').value = 0;
+    document.getElementById('category').value = 0;
+    document.getElementById('subcategory').value = 0;
+    document.getElementById('course-result').innerHTML = '';
+    if(2 == user_type){
+      document.getElementById('div_year').classList.remove('hide');
+      document.getElementById('selected_year').value = 0;
+    }
+    if(3 == user_type || 4 == user_type){
+      document.getElementById('div_year').classList.add('hide');
+      document.getElementById('selected_year').value = 0;
+    }
+    if(4 == login_User_Type && 3 == user_type){
+      showStudents();
+    } else {
+      resetUser();
+    }
+  }
   function resetYear(){
-    document.getElementById('selected_year').value = 0;
+     var user_type = parseInt(document.getElementById('user').value);
+    if(3 == user_type || 4 == user_type){
+      showStudents();
+    } else {
+      document.getElementById('selected_year').value = 0;
+    }
     document.getElementById('student').value = 0;
     document.getElementById('category').value = 0;
     document.getElementById('subcategory').value = 0;
@@ -136,7 +185,16 @@
   }
 
   function showStudents(){
-    var year = parseInt(document.getElementById('selected_year').value);
+    if(document.getElementById('user')){
+      var user_type = parseInt(document.getElementById('user').value);
+    } else {
+      var user_type = 0;
+    }
+    if(document.getElementById('selected_year')){
+      var year = parseInt(document.getElementById('selected_year').value);
+    } else {
+      var year = 0;
+    }
     if(document.getElementById("dept")){
         var department = parseInt(document.getElementById("dept").value);
     } else {
@@ -145,79 +203,179 @@
     document.getElementById('category').value = 0;
     document.getElementById('subcategory').value = 0;
     document.getElementById('course-result').innerHTML = '';
-    if(year > 0){
-      $.ajax({
-            method: "POST",
-            url: "{{url('showStudentsByDepartmentByYear')}}",
-            data: {year:year,department:department}
-        })
-        .done(function( msg ) {
-          select = document.getElementById('student');
-          select.innerHTML = '';
-          var opt = document.createElement('option');
-          opt.value = '0';
-          opt.innerHTML = 'Select Student';
-          select.appendChild(opt);
-          if( 0 < msg.length){
-            $.each(msg, function(idx, obj) {
-                var opt = document.createElement('option');
-                opt.value = obj.id;
-                opt.innerHTML = obj.name;
-                select.appendChild(opt);
-            });
-          }
-        });
-    }
-  }
-  function showResult(ele){
-    var student = parseInt(document.getElementById('student').value);
     $.ajax({
-        method: "POST",
-        url: "{{url('showStudentCourses')}}",
-        data: {student:student}
-    })
-    .done(function( msg ) {
+          method: "POST",
+          url: "{{url('showStudentsByDepartmentByYear')}}",
+          data: {year:year,department:department,user_type:user_type}
+      })
+      .done(function( msg ) {
+        select = document.getElementById('student');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '0';
+        opt.innerHTML = 'Select User';
+        select.appendChild(opt);
+        if( 0 < msg.length){
+          $.each(msg, function(idx, obj) {
+              var opt = document.createElement('option');
+              opt.value = obj.id;
+              opt.innerHTML = obj.name;
+              select.appendChild(opt);
+          });
+        }
+      });
+  }
+
+  function showResultWithCategorySubCategory(){
+    var subcategory = parseInt(document.getElementById('subcategory').value);
+    var category = parseInt(document.getElementById('category').value);
+    var student = parseInt(document.getElementById('student').value);
+    if(document.getElementById('selected_year')){
+      var year = parseInt(document.getElementById('selected_year').value);
+    } else {
+      var year = 0;
+    }
+    if(document.getElementById("dept")){
+        var department = parseInt(document.getElementById("dept").value);
+    } else {
+        var department = 0;
+    }
+    if(student > 0){
+      renderResult(category,subcategory,student,year,department);
+    } else {
       body = document.getElementById('course-result');
       body.innerHTML = '';
-      if( 0 < msg.length){
-        $.each(msg, function(idx, obj) {
+      var eleTr = document.createElement('tr');
+      var eleIndex = document.createElement('td');
+      eleIndex.innerHTML = 'Select user.';
+      eleIndex.setAttribute('colspan' ,4);
+      eleTr.appendChild(eleIndex);
+      body.appendChild(eleTr);
+    }
+  }
+
+  function showResult(ele){
+    document.getElementById('category').value = 0;
+    document.getElementById('subcategory').value = 0;
+    var subcategory = parseInt(document.getElementById('subcategory').value);
+    var category = parseInt(document.getElementById('category').value);
+    var student = parseInt(document.getElementById('student').value);
+    if(document.getElementById('selected_year')){
+      var year = parseInt(document.getElementById('selected_year').value);
+    } else {
+      var year = 0;
+    }
+    if(document.getElementById("dept")){
+        var department = parseInt(document.getElementById("dept").value);
+    } else {
+        var department = 0;
+    }
+    if(student > 0){
+      renderResult(category,subcategory,student,year,department);
+      // $.ajax({
+      //     method: "POST",
+      //     url: "{{url('showStudentCourses')}}",
+      //     data: {category:category,subcategory:subcategory,student:student,year:year,department:department}
+      // })
+      // .done(function( msg ) {
+      //   body = document.getElementById('course-result');
+      //   body.innerHTML = '';
+      //   if( 0 < msg.length){
+      //     $.each(msg, function(idx, obj) {
+      //       var eleTr = document.createElement('tr');
+      //       var eleIndex = document.createElement('td');
+      //       eleIndex.innerHTML = idx + 1;
+      //       eleTr.appendChild(eleIndex);
+
+      //       var eleName = document.createElement('td');
+      //       eleName.innerHTML = obj.name;
+      //       eleTr.appendChild(eleName);
+
+      //       var eleGrade = document.createElement('td');
+      //       if(obj.grade){
+      //         eleGrade.innerHTML = obj.grade;
+      //       } else {
+      //         eleGrade.innerHTML = 'Certificate exam is not given.';
+      //       }
+      //       eleTr.appendChild(eleGrade);
+
+      //       var eleCertified = document.createElement('td');
+      //       if(1 == obj.certified){
+      //         eleCertified.innerHTML = 'Certified';
+      //       } else {
+      //         eleCertified.innerHTML = 'Non-Certified';
+      //       }
+      //       eleTr.appendChild(eleCertified);
+      //       body.appendChild(eleTr);
+      //     });
+      //   } else {
+      //     var eleTr = document.createElement('tr');
+      //     var eleIndex = document.createElement('td');
+      //     eleIndex.innerHTML = 'No courses are registered for selected user.';
+      //     eleIndex.setAttribute('colspan' ,4);
+      //     eleTr.appendChild(eleIndex);
+      //     body.appendChild(eleTr);
+      //   }
+      // });
+    } else {
+      body = document.getElementById('course-result');
+      body.innerHTML = '';
+      var eleTr = document.createElement('tr');
+      var eleIndex = document.createElement('td');
+      eleIndex.innerHTML = 'Select user.';
+      eleIndex.setAttribute('colspan' ,4);
+      eleTr.appendChild(eleIndex);
+      body.appendChild(eleTr);
+    }
+  }
+
+  function renderResult(category,subcategory,student,year,department){
+     $.ajax({
+          method: "POST",
+          url: "{{url('showStudentCourses')}}",
+          data: {category:category,subcategory:subcategory,student:student,year:year,department:department}
+      })
+      .done(function( msg ) {
+        body = document.getElementById('course-result');
+        body.innerHTML = '';
+        if( 0 < msg.length){
+          $.each(msg, function(idx, obj) {
+            var eleTr = document.createElement('tr');
+            var eleIndex = document.createElement('td');
+            eleIndex.innerHTML = idx + 1;
+            eleTr.appendChild(eleIndex);
+
+            var eleName = document.createElement('td');
+            eleName.innerHTML = obj.name;
+            eleTr.appendChild(eleName);
+
+            var eleGrade = document.createElement('td');
+            if(obj.grade){
+              eleGrade.innerHTML = obj.grade;
+            } else {
+              eleGrade.innerHTML = 'Certificate exam is not given.';
+            }
+            eleTr.appendChild(eleGrade);
+
+            var eleCertified = document.createElement('td');
+            if(1 == obj.certified){
+              eleCertified.innerHTML = 'Certified';
+            } else {
+              eleCertified.innerHTML = 'Non-Certified';
+            }
+            eleTr.appendChild(eleCertified);
+            body.appendChild(eleTr);
+          });
+        } else {
           var eleTr = document.createElement('tr');
-          var eleIndex = document.createElement('td');
-          eleIndex.innerHTML = idx + 1;
-          eleTr.appendChild(eleIndex);
-
-          var eleName = document.createElement('td');
-          eleName.innerHTML = obj.name;
-          eleTr.appendChild(eleName);
-
-          var eleGrade = document.createElement('td');
-          if(obj.grade){
-            eleGrade.innerHTML = obj.grade;
-          } else {
-            eleGrade.innerHTML = 'Certificate exam is not given.';
-          }
-          eleTr.appendChild(eleGrade);
-
-          var eleCertified = document.createElement('td');
-          if(1 == obj.certified){
-            eleCertified.innerHTML = 'Certified';
-          } else {
-            eleCertified.innerHTML = 'Non-Certified';
-          }
-          eleTr.appendChild(eleCertified);
-          body.appendChild(eleTr);
-        });
-      } else {
-        var eleTr = document.createElement('tr');
           var eleIndex = document.createElement('td');
           eleIndex.innerHTML = 'No courses are registered for selected user.';
           eleIndex.setAttribute('colspan' ,4);
           eleTr.appendChild(eleIndex);
           body.appendChild(eleTr);
-      }
-    });
+        }
+      });
   }
-
   function selectSubcategory(ele){
     id = parseInt($(ele).val());
     if( 0 < id ){
@@ -244,6 +402,13 @@
       });
     }
   }
-
+  function resetUser(){
+    select = document.getElementById('student');
+    select.innerHTML = '';
+    var opt = document.createElement('option');
+    opt.value = '0';
+    opt.innerHTML = 'Select User';
+    select.appendChild(opt);
+  }
 </script>
 @stop

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\ResetPasswordMailNotificatipn;
 use App\Libraries\InputSanitise;
 use App\Models\CollegeDept;
+use App\Models\College;
 use App\Models\RegisterDocuments;
 use App\Models\RegisterFavouriteDocuments;
 use App\Models\RegisterLiveCourse;
@@ -95,12 +96,16 @@ class User extends Authenticatable
         return $result->get();
     }
 
-    protected function getAllStudentsByCollegeIdByDeptIdByYear($college,$department,$year){
-        $result = static::where('college_id', $college)
-                ->where('year', $year)
-                ->where('user_type', self::Student);
+    protected function getAllUsersByCollegeIdByDeptIdByYearByUserType($college,$department,$year,$userType){
+        $result = static::where('college_id', $college);
+        if($userType > 0){
+            $result->where('user_type', $userType);
+        }
         if($department > 0){
             $result->where('college_dept_id', $department);
+        }
+        if($year > 0){
+            $result->where('year', $year);
         }
         return $result->select('users.id', 'users.name')->get();
     }
@@ -111,10 +116,14 @@ class User extends Authenticatable
         $studentId = InputSanitise::inputInt($request->student_id);
         $year = InputSanitise::inputInt($request->year);
 
-        $student = static::where('college_id', $collegeId)
-                ->where('college_dept_id', $departmentId)
-                ->where('year', $year)
-                ->where('id', $studentId)->first();
+        $result = static::where('college_id', $collegeId);
+        if($departmentId > 0){
+            $result->where('college_dept_id', $departmentId);
+        }
+        if($year > 0){
+            $result->where('year', $year);
+        }
+        $student = $result->where('id', $studentId)->first();
         if(is_object($student)){
             if( 1 == $student->admin_approve){
                 $student->admin_approve = 0;
@@ -148,6 +157,10 @@ class User extends Authenticatable
         return 'false';
     }
 
+    public function college(){
+        return $this->belongsTo(College::class, 'college_id');
+    }
+
     public function department(){
         return $this->belongsTo(CollegeDept::class, 'college_dept_id');
     }
@@ -155,12 +168,14 @@ class User extends Authenticatable
     protected static function searchStudent(Request $request){
         $user = Auth::user();
         $student = static::join('college_depts', 'college_depts.id', '=', 'users.college_dept_id')
-                    ->where('users.college_id', $user->college_id)
-                    ->where('users.user_type', self::Student);
+                    ->where('users.college_id', $user->college_id);
         if($request->department > 0){
             $student->where('users.college_dept_id', $request->department);
-        } elseif(self::Lecturer == $user->user_type || self::Hod == $user->user_type){
+        } else if(3 == $user->user_type || 4 == $user->user_type){
             $student->where('users.college_dept_id', $user->college_dept_id);
+        }
+        if($request->user_type > 0){
+            $student->where('users.user_type', $request->user_type);
         }
         if($request->year > 0){
             $student->where('users.year', $request->year);
@@ -230,7 +245,7 @@ class User extends Authenticatable
         return 'false';
     }
 
-    protected function deleteOtherInfoByUserId($userId){
+    public function deleteOtherInfoByUserId($userId){
         $userStorage = "userStorage/".$userId;
         if(is_dir($userStorage)){
             InputSanitise::delFolder($userStorage);
@@ -270,19 +285,19 @@ class User extends Authenticatable
         return static::where('college_id', 'other')->select('id', 'name', 'email', 'phone', 'admin_approve', 'other_source', 'college_id', 'user_type', 'recorded_video')->get();
     }
 
-    protected static function changeOtherStudentApproveStatus(Request $request){
-        $userId = InputSanitise::inputInt($request->student_id);
-        $student = static::find($userId);
-        if(is_object($student)){
-            if( 1 == $student->admin_approve){
-                $student->admin_approve = 0;
-            } else {
-                $student->admin_approve = 1;
-            }
-            $student->save();
-        }
-        return;
-    }
+    // protected static function changeUserApproveStatus(Request $request){
+    //     $userId = InputSanitise::inputInt($request->student_id);
+    //     $student = static::find($userId);
+    //     if(is_object($student)){
+    //         if( 1 == $student->admin_approve){
+    //             $student->admin_approve = 0;
+    //         } else {
+    //             $student->admin_approve = 1;
+    //         }
+    //         $student->save();
+    //     }
+    //     return;
+    // }
 
     protected static function searchUsers(Request $request){
         $collegeId = $request->college_id;
@@ -328,5 +343,12 @@ class User extends Authenticatable
         return 'false';
     }
 
-
+    protected static function unApproveUsers($collegeId){
+        $result = static::join('colleges', 'colleges.id', '=', 'users.college_id')
+                    ->where('users.admin_approve', 0);
+        if($collegeId > 0){
+            $result->where('users.college_id', $collegeId);
+        }
+        return $result->select('users.id','users.name','users.college_id','colleges.name as college','users.admin_approve')->orderBy('college_id')->get();
+    }
 }

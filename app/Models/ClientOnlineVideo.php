@@ -9,6 +9,7 @@ use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientCourseComment;
 use App\Models\ClientOnlineVideoLike;
+use App\Models\ClientInstituteCourse;
 
 class ClientOnlineVideo extends Model
 {
@@ -20,12 +21,13 @@ class ClientOnlineVideo extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'description', 'duration', 'video_path','course_id', 'client_id'];
+    protected $fillable = ['name', 'description', 'duration', 'video_path','course_id', 'client_id', 'client_institute_course_id'];
 
     /**
      *  create/update video
      */
     protected static function addOrUpdateVideo(Request $request, $isUpdate = false){
+        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
     	$videoName = InputSanitise::inputString($request->get('video'));
     	$description = InputSanitise::inputString($request->get('description'));
     	$duration = InputSanitise::inputInt($request->get('duration'));
@@ -48,6 +50,7 @@ class ClientOnlineVideo extends Model
     	$video->video_path = $videoPath;
     	$video->course_id = $course;
     	$video->client_id = Auth::guard('client')->user()->id;
+        $video->client_institute_course_id = $instituteCourseId;
     	$video->save();
     	return $video;
     }
@@ -58,6 +61,10 @@ class ClientOnlineVideo extends Model
      */
     public function course(){
         return $this->belongsTo(ClientOnlineCourse::class, 'course_id');
+    }
+
+    public function instituteCourse(){
+        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
     }
 
     public static function getClientCourseVideosByCourseId($courseId, Request $request){
@@ -143,6 +150,15 @@ class ClientOnlineVideo extends Model
         if(is_object($this->deleteLikes) && false == $this->deleteLikes->isEmpty()){
             foreach($this->deleteLikes as $videoLike){
                 $videoLike->delete();
+            }
+        }
+    }
+
+    protected static function deleteClientOnlineVideosByClientId($clientId){
+        $videos = static::where('client_id', $clientId)->get();
+        if(is_object($videos) && false == $videos->isEmpty()){
+            foreach($videos as $video){
+                $video->delete();
             }
         }
     }

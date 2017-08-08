@@ -227,4 +227,13 @@ class ClientOnlineTestQuestion extends Model
                     ->where('client_id', $clientId)
                     ->get();
     }
+
+    protected static function deleteClientOnlineTestQuestionsByClientId($clientId){
+        $questions = static::where('client_id', $clientId)->get();
+        if(is_object($questions) && false == $questions->isEmpty()){
+            foreach($questions as $question){
+                $question->delete();
+            }
+        }
+    }
 }

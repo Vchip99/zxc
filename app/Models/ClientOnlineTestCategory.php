@@ -86,7 +86,7 @@ class ClientOnlineTestCategory extends Model
         } else {
             $result->where('clients.subdomain', $client);
         }
-        return $result->select('client_online_test_categories.id', 'client_online_test_categories.name')
+        return $result->select('client_online_test_categories.id', 'client_online_test_categories.name', 'client_online_test_categories.client_institute_course_id')
             ->groupBy('client_online_test_categories.id')->get();
     }
 
@@ -113,5 +113,14 @@ class ClientOnlineTestCategory extends Model
 
     protected static function getCategoriesByInstituteCourseId($id){
         return static::where('client_institute_course_id', $id)->get();
+    }
+
+    protected static function deleteClientOnlineTestCategoriesByClientId($clientId){
+        $categories = static::where('client_id', $clientId)->get();
+        if(is_object($categories) && false == $categories->isEmpty()){
+            foreach($categories as $category){
+                $category->delete();
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ use App\Models\ClientUserInstituteCourse;
 use App\Models\RegisterClientOnlinePaper;
 use App\Models\RegisterClientOnlineCourses;
 use App\Models\ClientScore;
+use App\Models\Client;
 use App\Models\ClientUserSolution;
 
 
@@ -26,7 +27,7 @@ class Clientuser extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token'
+        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video'
     ];
 
     /**
@@ -123,6 +124,7 @@ class Clientuser extends Authenticatable
         $student = static::where('id',$userId)->where('client_id',$clientId)->first();
         if(is_object($student)){
             $student->deleteOtherInfoByUserId($userId,$clientId);
+            $student->deleteUserStorageFolder();
             $student->delete();
             return 'true';
         }
@@ -135,6 +137,14 @@ class Clientuser extends Authenticatable
         ClientScore::deleteClientUserScores($userId);
         ClientUserSolution::deleteClientUserSolutions($userId);
         return;
+    }
+
+    public function deleteUserStorageFolder(){
+        $client = Client::find($this->client_id);
+        $userStoragePath = "clientUserStorage/".str_replace(' ', '_', $client->name)."/".$this->id;
+        if(is_dir($userStoragePath)){
+            InputSanitise::delFolder($userStoragePath);
+        }
     }
 
     protected static function changeClientUserApproveStatus(Request $request){
@@ -160,5 +170,74 @@ class Clientuser extends Authenticatable
                 ->where('client_user_institute_courses.client_id', $clientId)
                 ->where('client_user_institute_courses.client_institute_course_id', $courseId)
                 ->select('clientusers.*')->get();
+    }
+
+    protected static function updateUser(Request $request){
+        $user = Auth::guard('clientuser')->user();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+
+        $client = Client::find($user->client_id);
+        $userStoragePath = "clientUserStorage/".str_replace(' ', '_', $client->name)."/".$user->id;
+        if(!is_dir($userStoragePath)){
+            mkdir($userStoragePath, 0755, true);
+        }
+        if($request->exists('photo')){
+            $userImage = $request->file('photo')->getClientOriginalName();
+            $userImagePath = $userStoragePath."/".$user->photo;
+            if(!empty($user->photo) && file_exists($userImagePath)){
+                unlink($userImagePath);
+            }
+            $request->file('photo')->move($userStoragePath, $userImage);
+            $dbUserImagePath = $userStoragePath."/".$userImage;
+        }
+        if($request->exists('resume')){
+            $userResume = $request->file('resume')->getClientOriginalName();
+            $userResumePath = $userStoragePath."/".$user->resume;
+            if(!empty($user->resume) && file_exists($userResumePath)){
+                unlink($userResumePath);
+            }
+            $request->file('resume')->move($userStoragePath, $userResume);
+            $dbUserResumePath = $userStoragePath."/".$userResume;
+        }
+        if(!empty($dbUserImagePath)){
+            $user->photo = $dbUserImagePath;
+        }
+        if(!empty($dbUserResumePath)){
+            $user->resume = $dbUserResumePath;
+        }
+        $user->save();
+        return $user;
+    }
+
+    protected static function getStudentById($studentId){
+        return static::where('id', $studentId)
+                ->select('id','resume','recorded_video')->first();
+    }
+
+    protected static function deleteAllClientUsersInfoByClientId($clientId){
+        $users = static::where('client_id', $clientId)->get();
+        if(is_object($users) && false == $users->isEmpty()){
+            foreach($users as $user){
+                ClientScore::deleteClientUserScores($user->id);
+                ClientUserSolution::deleteClientUserSolutions($user->id);
+                $user->delete();
+            }
+        }
+        RegisterClientOnlineCourses::deleteRegisteredOnlineCoursesClientId($clientId);
+        RegisterClientOnlinePaper::deleteRegisteredPapersClientId($clientId);
+    }
+
+    protected static function getUserCoursePermissionCount(){
+        return static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id')
+                ->where('client_user_institute_courses.client_user_id', Auth::guard('clientuser')->user()->id)
+                ->where('client_user_institute_courses.course_permission', 1)->count();
+    }
+
+    protected static function getUserTestPermissionCount(){
+        return static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id')
+                ->where('client_user_institute_courses.client_user_id', Auth::guard('clientuser')->user()->id)
+                ->where('client_user_institute_courses.test_permission', 1)->count();
     }
 }

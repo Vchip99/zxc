@@ -149,11 +149,6 @@ class ClientOnlineCourse extends Model
     protected static function getOnlineCourseByCatIdBySubCatId($categoryId,$subcategoryId,Request $request){
         $categoryId = InputSanitise::inputInt($categoryId);
         $subcategoryId = InputSanitise::inputInt($subcategoryId);
-        // if(is_object(Auth::guard('clientuser')->user())){
-        //     $clientId = Auth::guard('clientuser')->user()->id;
-        // } else{
-        //     $client = InputSanitise::getCurrentClient($request);
-        // }
         $client = InputSanitise::getCurrentClient($request);
 
         /**
@@ -168,12 +163,7 @@ class ClientOnlineCourse extends Model
                     $join->on('clients.id', '=', 'client_online_videos.client_id');
                     $join->on('clients.id', '=', 'client_online_sub_categories.client_id');
                 });
-        // if(!empty($clientId)){
-        //     $result->join('register_client_online_courses', 'register_client_online_courses.client_online_course_id', '=', 'client_online_courses.id')
-        //     ->where('register_client_online_courses.client_user_id', $clientId);
-        // } else {
-        //     $result->where('clients.subdomain', $client);
-        // }
+
         return  $result->where('clients.subdomain', $client)
             ->where('client_online_courses.category_id', $categoryId)
             ->where('client_online_courses.sub_category_id', $subcategoryId)
@@ -279,5 +269,20 @@ class ClientOnlineCourse extends Model
             ->where('client_online_courses.client_institute_course_id', $courseId)
             ->where('register_client_online_courses.client_user_id', $id)
             ->get();
+    }
+
+    protected function getCoursesByClientInstituteCourseId($request){
+        $id = InputSanitise::inputInt($request->get('id'));
+        $client = Auth::guard('client')->user();
+        return static::where('client_id', $client->id)->where('client_institute_course_id', $id)->get();
+    }
+
+    protected static function deleteClientOnlineCoursesByClientId($clientId){
+        $courses = static::where('client_id', $clientId)->get();
+        if(is_object($courses) && false == $courses->isEmpty()){
+            foreach($courses as $course){
+                $course->delete();
+            }
+        }
     }
 }

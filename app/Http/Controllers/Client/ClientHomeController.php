@@ -17,6 +17,7 @@ use App\Models\Client;
 use App\Models\ClientInstituteCourse;
 use App\Mail\ClientUserEmailVerification;
 use App\Libraries\InputSanitise;
+use App\Models\ClientUserInstituteCourse;
 
 class ClientHomeController extends Controller
 {
@@ -27,40 +28,65 @@ class ClientHomeController extends Controller
      */
     public function __construct(Request $request)
     {
-        // $this->middleware('client');
         $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
-        view::share('subdomain', $subdomain);
-        $client = Client::where('subdomain', $subdomain->subdomain)->first();
-        view::share('client', $client);
+        if(is_object($subdomain)){
+            view::share('subdomain', $subdomain);
+            $client = Client::where('subdomain', $subdomain->subdomain)->first();
+            if(is_object($client)){
+                view::share('client', $client);
+            }
+        }
     }
 
     public function adminHome(Request $request){
-
-        // $subdomain = array_reverse(explode('/', $request->getUri()));
-        // // dd($subdomain[0] == Auth::user()->subdomain);
-        // if( $subdomain[0] == Auth::user()->subdomain){
-        //     $subUrl = 'http://'.Auth::user()->subdomain;
-        //     return Redirect::away($subUrl);
-        //     // dd(new RedirectResponse($subUrl));
-        // }
-
         return view('client.home');
     }
 
     protected function clientHome(Request $request){
         $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
-
+        $userSubCategoryPermissionIds = [];
+        $subCategoryCourseIds = [];
+        $courseIds = [];
+        $userCoursePermissionIds = [];
         if(is_object($subdomain)){
             $onlineCourses = ClientOnlineCourse::getCurrentCoursesByClient($subdomain->subdomain);
+            if(is_object($onlineCourses) && false == $onlineCourses->isEmpty()){
+                foreach($onlineCourses as $course){
+                    $courseIds[] = $course->client_institute_course_id;
+                }
+
+                if(is_object(Auth::guard('clientuser')->user())){
+                    $userCoursePermissions = ClientUserInstituteCourse::getCoursePermissionsByUserByCourseIdsByModule($courseIds, 'course');
+                    if(is_object($userCoursePermissions) && false == $userCoursePermissions->isEmpty()){
+                        foreach($userCoursePermissions as $userCoursePermission){
+                            $userCoursePermissionIds[] = $userCoursePermission->client_institute_course_id;
+                        }
+                    }
+                }
+            }
             $defaultCourse = ClientOnlineCourse::where('name', 'How to use course')->first();
             $defaultTest = ClientOnlineCourse::where('name', 'How to use test')->first();
 
             $onlineTestSubcategories = ClientOnlineTestSubCategory::getCurrentSubCategoriesAssociatedWithQuestion($subdomain->subdomain);
+            if(is_object($onlineTestSubcategories) && false == $onlineTestSubcategories->isEmpty()){
+                foreach($onlineTestSubcategories as $testSubCategory){
+                    $subCategoryCourseIds[] = $testSubCategory->client_institute_course_id;
+                }
+                if(is_object(Auth::guard('clientuser')->user())){
+                    $userCoursePermissions = ClientUserInstituteCourse::getCoursePermissionsByUserByCourseIdsByModule($subCategoryCourseIds, 'test');
+                    if(is_object($userCoursePermissions) && false == $userCoursePermissions->isEmpty()){
+                        foreach($userCoursePermissions as $userCoursePermission){
+                            $userSubCategoryPermissionIds[] = $userCoursePermission->client_institute_course_id;
+                        }
+                    }
+                }
+            }
+
             $testimonials = ClientTestimonial::getClientTestimonials($subdomain->subdomain);
             $clientTeam = ClientTeam::getClientTeam($subdomain->subdomain);
             $clientCustomers = ClientCustomer::getClientCustomer($subdomain->subdomain);
             $courses = ClientInstituteCourse::where('client_id', $subdomain->client_id)->get();
-            return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers', 'courses'));
+            return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers', 'courses','userSubCategoryPermissionIds', 'userCoursePermissionIds'));
         } else {
             return Redirect::away('http://localvchip.com');
         }

@@ -82,7 +82,9 @@
             <li title="My Online Courses"><a href="{{ url('myCourses')}}"><i class="fa fa-circle-o"></i> My Online Courses</a></li>
             <li title="My Course Results"><a href="{{ url('myCourseResults')}}"><i class="fa fa-circle-o"></i> My Course Results</a></li>
             <li title="My Certificate"><a href="{{ url('myCertificate')}}"><i class="fa fa-circle-o"></i> My Certificate</a></li>
-            <li title="More Courses"><a href="{{ url('online-courses')}}"><i class="fa fa-circle-o"></i> More Courses</a></li>
+            @if( is_object(Auth::guard('clientuser')->user()) && Auth::guard('clientuser')->user()::getUserCoursePermissionCount() > 0)
+              <li title="More Courses"><a href="{{ url('online-courses')}}"><i class="fa fa-circle-o"></i> More Courses</a></li>
+            @endif
           </ul>
         </li>
         @endif
@@ -98,11 +100,14 @@
           <ul class="treeview-menu">
             <li title="My Test"><a href="{{ url('myTest')}}"><i class="fa fa-circle-o"></i> My Test</a></li>
             <li title="My Test Results"><a href="{{ url('myTestResults')}}"><i class="fa fa-circle-o"></i> My Test Results</a></li>
-            <li title="More Test"><a href="{{ url('online-tests')}}"><i class="fa fa-circle-o"></i> More Test</a></li>
+            @if( is_object(Auth::guard('clientuser')->user()) && Auth::guard('clientuser')->user()::getUserTestPermissionCount() > 0)
+              <li title="More Test"><a href="{{ url('online-tests')}}"><i class="fa fa-circle-o"></i> More Test</a></li>
+            @endif
           </ul>
         </li>
         @endif
-        <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-dashboard"></i> <span>Home</span></a></li>
+        <li title="Home"><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li>
+        <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li>
         <li class="header">LABELS</li>
         <li title="Logout">
           <a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

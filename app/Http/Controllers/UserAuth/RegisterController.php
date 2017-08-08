@@ -130,20 +130,6 @@ class RegisterController extends Controller
         }
 
         return $user;
-        // return User::create([
-        //     'name' => $data['name'],
-        //     'phone' => $data['phone'],
-        //     'email' => $data['email'],
-        //     'password' => bcrypt($data['password']),
-        //     'user_type' => $data['user_type'],
-        //     'degree' => $data['degree'],
-        //     'college_id' => $data['college'],
-        //     'college_dept_id' => $data['department'],
-        //     'year' => $data['year'],
-        //     'roll_no' => $data['roll_no'],
-        //     'other_source' => $data['other_source'],
-        //     'email_token' => $emailToken,
-        // ]);
     }
 
     /**

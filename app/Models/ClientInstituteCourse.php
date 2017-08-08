@@ -37,4 +37,13 @@ class ClientInstituteCourse extends Model
     	$course->save();
     	return $course;
     }
+
+    protected static function deleteClientInstituteCoursesByClientId($clientId){
+        $courses = static::where('client_id', $clientId)->get();
+        if(is_object($courses) && false == $courses->isEmpty()){
+            foreach($courses as $course){
+                $course->delete();
+            }
+        }
+    }
 }

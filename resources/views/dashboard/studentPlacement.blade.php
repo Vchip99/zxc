@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Placement </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Students Dashboard</li>
+      <li><i class="fa fa-dashboard"></i> Users Info</li>
       <li class="active">Placement </li>
     </ol>
   </section>
@@ -54,10 +54,12 @@
                   <option value="0">Select Student </option>
                   @if(is_object($selectedStudent) && count($students) > 0)
                     @foreach($students as $student)
-                      @if(is_object($selectedStudent) && $selectedStudent->id == $student->id)
-                        <option value="{{$student->id}}" selected="true">{{$student->name}}</option>
-                      @else
-                        <option value="{{$student->id}}">{{$student->name}}</option>
+                      @if(is_object($selectedStudent) && $selectedStudent->year == $student->year)
+                        @if($selectedStudent->id == $student->id)
+                          <option value="{{$student->id}}" selected="true">{{$student->name}}</option>
+                        @else
+                          <option value="{{$student->id}}">{{$student->name}}</option>
+                        @endif
                       @endif
                     @endforeach
                   @endif

@@ -10,6 +10,7 @@ use App\Models\Admin;
 use App\Models\SubscriedUser;
 use App\Models\User;
 use App\Models\Client;
+use App\Models\Clientuser;
 use App\Mail\MailToSubscribedUser;
 use Auth,Hash,Session,Redirect,Validator,DB;
 use App\Libraries\InputSanitise;
@@ -92,6 +93,7 @@ class AdminController extends Controller
             {
                 $client = Client::find($request->client_id);
                 if(is_object($client)){
+                    Clientuser::deleteAllClientUsersInfoByClientId($client->id);
                     $client->deleteOtherInfoByClient($client);
                     $client->delete();
                     DB::connection('mysql2')->commit();

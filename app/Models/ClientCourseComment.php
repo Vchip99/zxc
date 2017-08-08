@@ -58,4 +58,13 @@ class ClientCourseComment extends Model
                 ->orderBy('client_course_comments.id', 'desc')->get();
         }
     }
+
+    protected static function deleteClientCourseCommentsByClientId($clientId){
+        $comments = static::where('client_id', $clientId)->get();
+        if(is_object($comments) && false == $comments->isEmpty()){
+            foreach($comments as $comment){
+                $comment->delete();
+            }
+        }
+    }
 }
