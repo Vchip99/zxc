@@ -160,10 +160,12 @@
     var department = parseInt(document.getElementById('selected_dept').value);
     var student = parseInt(document.getElementById('selected_student').value);
     var year = parseInt(document.getElementById('selected_year').value);
+    var category = parseInt(document.getElementById('category').value);
+    var subcategory = parseInt(document.getElementById('subcategory').value);
     $.ajax({
             method: "POST",
             url: "{{url('admin/showUserCourses')}}",
-            data: {college:college,department:department,student:student,year:year,}
+            data: {college:college,department:department,student:student,year:year,category:category,subcategory:subcategory}
         })
         .done(function( msg ) {
           body = document.getElementById('course-result');
@@ -287,7 +289,7 @@
     if( 0 < id ){
       $.ajax({
             method: "POST",
-            url: "{{url('getSubCategories')}}",
+            url: "{{url('admin/getCourseSubCategories')}}",
             data: {id:id}
         })
         .done(function( msg ) {

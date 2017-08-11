@@ -143,7 +143,7 @@ class AreaController extends Controller
                     return Redirect::to('admin/manageArea')->with('message', 'Area deleted successfully!');
                 }
                 catch(\Exception $e)
-                {   dd($e);
+                {
                     DB::rollback();
                     return redirect()->back()->withErrors('something went wrong.');
                 }

@@ -146,7 +146,7 @@ class DesignationController extends Controller
                     return Redirect::to('admin/manageDesignation')->with('message', 'Designation deleted successfully!');
                 }
                 catch(\Exception $e)
-                {   dd($e);
+                {
                     DB::rollback();
                     return redirect()->back()->withErrors('something went wrong.');
                 }

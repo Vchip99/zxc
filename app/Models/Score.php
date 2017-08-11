@@ -67,13 +67,17 @@ class Score extends Model
         return;
     }
 
-    protected static function getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$testScore){
-        return static::where('category_id', $categoryId)
-                ->where('subcat_id', $subcatId)
-                ->where('paper_id', $paperId)
-                ->where('subject_id', $subjectId)
-                ->where('test_score', '>', $testScore)
-                ->count();
+    protected static function getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$testScore,$userCollegeId){
+        $result = static::join('users', 'users.id', '=', 'scores.user_id')
+                ->where('scores.category_id', $categoryId)
+                ->where('scores.subcat_id', $subcatId)
+                ->where('scores.paper_id', $paperId)
+                ->where('scores.subject_id', $subjectId)
+                ->where('scores.test_score', '>', $testScore);
+        if('all' != $userCollegeId){
+            $result->where('users.college_id', $userCollegeId);
+        }
+        return $result->count();
     }
 
     protected static function getTestUserScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $userId){
@@ -93,12 +97,16 @@ class Score extends Model
         return $paperIds;
     }
 
-    protected static function getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId){
-        return static::where('category_id', $categoryId)
-                ->where('subcat_id', $subcategoryId)
-                ->where('paper_id', $paperId)
-                ->where('subject_id', $subjectId)
-                ->count();
+    protected static function getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId, $userCollegeId){
+        $result = static::join('users', 'users.id', '=', 'scores.user_id')
+                ->where('scores.category_id', $categoryId)
+                ->where('scores.subcat_id', $subcategoryId)
+                ->where('scores.paper_id', $paperId)
+                ->where('scores.subject_id', $subjectId);
+        if('all' != $userCollegeId){
+            $result->where('users.college_id', $userCollegeId);
+        }
+        return $result->count();
     }
 
     public function subject(){
@@ -113,9 +121,9 @@ class Score extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function rank(){
-        $rank =$this->getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id,$this->test_score);
-        $totalRank =$this->getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id);
+    public function rank($userCollegeId){
+        $rank =$this->getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id,$this->test_score, $userCollegeId);
+        $totalRank =$this->getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id,$userCollegeId);
         return ($rank + 1).'/'.$totalRank;
     }
     public function totalMarks(){

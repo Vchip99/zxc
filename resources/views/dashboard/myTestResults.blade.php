@@ -60,7 +60,7 @@
                           <td>{{$result->subject->name}}</td>
                           <td>{{$result->paper->name}}</td>
                           <td class="center">{{$result->test_score}} / {{$result->totalMarks()['totalMarks']}}</td>
-                          <td class="center">{{$result->rank()}}</td>
+                          <td class="center">{{$result->rank(Auth::user()->college_id)}}</td>
                         </tr>
                       @endforeach
                     @elseif(0 == count($results))

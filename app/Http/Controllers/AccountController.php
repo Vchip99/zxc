@@ -271,7 +271,7 @@ class AccountController extends Controller
         $scores = Score::getScoreByCollegeIdByDeptIdByFilters($user->college_id,$request->department,$request);
         if( false == $scores->isEmpty()){
             foreach($scores as $score){
-                $ranks[$score->id] = $score->rank();
+                $ranks[$score->id] = $score->rank($user->college_id);
                 $marks[$score->id] = $score->totalMarks();
             }
         }
@@ -389,9 +389,13 @@ class AccountController extends Controller
     }
 
     protected function myCourseResults(){
+        $categoryIds = [];
         $user = Auth::user();
-        $categories = CourseCategory::all();
         $courses = CourseCourse::getRegisteredOnlineCourses($user->id);
+        foreach($courses as $course){
+            $categoryIds[] = $course->course_category_id;
+        }
+        $categories = CourseCategory::find($categoryIds);
         return view('dashboard.myCourseResult', compact('categories', 'courses'));
     }
 
@@ -407,10 +411,11 @@ class AccountController extends Controller
     protected function showUserTestResultsByCatBySubCat(Request $request){
         $ranks = [];
         $marks = [];
+        $collegeId = Auth::user()->college_id;
         $scores = Score::getUserTestResultsByCatBySubCat($request);
         if( false == $scores->isEmpty()){
             foreach($scores as $score){
-                $ranks[$score->id] = $score->rank();
+                $ranks[$score->id] = $score->rank($collegeId);
                 $marks[$score->id] = $score->totalMarks();
             }
         }
@@ -444,7 +449,7 @@ class AccountController extends Controller
         $scores = Score::getAllUsersResults($request);
         if( false == $scores->isEmpty()){
             foreach($scores as $score){
-                $ranks[$score->id] = $score->rank();
+                $ranks[$score->id] = $score->rank($request->college);
                 $marks[$score->id] = $score->totalMarks();
                 if(is_object($score->user->college) && $score->user->college->id > 0){
                   $colleges[$score->id] = $score->user->college->name;

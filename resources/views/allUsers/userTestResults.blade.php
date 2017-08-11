@@ -128,7 +128,7 @@
                           <td>{{$result->subject->name}}</td>
                           <td>{{$result->paper->name}}</td>
                           <td class="center">{{$result->test_score}} / {{$result->totalMarks()['totalMarks']}}</td>
-                          <td class="center">{{$result->rank()}}</td>
+                          <td class="center">{{$result->rank($selectedStudent->college_id)}}</td>
                         </tr>
                       @endforeach
                     @elseif(is_object($selectedStudent) && 0 == count($results))
@@ -164,8 +164,8 @@
                       @if(count($results) > 0)
                         @foreach($results as $index => $result)
                           <div class="barchart-Col">
-                            <div class="barchart-Bar" style="height: {{$result->totalMarks()['percentage']}}%;" title="{{$result->totalMarks()['percentage']}}%" attr-height="{{$result->totalMarks()['percentage']}}%"></div>
-                            <div class="barchart-BarFooter " title="{{$result->subject->name}}-{{$result->paper->name}}">{{$result->subject->name}}-{{$result->paper->name}}</div>
+                            <div class="barchart-Bar" style="height: {{$result->totalMarks()['percentage']}}%;" title="{{$result->subject->name}}-{{$result->paper->name}}" attr-height="{{$result->totalMarks()['percentage']}}%"></div>
+                            <div class="barchart-BarFooter " title="{{$result->paper->name}}">{{$result->paper->name}}</div>
                           </div>
                         @endforeach
                       @endif
@@ -233,8 +233,8 @@
 
                 var eleMainDiv = document.createElement('div');
                 eleMainDiv.className = 'barchart-Col';
-                eleInnerHtml = '<div class="barchart-Bar" style="height:'+ msg['marks'][obj.id]['percentage']+ '%;" title="'+ msg['marks'][obj.id]['percentage']+ '%" attr-height="'+ msg['marks'][obj.id]['percentage']+ '%"></div>';
-                eleInnerHtml += '<div class="barchart-BarFooter " title="'+obj.subject+'-'+obj.paper+'">'+obj.subject+'-'+obj.paper+'</div>';
+                eleInnerHtml = '<div class="barchart-Bar" style="height:'+ msg['marks'][obj.id]['percentage']+ '%;" title="'+obj.subject+'-'+obj.paper+'" attr-height="'+ msg['marks'][obj.id]['percentage']+ '%"></div>';
+                eleInnerHtml += '<div class="barchart-BarFooter " title="'+obj.paper+'">'+obj.paper+'</div>';
                 eleMainDiv.innerHTML = eleInnerHtml;
                 barchart.appendChild(eleMainDiv);
             });

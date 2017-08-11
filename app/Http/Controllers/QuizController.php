@@ -121,6 +121,7 @@ class QuizController extends Controller
                 $totalMarks=0;
                 $userAnswers = [];
                 $userId = Auth::user()->id;
+                $collegeId = Auth::user()->college_id;
 
                 $categoryId = $request->get('category_id');
                 $subcategoryId = $request->get('sub_category_id');
@@ -181,8 +182,8 @@ class QuizController extends Controller
                     $userAnswers[$ind]['score_id'] = $score->id;
                 }
                 UserSolution::saveUserAnswers($userAnswers);
-                $rank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId,$paperId,$score->test_score);
-                $totalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId);
+                $rank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId,$paperId,$score->test_score,$collegeId);
+                $totalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId,$collegeId);
 
                 DB::commit();
                 return view('quiz.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank'));

@@ -44,7 +44,6 @@ class LiveCourseVideoController extends Controller
     protected function show(){
         $liveCourseCategoryIds = [];
         $liveCourses = LiveCourse::getLiveCoursesAssociatedWithVideos();
-        // dd($liveCourses);
         if(false == $liveCourses->isEmpty()){
             foreach($liveCourses as $liveCourse){
                 $liveCourseCategoryIds[] = $liveCourse->category_id;

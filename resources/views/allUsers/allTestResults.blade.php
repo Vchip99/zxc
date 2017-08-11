@@ -147,6 +147,7 @@
   }
 
   function selectSubcategory(ele){
+    document.getElementById('subcategory').value = 0;
     document.getElementById('subject').value = 0;
     document.getElementById('paper').value = 0;
     document.getElementById('students').innerHTML = '';
@@ -177,6 +178,7 @@
   }
 
   function selectSubject(ele){
+    document.getElementById('subject').value = 0;
     document.getElementById('paper').value = 0;
     document.getElementById('students').innerHTML = '';
     subcatId = parseInt($(ele).val());
@@ -207,6 +209,7 @@
   }
 
   function selectPaper(ele){
+    document.getElementById('paper').value = 0;
     subjectId = parseInt($(ele).val());
     document.getElementById('students').innerHTML = '';
     if( 0 < subjectId ){

@@ -116,14 +116,18 @@ class User extends Authenticatable
         $studentId = InputSanitise::inputInt($request->student_id);
         $year = InputSanitise::inputInt($request->year);
 
-        $result = static::where('college_id', $collegeId);
+        $result = static::where('id', $studentId);
+
+        if($collegeId > 0){
+            $result->where('college_id', $collegeId);
+        }
         if($departmentId > 0){
             $result->where('college_dept_id', $departmentId);
         }
         if($year > 0){
             $result->where('year', $year);
         }
-        $student = $result->where('id', $studentId)->first();
+        $student = $result->first();
         if(is_object($student)){
             if( 1 == $student->admin_approve){
                 $student->admin_approve = 0;

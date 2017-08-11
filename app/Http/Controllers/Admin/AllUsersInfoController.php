@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\Score;
 use App\Models\CourseCourse;
 use App\Models\TestCategory;
+use App\Models\CourseCategory;
 
 class AllUsersInfoController extends Controller
 {
@@ -119,7 +120,7 @@ class AllUsersInfoController extends Controller
         $scores = Score::getScoreByCollegeIdByDeptIdByFilters($request->college,$request->department,$request);
         if( false == $scores->isEmpty()){
             foreach($scores as $score){
-                $ranks[$score->id] = $score->rank();
+                $ranks[$score->id] = $score->rank($request->college);
                 $marks[$score->id] = $score->totalMarks();
             }
         }
@@ -153,13 +154,13 @@ class AllUsersInfoController extends Controller
             Session::set('admin_selected_user_type', $selectedStudent->user_type);
         }
         $colleges = College::all();
-        $categories = TestCategory::all();
+        $categories = CourseCategory::all();
         return view('allUsers.userCourses', compact('colleges', 'categories','collegeDepts', 'students', 'courses', 'selectedStudent'));
     }
 
     protected function showUserCourses(Request $request){
         Session::set('admin_selected_user', $request->student);
-        return CourseCourse::getRegisteredOnlineCourses($request->student);
+        return CourseCourse::getOnlineCoursesByUserIdByCategoryBySubCategory($request->student,$request->category,$request->subcategory);
     }
 
     protected function userPlacement($id=NULL){
@@ -265,7 +266,7 @@ class AllUsersInfoController extends Controller
         $scores = Score::getAllUsersResults($request);
         if( false == $scores->isEmpty()){
             foreach($scores as $score){
-                $ranks[$score->id] = $score->rank();
+                $ranks[$score->id] = $score->rank($request->college);
                 $marks[$score->id] = $score->totalMarks();
                 if(is_object($score->user->college) && $score->user->college->id > 0){
                   $colleges[$score->id] = $score->user->college->name;
