@@ -134,7 +134,9 @@ class Score extends Model
                 $totalMarks += $question->positive_marks;
             }
         }
+
         $percentage = round(($this->test_score/$totalMarks)*100,2);
+
         return ['totalMarks' => $totalMarks, 'percentage' => $percentage];
     }
 

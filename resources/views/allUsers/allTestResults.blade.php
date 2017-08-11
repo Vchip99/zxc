@@ -99,6 +99,7 @@
     var subcategory = document.getElementById('subcategory').value;
     var subject = document.getElementById('subject').value;
     var paper = document.getElementById('paper').value;
+    document.getElementById('students').innerHTML = '';
     $.ajax({
       method: "POST",
       url: "{{url('admin/getAllTestResults')}}",
@@ -127,7 +128,7 @@
             eleTr.appendChild(eleDepartment);
 
             var eleScore = document.createElement('td');
-            eleScore.innerHTML = obj.test_score+'/'+msg['marks'][obj.id]['totalMarks'];
+            eleScore.innerHTML = obj.test_score.toFixed(2)+'/'+msg['marks'][obj.id]['totalMarks'];
             eleTr.appendChild(eleScore);
 
             var eleRank = document.createElement('td');
