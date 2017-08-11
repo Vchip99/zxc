@@ -106,6 +106,7 @@
               <div class="navbar-content">
                 <li data-toggle="tooltip" title="Career"><a href="{{url('career')}}">Career</a></li>
                 <li data-toggle="tooltip" title="Our partners"><a href="{{url('ourpartner')}}">Our partners</a></li>
+                <li data-toggle="tooltip" title="Zero To Hero"><a href="{{url('heros')}}">Zero To Hero</a></li>
                 <li data-toggle="tooltip" title="Contact Us"><a href="{{url('contactus')}}">Contact Us</a></li>
               </div>
             </ul>

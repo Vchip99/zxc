@@ -55,29 +55,57 @@
 	        <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm  ">
 	          <select class="form-control" id="category" name="category" onChange="selectSubcategory(this);" title="Category">
           		<option>Select Category ...</option>
-          		@foreach($testCategories as $testCategory)
-          			@if( $catId == $testCategory->id)
-              			<option value="{{$testCategory->id}}" selected="true">
-              		@else
-              			<option value="{{$testCategory->id}}">
-              		@endif
-              			{{$testCategory->name}}
-              		</option>
-          		@endforeach
+          		@if(is_object(Auth::guard('clientuser')->user()))
+	          		@foreach($testCategories as $testCategory)
+	          			@if(in_array($testCategory->client_institute_course_id, $userCategoryPermissionIds))
+		          			@if( $catId == $testCategory->id)
+		              			<option value="{{$testCategory->id}}" selected="true">
+		              		@else
+		              			<option value="{{$testCategory->id}}">
+		              		@endif
+		              			{{$testCategory->name}}
+		              		</option>
+		              	@endif
+	          		@endforeach
+	          	@else
+	          		@foreach($testCategories as $testCategory)
+	          			@if( $catId == $testCategory->id)
+	              			<option value="{{$testCategory->id}}" selected="true">
+	              		@else
+	              			<option value="{{$testCategory->id}}">
+	              		@endif
+	              			{{$testCategory->name}}
+	              		</option>
+	              	@endforeach
+	          	@endif
           	</select>
 	        </div>
 	        <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm">
 	          <select class="form-control" id="subcategory" name="subcategory" onChange="selectPanel();" title="Sub Category">
 	          		<option>Select Sub Category ...</option>
-	          		@foreach($testSubCategories as $testSubCategory)
-	          			@if($subcatId == $testSubCategory->id)
-	          				<option value="{{$testSubCategory->id}}" selected>
-	          			@else
-	          				<option value="{{$testSubCategory->id}}">
-	          			@endif
-	          				{{$testSubCategory->name}}
-	          			</option>
-	          		@endforeach
+	          		@if(is_object(Auth::guard('clientuser')->user()))
+		          		@foreach($testSubCategories as $testSubCategory)
+		          			@if(in_array($testSubCategory->client_institute_course_id, $userSubCategoryPermissionIds))
+			          			@if($subcatId == $testSubCategory->id)
+			          				<option value="{{$testSubCategory->id}}" selected>
+			          			@else
+			          				<option value="{{$testSubCategory->id}}">
+			          			@endif
+			          				{{$testSubCategory->name}}
+			          			</option>
+			          		@endif
+		          		@endforeach
+		          	@else
+		          		@foreach($testSubCategories as $testSubCategory)
+		          			@if($subcatId == $testSubCategory->id)
+		          				<option value="{{$testSubCategory->id}}" selected>
+		          			@else
+		          				<option value="{{$testSubCategory->id}}">
+		          			@endif
+		          				{{$testSubCategory->name}}
+		          			</option>
+		          		@endforeach
+		          	@endif
 	          	</select>
 	        </div>
 	      </div>

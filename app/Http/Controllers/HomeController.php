@@ -12,9 +12,13 @@ use App\Models\User;
 use App\Models\SubscriedUser;
 use App\Models\College;
 use App\Models\CollegeDept;
+use App\Models\Designation;
+use App\Models\ZeroToHero;
+use App\Models\Area;
 use View,DB,Session,Redirect;
 use App\Mail\EmailVerification;
 use App\Mail\SubscribedUserVerification;
+use App\Libraries\InputSanitise;
 
 class HomeController extends Controller
 {
@@ -128,6 +132,16 @@ class HomeController extends Controller
         return view('more.contactus');
     }
 
+    /**
+     *  show career
+     */
+    protected function heros(){
+        $designations = Designation::all();
+        $courses = [];
+        $heros = ZeroToHero::all();
+        return view('zerotohero.heros', compact('designations', 'heros'));
+    }
+
     protected function sendMail(Request $request){
         try
         {
@@ -223,4 +237,18 @@ class HomeController extends Controller
             return redirect('/')->withErrors(['You are already subscribed.']);
         }
     }
+
+    protected function getAreasByDesignation(Request $request){
+        $designationId   = InputSanitise::inputInt($request->get('designation_id'));
+        return Area::getAreasByDesignation($designationId);
+    }
+
+    protected function getHerosBySearchArray(Request $request){
+        return ZeroToHero::getHerosBySearchArray($request);
+    }
+
+    protected function getHeroByDesignationByArea(Request $request){
+        return ZeroToHero::getHeroByDesignationByArea($request);
+    }
+
 }

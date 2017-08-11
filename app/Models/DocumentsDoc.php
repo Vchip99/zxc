@@ -108,7 +108,7 @@ class DocumentsDoc extends Model
         return DB::table('documents_docs')
                 ->join('documents_categories', 'documents_categories.id', '=', 'documents_docs.doc_category_id')
                 ->select('documents_docs.*', 'documents_categories.name as category_name')
-                ->get();
+                ->paginate(12);
     }
 
     /**

@@ -56,6 +56,9 @@
         @endif
       </tbody>
     </table>
+    <div style="float: right;" id="pagination">
+        {{ $blogCategories->links() }}
+      </div>
   </div>
   </div>
 <script type="text/javascript">

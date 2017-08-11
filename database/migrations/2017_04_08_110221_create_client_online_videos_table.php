@@ -16,12 +16,12 @@ class CreateClientOnlineVideosTable extends Migration
         Schema::connection('mysql2')->create('client_online_videos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('description');
+            $table->text('description');
             $table->string('duration');
             $table->string('video_path');
             $table->integer('course_id')->unsigned();
             $table->integer('client_id')->unsigned();
-            $table->integer('client_institute_course_id')->unsigned();
+            // $table->integer('client_institute_course_id')->unsigned();
             $table->timestamps();
         });
     }

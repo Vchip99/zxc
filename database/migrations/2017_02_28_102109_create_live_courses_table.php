@@ -18,10 +18,10 @@ class CreateLiveCoursesTable extends Migration
             $table->string('name');
             $table->integer('category_id')->unsigned();
             $table->string('author');
-            $table->string('author_introduction');
+            $table->text('author_introduction');
             $table->string('author_image');
             $table->string('image_path');
-            $table->string('description');
+            $table->text('description');
             $table->integer('difficulty_level');
             $table->boolean('certified');
             $table->boolean('on_demand');

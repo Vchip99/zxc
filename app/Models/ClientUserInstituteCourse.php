@@ -82,4 +82,8 @@ class ClientUserInstituteCourse extends Model
             }
         }
     }
+
+    protected static function getCoursesByUser($userId){
+        return static::where('client_user_id',$userId)->get();
+    }
 }

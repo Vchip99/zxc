@@ -39,9 +39,11 @@
         <div class="row text-center">
           <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm  ">
             <select class="form-control" id="category" name="category" onChange="selectSubcategory(this);" title="Category">
-              <option>Select Category ...</option>
+              <option>Select Category</option>
               @foreach($testCategories as $testCategory)
-                <option value="{{$testCategory->id}}"> {{$testCategory->name}} </option>
+                @if(in_array($testCategory->client_institute_course_id, $clientApproveCourses))
+                  <option value="{{$testCategory->id}}"> {{$testCategory->name}} </option>
+                @endif
               @endforeach
             </select>
           </div>
@@ -67,6 +69,7 @@
     <div class="container exam-panel" id="subjects">
       @if(count($testSubjects)>0)
         @foreach($testSubjects as $testSubject)
+          @if(in_array($testSubject->client_institute_course_id, $clientApproveCourses))
           <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <div class="panel panel-default" >
               <div class="panel-heading" role="tab" id="headingOne">
@@ -172,14 +175,12 @@
               </div>
             </div>
           </div>
+          @endif
         @endforeach
       @else
         <div class="panel-heading" role="tab" id="headingOne">
           <h4 class="panel-title">
-            <a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne">
-              <i class="more-less glyphicon glyphicon-plus"></i>
               No test papers are available.
-            </a>
           </h4>
         </div>
       @endif

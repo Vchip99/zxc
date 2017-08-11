@@ -171,10 +171,16 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('vCloud', 'HomeController@vCloud');
 	Route::get('liveVideo', 'HomeController@liveVideo');
 	Route::get('career', 'HomeController@career');
+	Route::get('heros', 'HomeController@heros');
 	Route::get('ourpartner', 'HomeController@ourpartner');
 	Route::get('contactus', 'HomeController@contactus');
 	Route::post('sendMail', 'HomeController@sendMail');
 	Route::post('sendContactUsMail', 'HomeController@sendContactUsMail');
+	Route::post('getHerosBySearchArray', 'HomeController@getHerosBySearchArray');
+	Route::post('getAreasByDesignation', 'HomeController@getAreasByDesignation');
+	Route::post('getHeroByDesignationByArea', 'HomeController@getHeroByDesignationByArea');
+
+
 
 	// online courses front
 	Route::get('courses', 'CourseController@courses');
@@ -422,6 +428,31 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('discussionLikeSubComment', 'DiscussionController@discussionLikeSubComment');
 	Route::post('likeBlog', 'BlogController@likeBlog');
 
+	// manage Designation
+	Route::get('admin/manageDesignation', 'ZeroToHero\DesignationController@show');
+	Route::get('admin/createDesignation', 'ZeroToHero\DesignationController@create');
+	Route::post('admin/createDesignation', 'ZeroToHero\DesignationController@store');
+	Route::get('admin/designation/{id}/edit', 'ZeroToHero\DesignationController@edit');
+	Route::put('admin/updateDesignation', 'ZeroToHero\DesignationController@update');
+	Route::delete('admin/deleteDesignation', 'ZeroToHero\DesignationController@delete');
+
+	//manage Area
+	Route::get('admin/manageArea', 'ZeroToHero\AreaController@show');
+	Route::get('admin/createArea', 'ZeroToHero\AreaController@create');
+	Route::post('admin/createArea', 'ZeroToHero\AreaController@store');
+	Route::get('admin/area/{id}/edit', 'ZeroToHero\AreaController@edit');
+	Route::put('admin/updateArea', 'ZeroToHero\AreaController@update');
+	Route::delete('admin/deleteArea', 'ZeroToHero\AreaController@delete');
+	Route::post('admin/getAreasByDesignation', 'ZeroToHero\AreaController@getAreasByDesignation');
+
+
+	//manage ZeroToHero
+	Route::get('admin/manageZeroToHero', 'ZeroToHero\ZeroToHeroController@show');
+	Route::get('admin/createZeroToHero', 'ZeroToHero\ZeroToHeroController@create');
+	Route::post('admin/createZeroToHero', 'ZeroToHero\ZeroToHeroController@store');
+	Route::get('admin/herotozero/{id}/edit', 'ZeroToHero\ZeroToHeroController@edit');
+	Route::put('admin/updateZeroToHero', 'ZeroToHero\ZeroToHeroController@update');
+	Route::delete('admin/deleteHero', 'ZeroToHero\ZeroToHeroController@delete');
 
 });
 

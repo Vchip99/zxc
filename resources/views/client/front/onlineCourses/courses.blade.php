@@ -32,11 +32,11 @@
         <h4 class="v_h4_subtitle"> Sorted By</h4>
         <div class="mrgn_20_top_btm" >
           <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-            <option value="0">Select Category ...</option>
+            <option value="0">Select Category</option>
             @if(count($courseCategories) > 0)
               @if(Auth::guard('clientuser')->user())
                 @foreach($courseCategories as $courseCategory)
-                  @if(in_array($courseCategory->id, $userCourseCategoryIds))
+                  @if(in_array($courseCategory->id, $userCourseCategoryIds[$courseCategory->client_institute_course_id]))
                     <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
                   @endif
                 @endforeach
@@ -50,7 +50,7 @@
         </div>
         <div class="dropdown mrgn_20_top_btm" id="subcat">
           <select id="subcategory" class="form-control" name="subcategory" onChange="selectCourses(this);" required title="Sub Category">
-              <option value="">Select Sub Category ...</option>
+              <option value="">Select Sub Category</option>
             </select>
         </div>
       </div>
@@ -133,7 +133,7 @@
                         </div>
                       </div>
                       <div class="course-auther">
-                        <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right" aria-hidden="true"> {{$course->author}}</i>
+                        <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true"> {{$course->author}}</i>
                         </a>
                       </div>
                     </div>
@@ -212,8 +212,8 @@
         select = document.getElementById('subcategory');
         select.innerHTML = '';
         var opt = document.createElement('option');
-        opt.value = '';
-        opt.innerHTML = 'Select Sub Category ...';
+        opt.value = 0;
+        opt.innerHTML = 'Select Sub Category';
         select.appendChild(opt);
         if( 0 < msg.length){
           $.each(msg, function(idx, obj) {
@@ -278,7 +278,7 @@
 
           var authorDiv = document.createElement('div');
           authorDiv.className = "course-auther";
-          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right" aria-hidden="true">'+ obj.author +'</i></a>';
+          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           divCourses.appendChild(firstDiv);

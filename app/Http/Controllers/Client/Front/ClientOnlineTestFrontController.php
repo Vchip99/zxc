@@ -134,7 +134,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 				$registeredPaperIds = $this->getRegisteredPaperIds();
 				$alreadyGivenPapers = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 				$currentDate = date('Y-m-d');
-				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'userCoursePermissionIds'));
+				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'userCategoryPermissionIds','userSubCategoryPermissionIds'));
 			}
 		}
 		return Redirect::to('/');

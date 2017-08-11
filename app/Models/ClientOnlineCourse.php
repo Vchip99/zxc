@@ -140,7 +140,7 @@ class ClientOnlineCourse extends Model
                     ->where('clients.subdomain', $subdomain)
                     ->select('client_online_courses.id','client_online_courses.*', 'client_online_sub_categories.name as subcategory', 'client_online_categories.name as category')
                     ->groupBy('client_online_courses.id')
-                    ->get() ;
+                    ->get();
     }
 
     /**
@@ -203,16 +203,19 @@ class ClientOnlineCourse extends Model
     /**
      *  get registered online courses for user
      */
-    protected static function getRegisteredOnlineCourses($userId){
+    protected static function getRegisteredOnlineCourses($userId,$clientApproveCourses=[]){
         $userId = InputSanitise::inputInt($userId);
-        return DB::connection('mysql2')->table('client_online_courses')
+        $result = DB::connection('mysql2')->table('client_online_courses')
                 ->join('clients', 'clients.id', '=', 'client_online_courses.client_id')
                 ->join('clientusers', 'clientusers.client_id', '=', 'clients.id')
                 ->join('register_client_online_courses', 'register_client_online_courses.client_online_course_id', '=', 'client_online_courses.id')
                 ->join('client_online_sub_categories', 'client_online_sub_categories.id', '=', 'client_online_courses.sub_category_id')
                 ->join('client_online_categories', 'client_online_categories.id', '=', 'client_online_courses.category_id')
-                ->where('register_client_online_courses.client_user_id', $userId)
-                ->select('client_online_courses.id','client_online_courses.*', 'client_online_sub_categories.name as subCategory', 'client_online_categories.name as category')
+                ->where('register_client_online_courses.client_user_id', $userId);
+        if(count($clientApproveCourses) > 0){
+            $result->whereIn('client_online_courses.client_institute_course_id', $clientApproveCourses);
+        }
+        return $result->select('client_online_courses.id','client_online_courses.*', 'client_online_sub_categories.name as subCategory', 'client_online_categories.name as category')
                 ->groupBy('client_online_courses.id')
                 ->get();
     }

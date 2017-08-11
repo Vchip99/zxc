@@ -18,6 +18,7 @@ use App\Models\ClientOnlineVideo;
 use App\Models\ClientScore;
 use App\Models\Clientuser;
 use App\Models\ClientOnlineTestCategory;
+use App\Models\ClientUserInstituteCourse;
 use App\Libraries\InputSanitise;
 
 class ClientUserController extends BaseController
@@ -44,8 +45,17 @@ class ClientUserController extends BaseController
 
     protected function myCourses(){
         $categoryIds = [];
+        $clientApproveCourses = [];
         $userId = Auth::guard('clientuser')->user()->id;
-        $courses = ClientOnlineCourse::getRegisteredOnlineCourses($userId);
+        $userCourses = ClientUserInstituteCourse::getCoursesByUser($userId);
+        if(is_object($userCourses) && false == $userCourses->isEmpty()){
+            foreach($userCourses as $userCourse){
+                if(1 == $userCourse->course_permission){
+                    $clientApproveCourses[] = $userCourse->client_institute_course_id;
+                }
+            }
+        }
+        $courses = ClientOnlineCourse::getRegisteredOnlineCourses($userId,$clientApproveCourses);
         foreach($courses as $course){
             $categoryIds[] = $course->category_id;
         }
@@ -65,18 +75,27 @@ class ClientUserController extends BaseController
         $testSubjects        = [];
         $testSubjectPaperIds = [];
         $testSubjectIds      = [];
+        $clientApproveCourses = [];
         $userId = Auth::guard('clientuser')->user()->id;
+        $userCourses = ClientUserInstituteCourse::getCoursesByUser($userId);
+        if(is_object($userCourses) && false == $userCourses->isEmpty()){
+            foreach($userCourses as $userCourse){
+                if(1 == $userCourse->test_permission){
+                    $clientApproveCourses[] = $userCourse->client_institute_course_id;
+                }
+            }
+        }
         $results = ClientOnlineTestSubjectPaper::getRegisteredSubjectPapersByUserId($userId);
         if(count($results)>0){
             $testSubjectPapers = $results['papers'];
-            $testSubjectPaperIds = $results['paperIds'];;
+            $testSubjectPaperIds = $results['paperIds'];
             $testSubjectIds = $results['subjectIds'];
             $testSubjects = ClientOnlineTestSubject::getSubjectsByIds($results['subjectIds']);
         }
         $testCategories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($userId);
         $alreadyGivenPapers = ClientScore::getClientUserTestScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $userId);
         $currentDate = date('Y-m-d');
-        return view('clientuser.dashboard.myTest', compact('testSubjects', 'testSubjectPapers', 'testCategories','currentDate', 'alreadyGivenPapers'));
+        return view('clientuser.dashboard.myTest', compact('testSubjects', 'testSubjectPapers', 'testCategories','currentDate', 'alreadyGivenPapers', 'clientApproveCourses'));
     }
 
     protected function getVideoCount($courses){
@@ -91,9 +110,23 @@ class ClientUserController extends BaseController
     }
 
     protected function myCourseResults(){
+        $categoryIds = [];
+        $clientApproveCourses = [];
         $user = Auth::guard('clientuser')->user();
-        $categories = ClientOnlineCategory::where('client_id', $user->client_id)->get();
-        $courses = ClientOnlineCourse::getRegisteredOnlineCourses($user->id);
+        $userCourses = ClientUserInstituteCourse::getCoursesByUser($user->id);
+        if(is_object($userCourses) && false == $userCourses->isEmpty()){
+            foreach($userCourses as $userCourse){
+                if(1 == $userCourse->course_permission){
+                    $clientApproveCourses[] = $userCourse->client_institute_course_id;
+                }
+            }
+        }
+
+        $courses = ClientOnlineCourse::getRegisteredOnlineCourses($user->id,$clientApproveCourses);
+        foreach($courses as $course){
+            $categoryIds[] = $course->category_id;
+        }
+        $categories = ClientOnlineCategory::find($categoryIds);
         return view('clientuser.dashboard.myCourseResult', compact('courses', 'categories'));
     }
 
@@ -107,9 +140,19 @@ class ClientUserController extends BaseController
     }
 
     protected function myTestResults(){
+        $clientApproveCourses = [];
         $user = Auth::guard('clientuser')->user();
-        $categories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($user->id);
-        $results = ClientScore::where('client_user_id', $user->id)->get();
+        $userCourses = ClientUserInstituteCourse::getCoursesByUser($user->id);
+        if(is_object($userCourses) && false == $userCourses->isEmpty()){
+            foreach($userCourses as $userCourse){
+                if(1 == $userCourse->test_permission){
+                    $clientApproveCourses[] = $userCourse->client_institute_course_id;
+                }
+            }
+        }
+        $categories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($user->id,$clientApproveCourses);
+        $results = ClientScore::where('client_user_id', $user->id)->whereIn('client_institute_course_id',$clientApproveCourses)->get();
+
         $barchartLimits = range(100, 0, 10);
         return view('clientuser.dashboard.myTestResults', compact('categories','results','barchartLimits'));
     }

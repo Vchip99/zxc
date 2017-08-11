@@ -75,6 +75,8 @@
                     </div>
                   @endforeach
                   {{$blogs->links()}}
+                @else
+                  No blogs available.
                 @endif
               </dir>
             </div>

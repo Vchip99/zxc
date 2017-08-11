@@ -27,6 +27,6 @@ class CreateCollegesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('college_infos');
+        Schema::drop('colleges');
     }
 }

@@ -160,7 +160,7 @@ class LiveCourse extends Model
                 ->join('live_videos', 'live_videos.live_course_id', '=', 'live_courses.id')
                 ->select('live_courses.id', 'live_courses.*')
                 ->groupBy('live_courses.id')
-                ->get();
+                ->paginate(9);
     }
 
     public function videos(){

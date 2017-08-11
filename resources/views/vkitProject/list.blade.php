@@ -61,6 +61,9 @@
         @endif
       </tbody>
     </table>
+      <div style="float: right;" id="pagination">
+        {{ $projects->links() }}
+      </div>
   </div>
   </div>
 <script type="text/javascript">

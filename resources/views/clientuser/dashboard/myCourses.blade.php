@@ -67,7 +67,7 @@
                   </div>
                 </div>
                 <div class="course-auther">
-                  <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right" aria-hidden="true"> {{$course->author}}</i>
+                  <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
                   </a>
                 </div>
               </div>
@@ -160,7 +160,7 @@
 
           var authorDiv = document.createElement('div');
           authorDiv.className = "course-auther";
-          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right" aria-hidden="true">'+ obj.author +'</i></a>';
+          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           divCourses.appendChild(firstDiv);

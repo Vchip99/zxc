@@ -174,7 +174,7 @@
 					    @endif
 			        @endforeach
 	    		@else
-	    			<tr><td>No questions are created.</td></tr>
+	    			<tr><td colspan="3">No questions are created.</td></tr>
 	    		@endif
 	      	</tbody>
 	    </table>

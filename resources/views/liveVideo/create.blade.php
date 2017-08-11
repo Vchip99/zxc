@@ -52,9 +52,9 @@
       <label for="course" class="col-sm-2 col-form-label">Description</label>
       <div class="col-sm-3">
         @if(isset($liveVideo->id))
-          <input type="text" class="form-control" name="description" value="{{$liveVideo->description}}" required="true">
+          <textarea type="text" class="form-control" name="description" placeholder="Description" required="true">{{$liveVideo->description}}</textarea>
         @else
-          <input type="text" class="form-control" name="description" value="" placeholder="Description" required="true">
+          <textarea type="text" class="form-control" name="description" placeholder="Description" required="true"></textarea>
         @endif
         @if($errors->has('description')) <p class="help-block">{{ $errors->first('description') }}</p> @endif
       </div>

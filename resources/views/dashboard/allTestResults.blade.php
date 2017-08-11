@@ -18,12 +18,16 @@
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="college" name="college" onChange="allResults(this.value);">
                 <option value="0"> Select College </option>
-                <option value="all">All</option>
-                <option value="other">Other</option>
-                @if(count($colleges) > 0)
-                  @foreach($colleges as $college)
-                    <option value="{{$college->id}}">{{$college->name}}</option>
-                  @endforeach
+                @if(2 == Auth::user()->user_type && 'other' == Auth::user()->college_id)
+                  <option value="other" selected="true">Other</option>
+                @else
+                  @if(count($colleges) > 0)
+                    @foreach($colleges as $college)
+                      @if(Auth::user()->college_id == $college->id)
+                        <option value="{{$college->id}}"  selected="true">{{$college->name}}</option>
+                      @endif
+                    @endforeach
+                  @endif
                 @endif
               </select>
             </div>

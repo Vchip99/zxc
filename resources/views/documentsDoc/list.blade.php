@@ -57,7 +57,7 @@
           </tr>
           @endforeach
         @else
-          <tr><td>No document is created.</td></tr>
+          <tr><td colspan="4">No document is created.</td></tr>
         @endif
       </tbody>
     </table>

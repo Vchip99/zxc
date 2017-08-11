@@ -126,11 +126,13 @@
 				          	<option value="">Select Category ...</option>
 				          	@if(count($testCategories) > 0)
 					            @foreach($testCategories as $testCategory)
-					            	@if($clientSelectedCategoryId == $testCategory->id)
-					                	<option value="{{$testCategory->id}}" selected="true">{{$testCategory->name}}</option>
-					                @else
-					                	<option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
-					                @endif
+					            	@if($clientSearchSelectedInstituteCategoryId == $testCategory->client_institute_course_id)
+						            	@if($clientSelectedCategoryId == $testCategory->id)
+						                	<option value="{{$testCategory->id}}" selected="true">{{$testCategory->name}}</option>
+						                @else
+						                	<option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
+						                @endif
+						            @endif
 					            @endforeach
 					        @endif
 				      	</select>

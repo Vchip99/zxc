@@ -132,7 +132,7 @@
                         </p>
                     </div>
                     <div class="course-auther">
-                      <a ><i class="fa fa-long-arrow-right" aria-hidden="true"> {{$document->author}}</i>
+                      <a ><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$document->author}}"> {{$document->author}}</i>
                       </a>
                     </div>
                   </div>
@@ -163,11 +163,14 @@
                 </div>
               </div>
             @endforeach
-            @else
-              No courses are available.
-            @endif
-          </div>
+          @else
+            No documents are available.
+          @endif
         </div>
+          <div style="float: right;" id="pagination">
+            {{ $documents->links() }}
+          </div>
+      </div>
     </div>
   </div>
 </section>
@@ -179,6 +182,7 @@
   function renderDocuments(msg){
     documents = document.getElementById('documents');
     documents.innerHTML = '';
+    document.getElementById('pagination').innerHTML = '';
     if(undefined !== msg['documents'] && 0 < msg['documents'].length){
       $.each(msg['documents'], function(idx, obj) {
         var firstDiv = document.createElement('div');
@@ -232,7 +236,7 @@
 
         var authorDiv = document.createElement('div');
         authorDiv.className = "course-auther";
-        authorDiv.innerHTML = '<a ><i class="fa fa-long-arrow-right" aria-hidden="true">'+ obj.author +'</i></a>';
+        authorDiv.innerHTML = '<a ><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
         secondDiv.appendChild(authorDiv);
         firstDiv.appendChild(secondDiv);
         documents.appendChild(firstDiv);

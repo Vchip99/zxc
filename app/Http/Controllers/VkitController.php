@@ -44,7 +44,7 @@ class VkitController extends Controller
      *  show vkits projects
      */
     protected function show(){
-        $projects = VkitProject::all();
+        $projects = VkitProject::paginate(12);
         $vkitCategories = VkitCategory::getProjectCategoriesAssociatedWithProject();
         return view('vkits.vkits', compact('projects', 'vkitCategories'));
     }

@@ -101,14 +101,17 @@ class ClientOnlineTestCategory extends Model
     /**
      * return test categopries registered subject papers
      */
-    protected static function getTestCategoriesByRegisteredSubjectPapersByUserId($userId){
+    protected static function getTestCategoriesByRegisteredSubjectPapersByUserId($userId, $clientApproveCourses=[]){
         $userId = InputSanitise::inputInt($userId);
-        return DB::connection('mysql2')->table('client_online_test_categories')
+        $result =  DB::connection('mysql2')->table('client_online_test_categories')
                 ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.category_id', 'client_online_test_categories.id')
                 ->join('register_client_online_papers', 'register_client_online_papers.client_paper_id', 'client_online_test_subject_papers.id')
                 ->join('clientusers', 'clientusers.id', '=', 'register_client_online_papers.client_user_id')
-                ->where('register_client_online_papers.client_user_id', $userId)
-                ->select('client_online_test_categories.id', 'client_online_test_categories.name')->groupBy('client_online_test_categories.id')->get();
+                ->where('register_client_online_papers.client_user_id', $userId);
+        if(count($clientApproveCourses) > 0){
+            $result->whereIn('client_online_test_categories.client_institute_course_id', $clientApproveCourses);
+        }
+        return $result->select('client_online_test_categories.id', 'client_online_test_categories.name', 'client_online_test_categories.client_institute_course_id')->groupBy('client_online_test_categories.id')->get();
     }
 
     protected static function getCategoriesByInstituteCourseId($id){

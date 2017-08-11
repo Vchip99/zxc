@@ -58,7 +58,7 @@ class VkitProjectController extends Controller
      *  show list of vkit projects
      */
     protected function show(){
-        $projects = VkitProject::all();
+        $projects = VkitProject::paginate();
         return view('vkitProject.list', compact('projects'));
     }
 

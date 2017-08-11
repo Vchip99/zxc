@@ -30,6 +30,6 @@ class CreateDiscussionPostsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('discussion_posts');
     }
 }

@@ -16,7 +16,7 @@ class CreateLiveVideosTable extends Migration
         Schema::create('live_videos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('description');
+            $table->text('description');
             $table->string('duration');
             $table->string('video_path');
             $table->integer('live_course_id')->unsigned();

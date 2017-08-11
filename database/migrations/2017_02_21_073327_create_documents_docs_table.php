@@ -17,7 +17,7 @@ class CreateDocumentsDocsTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('author');
-            $table->string('introduction');
+            $table->text('introduction');
             $table->integer('doc_category_id')->unsigned();
             $table->boolean('is_paid');
             $table->float('price', 8, 2);

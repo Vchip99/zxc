@@ -127,9 +127,12 @@
             @else
               No courses are available.
             @endif
-          </div>
         </div>
+      <div style="float: right;" id="pagination">
+        {{ $courses->links() }}
       </div>
+      </div>
+    </div>
   </div>
 </section>
 <section id="education" class="v_container" >
@@ -219,6 +222,7 @@
   function renderCourse(msg){
     divCourses = document.getElementById('addCourses');
     divCourses.innerHTML = '';
+    document.getElementById('pagination').innerHTML = '';
     if(undefined !== msg['courses'] && 0 < msg['courses'].length) {
       $.each(msg['courses'], function(idx, obj) {
           var firstDiv = document.createElement('div');
@@ -262,7 +266,7 @@
 
           var authorDiv = document.createElement('div');
           authorDiv.className = "course-auther";
-          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right" aria-hidden="true">'+ obj.author +'</i></a>';
+          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           divCourses.appendChild(firstDiv);

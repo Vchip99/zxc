@@ -96,12 +96,14 @@
         <div class="dropdown mrgn_20_top_btm" id="cat">
           <select id="category" class="form-control" name="category" title="Category" onChange="showLiveCourses(this);"  required>
             <option value="">Select Category ...</option>
-            @if(in_array(1,$liveCourseCategoryIds))
+            <!-- @if(in_array(1,$liveCourseCategoryIds))
               <option value="1">Technology</option>
             @endif
             @if(in_array(2,$liveCourseCategoryIds))
               <option value="2">Science</option>
-            @endif
+            @endif -->
+            <option value="1">Technology</option>
+            <option value="2">Science</option>
           </select>
         </div>
         <h4 class="v_h4_subtitle mrgn_20_top_btm"> Filter By</h4>
@@ -188,7 +190,10 @@
               No courses are available.
             @endif
           </div>
-        </div>
+          <div style="float: right;" id="pagination">
+            {{ $liveCourses->links() }}
+          </div>
+      </div>
     </div>
   </div>
 </section>
@@ -269,6 +274,7 @@
   function renderLiveCourse(msg){
     divAllLiveCourses = document.getElementById('all_live_courses');
     divAllLiveCourses.innerHTML = '';
+    document.getElementById('pagination').innerHTML = '';
     if(undefined !== msg['liveCourses'] && 0 < msg['liveCourses'].length) {
       $.each(msg['liveCourses'], function(idx, obj) {
         var firstDiv = document.createElement('div');
@@ -312,7 +318,7 @@
 
           var authorDiv = document.createElement('div');
           authorDiv.className = "course-auther";
-          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right" aria-hidden="true">'+ obj.author +'</i></a>';
+          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           divAllLiveCourses.appendChild(firstDiv);

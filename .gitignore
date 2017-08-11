@@ -1,7 +1,10 @@
 /node_modules
 /public/LiveCourseImages
+/public/clientUserStorage
 /public/client_images
 /public/courseImages
 /public/documentStorage
 /public/projectStorage
-
+/public/testSubCategoryImages
+/public/userStorage
+.env

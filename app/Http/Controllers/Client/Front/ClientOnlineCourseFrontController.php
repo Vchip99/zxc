@@ -58,18 +58,20 @@ class ClientOnlineCourseFrontController extends ClientHomeController
     	$subdomainName = InputSanitise::getCurrentClient($request);
         $courseCategories = ClientOnlineCategory::getCategoriesAssocaitedWithVideos($subdomainName);
         $courses = ClientOnlineCourse::getCourseAssocaitedWithVideos($subdomainName);
+
         if(is_object($courses) && false == $courses->isEmpty()){
             foreach($courses as $course){
                 $courseIds[] = $course->client_institute_course_id;
-                $courseCategoryIds[$course->client_institute_course_id] = $course->category_id;
+                $courseCategoryIds[$course->client_institute_course_id][] = $course->category_id;
             }
+
             if(is_object(Auth::guard('clientuser')->user())){
                 $userCoursePermissions = ClientUserInstituteCourse::getCoursePermissionsByUserByCourseIdsByModule($courseIds, 'course');
                 if(is_object($userCoursePermissions) && false == $userCoursePermissions->isEmpty()){
                     foreach($userCoursePermissions as $userCoursePermission){
                         $userCoursePermissionIds[] = $userCoursePermission->client_institute_course_id;
                         if(isset($courseCategoryIds[$userCoursePermission->client_institute_course_id])){
-                            $userCourseCategoryIds[] = $courseCategoryIds[$userCoursePermission->client_institute_course_id];
+                            $userCourseCategoryIds[$userCoursePermission->client_institute_course_id] = $courseCategoryIds[$userCoursePermission->client_institute_course_id];
                         }
                     }
                 }

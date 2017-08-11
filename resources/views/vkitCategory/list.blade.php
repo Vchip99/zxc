@@ -58,6 +58,9 @@
         @endif
       </tbody>
     </table>
+    <div style="float: right;" id="pagination">
+      {{ $vkitCategories->links() }}
+    </div>
   </div>
   </div>
 <script type="text/javascript">

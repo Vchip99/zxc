@@ -2,10 +2,10 @@
 @section('module_title')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <section class="content-header">
-    <h1> User Test Result </h1>
+    <h1> User Placement </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-dashboard"></i> Users Info </li>
-      <li class="active"> User Test Result </li>
+      <li class="active"> User Placement </li>
     </ol>
   </section>
 @stop

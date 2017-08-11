@@ -19,9 +19,9 @@ class CreateClientOnlineCoursesTable extends Migration
             $table->integer('category_id')->unsigned();
             $table->integer('sub_category_id')->unsigned();
             $table->string('author');
-            $table->string('author_introduction');
+            $table->text('author_introduction');
             $table->string('author_image');
-            $table->string('description');
+            $table->text('description');
             $table->float('price', 8, 2);
             $table->integer('difficulty_level')->unsigned();
             $table->boolean('certified');

@@ -182,7 +182,7 @@
             select.innerHTML = '';
             var opt = document.createElement('option');
             opt.value = '0';
-            opt.innerHTML = 'Select Sub Category ...';
+            opt.innerHTML = 'Select Sub Category';
             select.appendChild(opt);
             if( 0 < msg.length){
               $.each(msg, function(idx, obj) {

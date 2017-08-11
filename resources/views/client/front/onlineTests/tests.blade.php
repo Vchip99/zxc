@@ -4,6 +4,7 @@
 @stop
 @section('header-css')
    @include('layouts.home-css')
+   <link href="{{ asset('css/box.css')}}" rel="stylesheet"/>
   <style type="text/css">
     .vchip_product_item{
       background:#FFF;
@@ -69,37 +70,41 @@
             @if(Auth::guard('clientuser')->user())
               @foreach($testSubCategories as $testSubCategory)
                 @if(in_array($testSubCategory->client_institute_course_id, $userSubCategoryPermissionIds))
-                <div class=" col-sm-6 slideanim">
-                    <div class="vchip_product_item">
-                      <div class="" title="{{$testSubCategory->name}}">
-                        <img src="{{asset($testSubCategory->image_path)}}" class="img-responsive" width="800" height="400" alt="test "/>
-                      </div>
-                      <ul class="mrgn_5_top vchip_categories list-inline">
-                        <li>{{$testSubCategory->name}}</li>
-                      </ul>
-                      <div class="vchip_product_content">
-                      <p class="" title="Start Test"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link">Start Test <i  class="fa fa-angle-right" aria-hidden="true"></i></a>
-                        </p>
-                      </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 slideanim small-img">
+                  <div class="vchip_product_itm text-left">
+                    <figure title="{{$testSubCategory->name}}">
+                      <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
+                    </figure>
+                    <ul class="vchip_categories list-inline">
+                      <li>{{$testSubCategory->name}}</li>
+                    </ul>
+                    <div class="vchip_product_content">
+                      <p class="mrgn_20_top"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">Start Test <i
+                        class="fa fa-angle-right"
+                        aria-hidden="true"></i></a>
+                      </p>
                     </div>
+                  </div>
                 </div>
                 @endif
               @endforeach
             @else
               @foreach($testSubCategories as $testSubCategory)
-                <div class=" col-sm-6 slideanim">
-                    <div class="vchip_product_item">
-                      <div class="" title="{{$testSubCategory->name}}">
-                        <img src="{{asset($testSubCategory->image_path)}}" class="img-responsive" width="800" height="400" alt="test "/>
-                      </div>
-                      <ul class="mrgn_5_top vchip_categories list-inline">
-                        <li>{{$testSubCategory->name}}</li>
-                      </ul>
-                      <div class="vchip_product_content">
-                      <p class="" title="Start Test"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link">Start Test <i  class="fa fa-angle-right" aria-hidden="true"></i></a>
-                        </p>
-                      </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 slideanim small-img">
+                  <div class="vchip_product_itm text-left">
+                    <figure title="{{$testSubCategory->name}}">
+                      <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
+                    </figure>
+                    <ul class="vchip_categories list-inline">
+                      <li>{{$testSubCategory->name}}</li>
+                    </ul>
+                    <div class="vchip_product_content">
+                      <p class="mrgn_20_top"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">Start Test <i
+                        class="fa fa-angle-right"
+                        aria-hidden="true"></i></a>
+                      </p>
                     </div>
+                  </div>
                 </div>
               @endforeach
             @endif
@@ -116,7 +121,8 @@
 	@include('footer.client-footer')
   <script type="text/javascript">
       function showSubCategories(ele){
-        id = parseInt($(ele).val());
+        var id = parseInt($(ele).val());
+        var userId = parseInt(document.getElementById('user_id'));
         if( 0 < id ){
           $.ajax({
             method: "POST",
@@ -126,31 +132,60 @@
           .done(function( msg ) {
             var subcatDiv = document.getElementById('testSubCategories');
             subcatDiv.innerHTML = '';
-            if( 0 < msg.length){
-              $.each(msg, function(idx, obj) {
-                var mainDiv = document.createElement('div');
-                mainDiv.className = 'col-sm-6';
+            if( 0 < msg['sub_categories'].length){
+              if(userId > 0){
+                $.each(msg['sub_categories'], function(idx, obj) {
+                  if(msg['sub_category_permission'].length > 0 && true == msg['sub_category_permission'].indexOf(obj.id) > -1){
+                    var mainDiv = document.createElement('div');
+                    mainDiv.className = 'col-sm-6';
 
-                var productDiv = document.createElement('div');
-                productDiv.className = "vchip_product_item";
-                var imageDiv = document.createElement('div');
-                imageUrl = "{{ asset('')}}"+ obj.image_path;
-                imageDiv.innerHTML = '<img src="'+ imageUrl +'"class="img-responsive" width="800"height="400" alt="test "/>';
-                productDiv.appendChild(imageDiv);
+                    var productDiv = document.createElement('div');
+                    productDiv.className = "vchip_product_item";
+                    var imageDiv = document.createElement('div');
+                    imageUrl = "{{ asset('')}}"+ obj.image_path;
+                    imageDiv.innerHTML = '<img src="'+ imageUrl +'"class="img-responsive" width="800"height="400" alt="test "/>';
+                    productDiv.appendChild(imageDiv);
 
-                var eleUl = document.createElement('ul');
-                eleUl.className="mrgn_5_top vchip_categories list-inline";
-                eleUl.innerHTML='<li>'+ obj.name +'</li>';
-                productDiv.appendChild(eleUl);
+                    var eleUl = document.createElement('ul');
+                    eleUl.className="mrgn_5_top vchip_categories list-inline";
+                    eleUl.innerHTML='<li>'+ obj.name +'</li>';
+                    productDiv.appendChild(eleUl);
 
-                var contentDiv = document.createElement('div');
-                contentDiv.className ='vchip_product_content';
-                contentUrl = "{{url('getTest')}}/"+obj.id;
-                contentDiv.innerHTML = '<p class=""><a href="'+ contentUrl +'" class="btn-link">Start Test <i class="fa fa-angle-right"aria-hidden="true"></i></a></p>';
-                productDiv.appendChild(contentDiv);
-                mainDiv.appendChild(productDiv);
-                subcatDiv.appendChild(mainDiv);
+                    var contentDiv = document.createElement('div');
+                    contentDiv.className ='vchip_product_content';
+                    contentUrl = "{{url('getTest')}}/"+obj.id;
+                    contentDiv.innerHTML = '<p class=""><a href="'+ contentUrl +'" class="btn-link">Start Test <i class="fa fa-angle-right"aria-hidden="true"></i></a></p>';
+                    productDiv.appendChild(contentDiv);
+                    mainDiv.appendChild(productDiv);
+                    subcatDiv.appendChild(mainDiv);
+                  }
                 });
+              } else {
+                $.each(msg['sub_categories'], function(idx, obj) {
+                  var mainDiv = document.createElement('div');
+                  mainDiv.className = 'col-sm-6';
+
+                  var productDiv = document.createElement('div');
+                  productDiv.className = "vchip_product_item";
+                  var imageDiv = document.createElement('div');
+                  imageUrl = "{{ asset('')}}"+ obj.image_path;
+                  imageDiv.innerHTML = '<img src="'+ imageUrl +'"class="img-responsive" width="800"height="400" alt="test "/>';
+                  productDiv.appendChild(imageDiv);
+
+                  var eleUl = document.createElement('ul');
+                  eleUl.className="mrgn_5_top vchip_categories list-inline";
+                  eleUl.innerHTML='<li>'+ obj.name +'</li>';
+                  productDiv.appendChild(eleUl);
+
+                  var contentDiv = document.createElement('div');
+                  contentDiv.className ='vchip_product_content';
+                  contentUrl = "{{url('getTest')}}/"+obj.id;
+                  contentDiv.innerHTML = '<p class=""><a href="'+ contentUrl +'" class="btn-link">Start Test <i class="fa fa-angle-right"aria-hidden="true"></i></a></p>';
+                  productDiv.appendChild(contentDiv);
+                  mainDiv.appendChild(productDiv);
+                  subcatDiv.appendChild(mainDiv);
+                });
+              }
             } else {
               subcatDiv.innerHTML = 'No sub categories are available.';
             }

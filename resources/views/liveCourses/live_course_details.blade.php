@@ -99,7 +99,7 @@
               <h4 class="v_h4_subtitle" title="{{$video->name}}">
                 <a href="{{ url('liveEpisode')}}/{{$video->id}}">{{$video->name}}</a>
               </h4>
-              <p class="data-lg">{{$video->description}}</p>
+              <p class="more data-lg">{{$video->description}}</p>
               <p class="more data-sm">{{$video->description}}</p>
               <span class="v_download" title="Download">
                 <a class="btn btn-primary is-bold" role="button" data-toggle="collapse" href="#collapseExample_{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">

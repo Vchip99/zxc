@@ -72,49 +72,6 @@
                         <div>
                         <a href="{{ url('forgotPassword')}}" data-toggle="tooltip" title="Forgot Password">Forgot Password?</a></div>
                       </div>
-                      <!-- <div id="menu1" class="tab-pane fade">
-                        <form id="registerUser" method="post" action="{{ url('register')}}">
-                          {{ csrf_field() }}
-                          <div class="form-group">
-                            <input id="name" type="text" class="form-control" name="name" value="" placeholder="User / Institute" autocomplete="off" required/>
-                            <span class="help-block"></span>
-                          </div>
-                          <div class="form-group">
-                            <input type="phone" class="form-control" name="phone" value="" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}"/>
-                            <span class="help-block"></span>
-                          </div>
-                          <div class="form-group">
-                            <input id="email" name="email" type="text" class="form-control" onfocus="this.type='email'" autocomplete="off" placeholder="vchip@gmail.com" required>
-                            <span class="help-block"></span>
-                          </div>
-                          <div class="form-group">
-                            <input id="password" name="password" type="text" class="form-control" data-type="password" onfocus="this.type='password'" autocomplete="off" placeholder="password" required>
-                            <span class="help-block"></span>
-                          </div>
-                          <div class="form-group">
-                            <input id="confirm_password" name="confirm_password" type="text" class="form-control" data-type="password" onfocus="this.type='password'" autocomplete="off" placeholder="confirm password" required>
-                            <span class="help-block"></span>
-                          </div>
-                          <label class="radio-inline text-left">
-                            <input  id="student-radiobtn" type="radio" name="user_type" value="0">Student
-                          </label>
-                          <label class="radio-inline text-center ">
-                            <input  type="radio" id="teacher-radiobtn" name="user_type" value="1" >Teacher/Admin
-                          </label>
-                          <div class="show_hide input-group"  id="replyCommentT" style="display: none;">
-                            <input type="text" class="form-control mrgn_10_top" id="subdomain" name="subdomain" placeholder="Enter subdomain" aria-describedby="basic-addon" required/>
-                            <span class="input-group-addon" id="basic-addon">.vchipedu.com</span>
-                          </div>
-                          <div class="show_hide" style="display: none;">
-                            <span readonly>Ex. gateexam.vchipedu.com</span></br>
-                          </div>
-                          </br>
-                          <button name="register" class="btn btn-info btn-block" onclick="event.preventDefault(); confirmSubmit();" data-toggle="tooltip" title="Register">Register</button></br>
-                        </form>
-                        <div>
-                          <a data-toggle="tab" href="#home" title="Alredy Member">Alredy Member?</a>
-                        </div>
-                      </div> -->
                     </div>
                   </div>
                 </div>

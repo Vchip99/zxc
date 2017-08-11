@@ -96,8 +96,8 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 			if(is_object($subject)){
 				$testCategories    = ClientOnlineTestCategory:: showCategories($request);
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($subject->category_id, $request);
-
-				return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject'));
+				$instituteCourses = ClientInstituteCourse::where('client_id', $subject->client_id)->get();
+				return view('client.onlineTest.subject.create', compact('instituteCourses','testCategories','testSubCategories','subject'));
 			}
 		}
 		return Redirect::to('manageOnlineTestSubject');

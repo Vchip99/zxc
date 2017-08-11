@@ -90,7 +90,8 @@ class ClientOnlineSubCategoryController extends ClientBaseController
     		$subcategory = ClientOnlineSubCategory::find($id);
     		if(is_object($subcategory)){
                 $categories = ClientOnlineCategory::showCategories($request);
-	    		return view('client.onlineCourse.subcategory.create', compact('subcategory', 'categories'));
+                $instituteCourses = ClientInstituteCourse::where('client_id', $subcategory->client_id)->get();
+	    		return view('client.onlineCourse.subcategory.create', compact('instituteCourses','subcategory', 'categories'));
     		}
     	}
     	return Redirect::to('manageOnlineSubCategory');

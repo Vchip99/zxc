@@ -2,10 +2,10 @@
 @section('module_title')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <section class="content-header">
-    <h1> Users Info </h1>
+    <h1> All Test Results </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> All Users </li>
-      <li class="active"> Users Info </li>
+      <li><i class="fa fa-dashboard"></i> All Test Results </li>
+      <li class="active"> All Test Results </li>
     </ol>
   </section>
 @stop
@@ -93,7 +93,7 @@
             select = document.getElementById('category');
             select.innerHTML = '';
             var opt = document.createElement('option');
-            opt.value = '';
+            opt.value = 0;
             opt.innerHTML = 'Select Category';
             select.appendChild(opt);
             if( 0 < msg.length){
@@ -109,7 +109,7 @@
       select = document.getElementById('category');
       select.innerHTML = '';
       var opt = document.createElement('option');
-      opt.value = '';
+      opt.value = 0;
       opt.innerHTML = 'Select Category';
       select.appendChild(opt);
     }
@@ -174,7 +174,7 @@
             select = document.getElementById('subcategory');
             select.innerHTML = '';
             var opt = document.createElement('option');
-            opt.value = '';
+            opt.value = 0;
             opt.innerHTML = 'Select Sub Category';
             select.appendChild(opt);
             if( 0 < msg.length){
@@ -190,7 +190,7 @@
       select = document.getElementById('subcategory');
       select.innerHTML = '';
       var opt = document.createElement('option');
-      opt.value = '';
+      opt.value = 0;
       opt.innerHTML = 'Select Sub Category';
       select.appendChild(opt);
     }
@@ -211,7 +211,7 @@
             selectSub = document.getElementById('subject');
             selectSub.innerHTML = '';
             var opt = document.createElement('option');
-            opt.value = '';
+            opt.value = 0;
             opt.innerHTML = 'Select Subject';
             selectSub.appendChild(opt);
             if( 0 < msg.length){
@@ -227,7 +227,7 @@
       selectSub = document.getElementById('subject');
       selectSub.innerHTML = '';
       var opt = document.createElement('option');
-      opt.value = '';
+      opt.value = 0;
       opt.innerHTML = 'Select Subject';
       selectSub.appendChild(opt);
     }

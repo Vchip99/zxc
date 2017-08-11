@@ -54,7 +54,7 @@
           </tr>
           @endforeach
         @else
-          <tr><td>No college is created.</td></tr>
+          <tr><td colspan="3">No college is created.</td></tr>
         @endif
       </tbody>
     </table>

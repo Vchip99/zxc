@@ -59,7 +59,7 @@
           </tr>
           @endforeach
         @else
-          <tr><td>No videos are created.</td></tr>
+          <tr><td colspan="5">No videos are created.</td></tr>
         @endif
       </tbody>
     </table>

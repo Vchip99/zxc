@@ -107,7 +107,7 @@ class CourseCourse extends Model
                 ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
                 ->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category')
                 ->groupBy('course_courses.id')
-                ->get();
+                ->paginate(9);
     }
 
     /**
@@ -127,6 +127,7 @@ class CourseCourse extends Model
                     ->join('register_online_courses', 'register_online_courses.online_course_id', '=', 'course_courses.id')
                     ->where('course_courses.course_category_id', $categoryId)
                     ->where('course_courses.course_sub_category_id', $subcategoryId)
+                    ->where('register_online_courses.user_id', $userId)
                     ->select('course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category', 'register_online_courses.grade as grade')
                     ->groupBy('course_courses.id')
                     ->get() ;

@@ -15,7 +15,7 @@ class CreateClientTeamsTable extends Migration
     {
         Schema::connection('mysql2')->create('client_teams', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('member_details');
+            $table->text('member_details');
             $table->string('image');
             $table->integer('client_id')->unsigned();
             $table->timestamps();

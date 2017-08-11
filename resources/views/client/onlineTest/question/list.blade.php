@@ -78,11 +78,13 @@
 			          <option value="">Select Category ...</option>
 			          @if( $clientSearchSelectedCategoryId > 0 && count($testCategories) > 0)
 			            @foreach($testCategories as $testCategory)
-			              @if( $testCategory->id == $clientSearchSelectedCategoryId )
-			                <option value="{{$testCategory->id}}" selected="true" readonly="true">{{$testCategory->name}}</option>
-			              @else
-			                <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
-			              @endif
+			            	@if($clientSearchSelectedInstituteCategoryId == $testCategory->client_institute_course_id)
+					            @if( $testCategory->id == $clientSearchSelectedCategoryId )
+					                <option value="{{$testCategory->id}}" selected="true" readonly="true">{{$testCategory->name}}</option>
+					            @else
+					                <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
+					            @endif
+					        @endif
 			            @endforeach
 			          @endif
 			      </select>
@@ -209,7 +211,7 @@
 	    if( 0 < id ){
 	      $.ajax({
 	              method: "POST",
-	              url: "{{url('getOnlineCategories')}}",
+	              url: "{{url('getOnlineTestCategories')}}",
 	              data: {id:id}
 	          })
 	          .done(function( msg ) {

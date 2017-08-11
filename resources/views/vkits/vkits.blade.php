@@ -120,16 +120,19 @@
                       </div>
                     </div>
                     <div class="course-auther">
-                      <a href="{{ url('vkitproject')}}/{{$project->id}}"><i class="fa fa-long-arrow-right" aria-hidden="true"> {{$project->author}}</i>
+                      <a href="{{ url('vkitproject')}}/{{$project->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$project->author}}"> {{$project->author}}</i>
                       </a>
                     </div>
                   </div>
                 </div>
             @endforeach
             @else
-              No courses are available.
+              No projects are available.
             @endif
           </div>
+            <div style="float: right;" id="pagination">
+              {{ $projects->links() }}
+            </div>
         </div>
     </div>
   </div>
@@ -145,6 +148,7 @@
   function renderVkitProjects(msg){
     projects = document.getElementById('vkitprojects');
     projects.innerHTML = '';
+    document.getElementById('pagination').innerHTML = '';
     if( undefined !== msg.length && 0 < msg.length){
       $.each(msg, function(idx, obj) {
         var firstDiv = document.createElement('div');
@@ -179,7 +183,7 @@
 
           var authorDiv = document.createElement('div');
           authorDiv.className = "course-auther";
-          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right" aria-hidden="true">'+ obj.author +'</i></a>';
+          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           projects.appendChild(firstDiv);

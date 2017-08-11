@@ -65,7 +65,7 @@
                       @endforeach
                     @elseif(0 == count($results))
                       <tr class="">
-                        <td colspan="5">No result for selected user.</td>
+                        <td colspan="5">No result.</td>
                       </tr>
                     @endif
                   </tbody>

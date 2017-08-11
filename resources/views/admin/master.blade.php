@@ -255,6 +255,19 @@
               <li title="Manage Subdomains/Clients"><a href="{{ url('admin/manageClients')}}"><i class="fa fa-circle-o"></i> Manage Clients </a></li>
             </ul>
           </li>
+          <li class="treeview">
+            <a href="#" title="Zero to Hero">
+              <i class="fa fa-asterisk"></i> <span>Zero to Hero</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Manage Designation"><a href="{{ url('admin/manageDesignation')}}"><i class="fa fa-circle-o"></i> Manage Designation </a></li>
+              <li title="Manage Area"><a href="{{ url('admin/manageArea')}}"><i class="fa fa-circle-o"></i> Manage Area </a></li>
+              <li title="Manage Zero To Hero"><a href="{{ url('admin/manageZeroToHero')}}"><i class="fa fa-circle-o"></i> Manage Zero To Hero </a></li>
+            </ul>
+          </li>
         @endif
         <li class="header">LABELS</li>
         <li>
