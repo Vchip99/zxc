@@ -107,26 +107,29 @@
      <h2 class="v_h2_title ">OUR PRODUCTS</h2>
      <hr class="section-dash-dark"/>
      <ul class="nav nav-pills" >
-      <li class="active"><a data-toggle="tab" href="#online_courses">Online courses</a></li>
-      <li><a data-toggle="tab" href="#live_courses">Live courses</a></li>
-      <li><a data-toggle="tab" href="#test_series1">Test series</a></li>
+      <li class="active"><a data-toggle="tab" href="#online_courses">Online Classes</a></li>
+      <li><a data-toggle="tab" href="#live_courses">Students</a></li>
+     <!--  <li><a data-toggle="tab" href="#test_series1">Test series</a></li>
       <li><a data-toggle="tab" href="#v_kit">V-kit</a></li>
-      <li><a data-toggle="tab" href="#documents">Documents</a></li>
+      <li><a data-toggle="tab" href="#documents">Documents</a></li> -->
     </ul>
     <div class="tab-content" style="background-color: #428bca; padding : 6px 15px;">
       <div id="online_courses" class="tab-pane fade in active">
-        <h3>Online courses</h3>
-        <p>Start your online course  with in a minutes just follow following video.</p>
+        <h3>Online Classes</h3>
+        <p>Start your online classes  with in a minutes just follow following video.</p>
         <p style="" class="embed-responsive embed-responsive-16by9 v_video">
-          <iframe  src="https://www.youtube.com/embed/QSIPNhOiMoE" frameborder="0" allowfullscreen></iframe></p>
+          <!-- <iframe  src="https://www.youtube.com/embed/QSIPNhOiMoE" frameborder="0" allowfullscreen></iframe> -->
+          <iframe src="https://www.youtube.com/embed/tAZDiJxIRZk" frameborder="0" allowfullscreen></iframe></p>
         </div>
         <div id="live_courses" class="tab-pane fade">
-          <h3>Live courses</h3>
-          <p>Start your live course  with in a minutes just follow following video.</p>
+          <h3>Students</h3>
+          <p>Just follow following video to know how to use our platform.</p>
           <p style="" class="embed-responsive embed-responsive-16by9 v_video">
-            <iframe  src="https://www.youtube.com/embed/QSIPNhOiMoE" frameborder="0" allowfullscreen></iframe></p>
+            <!-- <iframe  src="https://www.youtube.com/embed/QSIPNhOiMoE" frameborder="0" allowfullscreen></iframe> -->
+            <iframe src="https://www.youtube.com/embed/nYQairlPfbA" frameborder="0" allowfullscreen></iframe>
+            </p>
           </div>
-          <div id="test_series1" class="tab-pane fade">
+          <!-- <div id="test_series1" class="tab-pane fade">
             <h3>Test series</h3>
             <p>Start your online test series with in a minutes just follow following video.</p>
             <p style="" class="embed-responsive embed-responsive-16by9 v_video">
@@ -146,7 +149,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </section>
           <section id="" class="v_container v_bg_grey">
           <div class="container text-center">

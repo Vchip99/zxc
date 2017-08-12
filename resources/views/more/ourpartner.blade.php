@@ -51,28 +51,28 @@
 	        <div class="row our_customer">
 	          	<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
 		            <div class="hovereffect">
-		              <img class="" src="{{ asset('images/our-partner/brose.jpg')}}" alt="" >
+		              <img class="" src="{{ asset('images/our-partner/vchip-tech-logo.jpg')}}" alt="Vchip Tech" >
 		              <div class="overlay">
-		               <h2>Brose</h2>
-		               <a class="info" href="https://www.brose.com/de-en/Company/" target="_blank">link here</a>
+		               <h2>Vchip Tech</h2>
+		               <a class="info" href="https://vchiptech.com/" target="_blank">link here</a>
 		             </div>
 		           </div>
 	         	</div>
 		         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
 		          <div class="hovereffect">
-		            <img class="" src="{{ asset('images/our-partner/behr.gif')}}" alt="Behr" >
+		            <img class="" src="{{ asset('images/our-partner/lasthour_logo.jpg')}}" alt="Last Hours Tech" >
 		            <div class="overlay">
-		             <h2>Behr</h2>
-		             <a class="info" href="http://www.behr.com/consumer" target="_blank">link here</a>
+		             <h2>Last Hours Tech</h2>
+		             <a class="info" href="http://lasthourstech.com/" target="_blank">link here</a>
 		           </div>
 		         </div>
 		       	</div>
 		       	<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
 			        <div class="hovereffect">
-			          <img class="" src="{{ asset('images/our-partner/tat-motors.jpg')}}" alt="Tata Motors">
+			          <img class="" src="" alt="Pinnaculum Infotech Pvt. Ltd">
 			          <div class="overlay">
-			           <h2>Tata Motors</h2>
-			           <a class="info" href="http://www.tatamotors.com/" target="_blank">link here</a>
+			           <h2>Pinnaculum Infotech</h2>
+			           <a class="info" href="http://pinnaculuminfotech.com/" target="_blank">link here</a>
 			         </div>
 			       </div>
 			     </div>
@@ -242,7 +242,7 @@
                     <input id="phone" name="phone" type="text" placeholder="Phone" class="form-control input-md" required="">
                   </div>
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                   <label class="col-md-4 control-label" for="gender">Gender</label>
                   <div class="col-md-4">
                     <label class="radio-inline" for="gender-0">
@@ -260,7 +260,7 @@
                   <div class="col-md-4">
                     <input type="file" name="resume" class="form-control">
                   </div>
-                </div>
+                </div> -->
                 <div class="form-group">
                   <label class="col-md-4 control-label" for="submit"></label>
                   <div class="col-md-4">

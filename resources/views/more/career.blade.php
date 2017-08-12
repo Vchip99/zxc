@@ -266,7 +266,7 @@
                     <input id="phone" name="phone" type="text" placeholder="Phone" class="form-control input-md" required="">
                   </div>
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                   <label class="col-md-4 control-label" for="gender">Gender</label>
                   <div class="col-md-4">
                     <label class="radio-inline" for="gender-0">
@@ -284,7 +284,7 @@
                   <div class="col-md-4">
                     <input type="file" name="resume" class="form-control">
                   </div>
-                </div>
+                </div> -->
                 <div class="form-group">
                   <label class="col-md-4 control-label" for="submit"></label>
                   <div class="col-md-4">
