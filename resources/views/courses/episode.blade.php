@@ -634,11 +634,14 @@
     });
 </script>
 <script type="text/javascript">
-
   $( document ).ready(function() {
-      showCommentEle = "{{ Session::get('course_comment_area')}}";
-      if(showCommentEle > 0){
+    showCommentEle = "{{ Session::get('course_comment_area')}}";
+    showsubCommentEle = "{{ Session::get('show_subcomment_area')}}";
+
+     if(showCommentEle > 0){
         window.location.hash = '#showComment_'+showCommentEle;
+      } else if(showsubCommentEle > 0){
+        window.location.hash = '#subcomment_'+showsubCommentEle;
       }
   });
 </script>

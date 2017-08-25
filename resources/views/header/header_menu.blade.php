@@ -12,17 +12,19 @@
         </button>
 
         <div class="pull-right dropdown " >
-          <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><i class="fa fa-user" aria-hidden="true"></i><b class="caret"></b>
-          </a>
           @if(Auth::user())
+          <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><i class="fa fa-user" aria-hidden="true"><b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></i><b class="caret"></b>
+          </a>
             <ul class="dropdown-menu" role="menu">
               <div class="navbar-content">
                 <li>
-                <!-- @if(!empty(Auth::user()->subdomain))
-                  <a href="{{Auth::user()->subdomain}}" target="_blank"><i class="fa fa-tachometer" aria-hidden="true"></i>Dashbord</a>
-                @else -->
                   <a href="{{ url('profile')}}" data-toggle="tooltip" title="Dashbord"><i class="fa fa-tachometer" aria-hidden="true"></i>Dashbord</a>
-                <!-- @endif -->
+                </li>
+                <li>
+                  <a href="{{ url('myNotifications')}}" data-toggle="tooltip" title="My Notifications"><i class="fa fa-star" aria-hidden="true"></i>My Notifications : <b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></a>
+                </li>
+                <li>
+                  <a href="{{ url('adminMessages')}}" data-toggle="tooltip" title="Admin Notifications"><i class="fa fa-star" aria-hidden="true"></i>Admin Messages : <b style="color: red;">{{Auth::user()->adminNotificationCount()}}</b></a>
                 </li>
                 <!-- <li><a href=""><i class="fa fa-user" aria-hidden="true"></i>My Profile</a></li> -->
                 <li><a href="{{ url('logout') }}" data-toggle="tooltip" title="Logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
@@ -33,6 +35,8 @@
               </div>
             </ul>
             @else
+              <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><i class="fa fa-user" aria-hidden="true"></i><b class="caret"></b>
+              </a>
               <ul class="dropdown-menu" role="menu">
                 <div class="navbar-content">
                   <li>

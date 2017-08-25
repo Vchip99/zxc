@@ -21,6 +21,8 @@ use App\Models\ClientHomePage;
 use App\Models\ClientCourseSubCommentLike;
 use App\Models\ClientCourseSubComment;
 use App\Models\ClientUserInstituteCourse;
+use App\Models\ClientNotification;
+use App\Models\ClientReadNotification;
 
 class ClientOnlineCourseFrontController extends ClientHomeController
 {
@@ -128,7 +130,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
     /**
      *  show episode and its details by id
      */
-    protected function episode($subdomain, $id,Request $request){
+    protected function episode($subdomain, $id,Request $request,$subcomment=NULL){
         $videoId = json_decode(trim($id));
         if(isset($videoId)){
             $video = ClientOnlineVideo::find($videoId);
@@ -148,6 +150,29 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                 $subcommentLikesCount = ClientCourseSubCommentLike::getLikesByVideoId($id, $request);
                 if(is_object(Auth::guard('clientuser')->user())){
                     $currentUser = Auth::guard('clientuser')->user()->id;
+                    if($videoId > 0 || $subcomment > 0){
+                        DB::beginTransaction();
+                        try
+                        {
+                            if($videoId > 0 && $subcomment == NULL){
+                                $readNotification = ClientReadNotification::readNotificationByModuleByModuleIdByUser(ClientNotification::CLIENTCOURSEVIDEO,$videoId,$currentUser);
+                                if(is_object($readNotification)){
+                                    DB::connection('mysql2')->commit();
+                                }
+                                Session::set('client_subcomment_area', 0);
+                            } else {
+                                Session::set('client_subcomment_area', $subcomment);
+                            }
+                            Session::set('client_course_comment', 0);
+                        }
+                        catch(\Exception $e)
+                        {
+                            DB::connection('mysql2')->rollback();
+                            return redirect()->back()->withErrors('something went wrong.');
+                        }
+                    } else {
+                        Session::set('client_subcomment_area', 0);
+                    }
                 } else {
                     $currentUser = 0;
                 }
@@ -295,11 +320,26 @@ class ClientOnlineCourseFrontController extends ClientHomeController
         DB::connection('mysql2')->beginTransaction();
         try
         {
-            $subcomment = ClientCourseSubComment::createSubComment($request);
-            Session::put('client_course_comment', $subcomment->client_course_comment_id);
-            DB::connection('mysql2')->commit();
+
+            $subComment = ClientCourseSubComment::createSubComment($request);
+            Session::put('client_course_comment', $subComment->client_course_comment_id);
+
             $videoId = strip_tags(trim($request->get('video_id')));
             $subdomain = explode('.',$request->getHost());
+            $commentId = $request->get('comment_id');
+            $subcommentId = $request->get('subcomment_id');
+
+            if($commentId > 0 && $subcommentId > 0){
+                $parentComment = ClientCourseSubComment::where('id',$subcommentId)->where('client_id', Auth::guard('clientuser')->user()->client_id)->where('user_id', '!=', Auth::guard('clientuser')->user()->id)->first();
+            } else {
+                $parentComment = ClientCourseComment::where('id',$subComment->client_course_comment_id)->where('client_id', Auth::guard('clientuser')->user()->client_id)->where('user_id', '!=', Auth::guard('clientuser')->user()->id)->first();
+            }
+            if(is_object($parentComment)){
+                $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
+                $notificationMessage = '<a href="'.$request->root().'/episode/'.$videoId.'/'.$subComment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
+                ClientNotification::addCommentNotification($notificationMessage, ClientNotification::USERCOURSEVIDEONOTIFICATION, $subComment->id,$subComment->user_id,$parentComment->user_id);
+            }
+            DB::connection('mysql2')->commit();
             if(0 < $videoId){
                 return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
             }

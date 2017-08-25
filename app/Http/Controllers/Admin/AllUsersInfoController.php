@@ -243,12 +243,32 @@ class AllUsersInfoController extends Controller
     }
 
     protected function unapproveUsersByCollegeId(Request $request){
-        return User::unApproveUsers($request->get('college_id'));
+        $collegeNames = [];
+        $result = [];
+        $colleges = College::all();
+        if(is_object($colleges) && false == $colleges->isEmpty()){
+            foreach($colleges as $college){
+                $collegeNames[$college->id] = $college->name;
+            }
+        }
+        $result['users'] = User::unApproveUsers($request->get('college_id'));;
+        $result['colleges'] = $collegeNames;
+        return $result;
     }
 
     protected function approveUser(Request $request){
+        $collegeNames = [];
+        $result = [];
         User::changeUserApproveStatus($request);
-        return User::unApproveUsers($request->get('selected_college_id'));
+        $colleges = College::all();
+        if(is_object($colleges) && false == $colleges->isEmpty()){
+            foreach($colleges as $college){
+                $collegeNames[$college->id] = $college->name;
+            }
+        }
+        $result['users'] = User::unApproveUsers($request->get('selected_college_id'));
+        $result['colleges'] = $collegeNames;
+        return $result;
     }
 
     protected function allTestResults(Request $request){

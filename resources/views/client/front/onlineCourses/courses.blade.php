@@ -36,7 +36,7 @@
             @if(count($courseCategories) > 0)
               @if(Auth::guard('clientuser')->user())
                 @foreach($courseCategories as $courseCategory)
-                  @if(in_array($courseCategory->id, $userCourseCategoryIds[$courseCategory->client_institute_course_id]))
+                  @if(isset($userCourseCategoryIds[$courseCategory->client_institute_course_id]) && in_array($courseCategory->id, $userCourseCategoryIds[$courseCategory->client_institute_course_id]))
                     <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
                   @endif
                 @endforeach

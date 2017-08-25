@@ -37,30 +37,33 @@ class ClientOnlineTestQuestion extends Model
         $ans4 = '';
         $solution = '';
         $newInstance = new static;
-        $question = $newInstance->changeSrc($request->get('question'));
-
-        if(!empty($request->get('ans1'))){
+        if(ctype_alnum($request->get('question'))){
+            $question = $newInstance->changeSrc($request->get('question'));
+        } else {
+            $question = $request->get('question');
+        }
+        if(!empty($request->get('ans1')) && ctype_alnum($request->get('ans1'))){
             $ans1 = trim($newInstance->changeSrc($request->get('ans1')), '<p>,<p/>');
         } else {
             $ans1 = trim($request->get('ans1'), '<p>,<p/>');
         }
-        if(!empty($request->get('ans2'))){
+        if(!empty($request->get('ans2')) && ctype_alnum($request->get('ans2'))){
             $ans2 = trim($newInstance->changeSrc($request->get('ans2')), '<p>,<p/>');
         } else {
             $ans2 = trim($request->get('ans2'), '<p>,<p/>');
         }
-        if(!empty($request->get('ans3'))){
+        if(!empty($request->get('ans3')) && ctype_alnum($request->get('ans3'))){
             $ans3 = trim($newInstance->changeSrc($request->get('ans3')), '<p>,<p/>');
         } else {
             $ans3 = trim($request->get('ans3'), '<p>,<p/>');
         }
-        if(!empty($request->get('ans4'))){
+        if(!empty($request->get('ans4')) && ctype_alnum($request->get('ans4'))){
             $ans4 = trim($newInstance->changeSrc($request->get('ans4')), '<p>,<p/>');
         } else {
             $ans4 = trim($request->get('ans4'), '<p>,<p/>');
         }
 
-        if(!empty($request->get('solution'))){
+        if(!empty($request->get('solution')) && ctype_alnum($request->get('solution'))){
             $solution = trim($newInstance->changeSrc($request->get('solution')), '<p>,<p/>');
         } else {
             $solution = trim($request->get('solution'), '<p>,<p/>');

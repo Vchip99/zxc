@@ -7,7 +7,7 @@
   <section class="content-header">
     <h1> My Live Courses </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Live Courses</li>
+      <li><i class="fa fa-pie-chart"></i> Live Courses</li>
       <li class="active">My Live Courses</li>
     </ol>
   </section>

@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Manage Sub Admin </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Sub Admin </li>
+      <li><i class="fa fa-user"></i> Sub Admin </li>
       <li class="active"> Manage Sub Admin </li>
     </ol>
   </section>

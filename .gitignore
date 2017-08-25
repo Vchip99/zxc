@@ -1,9 +1,9 @@
 /node_modules
-/public/LiveCourseImages
-/public/clientUserStorage
 /public/client_images
+/public/clientUserStorage
 /public/courseImages
 /public/documentStorage
+/public/LiveCourseImages
 /public/projectStorage
 /public/testSubCategoryImages
 /public/userStorage

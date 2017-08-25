@@ -11,9 +11,9 @@ use App\Models\DiscussionCommentLike;
 use App\Models\DiscussionSubComment;
 use App\Models\DiscussionSubCommentLike;
 use App\Models\DiscussionCategory;
-use Auth, DB;
-use Validator;
-use Redirect, Session;
+use App\Models\Notification;
+use App\Models\ReadNotification;
+use Auth,DB,Validator,Redirect,Session;
 
 class DiscussionController extends Controller
 {
@@ -45,7 +45,7 @@ class DiscussionController extends Controller
     /**
      *  show list of discussion post
      */
-    protected function discussion(){
+    protected function discussion($commentId=NULL, $subcommentId=NULL ){
         $postCategoryIds = [];
         $discussionCategories =DiscussionCategory::all();
         $posts = DiscussionPost::orderBy('id', 'desc')->get();
@@ -61,6 +61,33 @@ class DiscussionController extends Controller
         $subcommentLikesCount = DiscussionSubCommentLike::getLiksByPosts($posts);
         if(is_object(Auth::user())){
             $currentUser = Auth::user()->id;
+            if($commentId > 0 || ($commentId > 0 && $subcommentId > 0)){
+                Session::set('show_post_area', 0);
+                DB::beginTransaction();
+                try
+                {
+                    if($commentId > 0  && $subcommentId > 0){
+                        $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::USERDISCUSSIONSUBCOMMENTNOTIFICATION,$subcommentId,$currentUser);
+                        if(is_object($readNotification)){
+                            DB::commit();
+                        }
+                        Session::set('show_subcomment_area', $subcommentId);
+                        Session::set('show_comment_area', 0);
+                    } else {
+                        Session::set('show_comment_area', $commentId);
+                        Session::set('show_subcomment_area', 0);
+                    }
+
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors('something went wrong.');
+                }
+            } else {
+                Session::set('show_comment_area', 0);
+                Session::set('show_subcomment_area', 0);
+            }
         } else {
             $currentUser = 0;
         }
@@ -114,6 +141,12 @@ class DiscussionController extends Controller
         {
             $comment = DiscussionComment::createComment($request);
             $postModuleId = trim($request->get('all_post_module_id'));
+            $post = DiscussionPost::find($comment->discussion_post_id);
+            if(is_object($post) && is_object($comment)){
+                $string = (strlen($post->body) > 50) ? substr($post->body,0,50).'...' : $post->body;
+                $notificationMessage = '<a href="'.$request->root().'/discussion/'.$comment->id.'">A reply of your post: '. trim($string, '<p></p>')  .'</a>';
+                Notification::addCommentNotification($notificationMessage, Notification::USERDISCUSSIONCOMMENTNOTIFICATION, $comment->id,$comment->user_id,$post->user_id);
+            }
             DB::commit();
             Session::put('show_comment_area', 0);
             Session::put('show_post_area', $comment->discussion_post_id);
@@ -138,7 +171,19 @@ class DiscussionController extends Controller
         DB::beginTransaction();
         try
         {
+            $commentId = $request->get('comment_id');
+            $subcommentId = $request->get('parent_id');
             $subcomment = DiscussionSubComment::createSubComment($request);
+            if($commentId > 0 && $subcommentId > 0){
+                $parentComment = DiscussionSubComment::where('id',$subcommentId)->where('user_id', '!=', Auth::user()->id)->first();
+            } else {
+                $parentComment = DiscussionComment::where('id',$subcomment->discussion_comment_id)->first();
+            }
+            if(is_object($parentComment)){
+                $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
+                $notificationMessage = '<a href="'.$request->root().'/discussion/'.$parentComment->id.'/'.$subcomment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
+                Notification::addCommentNotification($notificationMessage, Notification::USERDISCUSSIONSUBCOMMENTNOTIFICATION, $subcomment->id,$subcomment->user_id,$parentComment->user_id);
+            }
 
             $postModuleId = trim($request->get('all_post_module_id'));
             DB::commit();

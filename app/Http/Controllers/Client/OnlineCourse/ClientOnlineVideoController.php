@@ -10,6 +10,7 @@ use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineVideo;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientInstituteCourse;
+use App\Models\ClientNotification;
 
 class ClientOnlineVideoController extends ClientBaseController
 {
@@ -71,6 +72,8 @@ class ClientOnlineVideoController extends ClientBaseController
         {
         	$video = ClientOnlineVideo::addOrUpdateVideo($request);
             if(is_object($video)){
+                $notificationMessage = 'A new course video: <a href="'.$request->root().'/episode/'.$video->id.'">'.$video->name.'</a> has been added.';
+                ClientNotification::addNotification($notificationMessage, ClientNotification::CLIENTCOURSEVIDEO, $video->id, $video->client_institute_course_id);
                 DB::connection('mysql2')->commit();
             	return Redirect::to('manageOnlineVideo')->with('message', 'Video created successfully!');
             }

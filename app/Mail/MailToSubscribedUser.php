@@ -11,14 +11,16 @@ class MailToSubscribedUser extends Mailable
 {
     use Queueable, SerializesModels;
     public $mailContent;
+    public $mailSubject;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($mailContent)
+    public function __construct($mailContent, $mailSubject)
     {
         $this->mailContent = $mailContent;
+        $this->mailSubject = $mailSubject;
     }
 
     /**
@@ -28,6 +30,6 @@ class MailToSubscribedUser extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.mailToSubscribedUser')->with('content', $this->mailContent);
+        return $this->subject($this->mailSubject)->view('emails.mailToSubscribedUser')->with('content', $this->mailContent);
     }
 }

@@ -48,7 +48,7 @@
            </div>
            <div class="hr"></div><br />
           <h3 class="v_h3_title"><em>Performance of a company is directly proportional to his team...</em></h3><br />
-            <p> V-edu have open, engaging, fun, employee-centric work environment with competitive compensation and rewards and fast-track programs for high potential employees. We are always be searching for new generation of entrepreneur. Our team is well balanced of both newly graduate and  experienced guys. We believe that newcomers known the exact market demand and our experienced guys fulfill it. We always welcome new ideas, technologically and ready to change. </p>
+            <p> V-edu have open, engaging, fun, employee-centric work environment with competitive compensation and rewards and fast-track programs for high potential employees. We are always be searching for new generation of entrepreneur. Our team is well balanced of both newly graduate and  experienced guys. We believe that newcomers known the exact market demand and our experienced guys fulfill it. We always welcome new ideas, technology and ready to change. </p>
 
             <p>Our main motive is bridging between educational organization  and Industry along with Digital village. So our most of tutors are belong to industries.</p>
           </div>

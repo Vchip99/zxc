@@ -37,7 +37,7 @@
   <section class="content-header">
     <h1> Read Articles </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Documents</li>
+      <li><i class="fa fa-book"></i> Documents</li>
       <li class="active">Read Articles</li>
     </ol>
   </section>

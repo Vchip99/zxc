@@ -6,7 +6,7 @@
   <section class="content-header">
     <h1> My Replies </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Discussion</li>
+      <li><i class="fa fa-comments"></i> Discussion</li>
       <li class="active">My Replies</li>
     </ol>
   </section>
@@ -32,7 +32,7 @@
                          <div class="media" id="showPost_{{$post->id}}">
                             <div class="media-heading" >
                               <div class="user-block ">
-                                <a id="{{$post->id}}" class="tital" onClick="goToPost(this);">{{$post->title}} </a>
+                                <a id="{{$post->id}}" class="tital" onClick="goToPost(this);" style="cursor: pointer;">{{$post->title}} </a>
                                   <form id="goToPost_{{$post->id}}" action="{{ url('goToPost')}}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="post_id" value="{{$post->id}}">
@@ -72,7 +72,7 @@
                                       <div class="item" id="showComment_{{$comment->id}}">
                                         <img src="{{ asset('images/user1.png') }}" alt="User Image" />
                                         <div class="message">
-                                            <a class="SubCommentName" id="{{$comment->id}}" onClick="goToComment(this);">{{ $user->find($comment->user_id)->name }}</a>
+                                            <a class="SubCommentName" id="{{$comment->id}}" onClick="goToComment(this);" style="cursor: pointer;">{{ $user->find($comment->user_id)->name }}</a>
                                             <form id="goToComment_{{$comment->id}}" action="{{ url('goToComment')}}" method="POST" style="display: none;">
                                               {{ csrf_field() }}
                                               <input type="hidden" name="comment_id" value="{{$comment->id}}">

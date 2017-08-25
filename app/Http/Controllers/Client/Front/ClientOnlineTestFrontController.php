@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Client\Front;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Client\ClientHomeController;
-use Redirect;
-use Validator, Session, Auth, View;
+use Redirect,Validator, Session, Auth, View, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
@@ -17,6 +16,8 @@ use App\Models\ClientHomePage;
 use App\Models\ClientScore;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientUserInstituteCourse;
+use App\Models\ClientNotification;
+use App\Models\ClientReadNotification;
 
 class ClientOnlineTestFrontController extends ClientHomeController
 {
@@ -81,7 +82,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
     /**
 	 *	show tests by categoryId by sub categoryId
 	 */
-	protected function getTest( $subdomain,$id, Request $request){
+	protected function getTest( $subdomain,$id,Request $request,$subject=NULL,$paper=NULL){
 		$subcatId = json_decode($id);
 		$testSubjectPaperIds = [];
 		$courseIds = [];
@@ -134,7 +135,25 @@ class ClientOnlineTestFrontController extends ClientHomeController
 				$registeredPaperIds = $this->getRegisteredPaperIds();
 				$alreadyGivenPapers = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 				$currentDate = date('Y-m-d');
-				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'userCategoryPermissionIds','userSubCategoryPermissionIds'));
+				if(is_object(Auth::guard('clientuser')->user())){
+                    $currentUser = Auth::guard('clientuser')->user()->id;
+                    if($subject > 0 && $paper > 0){
+                        DB::connection('mysql2')->beginTransaction();
+                        try
+                        {
+                        	$readNotification = ClientReadNotification::readNotificationByModuleByModuleIdByUser(ClientNotification::CLIENTPAPER,$paper,$currentUser);
+                            if(is_object($readNotification)){
+                                DB::connection('mysql2')->commit();
+                            }
+                        }
+                        catch(\Exception $e)
+                        {
+                            DB::connection('mysql2')->rollback();
+                            return redirect()->back()->withErrors('something went wrong.');
+                        }
+                    }
+                }
+				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'userCategoryPermissionIds','userSubCategoryPermissionIds','subject','paper'));
 			}
 		}
 		return Redirect::to('/');

@@ -7,8 +7,12 @@ use App\Http\Controllers\Controller;
 use Redirect;
 use App\Models\LiveCourse;
 use App\Models\LiveVideo;
+use App\Models\Notification;
 use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
+use App\Mail\MailToSubscribedUser;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 
 class LiveVideoController extends Controller
 {
@@ -68,7 +72,28 @@ class LiveVideoController extends Controller
         {
             $video = LiveVideo::addOrUpdateLiveVideo($request);
             if(is_object($video)){
+                $messageBody = '';
+                $notificationMessage = 'A new live course video: <a href="'.$request->root().'/liveEpisode/'.$video->id.'">'.$video->name.'</a> has been added.';
+                Notification::addNotification($notificationMessage, Notification::ADMINLIVECOURSEVIDEO, $video->id);
                 DB::commit();
+                $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get()->toArray();
+                $allUsers = array_chunk($subscriedUsers, 100);
+                if(count($allUsers) > 0){
+                    foreach($allUsers as $selectedUsers){
+                        foreach($selectedUsers as $user){
+                            $user = User::where('email', $user)->first();
+                            $messageBody .= '<p> Hello '.$user->name.'</p>';
+                            $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
+                            $messageBody .= '<p><b> Thanks and Regard, </b></p>';
+                            $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
+                            $messageBody .= '<b> More about us... </b><br/>';
+                            $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
+                            $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
+                            $mailSubject = 'Vchipedu added a new live course video';
+                            Mail::to($user)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
+                        }
+                    }
+                }
                 return Redirect::to('admin/manageLiveVideo')->with('message', 'Live Video Created Successfully!');
             }
         }

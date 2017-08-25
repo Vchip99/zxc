@@ -309,7 +309,11 @@ option:not(:checked) {
                 <div class="vid">
                   {!! $hero->url !!}
                 </div>
-                <b  style="align-content: center;">  {{$hero->name}} </b>
+              @if($id == $hero->id)
+                <b  style="align-content: center;">  {{$hero->name}} <span style="color: red;">[new]</span></b>
+              @else
+               <b  style="align-content: center;">  {{$hero->name}} </b>
+              @endif
               </div>
             @endforeach
           @else

@@ -12,6 +12,7 @@
   <link href="{{ asset('css/sidemenu/_all-skins.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/v_main.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/comment.css?ver=1.0')}}" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css?family=Hind" rel="stylesheet">
 
   <script src="{{ asset('js/jquery.min.js?ver=1.0')}}"></script>
   <script src="{{ asset('js/bootstrap.min.js?ver=1.0')}}"></script>
@@ -68,6 +69,7 @@
       </form>
       <ul class="sidebar-menu">
         <li class="header">Vchip Technology</li>
+
         <li class="treeview ">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>Online Courses</span>

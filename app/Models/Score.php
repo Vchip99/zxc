@@ -11,6 +11,7 @@ use App\Models\Question;
 
 class Score extends Model
 {
+
     /**
      * The attributes that are mass assignable.
      *
@@ -68,12 +69,12 @@ class Score extends Model
     }
 
     protected static function getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$testScore,$userCollegeId){
-        $result = static::join('users', 'users.id', '=', 'scores.user_id')
+        $result = DB::table('scores')->join('users', 'users.id', '=', 'scores.user_id')
                 ->where('scores.category_id', $categoryId)
                 ->where('scores.subcat_id', $subcatId)
                 ->where('scores.paper_id', $paperId)
                 ->where('scores.subject_id', $subjectId)
-                ->where('scores.test_score', '>', $testScore);
+                ->where('scores.test_score', '>', DB::raw($testScore));
         if('all' != $userCollegeId){
             $result->where('users.college_id', $userCollegeId);
         }

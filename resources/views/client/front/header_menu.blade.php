@@ -12,14 +12,19 @@
         </button>
 
         <div class="pull-right dropdown " >
-          <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><i class="fa fa-user" aria-hidden="true"></i><b class="caret"></b>
-          </a>
-
           @if(is_object(Auth::guard('clientuser')->user()))
+            <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><i class="fa fa-user" aria-hidden="true"><b style="color: red;">{{Auth::guard('clientuser')->user()->userNotificationCount()}}</b></i><b class="caret"></b>
+            </a>
             <ul class="dropdown-menu" role="menu">
               <div class="navbar-content">
                 <li>
                   <a href="{{ url('profile')}}" title="Dashbord"><i class="fa fa-tachometer" aria-hidden="true"></i>Dashbord</a>
+                </li>
+                <li>
+                  <a href="{{ url('myNotifications')}}" data-toggle="tooltip" title="My Notifications"><i class="fa fa-star" aria-hidden="true"></i>My Notifications : <b style="color: red;">{{Auth::guard('clientuser')->user()->userNotificationCount()}}</b></a>
+                </li>
+                <li>
+                  <a href="{{ url('clientMessages')}}" data-toggle="tooltip" title="Admin Messages"><i class="fa fa-star" aria-hidden="true"></i>Admin Messages : <b style="color: red;">{{Auth::guard('clientuser')->user()->adminNotificationCount()}}</b></a>
                 </li>
                 <!-- <li><a href=""><i class="fa fa-user" aria-hidden="true"></i>My Profile</a></li> -->
                 <li><a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" title="Logout"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
@@ -30,6 +35,8 @@
               </div>
             </ul>
             @else
+              <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><i class="fa fa-user" aria-hidden="true"><b style="color: red;"></b></i><b class="caret"></b>
+              </a>
               <ul class="dropdown-menu" role="menu">
                 <div class="navbar-content">
                   <li title="Login">

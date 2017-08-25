@@ -186,7 +186,7 @@ body{font-family:  Century Gothic, serif}
 			  	<div class="panel-footer">
 			  		<div class="row">
 					  	<div class="col-md-6 col-sm-6 col-xs-12">
-							<label class="checkbox-inline"><input type="checkbox" name="checkMe" value="" class="mrgn" id="checkMe">I am agree all terms and conditions.</label>
+							<label class="checkbox-inline"><input type="checkbox" name="checkMe" value="" class="mrgn" id="checkMe">I agree all terms and conditions.</label>
 							<button type="button"  class=" next-btn" onClick="return checkCondition();" >Next</button>
 					  	</div>
 			  			<div class="col-md-6 col-sm-6 col-xs-12 "></div>

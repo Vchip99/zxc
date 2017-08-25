@@ -8,9 +8,12 @@ use App\Models\TestCategory;
 use App\Models\TestSubCategory;
 use App\Models\TestSubject;
 use App\Models\TestSubjectPaper;
-use Redirect;
-use Validator, Auth, DB;
+use App\Models\Notification;
+use Redirect,Validator, Auth, DB;
 use App\Libraries\InputSanitise;
+use App\Mail\MailToSubscribedUser;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 
 class PaperController extends Controller
 {

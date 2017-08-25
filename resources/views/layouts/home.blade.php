@@ -31,15 +31,15 @@
     <div class="tab-content" style="background-color: #01bafd; padding : 6px 15px;">
       <div id="about1" class="tab-pane fade in active">
         <h3 class="v_h3_title">About</h3>
-        <p>Education is need of better society and in our country(India) most of people live in villages . So V-edu is working on Digital Education platform, so that we can provide great education platform equally in villages and remote areas along with urban area. In other word you can learn with fun from anywhere in the world. We always believes that better society is a best place to live and educated society is better than best. So at initial stage will we provide our services, V-edu platform at basic pay and after 2020 we will open V-edu platform completely free of cost for society.</p>
+        <p>Education is need of better society and in our country(India) most of people live in villages . So V-edu is working on Digital Education platform, so that we can provide great education platform equally in villages and remote areas along with urban area. In other word you can learn with fun from anywhere in the world. We always belives that a better society is a best place to live and educated society is better than best. So at initial stage will we provide our services, V-edu platform at basic pay and after 2020 we will open V-edu platform completely free of cost for society.</p>
       </div>
       <div id="vission" class="tab-pane fade">
         <h3 class="v_h3_title">Vission</h3>
-        <p>To be at leading and respectable place in the knowledge led creativity movement. World see toward our country as leading industry of Electronics and IT sector.</p>
+        <p>To be at leading and respectable place in the knowledge led creativity movement. World see toward our country as in leading industry of Electronics and IT sector.</p>
       </div>
       <div id="mission" class="tab-pane fade">
         <h3 class="v_h3_title">Mission</h3>
-        <p>Our dream is to identify our country as digital villages and we are working hard to make our dream into reality. In our country most of population live in villages, so its the first step toward digital India. In digital villages, we will fulfill all the basic needs like education, health care and all detail about agriculture by digitally with quality. We think educated society is best one and we dream  to make villages as better place to live, so we are working on online education platform namely V-edu. So quality education will reach to villages and remote areas along with urban area. We will make V-edu as open source so, that any one interested can start their career in education field.</p>
+        <p>Our dream is to identify our country as digital villages and we are working hard to make our dream into reality. In our country, most of population live in villages, so its the first step toward digital India. In digital villages, we will fulfill all the basic needs like education, health care and all detail about agriculture by digitally with quality. We think that educated society is best one and our dream is to make villages as a better place to live, so we are working on an online education platform namely V-edu. So quality education will reach to villages and remote areas along with the urban area. We will make the V-edu as open source, so that any one interested can start their career in the education field.</p>
       </div>
     </div>
   </div><br />

@@ -51,7 +51,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/changeClientPermissionStatus', 'Admin\AdminController@changeClientPermissionStatus');
 	Route::delete('admin/deleteClient', 'Admin\AdminController@deleteClient');
 
-
 	// Admin all users
 	Route::get('admin/allUsers', 'Admin\AllUsersInfoController@allUsers');
 	Route::post('admin/showOtherStudents', 'Admin\AllUsersInfoController@showOtherStudents');
@@ -171,7 +170,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('vCloud', 'HomeController@vCloud');
 	Route::get('liveVideo', 'HomeController@liveVideo');
 	Route::get('career', 'HomeController@career');
-	Route::get('heros', 'HomeController@heros');
+	Route::get('heros/{id?}', 'HomeController@heros');
 	Route::get('ourpartner', 'HomeController@ourpartner');
 	Route::get('contactus', 'HomeController@contactus');
 	Route::post('sendMail', 'HomeController@sendMail');
@@ -188,7 +187,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getCourseSubCategories', 'CourseController@getCourseSubCategories');
 	Route::get('courseDetails/{id}', 'CourseController@courseDetails');
 	Route::post('registerCourse', 'CourseController@courseRegister');
-	Route::get('episode/{id}', [ 'as' => 'episode', 'uses' => 'CourseController@episode' ]);
+	Route::get('episode/{id}/{subcomment?}', [ 'as' => 'episode', 'uses' => 'CourseController@episode' ]);
 	Route::post('getOnlineCourseBySearchArray', 'CourseController@getOnlineCourseBySearchArray');
 	Route::post('createCourseComment', 'CourseController@createCourseComment');
 	Route::put('updateCourseComment', 'CourseController@updateCourseComment');
@@ -238,7 +237,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 
 	// vkits user
 	Route::get('vkits', 'VkitController@show');
-	Route::get('vkitproject/{id}', [  'as' => 'project','uses' => 'VkitController@vkitproject']);
+	Route::get('vkitproject/{id}/{subcommentId?}', [  'as' => 'vkitproject','uses' => 'VkitController@vkitproject']);
 	Route::post('getVkitProjectsByCategoryId', 'VkitController@getVkitProjectsByCategoryId');
 	Route::post('getVkitProjectsBySearchArray', 'VkitController@getVkitProjectsBySearchArray');
 	Route::post('registerProject', 'VkitController@registerProject');
@@ -254,7 +253,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 
 	// blog
 	Route::get('blog', 'BlogController@show');
-	Route::get('blogComment/{id}', [ 'as' => 'blogComment', 'uses' => 'BlogController@blogComment']);
+	Route::get('blogComment/{id}/{subcomment?}', [ 'as' => 'blogComment', 'uses' => 'BlogController@blogComment']);
 	Route::post('createBlogComment', 'BlogController@createBlogComment');
 	Route::post('createBlogSubComment', 'BlogController@createBlogSubComment');
 	Route::post('getBlogsByCategoryId', 'BlogController@getBlogsByCategoryId');
@@ -315,14 +314,14 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteDocumentsDoc', 'Documents\DocumentsDocController@delete');
 
 	// Documents Docs user front
-	Route::get('documents', 'DocumentsController@show');
+	Route::get('documents/{id?}', 'DocumentsController@show');
 	Route::post('getDocumentsByCategoryId', 'DocumentsController@getDocumentsByCategoryId');
 	Route::post('getDocumentsBySearchArray', 'DocumentsController@getDocumentsBySearchArray');
 	Route::post('registerDocuments', 'DocumentsController@registerDocuments');
 	Route::post('registerFavouriteDocuments', 'DocumentsController@registerFavouriteDocuments');
 
 	// discussion and comments front
-	Route::get('discussion', 'DiscussionController@discussion');
+	Route::get('discussion/{commentId?}/{subcommentId?}', 'DiscussionController@discussion');
 	Route::post('createPost', 'DiscussionController@createPost');
 	Route::post('createComment', 'DiscussionController@createComment');
 	Route::post('createSubComment', 'DiscussionController@createSubComment');
@@ -341,7 +340,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	// live course front
 	Route::get('liveCourse', 'LiveCourseVideoController@show');
 	Route::get('liveCourse/{id}', 'LiveCourseVideoController@showLiveCourse');
-	Route::get('liveEpisode/{id}', [ 'as' => 'liveEpisode', 'uses' => 'LiveCourseVideoController@showLiveEpisode']);
+	Route::get('liveEpisode/{id}/{subcomment?}', [ 'as' => 'liveEpisode', 'uses' => 'LiveCourseVideoController@showLiveEpisode']);
 	Route::post('getLiveCourseByCatId', 'LiveCourseVideoController@getLiveCourseByCatId');
 	Route::post('getLiveCourseBySearchArray', 'LiveCourseVideoController@getLiveCourseBySearchArray');
 	Route::get('saveTimeSecurity', 'LiveCourseVideoController@saveTimeSecurity');
@@ -360,7 +359,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('/instructions', 'TestController@showInstructions');
 	Route::get('online-tests', 'TestController@index');
 	Route::get('showTest/{id}', 'TestController@showTest');
-	Route::get('getTest/{id}', 'TestController@getTest');
+	Route::get('getTest/{id}/{subject?}/{paper?}', 'TestController@getTest');
 	Route::post('showTests', 'TestController@showTests');
 	Route::post('getSubCategories', [ 'as' => 'getSubCategories', 'uses' => 'TestController@getSubCategories' ]);
 	Route::post('getDataByCatSubCat', [ 'as' => 'getDataByCatSubCat', 'uses' => 'TestController@getDataByCatSubCat' ]);
@@ -453,6 +452,10 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/herotozero/{id}/edit', 'ZeroToHero\ZeroToHeroController@edit');
 	Route::put('admin/updateZeroToHero', 'ZeroToHero\ZeroToHeroController@update');
 	Route::delete('admin/deleteHero', 'ZeroToHero\ZeroToHeroController@delete');
+
+	// Notifications
+	Route::get('myNotifications', 'AccountController@notifications');
+	Route::get('adminMessages/{year?}/{month?}', 'AccountController@adminMessages');
 
 });
 
@@ -590,7 +593,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('online-courses', 'Client\Front\ClientOnlineCourseFrontController@courses');
 	Route::post('getOnlineCourseByCatIdBySubCatId', 'Client\Front\ClientOnlineCourseFrontController@getOnlineCourseByCatIdBySubCatId');
 	Route::get('courseDetails/{id}', 'Client\Front\ClientOnlineCourseFrontController@courseDetails');
-	Route::get('episode/{id}', [ 'as' => 'client.episode', 'uses' => 'Client\Front\ClientOnlineCourseFrontController@episode' ]);
+	Route::get('episode/{id}/{subcomment?}', [ 'as' => 'client.episode', 'uses' => 'Client\Front\ClientOnlineCourseFrontController@episode' ]);
   	Route::post('getOnlineSubCategories', 'Client\Front\ClientOnlineCourseFrontController@getOnlineSubCategories');
   	Route::post('registerClientUserCourse', 'Client\Front\ClientOnlineCourseFrontController@registerClientUserCourse');
   	Route::post('getRegisteredOnlineCourseByCatIdBySubCatId', 'Client\Front\ClientOnlineCourseFrontController@getRegisteredOnlineCourseByCatIdBySubCatId');
@@ -608,7 +611,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	// online tests front
 	Route::get('online-tests', 'Client\Front\ClientOnlineTestFrontController@tests');
 	Route::post('getOnlineTestSubCategories', 'Client\Front\ClientOnlineTestFrontController@getOnlineTestSubCategories');
-	Route::get('getTest/{id}', 'Client\Front\ClientOnlineTestFrontController@getTest');
+	Route::get('getTest/{id}/{subject?}/{paper?}', 'Client\Front\ClientOnlineTestFrontController@getTest');
 	Route::post('getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion', 'Client\Front\ClientOnlineTestFrontController@getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion');
 	Route::post('getOnlineSubjectsAndPapersByCatIdBySubcatIdAssociatedWithQuestion', 'Client\Front\ClientOnlineTestFrontController@getOnlineSubjectsAndPapersByCatIdBySubcatIdAssociatedWithQuestion');
 	Route::post('setClientUserSessions', 'Client\Front\ClientOnlineTestFrontController@setClientUserSessions');
@@ -637,7 +640,9 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('showUserTestResultsByCategoryBySubcategoryByUserId','Client\ClientUserController@showUserTestResultsByCategoryBySubcategoryByUserId');
   	Route::get('profile', 'Client\ClientUserController@profile');
   	Route::put('updateProfile', 'Client\ClientUserController@updateProfile');
-
+  	Route::get('clientMessages', 'Client\ClientUserController@clientMessages');
+  	Route::get('myNotifications', 'Client\ClientUserController@myNotifications');
+  	Route::post('showClientMessages', 'Client\ClientUserController@clientMessages');
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');

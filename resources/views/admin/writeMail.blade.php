@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> Manage Send Mails </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Send Mails </li>
+      <li><i class="fa fa-envelope"></i> Send Mails </li>
       <li class="active"> Manage Send Mails </li>
     </ol>
   </section>

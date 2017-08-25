@@ -529,8 +529,6 @@
         titleDiv.className = 'user-block';
         titleDiv.innerHTML = '<span class="tital">'+ obj.title +'</span>'
         divMediaHeading.appendChild(titleDiv);
-
-
         var boxDiv = document.createElement('div');
         boxDiv.className = 'box-tools';
         boxDivInnerHtml = '<button type="button" data-toggle="collapse" data-target="#post'+ obj.id +'" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i></button>';
@@ -1036,12 +1034,15 @@
     });
 
   $( document ).ready(function() {
+      showSubCommentEle = "{{ Session::get('show_subcomment_area')}}";
       showCommentEle = "{{ Session::get('show_comment_area')}}";
       showPostEle = "{{ Session::get('show_post_area')}}";
-      if(showCommentEle > 0 &&  showPostEle == 0){
+      if(showCommentEle > 0 && showPostEle == 0 &&  showSubCommentEle == 0){
         window.location.hash = '#showComment_'+showCommentEle;
-      } else if(showCommentEle == 0 &&  showPostEle > 0){
+      } else if(showCommentEle == 0 && showPostEle > 0 &&  showSubCommentEle == 0){
         window.location.hash = '#showPost_'+showPostEle;
+      } else if(showCommentEle == 0 && showPostEle == 0 &&  showSubCommentEle > 0){
+        window.location.hash = '#subcomment_'+showSubCommentEle;
       }
       showMore();
   });

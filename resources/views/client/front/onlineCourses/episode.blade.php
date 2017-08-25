@@ -436,8 +436,12 @@
   $(document).ready(function() {
 
       showCommentEle = "{{ Session::get('client_course_comment')}}";
-      if(showCommentEle > 0 ){
+      showSubCommentEle = "{{ Session::get('client_subcomment_area')}}";
+
+      if(showCommentEle > 0 && showSubCommentEle == 0){
         window.location.hash = '#showComment_'+showCommentEle;
+      } else if(showSubCommentEle > 0 && showCommentEle == 0){
+        window.location.hash = '#subcomment_'+showSubCommentEle;
       }
 
       var showChar = 400;

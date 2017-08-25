@@ -95,7 +95,11 @@
 	  	<div class="container exam-panel" id="subjects">
 			@if(count($testSubjects)>0)
 	    		@foreach($testSubjects as $testSubject)
-				    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" >
+	    			@if($subject == $testSubject->id)
+				    	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="border-style: dotted;border-color: red;">
+				    @else
+				    	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" >
+				    @endif
 				      	<div class="panel panel-default">
 					        <div class="panel-heading" role="tab" id="headingOne">
 					          <h4 class="panel-title">
@@ -121,8 +125,12 @@
 					              	<tbody>
 			                      		@if(isset($testSubjectPapers[$testSubject->id]))
 				        					@foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
-								                <tr>
+							                	<tr>
+				        						@if($paper == $testSubjectPaper->id)
+								                	<td class=" ">{{ $testSubjectPaper->name }} <b style="color: red;">[new]</b></td>
+								                @else
 								                    <td class=" ">{{ $testSubjectPaper->name }}</td>
+								                @endif
 							                    	@if($currentDate < $testSubjectPaper->date_to_active)
 							                    		<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
 							                    	@elseif(!is_object(Auth::user()))

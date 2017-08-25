@@ -37,7 +37,7 @@
       <h2 class="v_h2_title">Our Partners</h2>
       <hr class="section-dash-dark"/>
       <h3 class="v_h3_title ">We belive that work together always increase productivity...</h3>
-      <p>An integral part of V-edu’s partners includes our mentors, funders and franchise holder. V-edu works with companies of same interest, governments, nonprofits and other organizations, institutes, mentors, funders and franchise holders to make a educated world and digital villages. We are partners not only for business but also for better educated society. By supporting to each others we have make stronger community.</p>
+      <p>An integral part of V-edu’s partners includes our mentors, funders and franchise holders. V-edu works with companies of same interest, governments, nonprofits and other organizations, institutes, mentors, funders and franchise holders to make an educated world and digital villages. We are partners not only for business, but also for better educated society. By supporting to each others we have made stronger community.</p>
     </div>
 </section>
 <section class="v_container">
@@ -102,7 +102,7 @@
       <div class="panel">
         <div class="panel-content ">
           <ul>
-           <li>We are looking for Angel Investor so we can concentrate more and more toward quality rather that currency flow at initial stage and also we can pay well to our team so they will be always with us. </li>
+           <li>We are looking for Angel Investor so we can concentrate more and more toward quality rather that currency flow at the initial stage and also we can pay well to our team so they will be always with us. </li>
            <h3 class="v_h3_title"> V-edu is best place to invest because:</h3>
            <ul class="vchip_list">
              <li> Education is one of the most growing business in the world.</li>

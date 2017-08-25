@@ -2,7 +2,7 @@
 	<div class="item replySubComment-1">
 	  	<img src="{{ asset('images/user1.png') }}" alt="User Image" />
 	  	<div class="message">
-	    	<p><a id="{{$comment->id}}" class="SubCommentName" onClick="goToComment(this);">{{ $user->find($subcomment->user_id)->name }}</a>
+	    	<p><a id="{{$comment->id}}" class="SubCommentName" onClick="goToComment(this);" style="cursor: pointer;">{{ $user->find($subcomment->user_id)->name }}</a>
 	    	<span class="more" id="editSubCommentHide_{{$subcomment->id}}">
 	    	{!! $subcomment->body !!}
 	    	</span></p>

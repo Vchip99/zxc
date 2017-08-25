@@ -127,7 +127,7 @@
                           <td>{{$result->subject->name}}</td>
                           <td>{{$result->paper->name}}</td>
                           <td class="center">{{$result->test_score}} / {{$result->totalMarks()['totalMarks']}}</td>
-                          <td class="center">{{$result->rank()}}</td>
+                          <td class="center">{{$result->rank($selectedStudent->college_id)}}</td>
                         </tr>
                       @endforeach
                     @elseif(is_object($selectedStudent) && 0 == count($results))

@@ -103,7 +103,11 @@
         <div class="row info" id="documents">
           @if(count($documents)>0)
             @foreach($documents as $document)
-              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim">
+              @if($id == $document->id)
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim" style="border-style: dotted;border-color: red;">
+              @else
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim">
+              @endif
                 <div class="course-box">
                   <a class="img-course-box">
                     @if(!empty($document->doc_image_path))

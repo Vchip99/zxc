@@ -15,6 +15,8 @@ use App\Libraries\InputSanitise;
 use Redirect,Validator, Auth, DB, Session;
 use App\Models\LiveCourseCommentLike;
 use App\Models\LiveCourseSubCommentLike;
+use App\Models\ReadNotification;
+use App\Models\Notification;
 
 class LiveCourseVideoController extends Controller
 {
@@ -69,7 +71,7 @@ class LiveCourseVideoController extends Controller
     /**
      *  show live episode by Id
      */
-    protected function showLiveEpisode($id){
+    protected function showLiveEpisode($id,$subcomment=NULL){
         $liveVideo = LiveVideo::find(json_decode($id));
         if(is_object($liveVideo)){
             $liveCourseVideos = LiveVideo::getLiveVideosByLiveCourseId($liveVideo->live_course_id);
@@ -80,6 +82,28 @@ class LiveCourseVideoController extends Controller
             $subcommentLikesCount = LiveCourseSubCommentLike::getLikesByVideoId($liveVideo->id);
             if(is_object(Auth::user())){
                 $currentUser = Auth::user()->id;
+                if($id > 0 || $subcomment > 0){
+                    DB::beginTransaction();
+                    try
+                    {
+                        if($id > 0 && $subcomment == NULL){
+                            $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINLIVECOURSEVIDEO,$id,$currentUser);
+                            if(is_object($readNotification)){
+                                DB::commit();
+                            }
+                        } else {
+                            Session::set('show_subcomment_area', $subcomment);
+                        }
+                        Session::set('live_course_comment', 0);
+                    }
+                    catch(\Exception $e)
+                    {
+                        DB::rollback();
+                        return redirect()->back()->withErrors('something went wrong.');
+                    }
+                } else {
+                    Session::set('show_subcomment_area', 0);
+                }
             } else {
                 $currentUser = 0;
             }
@@ -247,10 +271,23 @@ class LiveCourseVideoController extends Controller
         DB::beginTransaction();
         try
         {
-            $subComment = LiveCourseSubComment::createSubComment($request);
-            Session::put('live_course_comment', $request->get('comment_id'));
-            DB::commit();
             $videoId = strip_tags(trim($request->get('video_id')));
+            $commentId = $request->get('comment_id');
+            $subcommentId = $request->get('subcomment_id');
+            $subComment = LiveCourseSubComment::createSubComment($request);
+            if($commentId > 0 && $subcommentId > 0){
+                $parentComment = LiveCourseSubComment::where('id',$subcommentId)->where('user_id', '!=', Auth::user()->id)->first();
+            } else {
+                $parentComment = LiveCourseComment::where('id',$subComment->live_course_comment_id)->first();
+            }
+            if(is_object($parentComment)){
+                $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
+                $notificationMessage = '<a href="'.$request->root().'/liveEpisode/'.$videoId.'/'.$subComment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
+                Notification::addCommentNotification($notificationMessage, Notification::USERLIVECOURSENOTIFICATION, $subComment->id,$subComment->user_id,$parentComment->user_id);
+            }
+
+            Session::set('live_course_comment', $request->get('comment_id'));
+            DB::commit();
             if(0 < $videoId){
                 return redirect()->route('liveEpisode', ['id' => $videoId]);
             }

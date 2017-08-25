@@ -16,6 +16,8 @@ use DB, Auth, Session;
 use Validator, Redirect,Hash;
 use App\Libraries\InputSanitise;
 use App\Models\VkitProjectLike;
+use App\Models\Notification;
+use App\Models\ReadNotification;
 
 class VkitController extends Controller
 {
@@ -52,7 +54,7 @@ class VkitController extends Controller
     /**
      *  show vkits project by Id
      */
-    protected function vkitproject($id){
+    protected function vkitproject($id,$subcommentId=NULL){
         $project = VkitProject::find(json_decode($id));
         if(is_object($project)){
             $projects = VkitProject::all();
@@ -65,6 +67,28 @@ class VkitController extends Controller
             $subcommentLikesCount = VkitProjectSubCommentLike::getLikesByVkitProjectId($id);
             if(is_object(Auth::user())){
                 $currentUser = Auth::user()->id;
+                if($id > 0 || $subcommentId > 0){
+                    DB::beginTransaction();
+                    try
+                    {
+                        if($id > 0 && $subcommentId == NULL){
+                            $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINVKITPROJECT,$id,$currentUser);
+                            if(is_object($readNotification)){
+                                DB::commit();
+                            }
+                        } else {
+                            Session::set('show_subcomment_area', $subcommentId);
+                        }
+                        Session::set('project_comment_area', 0);
+                    }
+                    catch(\Exception $e)
+                    {
+                        DB::rollback();
+                        return redirect()->back()->withErrors('something went wrong.');
+                    }
+                } else {
+                    Session::set('show_subcomment_area', 0);
+                }
             } else {
                 $currentUser = 0;
             }
@@ -213,9 +237,23 @@ class VkitController extends Controller
         try
         {
             $VkitProjectSubComment = VkitProjectSubComment::createSubComment($request);
+            $projectId = InputSanitise::inputInt($request->get('project_id'));
+            $commentId = InputSanitise::inputInt($request->get('comment_id'));
+            $subcommentId = InputSanitise::inputInt($request->get('subcomment_id'));
+
+            if($commentId > 0 && $subcommentId > 0){
+                $parentComment = VkitProjectSubComment::where('id',$subcommentId)->where('user_id', '!=', Auth::user()->id)->first();
+            } else {
+                $parentComment = VkitProjectComment::where('id',$VkitProjectSubComment->vkit_project_comment_id)->first();
+            }
+
+            if(is_object($parentComment)){
+                $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
+                $notificationMessage = '<a href="'.$request->root().'/vkitproject/'.$projectId.'/'.$VkitProjectSubComment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
+                Notification::addCommentNotification($notificationMessage, Notification::USERVKITPROJECTNOTIFICATION, $VkitProjectSubComment->id,$VkitProjectSubComment->user_id,$parentComment->user_id);
+            }
             Session::put('project_comment_area', $request->get('comment_id'));
             DB::commit();
-            $projectId = strip_tags(trim($request->get('project_id')));
             if(0 < $projectId){
                 return redirect()->route('vkitproject', ['id' => $projectId]);
             }

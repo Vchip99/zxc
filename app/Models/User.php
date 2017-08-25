@@ -37,7 +37,9 @@ use App\Models\VkitProjectSubComment;
 use App\Models\VkitProjectSubCommentLike;
 use App\Models\Score;
 use App\Models\UserSolution;
-use Auth;
+use App\Models\Notification;
+use App\Models\ReadNotification;
+use Auth, DB;
 
 class User extends Authenticatable
 {
@@ -289,20 +291,6 @@ class User extends Authenticatable
         return static::where('college_id', 'other')->select('id', 'name', 'email', 'phone', 'admin_approve', 'other_source', 'college_id', 'user_type', 'recorded_video')->get();
     }
 
-    // protected static function changeUserApproveStatus(Request $request){
-    //     $userId = InputSanitise::inputInt($request->student_id);
-    //     $student = static::find($userId);
-    //     if(is_object($student)){
-    //         if( 1 == $student->admin_approve){
-    //             $student->admin_approve = 0;
-    //         } else {
-    //             $student->admin_approve = 1;
-    //         }
-    //         $student->save();
-    //     }
-    //     return;
-    // }
-
     protected static function searchUsers(Request $request){
         $collegeId = $request->college_id;
         $departmentId = InputSanitise::inputInt($request->department_id);
@@ -348,11 +336,28 @@ class User extends Authenticatable
     }
 
     protected static function unApproveUsers($collegeId){
-        $result = static::join('colleges', 'colleges.id', '=', 'users.college_id')
-                    ->where('users.admin_approve', 0);
         if($collegeId > 0){
-            $result->where('users.college_id', $collegeId);
+            $result = static::where('users.admin_approve', 0)->where('users.college_id', $collegeId);
+            return $result->select('users.id','users.name','users.college_id','users.other_source as collegeName','users.admin_approve')->orderBy('college_id')->get();
+        } else {
+            $result = static::where('users.admin_approve', 0);
+        return $result->select('users.id','users.name','users.college_id','users.other_source as collegeName','users.admin_approve')->orderBy('college_id')->get();
         }
-        return $result->select('users.id','users.name','users.college_id','colleges.name as college','users.admin_approve')->orderBy('college_id')->get();
+    }
+
+    function userNotificationCount(){
+        return Notification::where('is_seen', 0)->where('created_to', Auth::user()->id)->count();
+    }
+
+    function adminNotificationCount($year=NULL,$month=NULL){
+        $ids = ReadNotification::getReadNotificationIdsByUser();
+        $result = Notification::where('admin_id', 1)->where('is_seen', 0)->whereNotIn('id', $ids);
+        if($year > 0){
+            $result->whereYear('created_at', $year);
+        }
+        if($month > 0){
+            $result->whereMonth('created_at', $month);
+        }
+        return $result->count();
     }
 }

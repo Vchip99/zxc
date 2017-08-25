@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Manage Category </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Vkit </li>
+      <li><i class="fa fa-table"></i> Vkit </li>
       <li class="active"> Manage Category </li>
     </ol>
   </section>

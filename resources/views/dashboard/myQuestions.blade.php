@@ -5,7 +5,7 @@
   <section class="content-header">
     <h1> My Questions </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Discussion</li>
+      <li><i class="fa fa-comments"></i> Discussion</li>
       <li class="active">My Questions</li>
     </ol>
   </section>
@@ -32,7 +32,7 @@
                          <div class="media" id="showPost_{{$post->id}}">
                             <div class="media-heading" >
                               <div class="user-block ">
-                                <a id="{{$post->id}}"class="tital" onClick="goToPost(this);">{{$post->title}} </a>
+                                <a id="{{$post->id}}"class="tital" onClick="goToPost(this);" style="cursor: pointer;">{{$post->title}} </a>
                                   <form id="goToPost_{{$post->id}}" action="{{ url('goToPost')}}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="post_id" value="{{$post->id}}">

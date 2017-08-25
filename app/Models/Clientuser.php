@@ -15,7 +15,8 @@ use App\Models\RegisterClientOnlineCourses;
 use App\Models\ClientScore;
 use App\Models\Client;
 use App\Models\ClientUserSolution;
-
+use App\Models\ClientNotification;
+use App\Models\ClientReadNotification;
 
 class Clientuser extends Authenticatable
 {
@@ -239,5 +240,51 @@ class Clientuser extends Authenticatable
         return static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id')
                 ->where('client_user_institute_courses.client_user_id', Auth::guard('clientuser')->user()->id)
                 ->where('client_user_institute_courses.test_permission', 1)->count();
+    }
+
+    function adminNotificationCount($year=NULL,$month=NULL){
+        $ids = [];
+        $testCourseIds = [];
+        $courseCourseIds = [];
+        $notificationCount = [];
+        $testCourses = ClientUserInstituteCourse::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('client_user_id', Auth::guard('clientuser')->user()->id)->where('test_permission', 1)->select('client_institute_course_id')->get();
+        if(is_object($testCourses) && false == $testCourses->isEmpty()){
+            foreach($testCourses as $testCourse){
+                $testCourseIds[] = $testCourse->client_institute_course_id;
+            }
+        }
+
+        $courseCourses = ClientUserInstituteCourse::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('client_user_id', Auth::guard('clientuser')->user()->id)->where('course_permission', 1)->select('client_institute_course_id')->get();
+        if(is_object($courseCourses) && false == $courseCourses->isEmpty()){
+            foreach($courseCourses as $courseCourse){
+                $courseCourseIds[] = $courseCourse->client_institute_course_id;
+            }
+        }
+
+        $ids = ClientReadNotification::getReadNotificationIdsByUser($year,$month);
+        $resultQuery = ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id)
+                    ->where('is_seen', 0)->whereNotIn('id', $ids)->where('created_by',0)->where('created_to',0);
+        if($year > 0){
+            $resultQuery->whereYear('created_at', $year);
+        }
+        if($month > 0){
+            $resultQuery->whereMonth('created_at', $month);
+        }
+        $results = $resultQuery->get();
+
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                if((1 == $result->notification_module && in_array($result->client_institute_course_id, $courseCourseIds)) || (2 == $result->notification_module && in_array($result->client_institute_course_id, $testCourseIds))){
+                    $notificationCount[] = $result->id;
+                }
+            }
+        }
+
+        return count($notificationCount);
+    }
+
+    function userNotificationCount(){
+        return ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('created_to', Auth::guard('clientuser')->user()->id)->where('is_seen', 0)->count();
+
     }
 }

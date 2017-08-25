@@ -32,6 +32,9 @@ class AdminController extends Controller
 
     protected function sendSubscribedMails(Request $request){
         $mailContent = $request->get('mail_content');
+        if(empty($mailContent)){
+            return redirect()->back();
+        }
         $dom = new \DOMDocument();
         $dom->loadHTML($mailContent);
         $imgs = $dom->getElementsByTagName("img");
@@ -44,7 +47,8 @@ class AdminController extends Controller
         {
             $subscriedUsers = SubscriedUser::where('verified', 1)->select('email')->get()->toArray();
             $subscriedUsers = implode(',', array_column($subscriedUsers, 'email'));
-            Mail::to($subscriedUsers)->queue(new MailToSubscribedUser($body));
+            $mailSubject = 'Hello Vchip User';
+            Mail::to($subscriedUsers)->queue(new MailToSubscribedUser($body,$mailSubject));
             return redirect()->back()->with('message', 'Mail will be sent successfully to all subscribed users.');
         }
         catch(\Exception $e)

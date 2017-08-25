@@ -10,7 +10,9 @@ use App\Models\TestSubjectPaper;
 use App\Models\RegisterPaper;
 use App\Models\Score;
 use App\Models\Question;
-use Session, Redirect, Auth;
+use App\Models\Notification;
+use App\Models\ReadNotification;
+use Session, Redirect, Auth, DB;
 
 class TestController extends Controller
 {
@@ -43,7 +45,7 @@ class TestController extends Controller
 	/**
 	 *	show tests by categoryId by sub categoryId
 	 */
-	protected function getTest($id){
+	protected function getTest($id,$subject=NULL,$paper=NULL){
 		$subcatId = json_decode($id);
 		$testSubjectPaperIds = [];
 		if(isset($subcatId)){
@@ -65,9 +67,26 @@ class TestController extends Controller
 
 				$registeredPaperIds = $this->getRegisteredPaperIds();
 				$alreadyGivenPapers = $this->getTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
-
+				if(is_object(Auth::user())){
+                    $currentUser = Auth::user()->id;
+                    if($subject > 0 && $paper > 0){
+                        DB::beginTransaction();
+                        try
+                        {
+                            $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINPAPER,$paper,$currentUser);
+                            if(is_object($readNotification)){
+                                DB::commit();
+                            }
+                        }
+                        catch(\Exception $e)
+                        {
+                            DB::rollback();
+                            return redirect()->back()->withErrors('something went wrong.');
+                        }
+                    }
+                }
 				$currentDate = date('Y-m-d');
-				return view('tests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate'));
+				return view('tests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'subject', 'paper'));
 			}
 		}
 		return Redirect::to('/');

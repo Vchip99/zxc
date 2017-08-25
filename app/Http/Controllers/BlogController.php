@@ -12,6 +12,8 @@ use App\Models\BlogSubCommentLike;
 use App\Models\BlogTag;
 use App\Models\BlogCategory;
 use App\Models\BlogLikes;
+use App\Models\Notification;
+use App\Models\ReadNotification;
 use DB, Auth, Session;
 use Validator, Redirect;
 
@@ -51,7 +53,7 @@ class BlogController extends Controller
     /**
      *  show blog comments by blogId
      */
-    protected function blogComment($id){
+    protected function blogComment($id, $subcomment=NULL){
         $id = json_decode($id);
         if(isset($id)){
             $blog = Blog::find($id);
@@ -64,6 +66,28 @@ class BlogController extends Controller
                 $blogTags = BlogTag::where('blog_id', $blog->id)->get();
                 if(is_object(Auth::user())){
                     $currentUser = Auth::user()->id;
+                    if($id > 0 || $subcomment > 0){
+                        DB::beginTransaction();
+                        try
+                        {
+                            if($id > 0 && $subcomment == NULL){
+                                $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINBLOG,$id,$currentUser);
+                                if(is_object($readNotification)){
+                                    DB::commit();
+                                }
+                            } else {
+                                Session::set('show_subcomment_area', $subcomment);
+                            }
+                            Session::set('blog_comment_area', 0);
+                        }
+                        catch(\Exception $e)
+                        {
+                            DB::rollback();
+                            return redirect()->back()->withErrors('something went wrong.');
+                        }
+                    } else {
+                        Session::set('show_subcomment_area', 0);
+                    }
                 } else {
                     $currentUser = 0;
                 }
@@ -115,10 +139,23 @@ class BlogController extends Controller
         DB::beginTransaction();
         try
         {
+            $blogId = strip_tags(trim($request->get('blog_id')));
+            $commentId = $request->get('comment_id');
+            $subcommentId = $request->get('subcomment_id');
             $blogComment = BlogSubComment::createSubComment($request);
+            if($commentId > 0 && $subcommentId > 0){
+                $parentComment = BlogSubComment::where('id',$subcommentId)->where('user_id', '!=', Auth::user()->id)->first();
+            } else {
+                $parentComment = BlogComment::where('id',$blogComment->blog_comment_id)->first();
+            }
+            if(is_object($parentComment)){
+                $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
+                $notificationMessage = '<a href="'.$request->root().'/blogComment/'.$blogId.'/'.$blogComment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
+                Notification::addCommentNotification($notificationMessage, Notification::USERBLOGNOTIFICATION, $blogComment->id,$blogComment->user_id,$parentComment->user_id);
+            }
+
             DB::commit();
             Session::put('blog_comment_area', $blogComment->blog_comment_id);
-            $blogId = strip_tags(trim($request->get('blog_id')));
             if(is_object($blogComment)){
                 return redirect()->route('blogComment', ['id' => $blogId]);
             }

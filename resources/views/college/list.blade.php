@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Manage College Info </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Add College Info </li>
+      <li><i class="fa fa-university"></i> Add College Info </li>
       <li class="active"> Manage College Info </li>
     </ol>
   </section>

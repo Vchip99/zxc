@@ -1,7 +1,7 @@
 @foreach($comments as $subcomment)
 	<div class="item replySubComment-1">
 	  	<img src="{{ asset('images/user1.png') }}" alt="User Image" />
-	  	<div class="message">
+	  	<div class="message" id="subcomment_{{$subcomment->id}}">
 	  		@if( is_object(Auth::guard('clientuser')->user()) && ( Auth::guard('clientuser')->user()->id == $subcomment->user_id || Auth::guard('clientuser')->user()->id == $comment->user_id ))
 	    	<div class="dropdown pull-right">
 	      		<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

@@ -85,7 +85,7 @@
                         <form id="registerUser" method="post" action="{{ url('register')}}">
                           {{ csrf_field() }}
                           <div class="form-group @if ($errors->has('name')) has-error @endif">
-                           <input id="name" type="text" class="form-control" name="name" value="{{ old('name')?:''}}" placeholder="User / Institute" autocomplete="off" required="true">
+                           <input id="name" type="text" class="form-control" name="name" value="{{ old('name')?:''}}" placeholder="User Name" autocomplete="off" required="true">
                             <span class="help-block"></span>
                             @if($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
                           </div>
@@ -121,13 +121,13 @@
                             </select>
                             <p class="help-block hide" id="user_error" style="color: red;">Please select user.</p>
                           </div>
-                          <div class="form-group @if ($errors->has('degree')) has-error @endif">
+                          <!-- <div class="form-group @if ($errors->has('degree')) has-error @endif">
                             <select class="hide form-control slt mrgn_20_top" id="degree" name="degree">
                               <option value="0">Select Degree</option>
                               <option value="1">Engineering</option>
                             </select>
                             <p class="help-block hide" id="degree_error" style="color: red;">Please select degree.</p>
-                          </div>
+                          </div> -->
                           <div class="form-group @if ($errors->has('college')) has-error @endif">
                             <select class="hide form-control  slt mrgn_20_top" id="clg" name="college" onChange="getDepartment(this);">
                               <option value="0">Select Collage Name</option>
@@ -226,13 +226,13 @@
       }
     }
     if(2 == userType){
-      degree = document.getElementById('degree').value;
-      if(0 == degree){
-        document.getElementById('degree_error').classList.remove('hide');
-        error++;
-      } else {
-        document.getElementById('degree_error').classList.add('hide');
-      }
+      // degree = document.getElementById('degree').value;
+      // if(0 == degree){
+      //   document.getElementById('degree_error').classList.remove('hide');
+      //   error++;
+      // } else {
+      //   document.getElementById('degree_error').classList.add('hide');
+      // }
       clg = document.getElementById('clg').value;
       if(0 == clg){
         document.getElementById('college_error').classList.remove('hide');
@@ -280,13 +280,13 @@
     }
 
     if(3 == userType || 4 == userType){
-      degree = document.getElementById('degree').value;
-      if(0 == degree){
-        document.getElementById('degree_error').classList.remove('hide');
-        error++;
-      } else {
-        document.getElementById('degree_error').classList.add('hide');
-      }
+      // degree = document.getElementById('degree').value;
+      // if(0 == degree){
+      //   document.getElementById('degree_error').classList.remove('hide');
+      //   error++;
+      // } else {
+      //   document.getElementById('degree_error').classList.add('hide');
+      // }
       clg = document.getElementById('clg').value;
       if(0 == clg){
         document.getElementById('college_error').classList.remove('hide');
@@ -307,13 +307,13 @@
     }
 
     if(5 == userType || 6 == userType){
-      degree = document.getElementById('degree').value;
-      if(0 == degree){
-        document.getElementById('degree_error').classList.remove('hide');
-        error++;
-      } else {
-        document.getElementById('degree_error').classList.add('hide');
-      }
+      // degree = document.getElementById('degree').value;
+      // if(0 == degree){
+      //   document.getElementById('degree_error').classList.remove('hide');
+      //   error++;
+      // } else {
+      //   document.getElementById('degree_error').classList.add('hide');
+      // }
       clg = document.getElementById('clg').value;
       if(0 == clg){
         document.getElementById('college_error').classList.remove('hide');
@@ -403,13 +403,13 @@
       document.getElementById('year').classList.add("hide");
       document.getElementById('rollNo').classList.add("hide");
       document.getElementById('dept').classList.add("show");
-      document.getElementById('degree').classList.remove("hide");
+      // document.getElementById('degree').classList.remove("hide");
       document.getElementById('clg').classList.remove("hide");
 
       document.getElementById('dept').classList.remove("hide");
       document.getElementById('year').classList.remove("show");
       document.getElementById('rollNo').classList.remove("show");
-      document.getElementById('degree').classList.add("show");
+      // document.getElementById('degree').classList.add("show");
       document.getElementById('clg').classList.add("show");
       document.getElementById('other').classList.add("hide");
 
@@ -419,13 +419,13 @@
       document.getElementById('year').classList.add("show");
       document.getElementById('rollNo').classList.add("show");
       document.getElementById('dept').classList.add("show");
-      document.getElementById('degree').classList.remove("hide");
+      // document.getElementById('degree').classList.remove("hide");
       document.getElementById('clg').classList.remove("hide");
 
       document.getElementById('year').classList.remove("hide");
       document.getElementById('rollNo').classList.remove("hide");
       document.getElementById('dept').classList.remove("hide");
-      document.getElementById('degree').classList.add("show");
+      // document.getElementById('degree').classList.add("show");
       document.getElementById('clg').classList.add("show");
       document.getElementById('other').classList.remove("hide");
 
@@ -435,14 +435,14 @@
       document.getElementById('rollNo').classList.remove("show");
       document.getElementById('dept').classList.remove("show");
 
-      document.getElementById('degree').classList.remove("hide");
+      // document.getElementById('degree').classList.remove("hide");
       document.getElementById('clg').classList.remove("hide");
 
       document.getElementById('year').classList.add("hide");
       document.getElementById('rollNo').classList.add("hide");
       document.getElementById('dept').classList.add("hide");
 
-      document.getElementById('degree').classList.add("show");
+      // document.getElementById('degree').classList.add("show");
       document.getElementById('clg').classList.add("show");
       document.getElementById('other').classList.add("hide");
 
@@ -453,13 +453,13 @@
       document.getElementById('year').classList.add("hide");
       document.getElementById('rollNo').classList.add("hide");
       document.getElementById('dept').classList.add("hide");
-      document.getElementById('degree').classList.add("hide");
+      // document.getElementById('degree').classList.add("hide");
       document.getElementById('clg').classList.add("hide");
 
       document.getElementById('year').classList.remove("show");
       document.getElementById('rollNo').classList.remove("show");
       document.getElementById('dept').classList.remove("show");
-      document.getElementById('degree').classList.remove("show");
+      // document.getElementById('degree').classList.remove("show");
       document.getElementById('clg').classList.remove("show");
     }
   }

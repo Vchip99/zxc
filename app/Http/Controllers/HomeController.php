@@ -15,7 +15,9 @@ use App\Models\CollegeDept;
 use App\Models\Designation;
 use App\Models\ZeroToHero;
 use App\Models\Area;
-use View,DB,Session,Redirect;
+use App\Models\Notification;
+use App\Models\ReadNotification;
+use View,DB,Session,Redirect, Auth;
 use App\Mail\EmailVerification;
 use App\Mail\SubscribedUserVerification;
 use App\Libraries\InputSanitise;
@@ -135,11 +137,29 @@ class HomeController extends Controller
     /**
      *  show career
      */
-    protected function heros(){
+    protected function heros($id=NULL){
         $designations = Designation::all();
         $courses = [];
         $heros = ZeroToHero::all();
-        return view('zerotohero.heros', compact('designations', 'heros'));
+        if(is_object(Auth::user())){
+            $currentUser = Auth::user()->id;
+            if($id > 0 ){
+                DB::beginTransaction();
+                try
+                {
+                    $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINZEROTOHERO,$id,$currentUser);
+                    if(is_object($readNotification)){
+                        DB::commit();
+                    }
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors('something went wrong.');
+                }
+            }
+        }
+        return view('zerotohero.heros', compact('designations', 'heros', 'id'));
     }
 
     protected function sendMail(Request $request){

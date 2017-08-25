@@ -26,7 +26,7 @@ class VkitProjectSubComment extends Model
     	$parentSubComment = new static;
     	$projectId = InputSanitise::inputInt($request->get('project_id'));
     	$commentId = InputSanitise::inputInt($request->get('comment_id'));
-    	$subcommentId = InputSanitise::inputInt($request->get('sub_comment_id'));
+    	$subcommentId = InputSanitise::inputInt($request->get('subcomment_id'));
     	$userComment = $request->get('subcomment');
 
     	$subcomment = new static;

@@ -24,7 +24,7 @@
   <section class="content-header">
     <h1> Favourite Projects </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Vkits </li>
+      <li><i class="fa fa-table"></i> Vkits </li>
       <li class="active"> Favourite Projects </li>
     </ol>
   </section>

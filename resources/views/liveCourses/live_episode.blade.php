@@ -462,10 +462,12 @@
   }
 
   $(document).ready(function() {
-
       showCommentEle = "{{ Session::get('live_course_comment')}}";
+      showsubCommentEle = "{{ Session::get('show_subcomment_area')}}";
       if(showCommentEle > 0){
         window.location.hash = '#showComment_'+showCommentEle;
+      } else if(showsubCommentEle > 0){
+        window.location.hash = '#subcomment_'+showsubCommentEle;
       }
        var showChar = 400;
       var ellipsestext = "...";

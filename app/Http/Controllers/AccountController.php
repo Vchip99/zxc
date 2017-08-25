@@ -23,7 +23,9 @@ use App\Models\DiscussionCommentLike;
 use App\Models\DiscussionSubCommentLike;
 use App\Models\CollegeDept;
 use App\Models\College;
-use Auth,Hash,DB, Redirect,Session,Validator;
+use App\Models\Notification;
+use App\Models\ReadNotification;
+use Auth,Hash,DB, Redirect,Session,Validator,Input;
 
 class AccountController extends Controller
 {
@@ -475,4 +477,51 @@ class AccountController extends Controller
         return $results;
     }
 
+    protected function notifications(){
+        DB::beginTransaction();
+        try
+        {
+            Notification::readUserNotifications(Auth::user()->id);
+            DB::commit();
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        $notifications =  Notification::where('admin_id', 0)->where('created_to', Auth::user()->id)->orderBy('id', 'desc')->paginate();
+        return view('dashboard.notifications', compact('notifications'));
+    }
+
+    protected function adminMessages(Request $request){
+        $sortIds = [];
+        $allIds = [];
+        $idsImploded = '';
+        $selectedYear = !empty($request->get('year'))?$request->get('year'): date('Y');
+        $selectedMonth = !empty($request->get('month'))?$request->get('month'): date('m');
+        $readNotificationIds = ReadNotification::getReadNotificationIdsByUser($selectedYear,$selectedMonth);
+        $allAdminNotifications = Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->orderBy('id', 'desc')->get();
+        if(is_object($allAdminNotifications) && false == $allAdminNotifications->isEmpty()){
+            foreach ($allAdminNotifications as $allAdminNotification) {
+                if(!in_array($allAdminNotification->id, $readNotificationIds)){
+                    $sortIds[] = $allAdminNotification->id;
+                }
+            }
+            $allIds = array_merge($sortIds, $readNotificationIds);
+            $idsImploded = "'" . implode("','", $allIds) . "'";
+        }
+        if(!empty($idsImploded)){
+            $notifications =  Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->orderByRaw("FIELD(`id`,$idsImploded)")->paginate();
+        } else {
+            $notifications =  Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->paginate();
+        }
+        $years = range(2017, 2030);
+        $months = array(
+                    "1" => "January", "2" => "February", "3" => "March", "4" => "April",
+                    "5" => "May", "6" => "June", "7" => "July", "8" => "August",
+                    "9" => "September", "10" => "October", "11" => "November", "12" => "December",
+                );
+        return view('dashboard.adminNotifications', compact('notifications', 'readNotificationIds','years','months','selectedYear', 'selectedMonth'));
+
+    }
 }

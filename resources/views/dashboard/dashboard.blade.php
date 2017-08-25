@@ -76,6 +76,18 @@
         <li class="header">Vchip Technology</li>
         <li class="treeview ">
           <a href="#">
+            <i class="fa fa-star"><b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></i> <span>Notifications </span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{{ url('myNotifications')}}"><i class="fa fa-circle-o"></i> My Notifications : <b style="color: red;">{{Auth::user()->userNotificationCount()}} </b></a></li>
+            <li><a href="{{ url('adminMessages')}}"><i class="fa fa-circle-o"></i> Admin Messages : <b style="color: red;">{{Auth::user()->adminNotificationCount()}} </b></a></li>
+          </ul>
+        </li>
+        <li class="treeview ">
+          <a href="#">
             <i class="fa fa-dashboard"></i> <span>Online Courses</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>

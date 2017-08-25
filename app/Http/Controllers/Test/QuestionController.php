@@ -9,10 +9,12 @@ use App\Models\TestSubCategory;
 use App\Models\TestSubject;
 use App\Models\TestSubjectPaper;
 use App\Models\Question;
-use Redirect;
-use Validator;
-use Session, Auth, DB;
+use App\Models\Notification;
+use Redirect,Validator,Session,Auth,DB;
 use App\Libraries\InputSanitise;
+use App\Mail\MailToSubscribedUser;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 
 class QuestionController extends Controller
 {
@@ -184,6 +186,35 @@ class QuestionController extends Controller
                 Session::put('selected_prev_question', $testQuestion->id);
                 $nextQuestionNo = $this->getNextQuestionNo($categoryId,$subcategoryId,$subjectId,$paperId,$section_type);
                 Session::put('next_question_no', $nextQuestionNo);
+
+                $questionCount = Question::where('category_id', $categoryId)->where('subcat_id', $subcategoryId)->where('subject_id', $subjectId)->where('paper_id', $paperId)->count();
+                if(1 == $questionCount){
+                    $paper = TestSubjectPaper::find($paperId);
+                    if(is_object($paper)){
+                        $messageBody = '';
+                        $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'">'.$paper->name.'</a> has been added.';
+                        Notification::addNotification($notificationMessage, Notification::ADMINPAPER, $paper->id);
+                        $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get()->toArray();
+                        $allUsers = array_chunk($subscriedUsers, 100);
+                        if(count($allUsers) > 0){
+                            foreach($allUsers as $selectedUsers){
+                                foreach($selectedUsers as $user){
+                                    $user = User::where('email', $user)->first();
+                                    $messageBody .= '<p> Hello '.$user->name.'</p>';
+                                    $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
+                                    $messageBody .= '<p><b> Thanks and Regard, </b></p>';
+                                    $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
+                                    $messageBody .= '<b> More about us... </b><br/>';
+                                    $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
+                                    $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
+                                    $mailSubject = 'Vchipedu added a new test paper';
+                                    Mail::to($user)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
+                                }
+                            }
+                        }
+                    }
+                }
+
                 DB::commit();
                 return Redirect::to("admin/createQuestion")->with('message', 'Question created successfully!');
             }

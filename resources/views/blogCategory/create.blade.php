@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Manage Blog Category </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Blog Category </li>
+      <li><i class="fa fa-newspaper-o"></i> Blog Category </li>
       <li class="active"> Manage Blog Category </li>
     </ol>
   </section>

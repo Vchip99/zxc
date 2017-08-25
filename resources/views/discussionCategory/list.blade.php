@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Manage Discussion Category </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Discussion </li>
+      <li><i class="fa fa-comments-o"></i> Discussion </li>
       <li class="active"> Manage Discussion Category</li>
     </ol>
   </section>

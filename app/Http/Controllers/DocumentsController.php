@@ -7,8 +7,9 @@ use App\Models\DocumentsDoc;
 use App\Models\DocumentsCategory;
 use App\Models\RegisterDocuments;
 use App\Models\RegisterFavouriteDocuments;
-use Auth;
-use Hash;
+use App\Models\ReadNotification;
+use App\Models\Notification;
+use Auth,Hash,DB;
 
 class DocumentsController extends Controller
 {
@@ -26,14 +27,31 @@ class DocumentsController extends Controller
     /**
      *  show list of all document
      */
-    protected function show(){
+    protected function show($id=NULL){
         $registeredDocIds = [];
         $favouriteDocIds = [];
         $documents = DocumentsDoc::getDocumentsAssociatedWithCategory();
         $documentsCategories = DocumentsCategory::getDocumentsCategoriesAssociatedWithDocs();
         $registeredDocuments = $this->getRegisteredDocumentIds();
         $favouriteDocIds = $this->getFavouritedDocumentIds();
-        return view('documents.documents', compact('documents', 'documentsCategories', 'registeredDocIds', 'favouriteDocIds'));
+        if(is_object(Auth::user()) && $id > 0){
+            $currentUser = Auth::user()->id;
+            DB::beginTransaction();
+            try
+            {
+                $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINDOCUMENT,$id,$currentUser);
+
+                if(is_object($readNotification)){
+                    DB::commit();
+                }
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return redirect()->back()->withErrors('something went wrong.');
+            }
+        }
+        return view('documents.documents', compact('documents', 'documentsCategories', 'registeredDocIds', 'favouriteDocIds', 'id'));
     }
 
     /**

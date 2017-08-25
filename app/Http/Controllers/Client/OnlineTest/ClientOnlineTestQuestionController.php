@@ -13,6 +13,7 @@ use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientInstituteCourse;
+use App\Models\ClientNotification;
 
 class ClientOnlineTestQuestionController extends ClientBaseController
 {
@@ -191,6 +192,16 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                 Session::put('client_selected_prev_question', $testQuestion->id);
                 $nextQuestionNo = $this->getNextQuestionNo($categoryId,$subcategoryId,$subjectId,$paperId,$section_type);
                 Session::put('client_next_question_no', $nextQuestionNo);
+
+                $questionCount = ClientOnlineTestQuestion::where('category_id', $categoryId)->where('subcat_id', $subcategoryId)->where('subject_id', $subjectId)->where('paper_id', $paperId)->where('client_id', Auth::guard('client')->user()->id)->count();
+                if(1 == $questionCount){
+                    $paper = ClientOnlineTestSubjectPaper::find($paperId);
+                    if(is_object($paper)){
+                        $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'">'.$paper->name.'</a> has been added.';
+                        ClientNotification::addNotification($notificationMessage, ClientNotification::CLIENTPAPER, $paperId,$testQuestion->client_institute_course_id);
+                    }
+                }
+
                 DB::connection('mysql2')->commit();
                 return Redirect::to("createOnlineTestQuestion")->with('message', 'Question created successfully!');
             }

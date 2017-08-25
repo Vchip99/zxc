@@ -601,8 +601,11 @@ width: 400px;
 
     $( document ).ready(function() {
       showCommentEle = "{{ Session::get('blog_comment_area')}}";
+      showSubCommentEle = "{{ Session::get('show_subcomment_area')}}";
       if(showCommentEle > 0){
         window.location.hash = '#showComment_'+showCommentEle;
+      } else if(showSubCommentEle > 0){
+        window.location.hash = '#subcomment_'+showSubCommentEle;
       }
       showMore();
     });

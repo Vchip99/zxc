@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> Manage Clients </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Client Info </li>
+      <li><i class="fa fa-bookmark-o"></i> Client Info </li>
       <li class="active"> Manage Clients </li>
     </ol>
   </section>

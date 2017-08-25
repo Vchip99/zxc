@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> Un Approve Users </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Users Info </li>
+      <li><i class="fa fa-group"></i> Users Info </li>
       <li class="active"> Un Approve Users </li>
     </ol>
   </section>
@@ -41,7 +41,7 @@
                   <thead>
                     <tr>
                       <th>Sr. No.</th>
-                      <th>College</th>
+                      <th>College/Company</th>
                       <th>Name</th>
                       <th>Approval</th>
                     </tr>
@@ -51,7 +51,11 @@
                       @foreach($upApproveUsers as $index => $upApproveUser)
                         <tr>
                           <td>{{ $index + 1}}</td>
-                          <td>{{ $upApproveUser->college }}</td>
+                          @if($upApproveUser->college_id > 0)
+                            <td>{{ $upApproveUser->college->name }}</td>
+                          @else
+                            <td>{{ $upApproveUser->collegeName }}</td>
+                          @endif
                           <td>{{ $upApproveUser->name }}</td>
                           <td>
                               <input type="checkbox" data-student_id="{{$upApproveUser->id}}" data-college_id="{{$upApproveUser->college_id}}" onclick="approveUser(this);">
@@ -86,15 +90,19 @@
   }
 
   function renderRecords(msg, body){
-    if( 0 < msg.length){
-      $.each(msg, function(idx, obj) {
+    if( 0 < msg['users'].length){
+      $.each(msg['users'], function(idx, obj) {
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = idx + 1;
         eleTr.appendChild(eleIndex);
 
         var eleCollege = document.createElement('td');
-        eleCollege.innerHTML = obj.college;
+        if(obj.college_id > 0){
+          eleCollege.innerHTML = msg['colleges'][obj.college_id];
+        } else {
+          eleCollege.innerHTML = obj.collegeName;
+        }
         eleTr.appendChild(eleCollege);
 
         var eleName = document.createElement('td');
