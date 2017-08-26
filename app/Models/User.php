@@ -341,7 +341,7 @@ class User extends Authenticatable
             return $result->select('users.id','users.name','users.college_id','users.other_source as collegeName','users.admin_approve')->orderBy('college_id')->get();
         } else {
             $result = static::where('users.admin_approve', 0);
-        return $result->select('users.id','users.name','users.college_id','users.other_source as collegeName','users.admin_approve')->orderBy('college_id')->get();
+        return $result->where('user_type', '!=', '1')->select('users.id','users.name','users.college_id','users.other_source as collegeName','users.admin_approve')->orderBy('college_id')->get();
         }
     }
 

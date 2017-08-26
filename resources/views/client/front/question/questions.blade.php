@@ -343,7 +343,7 @@
 	$('.load-ajax-modal').click(function(){
 	    var category = parseInt(document.getElementById('category_id').value);
 		var subcategory = parseInt(document.getElementById('sub_category_id').value);
-		var subject = parseInt(document.getElementById('Subject_id').value);
+		var subject = parseInt(document.getElementById('subject_id').value);
 		var paper = parseInt(document.getElementById('paper_id').value);
 
 	    $.ajax({
