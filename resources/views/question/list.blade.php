@@ -44,7 +44,7 @@
 			$searchSelectedSectionId = 0;
 		}
 	@endphp
-  	<input type="hidden" name="messahe_status" id="messahe_status" value="@if(Session::has('message')) 1 @else 0 @endif">
+  	<input type="hidden" name="message_status" id="message_status" value="@if(Session::has('message')) 1 @else 0 @endif">
 	<div  class="admin_div">
 		<form id="questionForm" action="{{url('admin/showQuestions')}}" method="POST">
 			{{csrf_field()}}
@@ -139,7 +139,7 @@
 	</div>
 	<div class="form-group row ">
 	      <div id="addQuestionDiv">
-	        <a id="addQuestion" href="{{url('admin/createQuestion')}}" type="button" class="btn btn-primary" style="float: right;" title="Add New Question">Add New Question</a>&nbsp;&nbsp;
+	        <a id="addQuestion" href="{{url('admin/createQuestion')}}" type="button" class="btn btn-primary" style="float: right; margin-right: 12px;" title="Add New Question">Add New Question</a>&nbsp;&nbsp;
 	      </div>
 	    </div>
 	<div>

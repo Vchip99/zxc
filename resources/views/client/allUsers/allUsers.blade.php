@@ -126,9 +126,9 @@
         eleCourseName.innerHTML = obj.courseName;
         eleTr.appendChild(eleCourseName);
 
-        var eleApprove = document.createElement('td');
-        eleApprove.innerHTML = '<a class="btn" id="'+obj.id +'_'+obj.course_id+'" onclick="showPermissions(this);">Hide/Show Course Permission</a>';;
-        eleTr.appendChild(eleApprove);
+        var elePermission = document.createElement('td');
+        elePermission.innerHTML = '<a class="btn" id="'+obj.id +'_'+obj.course_id+'" onclick="showPermissions(this);">Hide/Show </a>';;
+        eleTr.appendChild(elePermission);
 
         var eleDelete = document.createElement('td');
         eleDelete.innerHTML = '<button class="btn btn-danger btn-xs delet-bt delet-btn" data-title="Delete" data-toggle="modal" data-target="#delete" data-client_user_id="'+ obj.id +'" data-client_id="'+ obj.client_id +'" onclick="deleteStudent(this);" ><span class="fa fa-trash-o" data-placement="top" data-toggle="tooltip" title="Delete"></span></button>';
@@ -158,17 +158,20 @@
 
         var elePerTr = document.createElement('tr');
         elePerTr.id = 'user_permission_'+ obj.id +'_'+obj.course_id;
-        elePerTr.className = 'hide';
+        elePerTr.className = 'hide expant-child';
         var elePerTd = document.createElement('td');
         elePerTd.setAttribute('colspan', '6');
 
         var eleTable = document.createElement('table');
+        eleTable.className = 'inner-table-border';
+        eleTable.id = 'user_permission_'+ obj.id +'_'+obj.course_id;
         var eleThead = document.createElement('thead');
         var eleTheadTr = document.createElement('tr');
         eleTheadTr.innerHTML='<th>Course Name</th><th>Test Permission</th><th>Course Permission</th>';
         eleThead.appendChild(eleTheadTr);
         eleTable.appendChild(eleThead);
         var eleTbody = document.createElement('tbody');
+        eleTbody.id = "mobile_client_user_permission"
 
         var userId = obj.id;
         var courseId = obj.course_id;

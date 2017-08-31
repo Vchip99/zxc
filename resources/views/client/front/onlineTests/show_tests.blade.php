@@ -55,57 +55,29 @@
 	        <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm  ">
 	          <select class="form-control" id="category" name="category" onChange="selectSubcategory(this);" title="Category">
           		<option>Select Category ...</option>
-          		@if(is_object(Auth::guard('clientuser')->user()))
-	          		@foreach($testCategories as $testCategory)
-	          			@if(in_array($testCategory->client_institute_course_id, $userCategoryPermissionIds))
-		          			@if( $catId == $testCategory->id)
-		              			<option value="{{$testCategory->id}}" selected="true">
-		              		@else
-		              			<option value="{{$testCategory->id}}">
-		              		@endif
-		              			{{$testCategory->name}}
-		              		</option>
-		              	@endif
-	          		@endforeach
-	          	@else
-	          		@foreach($testCategories as $testCategory)
-	          			@if( $catId == $testCategory->id)
-	              			<option value="{{$testCategory->id}}" selected="true">
-	              		@else
-	              			<option value="{{$testCategory->id}}">
-	              		@endif
-	              			{{$testCategory->name}}
-	              		</option>
-	              	@endforeach
-	          	@endif
+          		@foreach($testCategories as $testCategory)
+          			@if( $catId == $testCategory->id)
+              			<option value="{{$testCategory->id}}" selected="true">
+              		@else
+              			<option value="{{$testCategory->id}}">
+              		@endif
+              			{{$testCategory->name}}
+              		</option>
+              	@endforeach
           	</select>
 	        </div>
 	        <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm">
-	          <select class="form-control" id="subcategory" name="subcategory" onChange="selectPanel();" title="Sub Category">
+	          	<select class="form-control" id="subcategory" name="subcategory" onChange="selectPanel();" title="Sub Category">
 	          		<option>Select Sub Category ...</option>
-	          		@if(is_object(Auth::guard('clientuser')->user()))
-		          		@foreach($testSubCategories as $testSubCategory)
-		          			@if(in_array($testSubCategory->client_institute_course_id, $userSubCategoryPermissionIds))
-			          			@if($subcatId == $testSubCategory->id)
-			          				<option value="{{$testSubCategory->id}}" selected>
-			          			@else
-			          				<option value="{{$testSubCategory->id}}">
-			          			@endif
-			          				{{$testSubCategory->name}}
-			          			</option>
-			          		@endif
-		          		@endforeach
-		          	@else
-		          		@foreach($testSubCategories as $testSubCategory)
-		          			@if($subcatId == $testSubCategory->id)
-		          				<option value="{{$testSubCategory->id}}" selected>
-		          			@else
-		          				<option value="{{$testSubCategory->id}}">
-		          			@endif
-		          				{{$testSubCategory->name}}
-		          			</option>
-		          		@endforeach
-		          	@endif
+	          		@foreach($testSubCategories as $testSubCategory)
+	          			@if($subcatId == $testSubCategory->id)
+	          				<option value="{{$testSubCategory->id}}" selected>
+	          			@else
+	          				<option value="{{$testSubCategory->id}}">
+	          			@endif
+	          				{{$testSubCategory->name}}
+	          			</option>
+	          		@endforeach
 	          	</select>
 	        </div>
 	      </div>
@@ -197,15 +169,23 @@
 							                    </td>
 							                    <td class=" ">{{ $testSubjectPaper->date_to_active }}</td>
 							                    <td class=""><i class="fa fa-inr"></i>{{ $testSubjectPaper->price }}</td>
-							                    @if($currentDate < $testSubjectPaper->date_to_active)
-							                    	<td><button disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled after date to active"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
-							                    @else
-							                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
-								                    	<td><button disabled="true" data-toggle="tooltip" title="Already Added to Cart!"><i class="fa fa-cart-plus" aria-hidden="true"></i></button></td>
-								                    @else
-								                    	<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Cart!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
-								                    @endif
-							                    @endif
+							                    @if(is_object(Auth::guard('clientuser')->user()))
+								                    @if(in_array($testSubjectPaper->id, $assignedTestSubjectPapersIds))
+									                    @if($currentDate < $testSubjectPaper->date_to_active)
+									                    	<td><button disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled after date to active"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
+									                    @else
+									                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
+										                    	<td><button disabled="true" data-toggle="tooltip" title="Already Added to Cart!"><i class="fa fa-cart-plus" aria-hidden="true"></i></button></td>
+										                    @else
+										                    	<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Cart!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
+										                    @endif
+									                    @endif
+									                @else
+									                	<td onClick="checkRegisterPaperPermission(this);"><button data-toggle="tooltip" title="Add to Cart!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
+									                @endif
+								                @else
+								                	<td onClick="loginAlert(this);"><button data-toggle="tooltip" title="Add to Cart!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
+								                @endif
 							                </tr>
 					                		@endforeach
 						                @else
@@ -263,15 +243,23 @@
 									                           	<li>
 									                           		<button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span> {{ $testSubjectPaper->price }} </button>
 									                           	</li>
-								                           		@if($currentDate < $testSubjectPaper->date_to_active)
-											                    	<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled after date to active"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
-											                    @else
-											                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
-												                    	<li><button disabled="true" class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Already Added to Cart!"><span class="fa fa-cart-plus" aria-hidden="true"></span> Add</button></li>
-												                    @else
-												                    	<li id="registerPaper_mobile_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Cart!" class="btn-magick btn-sm btn3d"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
-												                    @endif
-											                    @endif
+									                           	@if(is_object(Auth::guard('clientuser')->user()))
+								                    				@if(in_array($testSubjectPaper->id, $assignedTestSubjectPapersIds))
+										                           		@if($currentDate < $testSubjectPaper->date_to_active)
+													                    	<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled after date to active"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
+													                    @else
+													                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
+														                    	<li><button disabled="true" class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Already Added to Cart!"><span class="fa fa-cart-plus" aria-hidden="true"></span> Add</button></li>
+														                    @else
+														                    	<li id="registerPaper_mobile_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Cart!" class="btn-magick btn-sm btn3d"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
+														                    @endif
+													                    @endif
+													            	@else
+													                	<li onClick="checkRegisterPaperPermission(this);"><button data-toggle="tooltip" title="Add to Cart!" class="btn-magick btn-sm btn3d"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
+													                @endif
+												                @else
+												                	<li onClick="loginAlert(this);"><button data-toggle="tooltip" title="Add to Cart!" class="btn-magick btn-sm btn3d"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
+												                @endif
 								                         	</ul>
 								                       	</div>
 							                     	</div>
@@ -315,7 +303,6 @@
 	        	}
 	        });
 		} else {
-
 			$.confirm({
 		    title: 'Confirmation',
 		    content: 'Please login first to start test. Click "Ok" button to login.',
@@ -385,24 +372,12 @@
 			    opt.innerHTML = 'Select Sub Category ...';
 			    select.appendChild(opt);
 			    if( 0 < msg['sub_categories'].length){
-			    	if('true' == msg['isLogin']){
-			    		$.each(msg['sub_categories'], function(idx, obj) {
-							if(msg['sub_category_permission'].indexOf(obj.client_institute_course_id) > -1){
-							    var opt = document.createElement('option');
-							    opt.value = obj.id;
-							    opt.innerHTML = obj.name;
-							    select.appendChild(opt);
-							}
-						});
-			    	} else {
-			    		$.each(msg['sub_categories'], function(idx, obj) {
-						    var opt = document.createElement('option');
-						    opt.value = obj.id;
-						    opt.innerHTML = obj.name;
-						    select.appendChild(opt);
-						});
-			    	}
-
+		    		$.each(msg['sub_categories'], function(idx, obj) {
+					    var opt = document.createElement('option');
+					    opt.value = obj.id;
+					    opt.innerHTML = obj.name;
+					    select.appendChild(opt);
+					});
 				}
 	        });
 		}
@@ -518,14 +493,22 @@
 							    divInnerHtml += '<td class=" ">'+ obj.date_to_active +'</td>';
 							    divInnerHtml += '<td class=""><i class="fa fa-inr"></i>'+ obj.price +'</td>';
 
-							    if(msg['currentDate'] < obj.date_to_active){
-							    	divInnerHtml += '<td disabled="true" ><button data-toggle="tooltip" title="Add to Cart will be enabled after date to active"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
-							    } else {
-								    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
-								    	divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Already Added to Cart."><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
-								    } else {
-								    	divInnerHtml += '<td id="registerPaper_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" onClick="registerPaper(this);" ><button data-toggle="tooltip" title="Add to Cart!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
-								    }
+							    if(false == isNaN(userId)) {
+							    	if(msg['assignedTestSubjectPapersIds'].length > 0 && true == msg['assignedTestSubjectPapersIds'].indexOf(obj.id) > -1){
+									    if(msg['currentDate'] < obj.date_to_active){
+									    	divInnerHtml += '<td disabled="true" ><button data-toggle="tooltip" title="Add to Cart will be enabled after date to active"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+									    } else {
+										    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
+										    	divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Already Added to Cart."><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+										    } else {
+										    	divInnerHtml += '<td id="registerPaper_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" onClick="registerPaper(this);" ><button data-toggle="tooltip" title="Add to Cart!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+										    }
+										}
+									} else {
+										divInnerHtml += '<td onClick="checkRegisterPaperPermission(this);" ><button data-toggle="tooltip" title="Add to Cart!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+									}
+								} else {
+									divInnerHtml += '<td onClick="loginAlert(this);" ><button data-toggle="tooltip" title="Add to Cart!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
 								}
 							    tbodyTr.innerHTML = divInnerHtml;
 							    tableBody.appendChild(tbodyTr);
@@ -604,14 +587,22 @@
 							    ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li>';
 							    ulDivInnerHtml += '<li class=""><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.price +'</button></li>';
 
-							    if(msg['currentDate'] < obj.date_to_active){
-							    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled after date to active"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
-							    } else {
-								    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
-								    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already Added to Cart."><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
-								    } else {
-								    	ulDivInnerHtml += '<li id="registerPaper_mobile_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" onClick="registerPaper(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Cart!"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
-								    }
+							    if(false == isNaN(userId)) {
+							    	if(msg['assignedTestSubjectPapersIds'].length > 0 && true == msg['assignedTestSubjectPapersIds'].indexOf(obj.id) > -1){
+									    if(msg['currentDate'] < obj.date_to_active){
+									    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled after date to active"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+									    } else {
+										    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
+										    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already Added to Cart."><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+										    } else {
+										    	ulDivInnerHtml += '<li id="registerPaper_mobile_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" onClick="registerPaper(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Cart!"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+										    }
+										}
+									} else {
+										ulDivInnerHtml += '<li onClick="checkRegisterPaperPermission(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Cart!"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+									}
+								} else {
+									ulDivInnerHtml += '<li onClick="loginAlert(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Cart!"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
 								}
 								ulDiv.innerHTML = ulDivInnerHtml;
 								rowDiv.appendChild(ulDiv);
@@ -798,6 +789,19 @@
 		        Cancle: function () {
 		        }
 		    }
+		});
+	}
+
+	function checkRegisterPaperPermission(ele){
+		$.alert({
+		    title: 'Alert!',
+		    content: 'Please register this paper to add to cart.',
+		});
+	}
+	function loginAlert(ele){
+		$.alert({
+		    title: 'Alert!',
+		    content: 'please login first and then add test.',
 		});
 	}
 </script>

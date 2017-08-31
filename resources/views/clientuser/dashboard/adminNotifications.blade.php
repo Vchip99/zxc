@@ -43,7 +43,7 @@
           </select>
         </div>
         <div class="col-sm-2 mrgn_10_btm">
-          <select id="month" class="form-control" name="month" required>
+          <select id="month" class="form-control" name="month" onChange="search();" required>
             <option value="">Select Month</option>
             @foreach($months as $index => $month)
               @if($selectedMonth == $index)
@@ -53,9 +53,6 @@
               @endif
             @endforeach
           </select>
-        </div>
-        <div class="col-sm-2 mrgn_10_btm">
-          <input type="submit" class="form-control" name="Search" />
         </div>
       </form>
     </div>
@@ -89,4 +86,9 @@
     </div>
   </div>
 </div>
+  <script type="text/javascript">
+    function search(){
+      document.getElementById('search').submit();
+    }
+  </script>
 @stop

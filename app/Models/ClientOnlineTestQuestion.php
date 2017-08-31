@@ -37,36 +37,22 @@ class ClientOnlineTestQuestion extends Model
         $ans4 = '';
         $solution = '';
         $newInstance = new static;
-        if(ctype_alnum($request->get('question'))){
-            $question = $newInstance->changeSrc($request->get('question'));
-        } else {
-            $question = $request->get('question');
-        }
-        if(!empty($request->get('ans1')) && ctype_alnum($request->get('ans1'))){
-            $ans1 = trim($newInstance->changeSrc($request->get('ans1')), '<p>,<p/>');
-        } else {
-            $ans1 = trim($request->get('ans1'), '<p>,<p/>');
-        }
-        if(!empty($request->get('ans2')) && ctype_alnum($request->get('ans2'))){
-            $ans2 = trim($newInstance->changeSrc($request->get('ans2')), '<p>,<p/>');
-        } else {
-            $ans2 = trim($request->get('ans2'), '<p>,<p/>');
-        }
-        if(!empty($request->get('ans3')) && ctype_alnum($request->get('ans3'))){
-            $ans3 = trim($newInstance->changeSrc($request->get('ans3')), '<p>,<p/>');
-        } else {
-            $ans3 = trim($request->get('ans3'), '<p>,<p/>');
-        }
-        if(!empty($request->get('ans4')) && ctype_alnum($request->get('ans4'))){
-            $ans4 = trim($newInstance->changeSrc($request->get('ans4')), '<p>,<p/>');
-        } else {
-            $ans4 = trim($request->get('ans4'), '<p>,<p/>');
-        }
 
-        if(!empty($request->get('solution')) && ctype_alnum($request->get('solution'))){
-            $solution = trim($newInstance->changeSrc($request->get('solution')), '<p>,<p/>');
-        } else {
-            $solution = trim($request->get('solution'), '<p>,<p/>');
+        $question = $newInstance->changeSrc($request->get('question'));
+        if(!empty($request->get('ans1'))){
+            $ans1 = $newInstance->changeSrc($request->get('ans1'));
+        }
+        if(!empty($request->get('ans2'))){
+            $ans2 = $newInstance->changeSrc($request->get('ans2'));
+        }
+        if(!empty($request->get('ans3'))){
+            $ans3 = $newInstance->changeSrc($request->get('ans3'));
+        }
+        if(!empty($request->get('ans4'))){
+            $ans4 = $newInstance->changeSrc($request->get('ans4'));
+        }
+        if(!empty($request->get('solution'))){
+            $solution = $newInstance->changeSrc($request->get('solution'));
         }
 
         $answer = InputSanitise::inputString($request->get('answer'));
@@ -119,19 +105,24 @@ class ClientOnlineTestQuestion extends Model
     }
 
     protected function changeSrc($question){
-        $dom = new \DOMDocument;
-        $dom->loadHTML($question);
-        $images = $dom->getElementsByTagName('img');
-        foreach ($images as $image) {
-            $url =  url('');
-            if (strpos($image->getAttribute('src'), $url) === false) {
-                $image->setAttribute('src', url('') . $image->getAttribute('src'));
+        $formatedQuestion = '';
+        $contents   = explode("src=\"" , $question);
+        if(count($contents) > 0){
+            foreach($contents as  $index => $content) {
+                if(strstr($content, '/templateEditor') && !strstr($content, asset(''))){
+                    $formatedQuestion .= 'src="'.rtrim(asset(''),'/') . $content;
+                } else {
+                    if( 0 == $index && strstr($content, '<img alt=""')){
+                        $formatedQuestion .= $content;
+                    } else {
+                        $formatedQuestion .= 'src="'.$content;
+                    }
+                }
             }
+        } else {
+            $formatedQuestion = $question;
         }
-        $html = $dom->saveHTML();
-        $body = explode('<body>', $html);
-        $body = explode('</body>', $body[1]);
-        return $body[0];
+        return trim($formatedQuestion, 'src="');
     }
 
     protected static function getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type){

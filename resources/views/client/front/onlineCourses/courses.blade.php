@@ -34,17 +34,9 @@
           <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
             <option value="0">Select Category</option>
             @if(count($courseCategories) > 0)
-              @if(Auth::guard('clientuser')->user())
-                @foreach($courseCategories as $courseCategory)
-                  @if(isset($userCourseCategoryIds[$courseCategory->client_institute_course_id]) && in_array($courseCategory->id, $userCourseCategoryIds[$courseCategory->client_institute_course_id]))
-                    <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
-                  @endif
-                @endforeach
-              @else
-                @foreach($courseCategories as $courseCategory)
-                  <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
-                @endforeach
-              @endif
+              @foreach($courseCategories as $courseCategory)
+                <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
+              @endforeach
             @endif
           </select>
         </div>
@@ -59,7 +51,6 @@
           @if(count($courses) > 0)
             @if(Auth::guard('clientuser')->user())
               @foreach($courses as $course)
-                @if(in_array($course->client_institute_course_id, $userCoursePermissionIds))
                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim">
                   <div class="course-box">
                     <a class="img-course-box" href="{{ url('courseDetails')}}/{{$course->id}}" title="{{$course->name}}">
@@ -97,7 +88,6 @@
                       </div>
                     </div>
                   </div>
-                @endif
               @endforeach
             @else
               @foreach($courses as $course)

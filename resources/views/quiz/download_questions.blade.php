@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1">
 
       <title>Vchip</title>
       <link href="{{asset('css/bootstrap.min.css?ver=1.0')}}" rel="stylesheet">
       <link href="{{asset('css/main.css?ver=1.0')}}" rel="stylesheet">
+      <link href="{{asset('css/hindi.css?ver=1.0')}}" rel="stylesheet">
       <script src="{{asset('js/jquery.min.js?ver=1.0')}}"></script>
       <script src="{{asset('js/bootstrap.min.js?ver=1.0')}}"></script>
       <style type="text/css">
@@ -17,9 +18,21 @@
           width: 100% !important;
         }
         .numpad{margin-top: 30px;}
-      </style>
+
+        @font-face {
+            font-family: Noto Sans;
+            src: url("{{ asset('fonts/NotoSansDevanagari-Bold.ttf') }}");
+            font-weight: normal;
+        }
+        @font-face {
+            font-family: Noto Sans;
+            src: url("{{ asset('fonts/NotoSansDevanagari-Regular.ttf') }}");
+            font-weight: bold;
+        }
+    </style>
+
   </head>
-  <body>
+  <body style="font-family: Noto Sans, sans-serif;">
     <div class="row">
 
   @if( !empty($questions[0]) && count($questions[0]) > 0)
@@ -33,17 +46,13 @@
           </p>
           <p>
           @if( 1 == $question->question_type )
-            <div class="row">A.<input type="radio" value="1" class="radio1 radio1_{{$question->id}}" id="radio1_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer1 !!}
+            <div class="row">A. {!! $question->answer1 !!}
             </div>
-            <div class="row">B.<input type="radio" value="2" class="radio1 radio1_{{$question->id}}" id="radio2_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer2 !!}
+            <div class="row">B. {!! $question->answer2 !!}
             </div>
-            <div class="row">C.<input type="radio" value="3" class="radio1 radio1_{{$question->id}}" id="radio3_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer3 !!}
+            <div class="row">C. {!! $question->answer3 !!}
             </div>
-            <div class="row">D.<input type="radio" value="4" class="radio1 radio1_{{$question->id}}" id="radio4_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer4 !!}
+            <div class="row">D. {!! $question->answer4 !!}
             </div>
           @else<br/>
           <div class="panel panel-default">
@@ -66,17 +75,13 @@
           </p>
           <p>
           @if( 1 == $question->question_type )
-            <div class="row">A.<input type="radio" value="1" class="radio1 radio1_{{$question->id}}" id="radio1_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer1 !!}
+            <div class="row">A. {!! $question->answer1 !!}
             </div>
-            <div class="row">B.<input type="radio" value="2" class="radio1 radio1_{{$question->id}}" id="radio2_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer2 !!}
+            <div class="row">B. {!! $question->answer2 !!}
             </div>
-            <div class="row">C.<input type="radio" value="3" class="radio1 radio1_{{$question->id}}" id="radio3_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer3 !!}
+            <div class="row">C. {!! $question->answer3 !!}
             </div>
-            <div class="row">D.<input type="radio" value="4" class="radio1 radio1_{{$question->id}}" id="radio4_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer4 !!}
+            <div class="row">D. {!! $question->answer4 !!}
             </div>
           @else<br/>
           <div class="panel panel-default">

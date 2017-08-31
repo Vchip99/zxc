@@ -1,5 +1,25 @@
 @extends('layouts.master')
 @section('content')
+<style type="text/css">
+	.watermark {
+  width: 300px;
+  height: 100px;
+  display: block;
+  position: relative;
+}
+
+.watermark::after {
+  content: "";
+ background:url(https://www.google.co.in/images/srpr/logo11w.png);
+  opacity: 0.2;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;
+}
+</style>
 <div class="row">
 
 	@if( isset($questions[0]) && count($questions[0]) > 0)
@@ -12,19 +32,14 @@
 				{!! $question->name !!}
 			</p>
 			@if( 1 == $question->question_type )
-				<div class="row">A.<input type="radio" value="1" class="radio1 radio1_{{$question->id}}" id="radio1_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-					{!! $question->answer1 !!}
+				<div class="row">A. {!! $question->answer1 !!}
 				</div>
-				<div class="row">B.<input type="radio" value="2" class="radio1 radio1_{{$question->id}}" id="radio2_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-					{!! $question->answer2 !!}
+				<div class="row">B. {!! $question->answer2 !!}
 				</div>
-				<div class="row">C.<input type="radio" value="3" class="radio1 radio1_{{$question->id}}" id="radio3_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-					{!! $question->answer3 !!}
+				<div class="row">C. {!! $question->answer3 !!}
 				</div>
-				<div class="row">D.<input type="radio" value="4" class="radio1 radio1_{{$question->id}}" id="radio4_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-					{!! $question->answer4 !!}
+				<div class="row">D. {!! $question->answer4 !!}
 				</div>
-				<input type="radio" checked='checked' style='display:none' value="unsolved" id='radio7_{{$question->id}}' name='{{$question->id}}' readonly="true"/>
 			@else
 				<input type="number" class="form-control numpad" id="numpad_{{$question->id}}" data-id="{{$question->id}}" name="{{$question->id}}" placeholder="Enter a number" readonly="true">
 			@endif
@@ -43,19 +58,14 @@
 			</p>
 			<p>
 			@if( 1 == $question->question_type )
-				<div class="row">A.<input type="radio" value="1" class="radio1 radio1_{{$question->id}}" id="radio1_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-					{!! $question->answer1 !!}
+				<div class="row">A. {!! $question->answer1 !!}
 				</div>
-				<div class="row">B.<input type="radio" value="2" class="radio1 radio1_{{$question->id}}" id="radio2_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-					{!! $question->answer2 !!}
+				<div class="row">B. {!! $question->answer2 !!}
 				</div>
-				<div class="row">C.<input type="radio" value="3" class="radio1 radio1_{{$question->id}}" id="radio3_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-					{!! $question->answer3 !!}
+				<div class="row">C. {!! $question->answer3 !!}
 				</div>
-				<div class="row">D.<input type="radio" value="4" class="radio1 radio1_{{$question->id}}" id="radio4_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-					{!! $question->answer4 !!}
+				<div class="row">D. {!! $question->answer4 !!}
 				</div>
-				<input type="radio" checked='checked' style='display:none' value="unsolved" id='radio7_{{$question->id}}' name='{{$question->id}}' readonly="true"/>
 			@else
 				<input type="number" class="form-control numpad" id="numpad_{{$question->id}}" data-id="{{$question->id}}" name="{{$question->id}}" placeholder="Enter a number" readonly="true">
 			@endif

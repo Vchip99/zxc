@@ -10,7 +10,8 @@
         "proengsoft/laravel-jsvalidation": "~1.1",
         "geniusts/roles": "^3.0.2",
         "hesto/multi-auth": "^1.0",
-        "barryvdh/laravel-dompdf": "^0.8.0"
+        "elibyy/tcpdf-laravel": "5.3.*",
+        "maatwebsite/excel": "^2.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

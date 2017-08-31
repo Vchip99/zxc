@@ -272,51 +272,6 @@
     }
     if(student > 0){
       renderResult(category,subcategory,student,year,department);
-      // $.ajax({
-      //     method: "POST",
-      //     url: "{{url('showStudentCourses')}}",
-      //     data: {category:category,subcategory:subcategory,student:student,year:year,department:department}
-      // })
-      // .done(function( msg ) {
-      //   body = document.getElementById('course-result');
-      //   body.innerHTML = '';
-      //   if( 0 < msg.length){
-      //     $.each(msg, function(idx, obj) {
-      //       var eleTr = document.createElement('tr');
-      //       var eleIndex = document.createElement('td');
-      //       eleIndex.innerHTML = idx + 1;
-      //       eleTr.appendChild(eleIndex);
-
-      //       var eleName = document.createElement('td');
-      //       eleName.innerHTML = obj.name;
-      //       eleTr.appendChild(eleName);
-
-      //       var eleGrade = document.createElement('td');
-      //       if(obj.grade){
-      //         eleGrade.innerHTML = obj.grade;
-      //       } else {
-      //         eleGrade.innerHTML = 'Certificate exam is not given.';
-      //       }
-      //       eleTr.appendChild(eleGrade);
-
-      //       var eleCertified = document.createElement('td');
-      //       if(1 == obj.certified){
-      //         eleCertified.innerHTML = 'Certified';
-      //       } else {
-      //         eleCertified.innerHTML = 'Non-Certified';
-      //       }
-      //       eleTr.appendChild(eleCertified);
-      //       body.appendChild(eleTr);
-      //     });
-      //   } else {
-      //     var eleTr = document.createElement('tr');
-      //     var eleIndex = document.createElement('td');
-      //     eleIndex.innerHTML = 'No courses are registered for selected user.';
-      //     eleIndex.setAttribute('colspan' ,4);
-      //     eleTr.appendChild(eleIndex);
-      //     body.appendChild(eleTr);
-      //   }
-      // });
     } else {
       body = document.getElementById('course-result');
       body.innerHTML = '';

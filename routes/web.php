@@ -71,6 +71,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/approveUser', 'Admin\AllUsersInfoController@approveUser');
 	Route::get('admin/allTestResults', 'Admin\AllUsersInfoController@allTestResults');
 	Route::post('admin/getAllTestResults', 'Admin\AllUsersInfoController@getAllTestResults');
+	Route::get('admin/downloadExcelResult', 'Admin\AllUsersInfoController@downloadExcelResult');
 
 	// admin college info
 	Route::get('admin/manageCollegeInfo', 'Test\CollegeInfo@manageCollegeInfo');
@@ -151,6 +152,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/getNextQuestionCount', [ 'as' => 'admin/getNextQuestionCount','uses' => 'Test\QuestionController@getNextQuestionCount' ]);
 	Route::post('admin/getCurrentQuestionCount', [ 'as' => 'admin/getCurrentQuestionCount','uses' => 'Test\QuestionController@getCurrentQuestionCount' ]);
 	Route::post('admin/getPrevQuestion', [ 'as' => 'admin/getPrevQuestion','uses' => 'Test\QuestionController@getPrevQuestion' ]);
+	Route::get('admin/uploadQuestions', 'Test\QuestionController@uploadQuestions');
+	Route::post('admin/uploadQuestions', 'Test\QuestionController@importQuestions');
 
 
 	// verify account
@@ -456,6 +459,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	// Notifications
 	Route::get('myNotifications', 'AccountController@notifications');
 	Route::get('adminMessages/{year?}/{month?}', 'AccountController@adminMessages');
+	Route::get('downloadExcelResult', 'AccountController@downloadExcelResult');
+
 
 });
 
@@ -494,6 +499,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::put('updateUserVideo', 'Client\ClientUsersInfoController@updateUserVideo');
 	Route::get('allTestResults', 'Client\ClientUsersInfoController@allTestResults');
 	Route::post('getAllTestResults', 'Client\ClientUsersInfoController@getAllTestResults');
+	Route::get('downloadExcelResult', 'Client\ClientUsersInfoController@downloadExcelResult');
 
   	// register client user
   	Route::post('/register', 'ClientuserAuth\RegisterController@register');

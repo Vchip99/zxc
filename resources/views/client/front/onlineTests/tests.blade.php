@@ -49,17 +49,9 @@
           <select class="form-control" id="category_id" name="category_id" onchange="showSubCategories(this);" title="Category">
             <option>Select Category ...</option>
             @if(count($testCategories) > 0)
-              @if(Auth::guard('clientuser')->user())
-                @foreach($testCategories as $testCategory)
-                  @if(in_array($testCategory->client_institute_course_id, $userCategoryPermissionIds))
-                    <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
-                  @endif
-                @endforeach
-              @else
-                @foreach($testCategories as $testCategory)
-                    <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
-                @endforeach
-              @endif
+              @foreach($testCategories as $testCategory)
+                  <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
+              @endforeach
             @endif
           </select>
         </div>
@@ -67,47 +59,24 @@
       <div class="col-sm-9">
         <div class="row" id="testSubCategories">
           @if(count($testSubCategories) > 0)
-            @if(Auth::guard('clientuser')->user())
-              @foreach($testSubCategories as $testSubCategory)
-                @if(in_array($testSubCategory->client_institute_course_id, $userSubCategoryPermissionIds))
-                <div class="col-lg-6 col-md-6 col-sm-6 slideanim small-img">
-                  <div class="vchip_product_itm text-left">
-                    <figure title="{{$testSubCategory->name}}">
-                      <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
-                    </figure>
-                    <ul class="vchip_categories list-inline">
-                      <li>{{$testSubCategory->name}}</li>
-                    </ul>
-                    <div class="vchip_product_content">
-                      <p class="mrgn_20_top"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">Start Test <i
-                        class="fa fa-angle-right"
-                        aria-hidden="true"></i></a>
-                      </p>
-                    </div>
+            @foreach($testSubCategories as $testSubCategory)
+              <div class="col-lg-6 col-md-6 col-sm-6 slideanim small-img">
+                <div class="vchip_product_itm text-left">
+                  <figure title="{{$testSubCategory->name}}">
+                    <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
+                  </figure>
+                  <ul class="vchip_categories list-inline">
+                    <li>{{$testSubCategory->name}}</li>
+                  </ul>
+                  <div class="vchip_product_content">
+                    <p class="mrgn_20_top"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">Start Test <i
+                      class="fa fa-angle-right"
+                      aria-hidden="true"></i></a>
+                    </p>
                   </div>
                 </div>
-                @endif
-              @endforeach
-            @else
-              @foreach($testSubCategories as $testSubCategory)
-                <div class="col-lg-6 col-md-6 col-sm-6 slideanim small-img">
-                  <div class="vchip_product_itm text-left">
-                    <figure title="{{$testSubCategory->name}}">
-                      <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
-                    </figure>
-                    <ul class="vchip_categories list-inline">
-                      <li>{{$testSubCategory->name}}</li>
-                    </ul>
-                    <div class="vchip_product_content">
-                      <p class="mrgn_20_top"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">Start Test <i
-                        class="fa fa-angle-right"
-                        aria-hidden="true"></i></a>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              @endforeach
-            @endif
+              </div>
+            @endforeach
           @else
             No tests are available.
           @endif

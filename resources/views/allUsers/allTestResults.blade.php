@@ -57,13 +57,23 @@
               <option value="0">Select Paper</option>
             </select>
           </div>
+          <div class="col-md-3 mrgn_10_btm">
+            <button class="btn btn-info" onClick="downloadExcelResult();">Download Result</button>
+            <form action="{{ url('admin/downloadExcelResult') }}" method="GET" id="export_result">
+              <input type="hidden" name="college" id="export_college" value="">
+              <input type="hidden" name="category" id="export_category" value="">
+              <input type="hidden" name="subcategory" id="export_subcategory" value="">
+              <input type="hidden" name="subject" id="export_subject" value="">
+              <input type="hidden" name="paper" id="export_paper" value="">
+            </form>
+          </div>
           <div class="col-lg-12" id="all-result">
             <div class="panel panel-info">
               <div class="panel-heading text-center">
                 Test Results
               </div>
               <div class="panel-body">
-                <table  class="" id="all_test_result">
+                <table  class="" id="">
                   <thead>
                     <tr>
                       <th>Sr. No.</th>
@@ -74,7 +84,7 @@
                       <th>Rank</th>
                     </tr>
                   </thead>
-                  <tbody id="students" class="">
+                  <tbody id="all_test_result" class="">
                   </tbody>
                 </table>
               </div>
@@ -86,12 +96,65 @@
   </div>
 
 <script type="text/javascript">
+
+  function downloadExcelResult(){
+    var college = document.getElementById('college').value;
+    var category = document.getElementById('category').value;
+    var subcategory = document.getElementById('subcategory').value;
+    var subject = document.getElementById('subject').value;
+    var paper = document.getElementById('paper').value;
+    if(0 == college){
+      $.alert({
+          title: 'Alert!',
+          content: 'Please select college.',
+      });
+      return false;
+    }
+    if(0 == category){
+      alert('Please select category.');
+      $.alert({
+          title: 'Alert!',
+          content: 'Please select category.',
+      });
+      return false;
+    }
+    if(0 == subcategory){
+      $.alert({
+          title: 'Alert!',
+          content: 'Please select subcategory.',
+      });
+      return false;
+    }
+    if(0 == subject){
+      $.alert({
+          title: 'Alert!',
+          content: 'Please select subject.',
+      });
+      return false;
+    }
+    if(0 == paper){
+      $.alert({
+          title: 'Alert!',
+          content: 'Please select paper.',
+      });
+      return false;
+    }
+    if(0 != college && 0 != category && 0 != subcategory && 0 != subject && 0 != paper){
+      document.getElementById('export_college').value = college;
+      document.getElementById('export_category').value = category;
+      document.getElementById('export_subcategory').value = subcategory;
+      document.getElementById('export_subject').value = subject;
+      document.getElementById('export_paper').value = paper;
+      document.getElementById('export_result').submit();
+    }
+  }
+
   function allResults(college){
     document.getElementById('category').value = 0;
     document.getElementById('subcategory').value = 0;
     document.getElementById('subject').value = 0;
     document.getElementById('paper').value = 0;
-    document.getElementById('students').innerHTML = '';
+    document.getElementById('all_test_result').innerHTML = '';
   }
   function showResult(){
     var college = document.getElementById('college').value;
@@ -99,14 +162,14 @@
     var subcategory = document.getElementById('subcategory').value;
     var subject = document.getElementById('subject').value;
     var paper = document.getElementById('paper').value;
-    document.getElementById('students').innerHTML = '';
+    document.getElementById('all_test_result').innerHTML = '';
     $.ajax({
       method: "POST",
       url: "{{url('admin/getAllTestResults')}}",
       data:{category:category,subcategory:subcategory,college:college,subject:subject,paper:paper}
     })
     .done(function( msg ) {
-      body = document.getElementById('students');
+      body = document.getElementById('all_test_result');
       body.innerHTML = '';
       if( 0 < msg['scores'].length){
         $.each(msg['scores'], function(idx, obj) {
@@ -151,7 +214,7 @@
     document.getElementById('subcategory').value = 0;
     document.getElementById('subject').value = 0;
     document.getElementById('paper').value = 0;
-    document.getElementById('students').innerHTML = '';
+    document.getElementById('all_test_result').innerHTML = '';
     id = parseInt($(ele).val());
     if( 0 < id ){
       $.ajax({
@@ -181,7 +244,7 @@
   function selectSubject(ele){
     document.getElementById('subject').value = 0;
     document.getElementById('paper').value = 0;
-    document.getElementById('students').innerHTML = '';
+    document.getElementById('all_test_result').innerHTML = '';
     subcatId = parseInt($(ele).val());
     catId = parseInt(document.getElementById('category').value);
     if( 0 < catId && 0 < subcatId ){
@@ -212,7 +275,7 @@
   function selectPaper(ele){
     document.getElementById('paper').value = 0;
     subjectId = parseInt($(ele).val());
-    document.getElementById('students').innerHTML = '';
+    document.getElementById('all_test_result').innerHTML = '';
     if( 0 < subjectId ){
       $.ajax({
           method: "POST",

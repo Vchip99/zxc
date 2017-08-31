@@ -75,17 +75,15 @@ class ClientOnlineVideo extends Model
             $client = InputSanitise::getCurrentClient($request);
         }
         $result = DB::connection('mysql2')->table('client_online_videos');
-            if( $courseId > 2){
-                $result->join('clients', function($join){
-                    $join->on('clients.id', '=', 'client_online_videos.client_id');
-                });
-                if(!empty($clientId)){
-                    $result->where('clients.id', $clientId);
-                } else {
-                    $result->where('clients.subdomain', $client);
-                }
-            }
-            return  $result->where('client_online_videos.course_id', $courseId)
+        $result->join('clients', function($join){
+            $join->on('clients.id', '=', 'client_online_videos.client_id');
+        });
+        if(!empty($clientId)){
+            $result->where('clients.id', $clientId);
+        } else {
+            $result->where('clients.subdomain', $client);
+        }
+        return  $result->where('client_online_videos.course_id', $courseId)
                 ->select('client_online_videos.*')
                 ->get();
     }
@@ -168,6 +166,14 @@ class ClientOnlineVideo extends Model
             ->where('client_online_videos.client_id', Auth::guard('clientuser')->user()->client_id)
             ->where('client_user_institute_courses.client_user_id', Auth::guard('clientuser')->user()->id)
             ->where('client_user_institute_courses.course_permission', 1)->select('client_online_videos.*')->get();
+    }
+
+    protected static function getAssignedClientCourseVideo($videoId){
+        return static::join('client_user_institute_courses', 'client_user_institute_courses.client_institute_course_id', '=', 'client_online_videos.client_institute_course_id')
+            ->where('client_online_videos.client_id', Auth::guard('clientuser')->user()->client_id)
+            ->where('client_user_institute_courses.client_user_id', Auth::guard('clientuser')->user()->id)
+            ->where('client_user_institute_courses.course_permission', 1)
+            ->where('client_online_videos.id', $videoId)->select('client_online_videos.*')->first();
     }
 
 }

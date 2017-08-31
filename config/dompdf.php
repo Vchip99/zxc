@@ -87,7 +87,7 @@ return array(
         /**
          * Whether to enable font subsetting or not.
          */
-        "DOMPDF_ENABLE_FONT_SUBSETTING" => false,
+        "DOMPDF_ENABLE_FONT_SUBSETTING" => true,
 
         /**
          * The PDF rendering backend to use

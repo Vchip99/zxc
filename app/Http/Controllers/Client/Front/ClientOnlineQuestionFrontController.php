@@ -193,8 +193,8 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             foreach ($userSolutions  as $key => $result) {
                 $userResults[$result->ques_id] = $result;
             }
-
-            return view('client.front.question.testSolution', compact('results', 'userResults', 'paper'));
+            $clientSubdomain = $request->route()->getParameter('client');
+            return view('client.front.question.testSolution', compact('results', 'userResults', 'paper', 'clientSubdomain'));
         }
     }
 
@@ -213,10 +213,11 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
+
         return view('client.front.question.show_questions', compact('questions'));
     }
 
-        /**
+    /**
      *  show all question  and their results by categoryId by sub categoryId by subjectId by paperId and download as pdf
      */
     protected function downloadQuestions($subdomain, $category, $subcategory, $subject, $paper,Request $request){

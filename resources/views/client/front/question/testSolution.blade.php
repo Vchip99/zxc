@@ -29,6 +29,37 @@
 			.btn-sq-sm{margin-left: 20%;}
 
 		}
+    .watermarked {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.watermarked img {
+  width: 100%;
+}
+
+.watermarked::before {
+  position: absolute;
+  top: -75%;
+  left: -75%;
+
+  display: block;
+  width: 150%;
+  height: 150%;
+
+  transform: rotate(-45deg);
+  content: attr(data-watermark);
+
+  opacity: 0.7;
+  line-height: 3em;
+  letter-spacing: 2px;
+  color:lightgrey;
+}
+.modal-content{
+	z-index: 1;
+position: relative;
+}
 	</style>
 @stop
 @section('content')
@@ -117,7 +148,7 @@
 					                	</h4></b><br/>
 					                	<b><h4>Your Answer:
 											@if(0 == $result->question_type)
-												@if( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer >= $result->min && $userResults[$result->id]->user_answer <= $result->max)
+												@if( isset($userResults[$result->id]))
 													{!! $userResults[$result->id]->user_answer !!}
 							                    @else
 							                    	unsolved
@@ -203,7 +234,7 @@
 					                	</h4></b><br/>
 					                	<b><h4>Your Answer:
 											@if(0 == $result->question_type)
-												@if( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer >= $result->min && $userResults[$result->id]->user_answer <= $result->max)
+												@if( isset($userResults[$result->id]))
 													{!! $userResults[$result->id]->user_answer !!}
 							                    @else
 							                    	unsolved
@@ -311,7 +342,8 @@
 				        	<div class="modal-header">
 					          	<button type="button" class="close" data-dismiss="modal">Close</button>
 					        </div>
-				          	<div class="modal-body" >
+				          	<div class="modal-body watermarked"  data-watermark="{{$clientSubdomain}}">
+
 				          	</div>
 			        	</div>
 			      	</div>
@@ -452,6 +484,10 @@
 			    }
 			// }
 		});
+	});
+	// watermark
+ 	Array.from(document.querySelectorAll('.watermarked')).forEach(function(el) {
+  		el.dataset.watermark = (el.dataset.watermark + ' ').repeat(800);
 	});
 </script>
 @stop

@@ -10,7 +10,8 @@ use App\Models\Question;
 use App\Models\UserSolution;
 use App\Models\TestSubjectPaper;
 use Session, Redirect, DB;
-use \PDF;
+// use PDF;
+use Elibyy\TCPDF\Facades\TCPDF;
 
 class QuizController extends Controller
 {
@@ -257,10 +258,59 @@ class QuizController extends Controller
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
+        $html = '';
+        $html .= '<style>'.file_get_contents(asset('/css/bootstrap.min.css')).'</style>';
+        $html .= '<style>'.file_get_contents(asset('/css/main.css')).'</style>';
 
-        // return view('quiz.download_questions', compact('questions'));
-        $pdf = \PDF::loadView('quiz.download_questions', compact('questions'));
-        return $pdf->download('questions.pdf');
+        if( !empty($questions[0]) && count($questions[0]) > 0){
+            $html .= '<a class="btn btn-primary" style="width:100px;" title="Technical">Technical</a>';
+            foreach($questions[0] as $index => $question){
+                $number = $index + 1;
+                $html .= '<div class="panel-body">
+                            <div >
+                                <p class="questions" >
+                                    <span class="btn btn-sq-xs btn-info">'.$number .'.</span> '.$question->name.'</p>';
+                $html .= '<p>';
+                if(1 == $question->question_type){
+                    $html .= '<div class="row">A. '.$question->answer1.'</div>';
+                    $html .= '<div class="row">B. '.$question->answer2.'</div>';
+                    $html .= '<div class="row">C. '.$question->answer3.'</div>';
+                    $html .= '<div class="row">D. '.$question->answer4.'</div>';
+                } else {
+                    $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
+                }
+                $html .= '</p>';
+            }
+        }
+        if( !empty($questions[1]) && count($questions[1]) > 0){
+            $html .= '<a class="btn btn-primary" style="width:100px; padding: 6px 12px;" title="Aptitude">Aptitude</a>';
+            foreach($questions[1] as $index => $question){
+                $number = $index + 1;
+                $html .= '<div class="panel-body">
+                            <div >
+                                <p class="questions" >
+                                    <span class="btn btn-sq-xs btn-info">'. $number .'.</span> '.$question->name.'</p>';
+                $html .= '<p>';
+                if(1 == $question->question_type){
+                    $html .= '<div class="row">A. '.$question->answer1.'</div>';
+                    $html .= '<div class="row">B. '.$question->answer2.'</div>';
+                    $html .= '<div class="row">C. '.$question->answer3.'</div>';
+                    $html .= '<div class="row">D. '.$question->answer4.'</div>';
+                } else {
+                    $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
+                }
+                $html .= '</p>';
+            }
+        }
+
+
+        $pdf = new TCPDF();
+        $pdf::SetTitle('Vchip');
+        $pdf::AddPage();
+        $pdf::SetFont('freesans', '', 12);
+        $pdf::SetFontSubsetting(true);
+        $pdf::writeHTML($html, true, false, true, false, '');
+        return $pdf::Output('download_questions.pdf', 'D');
     }
 
     /**

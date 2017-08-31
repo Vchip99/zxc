@@ -8,6 +8,7 @@
       <title>Vchip</title>
       <link href="{{asset('css/bootstrap.min.css?ver=1.0')}}" rel="stylesheet">
       <link href="{{asset('css/main.css?ver=1.0')}}" rel="stylesheet">
+      <link href="{{asset('css/hindi.css?ver=1.0')}}" rel="stylesheet">
       <!-- <link href="{{asset('css/style.css?ver=1.0')}}" rel="stylesheet"> -->
       <!-- Fonts -->
       <!-- <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css"> -->
@@ -20,10 +21,38 @@ p img{margin-top: 30px;
 width: 100% !important;
 }
 .numpad{margin-top: 30px;}
+.watermarked {
+  position: relative;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.watermarked img {
+  width: 100%;
+}
+
+.watermarked::before {
+  position: absolute;
+  top: -75%;
+  left: -75%;
+
+  display: block;
+  width: 150%;
+  height: 150%;
+
+  transform: rotate(-45deg);
+  content: attr(data-watermark);
+
+  opacity: 0.7;
+  line-height: 3em;
+  letter-spacing: 2px;
+  color:lightgrey;
+}
+
 </style>
   </head>
   <body>
-    <div class="row">
+    <div class="row  watermarked"  data-watermark="VCHIP">
 
   @if( !empty($questions[0]) && count($questions[0]) > 0)
     <a class="btn btn-primary" style="width:100px;" title="Technical">Technical</a>
@@ -36,17 +65,13 @@ width: 100% !important;
           </p>
           <p>
           @if( 1 == $question->question_type )
-            <div class="row">A.<input type="radio" value="1" class="radio1 radio1_{{$question->id}}" id="radio1_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer1 !!}
+            <div class="row">A. {!! $question->answer1 !!}
             </div>
-            <div class="row">B.<input type="radio" value="2" class="radio1 radio1_{{$question->id}}" id="radio2_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer2 !!}
+            <div class="row">B. {!! $question->answer2 !!}
             </div>
-            <div class="row">C.<input type="radio" value="3" class="radio1 radio1_{{$question->id}}" id="radio3_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer3 !!}
+            <div class="row">C. {!! $question->answer3 !!}
             </div>
-            <div class="row">D.<input type="radio" value="4" class="radio1 radio1_{{$question->id}}" id="radio4_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer4 !!}
+            <div class="row">D. {!! $question->answer4 !!}
             </div>
           @else<br/>
           <div class="panel panel-default">
@@ -69,17 +94,13 @@ width: 100% !important;
           </p>
           <p>
           @if( 1 == $question->question_type )
-            <div class="row">A.<input type="radio" value="1" class="radio1 radio1_{{$question->id}}" id="radio1_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer1 !!}
+            <div class="row">A. {!! $question->answer1 !!}
             </div>
-            <div class="row">B.<input type="radio" value="2" class="radio1 radio1_{{$question->id}}" id="radio2_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer2 !!}
+            <div class="row">B. {!! $question->answer2 !!}
             </div>
-            <div class="row">C.<input type="radio" value="3" class="radio1 radio1_{{$question->id}}" id="radio3_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer3 !!}
+            <div class="row">C. {!! $question->answer3 !!}
             </div>
-            <div class="row">D.<input type="radio" value="4" class="radio1 radio1_{{$question->id}}" id="radio4_{{$question->id}}" name="{{$question->id}}" readonly="true"/>
-              {!! $question->answer4 !!}
+            <div class="row">D. {!! $question->answer4 !!}
             </div>
           @else<br/>
           <div class="panel panel-default">
@@ -92,5 +113,10 @@ width: 100% !important;
     @endforeach
   @endif
 </div>
+<script type="text/javascript">
+   Array.from(document.querySelectorAll('.watermarked')).forEach(function(el) {
+  el.dataset.watermark = (el.dataset.watermark + ' ').repeat(300);
+});
+</script>
     </body>
 </html>

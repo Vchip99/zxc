@@ -113,11 +113,7 @@
 		                	</h4></b><br/>
 		                	<b><h4>Your Answer:
 								@if(0 == $result->question_type)
-									@if( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer >= $result->min && $userResults[$result->id]->user_answer <= $result->max)
-										{!! $userResults[$result->id]->user_answer !!}
-				                    @else
-				                    	unsolved
-				                    @endif
+									{!! $userResults[$result->id]->user_answer !!}
 				                @else
 				                	@if( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer == 1)
 										A
@@ -199,11 +195,7 @@
 		                	</h4></b><br/>
 		                	<b><h4>Your Answer:
 								@if(0 == $result->question_type)
-									@if( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer >= $result->min && $userResults[$result->id]->user_answer <= $result->max)
-										{!! $userResults[$result->id]->user_answer !!}
-				                    @else
-				                    	unsolved
-				                    @endif
+									{!! $userResults[$result->id]->user_answer !!}
 				                @else
 				                	@if( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer == 1)
 										A

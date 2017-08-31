@@ -526,6 +526,7 @@
 			$('#radio4_'+zxc).prop('checked', false);
 			$('#radio5_'+zxc).prop('checked', false);
 			$('#radio6_'+zxc).prop('checked', false);
+			$('#radio7_'+zxc).prop('checked', true);
 			$('#numpad_'+zxc).val('');
 			$('#id_'+zxc).css('background', 'red');
 			});

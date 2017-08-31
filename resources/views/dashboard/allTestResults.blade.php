@@ -18,6 +18,7 @@
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="college" name="college" onChange="allResults(this.value);">
                 <option value="0"> Select College </option>
+                <option value="all">All</option>
                 @if(2 == Auth::user()->user_type && 'other' == Auth::user()->college_id)
                   <option value="other" selected="true">Other</option>
                 @else
@@ -61,6 +62,16 @@
               <option value="0">Select Paper</option>
             </select>
           </div>
+          <div class="col-md-3 mrgn_10_btm">
+            <button class="btn btn-info" onClick="downloadExcelResult();">Download Result</button>
+            <form action="{{ url('downloadExcelResult') }}" method="GET" id="export_result">
+              <input type="hidden" name="college" id="export_college" value="">
+              <input type="hidden" name="category" id="export_category" value="">
+              <input type="hidden" name="subcategory" id="export_subcategory" value="">
+              <input type="hidden" name="subject" id="export_subject" value="">
+              <input type="hidden" name="paper" id="export_paper" value="">
+            </form>
+          </div>
           <div class="col-lg-12" id="all-result">
             <div class="panel panel-info">
               <div class="panel-heading text-center">
@@ -90,7 +101,63 @@
   </div>
 
 <script type="text/javascript">
+
+  function downloadExcelResult(){
+    var college = document.getElementById('college').value;
+    var category = document.getElementById('category').value;
+    var subcategory = document.getElementById('subcategory').value;
+    var subject = document.getElementById('subject').value;
+    var paper = document.getElementById('paper').value;
+    if(0 == college){
+      $.alert({
+          title: 'Alert!',
+          content: 'Please select college.',
+      });
+      return false;
+    }
+    if(0 == category){
+      alert('Please select category.');
+      $.alert({
+          title: 'Alert!',
+          content: 'Please select category.',
+      });
+      return false;
+    }
+    if(0 == subcategory){
+      $.alert({
+          title: 'Alert!',
+          content: 'Please select subcategory.',
+      });
+      return false;
+    }
+    if(0 == subject){
+      $.alert({
+          title: 'Alert!',
+          content: 'Please select subject.',
+      });
+      return false;
+    }
+    if(0 == paper){
+      $.alert({
+          title: 'Alert!',
+          content: 'Please select paper.',
+      });
+      return false;
+    }
+    if(0 != college && 0 != category && 0 != subcategory && 0 != subject && 0 != paper){
+      document.getElementById('export_college').value = college;
+      document.getElementById('export_category').value = category;
+      document.getElementById('export_subcategory').value = subcategory;
+      document.getElementById('export_subject').value = subject;
+      document.getElementById('export_paper').value = paper;
+      document.getElementById('export_result').submit();
+    }
+  }
   function allResults(college){
+    document.getElementById('category').value = 0;
+    document.getElementById('subcategory').value = 0;
+    document.getElementById('subject').value = 0;
+    document.getElementById('paper').value = 0;
     document.getElementById('students').innerHTML = '';
   }
   function showResult(){

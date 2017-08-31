@@ -283,3 +283,6 @@ img.img-hover:hover  {
   -o-transform:scale(1.1); /* Opera */
   transform:scale(1.1);
 }
+.curser{
+	cursor: pointer;
+}

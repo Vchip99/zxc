@@ -222,13 +222,6 @@
     }
 
     function showUserTestResult(ele){
-      if(confirm('Do you want to see result?')){
-        var paperId = parseInt($(ele).data('paper_id'));
-        var resultForm = document.getElementById('showUserTestResult_'+paperId);
-          resultForm.submit();
-      } else {
-        return false;
-      }
       $.confirm({
           title: 'Confirmation',
           content: 'Do you want to see result?',

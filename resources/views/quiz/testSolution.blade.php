@@ -119,7 +119,7 @@
 					                	</h4></b><br/>
 					                	<b><h4>Your Answer:
 										@if(0 == $result->question_type)
-											@if( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer >= $result->min && $userResults[$result->id]->user_answer <= $result->max)
+											@if( isset($userResults[$result->id]))
 												{!! $userResults[$result->id]->user_answer !!}
 						                    @else
 						                    	unsolved
@@ -205,7 +205,7 @@
 					                	</h4></b><br/>
 					                	<b><h4>Your Answer:
 					                	@if(0 == $result->question_type)
-											@if( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer >= $result->min && $userResults[$result->id]->user_answer <= $result->max)
+											@if( isset($userResults[$result->id]))
 												{!! $userResults[$result->id]->user_answer !!}
 						                    @else
 						                    	unsolved

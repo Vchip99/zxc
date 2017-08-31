@@ -15,9 +15,11 @@ use App\Models\ClientInstituteCourse;
 use App\Models\ClientUserInstituteCourse;
 use App\Models\Client;
 use App\Models\ClientScore;
+use App\Models\ClientOnlineTestSubjectPaper;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use Auth, Redirect, View, DB, Session;
+use Excel;
 
 class ClientUsersInfoController extends BaseController
 {
@@ -291,6 +293,46 @@ class ClientUsersInfoController extends BaseController
         $result['ranks'] = $ranks;
         $result['marks'] = $marks;
         return $result;
+    }
+
+    protected function downloadExcelResult(Request $request){
+        if($request->get('paper') > 0){
+            $paperName = ClientOnlineTestSubjectPaper::find($request->get('paper'))->name;
+        } else {
+            $paperName = $request->get('paper');
+        }
+        $sheetName = $paperName;
+        $resultArray[] = ['Test Series Result:',$sheetName, '',''];
+        $resultArray[] = [];
+        // Define the Excel spreadsheet headers
+        $resultArray[] = ['Sr. No.','Name','Marks', 'Rank'];
+        $scores = ClientScore::getAllUsersResults($request);
+        if( false == $scores->isEmpty()){
+            foreach($scores as $index => $score){
+                $result = [];
+                $result['Sr. No.'] = $index +1;
+                $result['Name'] = $score->user->name;
+
+                $totalMarks = $score->totalMarks()['totalMarks'];
+                $result['Marks'] = (string) $score->test_score.'/'.$totalMarks;
+                $result['Rank'] = (string) $score->rank($request->college);
+
+                $resultArray[] = $result;
+            }
+        }
+        if($request->get('course') > 0){
+            $courseName = ClientInstituteCourse::find($request->get('course'))->name;
+        } else {
+            $courseName = $request->get('course');
+        }
+
+        $courseResult = $courseName.'_'.$paperName.'_result';
+        return \Excel::create($courseResult, function($excel) use ($sheetName,$resultArray) {
+            $excel->sheet($sheetName , function($sheet) use ($resultArray)
+            {
+                $sheet->fromArray($resultArray);
+            });
+        })->download('xls');
     }
 
 }

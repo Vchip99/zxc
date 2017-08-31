@@ -15,6 +15,8 @@ use App\Models\Score;
 use App\Models\CourseCourse;
 use App\Models\TestCategory;
 use App\Models\CourseCategory;
+use App\Models\TestSubjectPaper;
+use Excel;
 
 class AllUsersInfoController extends Controller
 {
@@ -310,6 +312,59 @@ class AllUsersInfoController extends Controller
         $results['colleges'] = $colleges;
         $results['departments'] = $departments;
         return $results;
+    }
+
+    protected function downloadExcelResult(Request $request){
+        $resultArray[] = ['Sr. No.','Name','college','Department','Marks', 'Rank'];
+        $scores = Score::getAllUsersResults($request);
+        if( false == $scores->isEmpty()){
+            foreach($scores as $index => $score){
+                $result = [];
+                $result['Sr. No.'] = $index +1;
+                $result['Name'] = $score->user->name;
+
+                if(is_object($score->user->college) && $score->user->college->id > 0){
+                    $result['college'] = $score->user->college->name;
+                }else if(is_object($score->user) && 'other' == $score->user->college_id){
+                    $result['college'] = $score->user->other_source;
+                }else{
+                    $result['college'] = 'Client';
+                }
+
+                if(is_object($score->user->college) && $score->user->college->id > 0){
+                    $result['Department'] = $score->user->college->name;
+                }else if(is_object($score->user) && 'other' == $score->user->college_id){
+                    $result['Department'] = $score->user->other_source;
+                }else{
+                    $result['Department'] = 'Client';
+                }
+                $totalMarks = $score->totalMarks()['totalMarks'];
+                $result['Marks'] = (string) $score->test_score.'/'.$totalMarks;
+                $result['Rank'] = (string) $score->rank($request->college);
+
+                $resultArray[] = $result;
+            }
+        }
+        if($request->get('college') > 0){
+            $collegeName = College::find($request->get('college'))->name;
+        } else {
+            $collegeName = $request->get('college');
+        }
+
+        if($request->get('paper') > 0){
+            $paperName = TestSubjectPaper::find($request->get('paper'))->name;
+        } else {
+            $paperName = $request->get('paper');
+        }
+
+        $collegeResult = $collegeName.'_'.$paperName.'_result';
+        $sheetName = $paperName.' Test Result';
+        return \Excel::create($collegeResult, function($excel) use ($sheetName,$resultArray) {
+            $excel->sheet($sheetName , function($sheet) use ($resultArray)
+            {
+                $sheet->fromArray($resultArray);
+            });
+        })->download('xls');
     }
 }
 

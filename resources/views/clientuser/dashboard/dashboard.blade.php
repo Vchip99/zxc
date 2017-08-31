@@ -60,15 +60,6 @@
           <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::guard('clientuser')->user()))?Auth::guard('clientuser')->user()->id: NULL }}"/>
         </div>
       </div>
-      <!-- <form action="#" method="get" class="sidebar-form">
-        <div class="input-group">
-          <input type="text" name="q" class="form-control" placeholder="Search...">
-            <span class="input-group-btn">
-              <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-              </button>
-            </span>
-        </div>
-      </form> -->
       <ul class="sidebar-menu">
         <li class="header">Vchip Technology</li>
         <li class="treeview ">
@@ -95,9 +86,7 @@
             <li title="My Online Courses"><a href="{{ url('myCourses')}}"><i class="fa fa-circle-o"></i> My Online Courses</a></li>
             <li title="My Course Results"><a href="{{ url('myCourseResults')}}"><i class="fa fa-circle-o"></i> My Course Results</a></li>
             <li title="My Certificate"><a href="{{ url('myCertificate')}}"><i class="fa fa-circle-o"></i> My Certificate</a></li>
-            @if( is_object(Auth::guard('clientuser')->user()) && Auth::guard('clientuser')->user()::getUserCoursePermissionCount() > 0)
-              <li title="More Courses"><a href="{{ url('online-courses')}}"><i class="fa fa-circle-o"></i> More Courses</a></li>
-            @endif
+            <li title="More Courses"><a href="{{ url('online-courses')}}"><i class="fa fa-circle-o"></i> More Courses</a></li>
           </ul>
         </li>
         @endif
@@ -113,9 +102,7 @@
           <ul class="treeview-menu">
             <li title="My Test"><a href="{{ url('myTest')}}"><i class="fa fa-circle-o"></i> My Test</a></li>
             <li title="My Test Results"><a href="{{ url('myTestResults')}}"><i class="fa fa-circle-o"></i> My Test Results</a></li>
-            @if( is_object(Auth::guard('clientuser')->user()) && Auth::guard('clientuser')->user()::getUserTestPermissionCount() > 0)
-              <li title="More Test"><a href="{{ url('online-tests')}}"><i class="fa fa-circle-o"></i> More Test</a></li>
-            @endif
+            <li title="More Test"><a href="{{ url('online-tests')}}"><i class="fa fa-circle-o"></i> More Test</a></li>
           </ul>
         </li>
         @endif

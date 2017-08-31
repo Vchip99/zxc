@@ -15,6 +15,7 @@ use App\Libraries\InputSanitise;
 use App\Mail\MailToSubscribedUser;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
+use Excel;
 
 class QuestionController extends Controller
 {
@@ -234,6 +235,7 @@ class QuestionController extends Controller
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$testQuestion = Question::find($id);
+            // dd($testQuestion);
     		if(is_object($testQuestion)){
                 $testCategories = TestCategory::all();
                 $testSubCategories = TestSubCategory::getSubcategoriesByCategoryId($testQuestion->category_id);
@@ -293,7 +295,7 @@ class QuestionController extends Controller
             }
         }
         catch(\Exception $e)
-        {
+        {   dd($e);
             DB::rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }
@@ -389,5 +391,60 @@ class QuestionController extends Controller
 
     protected function getCurrentQuestionNo($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId){
         return Question::getCurrentQuestionNoByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId);
+    }
+
+    protected function uploadQuestions(){
+        $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+        $testSubCategories = [];
+        $testSubjects = [];
+        $papers =[];
+        return view('question.uploadQuestions', compact('testCategories','testSubCategories','testSubjects','papers'));
+    }
+
+    protected function importQuestions(Request $request){
+        if($request->hasFile('questions')){
+            $path = $request->file('questions')->getRealPath();
+            $questions = \Excel::selectSheetsByIndex(0)->load($path)->get();
+            if($questions->count()){
+                foreach ($questions as $key => $question) {
+                    $allQuestions[] = [
+                        'name' => $question->question,
+                        'answer1' => $question->option_a,
+                        'answer2' => $question->option_b,
+                        'answer3' => $question->option_c,
+                        'answer4' => $question->option_d,
+                        'answer5' => 0,
+                        'answer6' => 0,
+                        'answer' => $question->right_answer,
+                        'min' => $question->min,
+                        'max' => $question->max,
+                        'section_type' => (int) $question->section_type,
+                        'question_type' => (int) $question->question_type,
+                        'solution' => $question->solution,
+                        'positive_marks' => $question->positive_mark,
+                        'negative_marks' => $question->negative_mark,
+                        'category_id' => $request->get('category'),
+                        'subcat_id' =>  $request->get('subcategory'),
+                        'subject_id' => $request->get('subject'),
+                        'paper_id' => $request->get('paper'),
+                    ];
+                }
+                if(!empty($allQuestions)){
+                    DB::beginTransaction();
+                    try
+                    {
+                        DB::table('questions')->insert($allQuestions);
+                        DB::commit();
+                        return Redirect::to('admin/uploadQuestions')->with('message', 'Questions added successfully!');
+                    }
+                    catch(\Exception $e)
+                    {   dd($e);
+                        DB::rollback();
+                        return redirect()->back()->withErrors('something went wrong.');
+                    }
+                }
+            }
+        }
+        return Redirect::to('admin/uploadQuestions');
     }
 }

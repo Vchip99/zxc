@@ -40,7 +40,7 @@
           </select>
         </div>
         <div class="col-sm-2 mrgn_10_btm">
-          <select id="month" class="form-control" name="month" required>
+          <select id="month" class="form-control" name="month" onChange="search();" required>
             <option value="">Select Month</option>
             @foreach($months as $index => $month)
               @if($selectedMonth == $index)
@@ -50,9 +50,6 @@
               @endif
             @endforeach
           </select>
-        </div>
-        <div class="col-sm-2 mrgn_10_btm">
-          <input type="button" class="form-control" value="Search" onClick="search();" />
         </div>
       </form>
     </div>

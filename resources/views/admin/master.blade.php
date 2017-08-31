@@ -13,6 +13,7 @@
   <link href="{{ asset('css/v_main.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/jquery-confirm.min.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css?family=Hind" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans&subset=devanagari" rel="stylesheet">
 
   <script src="{{ asset('js/jquery.min.js?ver=1.0')}}"></script>
   <script src="{{ asset('js/bootstrap.min.js?ver=1.0')}}"></script>
@@ -26,8 +27,12 @@
     });
   </script>
   <style type="text/css">
-  .admin_table,.admin_div{
+  .admin_table{
     padding-top: 10px;
+    background-color: #01bafd;
+  }
+  .admin_div{
+    padding: 10px;
     background-color: #01bafd;
   }
   </style>
@@ -108,6 +113,7 @@
               <li title="Manage Subject"><a href="{{ url('admin/manageSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
               <li title="Manage Paper"><a href="{{ url('admin/managePaper')}}"><i class="fa fa-circle-o"></i> Manage Paper </a></li>
               <li title="Manage Question"><a href="{{ url('admin/manageQuestions')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
+              <li title="Upload Excel File"><a href="{{ url('admin/uploadQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
             </ul>
           </li>
         @endif

@@ -34,6 +34,7 @@
       .vote-btn.selected{
         color:#e91e63 !important;
       }
+
   </style>
 @stop
 @section('header-js')
@@ -76,11 +77,19 @@
           </button>
       </div>
       <div class="btn-group" role="group" title="Favourite">
-          @if('true' == $isCourseRegistered)
-            <a class="btn btn-default voted-btn" id="favourite" data-favourite="true" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Favourite" style="color: rgb(233, 30, 99);"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+        @if(is_object(Auth::guard('clientuser')->user()))
+          @if(is_object($userCoursePermissions) && false == $userCoursePermissions->isEmpty())
+            @if('true' == $isCourseRegistered)
+              <a class="btn btn-default voted-btn" id="favourite" data-favourite="true" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Favourite" style="color: rgb(233, 30, 99);"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+            @else
+              <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+            @endif
           @else
-            <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+            <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="checkFavouritePermission();" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
           @endif
+        @else
+            <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="checkLogin();" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+        @endif
       </div>
     </div>
     <div class="tab-content">
@@ -89,15 +98,29 @@
           @foreach($videos as $index => $video)
           <div class="row mrgn_30_top border_box padding_10">
             <div class="col-md-3 ">
-              <a href="{{ url('episode')}}/{{$video->id}}">
-                <h1 class="video_id">{{ $index + 1}}</h1>
-              </a>
+              @if(is_object(Auth::guard('clientuser')->user()))
+                @if(in_array($video->id, $onlineVideoIds))
+                  <a href="{{ url('episode')}}/{{$video->id}}"><h1 class="video_id">{{ $index + 1}}</h1></a>
+                @else
+                  <a class="curser" onClick="checkPermission();"><h1 class="video_id">{{ $index + 1}}</h1></a>
+                @endif
+              @else
+                <a class="curser" onClick="checkLogin();"><h1 class="video_id">{{ $index + 1}}</h1></a>
+              @endif
             </div>
             <div class="col-md-9 menu">
               <span class="divider">&#9679;</span>
               <span class="running-time">Run Time- {{ gmdate('H:i:s', $video->duration)}}</span>
               <h4 class="v_h4_subtitle">
-                <a href="{{ url('episode')}}/{{$video->id}}">{{$video->name}}</a>
+                @if(is_object(Auth::guard('clientuser')->user()))
+                  @if(in_array($video->id, $onlineVideoIds))
+                    <a href="{{ url('episode')}}/{{$video->id}}">{{$video->name}}</a>
+                  @else
+                    <a class="curser" onClick="checkPermission();">{{$video->name}}</a>
+                  @endif
+                @else
+                  <a class="curser" onClick="checkLogin();">{{$video->name}}</a>
+                @endif
               </h4>
               <p class="more data-lg">{{$video->description}}</p>
               <p class="more data-sm">{{$video->description}}</p>
@@ -167,6 +190,30 @@
 @section('footer')
 	@include('footer.client-footer')
   <script type="text/javascript">
+
+  function checkLogin(){
+    $.alert({
+          title: 'Alert!',
+          content: 'Please login first.',
+      });
+    return false;
+  }
+
+  function checkPermission(){
+   $.alert({
+          title: 'Alert!',
+          content: 'Please register course to acces this video.',
+      });
+    return false;
+  }
+
+  function checkFavouritePermission(){
+   $.alert({
+          title: 'Alert!',
+          content: 'Please register course to mark as favourite.',
+      });
+    return false;
+  }
 
   function registerCourse(ele){
     var userId = parseInt(document.getElementById('user_id').value);
