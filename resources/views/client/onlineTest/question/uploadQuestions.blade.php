@@ -1,14 +1,14 @@
-@extends('admin.master')
+@extends('client.dashboard')
 @section('module_title')
-  <section class="content-header">
-    <h1> Upload Questions </h1>
+<section class="content-header">
+	<h1> Upload Questions </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-files-o"></i> Online Test </li>
       <li class="active"> Upload Questions </li>
     </ol>
-  </section>
+</section>
 @stop
-@section('admin_content')
+@section('dashboard_content')
 	&nbsp;
 	<div class="container ">
 	@if(Session::has('message'))
@@ -17,24 +17,36 @@
 		  	{{ Session::get('message') }}
 		</div>
 	@endif
+  	<input type="hidden" name="message_status" id="message_status" value="@if(Session::has('message')) 1 @else 0 @endif">
 	<div  class="admin_div">
+
 		<div class="form-group row">
 		    <label class="col-sm-2 col-form-label">Download Excel File:</label>
 		    <div class="col-sm-3"><a class="btn btn-primary" href="{{asset('Download Excel Questions File.xlsx')}}" download data-toggle="tooltip" data-placement="bottom">Download Excel Questions File</a>
 		    </div>
 	  	</div>
-		<form id="questionForm" action="{{url('admin/uploadQuestions')}}" method="POST" enctype="multipart/form-data">
+
+		<form id="questionForm" action="{{url('uploadQuestions')}}" method="POST" enctype="multipart/form-data">
 			{{csrf_field()}}
+		  	<div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
+			    <label class="col-sm-2 col-form-label">Institute Course Name:</label>
+			    <div class="col-sm-3">
+			      <select class="form-control" name="institute_course" required title="Category" onChange="selectCategory(this);" >
+			          <option value="">Select Institute Course</option>
+			          @if(count($instituteCourses) > 0)
+			            @foreach($instituteCourses as $instituteCourse)
+			                <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
+			            @endforeach
+			          @endif
+			        </select>
+			        @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
+			    </div>
+		  	</div>
 			<div class="form-group row @if ($errors->has('category')) has-error @endif">
 			    <label class="col-sm-2 col-form-label">Category Name:</label>
 			    <div class="col-sm-3">
 			      <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
 			          <option value="">Select Category</option>
-			          	@if(count($testCategories) > 0)
-			            	@foreach($testCategories as $testCategory)
-			                	<option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
-			            	@endforeach
-			          	@endif
 			      </select>
 			      @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
 			    </div>
@@ -72,31 +84,30 @@
 			    	<input type="file" name="questions" class="form-control" />
 			    </div>
 		    </div>
-		  	<div class="form-group row" style="margin-left: 20px;">
+		  	<div class="form-group row">
+		      <div class="offset-sm-2 col-sm-10" title="Submit">
 		        <button id="submitButton" type="submit" class="btn btn-primary">Submit</button>
+		      </div>
 		    </div>
-
 		</form>
 	</div>
   	</div>
+  	</div>
 <script type="text/javascript">
-
-
-
-    function selectSubcategory(ele){
-	    id = parseInt($(ele).val());
+	function selectCategory(ele){
+	    var id = parseInt($(ele).val());
 	    if( 0 < id ){
 	      $.ajax({
 	              method: "POST",
-	              url: "{{url('admin/getSubCategories')}}",
+	              url: "{{url('getOnlineTestCategories')}}",
 	              data: {id:id}
 	          })
 	          .done(function( msg ) {
-	            select = document.getElementById('subcategory');
+	            select = document.getElementById('category');
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Sub Category ...';
+	            opt.innerHTML = 'Select Category';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -106,9 +117,68 @@
 	                  select.appendChild(opt);
 	              });
 	            }
+	          });
+	    } else {
+		    select = document.getElementById('category');
+	      	select.innerHTML = '';
+	      	var opt = document.createElement('option');
+	      	opt.value = '';
+	      	opt.innerHTML = 'Select Category';
+	      	select.appendChild(opt);
+	    }
+	      	document.getElementById("subcategory").selectedIndex = '';
+	      	document.getElementById("subject").selectedIndex = '';
+        	document.getElementById("paper").selectedIndex = '';
+	}
+
+	function confirmDelete(ele){
+      $.confirm({
+        title: 'Confirmation',
+        content: 'You want to delete this question?',
+        type: 'red',
+        typeAnimated: true,
+        buttons: {
+              Ok: {
+                  text: 'Ok',
+                  btnClass: 'btn-red',
+                  action: function(){
+                    var id = $(ele).attr('id');
+                    formId = 'deleteQuestion_'+id;
+                    document.getElementById(formId).submit();
+                  }
+              },
+              Cancle: function () {
+              }
+          }
+        });
+    }
+
+    function selectSubcategory(ele){
+	    id = parseInt($(ele).val());
+	    if( 0 < id ){
+	      $.ajax({
+	              method: "POST",
+	              url: "{{url('getOnlineTestSubCategories')}}",
+	              data: {id:id}
+	          })
+	          .done(function( msg ) {
+	            select = document.getElementById('subcategory');
+	            select.innerHTML = '';
+	            var opt = document.createElement('option');
+	            opt.value = '';
+	            opt.innerHTML = 'Select Sub Category';
+	            select.appendChild(opt);
+	            if( 0 < msg.length){
+	              $.each(msg, function(idx, obj) {
+	                  var opt = document.createElement('option');
+	                  opt.value = obj.id;
+	                  opt.innerHTML = obj.name;
+	                  select.appendChild(opt);
+	              });
+	            }
+          	});
 	            document.getElementById("subject").selectedIndex = '';
 	            document.getElementById("paper").selectedIndex = '';
-          	});
 	    }
   	}
 
@@ -118,7 +188,7 @@
 	    if( 0 < catId && 0 < subcatId ){
 	      $.ajax({
 	              method: "POST",
-	              url: "{{url('admin/getSubjectsByCatIdBySubcatId')}}",
+	              url: "{{url('getOnlineSubjectsByCatIdBySubcatId')}}",
 	              data: {catId:catId, subcatId:subcatId}
 	          })
 	          .done(function( msg ) {
@@ -126,7 +196,7 @@
 	            selectSub.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Subject ...';
+	            opt.innerHTML = 'Select Subject';
 	            selectSub.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -136,22 +206,23 @@
 	                  selectSub.appendChild(opt);
 	              });
 	            }
-	            document.getElementById("paper").selectedIndex = '';
 	        });
+	            document.getElementById("paper").selectedIndex = '';
     	}
   	}
+
 	function getPapersBySubjectId(subjectId){
 		if( 0 < subjectId ){
 	      	$.ajax({
 	             	method: "POST",
-	              	url: "{{url('admin/getPapersBySubjectId')}}",
+	              	url: "{{url('getOnlinePapersBySubjectId')}}",
 	              	data: {subjectId:subjectId}
           	}).done(function( msg ) {
 	            select = document.getElementById('paper');
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Paper ...';
+	            opt.innerHTML = 'Select Paper';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 		            $.each(msg, function(idx, obj) {

@@ -14,7 +14,7 @@ use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientScore;
 use App\Models\ClientUserSolution;
-use \PDF;
+use Elibyy\TCPDF\Facades\TCPDF;
 
 class ClientOnlineQuestionFrontController extends ClientHomeController
 {
@@ -193,8 +193,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             foreach ($userSolutions  as $key => $result) {
                 $userResults[$result->ques_id] = $result;
             }
-            $clientSubdomain = $request->route()->getParameter('client');
-            return view('client.front.question.testSolution', compact('results', 'userResults', 'paper', 'clientSubdomain'));
+            return view('client.front.question.testSolution', compact('results', 'userResults', 'paper'));
         }
     }
 
@@ -213,8 +212,8 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
-
-        return view('client.front.question.show_questions', compact('questions'));
+        $clientSubdomain = $request->route()->getParameter('client');
+        return view('client.front.question.show_questions', compact('questions', 'clientSubdomain'));
     }
 
     /**
@@ -225,14 +224,74 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         $subcategoryId = $subcategory;
         $subjectId = $subject;
         $paperId = $paper;
+        $clientSubdomain = $request->route()->getParameter('client');
         $allQuestions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
 
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
-        $pdf = \PDF::loadView('client.front.question.download_questions', compact('questions'));
-        return $pdf->download('questions.pdf');
 
+        $html = '';
+        $html .= '<style>'.file_get_contents(asset('/css/bootstrap.min.css')).'</style>';
+        $html .= '<style>'.file_get_contents(asset('/css/main.css')).'</style>';
+        $html .= '<style>.watermark {
+    position: absolute;
+    opacity: 0.25;
+    font-size: 50px;
+    width: 30%;
+    text-align: center;
+    z-index: 1000;
+    color: #ddd;
+}</style>';
+
+        if( !empty($questions[0]) && count($questions[0]) > 0){
+            $html .= '<a class="btn btn-primary" style="width:100px;" title="Technical">Technical</a>';
+            foreach($questions[0] as $index => $question){
+                $number = $index + 1;
+                $html .= '<div class="panel-body">
+                            <div ><span class="watermark">'.$clientSubdomain.'</span>
+                                <p class="questions" >
+                                    <span class="btn btn-sq-xs btn-info">'.$number .'.</span> '.$question->name.'</p>';
+                $html .= '<p>';
+                if(1 == $question->question_type){
+                    $html .= '<div class="row">A. '.$question->answer1.'</div>';
+                    $html .= '<div class="row">B. '.$question->answer2.'</div>';
+                    $html .= '<div class="row">C. '.$question->answer3.'</div>';
+                    $html .= '<div class="row">D. '.$question->answer4.'</div>';
+                } else {
+                    $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
+                }
+                $html .= '</p></div></div>';
+            }
+        }
+        if( !empty($questions[1]) && count($questions[1]) > 0){
+            $html .= '<a class="btn btn-primary" style="width:100px; padding: 6px 12px;" title="Aptitude">Aptitude</a>';
+            foreach($questions[1] as $index => $question){
+                $number = $index + 1;
+                $html .= '<div class="panel-body">
+                            <div ><span class="watermark">'.$clientSubdomain.'</span>
+                                <p class="questions" >
+                                    <span class="btn btn-sq-xs btn-info">'. $number .'.</span> '.$question->name.'</p>';
+                $html .= '<p>';
+                if(1 == $question->question_type){
+                    $html .= '<div class="row">A. '.$question->answer1.'</div>';
+                    $html .= '<div class="row">B. '.$question->answer2.'</div>';
+                    $html .= '<div class="row">C. '.$question->answer3.'</div>';
+                    $html .= '<div class="row">D. '.$question->answer4.'</div>';
+                } else {
+                    $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
+                }
+                $html .= '</p></div></div>';
+            }
+        }
+
+        $pdf = new TCPDF();
+        $pdf::SetTitle($clientSubdomain);
+        $pdf::AddPage();
+        $pdf::SetFont('freesans', '', 12);
+        $pdf::SetFontSubsetting(true);
+        $pdf::writeHTML($html, true, false, true, false, '');
+        return $pdf::Output('download_questions.pdf', 'D');
     }
 
 }

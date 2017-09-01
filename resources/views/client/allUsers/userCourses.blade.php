@@ -81,6 +81,7 @@
                     @elseif(is_object($selectedStudent) && 0 == count($courses))
                       <tr class="">
                         <td colspan="5">No courses are registered for selected user.</td>
+                      </tr>
                     @endif
                   </tbody>
                 </table>

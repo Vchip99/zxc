@@ -14,6 +14,7 @@ use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientInstituteCourse;
 use App\Models\ClientNotification;
+use Excel;
 
 class ClientOnlineTestQuestionController extends ClientBaseController
 {
@@ -380,6 +381,74 @@ class ClientOnlineTestQuestionController extends ClientBaseController
 
     protected function getClientCurrentQuestionNo($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId){
         return ClientOnlineTestQuestion::getClientCurrentQuestionNoByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId);
+    }
+
+     /**
+     *  show questions associated with subject and paper
+     */
+    protected function uploadQuestions(Request $request){
+        $coursePermission = InputSanitise::checkModulePermission($request, 'test');
+        if('false' == $coursePermission){
+            return Redirect::to('manageClientHome');
+        }
+        $clientId = Auth::guard('client')->user()->id;
+        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
+
+        $testCategories = ClientOnlineTestCategory::showCategories($request);
+        $testSubCategories = [];
+        $testSubjects = [];
+        $papers = [];
+
+        return view('client.onlineTest.question.uploadQuestions', compact('instituteCourses', 'testCategories', 'testSubCategories', 'testSubjects', 'papers'));
+    }
+
+    protected function importQuestions(Request $request){
+        if($request->hasFile('questions')){
+            $path = $request->file('questions')->getRealPath();
+            $questions = \Excel::selectSheetsByIndex(0)->load($path)->get();
+            if($questions->count()){
+                foreach ($questions as $key => $question) {
+                    $allQuestions[] = [
+                        'name' => $question->question,
+                        'answer1' => $question->option_a,
+                        'answer2' => $question->option_b,
+                        'answer3' => $question->option_c,
+                        'answer4' => $question->option_d,
+                        'answer5' => 0,
+                        'answer6' => 0,
+                        'answer' => $question->right_answer,
+                        'min' => $question->min,
+                        'max' => $question->max,
+                        'section_type' => (int) $question->section_type,
+                        'question_type' => (int) $question->question_type,
+                        'solution' => $question->solution,
+                        'positive_marks' => $question->positive_mark,
+                        'negative_marks' => $question->negative_mark,
+                        'category_id' => $request->get('category'),
+                        'subcat_id' =>  $request->get('subcategory'),
+                        'subject_id' => $request->get('subject'),
+                        'paper_id' => $request->get('paper'),
+                        'client_id' => Auth::guard('client')->user()->id,
+                        'client_institute_course_id' => $request->get('institute_course')
+                    ];
+                }
+                if(!empty($allQuestions)){
+                    DB::connection('mysql2')->beginTransaction();
+                    try
+                    {
+                        DB::connection('mysql2')->table('client_online_test_questions')->insert($allQuestions);
+                        DB::connection('mysql2')->commit();
+                        return Redirect::to('manageUploadQuestions')->with('message', 'Questions added successfully!');
+                    }
+                    catch(\Exception $e)
+                    {
+                        DB::connection('mysql2')->rollback();
+                        return redirect()->back()->withErrors('something went wrong.');
+                    }
+                }
+            }
+        }
+        return Redirect::to('manageUploadQuestions');
     }
 
 }

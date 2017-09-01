@@ -594,6 +594,9 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('getClientNextQuestionCount', 'Client\OnlineTest\ClientOnlineTestQuestionController@getClientNextQuestionCount');
   	Route::post('getClientCurrentQuestionCount', 'Client\OnlineTest\ClientOnlineTestQuestionController@getClientCurrentQuestionCount');
   	Route::post('getClientPrevQuestion', 'Client\OnlineTest\ClientOnlineTestQuestionController@getClientPrevQuestion');
+  	Route::get('manageUploadQuestions', 'Client\OnlineTest\ClientOnlineTestQuestionController@uploadQuestions');
+  	Route::post('uploadQuestions', 'Client\OnlineTest\ClientOnlineTestQuestionController@importQuestions');
+
 
   	// online courses front
 	Route::get('online-courses', 'Client\Front\ClientOnlineCourseFrontController@courses');

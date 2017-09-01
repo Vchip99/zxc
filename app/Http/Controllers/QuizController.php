@@ -10,7 +10,6 @@ use App\Models\Question;
 use App\Models\UserSolution;
 use App\Models\TestSubjectPaper;
 use Session, Redirect, DB;
-// use PDF;
 use Elibyy\TCPDF\Facades\TCPDF;
 
 class QuizController extends Controller
@@ -261,12 +260,21 @@ class QuizController extends Controller
         $html = '';
         $html .= '<style>'.file_get_contents(asset('/css/bootstrap.min.css')).'</style>';
         $html .= '<style>'.file_get_contents(asset('/css/main.css')).'</style>';
+        $html .= '<style>.watermark {
+    position: absolute;
+    opacity: 0.25;
+    font-size: 30px;
+    width: 50%;
+    text-align: center;
+    z-index: 1000;
+    color: #ddd;
+}</style>';
 
         if( !empty($questions[0]) && count($questions[0]) > 0){
             $html .= '<a class="btn btn-primary" style="width:100px;" title="Technical">Technical</a>';
             foreach($questions[0] as $index => $question){
                 $number = $index + 1;
-                $html .= '<div class="panel-body">
+                $html .= '<div class="panel-body"><span class="watermark">Vchip Technology</span>
                             <div >
                                 <p class="questions" >
                                     <span class="btn btn-sq-xs btn-info">'.$number .'.</span> '.$question->name.'</p>';
@@ -279,7 +287,7 @@ class QuizController extends Controller
                 } else {
                     $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
                 }
-                $html .= '</p>';
+                $html .= '</p></div></div>';
             }
         }
         if( !empty($questions[1]) && count($questions[1]) > 0){
@@ -287,7 +295,7 @@ class QuizController extends Controller
             foreach($questions[1] as $index => $question){
                 $number = $index + 1;
                 $html .= '<div class="panel-body">
-                            <div >
+                            <div ><span class="watermark">Vchip Technology</span>
                                 <p class="questions" >
                                     <span class="btn btn-sq-xs btn-info">'. $number .'.</span> '.$question->name.'</p>';
                 $html .= '<p>';
@@ -299,13 +307,13 @@ class QuizController extends Controller
                 } else {
                     $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
                 }
-                $html .= '</p>';
+                $html .= '</p></div></div>';
             }
         }
 
 
         $pdf = new TCPDF();
-        $pdf::SetTitle('Vchip');
+        $pdf::SetTitle('Vchip Technology');
         $pdf::AddPage();
         $pdf::SetFont('freesans', '', 12);
         $pdf::SetFontSubsetting(true);

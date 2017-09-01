@@ -7,14 +7,25 @@ p img{margin-top: 30px;}
 
 }
 </style>
-
-<div class="row  watermarked"  >
+<style>
+.watermark {
+    position: absolute;
+    opacity: 0.25;
+    font-size: 100px;
+    width: 100%;
+    text-align: center;
+    z-index: 1000;
+    color: grey;
+}
+</style>
+<div class="row"  >
 
 	@if( !empty($questions[0]) && count($questions[0]) > 0)
 		<a class="btn btn-primary" style="width:100px;" title="Technical">Technical</a>
 		@foreach($questions[0] as $index => $question)
+
 			<div class="panel-body ">
-				<div >
+				<div ><span class="watermark">{{$clientSubdomain}}</span>
 					<p class="questions" >
 						<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
 						{!! $question->name !!}
@@ -40,8 +51,9 @@ p img{margin-top: 30px;}
 	@if( !empty($questions[1]) && count($questions[1]) > 0)
 		<a class="btn btn-primary" style="width:100px;" title="Aptitude">Aptitude</a>
 		@foreach($questions[1] as $index => $question)
+
 			<div class="panel-body">
-				<div >
+				<div ><span class="watermark">{{$clientSubdomain}}</span>
 					<p class="questions" >
 						<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
 						{!! $question->name !!}

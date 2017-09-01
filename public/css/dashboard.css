@@ -62,9 +62,7 @@ only screen and (max-width: 760px),
     padding-right: 10px;
     white-space: nowrap;
   }
-
-
-/*student record*/
+  /*student record*/
   #student-record td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
   #student-record td:nth-of-type(2):before { content: "Name";  font-weight: bolder;}
   #student-record td:nth-of-type(3):before { content: "Department";  font-weight: bolder;}
@@ -82,6 +80,11 @@ only screen and (max-width: 760px),
   #course-result td:nth-of-type(2):before { content: "Courses";  font-weight: bolder;}
   #course-result td:nth-of-type(3):before { content: "Grade"; font-weight: bolder;}
   #course-result td:nth-of-type(4):before { content: "Certificate"; font-weight: bolder;}
+  /*unapprove student*/
+  #students td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #students td:nth-of-type(2):before { content: "College/Company";  font-weight: bolder;}
+  #students td:nth-of-type(3):before { content: "Name";  font-weight: bolder;}
+  #students td:nth-of-type(4):before { content: "Approval"; font-weight: bolder;}
   /*profile*/
   #usr-profile td:nth-of-type(1):before { content: "NAME :" ; font-weight: bolder; }
   #usr-profile td:nth-of-type(2):before { content: "EMAIL :";  font-weight: bolder;}
@@ -103,7 +106,7 @@ only screen and (max-width: 760px),
   #principal_tnp_record td:nth-of-type(2):before { content: "Name";  font-weight: bolder;}
   #principal_tnp_record td:nth-of-type(3):before { content: "Approval"; font-weight: bolder;}
   #principal_tnp_record td:nth-of-type(4):before { content: "Delete"; font-weight: bolder;}
-   /*clients*/
+    /*clients*/
   #clients td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
   #clients td:nth-of-type(2):before { content: "Name of Institute";  font-weight: bolder;}
   #clients td:nth-of-type(3):before { content: "Test Permission"; font-weight: bolder;}
@@ -111,34 +114,43 @@ only screen and (max-width: 760px),
   #clients td:nth-of-type(5):before { content: "Url";  font-weight: bolder;}
   #clients td:nth-of-type(6):before { content: "Approval"; font-weight: bolder;}
   #clients td:nth-of-type(7):before { content: "Delete"; font-weight: bolder;}
-
-  /* all_test_result */
+    /* all_test_result */
   #all_test_result td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
   #all_test_result td:nth-of-type(2):before { content: "Name";  font-weight: bolder;}
   #all_test_result td:nth-of-type(3):before { content: "College";  font-weight: bolder;}
   #all_test_result td:nth-of-type(4):before { content: "Department."; font-weight: bolder;}
   #all_test_result td:nth-of-type(5):before { content: "Marks"; font-weight: bolder;}
   #all_test_result td:nth-of-type(6):before { content: "Rank"; font-weight: bolder;}
-
-  /* mobile_client_users */
+    /* mobile_client_users */
   #mobile_client_users td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
   #mobile_client_users td:nth-of-type(2):before { content: "Name";  font-weight: bolder;}
   #mobile_client_users td:nth-of-type(3):before { content: "Client Approve";  font-weight: bolder;}
   #mobile_client_users td:nth-of-type(4):before { content: "Course."; font-weight: bolder;}
   #mobile_client_users td:nth-of-type(5):before { content: "Courses Permission"; font-weight: bolder;}
   #mobile_client_users td:nth-of-type(6):before { content: "Delete"; font-weight: bolder;}
-
-  /*mobile_client_user_permission*/
+    /* mobile_client_messages */
+  #mobile_client_messages td:nth-of-type(1):before { content: "Message" ; font-weight: bolder; }
+  #mobile_client_messages td:nth-of-type(2):before { content: "Already Seen";  font-weight: bolder;}
+  /* mobile_user_messages */
+  #mobile_user_messages td:nth-of-type(1):before { content: "Message" ; font-weight: bolder; }
+  /* mobile_user_notifications */
+  #mobile_user_notifications td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #mobile_user_notifications td:nth-of-type(2):before { content: "Message" ; font-weight: bolder; }
+  /* mobile_admin_messages */
+  #mobile_admin_messages td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #mobile_admin_messages td:nth-of-type(2):before { content: "Message" ; font-weight: bolder; }
+  #mobile_admin_messages td:nth-of-type(3):before { content: "Already Seen";  font-weight: bolder;}
+    /*mobile_client_user_permission*/
  #mobile_client_user_permission td:nth-of-type(1):before { content: "Course Name" ; font-weight: bolder; }
  #mobile_client_user_permission td:nth-of-type(2):before { content: "Test Permission";  font-weight: bolder;}
  #mobile_client_user_permission td:nth-of-type(3):before { content: "Course Permission";  font-weight: bolder;}
-.expant-child>td:before{display: none!important;}
-.expant-child>td{
-  position: relative;
-  padding-left: 0px;
+ .expant-child>td:before{display: none!important;}
+  .expant-child>td{
+    position: relative;
+    padding-left: 0px;
+  }
 }
 
-}
 table.inner-table-border{
   border:1px solid #e91e63 !important;
 }

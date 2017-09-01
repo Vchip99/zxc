@@ -27,8 +27,12 @@
     });
   </script>
   <style type="text/css">
-  .admin_table,.admin_div{
+  .admin_table{
     padding-top: 10px;
+    background-color: #01bafd;
+  }
+  .admin_div{
+    padding: 10px;
     background-color: #01bafd;
   }
   </style>
@@ -260,6 +264,7 @@
               <li title="Manage Subject"><a href="{{ url('manageOnlineTestSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
               <li title="Manage Paper"><a href="{{ url('manageOnlineTestSubjectPaper')}}"><i class="fa fa-circle-o"></i> Manage Paper </a></li>
               <li title="Manage Question"><a href="{{ url('manageOnlineTestQuestion')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
+              <li title="Upload Excel File"><a href="{{ url('manageUploadQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
           </ul>
         </li>
         @endif

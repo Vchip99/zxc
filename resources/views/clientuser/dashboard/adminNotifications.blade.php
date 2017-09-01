@@ -1,6 +1,13 @@
 @extends('clientuser.dashboard.dashboard')
 @section('dashboard_header')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
+  <style type="text/css">
+  @media only screen and (max-width: 760px), (max-device-width: 1024px) and (min-device-width: 768px){
+  td {
+      padding-left: 50% !important;
+  }
+}
+  </style>
 @stop
 @section('module_title')
   <section class="content-header">
@@ -64,9 +71,10 @@
           <th>Already Seen</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="mobile_client_messages">
         @if(count($notifications) > 0)
           @foreach($notifications as $index => $notification)
+              <tr>
                 <td>{!! $notification->message !!}
                 </td>
                 <td>@if(in_array($notification->id, $readNotificationIds)) <i class="fa fa-envelope-open"></i> @else <i class="fa fa-envelope"></i> @endif</td>

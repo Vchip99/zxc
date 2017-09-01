@@ -1,31 +1,20 @@
 @extends('layouts.master')
 @section('content')
-<style type="text/css">
-	.watermark {
-  width: 300px;
-  height: 100px;
-  display: block;
-  position: relative;
-}
-
-.watermark::after {
-  content: "";
- background:url(https://www.google.co.in/images/srpr/logo11w.png);
-  opacity: 0.2;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  position: absolute;
-  z-index: -1;
-}
-</style>
+<style>.watermark {
+    position: absolute;
+    opacity: 0.25;
+    font-size: 50px;
+    width: 100%;
+    text-align: center;
+    z-index: 1000;
+    color: grey;
+}</style>
 <div class="row">
 
 	@if( isset($questions[0]) && count($questions[0]) > 0)
 	<a class="btn btn-primary" style="width:100px;">Technical</a>
 	@foreach($questions[0] as $index => $question)
-	<div class="panel-body">
+	<div class="panel-body"><span class="watermark">Vchip Technology</span>
 		<div >
 			<p class="questions" >
 				<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
@@ -50,7 +39,7 @@
 	@if( isset($questions[1]) && count($questions[1]) > 0)
 	<a class="btn btn-primary" style="width:100px;">Aptitude</a>
 	@foreach($questions[1] as $index => $question)
-	<div class="panel-body">
+	<div class="panel-body"><span class="watermark">Vchip Technology</span>
 		<div >
 			<p class="questions" >
 				<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>

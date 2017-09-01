@@ -235,7 +235,6 @@ class QuestionController extends Controller
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$testQuestion = Question::find($id);
-            // dd($testQuestion);
     		if(is_object($testQuestion)){
                 $testCategories = TestCategory::all();
                 $testSubCategories = TestSubCategory::getSubcategoriesByCategoryId($testQuestion->category_id);
@@ -295,7 +294,7 @@ class QuestionController extends Controller
             }
         }
         catch(\Exception $e)
-        {   dd($e);
+        {
             DB::rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }
@@ -438,7 +437,7 @@ class QuestionController extends Controller
                         return Redirect::to('admin/uploadQuestions')->with('message', 'Questions added successfully!');
                     }
                     catch(\Exception $e)
-                    {   dd($e);
+                    {
                         DB::rollback();
                         return redirect()->back()->withErrors('something went wrong.');
                     }
