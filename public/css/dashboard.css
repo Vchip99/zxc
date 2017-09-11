@@ -335,3 +335,11 @@ margin-top: -10px;}
 .btn.active span:last-child  {
   display: none;
 }
+
+.block-with-text{
+  display:inline-block;
+  width:180px;
+  white-space: nowrap;
+  overflow:hidden !important;
+  text-overflow: ellipsis;
+}

@@ -404,19 +404,20 @@ class QuestionController extends Controller
         if($request->hasFile('questions')){
             $path = $request->file('questions')->getRealPath();
             $questions = \Excel::selectSheetsByIndex(0)->load($path)->get();
+
             if($questions->count()){
                 foreach ($questions as $key => $question) {
                     $allQuestions[] = [
                         'name' => $question->question,
-                        'answer1' => $question->option_a,
-                        'answer2' => $question->option_b,
-                        'answer3' => $question->option_c,
-                        'answer4' => $question->option_d,
+                        'answer1' => ($question->option_a)?:'',
+                        'answer2' => ($question->option_b)?:'',
+                        'answer3' => ($question->option_c)?:'',
+                        'answer4' => ($question->option_d)?:'',
                         'answer5' => 0,
                         'answer6' => 0,
                         'answer' => $question->right_answer,
-                        'min' => $question->min,
-                        'max' => $question->max,
+                        'min' => ($question->min)?:0,
+                        'max' => ($question->max)?:0,
                         'section_type' => (int) $question->section_type,
                         'question_type' => (int) $question->question_type,
                         'solution' => $question->solution,
@@ -428,6 +429,7 @@ class QuestionController extends Controller
                         'paper_id' => $request->get('paper'),
                     ];
                 }
+
                 if(!empty($allQuestions)){
                     DB::beginTransaction();
                     try

@@ -90,7 +90,7 @@ class ClientScore extends Model
                 ->where('subcat_id', $subcategoryId)
                 ->where('paper_id', $paperId)
                 ->where('subject_id', $subjectId)
-                ->where('test_score', '>', $testScore)
+                ->where('test_score', '>', DB::raw($testScore))
                 ->count();
     }
 

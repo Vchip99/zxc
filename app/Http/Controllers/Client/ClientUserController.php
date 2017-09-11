@@ -190,6 +190,7 @@ class ClientUserController extends BaseController
         $sortIds = [];
         $allIds = [];
         $testCourseIds = [];
+        $onlineVideoIds = [];
         $testSubjectPapersIds = [];
         $idsImploded = '';
         $selectedYear = !empty($request->get('year'))?$request->get('year'): date('Y');

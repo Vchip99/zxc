@@ -52,7 +52,11 @@
     <section class="sidebar">
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="{{ asset('images/user.png')}}" class="img-circle" alt="User Image">
+          @if(!empty(Auth::guard('clientuser')->user()->photo))
+            <img src="{{ asset(Auth::guard('clientuser')->user()->photo)}}" class="img-circle" alt="User Image" >
+          @else
+            <img src="{{ asset('images/user.png')}}" class="img-circle" alt="User Image">
+          @endif
         </div>
         <div class="pull-left info">
           <p>{{ ucfirst(Auth::guard('clientuser')->user()->name)}}</p>

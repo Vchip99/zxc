@@ -682,20 +682,19 @@
         },
         {
             "name": "maatwebsite/excel",
-            "version": "2.1.21",
+            "version": "2.1.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Maatwebsite/Laravel-Excel.git",
-                "reference": "2f5e717a09bfa69f5d804a97880a944a3bbe25d2"
+                "reference": "bb7b3d9a72f56ddab974e6a629e4f5e51cd945a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Maatwebsite/Laravel-Excel/zipball/2f5e717a09bfa69f5d804a97880a944a3bbe25d2",
-                "reference": "2f5e717a09bfa69f5d804a97880a944a3bbe25d2",
+                "url": "https://api.github.com/repos/Maatwebsite/Laravel-Excel/zipball/bb7b3d9a72f56ddab974e6a629e4f5e51cd945a2",
+                "reference": "bb7b3d9a72f56ddab974e6a629e4f5e51cd945a2",
                 "shasum": ""
             },
             "require": {
-                "ext-zip": "*",
                 "illuminate/cache": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*|5.5.*",
                 "illuminate/config": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*|5.5.*",
                 "illuminate/filesystem": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*|5.5.*",
@@ -757,7 +756,7 @@
                 "import",
                 "laravel"
             ],
-            "time": "2017-08-16T14:49:55+00:00"
+            "time": "2017-08-31T14:52:24+00:00"
         },
         {
             "name": "monolog/monolog",
