@@ -59,7 +59,7 @@ class Notification extends Model
         $notification->created_by = $createdBy;
         $notification->created_to = $createdTo;
         $notification->is_seen = 0;
-        $notification->created_at = date(Y-m-d);
+        $notification->created_at = date('Y-m-d');
         $notification->save();
     }
 
