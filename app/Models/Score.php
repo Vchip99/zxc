@@ -192,6 +192,16 @@ class Score extends Model
         return;
     }
 
+    protected static function deleteUserScoresByPaperId($paperId){
+        $scores = static::where('paper_id', $paperId)->get();
+        if(is_object($scores) && false == $scores->isEmpty()){
+            foreach($scores as $score){
+                $score->delete();
+            }
+        }
+        return;
+    }
+
     protected static function getAllUsersResults(Request $request){
         $collegeId = $request->get('college');
         $categoryId = $request->get('category');

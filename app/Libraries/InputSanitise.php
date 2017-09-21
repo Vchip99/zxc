@@ -33,11 +33,16 @@ class InputSanitise{
     }
 
     public static function delFolder($dir) {
-       	$files = array_diff(scandir($dir), array('.','..'));
-        foreach ($files as $file) {
-          (is_dir("$dir/$file")) ? static::delFolder("$dir/$file") : unlink("$dir/$file");
+        if(is_dir($dir)){
+            $files = array_diff(scandir($dir), array('.','..'));
+            if(count($files) > 0){
+                foreach ($files as $file) {
+                  (is_dir("$dir/$file")) ? static::delFolder("$dir/$file") : unlink("$dir/$file");
+                }
+                return rmdir($dir);
+            }
         }
-        return rmdir($dir);
+        return;
     }
 
     public static function checkModulePermission(Request $request, $module){

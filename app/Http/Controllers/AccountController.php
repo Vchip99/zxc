@@ -25,8 +25,13 @@ use App\Models\CollegeDept;
 use App\Models\College;
 use App\Models\Notification;
 use App\Models\ReadNotification;
+use App\Models\AssignmentQuestion;
+use App\Models\AssignmentAnswer;
+use App\Models\AssignmentSubject;
+use App\Models\AssignmentTopic;
 use Excel;
 use Auth,Hash,DB, Redirect,Session,Validator,Input;
+use App\Libraries\InputSanitise;
 
 class AccountController extends Controller
 {
@@ -52,6 +57,7 @@ class AccountController extends Controller
                 6 => 'TNP Officer',
             ];
     const Student = 2;
+    const Lecturer = 3;
     /**
      * Define your validation rules in a property in
      * the controller to reuse the rules.
@@ -578,5 +584,86 @@ class AccountController extends Controller
                 $sheet->fromArray($resultArray);
             });
         })->download('xls');
+    }
+
+    protected function myAssignments(){
+        $assignments = AssignmentQuestion::getStudentAssignments();
+        $assignmentTeachers = User::getTeachers();
+        return view('dashboard.assignmentLists', compact('assignments', 'assignmentTeachers'));
+    }
+
+    protected function doAssignment($id){
+        $assignment = AssignmentQuestion::find($id);
+        $answers = AssignmentAnswer::where('student_id', Auth::user()->id)->where('assignment_question_id', $id)->get();
+        return view('dashboard.assignmentDetails', compact('assignment', 'answers'));
+    }
+
+    protected function createAssignmentAnswer(Request $request){
+        $questionId   = InputSanitise::inputInt($request->get('assignment_question_id'));
+        $studentId   = InputSanitise::inputInt($request->get('student_id'));
+        $answer = $request->get('answer');
+        $lecturerComment = $request->get('lecturer_comment');
+        if(empty($answer) && empty($lecturerComment)){
+            if(User::Student == Auth::user()->user_type){
+                return Redirect::to('doAssignment/'.$questionId);
+            } else {
+                return Redirect::to('assignmentRemark/'.$questionId.'/'.$studentId);
+            }
+        }
+
+        DB::beginTransaction();
+        try
+        {
+            AssignmentAnswer::addAssignmentAnswer($request);
+            DB::commit();
+            if(!empty($answer)){
+                return Redirect::to('doAssignment/'.$questionId)->with('message', 'Assignment updated successfully.');
+            } else {
+                return Redirect::to('assignmentRemark/'.$questionId.'/'.$studentId )->with('message', 'Assignment updated successfully.');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('doAssignment/'.$questionId);
+    }
+
+    protected function studentsAssignment(){
+        $assignmentSubjects = [];
+        $assignmentTopics = [];
+        $assignmentUsers = [];
+        $assignment = '';
+        $selectedAssignmentYear = Session::get('selected_assignment_year');
+        $selectedAssignmentSubject  = Session::get('selected_assignment_subject');
+        $selectedAssignmentTopic = Session::get('selected_assignment_topic');
+        $selectedAssignmentStudent = Session::get('selected_assignment_student');
+        if($selectedAssignmentSubject > 0 && $selectedAssignmentYear > 0){
+            $assignmentSubjects = AssignmentSubject::getAssignmentSubjectsByYear($selectedAssignmentYear);
+        }
+        if($selectedAssignmentSubject > 0){
+            $assignmentTopics = AssignmentTopic::getAssignmentTopics($selectedAssignmentSubject);
+        }
+        if($selectedAssignmentStudent > 0){
+            $assignmentUsers = User::getAssignmentUsers($selectedAssignmentYear);
+        }
+        if($selectedAssignmentSubject > 0 && $selectedAssignmentYear > 0 && $selectedAssignmentTopic > 0 && $selectedAssignmentStudent > 0){
+            $assignment = AssignmentQuestion::getAssignmentByTopic($selectedAssignmentTopic);
+        }
+        return view('dashboard.studentsAssignment', compact('selectedAssignmentYear','selectedAssignmentSubject','selectedAssignmentTopic','selectedAssignmentStudent', 'assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'assignment'));
+    }
+
+    protected function assignmentRemark($assignmentId, $studentId){
+        $assignmentId = InputSanitise::inputInt(json_decode($assignmentId));
+        $studentId = InputSanitise::inputInt(json_decode($studentId));
+        $assignment = AssignmentQuestion::find($assignmentId);
+        $answers = AssignmentAnswer::where('student_id', $studentId)->where('assignment_question_id', $assignmentId)->get();
+        $student = User::find($studentId);
+        return view('dashboard.assignmentRemark', compact('assignment', 'answers', 'student'));
+    }
+
+    protected function getDepartmentLecturers(Request $request){
+        return User::getTeachers($request->department);
     }
 }

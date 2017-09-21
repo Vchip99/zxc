@@ -360,4 +360,30 @@ class User extends Authenticatable
         }
         return $result->count();
     }
+
+    protected static function getAssignmentUsers($selectedAssignmentYear){
+        return static::where('user_type', self::Student)->where('college_id', Auth::user()->college_id)->where('college_dept_id', Auth::user()->college_dept_id)->where('year', $selectedAssignmentYear)->get();
+    }
+
+    protected static function getTeachers($collegeDept=NULL){
+        if( self::Lecturer == Auth::user()->user_type){
+            return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
+                ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
+                ->where('users.college_id', Auth::user()->college_id)
+                ->where('users.college_dept_id', Auth::user()->college_dept_id)
+                ->where('assignment_questions.year', Auth::user()->year)
+                ->select('users.id', 'users.*')->groupBy('users.id')->get();
+        } else if( self::Hod == Auth::user()->user_type){
+            return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
+                ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
+                ->where('users.college_id', Auth::user()->college_id)
+                ->where('users.college_dept_id', Auth::user()->college_dept_id)
+                ->select('users.id', 'users.*')->groupBy('users.id')->get();
+        } else if( self::Directore == Auth::user()->user_type){
+            return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
+                ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
+                ->where('users.college_dept_id', $collegeDept)
+                ->select('users.id', 'users.*')->groupBy('users.id')->get();
+        }
+    }
 }

@@ -417,6 +417,12 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getSubjectsByCatIdBySubcatId', 'AccountController@getSubjectsByCatIdBySubcatId');
 	Route::post('getPapersBySubjectId', 'AccountController@getPapersBySubjectId');
 	Route::post('getAllTestResults', 'AccountController@getAllTestResults');
+	Route::get('myAssignments', 'AccountController@myAssignments');
+	Route::get('doAssignment/{id}', 'AccountController@doAssignment');
+	Route::post('createAssignmentAnswer', 'AccountController@createAssignmentAnswer');
+	Route::get('studentsAssignment', 'AccountController@studentsAssignment');
+	Route::get('assignmentRemark/{assignmentId}/{studentId}', 'AccountController@assignmentRemark');
+	Route::post('getDepartmentLecturers', 'AccountController@getDepartmentLecturers');
 
 
 	// like- dis-like count front
@@ -461,6 +467,38 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('adminMessages/{year?}/{month?}', 'AccountController@adminMessages');
 	Route::get('downloadExcelResult', 'AccountController@downloadExcelResult');
 
+	// AssignmentSubject
+	Route::get('manageAssignmentSubject', 'AssignmentSubjectController@show');
+	Route::get('createAssignmentSubject', 'AssignmentSubjectController@create');
+	Route::post('createAssignmentSubject', 'AssignmentSubjectController@store');
+	Route::get('assignmentSubject/{id}/edit', 'AssignmentSubjectController@edit');
+	Route::put('updateAssignmentSubject', 'AssignmentSubjectController@update');
+	Route::post('getAssignmentSubjectsByYear', 'AssignmentSubjectController@getAssignmentSubjectsByYear');
+	Route::post('getAssignmentSubjectsOfGivenAssignmentByLecturer', 'AssignmentSubjectController@getAssignmentSubjectsOfGivenAssignmentByLecturer');
+	Route::delete('deleteAssignmentSubject', 'AssignmentSubjectController@delete');
+
+
+	// AssignmentTopic
+	Route::get('manageAssignmentTopic', 'AssignmentTopicController@show');
+	Route::get('createAssignmentTopic', 'AssignmentTopicController@create');
+	Route::post('createAssignmentTopic', 'AssignmentTopicController@store');
+	Route::get('assignmentTopic/{id}/edit', 'AssignmentTopicController@edit');
+	Route::put('updateAssignmentTopic', 'AssignmentTopicController@update');
+	Route::delete('deleteAssignmentTopic', 'AssignmentTopicController@delete');
+
+
+	// Assignments
+	Route::get('manageAssignment', 'AssignmentController@show');
+	Route::get('createAssignment', 'AssignmentController@create');
+	Route::post('createAssignment', 'AssignmentController@store');
+	Route::get('assignment/{id}/edit', 'AssignmentController@edit');
+	Route::put('updateAssignment', 'AssignmentController@update');
+	Route::post('getAssignmentTopics', 'AssignmentController@getAssignmentTopics');
+	Route::post('getAssignmentByTopic', 'AssignmentController@getAssignmentByTopic');
+	Route::post('getAssignments', 'AssignmentController@getAssignments');
+	Route::post('getAssignmentByTopicForStudent', 'AssignmentController@getAssignmentByTopicForStudent');
+	Route::post('checkAssignmentIsExist', 'AssignmentController@checkAssignmentIsExist');
+	Route::delete('deleteAssignment', 'AssignmentController@delete');
 
 });
 
@@ -500,6 +538,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('allTestResults', 'Client\ClientUsersInfoController@allTestResults');
 	Route::post('getAllTestResults', 'Client\ClientUsersInfoController@getAllTestResults');
 	Route::get('downloadExcelResult', 'Client\ClientUsersInfoController@downloadExcelResult');
+
 
   	// register client user
   	Route::post('/register', 'ClientuserAuth\RegisterController@register');
@@ -638,7 +677,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('downloadQuestions/{category}/{subcategory}/{subject}/{paper}', 'Client\Front\ClientOnlineQuestionFrontController@downloadQuestions');
 
 
-	// client dashboard
+	// client user dashboard
 	Route::get('dashboard', 'Client\ClientUserController@showClientUserDashBoard');
 	Route::get('myCourses', 'Client\ClientUserController@myCourses');
 	Route::get('myCertificate', 'Client\ClientUserController@myCertificate');
@@ -652,6 +691,12 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('clientMessages', 'Client\ClientUserController@clientMessages');
   	Route::get('myNotifications', 'Client\ClientUserController@myNotifications');
   	Route::post('showClientMessages', 'Client\ClientUserController@clientMessages');
+  	Route::get('myAssignments', 'Client\ClientUserController@myAssignments');
+  	Route::post('getAssignmentSubjectsByCourseForUser', 'Client\ClientUserController@getAssignmentSubjectsByCourse');
+  	Route::post('getAssignmentTopicsBySubjectForUser', 'Client\ClientUserController@getAssignmentTopicsBySubject');
+  	Route::post('getAssignments', 'Client\ClientUserController@getAssignments');
+  	Route::get('doAssignment/{id}', 'Client\ClientUserController@doAssignment');
+  	Route::post('createAssignmentAnswer', 'Client\ClientUserController@createAssignmentAnswer');
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');
@@ -668,4 +713,40 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('clientLikePost', 'Client\Front\ClientOnlineCourseFrontController@likePost');
 	Route::post('clientLikeComment', 'Client\Front\ClientOnlineCourseFrontController@clientLikeComment');
 	Route::post('clientLikeSubComment', 'Client\Front\ClientOnlineCourseFrontController@clientLikeSubComment');
+
+	// manage assignment subject
+	Route::get('manageAssignmentSubject', 'Client\ClientAssignmentSubjectController@show');
+	Route::get('createAssignmentSubject', 'Client\ClientAssignmentSubjectController@create');
+	Route::post('createAssignmentSubject', 'Client\ClientAssignmentSubjectController@store');
+	Route::get('assignmentSubject/{id}/edit', 'Client\ClientAssignmentSubjectController@edit');
+	Route::put('updateAssignmentSubject', 'Client\ClientAssignmentSubjectController@update');
+	Route::post('getAssignmentSubjectsByCourse', 'Client\ClientAssignmentSubjectController@getAssignmentSubjectsByCourse');
+	Route::delete('deleteAssignmentSubject', 'Client\ClientAssignmentSubjectController@delete');
+
+	// manage assignment topic
+	Route::get('manageAssignmentTopic', 'Client\ClientAssignmentTopicController@show');
+	Route::get('createAssignmentTopic', 'Client\ClientAssignmentTopicController@create');
+	Route::post('createAssignmentTopic', 'Client\ClientAssignmentTopicController@store');
+	Route::get('assignmentTopic/{id}/edit', 'Client\ClientAssignmentTopicController@edit');
+	Route::put('updateAssignmentTopic', 'Client\ClientAssignmentTopicController@update');
+	Route::post('getAssignmentTopicsBySubject', 'Client\ClientAssignmentTopicController@getAssignmentTopicsBySubject');
+	Route::delete('deleteAssignmentTopic', 'Client\ClientAssignmentTopicController@delete');
+
+
+	// manage assignment
+	Route::get('manageAssignment', 'Client\ClientAssignmentController@show');
+	Route::get('createAssignment', 'Client\ClientAssignmentController@create');
+	Route::post('createAssignment', 'Client\ClientAssignmentController@store');
+	Route::get('assignment/{id}/edit', 'Client\ClientAssignmentController@edit');
+	Route::put('updateAssignment', 'Client\ClientAssignmentController@update');
+	Route::post('checkAssignmentExist', 'Client\ClientAssignmentController@checkAssignmentExist');
+	Route::delete('deleteAssignment', 'Client\ClientAssignmentController@delete');
+
+
+	Route::get('studentsAssignment', 'Client\ClientAssignmentController@studentsAssignment');
+	Route::post('searchStudentForAssignment', 'Client\ClientAssignmentController@searchStudentForAssignment');
+	Route::post('getAssignmentByTopicForStudent', 'Client\ClientAssignmentController@getAssignmentByTopicForStudent');
+	Route::get('assignmentRemark/{id}/{studentId}', 'Client\ClientAssignmentController@assignmentRemark');
+	Route::post('createAssignmentRemark', 'Client\ClientAssignmentController@createAssignmentRemark');
+
 });

@@ -26,6 +26,20 @@
         }
     });
   </script>
+  <style type="text/css">
+  .admin_table{
+    padding-top: 10px;
+    background-color: #01bafd;
+  }
+  .admin_div{
+    padding: 10px;
+    background-color: #01bafd;
+  }
+  .btn-primary {
+    background-color: #3c8dbc;
+    border-color: #367fa9;
+  }
+  </style>
   @yield('dashboard_header')
 </head>
 <body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
@@ -110,6 +124,17 @@
           </ul>
         </li>
         @endif
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-tasks"></i> <span>Assignment</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{{ url('myAssignments')}}"><i class="fa fa-circle-o"></i> My Assignments</a></li>
+          </ul>
+        </li>
         <li title="Home"><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li>
         <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li>
         <li class="header">LABELS</li>
@@ -136,6 +161,12 @@
     </section>
   </div>
 
-
+<script type="text/javascript">
+  $(document).ready(function(){
+        setTimeout(function() {
+          $('.alert-success').fadeOut('fast');
+        }, 10000); // <-- time in milliseconds
+    });
+</script>
 </body>
 </html>

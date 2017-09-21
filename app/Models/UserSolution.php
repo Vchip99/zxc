@@ -41,4 +41,14 @@ class UserSolution extends Model
         }
         return;
     }
+
+    protected static function deleteUserSolutionsByQuestionId($questionId){
+        $userSolutions = static::where('ques_id', $questionId)->get();
+        if(is_object($userSolutions) && false == $userSolutions->isEmpty()){
+            foreach($userSolutions as $userSolution){
+                $userSolution->delete();
+            }
+        }
+        return;
+    }
 }

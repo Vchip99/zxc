@@ -21,6 +21,11 @@ use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientUserInstituteCourse;
 use App\Models\ClientNotification;
 use App\Models\ClientReadNotification;
+use App\Models\ClientAssignmentQuestion;
+use App\Models\ClientInstituteCourse;
+use App\Models\ClientAssignmentSubject;
+use App\Models\ClientAssignmentTopic;
+use App\Models\ClientAssignmentAnswer;
 use App\Libraries\InputSanitise;
 
 class ClientUserController extends BaseController
@@ -260,5 +265,82 @@ class ClientUserController extends BaseController
         }
         $notifications =  ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('created_to', Auth::guard('clientuser')->user()->id)->orderBy('id', 'desc')->paginate();
         return view('clientuser.dashboard.notifications', compact('notifications'));
+    }
+
+    protected function myAssignments(){
+        $assignments = ClientAssignmentQuestion::join('client_user_institute_courses', 'client_user_institute_courses.id', '=', 'client_assignment_questions.client_institute_course_id')
+                ->where('client_assignment_questions.client_id', Auth::guard('clientuser')->user()->client_id)
+                ->select('client_assignment_questions.*')->paginate();
+        $instituteCourses = ClientInstituteCourse::join('client_user_institute_courses', 'client_user_institute_courses.client_institute_course_id', '=', 'client_institute_courses.id')
+                ->where('client_user_institute_courses.client_id', Auth::guard('clientuser')->user()->client_id)
+                ->where('client_user_institute_courses.client_user_id', Auth::guard('clientuser')->user()->id)
+                ->select('client_institute_courses.*')->get();
+        return view('clientuser.dashboard.myAssignmentList', compact('assignments', 'instituteCourses'));
+    }
+
+    protected function getAssignmentSubjectsByCourse(Request $request){
+        return ClientAssignmentSubject::getAssignmentSubjectsByCourse($request->institute_course_id);
+    }
+
+    protected function getAssignmentTopicsBySubject(Request $request){
+        return ClientAssignmentTopic::getAssignmentTopicsBySubject($request->subject_id);
+    }
+
+    protected function getAssignments(Request $request){
+        $results = [];
+        $query = ClientAssignmentQuestion::where('client_id', Auth::guard('clientuser')->user()->client_id);
+        if($request->institute_course_id > 0){
+            $query->where('client_institute_course_id', $request->institute_course_id);
+        }
+        if($request->subject > 0){
+            $query->where('client_assignment_subject_id', $request->subject);
+        }
+        if($request->topic > 0){
+            $query->where('client_assignment_topic_id', $request->topic);
+        }
+        $assignments = $query->get();
+        if(is_object($assignments) and false == $assignments->isEmpty()){
+            foreach($assignments as $assignment){
+                $results[$assignment->id]['id'] = $assignment->id;
+                $results[$assignment->id]['question'] = mb_strimwidth($assignment->question, 0, 400, "...");
+                $results[$assignment->id]['subject'] = $assignment->subject->name;
+                $results[$assignment->id]['topic'] = $assignment->topic->name;
+                $results[$assignment->id]['instituteCourse'] = $assignment->instituteCourse->name;
+            }
+        }
+        return $results;
+    }
+
+    protected function doAssignment($subdomain, $id){
+        $id = InputSanitise::inputInt(json_decode($id));
+        $assignment = ClientAssignmentQuestion::find($id);
+        $user = Auth::guard('clientuser')->user();
+        $answers = ClientAssignmentAnswer::where('client_id', $user->client_id)->where('student_id', $user->id)->where('client_assignment_question_id', $assignment->id)->get();
+        return view('clientuser.dashboard.myAssignmentDetails', compact('assignment', 'instituteCourses', 'answers'));
+    }
+
+    protected function createAssignmentAnswer(Request $request){
+        $questionId   = InputSanitise::inputInt($request->get('assignment_question_id'));
+        $studentId   = InputSanitise::inputInt($request->get('student_id'));
+        $answer = $request->get('answer');
+        $teacherComment = $request->get('teacher_comment');
+        if(empty($answer) && empty($teacherComment)){
+            return Redirect::to('doAssignment/'.$questionId);
+        }
+
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            ClientAssignmentAnswer::addAssignmentAnswer($request);
+            DB::connection('mysql2')->commit();
+            return Redirect::to('doAssignment/'.$questionId)->with('message', 'Assignment updated successfully.');
+
+        }
+        catch(\Exception $e)
+        {   dd($e);
+            DB::connection('mysql2')->rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('doAssignment/'.$questionId);
     }
 }

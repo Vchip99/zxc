@@ -43,4 +43,14 @@ class ClientUserSolution extends Model
         }
         return;
     }
+
+    protected static function deleteClientUserSolutionsByQuestionId($questionId){
+        $solutions = static::where('ques_id', $questionId)->get();
+        if(is_object($solutions) && false == $solutions->isEmpty()){
+            foreach($solutions as $solution){
+                $solution->delete();
+            }
+        }
+        return;
+    }
 }

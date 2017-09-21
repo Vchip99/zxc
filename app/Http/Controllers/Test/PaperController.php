@@ -9,6 +9,8 @@ use App\Models\TestSubCategory;
 use App\Models\TestSubject;
 use App\Models\TestSubjectPaper;
 use App\Models\Notification;
+use App\Models\UserSolution;
+use App\Models\Score;
 use Redirect,Validator, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Mail\MailToSubscribedUser;
@@ -149,9 +151,11 @@ class PaperController extends Controller
                 {
                     if( true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
                         foreach($paper->questions as $question){
+                            UserSolution::deleteUserSolutionsByQuestionId($question->id);
                             $question->delete();
                         }
                     }
+                    Score::deleteUserScoresByPaperId($paper->id);
                     $paper->deleteRegisteredPaper();
     	    		$paper->delete();
                     DB::commit();

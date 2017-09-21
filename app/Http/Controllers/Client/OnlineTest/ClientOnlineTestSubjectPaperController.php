@@ -12,6 +12,8 @@ use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientInstituteCourse;
+use App\Models\ClientUserSolution;
+use App\Models\ClientScore;
 
 class ClientOnlineTestSubjectPaperController extends ClientBaseController
 {
@@ -149,9 +151,11 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
                 {
                     if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
                         foreach($paper->questions as $question){
+                            ClientUserSolution::deleteClientUserSolutionsByQuestionId($question->id);
                             $question->delete();
                         }
                     }
+                    ClientScore::deleteScoresByPaperId($paper->id);
                     $paper->deleteRegisteredPaper();
     	    		$paper->delete();
                     DB::connection('mysql2')->commit();

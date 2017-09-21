@@ -172,7 +172,7 @@
 	      	<thead class="thead-inverse">
 		        <tr>
 		          	<th>#</th>
-		          	<th>Question</th>
+		          	<th style="max-width: 200px;">Question</th>
 		          	<th>Edit Question</th>
 		          	<th>Delete Question</th>
 		        </tr>
@@ -183,7 +183,7 @@
 		        	@if(isset($question->id))
 				        <tr>
 				          <th scope="row">{{$index + 1}}</th>
-				          <td>{!! $question->name !!}</td>
+				          <td style="max-width: 200px;">{!! $question->name !!}</td>
 				          <td>
 				            <a href="{{url('onlinetestquestion')}}/{{$question->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit Question" /></a>
 				          </td>

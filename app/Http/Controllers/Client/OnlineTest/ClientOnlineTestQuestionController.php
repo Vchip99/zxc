@@ -14,6 +14,7 @@ use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientInstituteCourse;
 use App\Models\ClientNotification;
+use App\Models\ClientUserSolution;
 use Excel;
 
 class ClientOnlineTestQuestionController extends ClientBaseController
@@ -302,6 +303,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             {
         		$testQuestion = ClientOnlineTestQuestion::find($questionId);
         		if(is_object($testQuestion)){
+                    ClientUserSolution::deleteClientUserSolutionsByQuestionId($questionId);
         			$testQuestion->delete();
                     DB::connection('mysql2')->commit();
                     return Redirect::to('manageOnlineTestQuestion')->with('message', 'Question deleted successfully!');

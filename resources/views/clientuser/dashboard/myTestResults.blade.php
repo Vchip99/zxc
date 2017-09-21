@@ -6,10 +6,10 @@
 @stop
 @section('module_title')
   <section class="content-header">
-    <h1> Course Results </h1>
+    <h1> My Test Results </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Online Courses</li>
-      <li class="active">Course Results </li>
+      <li><i class="fa fa-dashboard"></i> Online Test</li>
+      <li class="active"> My Test Results </li>
     </ol>
   </section>
 @stop

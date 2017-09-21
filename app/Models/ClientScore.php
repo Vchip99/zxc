@@ -115,6 +115,16 @@ class ClientScore extends Model
         return;
     }
 
+    protected static function deleteScoresByPaperId($paperId){
+        $scores = static::where('paper_id', $paperId)->get();
+        if(is_object($scores) && false == $scores->isEmpty()){
+            foreach($scores as $score){
+                $score->delete();
+            }
+        }
+        return;
+    }
+
     public function subject(){
         return $this->belongsTo(ClientOnlineTestSubject::class, 'subject_id');
     }

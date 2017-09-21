@@ -37,7 +37,7 @@
         @if(count($testCategories) > 0)
           @foreach($testCategories as $index => $testCategory)
           <tr>
-            <th scope="row">{{$testCategory->id}}</th>
+            <th scope="row">{{$index + 1}}</th>
             <td>{{$testCategory->name}}</td>
             <td>{{$testCategory->name}}</td>
             <td>

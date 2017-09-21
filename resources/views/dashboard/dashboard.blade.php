@@ -31,6 +31,20 @@
         }
     });
   </script>
+  <style type="text/css">
+  .admin_table{
+    padding-top: 10px;
+    background-color: #01bafd;
+  }
+  .admin_div{
+    padding: 10px;
+    background-color: #01bafd;
+  }
+  .btn-primary {
+    background-color: #3c8dbc;
+    border-color: #367fa9;
+  }
+  </style>
   @yield('dashboard_header')
 </head>
 <body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
@@ -178,6 +192,32 @@
             <li><a href="{{ url('discussion')}}"><i class="fa fa-circle-o"></i> More Discussion</a></li>
           </ul>
         </li>
+        @if(2 == Auth::user()->user_type || 3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type)
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-tasks"></i> <span>Assignment</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type)
+              @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type)
+                <li><a href="{{ url('manageAssignmentSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject</a></li>
+                <li><a href="{{ url('manageAssignmentTopic')}}"><i class="fa fa-circle-o"></i> Manage Topic</a></li>
+              @endif
+              @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type)
+                <li><a href="{{ url('manageAssignment')}}"><i class="fa fa-circle-o"></i> Manage Assignment</a></li>
+              @endif
+              @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type)
+                <li><a href="{{ url('studentsAssignment')}}"><i class="fa fa-circle-o"></i> Students Assignment</a></li>
+              @endif
+            @elseif(2 == Auth::user()->user_type)
+              <li><a href="{{ url('myAssignments')}}"><i class="fa fa-circle-o"></i> My Assignments</a></li>
+            @endif
+          </ul>
+        </li>
+        @endif
         @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
           <li class="treeview">
             <a href="#">
@@ -224,20 +264,24 @@
   </aside>
   <div class="content-wrapper">
     @yield('module_title')
-    <section class="content">
-      <div class="row">
-        <div class="col-sm-9">
-          @yield('dashboard_content')
+    <section class="v-container">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-9">
+            @yield('dashboard_content')
+          </div>
         </div>
       </div>
     </section>
   </div>
+</div>
 <script type="text/javascript">
   $(document).ready(function(){
         setTimeout(function() {
           $('.alert-success').fadeOut('fast');
         }, 10000); // <-- time in milliseconds
     });
+
 </script>
 
 </body>

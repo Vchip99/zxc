@@ -287,4 +287,16 @@ class Clientuser extends Authenticatable
         return ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('created_to', Auth::guard('clientuser')->user()->id)->where('is_seen', 0)->count();
 
     }
+
+    protected static function searchStudentForAssignment($courseId){
+
+        $clientId = Auth::guard('client')->user()->id;
+        $result = static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id');
+        if($courseId > 0){
+            $result->where('client_user_institute_courses.client_institute_course_id', $courseId);
+        }
+        $result->where('client_user_institute_courses.client_id', $clientId);
+
+        return $result->select('clientusers.*')->groupBy('clientusers.id')->get();
+    }
 }

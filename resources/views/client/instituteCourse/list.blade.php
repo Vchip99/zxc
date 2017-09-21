@@ -70,7 +70,7 @@
     function confirmDelete(ele){
         $.confirm({
         title: 'Confirmation',
-        content: 'Are you sure, you want to delete this course.',
+        content: 'If you delete this course, all online courses and all online tests associated with this course will be deleted.',
         type: 'red',
         typeAnimated: true,
         buttons: {

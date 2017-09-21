@@ -86,7 +86,7 @@
                   </div>
                   <div  align="center" style="background-image: url('{{ url('images/user/profile-bg.jpg')}}');"">
                     @if(!empty(Auth::user()->photo))
-                      <img alt="User Pic" style="max-height: 200px !important;" src="{{Auth::user()->photo}}" id="profile-image1" class="img-circle img-responsive">
+                      <img alt="User Pic" style="max-height: 200px !important;" src="{{Auth::user()->photo}}" id="profile-image1" class="user-prof img-responsive">
                     @else
                       <img alt="User Pic" src="{{ url('images/user/user.png')}}" id="profile-image1" class="img-circle img-responsive">
                     @endif

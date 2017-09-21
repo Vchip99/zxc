@@ -15,6 +15,7 @@ use App\Libraries\InputSanitise;
 use App\Mail\MailToSubscribedUser;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
+use App\Models\UserSolution;
 use Excel;
 
 class QuestionController extends Controller
@@ -312,6 +313,7 @@ class QuestionController extends Controller
                 DB::beginTransaction();
                 try
                 {
+                    UserSolution::deleteUserSolutionsByQuestionId($testQuestion->id);
         			$testQuestion->delete();
                     DB::commit();
                     return Redirect::to('admin/manageQuestions')->with('message', 'Question deleted successfully!');

@@ -43,7 +43,7 @@
   <header class="main-header">
     <a href="" class="logo">
       <span class="logo-mini"><b> V</b>EDU</span>
-      <span class="logo-lg"><b>Vchip</b>TECHNOLOGY</span>
+      <span class="logo-lg"><b>Vchip</b>Technology</span>
     </a>
     <nav class="navbar navbar-static-top">
       <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
@@ -70,15 +70,6 @@
           <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::guard('client')->user()))?Auth::guard('client')->user()->id: NULL }}"/>
         </div>
       </div>
-      <!-- <form action="#" method="get" class="sidebar-form">
-        <div class="input-group">
-          <input type="text" name="q" class="form-control" placeholder="Search...">
-            <span class="input-group-btn">
-              <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-              </button>
-            </span>
-        </div>
-      </form> -->
       <ul class="sidebar-menu">
         <li class="header">Home Page</li>
 
@@ -292,6 +283,20 @@
             </a>
             <ul class="treeview-menu">
               <li title="Show All Test Results"><a href="{{ url('allTestResults')}}"><i class="fa fa-circle-o"></i> All Test Results </a></li>
+            </ul>
+          </li>
+          <li class="treeview">
+            <a href="#" title="Assignment">
+              <i class="fa fa-tasks"></i> <span>Assignment</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Manage Subject"><a href="{{ url('manageAssignmentSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject</a></li>
+              <li title="Manage Topic"><a href="{{ url('manageAssignmentTopic')}}"><i class="fa fa-circle-o"></i> Manage Topic</a></li>
+              <li title="Manage Assignment"><a href="{{ url('manageAssignment')}}"><i class="fa fa-circle-o"></i> Manage Assignment</a></li>
+              <li title="Students Assignment"><a href="{{ url('studentsAssignment')}}"><i class="fa fa-circle-o"></i>Students Assignment</a></li>
             </ul>
           </li>
         <!-- <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li> -->

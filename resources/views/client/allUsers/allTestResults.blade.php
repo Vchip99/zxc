@@ -66,7 +66,7 @@
                 Test Results
               </div>
               <div class="panel-body">
-                <table  class="" id="">
+                <table  class="" id="clientAllTestResult">
                   <thead>
                     <tr>
                       <th>Sr. No.</th>
