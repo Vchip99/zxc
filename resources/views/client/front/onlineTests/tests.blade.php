@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>Free Online Courses by Industrial Expert |V-edu</title>
+  <title>Free Online Courses by Industrial Expert |Vchip-edu</title>
 @stop
 @section('header-css')
    @include('layouts.home-css')

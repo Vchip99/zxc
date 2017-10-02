@@ -31,7 +31,29 @@ class MailToAdmin extends Mailable
     public function build()
     {
         $fromEmail = $this->request->email;
-        return $this->subject('New Application ')
+        if(!empty($this->request->resume)){
+            return $this->subject('New Application ')
+            ->from($fromEmail, $this->request->firstname)
+            ->view('emails.mailtoadmin')
+            ->with(['subject' => $this->request->subject,
+                    'firstName' => $this->request->firstname,
+                    'lastName' => $this->request->lastname,
+                    'email' => $this->request->email,
+                    'company' => $this->request->company,
+                    'address1' => $this->request->address1,
+                    'address2' => $this->request->address2,
+                    'city' => $this->request->city,
+                    'zip' => $this->request->zip,
+                    'country' => $this->request->country,
+                    'phone' => $this->request->phone,
+                    'gender' => $this->request->gender,
+                ])
+            ->attach($this->request->resume->path(), [
+                'as' => $this->request->resume->getClientOriginalName(),
+                'mime' => 'application/pdf',
+            ]);
+        } else {
+            return $this->subject('New Application ')
         ->from($fromEmail, $this->request->firstname)
         ->view('emails.mailtoadmin')
         ->with(['subject' => $this->request->subject,
@@ -46,10 +68,8 @@ class MailToAdmin extends Mailable
                 'country' => $this->request->country,
                 'phone' => $this->request->phone,
                 'gender' => $this->request->gender,
-            ])
-        ->attach($this->request->resume->path(), [
-            'as' => $this->request->resume->getClientOriginalName(),
-            'mime' => 'application/pdf',
-        ]);
+            ]);
+        }
+
     }
 }

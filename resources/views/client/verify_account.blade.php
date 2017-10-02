@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>Contact | V-edu</title>
+  <title>Contact | Vchip-edu</title>
 @stop
 @section('header-css')
 	@include('layouts.home-css')

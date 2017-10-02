@@ -9,7 +9,7 @@
 
   <meta name="description" content="Vchip Technology is working on Digital Education platform with name V-edu, V-edu provide great education platform equally in villages and remote areas along with urban area. In other word you can learn with fun from anywhere in the world. We always believes that better society is a best place to live and educated society is best society. We are currently focusing on formation of Digital Villages and bridging between well establish Industry/start-ups and educational organizations." />
   <meta name="author" content=" Vchip Technology" />
-  <meta name="keywords" content="V-edu, vchipedu, Education sector, Online Courses, Digital Education, eLearning, Online learning, Online test series, Webinars, Online live courses, Live discussion,  vchip, Technology, vchip Technology, vchip Technology private ltd, vchip design and training, vchip design pvt ltd, vchip design and training pvt ltd, vishesh agrawal, web development, IoT, Internet of things, M2M, Mobile app development, Android app development, cloud formation, Internet of Everything, health sector, agriculture sector, food sector, Pune, Amravati." />
+  <meta name="keywords" content="Vchip-edu, vchipedu, Education sector, Online Courses, Digital Education, eLearning, Online learning, Online test series, Webinars, Online live courses, Live discussion,  vchip, Technology, vchip Technology, vchip Technology private ltd, vchip design and training, vchip design pvt ltd, vchip design and training pvt ltd, vishesh agrawal, web development, IoT, Internet of things, M2M, Mobile app development, Android app development, cloud formation, Internet of Everything, health sector, agriculture sector, food sector, Pune, Amravati." />
 
   <!-- Schema.org markup for Google+ -->
   <meta itemprop="name" content="V-edu - Digital Education, Online Courses & eLearning |Vchip Technology" />
@@ -84,6 +84,30 @@ width: 400px;
 .navbar-header span{
   background: white;
 }
+ @media  (min-width: 350px) {
+          .hidden-lg { display: none; }
+        }
+      @media  (max-width: 349px) {
+          .hidden-sm { display: none; }
+        }
+.fa-comment-o, .first-like i, .your-cmt{
+  font-weight: bold;
+  font-size: 18px;
+  color: #555;
+}
+.first-like i{
+  margin-right: 5px;
+}
+hr{
+  margin-top: 5px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid ;
+}
+.comment-meta{
+  margin-left: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 </style>
 <script type="text/javascript">
     $.ajaxSetup({
@@ -154,28 +178,30 @@ width: 400px;
     </div>
   </div>
 </section>
-<section class="v_container">
+<section class="">
     <div class="container">
-      <div class="panel with-nav-tabs panel-info">
-        <div class="panel-heading">
-          <dir class="comment-meta">
-            <span id="like_{{$blog->id}}" >
+      <div class="with-nav-tabs">
+        <div class="">
+          <div class="comment-meta">
+            <span id="like_{{$blog->id}}"  class="first-like">
               @if( isset($likesCount[$blog->id]) && isset($likesCount[$blog->id]['user_id'][$currentUser]))
-                   <i id="blog_like_{{$blog->id}}" data-blog_id="{{$blog->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                   <i id="blog_like_{{$blog->id}}" data-blog_id="{{$blog->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>
                    <span id="like1-bs3">{{count($likesCount[$blog->id]['like_id'])}}</span>
               @else
-                   <i id="blog_like_{{$blog->id}}" data-blog_id="{{$blog->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                   <i id="blog_like_{{$blog->id}}" data-blog_id="{{$blog->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>
                    <span id="like1-bs3">@if( isset($likesCount[$blog->id])) {{count($likesCount[$blog->id]['like_id'])}} @endif</span>
               @endif
             </span>
             <span class="mrgn_5_left">
-              <a class="" role="button" data-toggle="collapse" href="#replyToBlog{{$blog->id}}" aria-expanded="false" aria-controls="collapseExample">Reply</a>
+              <i class="fa fa-comment-o" aria-hidden="true"></i>
+              <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToBlog{{$blog->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
             </span>
+            <hr />
             <div class="collapse replyComment" id="replyToBlog{{$blog->id}}">
               <form action="{{ url('createBlogComment')}}" method="POST" id="createBlogComment">
                 {{csrf_field()}}
                 <div class="form-group">
-                  <label for="comment">Your Comment</label>
+                  <!-- <label for="comment">Your Comment</label> -->
                   <textarea name="comment" id="comment" placeholder="Comment here.." class="form-control"></textarea>
                   <script type="text/javascript">
                     CKEDITOR.replace( 'comment');
@@ -202,7 +228,7 @@ width: 400px;
                 <button type="button" class="btn btn-default" data-id="replyToBlog{{$blog->id}}" onclick="cancleReply(this);">Cancle</button>
               </form>
             </div>
-          </dir>
+          </div>
         </div>
         <div class="panel-body">
           <div class="tab-content">
@@ -211,10 +237,13 @@ width: 400px;
                 <div class="row" id="showAllPosts">
                   @if(count($comments) > 0)
                     @foreach($comments as $comment)
-                    <div class="cmt-bg">
-                      <div class="box-body chat" id="chat-box">
+                    <div class="box-body chat" id="chat-box">
                       <div class="item" id="showComment_{{$comment->id}}">
-                        <img src="{{ asset('images/user1.png') }}" alt="User Image" />
+                        @if(!empty($comment->user->photo))
+                          <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
+                        @else
+                          <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                        @endif
                         <div class="message">
                           @if(is_object(Auth::user()) && (Auth::user()->id == $comment->user_id))
                           <div class="dropdown pull-right">
@@ -302,7 +331,6 @@ width: 400px;
                       @if(count( $comment->children ) > 0)
                         @include('blog.child_comments', ['comments' => $comment->children, 'parent' => $comment->id, 'user' => $user])
                       @endif
-                    </div>
                     </div>
                     @endforeach
                   @endif
@@ -476,10 +504,10 @@ width: 400px;
               var likeSpan = document.getElementById('like_'+blogId);
               likeSpan.innerHTML = '';
               if( 1 == dislike ){
-                likeSpan.innerHTML +='<i id="blog_like_'+blogId+'" data-blog_id="'+blogId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+                likeSpan.innerHTML +='<i id="blog_like_'+blogId+'" data-blog_id="'+blogId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>';
                 likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
               } else {
-                likeSpan.innerHTML +='<i id="blog_like_'+blogId+'" data-blog_id="'+blogId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+                likeSpan.innerHTML +='<i id="blog_like_'+blogId+'" data-blog_id="'+blogId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>';
                 likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
               }
             }

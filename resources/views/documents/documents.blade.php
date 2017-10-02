@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>Document – Technical Document, Research Paper, Study Material |V-edu</title>
+  <title>Document – Technical Document, Research Paper, Study Material |Vchip-edu</title>
 @stop
 @section('header-css')
   @include('layouts.home-css')

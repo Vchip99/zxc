@@ -17,7 +17,7 @@
             </div>
         @endif
           <div class="col-md-7 mt-text animate-box" data-animate-effect="fadeInUp">
-            <span class="intro-text-small animated bounceInLeft">V-EDU <a href="" target="_blank">vchiptech.com</a></span>
+            <span class="intro-text-small animated bounceInLeft">Vchip-EDU <a href="" target="_blank">vchiptech.com</a></span>
             <h1 class="cursive-font animated bounceInLeft">Client Digital Education</h1>
           </div>
           @if(!Auth::user())

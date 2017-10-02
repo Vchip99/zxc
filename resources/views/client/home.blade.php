@@ -246,8 +246,6 @@
             <div class="navbar-content">
               <li title="Dashbord"><a href=""><i class="fa fa-tachometer" aria-hidden="true"></i>
                 Dashbord</a></li>
-                <!-- <li><a href=""><i class="fa fa-user" aria-hidden="true"></i>
-                  My Profile</a></li> -->
                   <li title="Logout"><a href=""><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a></li>
                 </div>
               </ul>

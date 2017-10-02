@@ -10,6 +10,7 @@ use App\Models\BlogComment;
 use App\Models\BlogCommentLike;
 use App\Models\BlogCategory;
 use App\Models\BlogTag;
+use App\Models\User;
 
 class Blog extends Model
 {
@@ -76,6 +77,10 @@ class Blog extends Model
 
     public function deleteLikes(){
         return $this->hasMany(BlogLikes::class, 'blog_id');
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function deleteCommantsAndSubComments(){

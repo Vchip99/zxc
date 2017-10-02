@@ -500,7 +500,7 @@ a:focus {
 .user-panel:after {
   clear: both;
 }
-.user-panel > .image > img {
+.user-panel > .image > a > img {
     border-radius: 50%;
     float: left;
     width: 30px;

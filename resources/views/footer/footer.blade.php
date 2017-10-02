@@ -1,37 +1,42 @@
  <footer>
-  <div class="footer" >
+ <div class="footer" >
     <div class="container">
       <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-3">
-          <h3> organizations</h3>
+          <h3> Services</h3>
           <ul>
-            <li title="V-Education"><a href="{{ url('vEducation')}}" > V-Education</a></li>
-            <li title="V-Connect"><a href="{{ url('vConnect')}}" >V-Connect</a></li>
-            <li title="V-Pendrive"><a href="{{ url('vPendrive')}}" >V-Pendrive</a></li>
-            <li title="V-Cloud"><a href="{{ url('vCloud')}}" >V-Cloud</a></li>
-            <li title="Admin Dashbord"><a href="{{ url('admin/home') }}" >Admin Dashbord</a></li>
+            <li class=""><a href="{{ url('erp') }}">Digital edu & ERP</a></li>
+            <li class=""><a href="{{ url('educationalPlatform') }}">Education Platform</a></li>
+            <li class=""><a href="{{ url('digitalMarketing') }}">Digital Marketing</a></li>
+            <li class=""><a href="{{ url('pricing') }}">pricing</a></li>
           </ul>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3">
-          <h3> STUDENT</h3>
-          <ul>
-            <li title="Course"> <a href="{{ url('courses')}}"> Course</a> </li>
-            <li title="Live Course"> <a href="{{ url('liveCourse') }}" >Live Course</a> </li>
-            <!-- <li> <a href="{{ url('webinar') }}" > Webinar</a> </li> -->
-            <li title="V-Doc"> <a href="{{ url('documents') }}" > V-Doc </a> </li>
-            <li title="Projects"> <a href="{{ url('vkits') }}" >Projects</a> </li>
-            <li title="Student Dashbord"><a href="{{ url('dashboard') }}" >Student Dashbord</a></li>
+          <h3 class="hidden-2"> Digital Education</h3>
+          <h3 class="hidden-1">Education</h3>
+          <ul >
+             <li><a href="{{ url('courses')}}">Online Courses</a></li>
+             <li><a href="{{ url('liveCourse') }}">Live course</a></li>
+             <li class="divider"></li>
+             <li><a href="{{ url('online-tests') }}">Online Test Series</a></li>
+             <li class="divider"></li>
+             <li><a href="{{ url('workshops') }}">Workshop</a></li>
+             <li class="divider"></li>
+             <li><a href="{{ url('vkits') }}">Hoby Project</a></li>
+             <li class="divider"></li>
+             <li><a href="{{ url('documents') }}">Documents</a></li>
           </ul>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3">
-          <h3> Subscribe </h3>
+          <h3 class="hidden-2">Placement & Other</h3>
+          <h3 class="hidden-1">Placement</h3>
           <ul>
-            <li>Get latest update, news</li>
-            <form class="v_subscribe_form" action="{{url('subscribedUser')}}" method="POST">
-              {{csrf_field()}}
-              <input type="email" name="email" placeholder="Enter your email" required="true"><br/><br/>
-              <button class="btn-primary" type="submit">Subscribe!</button>
-            </form>
+            <li><a href="{{ url('placements')}}">Placement</a></li>
+            <li><a href="{{ url('/showTest') }}/1">Placement mock test</a></li>
+            <li><a href="{{url('discussion')}}">Discussion forum</a></li>
+            <li><a href="{{url('blog')}}">Blog</a></li>
+            <li><a href="{{url('ourpartner')}}">Our partners</a></li>
+            <li><a href="{{url('career')}}">Career</a></li>
           </ul>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3">
@@ -41,13 +46,18 @@
            <p>Address: GITANJALI COLONY, NEAR RAJYOG SOCIETY, </p>
            <p> WARJE, PUNE-411058, INDIA.</p>
            <p>Email: info@vchiptech.com</p>
+           <form action="{{url('subscribedUser')}}" method="POST">
+            {{csrf_field()}}
+              <div class="v_subscribe_form input-group">
+                 <input class="btn btn-sm" name="email" id="email" type="email" placeholder="Email" required>
+                 <button class=" btn-info btn-sm" type="submit">Subscribe!</button>
+              </div>
+           </form>
          </address>
-       </div>
-     </div>
-     <!--/.row-->
+        </div>
+      </div>
    </div>
- </div>
-
+  </div>
  <div class="footer-bottom">
   <div class="container">
     <div class="row">

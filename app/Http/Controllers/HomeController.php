@@ -135,6 +135,41 @@ class HomeController extends Controller
     }
 
     /**
+     * erp
+     */
+    protected function erp(){
+        return view('services.erp');
+    }
+
+    /**
+     * educationalPlatform
+     */
+    protected function educationalPlatform(){
+        return view('services.educationalPlatform');
+    }
+
+    /**
+     * digitalMarketing
+     */
+    protected function digitalMarketing(){
+        return view('services.digitalMarketing');
+    }
+
+    /**
+     * pricing
+     */
+    protected function pricing(){
+        return view('services.pricing');
+    }
+
+    /**
+     * us
+     */
+    protected function us(){
+        return view('more.us');
+    }
+
+    /**
      *  show career
      */
     protected function heros($id=NULL){

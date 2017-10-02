@@ -41,6 +41,10 @@ class VkitProjectComment extends Model
         return $this->hasMany(VkitProjectCommentLike::class);
     }
 
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     protected static function deleteVkitProjectCommentsByUserId($userId){
         $comments = static::where('user_id', $userId)->get();
         if(is_object($comments) && false == $comments->isEmpty()){

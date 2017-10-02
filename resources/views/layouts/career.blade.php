@@ -260,7 +260,7 @@
 					</div>
 					<div class="hr"></div><br />
 					<div><em>Performance of a company is directly proportional to his team...</em></div><br />
-					<p> V-edu have open, engaging, fun, employee-centric work environment with competitive compensation and rewards and fast-track programs for high potential employees. We are always be searching for new generation of entrepreneur. Our team is well balanced of both newly graduate and  experienced guys. We believe that newcomers known the exact market demand and our experienced guys fulfill it. We always welcome new ideas, technologically and ready to change. </p>
+					<p> Vchip-edu have open, engaging, fun, employee-centric work environment with competitive compensation and rewards and fast-track programs for high potential employees. We are always be searching for new generation of entrepreneur. Our team is well balanced of both newly graduate and  experienced guys. We believe that newcomers known the exact market demand and our experienced guys fulfill it. We always welcome new ideas, technologically and ready to change. </p>
 
 					<p>Our main motive is bridging between educational organization  and Industry along with Digital village. So our most of tutors are belong to industries.</p>
 					<div class="hr"></div>
@@ -277,7 +277,7 @@
 							<div class="mu-about-us-left">
 								<!-- Start Title -->
 								<div class="mu-title">
-									<h2>Features of V-edu</h2>
+									<h2>Features of Vchip-edu</h2>
 								</div>
 								<!-- End Title -->
 

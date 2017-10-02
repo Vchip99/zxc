@@ -62,7 +62,9 @@
     <section class="sidebar">
       <div class="user-panel">
         <div class="pull-left image">
+        <a href="">
           <img src="{{ asset('images/user.png')}}" class="img-circle" alt="User Image">
+        </a>
         </div>
         <div class="pull-left info">
           @php
@@ -74,13 +76,6 @@
         </div>
       </div>
       <ul class="sidebar-menu">
-        <!-- <li class="header">Sub Domain Home Page</li>
-        <li>
-          <a href="{{ url('admin/manageSubAdminHome')}}">
-            <i class="fa fa-sign-out" aria-hidden="true"></i><span>Home Page</span>
-            <span class="pull-right-container"></span>
-          </a>
-        </li> -->
         <li class="header">Vchip Technology - Admin</li>
          @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineCourse'))
           <li class="treeview ">
@@ -170,7 +165,6 @@
             </a>
             <ul class="treeview-menu">
               <li title="Manage Discussion Category"><a href="{{ url('admin/manageDiscussionCategory')}}"><i class="fa fa-circle-o"></i> Discussion Category </a></li>
-              <!-- <li title="Manage Discussion"><a href="{{ url('admin/manageDiscussion')}}"><i class="fa fa-circle-o"></i> Manage Discussion </a></li> -->
             </ul>
           </li>
         @endif
@@ -273,6 +267,34 @@
               <li title="Manage Designation"><a href="{{ url('admin/manageDesignation')}}"><i class="fa fa-circle-o"></i> Manage Designation </a></li>
               <li title="Manage Area"><a href="{{ url('admin/manageArea')}}"><i class="fa fa-circle-o"></i> Manage Area </a></li>
               <li title="Manage Zero To Hero"><a href="{{ url('admin/manageZeroToHero')}}"><i class="fa fa-circle-o"></i> Manage Zero To Hero </a></li>
+            </ul>
+          </li>
+          <li class="treeview">
+            <a href="#" title="Placement">
+              <i class="fa fa-gift"></i> <span>Placement</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Placement Area"><a href="{{ url('admin/managePlacementArea')}}"><i class="fa fa-circle-o"></i> Placement Area </a></li>
+              <li title="Placement Company"><a href="{{ url('admin/managePlacementCompany')}}"><i class="fa fa-circle-o"></i> Placement Company </a></li>
+              <li title="Placement Company Details"><a href="{{ url('admin/managePlacementCompanyDetails')}}"><i class="fa fa-circle-o"></i> Company Details</a></li>
+              <li title="Placement Process"><a href="{{ url('admin/managePlacementProcess')}}"><i class="fa fa-circle-o"></i> Placement Process</a></li>
+              <li title="Placement Faq"><a href="{{ url('admin/managePlacementFaq')}}"><i class="fa fa-circle-o"></i> Placement Faq</a></li>
+            </ul>
+          </li>
+          <li class="treeview">
+            <a href="#" title="Workshop">
+              <i class="fa fa-link"></i> <span>Workshop</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Workshop Category"><a href="{{ url('admin/manageWorkshopCategory')}}"><i class="fa fa-circle-o"></i> Workshop Category </a></li>
+              <li title="Workshop Details"><a href="{{ url('admin/manageWorkshopDetails')}}"><i class="fa fa-circle-o"></i> Workshop Details </a></li>
+              <li title="Workshop Videos"><a href="{{ url('admin/manageWorkshopVideos')}}"><i class="fa fa-circle-o"></i> Workshop Videos </a></li>
             </ul>
           </li>
         @endif

@@ -1,0 +1,194 @@
+    .badge {
+    border-radius: 12px !important;
+    font-size: 11px !important;
+    font-weight: 300;
+    height: 18px;
+    padding: 3px 6px;
+    text-align: center;
+    text-shadow: none !important;
+    vertical-align: middle;
+}
+.badge-success {
+    background-color: #45b6af;
+    background-image: none;
+    }
+.badge-danger {
+    background-color: #f3565d;
+    background-image: none;
+}
+.danger-icon{
+    color: #f3565d;
+}
+
+.portlet {
+    border-radius: 4px;
+    margin-bottom: 25px;
+    margin-top: 0;
+    padding: 0;
+}
+
+.portlet > .portlet-title > .nav-tabs {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    border: 0 none;
+    display: inline-block;
+    float: right;
+    margin: 0;
+}
+div, input, select, textarea, span, img, table, label, td, th, p, a, button, ul, code, pre, li {
+    /*border-radius: 0 !important;*/
+}
+.portlet > .portlet-body.grey-cascade, .portlet.grey-cascade {
+    background-color: #95a5a6;
+}
+.portlet.box.grey-cascade {
+    border-color: #b1bdbd  !important;
+    border-image: none;
+    border-style: none solid solid;
+    border-width: 0 1px 1px;
+}
+
+.portlet.box > .portlet-title {
+    border-bottom: 0 none;
+    color: #fff;
+    margin-bottom: 0;
+    padding: 0 10px;
+}
+.portlet.box > .portlet-body {
+    background-color: #fff;
+    padding: 10px;
+}
+.portlet > .portlet-body {
+    border-radius: 0 0 4px 4px;
+    clear: both;
+}
+.portlet > .portlet-title > .nav-tabs > li > a {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    border: 0 none;
+    color: #fff;
+    margin: 5px 0 0 1px;
+    padding: 8px 12px;
+}
+.portlet > .portlet-title > .nav-tabs > li.active > a, .portlet > .portlet-title > .nav-tabs > li:hover > a {
+    background: #fff none repeat scroll 0 0;
+    border: 0 none;
+    color: #333;
+}
+.nav-tabs > li > a, .nav-pills > li > a {
+    border-radius: 4px 4px 0 0;
+    font-size: 14px;
+}
+.nav-tabs > li > a, .nav-pills > li > a {
+    border-radius: 4px 4px 0 0;
+    font-size: 14px;
+}
+ul.custom-list-style li:before{
+  content: "\f192"; /* FontAwesome Unicode */
+  font-family: FontAwesome;
+  display: inline-block;
+  font-size: 20px;
+  color: #339999;
+  margin-left: -20px; /* same as padding-left set on li */
+  margin-right: 5px;
+  width: 20px; /* same as padding-left set on li */
+}
+.tab-pane .panel-title{font-weight: bolder;}
+.tab-pane .panel{  border: none !important;    box-shadow: none;}
+.tab-pane .panel-body{text-align: justify;}
+.link{cursor: pointer; font-weight: bolder; font-style: italic;}
+/*.tab-pane .panel-body img{vertical-align: middle; margin: 0px auto; padding-bottom: 10px;}
+*/
+.img-course-box {
+  width: 100%;
+  height:150px;
+  border-top-left-radius:2px;
+  border-top-right-radius:2px;
+  display:block;
+  overflow: hidden;
+  border-bottom: 2px dotted #ddd;
+}
+.img-course-box img{
+  width: 100%;
+  height: 100%;
+  transition: all .25s ease;
+}
+.course-box {
+  display: block;
+  margin-bottom: 20px;
+  line-height: 1.42857143;
+  background-color: #fff;
+  border-radius: 2px;
+  position: relative;
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+  transition: box-shadow .25s;
+  border-top: 18px solid #007ba7;
+
+}
+.course-box:hover {
+  box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+}
+.course-box-content{padding: 15px;}
+
+.course-box-title {
+  text-align: center;
+  width: 100%;
+  font-weight: bolder;
+}
+.course-box-content p{color: grey;}
+.add-view {
+    border-top: 1px solid #D4D4D4;
+    text-align:center;
+    background-color: #eee;
+  }
+  .add-view a {
+    text-decoration: none !important;
+    padding:10px;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+@media (min-width: 995px) and (max-width: 1600px) {
+  .hidden-div {
+    display: none !important;
+  }
+}
+ .hidden-div {
+ right: 0%;
+    width: 100%;
+  }
+@media (max-width: 995px) {
+  .hidden-div1 {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 995px) {
+
+  .col-sm-pull-9 {
+    right: 0%;
+    width: 100%;
+  }
+    .col-sm-push-3 {
+    left:  0%;
+    width: 100%;
+  }
+   .add-1, .add-2{width:50%;
+    float: left;
+  position: relative;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;}
+}
+@media (min-width: 568px) and (max-width: 766px) {
+  .add-1, .add-2{width:50%;
+    float: left;
+  position: relative;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;}
+}
+/**/
+ .clickable{
+      cursor: pointer;
+    }
+    .panel-heading span {
+      margin-top: -20px;
+      font-size: 15px;
+    }

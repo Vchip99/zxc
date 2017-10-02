@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>V-edu - Digital Education, Online Courses & eLearning |Vchip Technology</title>
+  <title>Vchip-edu - Digital Education, Online Courses & eLearning |Vchip Technology</title>
 @stop
 @section('header-css')
   @include('layouts.home-css')

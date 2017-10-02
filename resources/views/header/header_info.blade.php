@@ -21,9 +21,17 @@
                 {{ session('status') }}
             </div>
         @endif
-          <div class="col-md-7 mt-text animate-box" data-animate-effect="fadeInUp">
-            <span class="intro-text-small animated bounceInLeft">V-edu <a href="https://vchiptech.com" target="_blank">(Vchip Technology)</a></span>
-            <h1 class="cursive-font animated bounceInLeft">Digital Education</h1>
+          <div class="col-md-7 mt-text animate-box " data-animate-effect="fadeInUp">
+            <h1 class="cursive-font">Digital Education</h1>
+            <div class="about-videos">
+              <p data-toggle="modal" data-target="#myModal">
+                <i class="fa fa-play-circle-o" aria-hidden="true"  id="clg"></i>
+                <span class="about-video-tital"><em>COLLAGE / STUDENT</em></span>
+              </p>
+              <p data-toggle="modal" data-target="#instituteModal" id="cotching-inst">  <i class="fa fa-play-circle-o" aria-hidden="true" ></i>
+                <span class="about-video-tital"><em>COTCHING INSTITUTE</em></span>
+              </p>
+            </div>
           </div>
           @if(!Auth::user())
           <div class="col-md-5  animated bounceInRight" data-animate-effect="fadeInRight">
@@ -67,10 +75,10 @@
                             </label>
                           </div>
                           <button type="submit" value="login" name="submit" class="btn btn-info btn-block" data-toggle="tooltip" title="Login">Login</button>
-                          </br>
+                          <!-- </br> -->
                         </form>
                         <div>
-                        <a href="{{ url('forgotPassword')}}" data-toggle="tooltip" title="Forgot Password">Forgot Password?</a></div>
+                          <a href="{{ url('forgotPassword')}}" data-toggle="tooltip" title="Forgot Password">Forgot Password?</a></div>
                       </div>
                     </div>
                   </div>
@@ -84,6 +92,38 @@
     </div>
   </div>
 </header>
+  <!-- Modal collage-->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="border-radius: 0px;">
+        <div class="modal-header" style=" padding: 5px 10px; font-weight: bolder; text-align: center;">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h4 class="modal-title" id="myModalLabel">Collage</h4>
+        </div>
+        <div class="modal-body" style="padding: 0px; ">
+          <div class="vid">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/nYQairlPfbA" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ <!-- Modal private institute-->
+  <div class="modal fade" id="instituteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="border-radius: 0px;">
+        <div class="modal-header" style=" padding: 5px 10px; font-weight: bolder; text-align: center;">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h4 class="modal-title" id="myModalLabel">Private Institute</h4>
+        </div>
+        <div class="modal-body" style="padding: 0px; ">
+          <div class="vid">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/tAZDiJxIRZk" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 <script type="text/javascript">
   function confirmSubmit(){
     subdomain = document.getElementById('subdomain').value;

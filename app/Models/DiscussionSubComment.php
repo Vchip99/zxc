@@ -55,4 +55,8 @@ class DiscussionSubComment extends Model
     public function deleteLikes(){
         return $this->hasMany(DiscussionSubCommentLike::class, 'discussion_sub_comment_id');
     }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

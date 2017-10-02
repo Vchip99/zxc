@@ -181,8 +181,11 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getHerosBySearchArray', 'HomeController@getHerosBySearchArray');
 	Route::post('getAreasByDesignation', 'HomeController@getAreasByDesignation');
 	Route::post('getHeroByDesignationByArea', 'HomeController@getHeroByDesignationByArea');
-
-
+	Route::get('erp', 'HomeController@erp');
+	Route::get('educationalPlatform', 'HomeController@educationalPlatform');
+	Route::get('digitalMarketing', 'HomeController@digitalMarketing');
+	Route::get('pricing', 'HomeController@pricing');
+	Route::get('us', 'HomeController@us');
 
 	// online courses front
 	Route::get('courses', 'CourseController@courses');
@@ -477,7 +480,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getAssignmentSubjectsOfGivenAssignmentByLecturer', 'AssignmentSubjectController@getAssignmentSubjectsOfGivenAssignmentByLecturer');
 	Route::delete('deleteAssignmentSubject', 'AssignmentSubjectController@delete');
 
-
 	// AssignmentTopic
 	Route::get('manageAssignmentTopic', 'AssignmentTopicController@show');
 	Route::get('createAssignmentTopic', 'AssignmentTopicController@create');
@@ -485,7 +487,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('assignmentTopic/{id}/edit', 'AssignmentTopicController@edit');
 	Route::put('updateAssignmentTopic', 'AssignmentTopicController@update');
 	Route::delete('deleteAssignmentTopic', 'AssignmentTopicController@delete');
-
 
 	// Assignments
 	Route::get('manageAssignment', 'AssignmentController@show');
@@ -499,6 +500,81 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getAssignmentByTopicForStudent', 'AssignmentController@getAssignmentByTopicForStudent');
 	Route::post('checkAssignmentIsExist', 'AssignmentController@checkAssignmentIsExist');
 	Route::delete('deleteAssignment', 'AssignmentController@delete');
+
+	// workshop category
+	Route::get('admin/manageWorkshopCategory', 'Workshop\WorkshopCategoryController@show');
+	Route::get('admin/createWorkshopCategory', 'Workshop\WorkshopCategoryController@create');
+	Route::post('admin/createWorkshopCategory', 'Workshop\WorkshopCategoryController@store');
+	Route::get('admin/workshopCategory/{id}/edit', 'Workshop\WorkshopCategoryController@edit');
+	Route::put('admin/updateWorkshopCategory', 'Workshop\WorkshopCategoryController@update');
+
+	// workshop Details
+	Route::get('admin/manageWorkshopDetails', 'Workshop\WorkshopDetailsController@show');
+	Route::get('admin/createWorkshopDetails', 'Workshop\WorkshopDetailsController@create');
+	Route::post('admin/createWorkshopDetails', 'Workshop\WorkshopDetailsController@store');
+	Route::get('admin/workshopDetails/{id}/edit', 'Workshop\WorkshopDetailsController@edit');
+	Route::put('admin/updateWorkshopDetails', 'Workshop\WorkshopDetailsController@update');
+
+	// workshop Videos
+	Route::get('admin/manageWorkshopVideos', 'Workshop\WorkshopVideosController@show');
+	Route::get('admin/createWorkshopVideo', 'Workshop\WorkshopVideosController@create');
+	Route::post('admin/createWorkshopVideo', 'Workshop\WorkshopVideosController@store');
+	Route::get('admin/workshopVideo/{id}/edit', 'Workshop\WorkshopVideosController@edit');
+	Route::put('admin/updateWorkshopVideo', 'Workshop\WorkshopVideosController@update');
+	Route::post('admin/getWorkshopsByCategory', 'Workshop\WorkshopVideosController@getWorkshopsByCategory');
+
+	// workshop front
+	Route::get('workshops', 'WorkshopController@show');
+	Route::post('getWorkshopsByCategory', 'WorkshopController@getWorkshopsByCategory');
+	Route::get('workshopDetails/{id}', 'WorkshopController@workshopDetails');
+	Route::get('workshopVideo/{id}', 'WorkshopController@workshopVideo');
+
+	// placement area
+	Route::get('admin/managePlacementArea', 'Placement\PlacementAreaController@show');
+	Route::get('admin/createPlacementArea', 'Placement\PlacementAreaController@create');
+	Route::post('admin/createPlacementArea', 'Placement\PlacementAreaController@store');
+	Route::get('admin/placementArea/{id}/edit', 'Placement\PlacementAreaController@edit');
+	Route::put('admin/updatePlacementArea', 'Placement\PlacementAreaController@update');
+
+	// placement company
+	Route::get('admin/managePlacementCompany', 'Placement\PlacementCompanyController@show');
+	Route::get('admin/createPlacementCompany', 'Placement\PlacementCompanyController@create');
+	Route::post('admin/createPlacementCompany', 'Placement\PlacementCompanyController@store');
+	Route::get('admin/placementCompany/{id}/edit', 'Placement\PlacementCompanyController@edit');
+	Route::put('admin/updatePlacementCompany', 'Placement\PlacementCompanyController@update');
+
+	// placement Details
+	Route::get('admin/managePlacementCompanyDetails', 'Placement\PlacementCompanyDetailsController@show');
+	Route::get('admin/createPlacementCompanyDetails', 'Placement\PlacementCompanyDetailsController@create');
+	Route::post('admin/createPlacementCompanyDetails', 'Placement\PlacementCompanyDetailsController@store');
+	Route::get('admin/placementCompanyDetail/{id}/edit', 'Placement\PlacementCompanyDetailsController@edit');
+	Route::put('admin/updatePlacementCompanyDetails', 'Placement\PlacementCompanyDetailsController@update');
+	Route::post('admin/getPlacementCompaniesByArea', 'Placement\PlacementCompanyDetailsController@getPlacementCompaniesByArea');
+	Route::post('admin/checkCompanyDetails', 'Placement\PlacementCompanyDetailsController@checkCompanyDetails');
+
+	// placement process
+	Route::get('admin/managePlacementProcess', 'Placement\PlacementProcessController@show');
+	Route::get('admin/createPlacementProcess', 'Placement\PlacementProcessController@create');
+	Route::post('admin/createPlacementProcess', 'Placement\PlacementProcessController@store');
+	Route::get('admin/placementCompanyProcess/{id}/edit', 'Placement\PlacementProcessController@edit');
+	Route::put('admin/updatePlacementProcess', 'Placement\PlacementProcessController@update');
+	Route::post('admin/checkPlacementCompanyProcesss', 'Placement\PlacementProcessController@checkPlacementCompanyProcesss');
+
+
+	// placement front
+	Route::get('placements', 'PlacementController@show');
+	Route::post('placements', 'PlacementController@showPlacements');
+	Route::post('getPlacementCompaniesByArea', 'PlacementController@getPlacementCompaniesByArea');
+	Route::post('getPlacementCompaniesByAreaForFront', 'PlacementController@getPlacementCompaniesByAreaForFront');
+	Route::post('createPlacementExperiance', 'PlacementController@createPlacementExperiance');
+	Route::get('placementExperiance/{id}', 'PlacementController@placementExperiance');
+
+	// placement faq
+	Route::get('admin/managePlacementFaq', 'Placement\PlacementFaqController@show');
+	Route::get('admin/createPlacementFaq', 'Placement\PlacementFaqController@create');
+	Route::post('admin/createPlacementFaq', 'Placement\PlacementFaqController@store');
+	Route::get('admin/placementFaq/{id}/edit', 'Placement\PlacementFaqController@edit');
+	Route::put('admin/updatePlacementFaq', 'Placement\PlacementFaqController@update');
 
 });
 

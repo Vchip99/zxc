@@ -139,7 +139,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md-8 col-md-offset-2 text-center mrgn-60-top"">
-            <h2 class="v_h2_title">Education at V-edu</h2>
+            <h2 class="v_h2_title">Education at Vchip-edu</h2>
             <hr class="section-dash-dark"/>
             <h3 class="v_h3_title ">Earn a Professional Certificate, Nano degree course...</p>
             </div>

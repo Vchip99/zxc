@@ -74,6 +74,31 @@
       overflow:hidden !important;
       text-overflow: ellipsis;
     }
+
+    @media  (min-width: 350px) {
+          .hidden-lg { display: none; }
+        }
+      @media  (max-width: 349px) {
+          .hidden-sm { display: none; }
+        }
+.fa-comment-o, .first-like i, .your-cmt{
+  font-weight: bold;
+  font-size: 18px;
+  color: #555;
+}
+.first-like i{
+  margin-right: 5px;
+}
+hr{
+  margin-top: 5px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid ;
+}
+.comment-meta{
+  margin-left: 30px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
   </style>
 @stop
 @section('header-js')
@@ -82,12 +107,11 @@
 @stop
 @section('content')
 @include('header.header_menu')
-<section id="" class="v_container v_bg_grey" style="background: #3A5894;">
+<section id="" class="v_container " style="background: #3A5894;">
   <div class="container text-center">
     <div class="row mrgn_60_top">
       <div class="col-md-9">
         <div class="embed-responsive embed-responsive-16by9" width="854" height="480">
-          <!-- <iframe class="embed-responsive-item" width="854" height="480" src="{{$liveVideo->video_path}}" frameborder="0" allowfullscreen></iframe> -->
           {!! $liveVideo->video_path !!}
         </div>
       </div>
@@ -108,7 +132,7 @@
     </div>
   </div>
 </section>
-<section class="v_container v_bg_grey">
+<section class="v_container ">
   <div class="container">
     <div class="row">
       <div class="col-md-6 ">
@@ -139,28 +163,31 @@
   </section>
 
 <!-- <span>&nbsp;</span> -->
-  <section class="v_container">
+  <section class="">
     <div class="container">
-      <div class="panel with-nav-tabs panel-info">
-        <div class="panel-heading">
-          <dir class="comment-meta">
-            <span id="like_{{$liveVideo->id}}" >
+      <div class=" with-nav-tabs ">
+        <div class="">
+          <div class="comment-meta">
+            <span id="like_{{$liveVideo->id}}" class="first-like">
               @if( isset($likesCount[$liveVideo->id]) && isset($likesCount[$liveVideo->id]['user_id'][$currentUser]))
-                   <i id="video_like_{{$liveVideo->id}}" data-video_id="{{$liveVideo->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                   <i id="video_like_{{$liveVideo->id}}" data-video_id="{{$liveVideo->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>
                    <span id="like1-bs3">{{count($likesCount[$liveVideo->id]['like_id'])}}</span>
               @else
-                   <i id="video_like_{{$liveVideo->id}}" data-video_id="{{$liveVideo->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                   <i id="video_like_{{$liveVideo->id}}" data-video_id="{{$liveVideo->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>
                    <span id="like1-bs3">@if( isset($likesCount[$liveVideo->id])) {{count($likesCount[$liveVideo->id]['like_id'])}} @endif</span>
               @endif
             </span>
+
             <span class="mrgn_5_left">
-              <a class="" role="button" data-toggle="collapse" href="#replyToEpisode{{$liveVideo->id}}" aria-expanded="false" aria-controls="collapseExample">Reply</a>
+              <i class="fa fa-comment-o" aria-hidden="true"></i>
+              <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{$liveVideo->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
             </span>
+            <hr />
             <div class="collapse replyComment" id="replyToEpisode{{$liveVideo->id}}">
               <form action="{{ url('createLiveCourseComment')}}" method="POST" id="createLiveCourseComment">
                 {{csrf_field()}}
                 <div class="form-group">
-                  <label for="comment">Your Comment</label>
+                  <!-- <label for="comment">Your Comment</label> -->
                   <textarea name="comment" id="comment" placeholder="Comment here.." class="form-control"></textarea>
                   <script type="text/javascript">
                     CKEDITOR.replace( 'comment');
@@ -187,19 +214,23 @@
                 <button type="button" class="btn btn-default" data-id="replyToEpisode{{$liveVideo->id}}" onclick="cancleReply(this);">Cancle</button>
               </form>
             </div>
-          </dir>
+          </div>
         </div>
         <div class="panel-body">
           <div class="tab-content">
             <div class="tab-pane fade in active" id="questions" style="padding: 15px !important;">
               <div class="post-comments ">
                 <div class="row">
-                  <div class="cmt-bg ">
+                   <div class=" ">
                     <div class="box-body chat " id="chat-box">
                       @if(count( $comments) > 0)
                         @foreach($comments as $comment)
                           <div class="item" id="showComment_{{$comment->id}}">
-                            <img src="{{ asset('images/user1.png') }}" alt="User Image" />
+                            @if(!empty($comment->user->photo))
+                              <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
+                            @else
+                              <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                            @endif
                             <div class="message">
                               @if(is_object(Auth::user()) && (Auth::user()->id == $comment->user_id))
                               <div class="dropdown pull-right">
@@ -531,10 +562,10 @@
               var likeSpan = document.getElementById('like_'+videoId);
               likeSpan.innerHTML = '';
               if( 1 == dislike ){
-                likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+                likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>';
                 likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
               } else {
-                likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+                likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>';
                 likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
               }
             }

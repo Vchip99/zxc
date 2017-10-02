@@ -129,7 +129,7 @@
             <div class="direct-chat-messages">
               @if(count($answers) > 0)
                 @foreach($answers as $answer)
-                  @if(!empty($answer->answer))
+                  @if(1 == $answer->is_student_created)
                     <div class="direct-chat-msg left">
                       <div class="direct-chat-info clearfix">
                         <span class="direct-chat-name pull-left">{{ $answer->student->name }}</span>
@@ -140,9 +140,11 @@
                       @else
                         <img class="direct-chat-img" src="{{ url('images/user/user.png')}}" alt="User Image" />
                       @endif
-                      <div class="direct-chat-text-left ">
-                       {!! $answer->answer !!}
-                      </div>
+                      @if(!empty($answer->answer))
+                        <div class="direct-chat-text-left ">
+                         {!! $answer->answer !!}
+                        </div>
+                      @endif
                       @if(!empty($answer->attached_link))
                         <div class="attachment" >
                            <a  data-path="{{asset($answer->attached_link)}}" data-toggle="modal" data-target="#dynamic-modal-answer-{{$answer->id}}" data-document_id="{{$answer->id}}" style="">
@@ -163,8 +165,9 @@
                       @else
                         <img class="direct-chat-img" src="{{ url('images/user/user.png')}}" alt="User Image" />
                       @endif
-                      <div class="direct-chat-text ">{!! $answer->lecturer_comment !!}
-                      </div>
+                      @if(!empty($answer->answer))
+                        <div class="direct-chat-text ">{!! $answer->answer !!}</div>
+                      @endif
                       @if(!empty($answer->attached_link))
                           <div class="attachment" style="float: right; margin-right: 50px;">
                            <a  data-path="{{asset($answer->attached_link)}}" data-toggle="modal" data-target="#dynamic-modal-answer-{{$answer->id}}" data-document_id="{{$answer->id}}" style="">
@@ -183,13 +186,13 @@
             @if(Auth::user()->id == $assignment->lecturer_id)
               <form action="{{url('createAssignmentAnswer')}}" method="POST" enctype="multipart/form-data">
                 {{ csrf_field() }}
-                <div class="form-group row @if ($errors->has('lecturer_comment')) has-error @endif">
-                  <label for="lecturer_comment" class="col-sm-2 col-form-label">Remark:</label>
+                <div class="form-group row @if ($errors->has('answer')) has-error @endif">
+                  <label for="answer" class="col-sm-2 col-form-label">Remark:</label>
                   <div class="col-sm-10">
-                    <textarea name="lecturer_comment" cols="60" rows="4" id="lecturer_comment" placeholder="Enter your comment" required>
+                    <textarea name="answer" cols="60" rows="4" id="answer" placeholder="Enter your comment" required>
                     </textarea>
                     <script type="text/javascript">
-                      CKEDITOR.replace( 'lecturer_comment', { enterMode: CKEDITOR.ENTER_BR } );
+                      CKEDITOR.replace( 'answer', { enterMode: CKEDITOR.ENTER_BR } );
                     </script>
                   </div>
                 </div>
@@ -202,7 +205,6 @@
                 <input type="hidden" name="assignment_question_id" value="{{$assignment->id}}">
                 <input type="hidden" name="student_id" value="{{ $student->id }}">
                 <input type="hidden" name="lecturer_id" value="{{$assignment->lecturer_id}}">
-                <input type="hidden" name="answer" value="">
                 <div class="form-group row">
                   <div class="offset-sm-2 col-sm-3" title="Submit">
                     <button type="submit" class="btn btn-primary" style="width: 90px !important;">Submit</button>
@@ -214,49 +216,26 @@
           </div>
           @if(count($answers) > 0)
             @foreach($answers as $answer)
-              @if(!empty($answer->answer))
-                  @if(!empty($answer->attached_link))
-                      <div id="dynamic-modal-answer-{{$answer->id}}" class="modal fade" role="dialog">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <button class="close" data-dismiss="modal">×</button>
-                              <h2  class="modal-title">{{basename($answer->attached_link)}}</h2>
+              @if(!empty($answer->attached_link))
+                  <div id="dynamic-modal-answer-{{$answer->id}}" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button class="close" data-dismiss="modal">×</button>
+                          <h2  class="modal-title">{{basename($answer->attached_link)}}</h2>
+                        </div>
+                        <div class="modal-body">
+                            <div class="iframe-container">
+                              <iframe src="{{asset($answer->attached_link)}}" frameborder="0"></iframe>
                             </div>
-                            <div class="modal-body">
-                                <div class="iframe-container">
-                                  <iframe src="{{asset($answer->attached_link)}}" frameborder="0"></iframe>
-                                </div>
-                            </div>
-                            <div class="modal-footer ">
-                              <a href="{{asset($answer->attached_link)}}" download class="btn btn-primary download" id="myBtn" style="width: 90px !important;"><i class="fa fa-download" aria-hidden="true"></i></a>
-                            </div>
-                          </div>
+                        </div>
+                        <div class="modal-footer ">
+                          <a href="{{asset($answer->attached_link)}}" download class="btn btn-primary download" id="myBtn" style="width: 90px !important;"><i class="fa fa-download" aria-hidden="true"></i></a>
                         </div>
                       </div>
-                    @endif
-              @else
-                  @if(!empty($answer->attached_link))
-                      <div id="dynamic-modal-answer-{{$answer->id}}" class="modal fade" role="dialog">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <button class="close" data-dismiss="modal">×</button>
-                              <h2  class="modal-title">{{basename($answer->attached_link)}}</h2>
-                            </div>
-                            <div class="modal-body">
-                                <div class="iframe-container">
-                                  <iframe src="{{asset($answer->attached_link)}}" frameborder="0"></iframe>
-                                </div>
-                            </div>
-                            <div class="modal-footer ">
-                              <a href="{{asset($answer->attached_link)}}" download class="btn btn-primary download" id="myBtn" style="width: 90px !important;"><i class="fa fa-download" aria-hidden="true"></i></a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    @endif
-              @endif
+                    </div>
+                  </div>
+                @endif
             @endforeach
           @endif
         </div>

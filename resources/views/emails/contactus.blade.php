@@ -5,12 +5,21 @@
 </head>
 <body>
 	<p>Hi Admin,</p>
-		<p>The person {{ $name }} of email id {{ $email }} send mail as a contact us for subject '<b>{{ $subject }}</b>'.</p>
+		@if(!empty($subject))
+			<p>The person {{ $name }} of email id {{ $email }} send mail as a contact us for subject '<b>{{ $subject }}</b>'.</p>
+		@else
+			<p>The person {{ $name }} of email id {{ $email }} send a mail.</p>
+		@endif
 		<p>Follwoing are the details:</p>
 		<div>
 			<p>Name : {{ $name }}</p>
 			<p>Email : {{ $email }} </p>
-			<p>subject : {{ $subject }}</p>
+			@if(!empty($subject))
+				<p>subject : {{ $subject }}</p>
+			@endif
+			@if(!empty($phone))
+				<p>phone : {{ $phone }}</p>
+			@endif
 			<p>message : {{ $bodyMessage }} </p>
 		</div>
 

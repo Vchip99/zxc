@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>Online Test Series for GATE, CAT, Aptitude |V-edu</title>
+  <title>Online Test Series for GATE, CAT, Aptitude |Vchip-edu</title>
 @stop
 @section('header-css')
 	@include('layouts.home-css')

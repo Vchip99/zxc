@@ -213,6 +213,7 @@ class DiscussionController extends Controller
             $postChildComments[$subComment->id]['user_id'] = $subComment->user_id;
             $postChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
             $postChildComments[$subComment->id]['title'] = $title;
+            $postChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
             if($subComment->children){
                 $postChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children,$title);
             }
@@ -236,6 +237,7 @@ class DiscussionController extends Controller
             $postComments[$comment->id]['user_name'] = $user->find($comment->user_id)->name;
             $postComments[$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
             $postComments[$comment->id]['title'] = $title;
+            $postComments[$comment->id]['user_image'] = $comment->user->photo;
             if($comment->children){
                 $postComments[$comment->id]['subcomments'] = $this->getSubComments($comment->children,$title);
             }
@@ -257,6 +259,7 @@ class DiscussionController extends Controller
             $allPosts['posts'][$post->id]['user_id'] = $post->user_id;
             $allPosts['posts'][$post->id]['user_name'] = $user->find($post->user_id)->name;
             $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
+            $allPosts['posts'][$post->id]['user_image'] = $post->user->photo;
 
             if($post->descComments){
                 $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>Live Online Video Courses episod by Industrial Expert |V-edu</title>
+  <title>Live Online Video Courses episod by Industrial Expert |Vchip-edu</title>
 @stop
 @section('header-css')
 @include('layouts.home-css')
@@ -75,6 +75,31 @@
       overflow:hidden !important;
       text-overflow: ellipsis;
     }
+        @media  (min-width: 350px) {
+          .hidden-lg { display: none; }
+        }
+      @media  (max-width: 349px) {
+          .hidden-sm { display: none; }
+        }
+.fa-comment-o, .first-like i, .your-cmt{
+  font-weight: bold;
+  font-size: 18px;
+  color: #555;
+}
+.first-like i{
+  margin-right: 5px;
+}
+hr{
+  margin-top: 5px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid ;
+}
+.comment-meta{
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
   </style>
 @stop
 @section('header-js')
@@ -108,7 +133,7 @@
     </div>
   </div>
 </section>
-<section class="v_container v_bg_grey">
+<section class="v_container">
   <div class="container">
     <div class="row">
       <div class="col-md-6 ">
@@ -138,28 +163,30 @@
       </div>
     </div>
   </section>
-  <section class="v_container">
+  <section class="">
     <div class="container">
-      <div class="panel with-nav-tabs panel-info">
-        <div class="panel-heading">
-          <dir class="comment-meta">
-            <span id="like_{{$video->id}}" >
+      <div class="with-nav-tabs ">
+        <div class="">
+          <div class="comment-meta">
+            <span id="like_{{$video->id}}"  class="first-like">
               @if( isset($likesCount[$video->id]) && isset($likesCount[$video->id]['user_id'][$currentUser]))
-                   <i id="video_like_{{$video->id}}" data-video_id="{{$video->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                   <i id="video_like_{{$video->id}}" data-video_id="{{$video->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>
                    <span id="like1-bs3">{{count($likesCount[$video->id]['like_id'])}}</span>
               @else
-                   <i id="video_like_{{$video->id}}" data-video_id="{{$video->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                   <i id="video_like_{{$video->id}}" data-video_id="{{$video->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>
                    <span id="like1-bs3">@if( isset($likesCount[$video->id])) {{count($likesCount[$video->id]['like_id'])}} @endif</span>
               @endif
             </span>
             <span class="mrgn_5_left">
-              <a class="" role="button" data-toggle="collapse" href="#replyToEpisode{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">Reply</a>
+              <i class="fa fa-comment-o" aria-hidden="true"></i>
+              <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
             </span>
+            <hr/>
             <div class="collapse replyComment" id="replyToEpisode{{$video->id}}">
               <form action="{{ url('createClientCourseComment')}}" method="POST" id="createClientCourseComment">
                 {{csrf_field()}}
                 <div class="form-group">
-                  <label for="comment">Your Comment</label>
+                  <!-- <label for="comment">Your Comment</label> -->
                   <textarea name="comment" id="comment" placeholder="Comment here.." class="form-control"></textarea>
                   <script type="text/javascript">
                     CKEDITOR.replace( 'comment');
@@ -186,109 +213,107 @@
                 <button type="button" class="btn btn-default" data-id="replyToEpisode{{$video->id}}" onclick="cancleReply(this);">Cancle</button>
               </form>
             </div>
-          </dir>
+          </div>
         </div>
         <div class="panel-body">
           <div class="tab-content">
             <div class="tab-pane fade in active" id="questions" style="padding: 15px !important;">
               <div class="post-comments ">
                 <div class="row">
-                  <div class="cmt-bg ">
-                    <div class="box-body chat " id="chat-box">
-                      @if(count( $comments) > 0)
-                        @foreach($comments as $comment)
-                          <div class="item" id="showComment_{{$comment->id}}">
-                            <img src="{{ asset('images/user1.png') }}" alt="User Image" />
-                            <div class="message">
-                              @if(is_object(Auth::guard('clientuser')->user()) && (Auth::guard('clientuser')->user()->id == $comment->user_id))
-                              <div class="dropdown pull-right">
-                                <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                  <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                  @if(Auth::guard('clientuser')->user()->id == $comment->user_id)
-                                    <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
-                                    <form id="deleteComment_{{$comment->id}}" action="{{ url('deleteClientCourseComment')}}" method="POST" style="display: none;">
-                                      {{ csrf_field() }}
-                                      {{ method_field('DELETE') }}
-                                      <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                      <input type="hidden" name="video_id" value="{{$video->id}}" >
-                                    </form>
-                                  @endif
-                                  @if(Auth::guard('clientuser')->user()->id == $comment->user_id)
-                                    <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
-                                  @endif
-                                </ul>
-                              </div>
-                              @endif
-                                <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
-                                <div class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
-                                <form action="{{ url('updateClientCourseComment')}}" method="POST" id="formUpdateComment{{$comment->id}}">
-                                      {{csrf_field()}}
-                                      {{ method_field('PUT') }}
-                                  <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
-                                    <textarea class="form-control" name="comment" id="comment_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
-                                    <script type="text/javascript">
-                                      CKEDITOR.replace( 'comment_{{$comment->id}}');
-                                      CKEDITOR.config.width="100%";
-                                      CKEDITOR.config.height="auto";
-                                      CKEDITOR.on('dialogDefinition', function (ev) {
-                                          var dialogName = ev.data.name,
-                                              dialogDefinition = ev.data.definition;
-                                          if (dialogName == 'image') {
-                                              var onOk = dialogDefinition.onOk;
-                                              dialogDefinition.onOk = function (e) {
-                                                  var width = this.getContentElement('info', 'txtWidth');
-                                                  width.setValue('100%');
-                                                  var height = this.getContentElement('info', 'txtHeight');
-                                                  height.setValue('400');
-                                                  onOk && onOk.apply(this, e);
-                                              };
-                                          }
-                                      });
-                                    </script>
+                  <div class="box-body chat " id="chat-box">
+                    @if(count( $comments) > 0)
+                      @foreach($comments as $comment)
+                        <div class="item" id="showComment_{{$comment->id}}">
+                          <img src="{{ asset('images/user1.png') }}" alt="User Image" />
+                          <div class="message">
+                            @if(is_object(Auth::guard('clientuser')->user()) && (Auth::guard('clientuser')->user()->id == $comment->user_id))
+                            <div class="dropdown pull-right">
+                              <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                              </button>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                @if(Auth::guard('clientuser')->user()->id == $comment->user_id)
+                                  <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
+                                  <form id="deleteComment_{{$comment->id}}" action="{{ url('deleteClientCourseComment')}}" method="POST" style="display: none;">
+                                    {{ csrf_field() }}
+                                    {{ method_field('DELETE') }}
                                     <input type="hidden" name="comment_id" value="{{$comment->id}}">
                                     <input type="hidden" name="video_id" value="{{$video->id}}" >
-                                    <button type="submit" class="btn btn-primary">Update</button>
-                                    <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
-                                  </div>
-                                </form>
-                              </div>
-                              <div class="comment-meta reply-1">
-                                <span id="cmt_like_{{$comment->id}}" >
-                                  @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
-                                       <i id="comment_like_{{$comment->id}}" data-video_id="{{$video->id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                       <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
-                                  @else
-                                       <i id="comment_like_{{$comment->id}}" data-video_id="{{$video->id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
-                                       <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
-                                  @endif
-                                </span>
-                               <span class="mrgn_5_left">
-                                <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
-                              </span>
-                              <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
-                              <div class="collapse replyComment" id="replyToComment{{$comment->id}}">
-                                <form action="{{ url('createClientCourseSubComment')}}" method="POST" id="formReplyToComment{{$comment->id}}">
-                                   {{csrf_field()}}
-                                  <div class="form-group">
-                                    <label for="subcomment">Your Sub Comment</label>
-                                      <textarea name="subcomment" class="form-control" rows="3"></textarea>
-                                  </div>
+                                  </form>
+                                @endif
+                                @if(Auth::guard('clientuser')->user()->id == $comment->user_id)
+                                  <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
+                                @endif
+                              </ul>
+                            </div>
+                            @endif
+                              <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
+                              <div class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
+                              <form action="{{ url('updateClientCourseComment')}}" method="POST" id="formUpdateComment{{$comment->id}}">
+                                    {{csrf_field()}}
+                                    {{ method_field('PUT') }}
+                                <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
+                                  <textarea class="form-control" name="comment" id="comment_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
+                                  <script type="text/javascript">
+                                    CKEDITOR.replace( 'comment_{{$comment->id}}');
+                                    CKEDITOR.config.width="100%";
+                                    CKEDITOR.config.height="auto";
+                                    CKEDITOR.on('dialogDefinition', function (ev) {
+                                        var dialogName = ev.data.name,
+                                            dialogDefinition = ev.data.definition;
+                                        if (dialogName == 'image') {
+                                            var onOk = dialogDefinition.onOk;
+                                            dialogDefinition.onOk = function (e) {
+                                                var width = this.getContentElement('info', 'txtWidth');
+                                                width.setValue('100%');
+                                                var height = this.getContentElement('info', 'txtHeight');
+                                                height.setValue('400');
+                                                onOk && onOk.apply(this, e);
+                                            };
+                                        }
+                                    });
+                                  </script>
                                   <input type="hidden" name="comment_id" value="{{$comment->id}}">
                                   <input type="hidden" name="video_id" value="{{$video->id}}" >
-                                  <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToComment{{$comment->id}}">Send</button>
-                                  <button type="button" class="btn btn-default" data-id="replyToComment{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
-                                </form>
-                              </div>
+                                  <button type="submit" class="btn btn-primary">Update</button>
+                                  <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
+                                </div>
+                              </form>
+                            </div>
+                            <div class="comment-meta reply-1">
+                              <span id="cmt_like_{{$comment->id}}" >
+                                @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
+                                     <i id="comment_like_{{$comment->id}}" data-video_id="{{$video->id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                     <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
+                                @else
+                                     <i id="comment_like_{{$comment->id}}" data-video_id="{{$video->id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                     <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
+                                @endif
+                              </span>
+                             <span class="mrgn_5_left">
+                              <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                            </span>
+                            <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
+                            <div class="collapse replyComment" id="replyToComment{{$comment->id}}">
+                              <form action="{{ url('createClientCourseSubComment')}}" method="POST" id="formReplyToComment{{$comment->id}}">
+                                 {{csrf_field()}}
+                                <div class="form-group">
+                                  <label for="subcomment">Your Sub Comment</label>
+                                    <textarea name="subcomment" class="form-control" rows="3"></textarea>
+                                </div>
+                                <input type="hidden" name="comment_id" value="{{$comment->id}}">
+                                <input type="hidden" name="video_id" value="{{$video->id}}" >
+                                <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToComment{{$comment->id}}">Send</button>
+                                <button type="button" class="btn btn-default" data-id="replyToComment{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
+                              </form>
                             </div>
                           </div>
-                          @if(count( $comment->children ) > 0)
-                            @include('client.front.onlineCourses.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'user' => $user, 'videoId' => $video->id])
-                          @endif
-                        @endforeach
-                      @endif
-                    </div>
+                        </div>
+                        @if(count( $comment->children ) > 0)
+                          @include('client.front.onlineCourses.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'user' => $user, 'videoId' => $video->id])
+                        @endif
+                      @endforeach
+                    @endif
                   </div>
               </div>
             </div>

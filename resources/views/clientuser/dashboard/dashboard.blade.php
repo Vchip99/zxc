@@ -45,7 +45,7 @@
 <body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
 <div class="wrapper">
   <header class="main-header">
-    <a href="" class="logo">
+    <a href="{{ url('/')}}" class="logo">
       <span class="logo-mini"><b> V</b>EDU</span>
       <span class="logo-lg"><b>Vchip</b>Technology</span>
     </a>
@@ -66,11 +66,13 @@
     <section class="sidebar">
       <div class="user-panel">
         <div class="pull-left image">
+          <a href="{{ url('profile')}}">
           @if(!empty(Auth::guard('clientuser')->user()->photo))
             <img src="{{ asset(Auth::guard('clientuser')->user()->photo)}}" class="img-circle" alt="User Image" >
           @else
             <img src="{{ asset('images/user.png')}}" class="img-circle" alt="User Image">
           @endif
+          </a>
         </div>
         <div class="pull-left info">
           <p>{{ ucfirst(Auth::guard('clientuser')->user()->name)}}</p>
@@ -135,8 +137,8 @@
             <li><a href="{{ url('myAssignments')}}"><i class="fa fa-circle-o"></i> My Assignments</a></li>
           </ul>
         </li>
-        <li title="Home"><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li>
-        <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li>
+        <!-- <li title="Home"><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li> -->
+        <!-- <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li> -->
         <li class="header">LABELS</li>
         <li title="Logout">
           <a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

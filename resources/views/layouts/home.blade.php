@@ -1,411 +1,528 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>V-edu - Digital Education, Online Courses & eLearning |Vchip Technology</title>
+  <title>Vchip-edu - Digital Education, Online Courses & eLearning |Vchip Technology</title>
 @stop
 @section('header-css')
   @include('layouts.home-css')
-  <link href="{{asset('css/index.css?ver=1.0')}}" rel="stylesheet"/>
+  <link href="{{asset('css/index_new.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{asset('css/hover.css?ver=1.0')}}" rel="stylesheet"/>
-  <link href="{{asset('css/animate.min.css?ver=1.0')}}" rel="stylesheet"/>
+  <link href="{{asset('css/themify-icons/themify-icons.css?ver=1.0')}}" rel="stylesheet"/>
+  <!-- <link href="{{asset('css/animate.min.css?ver=1.0')}}" rel="stylesheet"/> -->
+  <style>
+.divide-nav{
+  background-color:#151B54;
+  padding-top: 5px;
+}
+.divide-text{
+    color:#fff;
+    line-height: 20px;
+    font-size:10px;
+    padding: 15px 0px;
+}
+.affix {
+  top: 0px;
+  width:100%;
+}
+.filler{
+  min-height: 2000px;
+}
+
+
+#vchip-header {
+  background: #4d4d4d;
+/*top:-90px !important;*/
+}
+@media screen and (max-width: 1200px) {
+  .divide-nav{display: none;}
+}
+#marquee-text span {
+    margin-right: 10%;
+    }
+#marquee-text{
+   margin: 0px;
+   position: absolute;
+   color: #fff;
+    }
+@media screen and (max-width: 1200px) {
+.top-nav{display: none;}
+}
+@media screen and (max-width: 800px) {
+.top-nav{display: none;}
+}
+
+  /*tree*/
+  .tree-tital{
+    font-weight: 800;
+    color: #448eda;
+    font-size: 23px;
+  }
+  .tree-menu {
+    margin: 13% 0 25%;
+    float: left;
+    font-weight: bolder;
+    width: 100%;
+}
+@media screen and (max-width: 991px){
+.tree-menu{
+    margin: 2% 0;
+    line-height: 1;
+}
+}
+@media screen and (max-width: 991px){
+.tree-menu ,.tree-tital{
+    text-align: center;
+}
+}
+.top-right {
+  float: left;
+}
+
+.top-right ul >li {
+  display: inline-block;
+  margin-left: 15px;
+  text-transform: uppercase;
+  height: 5px;
+
+}
+.top-right .btn{
+border:1px solid #fff;
+  padding: 0px 5px;
+  font-weight: bolder;
+}
+.top-right a {
+  font-size: 16px;
+  color: #fff;
+}
+
+.top-right a:hover {
+  color: #01b1d7;
+}
+
+
+/**/
+.v-icon{
+      width:150px;
+    margin: 0 auto;
+    height: 150px;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: 5px 5px 25px 0 rgba(46,61,73,.2);
+}
+.v-icon i {
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    font-size: 60px;
+    color:#e91e63;
+}
+/*customer*/
+.tile
+{
+  width:100%;
+  height:200px;
+  margin:10px;
+  background-color:#99aeff;
+  display:inline-block;
+  background-size:cover;
+  position:relative;
+  cursor:pointer;
+  transition: all 0.4s ease-out;
+  box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.44);
+  overflow:hidden;
+  color:white;
+  font-family:'Roboto';
+
+}
+.tile img
+{
+  height:100%;
+  width:100%;
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:0;
+  transition: all 0.4s ease-out;
+}
+.tile .text
+{
+   z-index:99;
+  position:absolute;
+  /*padding:30px;*/
+  height:calc(100% - 60px);
+}
+.tile h1
+{
+  font-weight:300;
+  margin:0;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+  color:#e91e63;
+  background-color: rgba(255,255,255,.35);
+  padding:0px;
+  font-size: 15px;
+  top: 0px !important;
+   box-shadow: 5px 5px 25px 0 rgba(46,61,73,.2);
+}
+.tile h2
+{
+  font-weight:100;
+  margin:20px 0 0 0;
+  font-style:italic;
+   transform: translateX(200px);
+}
+.tile p
+{
+  font-weight:300;
+  margin:20px 0 0 0;
+  line-height: 25px;
+/*   opacity:0; */
+  transform: translateX(-200px);
+  transition-delay: 0.2s;
+}
+.animate-text
+{
+  padding: 50px 0px 50px 45px;
+  opacity:0;
+  transition: all 0.6s ease-in-out;
+}
+.animate-text>a
+{
+font-weight: bolder;
+   box-shadow: 5px 5px 25px 0 rgba(46,61,73,.2);
+
+}
+.tile:hover
+{
+/*   background-color:#99aeff; */
+box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
+  transform:scale(1.05);
+}
+.tile:hover img
+{
+  opacity: 0.2;
+}
+.tile:hover .animate-text
+{
+  transform:translateX(0);
+  opacity:1;
+}
+/*video*/
+#watch-video i {
+    position: relative;
+    display: table-cell;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    right: -9px;
+    -webkit-transition: 0.3s;
+    -o-transition: 0.3s;
+    transition: 0.3s;
+}
+/*about videos*/
+#vchip-header .about-videos{
+margin-top: 20px;
+cursor: pointer;}
+#vchip-header .about-videos i{
+font-size: 15px;
+color: #01bafd;
+padding: 6px;
+background-color: rgba(255,255,255,.35);
+border-radius: 50%;
+border:3px solid #01bafd;
+}
+@media(max-width: 768px)
+{
+  #vchip-header .about-videos i{
+font-size: 15px;
+padding: 3px;
+border:2px solid #01bafd;
+}
+}
+@media(max-width: 990px){
+  #clg{
+  margin-left: -10px;
+}
+}
+.about-video-tital{
+font-size: 15px;
+  color: white;
+  padding-bottom:
+  font-style:italic;
+}
+@media(max-width: 1088px){
+  #vchip-header h1 {
+    font-size: 60px;
+}
+}
+@media(max-width: 544px){
+  #vchip-header h1 {
+    font-size: 30px;
+}
+#vchip-header .about-videos i{
+font-size: 20px;
+}
+}
+@media(max-width: 990px){
+  #vchip-header .mt-text {
+    margin-top: 0;
+    text-align: center;
+}
+}
+@media(min-width: 578px) and (max-width: 764px){
+.col-xs-12 {
+    width: 70%;
+    margin-left: 20%;
+}
+}
+@media(max-width: 578px){
+.col-xs-12 {
+    width: 80%;
+    margin-left: 10%;
+}
+}
+@media(max-width: 492px){
+.col-xs-12 {
+    width: 100%;
+    margin-left: 0%;
+}
+}
+</style>
 @stop
 @section('header-js')
   @include('layouts.home-js')
+
 @stop
 @section('content')
   @include('header.header_menu')
   @include('header.header_info')
-<section class="v_bg_grey v_container" >
+<section class="v_bg_grey v_container " >
   <div class="container">
     <div class="row">
       <div class="col-md-8 col-md-offset-2 text-center ">
-        <h2 class="v_h2_title">ABOUT US</h2>
+        <h2 class="v_h2_title flyLeft">ABOUT US</h2>
         <hr class="section-dash-dark"/>
       </div>
     </div>
     <ul class="nav nav-pills mrgn_30_top" >
-      <li class="active"><a data-toggle="tab" href="#about1" title="About">About</a></li>
-      <li><a data-toggle="tab" href="#vission" title="Vision">Vision</a></li>
-      <li><a data-toggle="tab" href="#mission" title="Mission">Mission</a></li>
+      <li class="active"><a data-toggle="tab" href="#about1">About</a></li>
+      <li><a data-toggle="tab" href="#vission">Vission</a></li>
+      <li><a data-toggle="tab" href="#mission">Mission</a></li>
     </ul>
-
     <div class="tab-content" style="background-color: #01bafd; padding : 6px 15px;">
       <div id="about1" class="tab-pane fade in active">
-        <h3 class="v_h3_title">About</h3>
-        <p>Education is need of better society and in our country(India) most of people live in villages . So V-edu is working on Digital Education platform, so that we can provide great education platform equally in villages and remote areas along with urban area. In other word you can learn with fun from anywhere in the world. We always belives that a better society is a best place to live and educated society is better than best. So at initial stage will we provide our services, V-edu platform at basic pay and after 2020 we will open V-edu platform completely free of cost for society.</p>
+        <h3 class="v_h3_title ">About</h3>
+          <p class="more"> Vchip-edu is the part of Vchip Technology. Vchip Technology is IoT base young start-up company having head office in Pune. Vchip Technology is working in Education, Health and Agriculture sectores.
+          <br/>
+          Vchip-edu believes that better education is right of everyone. In our country (India), most of people live in villages. So Vchip-edu is working on Digital Education platform, so that we can provide a quality education equally in villages and remote areas along with urban area. In other word everyone can learn with fun from anywhere in the world at any time.
+          <br/><br/>
+          Currently, we are focusing on bridging a gap between industries and educational organizations along with digital villages. In that we are working on direct interaction of students with industries and our experts who belong to different industries. Also, interaction of students with Founder and CEO’s of successful start-ups. Also, our platform have all the require things which are needed for placement like online test (design according to pattern of the major companies), online course for aptitude preparation, discussion forum etc.
+          <br/><br/>
+          We are providing access of Vchip-edu platform to colleges at totally free of cost, so more and more students can get benefit of it. Student access to our platform is also totally free of cost. Also, any private/coaching institutes can start their classes digitally with in 15 minute on our platform. For  private/coaching institutes also our platform is free to use upto 20 logins.
+          <br/>
+              <b>" We always believe that better society is a best place to live and educated society is better than best. "</b>
+          </p>
       </div>
       <div id="vission" class="tab-pane fade">
         <h3 class="v_h3_title">Vission</h3>
-        <p>To be at leading and respectable place in the knowledge led creativity movement. World see toward our country as in leading industry of Electronics and IT sector.</p>
+          <p>To be at leading and respectable place in the knowledge led creativity movement. World see toward our country as leading industry of Electronics and IT sector.</p>
       </div>
       <div id="mission" class="tab-pane fade">
         <h3 class="v_h3_title">Mission</h3>
-        <p>Our dream is to identify our country as digital villages and we are working hard to make our dream into reality. In our country, most of population live in villages, so its the first step toward digital India. In digital villages, we will fulfill all the basic needs like education, health care and all detail about agriculture by digitally with quality. We think that educated society is best one and our dream is to make villages as a better place to live, so we are working on an online education platform namely V-edu. So quality education will reach to villages and remote areas along with the urban area. We will make the V-edu as open source, so that any one interested can start their career in the education field.</p>
+        <p>We are working on digital education platform with the prior motive of bridging a gap between industry and educational organizations along with digital village. So that, we are collaborating with educational organization, institutes, colleges along with well establish industries and start-ups. </p>
       </div>
     </div>
-  </div><br />
+  </div>
+  <br />
 </section>
 <section id="vchip_solution" class="v_container" >
- <div class="container ">
-  <div class="row mrgn_60_btm">
-    <div class="col-md-8 col-md-offset-2 text-center ">
-      <h2 class="v_h2_title">OUR SOLUTIONS</h2>
-      <hr class="section-dash-dark"/>
-      <h3 class="v_h3_title">Learn with fun...</h3>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-3 mrgn_60_btm text-center slideanim">
-      <div class="v_solution_containt">
-        <div class="icon ">
-          <span data-toggle="tooltip" title="V-Education"><i class="fa fa-graduation-cap"></i></span>
-        </div>
-        <h3 class="v_h3_title">V-Education</h3>
-        <p class="more v_p_text mrgn_10_left_rgt">
-          End to end IoT base both hardware and software solution to institutes, colleges and educational organizations.
-        </p>
-      </div>
-    </div>
-    <div class="col-md-3  mrgn_60_btm text-center  ">
-      <div class="v_solution_containt">
-        <div class="icon mrgn_30_top_btm">
-          <span data-toggle="tooltip" title="V-Connect"><i class="fa fa-mobile"></i></span>
-        </div>
-        <h3 class="v_h3_title">V-Connect</h3>
-        <p class="more v_p_text mrgn_10_left_rgt">
-          V-connect connects the mobile phone, pad and laptop. Using V-connect lecturer  can monitor student activity, share screen with individual or in group, lock individual or grouped devices, send new activities or assignment and receive alerts messages from devices.
-        </p>
-      </div>
-    </div>
-    <div class="col-md-3 mrgn_60_btm text-center slideanim">
-      <div class="v_solution_containt">
-        <div class="icon">
-          <span data-toggle="tooltip" title="V-Pendrive"><i class="fa fa-eraser"></i></span>
-        </div>
-        <h3 class="v_h3_title">V-Pendrive</h3>
-        <p class="more v_p_text mrgn_10_left_rgt">
-          Students can access our on-line courses, test series and other facilities remotely even without Internet connectivity.
-        </p>
-      </div>
-    </div>
-    <div class="col-md-3 mrgn_60_btm text-center  ">
-      <div class="v_solution_containt ">
-        <div class="icon">
-          <span data-toggle="tooltip" title="V-Cloud"><i class="fa fa-cloud"></i></span>
-        </div>
-        <h3 class="v_h3_title">V-Cloud</h3>
-        <p class="more v_p_text mrgn_10_left_rgt ">
-          V-Cloud use for storing all the information about students. Here we store students assignment, their work, response and all about our class.
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-<section class="v_bg_grey">
-<div class="container v_container">
-   <div class="row mrgn_60_btm">
-     <div class="col-md-8 col-md-offset-2 text-center mrgn-60-top">
-        <h2 class="v_h2_title">OUR PRODUCT</h2>
+  <div class="container ">
+    <div class="row mrgn_60_btm">
+      <div class="col-md-8 col-md-offset-2 text-center ">
+        <h2 class="v_h2_title">OUR SERVICES</h2>
         <hr class="section-dash-dark"/>
-        <h3 class="v_h3_title">Digital village is our dream...</h3>
+        <h3 class="v_h3_title">Learn with fun...</h3>
       </div>
+    </div>
   </div>
-  <div class="row">
-      <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
-        <div class="vchip_product_itm text-left">
-            <figure data-toggle="tooltip" title="Online Courses">
-              <img src="{{asset('images/index/online-course.jpg')}}" alt="onlne course" class="img-responsive">
-            </figure>
-            <ul class="vchip_categories list-inline">
-            <li>Online Courses</li>
-          </ul>
-          <div class="vchip_product_content">
-            <p>We provide online courses... </p>
-            <p class="mrgn_20_top"><a href="{{ url('courses')}}" class="btn-link">Learn More <i
-              class="fa fa-angle-right"
-              aria-hidden="true"></i></a>
-            </p>
-          </div>
-        </div>
-       </div>
-       <div class="col-lg-4 col-md-4 col-sm-6">
-        <div class="vchip_product_itm">
-            <figure data-toggle="tooltip" title="Live Courses">
-              <img src="{{asset('images/index/live-course.jpg')}}" alt="live course" class="img-responsive">
-            </figure>
-            <ul class="vchip_categories list-inline">
-          <li>Live Courses</li>
-        </ul>
-        <div class="vchip_product_content">
-          <p>We provide Livecourses... </p>
-          <p class="mrgn_20_top"><a href="{{ url('liveCourse')}}" class="btn-link">Learn More <i
-            class="fa fa-angle-right"
-            aria-hidden="true"></i></a>
-          </p>
-        </div>
-        </div>
-       </div>
-       <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
-        <div class="vchip_product_itm">
-            <figure data-toggle="tooltip" title="Webinar">
-              <img src="{{asset('images/index/webinar.jpg')}}" alt="webinar" class="img-responsive">
-            </figure>
-             <ul class="vchip_categories list-inline">
-        <li>Webinar</li>
-      </ul>
-      <div class="vchip_product_content">
-        <p>We provide Webine... </p>
-        <p class="mrgn_20_top"><a href="{{ url('webinar')}}" class="btn-link">Learn More <i
-          class="fa fa-angle-right"
-          aria-hidden="true"></i></a>
-        </p>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-push-2" style="padding: 1% 0;">
+        <figure >
+          <img src="{{asset('images/solution/tree-digram.png')}}" class="img-responsive" alt="Tree Digram" style="width: 100%;"/>
+        </figure>
       </div>
-        </div>
-       </div>
-       <div class="col-lg-4 col-md-4 col-sm-6">
-        <div class="vchip_product_itm">
-            <figure data-toggle="tooltip" title="Online Test Series">
-              <img src="{{asset('images/index/online-test-series.jpg')}}" alt="online test series" class="img-responsive">
-            </figure>
-          <ul class="vchip_categories list-inline">
-        <li>Online Test Series</li>
-      </ul>
-      <div class="vchip_product_content">
-        <p>We provide Online Test Series... </p>
-        <p class="mrgn_20_top"><a href="{{ url('online-tests') }}" class="btn-link">Learn More <i
-          class="fa fa-angle-right"
-          aria-hidden="true"></i></a>
-        </p>
-      </div>
-        </div>
-       </div>
-        <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
-        <div class="vchip_product_itm">
-            <figure data-toggle="tooltip" title="V-kit">
-              <img src="{{asset('images/index/v-kit.jpg')}}" alt="v-kit" class="img-responsive">
-            </figure>
-          <ul class="vchip_categories list-inline">
-      <li>V-kit</li>
-    </ul>
-     <div class="vchip_product_content">
-      <p>We provide hobby projects </p>
-      <p class="mrgn_20_top"><a href="{{ url('vkits') }}" class="btn-link">Learn More <i
-        class="fa fa-angle-right"
-        aria-hidden="true"></i></a>
-      </p>
-    </div>
-        </div>
-       </div>
-       <div class="col-lg-4 col-md-4 col-sm-6">
-        <div class="vchip_product_itm">
-            <figure data-toggle="tooltip" title="V-Doc">
-              <img src="{{asset('images/index/v-doc.jpg')}}" alt="documents" class="img-responsive">
-            </figure>
-         <ul class="vchip_categories list-inline">
-      <li>V-Doc</li>
-    </ul>
+      <div class="col-md-2 col-md-pull-8 " style="padding: 4% 0;">
+          <p class="tree-tital">COLLAGE/STUDENTS</p>
+            <div class="tree-menu"><a href="#">Bridging a gap between industries & Students</a></div>
+            <div class="tree-menu"><a href="#">Placement, Internship, Sponsor projects</a></div>
+            <div class="tree-menu"><a href="#">Workshops on emerging Technology </a></div>
+            <div class="tree-menu"><a href="#">ERP Management, Discussion forum</a></div>
+            <div class="tree-menu"><a href="#">Start-ups</a></div>
+            <div class="tree-menu"><a href="#">Online Courses, Test-series, Doc & projects  </a></div>
 
-    <div class="vchip_product_content">
-      <p>We provide research paper... </p>
-      <p class="mrgn_20_top"><a href="{{ url('documents') }}" class="btn-link">Learn More <i
-        class="fa fa-angle-right"
-        aria-hidden="true"></i></a>
-      </p>
     </div>
-        </div>
-       </div>
-</div>
-</div>
+      <div class="col-md-2 " style="padding: 4% 0;">
+           <p class="tree-tital" >COTCHING INSTITUTE</p>
+            <div class="tree-menu"><a href="#">Digital Education Platform</a></div>
+            <div class="tree-menu"><a href="#">ERP Management</a></div>
+            <div class="tree-menu"><a href="#">Web Site Development</a></div>
+            <div class="tree-menu"><a href="#">Digital Marketing</a></div>
+            <div class="tree-menu"><a href="#">SEO</a></div>
+      </div>
+    </div>
+  </div>
 </section>
+<section class="v_bg_grey" id="feature">
+  <div class="container v_container">
+    <div class="row mrgn_60_btm">
+     <div class="col-md-8 col-md-offset-2 text-center mrgn-60-top">
+      <h2 class="v_h2_title">Digital Education</h2>
+      <hr class="section-dash-dark"/>
+      <h3 class="v_h3_title">Digital villege is our dream...</h3>
+     </div>
+    </div>
+    <div class="row">
+    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+      <div class="v-icon text-center mb-1 left-reveal">
+         <i class="fa fa-list-alt" aria-hidden="true"></i>
+      </div>
+      <div class="text-center">
+      <h3 class="v_h3_title">ONLINE COURSES</h3>
+      <p>We provide online courses...</p>
+      <p class="mrgn_20_top">
+        <a href="{{ url('courses')}}" class="btn-link">Learn More
+          <i class="fa fa-angle-right" aria-hidden="true"></i>
+        </a>
+      </p>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+      <div class="v-icon text-center mb-1 left-reveal">
+         <i class="fa fa-laptop" aria-hidden="true"></i>
+      </div>
+      <div class="text-center">
+      <h3 class="v_h3_title">Online Test Series</h3>
+      <p>We provide online Test Series...</p>
+      <p class="mrgn_20_top">
+        <a href="{{ url('online-tests') }}" class="btn-link">Learn More
+          <i class="fa fa-angle-right" aria-hidden="true"></i>
+        </a>
+      </p>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+      <div class="v-icon text-center mb-1 left-reveal">
+         <i class="fa fa-wrench" aria-hidden="true"></i>
+      </div>
+      <div class="text-center">
+      <h3 class="v_h3_title">Workshop</h3>
+      <p>We provide online Workshop...</p>
+      <p class="mrgn_20_top">
+        <a href="workshop.html" class="btn-link">Learn More
+          <i class="fa fa-angle-right" aria-hidden="true"></i>
+        </a>
+      </p>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+      <div class="v-icon text-center mb-1 left-reveal">
+         <i class="fa fa-joomla" aria-hidden="true"></i>
 
-<section class="v_container">
-  <div class="container" >
+      </div>
+      <div class="text-center">
+      <h3 class="v_h3_title">Vchip-kit</h3>
+      <p>We provide hobby projects...</p>
+      <p class="mrgn_20_top">
+        <a href="{{ url('vkits') }}" class="btn-link">Learn More
+          <i class="fa fa-angle-right" aria-hidden="true"></i>
+        </a>
+      </p>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+      <div class="v-icon text-center mb-1 left-reveal">
+         <i class="fa fa-folder-open" aria-hidden="true"></i>
+      </div>
+      <div class="text-center">
+      <h3 class="v_h3_title">Vchip-Doc</h3>
+      <p>We provide research paper...</p>
+      <p class="mrgn_20_top">
+        <a href="{{ url('documents') }}" class="btn-link">Learn More
+          <i class="fa fa-angle-right" aria-hidden="true"></i>
+        </a>
+      </p>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+      <div class="v-icon text-center mb-1 left-reveal">
+         <i class="fa fa-file-video-o" aria-hidden="true"></i>
+      </div>
+      <div class="text-center">
+      <h3 class="v_h3_title">Live courses</h3>
+      <p>We provide Live courses...</p>
+      <p class="mrgn_20_top">
+        <a href="{{ url('liveCourse')}}" class="btn-link">Learn More
+          <i class="fa fa-angle-right" aria-hidden="true"></i>
+        </a>
+      </p>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+<section id="event" class="v_container " >
+  <div class="container">
     <div class="row">
       <div class="col-md-8 col-md-offset-2 text-center ">
-        <h2 class="v_h2_title">OUR CUSTOMERS</h2>
+        <h2 class="v_h2_title">EVENTS</h2>
         <hr class="section-dash-dark"/>
-        <h3 class="v_h3_title">Happy customers...Successful adventure.</h3>
+        <h3 class="v_h3_title">New ideas...Successful adventure.</h3>
       </div>
-      <div class="row our_customer">
-        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
-          <div class="hovereffect">
-            <img class="" src="{{ asset('images/logo/ssgmce-logo.jpg')}}" alt="SSGMCE" />
-            <div class="overlay">
-             <h2>SSGMCE</h2>
-             <a class="info" href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">link here</a>
-           </div>
-         </div>
-       </div>
-       <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim mrgn_10_top">
-        <div class="hovereffect">
-          <img class="" src="{{ asset('images/logo/gate-the-Direction.png')}}" alt="GATE THE Direction" style="padding: 20px 0px;">
-          <div class="overlay">
-           <h2>GATE THE Direction</h2>
-           <a class="info" href="http://gatethedirection.com/" target="_blank">link here</a>
-         </div>
-       </div>
-     </div>
-     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim mrgn_10_top">
-      <div class="hovereffect">
-        <img class="" src="{{ asset('images/logo/kaizen.jpg')}}" alt="Kaizen Technology"/>
-        <div class="overlay">
-         <h2>Kaizen Technology</h2>
-         <a class="info" href="http://kaizenn.org/" target="_blank">link here</a>
-       </div>
-     </div>
-   </div>
-   <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim mrgn_10_top">
-    <div class="hovereffect">
-      <img class="" src="{{ asset('images/logo/ghrcema_logo.png')}}" alt="G H Risoni"/>
-      <div class="overlay">
-       <h2>G H Risoni</h2>
-       <a class="info" href="http://ghrcema.raisoni.net/" target="_blank">link here</a>
-     </div>
-   </div>
- </div>
+    </div>
 
-</div>
-</div>
-</div>
-</section>
-
-<section id="counter1" class="blog-wrapper" style="background: #eee" >
- <div class="container">
-  <div class="row">
-    <div class="col-md-8 col-md-offset-2 text-center ">
-      <h2 class="v_h2_title">EVENTS</h2>
-      <hr class="section-dash-dark"/>
-      <h3 class="v_h3_title">Start-up to stand-up...</h3>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-4 col-sm-4 animate-box slideanim" >
-      <div class="feature-center" style="text-align: center">
-        <span class="icon">
-          <i class="ti-download"></i>
-        </span>
-        <span class="counter">
-         <h2>ELECTROfreaks</h2>
-         <img src="{{asset('images/index/electro.jpg')}}" alt="technical event" style="width: 100px;">
-         <h6 class="blog-date">Technical Event </h6>
-         <p>Technical event conducted by Vchip design in Amravati (India) in the month of February of every years.</p>
-       </span>
-     </div>
-   </div>
-   <div class="col-md-4 col-sm-4 animate-box" >
-    <div class="feature-center" style="text-align: center">
-      <span class="icon">
-        <i class="ti-face-smile"></i>
-      </span>
-      <span class="counter">
-        <h2>V-Tech</h2>
-        <img src="{{asset('images/index/v-tech.jpg')}}" alt="technical event" style="width: 100px;"  />
-        <h6 class="blog-date">Technical Event</h6>
-        <p>Technical event conducted by Vchip design in Pune (India) in the month of August of every years.</p>
-      </span>
-    </div>
-  </div>
-  <div class="col-md-4 col-sm-4 animate-box slideanim" >
-    <div class="feature-center" style="text-align: center">
-      <span class="icon">
-        <i class="ti-face-smile"></i>
-      </span>
-      <span class="counter">
-        <h2>V-Debu</h2>
-        <img src="{{asset('images/index/award.jpg')}}" alt="paper Presentation" style="width: 100px;"  />
-        <h6 class="blog-date">Paper Presentation</h6>
-        <p>Its the competition for debut in new technology. Winner get internship, funding and work space from Vchip design.</p>
-      </span>
-    </div>
-  </div>
-</div>
-</div>
-</section>
-<section id="team" class="team blog-wrapper" >
- <div class="container">
-  <div class="row">
-    <div class="col-md-8 col-md-offset-2 text-center ">
-      <h2 class="v_h2_title">OUR TEAM</h2>
-      <hr class="section-dash-dark"/>
-      <h3 class="v_h3_title">The place where we deffer...</h3>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-2 single-member col-sm-4">
-      <div class="person">
-        <img class="img-responsive" src="{{asset('images/team/vishesh.jpg')}}" alt="member-1">
+    <div class="row">
+      <div class="col-md-4 col-sm-4 animate-box slideanim" >
+        <div class="feature-center" >
+          <span class="icon">
+            <i class="ti-ruler-alt-2 icon-sm"></i>
+          </span>
+          <span class="counter">
+            <h3 class="v_h3_title">ELECTROfreaks</h3>
+            <p>Technical event conducted by Vchip Technology in Amravati (India) in the month of February of every years.</p>
+          </span>
+        </div>
       </div>
-      <div class="person-detail slideanim">
-        <div class="arrow-bottom"></div>
-        <p><strong>Mr. Vishesh Agrawal</strong></p>
-        <p>CEO</p>
-        <p>M-Tech: IIT Kharagpur </p>
+      <div class="col-md-4 col-sm-4 animate-box" >
+        <div class="feature-center" >
+          <span class="icon">
+            <i class="ti-panel icon-sm"></i>
+          </span>
+          <span class="counter">
+           <h3 class="v_h3_title">Vchip-Tech</h3>
+            <p>Technical event conducted by Vchip Technology in Pune (India) in the month of August of every years.</p>
+          </span>
+        </div>
       </div>
-    </div>
-    <div class="col-md-2 single-member col-sm-4">
-      <div class="person-detail ">
-        <div class="arrow-top"></div>
-        <p><strong>Mr. Ajay Jangra</strong></p>
-        <p>Adjunct Professor</p>
-        <p>M-Tech: IIT Kharagpur </p>
-      </div>
-      <div class="person slideanim">
-        <img class="img-responsive" src="{{asset('images/team/ajay.jpg')}}" alt="member-2">
-      </div>
-    </div>
-    <div class="col-md-2 single-member col-sm-4">
-      <div class="person">
-        <img class="img-responsive" src="{{asset('images/team/vishal_kumar.jpg')}}" alt="member-3">
-      </div>
-      <div class="person-detail slideanim">
-        <div class="arrow-bottom"></div>
-        <p><strong>Mr. Vishal Kumar</strong></p>
-        <p>Adjunct Professor</p>
-        <p>M-Tech: IIT Kharagpur </p>
-      </div>
-    </div>
-    <div class="col-md-2 single-member col-sm-4">
-      <div class="person-detail">
-        <div class="arrow-top"></div>
-        <p><strong>Mr. Vishal Parvani</strong></p>
-        <p>Adjunct Professor</p>
-        <p>M-Tech: Bits Pilani </p>
-      </div>
-      <div class="person slideanim">
-        <img class="img-responsive" src="{{asset('images/team/vishal_parvani.jpg')}}" alt="member-5">
-      </div>
-    </div>
-    <div class="col-md-2 single-member col-sm-4">
-      <div class="person">
-        <img class="img-responsive" src="{{asset('images/team/vartul.jpg')}}" alt="member-6">
-      </div>
-      <div class="person-detail slideanim">
-        <div class="arrow-bottom"></div>
-        <p><strong>Mr. Vartul Sharma</strong></p>
-        <p>Adjunct Professor</p>
-        <p>M-Tech: COEP Pune </p>
-      </div>
-    </div>
-    <div class="col-md-2 single-member col-sm-4">
-      <div class="person-detail">
-        <div class="arrow-top"></div>
-        <p><strong>Mr. Aditya Jagtap</strong></p>
-        <p>Adjunct Professor</p>
-        <p>M-Tech: VIT Vellore </p>
-      </div>
-      <div class="person slideanim">
-        <img class="img-responsive" src="{{asset('images/team/aditya.jpg')}}" alt="member-5">
+      <div class="col-md-4 col-sm-4 animate-box slideanim" >
+        <div class="feature-center">
+          <span class="icon">
+           <i class="fa fa-trophy" aria-hidden="true"></i>
+          </span>
+          <span class="counter">
+           <h3 class="v_h3_title">Vchip-Debu</h3>
+            <p>Its the competition for debut in new technology. Winner get internship, funding and work space from Vchip Technology.</p>
+          </span>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </section>
 @stop
 @section('footer')
   @include('footer.footer')
-  <script type="text/javascript">
+<script>
   $(document).ready(function() {
-    var showChar = 100;
+    var showChar = 500;
     var ellipsestext = "...";
     var moretext = "<br /> Read More";
     var lesstext = "<br /> less";
@@ -417,7 +534,7 @@
         var c = content1.substr(0, showChar);
         var h = content1.substr(showChar, content1.length - showChar);
 
-        var html = c + '<span class="moreelipses">'+ellipsestext+'</span><span class="morecontent"><span>' + h + '</span><a href="" class="morelink" style="color:#01bafd;">'+moretext+'</a></span>';
+        var html = c + '<span class="moreelipses">'+ellipsestext+'</span><span class="morecontent"><span>' + h + '</span><a href="" class="morelink" style="color:#e91e63; font-weight:bolder;">'+moretext+'</a></span>';
 
         $(this).html(html);
       }
@@ -437,21 +554,8 @@
     return false;
   });
   });
+
+
 </script>
 
-<script>
-$("#teacher-radiobtn").click(function(){
-$(".show_hide").show();
-});
-
-$("#student-radiobtn").click(function(){
-$(".show_hide").hide();
-});
-
-$(document).ready(function(){
-        setTimeout(function() {
-          $('.alert-success').fadeOut('fast');
-        }, 2000); // <-- time in milliseconds
-    });
-</script>
 @stop

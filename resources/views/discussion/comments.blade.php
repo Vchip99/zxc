@@ -1,6 +1,10 @@
 @foreach($comments as $subcomment)
 	<div class="item replySubComment-1">
-	  	<img src="{{ asset('images/user1.png') }}" alt="User Image" />
+	  	@if(!empty($subcomment->user->photo))
+	        <img src="{{ asset($subcomment->user->photo)}} " class="img-circle" alt="User Image">
+	      @else
+	        <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+	      @endif
 	  	<div class="message" id="subcomment_{{$subcomment->id}}">
 	  		@if( is_object(Auth::user()) && ( Auth::user()->id == $subcomment->user_id || Auth::user()->id == $post->user_id || Auth::user()->id == $comment->user_id ))
 	    	<div class="dropdown pull-right">

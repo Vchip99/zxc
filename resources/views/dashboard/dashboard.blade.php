@@ -50,7 +50,7 @@
 <body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
 <div class="wrapper">
   <header class="main-header">
-    <a href="" class="logo">
+    <a href="{{ url('/')}}" class="logo">
       <span class="logo-mini"><b> V</b>EDU</span>
       <span class="logo-lg"><b>Vchip</b>Technology</span>
     </a>
@@ -71,11 +71,13 @@
     <section class="sidebar">
       <div class="user-panel">
         <div class="pull-left image">
+          <a href="{{ url('profile')}}">
           @if(!empty(Auth::user()->photo))
             <img src="{{ asset(Auth::user()->photo)}} " class="img-circle" alt="User Image">
           @else
             <img src="{{ url('images/user/user.png')}}" class="img-circle" alt="User Image">
           @endif
+          </a>
           @php
             $selectedUserType = Session::get('selected_user_type');
           @endphp
@@ -247,8 +249,8 @@
             </ul>
           </li>
         @endif
-        <li><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li>
-        <li><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li>
+        <!-- <li><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li>
+        <li><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li> -->
         <li class="header">LABELS</li>
         <li>
           <a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

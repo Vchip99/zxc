@@ -1,11 +1,113 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>V-edu – Be partner with Vchip Technology</title>
+  <title>Vchip-edu – Be partner with Vchip Technology</title>
 @stop
 @section('header-css')
 	@include('layouts.home-css')
 <link id="cpswitch" href="{{ asset('css/hover.css?ver=1.0')}}" rel="stylesheet" />
 <link href="{{ asset('css/v_career.css?ver=1.0')}}" rel="stylesheet"/>
+<style type="text/css">
+  .tile
+{
+  width:100%;
+  height:200px;
+  margin:10px;
+  background-color:#fff;
+  display:inline-block;
+  background-size:cover;
+  position:relative;
+  cursor:pointer;
+  transition: all 0.4s ease-out;
+  box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.44);
+  overflow:hidden;
+  color:white;
+  font-family:'Roboto';
+
+}
+.tile img
+{
+  height:100%;
+  width:100%;
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:0;
+  transition: all 0.4s ease-out;
+}
+.tile .text
+{
+   z-index:99;
+  position:absolute;
+  /*padding:30px;*/
+  height:calc(100% - 60px);
+}
+.tile h1
+{
+  font-weight:300;
+  margin:0;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+  color:#e91e63;
+  background-color: rgba(255,255,255,.35);
+  padding:0px;
+  font-size: 15px;
+  top: 0px !important;
+   box-shadow: 5px 5px 25px 0 rgba(46,61,73,.2);
+}
+.tile h2
+{
+  font-weight:100;
+  margin:20px 0 0 0;
+  font-style:italic;
+   transform: translateX(200px);
+}
+.tile p
+{
+  font-weight:300;
+  margin:20px 0 0 0;
+  line-height: 25px;
+/*   opacity:0; */
+  transform: translateX(-200px);
+  transition-delay: 0.2s;
+}
+.animate-text
+{
+  padding: 50px 0px 50px 45px;
+  opacity:0;
+  transition: all 0.6s ease-in-out;
+}
+.animate-text>a
+{
+font-weight: bolder;
+   box-shadow: 5px 5px 25px 0 rgba(46,61,73,.2);
+
+}
+.tile:hover
+{
+/*   background-color:#99aeff; */
+box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
+  transform:scale(1.05);
+}
+.tile:hover img
+{
+  opacity: 0.2;
+}
+.tile:hover .animate-text
+{
+  transform:translateX(0);
+  opacity:1;
+}
+@media (min-width: 500px) and (max-width: 764px){
+.tile {
+     width: 60%;
+     margin-left: 20%;
+  }
+}
+@media screen and (max-width: 388px){
+   .tile {
+     width: 100%;
+  }
+}
+</style>
 @stop
 @section('header-js')
 	@include('layouts.home-js')
@@ -37,54 +139,70 @@
       <h2 class="v_h2_title">Our Partners</h2>
       <hr class="section-dash-dark"/>
       <h3 class="v_h3_title ">We belive that work together always increase productivity...</h3>
-      <p>An integral part of V-edu’s partners includes our mentors, funders and franchise holders. V-edu works with companies of same interest, governments, nonprofits and other organizations, institutes, mentors, funders and franchise holders to make an educated world and digital villages. We are partners not only for business, but also for better educated society. By supporting to each others we have made stronger community.</p>
+      <p>An integral part of Vchip-edu’s partners includes our mentors, funders and franchise holders. Vchip-edu works with companies of same interest, governments, nonprofits and other organizations, institutes, mentors, funders and franchise holders to make an educated world and digital villages. We are partners not only for business, but also for better educated society. By supporting to each others we have made stronger community.</p>
     </div>
 </section>
 <section class="v_container">
     <div class="container" >
       	<div class="row">
 	        <div class="col-md-8 col-md-offset-2 text-center ">
-	          <h2 class="v_h2_title">OUR CUSTOMERS</h2>
+	          <h2 class="v_h2_title">OUR PARTNERS</h2>
 	          <hr class="section-dash-dark"/>
-	          <h3 class="v_h3_title ">Happy customers...Successful adventure.</h3>
+	          <h3 class="v_h3_title ">Happy partners...Successful adventure.</h3>
 	        </div>
 	        <div class="row our_customer">
-	          	<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
-		            <div class="hovereffect">
-		              <img class="" src="{{ asset('images/our-partner/vchip-tech-logo.jpg')}}" alt="Vchip Tech" >
-		              <div class="overlay">
-		               <h2>Vchip Tech</h2>
-		               <a class="info" href="https://vchiptech.com/" target="_blank">link here</a>
-		             </div>
-		           </div>
-	         	</div>
-		         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
-		          <div class="hovereffect">
-		            <img class="" src="{{ asset('images/our-partner/lasthour_logo.jpg')}}" alt="Last Hours Tech" >
-		            <div class="overlay">
-		             <h2>Last Hours Tech</h2>
-		             <a class="info" href="http://lasthourstech.com/" target="_blank">link here</a>
-		           </div>
-		         </div>
-		       	</div>
-		       	<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
-			        <div class="hovereffect">
-			          <img class="" src="" alt="Pinnaculum Infotech Pvt. Ltd">
-			          <div class="overlay">
-			           <h2>Pinnaculum Infotech</h2>
-			           <a class="info" href="http://pinnaculuminfotech.com/" target="_blank">link here</a>
-			         </div>
-			       </div>
-			     </div>
-		     	<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
-				      <div class="hovereffect">
-				        <img class="" src="{{ asset('images/our-partner/axis-bank.jpg')}}" alt="Axis Bank">
-				        <div class="overlay">
-				         <h2>Axis Bank</h2>
-				         <a class="info" href="https://www.axisbank.com/" target="_blank">link here</a>
-				       </div>
-				     </div>
-	   			</div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+              <div class="tile">
+                    <img src="{{ asset('images/our-partner/vchip-tech-logo.jpg')}}" alt="SSGMCE"/>
+                    <div class="text">
+                      <h1 title="Vchip Tech">Vchip Tech</h1>
+                      <p class="animate-text">
+                        <a class="info" href="https://vchiptech.com/" target="_blank">Learn More
+                           <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                      </p>
+                    </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+              <div class="tile">
+                    <img src="{{ asset('images/our-partner/lasthour_logo.jpg')}}" alt="Last Hours Tech"/>
+                    <div class="text">
+                      <h1 title="Last Hours Tech">Last Hours Tech</h1>
+                      <p class="animate-text">
+                        <a class="info" href="http://lasthourstech.com/" target="_blank">Learn More
+                           <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                      </p>
+                    </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+              <div class="tile">
+                    <img src="" alt="Pinnaculum Infotech Pvt. Ltd"/>
+                    <div class="text">
+                      <h1 title="Pinnaculum Infotech">Pinnaculum Infotech</h1>
+                      <p class="animate-text">
+                        <a class="info" href="http://pinnaculuminfotech.com/" target="_blank">Learn More
+                           <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                      </p>
+                    </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+              <div class="tile">
+                    <img class="" src="{{ asset('images/our-partner/axis-bank.jpg')}}" alt="Axis Bank">
+                    <div class="text">
+                      <h1 title="Axis Bank">Axis Bank</h1>
+                      <p class="animate-text">
+                        <a class="info" href="https://www.axisbank.com/" target="_blank">Learn More
+                           <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                      </p>
+                    </div>
+              </div>
+            </div>
  			</div>
 		</div>
 	</div>
@@ -93,9 +211,9 @@
   <div class="container">
     <div class="row">
       <div class="text-center">
-       <h1 class="v_hedling ">BE OUR CUSTOMERS</h1>
+       <h1 class="v_hedling ">BE OUR PARTNERS</h1>
        <hr class="section-dash-dark" />
-       <h3 class="v_h3_title text-muted "><em>Happy customers...Successful adventure.</em></h3>
+       <h3 class="v_h3_title text-muted "><em>Happy partners...Successful adventure.</em></h3>
      </div>
      <div class="col-md-12 mrgn_30_top">
       <button class="accordion slideanim" title="ANGEL INVESTOR">ANGEL INVESTOR</button>
@@ -103,10 +221,10 @@
         <div class="panel-content ">
           <ul>
            <li>We are looking for Angel Investor so we can concentrate more and more toward quality rather that currency flow at the initial stage and also we can pay well to our team so they will be always with us. </li>
-           <h3 class="v_h3_title"> V-edu is best place to invest because:</h3>
+           <h3 class="v_h3_title"> Vchip-edu is best place to invest because:</h3>
            <ul class="vchip_list">
              <li> Education is one of the most growing business in the world.</li>
-             <li> V-edu is working on IoT base both software and hardware solution for education sector. </li>
+             <li> Vchip-edu is working on IoT base both software and hardware solution for education sector. </li>
              <li> We have done lots of research on what’s beneficial to our student's for their long term future.</li>
              <li> Optimize solution.</li>
              <li> First time digital villages concept in India.</li>
@@ -115,7 +233,7 @@
              <li> Our education platform provides industrial touch along with quality education. </li>
            </ul>
          </ul>
-         <h4 class="v_h4_subtitle">So, V-edu is one of the prominent place to invest.</h4>
+         <h4 class="v_h4_subtitle">So, Vchip-edu is one of the prominent place to invest.</h4>
          <p><a class="btn btn-apply btn-primary push-bottom flot-left" href="#" data-toggle="modal" data-target="#myModal" title="Apply Now">Apply Now</a></p>
        </div>
 
@@ -125,28 +243,28 @@
      <button class="accordion slideanim" title="FRANCHISE HOLDER">FRANCHISE HOLDER</button>
      <div class="panel">
       <div class="panel-content ">
-        <h2 class="v_h2_title text-center">V-edu, leaders in on-line education platform.</h2>
-        <p>V-edu offers the customize on-line education platform to the students, industrial personal by the quality teaching, optimistic materials. V-edu has introduced the innovative products live learn with fun, V-Education, V-connect, V-pendrive, V-cloud. </p>
-        <p>The Franchise concept is the most trusted and successful business model. It help to grow the business across the world ie. win-win condition to all of us along with our customers.  V-edu offers a complete business format to the franchisees including support in setting up and operating the center. In general our Franchisees will have:</p>
+        <h2 class="v_h2_title text-center">Vchip-edu, leaders in on-line education platform.</h2>
+        <p>Vchip-edu offers the customize on-line education platform to the students, industrial personal by the quality teaching, optimistic materials. Vchip-edu has introduced the innovative products live learn with fun, Vchip-education, Vchip-connect, Vchip-pendrive, Vchip-cloud. </p>
+        <p>The Franchise concept is the most trusted and successful business model. It help to grow the business across the world ie. win-win condition to all of us along with our customers.  Vchip-edu offers a complete business format to the franchisees including support in setting up and operating the center. In general our Franchisees will have:</p>
         <ul class=" vchip_list">
           <li> Opportunity to work with the leader in Education field. </li>
-          <li> Access to the brand V-edu.</li>
+          <li> Access to the brand Vchip-edu.</li>
           <li> Access to all of our platform.</li>
           <li> Exposure to standard business process, with highest level of ethical standards.</li>
           <li> Opportunity to do something for society.</li>
           <li> Access to research papers, study material and faculty orientation programs.</li>
           <li> Guidance and motivation to do business. </li>
         </ul>
-        <h3 class="v_h3_title"> Advantages of being a V-edu Franchisee</h3>
+        <h3 class="v_h3_title"> Advantages of being a Vchip-edu Franchisee</h3>
         <ul class="vchip_list float-left">
           <li><a>Lower risks:</a> On-line education is the one of the most growing business in the world. Our team take care of your business so it takes off smoothly.</li>
           <li><a>Business Plan:</a> We will provide the basic business plan and know-how to operate the center.</li>
-          <li><a>Beyond the conventional ways:</a> V-edu provides business module different than that of conventional business module. So your services to your students become unique.</li>
-          <li><a>Training:</a> All new partners and their team will undergo the basic training to deal with all the platform of the V-edu. Specific modules like marketing and counseling training will be available on request.</li>
-          <li><a>Quality and optimistic products and Services:</a> V-edu has our unique, innovative and optimistic products.  such as Learn with fun, V-education, V-connect, V-pendrive, V-cloud. </li>
+          <li><a>Beyond the conventional ways:</a> Vchip-edu provides business module different than that of conventional business module. So your services to your students become unique.</li>
+          <li><a>Training:</a> All new partners and their team will undergo the basic training to deal with all the platform of the Vchip-edu. Specific modules like marketing and counseling training will be available on request.</li>
+          <li><a>Quality and optimistic products and Services:</a> Vchip-edu has our unique, innovative and optimistic products.  such as Learn with fun, Vchip-education, Vchip-connect, Vchip-pendrive, Vchip-cloud. </li>
         </ul>
-        <h4 class="v_h4_subtitle">V-edu franchisee would have access to all the products and services offered by us.
-          So, V-edu is one of the prominent place to gather and build prominent products.</h4>
+        <h4 class="v_h4_subtitle">Vchip-edu franchisee would have access to all the products and services offered by us.
+          So, Vchip-edu is one of the prominent place to gather and build prominent products.</h4>
           <p><a class="btn btn-apply btn-primary push-bottom" href="#" data-toggle="modal" data-target="#myModal" title="Apply Now">Apply Now</a></p>
         </div>
 
@@ -155,7 +273,7 @@
       <div class="panel">
         <div class="panel-content">
           <p>We believes that if you want to win the race then only your speed in not enough but also you should have proper direction. So before starting any adventure we at first discuss our plan with our mentors, industry leaders who are working in same fields.
-            All the industry leaders in the field of education, professors are most welcome to become mentor of V-edu. </p>
+            All the industry leaders in the field of education, professors are most welcome to become mentor of Vchip-edu. </p>
             <p><a class="btn btn-apply btn-primary push-bottom" href="#" data-toggle="modal" data-target="#myModal" title="Apply Now">Apply Now</a></p>
           </div>
         </div>

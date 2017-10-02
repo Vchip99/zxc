@@ -1,11 +1,12 @@
 body {overflow-x: hidden;}
-
 .navbar-default {
   background-color: transparent;
   border-color: transparent;
   -webkit-transition: all 0.5s ease 0s;
   -o-transition: all 0.5s ease 0s;
   transition: all 0.5s ease 0s;
+  border-radius: 0px;
+
 }
 .navbar .navbar-header .user_menu{
   padding:20px 20px 0 0;
@@ -14,38 +15,36 @@ body {overflow-x: hidden;}
   color: #fff;
 }
 @media screen and (max-width: 767px) {
-
   .navbar .navbar-header .user_menu {
-   margin-left: 0px;
-   margin-right: 20px;
-   margin-top: 10px;
-   font-size: 15px;
-   padding: 5px;
-   background: #01bafd;
-   border: 1px solid #01bafd;
-   border-radius: 10px;
- }
+    margin-left: 0px;
+    margin-right: 20px;
+    margin-top: 10px;
+    font-size: 15px;
+    padding: 5px;
+    background: #01bafd;
+    border: 1px solid #01bafd;
+    border-radius: 10px;
+  }
 }
 @media screen and (max-width: 1200px) {
-
   .navbar .navbar-header .user_menu {
-   margin-left: 0px;
-   margin-right: 20px;
-   margin-top: 10px;
-   font-size: 15px;
-   padding: 5px;
-   background: #01bafd;
-   border: 1px solid #01bafd;
-   border-radius: 10px;
- }
-.navbar-header .dropdown-menu .navbar-content
-   {
+    margin-left: 0px;
+    margin-right: 20px;
+    margin-top: 10px;
+    font-size: 15px;
+    padding: 5px;
+    background: #01bafd;
+    border: 1px solid #01bafd;
+    border-radius: 10px;
+  }
+  .navbar-header .dropdown-menu .navbar-content
+  {
     width:250px;
     padding: 15px;
     padding-bottom:0px;
     border: 1px solid #01bafd;
-margin: 0px 20px;  }
-
+    margin: 0px 20px;
+  }
 }
 .navbar-nav {
   margin-top: 40px;
@@ -74,13 +73,14 @@ margin: 0px 20px;  }
 }
 
 @media screen and (max-width: 1200px) {
- .navbar-nav {
-  margin-top: 40px;
-}
-#bs-example-navbar-collapse-1
-{
-  margin: 70px 0 0 0;
-}
+  .navbar-nav {
+    margin-top: 40px;
+  }
+  #bs-example-navbar-collapse-1
+  {
+    margin: 70px 0 0 0;
+  }
+  .top-nav{display: none;}
 }
 
 .navbar-default .navbar-brand {
@@ -93,138 +93,115 @@ margin: 0px 20px;  }
   -o-transition:color .5s ease-in;
   -webkit-transition:color .5s ease-in;
 }
-
-
 .navbar-default .navbar-brand img{max-width:110px;
-  margin-top:-7px;}
+ margin-top:-7px;}
 
-  @media screen and (max-width: 400px) {
-    .navbar-default .navbar-brand {
-      font-size: 22px;
-    }
+ @media screen and (max-width: 400px) {
+  .navbar-default .navbar-brand {
+    font-size: 22px;
   }
-
-  .navbar-default .navbar-brand:hover,
-  .navbar-default .navbar-brand span:hover {
-    color: #3D99B8;
-  }
-
-  .navbar-default .navbar-nav>li>a {
-    color: #fff;
-    font-size: 14px;
-    font-family: 'Noto Sans', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .navbar-default .navbar-nav>li>a:hover {
-    color: #42a5f6;
-  }
-
-  .navbar-default .navbar-nav>li>a:focus {
-    color: #42a5f6;
-  }
-  .navbar-default .dropdown-menu {
-    background: rgba(25, 33, 60, 0.5);
-    color: #fff;
-    overflow: hidden;
-
-  }
-  .navbar-default .dropdown-menu li a{
-   color: #fff;
-   font-family: 'Noto Sans', sans-serif;
-   text-transform: uppercase;
-   letter-spacing:0px;
-   width: 100%;
-
- }
- .navbar-default .dropdown-menu li a:hover{
-   background: rgba(25, 33, 60, 0.5);
-   color:#fff;
- }
- .navbar-default .dropdown-menu>li>a:focus {
+}
+.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand span:hover {
+  color: #3D99B8;
+}
+.navbar-default .navbar-nav>li>a {
+  color: #fff;
+  font-size: 14px;
+  font-family: 'Noto Sans', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.navbar-default .navbar-nav>li>a:hover {
   color: #42a5f6;
 }
-
+.navbar-default .navbar-nav>li>a:focus {
+  color: #42a5f6;
+}
+.navbar-default .dropdown-menu {
+  background: rgba(25, 33, 60, 0.5);
+  color: #fff;
+  overflow: hidden;
+}
+.navbar-default .dropdown-menu li a{
+  color: #fff;
+  font-family: 'Noto Sans', sans-serif;
+  text-transform: uppercase;
+  letter-spacing:0px;
+  width: 100%;
+}
+.navbar-default .dropdown-menu li a:hover{
+  background: rgba(25, 33, 60, 0.5);
+  color:#fff;
+}
+.navbar-default .dropdown-menu>li>a:focus {
+  color: #42a5f6;
+}
 .navbar-default .navbar-toggle {
   margin-top: 40px;
   border: none;
 }
-
 .navbar-default .navbar-toggle:focus,
 .navbar-default .navbar-toggle:hover {
   background: none;
 }
-
 .navbar-default .navbar-toggle .icon-bar {
   height: 4px;
   width: 28px;
   background: #42a5f6;
 }
-
 .navbar-default.shrink {
   background:rgba(25, 33, 60, 0.8);
-
 }
-
 .navbar-default.shrink .navbar-nav {
   margin-top:5px;
   margin-bottom: 5px;
 }
-
 .navbar-default.shrink .navbar-brand {
   margin-top: 5px;
 }
-
 .navbar-default.shrink .navbar-toggle {
   margin-top: 5px;
 }
 @media screen and (max-width: 984px) {
-
   .navbar-nav {
     float: none;
   }
-
   .navbar-default .navbar-brand img{
     max-width:90px;
     float: left;
   }
-
 }
-
-.navbar-content
-{
+.navbar-content{
   width:250px;
   padding: 15px;
   padding-bottom:0px;
 }
 .navbar-content li a{
   text-decoration:none;
-
 }
 .navbar-content li{
   margin-top:  10px;
   margin-bottom: 20px;
 }
 @media (max-width: 768px){
- .navbar-content
- {
-  width:250px;
-  padding: 15px;
-  padding-bottom:0px;
-  border: 1px solid #01bafd;
-  margin-left: 20px;
-  }}
-  @media (min-width: 768px) and (max-width: 1200px) {
-   .navbar-content
-   {
+  .navbar-content
+  {
     width:250px;
     padding: 15px;
     padding-bottom:0px;
     border: 1px solid #01bafd;
     margin-left: 20px;
   }
-
+}
+@media (min-width: 768px) and (max-width: 1200px) {
+  .navbar-content{
+    width:250px;
+    padding: 15px;
+    padding-bottom:0px;
+    border: 1px solid #01bafd;
+    margin-left: 20px;
+  }
   .navbar-nav {
     float: left;
   }
@@ -296,7 +273,6 @@ margin: 0px 20px;  }
     overflow: hidden!important;
   }
 }
-
 .full {
   width: 100%;
 }
@@ -317,10 +293,9 @@ margin: 0px 20px;  }
   border-top: 1px solid #DDDDDD;
 }
 @media (max-width: 768px) {
- .footer { text-align: center;}
- .footer ul li a {font-size: 15px;}
+  .footer { text-align: center;}
+  .footer ul li a {font-size: 15px;}
 }
-
 .footer p {
   margin: 0;
 }
@@ -358,30 +333,59 @@ margin: 0px 20px;  }
   margin-bottom: 0 !important;
   padding-bottom: 0;
 }
-.v_subscribe_form{
-  display: inline;
-  float: right;
-  margin-top: 10px;
-  width: 100%;}
-  .v_subscribe_form input{
-    border-radius: 20px;
-    height: 30px;
-    outline: 0;
-    color: #000;
-    font-weight: bold;
+@media (min-width: 768px) and (max-width: 1200px){
+.v_subscribe_form input {
+    width: 40%;
+}
+.hidden-2{
+  display: none;
+}
+}
+@media (min-width: 1201px)
+{
+  .hidden-1{
+  display: none;
+}
+}
+@media (max-width: 767px){
+.hidden-1{
+  display: none;
+}
+}
+@media (max-width: 990px){
+  .hidden-link{
+display: none;
+  }
+  }
+@media (max-width: 768px){
+.vchiptech, .social-circle{
+    text-align: center;
+  }
+  }
+  .hidden-link{
+    float:right;
+  }
+ .v_subscribe_form  {
+    margin: 20px auto;
+    width: 100%;
+}
+.v_subscribe_form input.btn.btn-sm,
+.v_subscribe_form input.btn.btn-sm:focus {
+    outline: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 
-  }
-  .v_subscribe_form .btn-primary{
-    border-radius: 20px;
-    width: 100px;
-    font-size: 15px;
-    height: 30px;
-  }
-  .vchip_social address{
+}
+.v_subscribe_form button.btn {
+    width: 40%;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.vchip_social address{
     color: #fff;
   }
-
-
   .footer-bottom {
     background:#42526C;
     color: #fff;
@@ -693,3 +697,42 @@ footer .footer-bottom .container .row .col-md-4 .social-network{display: none!im
   padding: 0px auto;
 margin-left: 50%;}
 }
+
+/*user profile*/
+ .user-profile {
+    height: 30px;
+    width: 30px;
+    border: 2px solid #108DB6 !important;
+ }
+.user-profile1{
+  height: 50px;
+  width: 50px;
+  border: 2px solid #108DB6 !important;
+}
+.user-dropdown .more {
+  padding: 0px;
+  width: 100%;
+  height: 40px;
+  border-top: 1px solid #ddd;
+}
+
+.user-dropdown .more ul {
+  padding: 0px;
+  padding-left: 10px;
+}
+
+.user-dropdown .more li {
+  float: left;
+  list-style: none;
+  padding: 15px;
+  padding-top: 5px;
+}
+
+.user-dropdown .more a {
+  font-size: 18px;
+  color: #ddd;
+}
+.navbar-collapse{
+   padding-left:0;
+}
+.navbar-content li>b{text-transform: uppercase;}

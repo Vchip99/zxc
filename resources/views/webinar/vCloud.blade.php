@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-title')
-<title>V-Cloud – Access Data of your Students just by click |V-edu</title>
+<title>V-Cloud – Access Data of your Students just by click |Vchip-edu</title>
 @stop
 @section('header-css')
 @include('layouts.home-css')
@@ -29,7 +29,7 @@
 			<div class="col-md-9">
 				<h2 class="v_h2_title text-center">V-cloud</h2>
 				<p>
-					V-edu provides cloud storage to which pupils can send (hand in) documents, photographs and other created work. This means that lecturer can easily view, edit, save, mark and print students’ work that they have created on V-connect platform.
+					Vchip-edu provides cloud storage to which pupils can send (hand in) documents, photographs and other created work. This means that lecturer can easily view, edit, save, mark and print students’ work that they have created on V-connect platform.
 					<br/>
 					V-education’s V-Cloud is secure cloud storage which is used in conjunction with V-connect in class teaching.
 				</p>

@@ -42,9 +42,9 @@ list-style: none;
        width:250px;
        height:250px;
 }
-.panel{
+/*.panel{
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
+}*/
 .border-top{
   border-top: 5px solid #0077b3;
 }
@@ -78,7 +78,7 @@ width: 100%;
   font-weight: normal;
   padding: 5px 5px 5px 15px;
   position: relative;
-  
+
 
 }
 .right-sidebar img{

@@ -41,6 +41,10 @@ class CourseComment extends Model
         return $this->hasMany(CourseCommentLike::class);
     }
 
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     protected static function deleteCourseCommentsByUserId($userId){
         $comments = static::where('user_id', $userId)->get();
         if(is_object($comments) && false == $comments->isEmpty()){

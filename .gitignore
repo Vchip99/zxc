@@ -7,4 +7,6 @@
 /public/projectStorage
 /public/testSubCategoryImages
 /public/userStorage
+/public/assignmentStorage
+/public/clientAssignmentStorage
 .env

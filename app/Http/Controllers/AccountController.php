@@ -186,7 +186,8 @@ class AccountController extends Controller
         $allPostModuleId = self::AllPostModuleIdForMyQuestions;
         $likesCount = DiscussionPostLike::getLikes();
         $currentUser = Auth::user()->id;
-        return view('dashboard.myQuestions', compact('posts', 'user', 'allPostModuleId', 'likesCount', 'currentUser'));
+        $discussionCategories = [];
+        return view('dashboard.myQuestions', compact('posts', 'user', 'allPostModuleId', 'likesCount', 'currentUser', 'discussionCategories'));
     }
 
     protected function myReplies(){
@@ -602,8 +603,7 @@ class AccountController extends Controller
         $questionId   = InputSanitise::inputInt($request->get('assignment_question_id'));
         $studentId   = InputSanitise::inputInt($request->get('student_id'));
         $answer = $request->get('answer');
-        $lecturerComment = $request->get('lecturer_comment');
-        if(empty($answer) && empty($lecturerComment)){
+        if(empty($answer) && false == $request->exists('attached_link')){
             if(User::Student == Auth::user()->user_type){
                 return Redirect::to('doAssignment/'.$questionId);
             } else {
@@ -616,7 +616,7 @@ class AccountController extends Controller
         {
             AssignmentAnswer::addAssignmentAnswer($request);
             DB::commit();
-            if(!empty($answer)){
+            if(User::Student == Auth::user()->user_type){
                 return Redirect::to('doAssignment/'.$questionId)->with('message', 'Assignment updated successfully.');
             } else {
                 return Redirect::to('assignmentRemark/'.$questionId.'/'.$studentId )->with('message', 'Assignment updated successfully.');

@@ -51,6 +51,14 @@ class BlogSubComment extends Model
         return $this->hasMany(BlogSubCommentLike::class);
     }
 
+     /**
+     *  blog associated user
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id');
+    }
+
     protected static function deleteBlogSubCommentsByUserId($userId){
         $subcomments = static::where('user_id', $userId)->get();
         if(is_object($subcomments) && false == $subcomments->isEmpty()){

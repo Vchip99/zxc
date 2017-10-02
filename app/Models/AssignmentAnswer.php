@@ -17,24 +17,27 @@ class AssignmentAnswer extends Model
      *
      * @var array
      */
-    protected $fillable = ['answer','lecturer_comment','assignment_question_id', 'student_id', 'lecturer_id', 'attached_link'];
+    protected $fillable = ['answer','assignment_question_id', 'student_id', 'lecturer_id', 'attached_link','is_student_created',];
 
     /**
      *  add assignment answer
      */
     protected static function addAssignmentAnswer( Request $request){
         $answer = $request->get('answer');
-        $lecturerComment = $request->get('lecturer_comment');
         $questionId   = InputSanitise::inputInt($request->get('assignment_question_id'));
         $studentId   = InputSanitise::inputInt($request->get('student_id'));
         $lecturerId   = InputSanitise::inputInt($request->get('lecturer_id'));
 
         $assignmentAnswer = new static;
         $assignmentAnswer->answer = $answer?:'';
-        $assignmentAnswer->lecturer_comment = $lecturerComment?:'';
         $assignmentAnswer->assignment_question_id = $questionId;
         $assignmentAnswer->student_id = $studentId;
         $assignmentAnswer->lecturer_id = $lecturerId;
+        if( 2 == Auth::user()->user_type){
+            $assignmentAnswer->is_student_created = 1;
+        } else {
+            $assignmentAnswer->is_student_created = 0;
+        }
 
         if($request->exists('attached_link')){
 	        $attachmentFolderPath = "assignmentStorage/studentId-".$studentId."/assignmentId-".$questionId;

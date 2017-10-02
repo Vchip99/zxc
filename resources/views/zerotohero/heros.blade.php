@@ -1,11 +1,10 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>Free Online Courses by Industrial Expert |V-edu</title>
+  <title>Free Online Courses by Industrial Expert |Vchip-edu</title>
 @stop
 @section('header-css')
   @include('layouts.home-css')
   <link href="{{ asset('css/sidemenuindex.css?ver=1.0')}}" rel="stylesheet"/>
-  <!-- <link href="{{ asset('css/v_courses.css?ver=1.0')}}" rel="stylesheet"/> -->
 <style type="text/css">
 #vchip-header {
   background: #4d4d4d;

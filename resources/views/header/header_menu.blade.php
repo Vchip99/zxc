@@ -1,7 +1,9 @@
-<nav class="navbar navbar-default navbar-fixed-top shrink" role="navigation">
-    <div class="container">
-      <div class="pull-left">
-        <a class="navbar-brand pull-left" href="{{url('/')}}"><i class="fa fa-university"></i><span>V-edu</span></a>
+<nav class=" navbar-lower navbar navbar-default  shrink navbar-fixed-top" style=" z-index: 1030; ">
+  <div class="container">
+      <div class="pull-left" >
+        <a class="navbar-brand pull-left" href="{{ url('/')}}">
+         <span>Vchip-edu</span>
+        </a>
       </div>
       <div class="navbar-header pull-right">
         <button type="button" class="navbar-toggle pull-left" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -10,112 +12,144 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-
         <div class="pull-right dropdown " >
           @if(Auth::user())
-          <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><i class="fa fa-user" aria-hidden="true"><b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></i><b class="caret"></b>
+          <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User">
+            @if(!empty(Auth::user()->photo))
+              <img src="{{asset(Auth::user()->photo)}}" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
+            @else
+              <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
+            @endif
+            @if(Auth::user()->userNotificationCount() > 0)
+              <b style="color: red;">{{Auth::user()->userNotificationCount()}}</b>
+            @endif
           </a>
-            <ul class="dropdown-menu" role="menu">
-              <div class="navbar-content">
+            <ul class="dropdown-menu user-dropdown ">
                 <li>
-                  <a href="{{ url('profile')}}" data-toggle="tooltip" title="Dashbord"><i class="fa fa-tachometer" aria-hidden="true"></i>Dashbord</a>
+                  <a href="{{ url('profile')}}" data-toggle="tooltip" title="Dashbord">
+                  @if(!empty(Auth::user()->photo))
+                    <img src="{{asset(Auth::user()->photo)}}" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
+                  @else
+                    <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
+                  @endif
+                  {{Auth::user()->name}}</a>
+                </li>
+                <li role="separator" class="divider"></li>
+                <li>
+                  <a href="{{ url('myNotifications')}}" data-toggle="tooltip" title="My Notifications"><i class="fa fa-star" aria-hidden="true"></i> My Notifications : <b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></a>
                 </li>
                 <li>
-                  <a href="{{ url('myNotifications')}}" data-toggle="tooltip" title="My Notifications"><i class="fa fa-star" aria-hidden="true"></i>My Notifications : <b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></a>
+                  <a href="{{ url('adminMessages')}}" data-toggle="tooltip" title="Admin Notifications"><i class="fa fa-star" aria-hidden="true"></i> Admin Messages : <b style="color: red;">{{Auth::user()->adminNotificationCount()}}</b></a>
                 </li>
-                <li>
-                  <a href="{{ url('adminMessages')}}" data-toggle="tooltip" title="Admin Notifications"><i class="fa fa-star" aria-hidden="true"></i>Admin Messages : <b style="color: red;">{{Auth::user()->adminNotificationCount()}}</b></a>
-                </li>
-                <!-- <li><a href=""><i class="fa fa-user" aria-hidden="true"></i>My Profile</a></li> -->
-                <li><a href="{{ url('logout') }}" data-toggle="tooltip" title="Logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
+                <li role="separator" class="divider"></li>
+                <li><a href="{{ url('logout') }}" data-toggle="tooltip" title="Logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
                   <form id="logout-form" action="{{ url('logout') }}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                   </form>
                 </li>
-              </div>
             </ul>
             @else
-              <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><i class="fa fa-user" aria-hidden="true"></i><b class="caret"></b>
+              <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>
               </a>
               <ul class="dropdown-menu" role="menu">
                 <div class="navbar-content">
                   <li>
-                    <a href="{{ url('/')}}"><i class="fa fa-tachometer" aria-hidden="true"></i>Login</a>
+                    <a href="{{ url('/')}}"><i class="fa fa-tachometer" aria-hidden="true"></i> Login</a>
                   </li>
                 </div>
               </ul>
           @endif
-          </div>
-          <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::user()))?Auth::user()->id: NULL }}">
         </div>
-          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-          <li class="" data-toggle="tooltip" title="Home"><a href="{{ asset('/home')}}">HOME</a></li>
+      </div>
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Course">Course <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" role="menu">
-              <div class="navbar-content">
-                <li data-toggle="tooltip" title="Online Course"><a href="{{ url('courses')}}"> Online course </a></li>
-                <li data-toggle="tooltip" title="Live Course"><a href="{{ url('liveCourse') }}"> Live course </a></li>
-                <li data-toggle="tooltip" title="Webinar"><a href="{{ url('webinar')}}">Webinar</a></li>
-              </div>
-            </ul>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Digital Education">Digital Education <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" role="menu">
+                <div class="navbar-content">
+                 <li><a href="{{ url('courses')}}" title="Online Courses">Online Courses</a></li>
+                 <li><a href="{{ url('liveCourse')}}" title="Live course">Live course</a></li>
+                 <li class="divider"></li>
+                 <li><a href="{{ url('workshops') }}" title="Workshop">Workshop</a></li>
+                 <li class="divider"></li>
+                 <li><a href="{{url('vkits')}}" title="Hoby Project">Hoby Project</a></li>
+                 <li class="divider"></li>
+                  <li><a href="{{url('documents')}}" title="Documents">Documents</a></li>
+                </div>
+              </ul>
           </li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Test-Series">Test-Series <span class="caret"></span>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Test-Series">Test-Series <span class="caret"></span>
+                </a>
+              <ul class="dropdown-menu" role="menu">
+                <div class="navbar-content">
+                  <li><a class="" href="{{ url('online-tests') }}" data-toggle="tooltip" title="Online Tests"> Online Tests </a></li>
+                  @if(count($testCategoriesWithQuestions) > 0)
+                    @foreach($testCategoriesWithQuestions as $testCategory)
+                      <li>
+                        <a href="{{ url('/showTest') }}/{{ $testCategory->id }}" data-toggle="tooltip" title="{{ $testCategory->name }}">{{ $testCategory->name }}</a>
+                      </li>
+                    @endforeach
+                  @endif
+               </div>
+              </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Service">Service<span class="caret"></span>
             </a>
             <ul class="dropdown-menu" role="menu">
-              <div class="navbar-content">
-                <li><a class="" href="{{ url('online-tests') }}" data-toggle="tooltip" title="Online Tests"> Online Tests </a></li>
-                @if(count($testCategoriesWithQuestions) > 0)
-                  @foreach($testCategoriesWithQuestions as $testCategory)
-                    <li>
-                      <a href="{{ url('/showTest') }}/{{ $testCategory->id }}" data-toggle="tooltip" title="{{ $testCategory->name }}">{{ $testCategory->name }}</a>
-                    </li>
-                  @endforeach
-                @endif
+             <div class="navbar-content">
+               <li> <b style="color: #01bafd;">Collage</b></li>
+                 <li class="mrgn_10_left"><a href="{{ url('erp') }}" title="Digital edu & ERP">Digital edu & ERP</a></li>
+                <li class="divider"></li>
+                <li> <b style="color: #01bafd;">Cotching Institute</b></li>
+                 <li class="mrgn_10_left"><a href="{{ url('educationalPlatform') }}" title="Education Platform">Education Platform</a></li>
+                 <li class="mrgn_10_left"><a href="{{ url('digitalMarketing') }}" title="Digital Marketing">Digital Marketing</a></li>
+                 <li class="mrgn_10_left"><a href="{{ url('pricing') }}" title="pricing">pricing</a></li>
              </div>
             </ul>
           </li>
-          <li>
-            <a class="page-scroll" href="{{url('vkits')}}" data-toggle="tooltip" title="V-Kits">V-Kits</a>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Solution">Solution <span class="caret"></span>
+         <li><a href="{{ url('placements') }}" title="Placement">placement</a></li>
+          <li><a href="{{url('heros')}}" title="Zero To Hero">Z To H</a></li>
+           <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Discussion">Discussion <span class="caret"></span>
             </a>
             <ul class="dropdown-menu" role="menu">
               <div class="navbar-content">
-                <li data-toggle="tooltip" title="V-Education"><a href="{{ url('vEducation')}}"> V-Education</a></li>
-                <li data-toggle="tooltip" title="V-Connect"><a href="{{ url('vConnect')}}">V-Connect</a></li>
-                <li data-toggle="tooltip" title="V-Pendrive"><a href="{{ url('vPendrive')}}">V-Pendrive</a></li>
-                <li data-toggle="tooltip" title="V-Cloud"><a href="{{ url('vCloud')}}">V-Cloud</a></li>
-              </div>
-            </ul>
-          </li>
-          <li><a class="page-scroll" href="{{url('documents')}}" data-toggle="tooltip" title="Documents">Documents</a></li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Discussion">Discussion <span class="caret"></span></a>
-            <ul class="dropdown-menu" role="menu">
-              <div class="navbar-content">
-                <li data-toggle="tooltip" title="Discussion forum"><a href="{{url('discussion')}}">Discussion forum</a></li>
-                <li data-toggle="tooltip" title="Live video discussion"><a href="{{url('liveVideo')}}">Live video discussion</a></li>
-                <li data-toggle="tooltip" title="Blog"><a href="{{url('blog')}}">Blog</a></li>
+                <li><a href="{{url('discussion')}}" title="Discussion forum">Discussion forum</a></li>
+                <li><a href="{{url('liveVideo')}}" title="Live video discussion">Live video discussion</a></li>
+                <li><a href="{{url('blog')}}" title="Blog">Blog</a></li>
               </div>
             </ul>
           </li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="More">More <span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="About">About <span class="caret"></span>
+            </a>
             <ul class="dropdown-menu " role="menu">
               <div class="navbar-content">
-                <li data-toggle="tooltip" title="Career"><a href="{{url('career')}}">Career</a></li>
-                <li data-toggle="tooltip" title="Our partners"><a href="{{url('ourpartner')}}">Our partners</a></li>
-                <li data-toggle="tooltip" title="Zero To Hero"><a href="{{url('heros')}}">Zero To Hero</a></li>
-                <li data-toggle="tooltip" title="Contact Us"><a href="{{url('contactus')}}">Contact Us</a></li>
-              </div>
-            </ul>
+               <li><a href="{{url('us')}}" title="US">US</a></li>
+               <li><a href="{{url('ourpartner')}}" title="Our partners">Our partners</a></li>
+               <li><a href="{{url('career')}}" title="Career">Career</a></li>
+               <li><a href="{{url('contactus')}}" title="Contact us">Contact us</a></li>
+             </div>
+           </ul>
           </li>
+
         </ul>
-   </div>
- </div>
+      </div>
+    </div>
 </nav>
+<input type="hidden" id="user_id" name="user_id" value="{{ (is_object(Auth::user())?Auth::user()->id:NULL)}}">
+<script type="text/javascript">
+  $(function () {
+  $('.navbar-collapse ul li a:not(.dropdown-toggle)').click(function () {
+          $('.navbar-toggle:visible').click();
+  });
+});
+$('.dropdown').hover(function() {
+  $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn(500);
+}, function() {
+  $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut(500);
+});
+</script>

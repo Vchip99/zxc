@@ -208,7 +208,7 @@ class ClientAssignmentController extends ClientBaseController
     protected function createAssignmentRemark(Request $request){
         $questionId   = InputSanitise::inputInt($request->get('assignment_question_id'));
         $studentId   = InputSanitise::inputInt($request->get('student_id'));
-        if(empty($request->get('teacher_comment')) && empty($request->get('attached_link'))){
+        if(empty($request->get('answer')) && false == $request->exists('attached_link')){
             return Redirect::to('studentsAssignment')->with('message', 'please enter remark or select attachment.');
         }
         DB::connection('mysql2')->beginTransaction();

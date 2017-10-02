@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>V-edu - Best Place for Enhancing your Career |Vchip Technology</title>
+  <title>Vchip-edu - Best Place for Enhancing your Career |Vchip Technology</title>
 @stop
 @section('header-css')
 	@include('layouts.home-css')
@@ -12,6 +12,7 @@
 @stop
 @section('content')
 @include('header.header_menu')
+
 <section id="vchip-background" class="mrgn_60_btm">
 	<div class="vchip-background-single">
 		<div class="vchip-background-img">
@@ -36,19 +37,17 @@
        <div class="col-md-12">
           <div class="v_career">
           <div class="font_size">
-          <h2 class="v_h2_title">WE ARE HIRING<em> tutors for!</em></h2>
-            <div class="rotating_text">
-              <span class="span1">
-                Data Science <br />
-                Quantitative Aptitude <br />
-                Reasoning<br />
-                Android App Development
-                </span>
-            </div>
-           </div>
+              <h2 class="v_h2_title">WE ARE HIRING<em> tutors for!</em>
+              <span
+                 class="txt-rotate"
+                 data-period="2000"
+                 data-rotate='[  "Data Science.", "Quantitative Aptitude", "Reasoning.", "Android  Developer" ]'>
+              </span>
+             </h2>
+             </div>
            <div class="hr"></div><br />
           <h3 class="v_h3_title"><em>Performance of a company is directly proportional to his team...</em></h3><br />
-            <p> V-edu have open, engaging, fun, employee-centric work environment with competitive compensation and rewards and fast-track programs for high potential employees. We are always be searching for new generation of entrepreneur. Our team is well balanced of both newly graduate and  experienced guys. We believe that newcomers known the exact market demand and our experienced guys fulfill it. We always welcome new ideas, technology and ready to change. </p>
+            <p> Vchip-edu have open, engaging, fun, employee-centric work environment with competitive compensation and rewards and fast-track programs for high potential employees. We are always be searching for new generation of entrepreneur. Our team is well balanced of both newly graduate and  experienced guys. We believe that newcomers known the exact market demand and our experienced guys fulfill it. We always welcome new ideas, technology and ready to change. </p>
 
             <p>Our main motive is bridging between educational organization  and Industry along with Digital village. So our most of tutors are belong to industries.</p>
           </div>
@@ -56,6 +55,7 @@
       </div>
       </div>
       </section>
+
       <section class="v_container">
       <div class="container">
       <div class="row">
@@ -65,7 +65,7 @@
                 <div class="col-lg-6 col-md-6">
                 <div class="vchip_career_info-left">
                   <div class="text-center">
-                   <h2 class="v_h2_title">Features of V-edu</h2>
+                   <h2 class="v_h2_title">Features of Vchip-edu</h2>
                   </div>
                   <ul class="vchip_list">
                     <li>Dynamic, healthy and happy Working Environment</li>
@@ -310,4 +310,62 @@
 @section('footer')
 	@include('footer.footer')
 	<script src="{{ asset('js/form.js') }}"></script>
+  <script type="text/javascript">
+  var TxtRotate = function(el, toRotate, period) {
+  this.toRotate = toRotate;
+  this.el = el;
+  this.loopNum = 0;
+  this.period = parseInt(period, 10) || 2000;
+  this.txt = '';
+  this.tick();
+  this.isDeleting = false;
+};
+
+TxtRotate.prototype.tick = function() {
+  var i = this.loopNum % this.toRotate.length;
+  var fullTxt = this.toRotate[i];
+
+  if (this.isDeleting) {
+    this.txt = fullTxt.substring(0, this.txt.length - 1);
+  } else {
+    this.txt = fullTxt.substring(0, this.txt.length + 1);
+  }
+
+  this.el.innerHTML = '<span class="wrap">'+this.txt+'</span>';
+
+  var that = this;
+  var delta = 300 - Math.random() * 100;
+
+  if (this.isDeleting) { delta /= 2; }
+
+  if (!this.isDeleting && this.txt === fullTxt) {
+    delta = this.period;
+    this.isDeleting = true;
+  } else if (this.isDeleting && this.txt === '') {
+    this.isDeleting = false;
+    this.loopNum++;
+    delta = 500;
+  }
+
+  setTimeout(function() {
+    that.tick();
+  }, delta);
+};
+
+window.onload = function() {
+  var elements = document.getElementsByClassName('txt-rotate');
+  for (var i=0; i<elements.length; i++) {
+    var toRotate = elements[i].getAttribute('data-rotate');
+    var period = elements[i].getAttribute('data-period');
+    if (toRotate) {
+      new TxtRotate(elements[i], JSON.parse(toRotate), period);
+    }
+  }
+  // INJECT CSS
+  var css = document.createElement("style");
+  css.type = "text/css";
+  css.innerHTML = ".txt-rotate > .wrap { border-right: 0.08em solid #666 }";
+  document.body.appendChild(css);
+};
+</script>
 @stop

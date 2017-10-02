@@ -77,6 +77,7 @@
   </div>
 <script type="text/javascript">
   $('#addDept').click(function(){
+    event.preventDefault();
     var departmrnts = document.getElementById('departments');
     var numberOfChildren = departmrnts.getElementsByTagName('input').length + 1;
     var departmrntId = document.getElementById('college_id');

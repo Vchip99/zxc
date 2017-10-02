@@ -7,19 +7,38 @@
   <link href="{{ asset('css/solution.css') }}" rel="stylesheet"/>
   <link href="{{ asset('css/comment.css') }}" rel="stylesheet"/>
   <style type="text/css">
-    .crl{
-      float: right;
-      background-color:#01bafd;
-      padding: 0px 10px;
-      display: inline-block;
-      -moz-border-radius: 100px;
-      -webkit-border-radius: 100px;
-      border-radius: 100px;
-      -moz-box-shadow: 0px 0px 2px #888;
-      -webkit-box-shadow: 0px 0px 2px #888;
-      box-shadow: 0px 0px 2px #888;
-      color: #fff;
-    }
+  .ellipsed {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+p.ellipsed{
+  cursor: pointer;
+}
+  .v_p_heding{font-weight: bolder;}
+ .panel-heading img {
+  width: 30px;
+  height: 30px;
+  float: left;
+  border: 2px solid #d2d6de;
+  padding: 1px;
+}
+.username{
+margin-left: 10px;
+margin-right: 10px;
+
+}
+.username {
+  font-size: 16px;
+  font-weight: 600;
+  color:#b6b6b6;
+}
+.fa-calendar-o{ font-weight: bolder;
+margin-right: 5px;
+}
+.date{
+color: #b6b6b6;
+}
   </style>
 @stop
 @section('header-js')
@@ -41,28 +60,29 @@
   </section>
   <section id="" class="v_container v_bg_grey">
     <div class="container ">
-      <div class="container">
         <div class="row">
           <div class="col-md-9">
             <div class="">
               <h2 class="v_h2_title text-center">Blogs</h2>
-              <dir id="blogs">
+              <div id="blogs">
                 @if(count($blogs) > 0)
                   @foreach($blogs as $blog)
-                    <div class="panel panel-info container-fluid">
+                    <div class="panel panel-default container-fluid slideanim">
                       <div class="panel-heading row">
-                        <div class="col-xs-6 ">
-                          <a class="uppercase" href="{{url('blogComment')}}/{{$blog->id}}" target="_blank"> {{$blog->title}}</a>
-                          <figcaption class="blog-by">
-                            <span><i class="fa fa-user" aria-hidden="true"> <a href="#">{{$blog->author}}</a></i></span>
-                          </figcaption>
-                        </div>
-                        <div class="col-xs-6">
-                          <div class="crl">
-                           <div class="entry-time-day">{{ $blog->created_at->format('d') }}</div>
-                           <div class="entry-time-month">{{ $blog->created_at->format('M') }}</div>
-                         </div>
-                        </div>
+                        <p class="ellipsed"> <a class="uppercase v_p_heding " href="{{url('blogComment')}}/{{$blog->id}}" target="_blank"> {{$blog->title}}</a>
+                        </p>
+                        <figcaption class="blog-by">
+                          <span>
+                            <!-- <img class="img-circle" src="{{ asset('images/user/user.png')}}" alt="User Image" /> -->
+                            @if(!empty($blog->user->photo))
+                              <img src="{{ asset($blog->user->photo)}} " class="img-circle" alt="User Image">
+                            @else
+                              <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                            @endif
+                          </span>
+                          <span class="username">{{$blog->author}}</span>
+                          <span class="date"><i class="fa fa-calendar-o"></i><span> {{ $blog->created_at->format('M d , Y') }}</span></span>
+                        </figcaption>
                       </div>
                       <div class="panel-body mrgn_10_top_btm more">
                         {!! $blog->content !!}
@@ -78,7 +98,7 @@
                 @else
                   No blogs available.
                 @endif
-              </dir>
+              </div>
             </div>
           </div>
           <div class="col-md-3 ">
@@ -105,7 +125,6 @@
             </div>
           </div>
         </div>
-      </div>
     </div>
   </section>
 @stop
@@ -181,19 +200,13 @@ function showBlogs(ele){
       if( 0 < msg.data.length){
         $.each(msg.data, function(idx, obj) {
           var mainDiv = document.createElement('div');
-          mainDiv.className = 'panel panel-info container-fluid';
+          mainDiv.className = 'panel panel-default container-fluid';
           var panelDiv = document.createElement('div');
           panelDiv.className = 'panel-heading row';
           var panelHeadingDiv = document.createElement('div');
-          panelHeadingDiv.className = 'col-xs-6';
           var url = "{{url('blogComment')}}/"+obj.id;
-          panelHeadingDiv.innerHTML = '<a class="uppercase" href="'+url+'" target="_blank">'+ obj.title +'</a><figcaption class="blog-by"><span><i class="fa fa-user" aria-hidden="true"> <a href="#">'+ obj.author+'</a></i></span></figcaption>';
+          panelHeadingDiv.innerHTML = '<p class="ellipsed"> <a class="uppercase" href="'+url+'" target="_blank">'+ obj.title +'</a></p><figcaption class="blog-by"><span><img src="images/user1.png" class="img-circle" alt="User Image"></span><span class="username">'+ obj.author+'</span><span class="date"><i class="fa fa-calendar-o"></i><span> '+ new Date(obj.created_at).getDate() +'/'+ new Date(obj.created_at).getMonth() +'/'+ new Date(obj.created_at).getFullYear()+'</span></span></figcaption>';
           panelDiv.appendChild(panelHeadingDiv);
-
-          var panelDateDiv = document.createElement('div');
-          panelDateDiv.className = 'col-xs-6';
-          panelDateDiv.innerHTML = '<div class="crl"><div class="entry-time-day">'+ new Date(obj.created_at).getDate() +'</div><div class="entry-time-month">'+ new Date(obj.created_at).toLocaleString("en-us", { month: "short" }) +'</div></div>';
-          panelDiv.appendChild(panelDateDiv);
           mainDiv.appendChild(panelDiv);
 
           var panelContentDiv = document.createElement('div');

@@ -36,6 +36,7 @@ class ContactUs extends Mailable
         ->view('emails.contactus')
         ->with(['subject' => $this->request->subject,
                 'name' => $this->request->name,
+                'phone' => $this->request->phone,
                 'bodyMessage' => $this->request->message,
                 'email' => $this->request->email,
             ]);

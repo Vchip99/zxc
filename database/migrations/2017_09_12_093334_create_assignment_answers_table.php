@@ -16,11 +16,11 @@ class CreateAssignmentAnswersTable extends Migration
         Schema::create('assignment_answers', function (Blueprint $table) {
             $table->increments('id');
             $table->text('answer');
-            $table->text('lecturer_comment');
             $table->integer('assignment_question_id')->unsigned();
             $table->integer('student_id')->unsigned();
             $table->integer('lecturer_id')->unsigned();
             $table->string('attached_link');
+            $table->tinyInteger('is_student_created')->unsigned();
             $table->timestamps();
         });
     }

@@ -1,11 +1,24 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>V-edu – Technical Discussion Forum |Vchip Technology</title>
+  <title>Vchip-edu – Technical Discussion Forum |Vchip Technology</title>
 @stop
 @section('header-css')
   @include('layouts.home-css')
   <link href="{{asset('css/sidemenuindex.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{asset('css/comment.css?ver=1.0')}}" rel="stylesheet"/>
+  <style type="text/css">
+    .ask-qst button{border-radius: 0px;
+margin-bottom: 20px;
+margin-left: -13px;}
+@media(max-width: 768px){
+  .ask-qst {
+    text-align: center !important;
+  }
+}
+.cmt-left-margin{
+  margin-left: 20px;
+}
+  </style>
 @stop
 @section('header-js')
   @include('layouts.home-js')
@@ -54,218 +67,57 @@
           </div>
         </div>
         <div class="col-sm-9">
-          <div class="panel with-nav-tabs panel-info">
-            <div class="panel-heading">
-              <ul class="nav nav-tabs">
-                <li class="active"><a href="#questions" data-toggle="tab" title="Questions">Questions</a></li>
-                <li><a href="#askQuestion" data-toggle="tab" title="Ask Question">Ask Question</a></li>
-              </ul>
-            </div>
-            <div class="panel-body">
-              <div class="tab-content">
-                <div class="tab-pane fade in active" id="questions" style="padding: 15px !important;">
-                  <div class="post-comments ">
-                    <div class="row" id="showAllPosts">
-                      @if(count($posts) > 0)
-                        @foreach($posts as $post)
-                         <div class="media" id="showPost_{{$post->id}}">
-                            <div class="media-heading" >
-                            <div class="user-block ">
-                              <span class="tital">{{$post->title}} </span>
-                            </div>
-                            <div class="box-tools ">
-                              <button type="button" data-toggle="collapse" data-target="#post{{$post->id}}" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i>
-                              </button>
-                              @if(is_object(Auth::user()) && Auth::user()->id == $post->user_id)
-                              <button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button>
-                              <ul role="menu" class="dropdown-menu dropdown-menu-right">
-                                <li><a id="{{$post->id}}" onclick="confirmPostDelete(this);">Delete</a></li>
-                                <form id="deletePost_{{$post->id}}" action="{{ url('deletePost')}}" method="POST" style="display: none;">
-                                    {{ csrf_field() }}
-                                    {{ method_field('DELETE') }}
-                                    <input type="hidden" name="post_id" value="{{$post->id}}">
-                                </form>
-                                <li><a id="{{$post->id}}" onclick="editPost(this);">Edit</a></li>
-                              </ul>
-                              @endif
-                            </div>
-                            </div>
-                            <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
-                            <div class="user-block">
-                              <img class="img-circle" src="{{ asset('images/user1.png') }}" alt="User Image" />
-                              <span class="username">{{ $user->find($post->user_id)->name }} </span>
-                              <span class="description">Shared publicly - {{$post->updated_at->diffForHumans()}}</span>
-                            </div>
-                            <div  class="media-body" data-toggle="lightbox">
-                              <br/>
-                              <div class="more bold img-ckeditor img-responsive" id="editPostHide_{{$post->id}}">{!! $post->body !!}</div>
-                              <form action="{{ url('updatePost')}}" method="POST" id="formUpdatePost{{$post->id}}">
-                                    {{csrf_field()}}
-                                    {{ method_field('PUT') }}
-                                <div class="form-group hide" id="editPostShow_{{$post->id}}" >
-                                  <textarea name="update_question" placeholder="Answer 1" type="text" id="updatequestion_{{$post->id}}" required>{!! $post->body !!}</textarea>
-                                    <script type="text/javascript">
-                                      CKEDITOR.replace( 'updatequestion_{{$post->id}}', { enterMode: CKEDITOR.ENTER_BR } );
-                                      CKEDITOR.config.width="100%";
-                                      CKEDITOR.config.height="auto";
-                                      CKEDITOR.on('dialogDefinition', function (ev) {
-
-                                          var dialogName = ev.data.name,
-                                              dialogDefinition = ev.data.definition;
-
-                                          if (dialogName == 'image') {
-                                              var onOk = dialogDefinition.onOk;
-
-                                              dialogDefinition.onOk = function (e) {
-                                                  var width = this.getContentElement('info', 'txtWidth');
-                                                  width.setValue('100%');//Set Default Width
-
-                                                  var height = this.getContentElement('info', 'txtHeight');
-                                                  height.setValue('auto');////Set Default height
-
-                                                  onOk && onOk.apply(this, e);
-                                              };
-                                          }
-                                      });
-                                    </script>
-                                  <input type="hidden" name="post_id" value="{{$post->id}}">
-                                  <button type="submit" class="btn btn-primary">Update</button>
-                                  <button type="button" class="btn btn-default" id="{{$post->id}}" onclick="canclePost(this);">Cancle</button>
-                                </div>
-                              </form>
-                              <div class="border-bottom"></div>
-                              <div class="comment-meta main-reply-box">
-                                  <span id="like_{{$post->id}}" >
-                                    @if( isset($likesCount[$post->id]) && isset($likesCount[$post->id]['user_id'][$currentUser]))
-                                         <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                         <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
-                                    @else
-                                         <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
-                                         <span id="like1-bs3">@if( isset($likesCount[$post->id])) {{count($likesCount[$post->id]['like_id'])}} @endif</span>
-                                    @endif
-                                  </span>
-                                 <span class="mrgn_5_left">
-                                  <a class="" role="button" data-toggle="collapse" href="#replyToPost{{$post->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
-                                </span>
-                                <div class="collapse replyComment" id="replyToPost{{$post->id}}">
-                                  <form action="{{ url('createComment')}}" method="POST" id="formReplyToPost{{$post->id}}">
-                                    {{csrf_field()}}
-                                    <div class="form-group">
-                                      <label for="comment">Your Comment</label>
-                                      <textarea name="comment" class="form-control" ></textarea>
-                                    </div>
-                                    <input type="hidden" name="discussion_post_id" value="{{$post->id}}">
-                                    <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoPost(this);" id="formReplyToPost{{$post->id}}">Send</button>
-                                  </form>
-                                </div>
-                              </div>
-                              <div class="cmt-bg">
-                                <div class="box-body chat" id="chat-box">
-                                  @if(count( $post->comments) > 0)
-                                    @foreach($post->comments as $comment)
-                                      <div class="item" id="showComment_{{$comment->id}}">
-                                        <img src="{{ asset('images/user1.png') }}" alt="User Image" />
-                                        <div class="message">
-                                          @if(is_object(Auth::user()) && (Auth::user()->id == $comment->user_id || Auth::user()->id == $post->user_id))
-                                          <div class="dropdown pull-right">
-                                            <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                              <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                              @if(Auth::user()->id == $comment->user_id || Auth::user()->id == $post->user_id)
-                                                <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
-                                                <form id="deleteComment_{{$comment->id}}" action="{{ url('deleteComment')}}" method="POST" style="display: none;">
-                                                  {{ csrf_field() }}
-                                                  {{ method_field('DELETE') }}
-                                                  <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                                </form>
-                                              @endif
-                                              @if(Auth::user()->id == $comment->user_id)
-                                                <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
-                                              @endif
-                                            </ul>
-                                          </div>
-                                          @endif
-                                            <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
-                                            <p class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</p>
-                                            <form action="{{ url('updateComment')}}" method="POST" id="formUpdateComment{{$comment->id}}">
-                                                  {{csrf_field()}}
-                                                  {{ method_field('PUT') }}
-                                              <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
-                                                <textarea class="form-control" name="comment" rows="3">{!! $comment->body !!}</textarea>
-                                                <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                                <input type="hidden" name="post_id" value="{{$post->id}}">
-                                                <button type="submit" class="btn btn-primary">Update</button>
-                                                <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
-                                              </div>
-                                            </form>
-                                          </div>
-                                          <div class="comment-meta reply-1">
-                                            <span id="cmt_like_{{$comment->id}}" >
-                                              @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
-                                                   <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                                   <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
-                                              @else
-                                                   <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
-                                                   <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
-                                              @endif
-                                            </span>
-                                           <span class="mrgn_5_left">
-                                            <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$post->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
-                                          </span>
-                                          <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
-                                          <div class="collapse replyComment" id="replyToComment{{$post->id}}-{{$comment->id}}">
-                                            <form action="{{ url('createSubComment')}}" method="POST" id="formReplyToComment{{$post->id}}{{$comment->id}}">
-                                               {{csrf_field()}}
-                                              <div class="form-group">
-                                                <label for="subcomment">Your Sub Comment</label>
-                                                  <textarea name="subcomment" class="form-control" rows="3"></textarea>
-                                              </div>
-                                              <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                              <input type="hidden" name="discussion_post_id" value="{{$post->id}}">
-                                              <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToComment{{$post->id}}{{$comment->id}}">Send</button>
-                                            </form>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      @if(count( $comment->children ) > 0)
-                                        @include('discussion.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'user' => $user])
-                                      @endif
-                                    @endforeach
-                                  @endif
-                                </div>
-                              </div>
-                            </div>
-                            </div>
-                          </div>
-                        @endforeach
+          <div class="ask-qst">
+              <button class="btn btn-primary "  data-toggle="modal" data-target="#askQuestion"> Ask Question</button>
+              <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::user()))?Auth::user()->id:NULL}}">
+          </div>
+          <div class="post-comments ">
+            <div class="row" id="showAllPosts">
+              @if(count($posts) > 0)
+                @foreach($posts as $post)
+                 <div class="media" id="showPost_{{$post->id}}">
+                    <div class="media-heading" >
+                    <div class="user-block ">
+                      <span class="tital">{{$post->title}} </span>
+                    </div>
+                    <div class="box-tools ">
+                      <button type="button" data-toggle="collapse" data-target="#post{{$post->id}}" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i>
+                      </button>
+                      @if(is_object(Auth::user()) && Auth::user()->id == $post->user_id)
+                      <button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button>
+                      <ul role="menu" class="dropdown-menu dropdown-menu-right">
+                        <li><a id="{{$post->id}}" onclick="confirmPostDelete(this);">Delete</a></li>
+                        <form id="deletePost_{{$post->id}}" action="{{ url('deletePost')}}" method="POST" style="display: none;">
+                            {{ csrf_field() }}
+                            {{ method_field('DELETE') }}
+                            <input type="hidden" name="post_id" value="{{$post->id}}">
+                        </form>
+                        <li><a id="{{$post->id}}" onclick="editPost(this);">Edit</a></li>
+                      </ul>
                       @endif
                     </div>
-                  </div>
-                </div>
-                <div class="tab-pane fade" id="askQuestion">
-                  <div class="">
-                    <div class="dropdown selectCategory col-md-6">
-                      <select id="post_category" class="form-control" name="post_category" required>
-                        <option value = ""> Select Category ...</option>
-                        @if(count($discussionCategories) > 0)
-                          @foreach($discussionCategories as $discussionCategory)
-                            <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
-                          @endforeach
-                        @endif
-                      </select>
                     </div>
-                    <div class="widget-area ">
-                      <div class="status-upload">
-                        <form action="{{url('createPost')}}" method="POST" id="createPost">
-                          {{csrf_field()}}
-                           <div class="input-group">
-                              <span class="input-group-addon">Title</span>
-                              <input id="title" type="text" class="form-control" name="title" placeholder="Add Title Here">
-                            </div>
-                             <textarea name="question" placeholder="post here" type="text" id="question" required></textarea>
+                    <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
+                    <div class="user-block cmt-left-margin">
+                      @if(!empty($post->user->photo))
+                        <img src="{{ asset($post->user->photo)}} " class="img-circle" alt="User Image">
+                      @else
+                        <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                      @endif
+                      <span class="username">{{ $user->find($post->user_id)->name }} </span>
+                      <span class="description">Shared publicly - {{$post->updated_at->diffForHumans()}}</span>
+                    </div>
+                    <div  class="media-body" data-toggle="lightbox">
+                      <br/>
+                      <div class="more bold img-ckeditor img-responsive cmt-left-margin" id="editPostHide_{{$post->id}}">{!! $post->body !!}</div>
+                       <br/>
+                      <form action="{{ url('updatePost')}}" method="POST" id="formUpdatePost{{$post->id}}">
+                            {{csrf_field()}}
+                            {{ method_field('PUT') }}
+                        <div class="form-group hide" id="editPostShow_{{$post->id}}" >
+                          <textarea name="update_question" placeholder="Answer 1" type="text" id="updatequestion_{{$post->id}}" required>{!! $post->body !!}</textarea>
                             <script type="text/javascript">
-                              CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
+                              CKEDITOR.replace( 'updatequestion_{{$post->id}}', { enterMode: CKEDITOR.ENTER_BR } );
                               CKEDITOR.config.width="100%";
                               CKEDITOR.config.height="auto";
                               CKEDITOR.on('dialogDefinition', function (ev) {
@@ -288,18 +140,179 @@
                                   }
                               });
                             </script>
-                            <ul>
-                              <li><a title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Audio"><i class="fa fa-music"></i></a></li>
-                              <li><a title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Video"><i class="fa fa-video-camera"></i></a></li>
-                              <li><a title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Sound Record"><i class="fa fa-microphone"></i></a></li>
-                              <li><a title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Picture"><i class="fa fa-picture-o"></i></a></li>
-                            </ul>
-                            <input type="hidden" name="post_category_id" value="" id="post_category_id">
-                            <button type="button" class="btn btn-success btn-circle text-uppercase" onclick=" confirmSubmit(this);" id="createPost" title="Share"><i class="fa fa-share"></i> Share</button>
-                        </form>
+                          <input type="hidden" name="post_id" value="{{$post->id}}">
+                          <button type="submit" class="btn btn-primary">Update</button>
+                          <button type="button" class="btn btn-default" id="{{$post->id}}" onclick="canclePost(this);">Cancle</button>
+                        </div>
+                      </form>
+                      <div class="border-bottom"></div>
+                      <div class="comment-meta main-reply-box cmt-left-margin">
+                          <span id="like_{{$post->id}}" >
+                            @if( isset($likesCount[$post->id]) && isset($likesCount[$post->id]['user_id'][$currentUser]))
+                                 <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                 <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
+                            @else
+                                 <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                 <span id="like1-bs3">@if( isset($likesCount[$post->id])) {{count($likesCount[$post->id]['like_id'])}} @endif</span>
+                            @endif
+                          </span>
+                         <span class="mrgn_5_left">
+                          <a class="" role="button" data-toggle="collapse" href="#replyToPost{{$post->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                        </span>
+                        <div class="collapse replyComment" id="replyToPost{{$post->id}}">
+                          <form action="{{ url('createComment')}}" method="POST" id="formReplyToPost{{$post->id}}">
+                            {{csrf_field()}}
+                            <div class="form-group">
+                              <label for="comment">Your Comment</label>
+                              <textarea name="comment" class="form-control" ></textarea>
+                            </div>
+                            <input type="hidden" name="discussion_post_id" value="{{$post->id}}">
+                            <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoPost(this);" id="formReplyToPost{{$post->id}}">Send</button>
+                          </form>
+                        </div>
+                      </div>
+                      <div class="cmt-bg">
+                        <div class="box-body chat" id="chat-box">
+                          @if(count( $post->comments) > 0)
+                            @foreach($post->comments as $comment)
+                              <div class="item cmt-left-margin-10" id="showComment_{{$comment->id}}">
+                                @if(!empty($comment->user->photo))
+                                  <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
+                                @else
+                                  <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                                @endif
+                                <div class="message">
+                                  @if(is_object(Auth::user()) && (Auth::user()->id == $comment->user_id || Auth::user()->id == $post->user_id))
+                                  <div class="dropdown pull-right">
+                                    <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                      <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                      @if(Auth::user()->id == $comment->user_id || Auth::user()->id == $post->user_id)
+                                        <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
+                                        <form id="deleteComment_{{$comment->id}}" action="{{ url('deleteComment')}}" method="POST" style="display: none;">
+                                          {{ csrf_field() }}
+                                          {{ method_field('DELETE') }}
+                                          <input type="hidden" name="comment_id" value="{{$comment->id}}">
+                                        </form>
+                                      @endif
+                                      @if(Auth::user()->id == $comment->user_id)
+                                        <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
+                                      @endif
+                                    </ul>
+                                  </div>
+                                  @endif
+                                    <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
+                                    <p class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</p>
+                                    <form action="{{ url('updateComment')}}" method="POST" id="formUpdateComment{{$comment->id}}">
+                                          {{csrf_field()}}
+                                          {{ method_field('PUT') }}
+                                      <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
+                                        <textarea class="form-control" name="comment" rows="3">{!! $comment->body !!}</textarea>
+                                        <input type="hidden" name="comment_id" value="{{$comment->id}}">
+                                        <input type="hidden" name="post_id" value="{{$post->id}}">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                        <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                  <div class="comment-meta reply-1 cmt-left-margin">
+                                    <span id="cmt_like_{{$comment->id}}" >
+                                      @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
+                                           <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                           <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
+                                      @else
+                                           <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                           <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
+                                      @endif
+                                    </span>
+                                   <span class="mrgn_5_left">
+                                    <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$post->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                                  </span>
+                                  <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
+                                  <div class="collapse replyComment" id="replyToComment{{$post->id}}-{{$comment->id}}">
+                                    <form action="{{ url('createSubComment')}}" method="POST" id="formReplyToComment{{$post->id}}{{$comment->id}}">
+                                       {{csrf_field()}}
+                                      <div class="form-group">
+                                        <label for="subcomment">Your Sub Comment</label>
+                                          <textarea name="subcomment" class="form-control" rows="3"></textarea>
+                                      </div>
+                                      <input type="hidden" name="comment_id" value="{{$comment->id}}">
+                                      <input type="hidden" name="discussion_post_id" value="{{$post->id}}">
+                                      <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToComment{{$post->id}}{{$comment->id}}">Send</button>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                              @if(count( $comment->children ) > 0)
+                                @include('discussion.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'user' => $user])
+                              @endif
+                            @endforeach
+                          @endif
+                        </div>
                       </div>
                     </div>
+                    </div>
                   </div>
+                @endforeach
+              @endif
+            </div>
+          </div>
+          <div class="modal fade" id="askQuestion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <select id="post_category" class="form-control" name="post_category" required>
+                      <option value = ""> Select Category ...</option>
+                      @if(count($discussionCategories) > 0)
+                        @foreach($discussionCategories as $discussionCategory)
+                          <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
+                        @endforeach
+                      @endif
+                  </select>
+                </div>
+                <div class="modal-body" style="padding: 0px;">
+                  <div class="widget-area no-padding blank">
+                        <div class="status-upload">
+                            <form action="{{url('createPost')}}" method="POST" id="createPost">
+                        {{csrf_field()}}
+                         <div class="input-group">
+                            <span class="input-group-addon">Title</span>
+                            <input id="title" type="text" class="form-control" name="title" placeholder="Add Title Here">
+                          </div>
+                           <textarea name="question" placeholder="post here" type="text" id="question" required></textarea>
+                          <script type="text/javascript">
+                            CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
+                            CKEDITOR.config.width="100%";
+                            CKEDITOR.config.height="auto";
+                            CKEDITOR.on('dialogDefinition', function (ev) {
+
+                                var dialogName = ev.data.name,
+                                    dialogDefinition = ev.data.definition;
+
+                                if (dialogName == 'image') {
+                                    var onOk = dialogDefinition.onOk;
+
+                                    dialogDefinition.onOk = function (e) {
+                                        var width = this.getContentElement('info', 'txtWidth');
+                                        width.setValue('100%');//Set Default Width
+
+                                        var height = this.getContentElement('info', 'txtHeight');
+                                        height.setValue('auto');////Set Default height
+
+                                        onOk && onOk.apply(this, e);
+                                    };
+                                }
+                            });
+                          </script>
+                          <input type="hidden" name="post_category_id" value="" id="post_category_id">
+                          <button type="button" class="btn btn-success btn-circle text-uppercase" onclick=" confirmSubmit(this);" id="createPost" title="Share"><i class="fa fa-share"></i> Share</button>
+                      </form>
+                        </div><!-- Status Upload  -->
+                      </div>
+                </div>
+                <div class="modal-footer ">
+                  <button type="button" class="btn btn-default " data-dismiss="modal" style="margin-top: 10px;">close</button>
                 </div>
               </div>
             </div>
@@ -547,18 +560,24 @@
         divPanel.id = 'post'+obj.id;
 
         var commentBlockDiv = document.createElement('div');
-        commentBlockDiv.className = 'user-block';
-        var userImage = "{{ asset('images/user1.png') }}";
-        commentBlockDiv.innerHTML = '<img class="img-circle" src="'+userImage+'" alt="User Image" /><span class="username">'+ obj.user_name +'</span><span class="description">Shared publicly - '+ obj.updated_at+'</span>';
+        commentBlockDiv.className = 'user-block cmt-left-margin';
+        var userImagePath = "{{ asset('images/user1.png') }}";
+        if(obj.user_image){
+          var userImage = '<img class="img-circle" src="'+obj.user_image+'" alt="User Image" />';
+        } else {
+          var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
+        }
+        commentBlockDiv.innerHTML = ''+userImage+'<span class="username">'+ obj.user_name +'</span><span class="description">Shared publicly - '+ obj.updated_at+'</span>';
         divPanel.appendChild(commentBlockDiv);
 
         var divMediaBody = document.createElement('div');
         divMediaBody.className = 'media-body';
         divMediaBody.setAttribute('data-toggle', 'lightbox');
+        divMediaBody.innerHTML = '<br/>';
         var pBody = document.createElement('p');
-        pBody.className = 'more bold';
+        pBody.className = 'more bold cmt-left-margin';
         pBody.id ='editPostHide_'+ obj.id;
-        pBody.innerHTML = obj.body;
+        pBody.innerHTML = obj.body + ' <br/>';
         divMediaBody.appendChild(pBody);
 
         var spanEle = document.createElement('span');
@@ -596,7 +615,7 @@
         divMediaBody.appendChild(borderDiv);
 
         var divComment = document.createElement('div');
-        divComment.className = 'comment-meta main-reply-box';
+        divComment.className = 'comment-meta main-reply-box cmt-left-margin';
         commentInnerHtml = '<span id="like_'+obj.id+'">';
 
           if( msg['likesCount'][obj.id] && msg['likesCount'][obj.id]['user_id'][userId]){
@@ -643,11 +662,15 @@
           if(false == $.isEmptyObject(comments)){
             $.each(comments, function(idx, obj) {
               var mainCommentDiv = document.createElement('div');
-              mainCommentDiv.className = 'item';
+              mainCommentDiv.className = 'item cmt-left-margin-10';
               mainCommentDiv.id = 'showComment_'+obj.id;
 
               var commentImage = document.createElement('img');
-              var imageUrl = "{{ asset('images/user1.png') }}";
+              if(obj.user_image){
+                var imageUrl = obj.user_image;
+              } else {
+                var imageUrl = "{{ asset('images/user1.png') }}";
+              }
               commentImage.setAttribute('src',imageUrl);
               mainCommentDiv.appendChild(commentImage);
 
@@ -770,7 +793,11 @@
         mainSubCommentDiv.className = 'item replySubComment-1';
 
         var subcommentImage = document.createElement('img');
-        var subcommentImageUrl = "{{ asset('images/user1.png') }}";
+        if(obj.user_image){
+          var subcommentImageUrl = obj.user_image;
+        } else {
+          var subcommentImageUrl = "{{ asset('images/user1.png') }}";
+        }
         subcommentImage.setAttribute('src',subcommentImageUrl);
         mainSubCommentDiv.appendChild(subcommentImage);
 
@@ -1085,4 +1112,5 @@
   // });
 
 </script>
+
 @stop

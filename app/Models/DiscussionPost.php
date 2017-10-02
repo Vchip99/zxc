@@ -8,6 +8,7 @@ use App\Models\DiscussionComment;
 use DB;
 use App\Models\DiscussionCommentLike;
 use App\Models\DiscussionPostLike;
+use App\Models\User;
 
 class DiscussionPost extends Model
 {
@@ -86,6 +87,10 @@ class DiscussionPost extends Model
 
     public function deleteLikes(){
         return $this->hasMany(DiscussionPostLike::class, 'discussion_post_id');
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function deleteCommantsAndSubComments(){

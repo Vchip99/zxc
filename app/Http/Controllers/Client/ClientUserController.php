@@ -323,8 +323,7 @@ class ClientUserController extends BaseController
         $questionId   = InputSanitise::inputInt($request->get('assignment_question_id'));
         $studentId   = InputSanitise::inputInt($request->get('student_id'));
         $answer = $request->get('answer');
-        $teacherComment = $request->get('teacher_comment');
-        if(empty($answer) && empty($teacherComment)){
+        if(empty($answer) && false == $request->exists('attached_link')){
             return Redirect::to('doAssignment/'.$questionId);
         }
 
@@ -337,7 +336,7 @@ class ClientUserController extends BaseController
 
         }
         catch(\Exception $e)
-        {   dd($e);
+        {
             DB::connection('mysql2')->rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }

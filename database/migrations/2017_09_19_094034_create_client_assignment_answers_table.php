@@ -16,11 +16,11 @@ class CreateClientAssignmentAnswersTable extends Migration
         Schema::connection('mysql2')->create('client_assignment_answers', function (Blueprint $table) {
             $table->increments('id');
             $table->text('answer');
-            $table->text('teacher_comment');
             $table->integer('client_assignment_question_id')->unsigned();
             $table->integer('student_id')->unsigned();
             $table->integer('client_id')->unsigned();
             $table->string('attached_link');
+            $table->tinyInteger('is_student_created')->unsigned();
             $table->timestamps();
         });
     }

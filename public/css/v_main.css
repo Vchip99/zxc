@@ -1,3 +1,8 @@
+body{overflow-x: hidden;}
+.row{
+	margin-left: 0px;
+	margin-right: 0px;
+}
 /*___Margins________________________________________________________________________________*/
 .mrgn_5_top{margin-top:5px}
 .mrgn_10_top{margin-top:10px}

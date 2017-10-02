@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>Hobby Projects in Electronics, IoT, VLSI and V-kit |V-edu</title>
+  <title>Hobby Projects in Electronics, IoT, VLSI and Vchip-kit |Vchip-edu</title>
 @stop
 @section('header-css')
 @include('layouts.home-css')
@@ -35,6 +35,31 @@
       .img-ckeditor p>img{padding:10px!important;}
       .message p>img{width: 100%;height: auto !important;}
     }
+        @media  (min-width: 350px) {
+          .hidden-lg { display: none; }
+        }
+      @media  (max-width: 349px) {
+          .hidden-sm { display: none; }
+        }
+.fa-comment-o, .first-like i, .your-cmt{
+  font-weight: bold;
+  font-size: 18px;
+  color: #555;
+}
+.first-like i{
+  margin-right: 5px;
+}
+hr{
+  margin-top: 5px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid ;
+}
+.comment-meta{
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
  </style>
 
 
@@ -130,29 +155,31 @@
   </div>
 </div>
 </section>
-<span>&nbsp;</span>
-<section class="v_container">
+<section class="">
     <div class="container">
-      <div class="panel with-nav-tabs panel-info">
-        <div class="panel-heading">
-          <dir class="comment-meta">
-            <span id="like_{{$project->id}}" >
+      <div class="with-nav-tabs">
+        <div class="">
+          <div class="comment-meta">
+            <span id="like_{{$project->id}}"  class="first-like">
               @if( isset($likesCount[$project->id]) && isset($likesCount[$project->id]['user_id'][$currentUser]))
-                   <i id="project_like_{{$project->id}}" data-project_id="{{$project->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                   <i id="project_like_{{$project->id}}" data-project_id="{{$project->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>
                    <span id="like1-bs3">{{count($likesCount[$project->id]['like_id'])}}</span>
               @else
-                   <i id="project_like_{{$project->id}}" data-project_id="{{$project->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                   <i id="project_like_{{$project->id}}" data-project_id="{{$project->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>
                    <span id="like1-bs3">@if( isset($likesCount[$project->id])) {{count($likesCount[$project->id]['like_id'])}} @endif</span>
               @endif
             </span>
+
             <span class="mrgn_5_left">
-              <a class="" role="button" data-toggle="collapse" href="#replyToProject{{$project->id}}" aria-expanded="false" aria-controls="collapseExample">Reply</a>
+              <i class="fa fa-comment-o" aria-hidden="true"></i>
+              <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToProject{{$project->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
             </span>
+            <hr />
             <div class="collapse replyComment" id="replyToProject{{$project->id}}">
               <form action="{{ url('createProjectComment')}}" method="POST" id="createProjectComment">
                 {{csrf_field()}}
                 <div class="form-group">
-                  <label for="comment">Your Comment</label>
+                  <!-- <label for="comment">Your Comment</label> -->
                   <textarea name="comment" id="comment" placeholder="Comment here.." class="form-control"></textarea>
                   <script type="text/javascript">
                     CKEDITOR.replace( 'comment');
@@ -179,109 +206,111 @@
                 <button type="button" class="btn btn-default" data-id="replyToProject{{$project->id}}" onclick="cancleReply(this);">Cancle</button>
               </form>
             </div>
-          </dir>
+          </div>
         </div>
         <div class="panel-body">
           <div class="tab-content">
             <div class="tab-pane fade in active" id="questions" style="padding: 15px !important;">
               <div class="post-comments ">
                 <div class="row">
-                  <div class="cmt-bg ">
-                    <div class="box-body chat " id="chat-box">
-                      @if(count( $comments) > 0)
-                        @foreach($comments as $comment)
-                          <div class="item" id="showComment_{{$comment->id}}">
-                            <img src="{{ asset('images/user1.png') }}" alt="User Image" />
-                            <div class="message">
-                              @if(is_object(Auth::user()) && (Auth::user()->id == $comment->user_id))
-                              <div class="dropdown pull-right">
-                                <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                  <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                  @if(Auth::user()->id == $comment->user_id)
-                                    <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
-                                    <form id="deleteComment_{{$comment->id}}" action="{{ url('deleteVkitProjectComment')}}" method="POST" style="display: none;">
-                                      {{ csrf_field() }}
-                                      {{ method_field('DELETE') }}
-                                      <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                      <input type="hidden" name="project_id" value="{{$project->id}}" >
-                                    </form>
-                                  @endif
-                                  @if(Auth::user()->id == $comment->user_id)
-                                    <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
-                                  @endif
-                                </ul>
-                              </div>
-                              @endif
-                                <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
-                                <div class="more img-responsive img-ckeditor " id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
-                                <form action="{{ url('updateVkitProjectComment')}}" method="POST" id="formUpdateComment{{$comment->id}}">
-                                      {{csrf_field()}}
-                                      {{ method_field('PUT') }}
-                                  <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
-                                     <textarea class="form-control" name="comment" id="comment_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
-                                    <script type="text/javascript">
-                                      CKEDITOR.replace( 'comment_{{$comment->id}}');
-                                      CKEDITOR.config.width="100%";
-                                      CKEDITOR.config.height="auto";
-                                      CKEDITOR.on('dialogDefinition', function (ev) {
-                                          var dialogName = ev.data.name,
-                                              dialogDefinition = ev.data.definition;
-                                          if (dialogName == 'image') {
-                                              var onOk = dialogDefinition.onOk;
-                                              dialogDefinition.onOk = function (e) {
-                                                  var width = this.getContentElement('info', 'txtWidth');
-                                                  width.setValue('100%');
-                                                  var height = this.getContentElement('info', 'txtHeight');
-                                                  height.setValue('auto');
-                                                  onOk && onOk.apply(this, e);
-                                              };
-                                          }
-                                      });
-                                    </script>
+                  <div class="box-body chat " id="chat-box">
+                    @if(count( $comments) > 0)
+                      @foreach($comments as $comment)
+                        <div class="item" id="showComment_{{$comment->id}}">
+                          @if(!empty($comment->user->photo))
+                            <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
+                          @else
+                            <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                          @endif
+                          <div class="message">
+                            @if(is_object(Auth::user()) && (Auth::user()->id == $comment->user_id))
+                            <div class="dropdown pull-right">
+                              <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                              </button>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                @if(Auth::user()->id == $comment->user_id)
+                                  <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
+                                  <form id="deleteComment_{{$comment->id}}" action="{{ url('deleteVkitProjectComment')}}" method="POST" style="display: none;">
+                                    {{ csrf_field() }}
+                                    {{ method_field('DELETE') }}
                                     <input type="hidden" name="comment_id" value="{{$comment->id}}">
                                     <input type="hidden" name="project_id" value="{{$project->id}}" >
-                                    <button type="submit" class="btn btn-primary">Update</button>
-                                    <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
-                                  </div>
-                                </form>
-                              </div>
-                              <div class="comment-meta reply-1">
-                                <span id="cmt_like_{{$comment->id}}" >
-                                  @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
-                                       <i id="comment_like_{{$comment->id}}" data-project_id="{{$project->id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                       <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
-                                  @else
-                                       <i id="comment_like_{{$comment->id}}" data-project_id="{{$project->id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
-                                       <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
-                                  @endif
-                                </span>
-                               <span class="mrgn_5_left">
-                                <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
-                              </span>
-                              <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
-                              <div class="collapse replyComment" id="replyToComment{{$comment->id}}">
-                                <form action="{{ url('createVkitProjectSubComment')}}" method="POST" id="formReplyToComment{{$comment->id}}">
-                                   {{csrf_field()}}
-                                  <div class="form-group">
-                                    <label for="subcomment">Your Sub Comment</label>
-                                      <textarea name="subcomment" class="form-control" rows="3"></textarea>
-                                  </div>
+                                  </form>
+                                @endif
+                                @if(Auth::user()->id == $comment->user_id)
+                                  <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
+                                @endif
+                              </ul>
+                            </div>
+                            @endif
+                              <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
+                              <div class="more img-responsive img-ckeditor " id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
+                              <form action="{{ url('updateVkitProjectComment')}}" method="POST" id="formUpdateComment{{$comment->id}}">
+                                    {{csrf_field()}}
+                                    {{ method_field('PUT') }}
+                                <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
+                                   <textarea class="form-control" name="comment" id="comment_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
+                                  <script type="text/javascript">
+                                    CKEDITOR.replace( 'comment_{{$comment->id}}');
+                                    CKEDITOR.config.width="100%";
+                                    CKEDITOR.config.height="auto";
+                                    CKEDITOR.on('dialogDefinition', function (ev) {
+                                        var dialogName = ev.data.name,
+                                            dialogDefinition = ev.data.definition;
+                                        if (dialogName == 'image') {
+                                            var onOk = dialogDefinition.onOk;
+                                            dialogDefinition.onOk = function (e) {
+                                                var width = this.getContentElement('info', 'txtWidth');
+                                                width.setValue('100%');
+                                                var height = this.getContentElement('info', 'txtHeight');
+                                                height.setValue('auto');
+                                                onOk && onOk.apply(this, e);
+                                            };
+                                        }
+                                    });
+                                  </script>
                                   <input type="hidden" name="comment_id" value="{{$comment->id}}">
                                   <input type="hidden" name="project_id" value="{{$project->id}}" >
-                                  <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToComment{{$comment->id}}">Send</button>
-                                  <button type="button" class="btn btn-default" data-id="replyToComment{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
-                                </form>
-                              </div>
+                                  <button type="submit" class="btn btn-primary">Update</button>
+                                  <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
+                                </div>
+                              </form>
+                            </div>
+                            <div class="comment-meta reply-1">
+                              <span id="cmt_like_{{$comment->id}}" >
+                                @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
+                                     <i id="comment_like_{{$comment->id}}" data-project_id="{{$project->id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                     <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
+                                @else
+                                     <i id="comment_like_{{$comment->id}}" data-project_id="{{$project->id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                     <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
+                                @endif
+                              </span>
+                             <span class="mrgn_5_left">
+                              <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                            </span>
+                            <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
+                            <div class="collapse replyComment" id="replyToComment{{$comment->id}}">
+                              <form action="{{ url('createVkitProjectSubComment')}}" method="POST" id="formReplyToComment{{$comment->id}}">
+                                 {{csrf_field()}}
+                                <div class="form-group">
+                                  <label for="subcomment">Your Sub Comment</label>
+                                    <textarea name="subcomment" class="form-control" rows="3"></textarea>
+                                </div>
+                                <input type="hidden" name="comment_id" value="{{$comment->id}}">
+                                <input type="hidden" name="project_id" value="{{$project->id}}" >
+                                <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToComment{{$comment->id}}">Send</button>
+                                <button type="button" class="btn btn-default" data-id="replyToComment{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
+                              </form>
                             </div>
                           </div>
-                          @if(count( $comment->children ) > 0)
-                            @include('vkits.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'user' => $user, 'projectId' => $project->id])
-                          @endif
-                        @endforeach
-                      @endif
-                    </div>
+                        </div>
+                        @if(count( $comment->children ) > 0)
+                          @include('vkits.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'user' => $user, 'projectId' => $project->id])
+                        @endif
+                      @endforeach
+                    @endif
                   </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('header-title')
-  <title>Hobby Projects in Electronics, IoT, VLSI and V-kit |V-edu</title>
+  <title>Hobby Projects in Electronics, IoT, VLSI and Vchip-kit |Vchip-edu </title>
 @stop
 @section('header-css')
   @include('layouts.home-css')

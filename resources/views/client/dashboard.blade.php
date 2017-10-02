@@ -62,7 +62,13 @@
     <section class="sidebar">
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="{{ asset('images/user.png')}}" class="img-circle" alt="User Image">
+          <a href="">
+          @if(!empty(Auth::guard('client')->user()->photo))
+            <img src="{{ asset(Auth::user()->photo)}} " class="img-circle" alt="User Image">
+          @else
+            <img src="{{ url('images/user/user.png')}}" class="img-circle" alt="User Image">
+          @endif
+          </a>
         </div>
         <div class="pull-left info">
           <p>{{ ucfirst(Auth::guard('client')->user()->name)}}</p>
