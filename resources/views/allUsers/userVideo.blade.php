@@ -133,12 +133,12 @@
           data: {student:student}
       })
       .done(function( msg ) {
-        if(msg){
+        if(msg.recorded_video){
           document.getElementById('student_id').value = msg.id;
           document.getElementById('recorded_video').value = msg.recorded_video;
         } else {
-          document.getElementById('student_id').value = 0;
-          document.getElementById('recorded_video').value = '';
+          document.getElementById('student_id').value = msg.id;
+          document.getElementById('recorded_video').value = 'Enter video url';
         }
     });
   }

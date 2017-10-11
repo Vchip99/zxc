@@ -30,7 +30,7 @@
           <th>Workshop Name</th>
           <th>Category Name</th>
           <th>Edit Category</th>
-          <!-- <th>Delete Workshop</th> -->
+          <th>Delete Workshop</th>
         </tr>
       </thead>
       <tbody>
@@ -44,15 +44,15 @@
               <a href="{{url('admin/workshopDetails')}}/{{$workshopDetail->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$workshopDetail->name}}" />
                 </a>
             </td>
-           <!--  <td>
-            <a id="{{$workshopDetail->id}}" ><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$workshopDetail->name}}" />
+            <td>
+            <a id="{{$workshopDetail->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$workshopDetail->name}}" />
                 </a>
-                <form id="deleteCategory_{{$workshopDetail->id}}" action="{{url('admin/deleteWorkshopCategory')}}" method="POST" style="display: none;">
+                <form id="deleteWorkshopDetail_{{$workshopDetail->id}}" action="{{url('admin/deleteWorkshopDetails')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
-                    <input type="hidden" name="category_id" value="{{$workshopDetail->id}}">
+                    <input type="hidden" name="workshop_id" value="{{$workshopDetail->id}}">
                 </form>
-            </td> -->
+            </td>
           </tr>
           @endforeach
         @else
@@ -70,7 +70,7 @@
     function confirmDelete(ele){
       $.confirm({
           title: 'Confirmation',
-          content: 'If you delete this category, all associated projects of this category will be deleted.',
+          content: 'If you delete this workshop, all associated videos of this workshop will be deleted.',
           type: 'red',
           typeAnimated: true,
           buttons: {
@@ -79,7 +79,7 @@
                     btnClass: 'btn-red',
                     action: function(){
                       var id = $(ele).attr('id');
-                      formId = 'deleteCategory_'+id;
+                      formId = 'deleteWorkshopDetail_'+id;
                       document.getElementById(formId).submit();
                     }
                 },

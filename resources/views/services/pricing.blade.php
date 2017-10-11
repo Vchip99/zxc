@@ -125,7 +125,7 @@
               <li class="list-group-item " style="padding-bottom: 22px;">Up-to 20 login </li>
             </ul>
             <div class="panel-footer mrgn_10_top">
-              <a class="btn btn-lg btn-block btn-info" href="#">BUY NOW!</a>
+              <a class="btn btn-lg btn-block btn-info" href="#">Free</a>
             </div>
           </div>
         </div>

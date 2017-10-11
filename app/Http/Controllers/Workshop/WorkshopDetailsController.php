@@ -103,8 +103,8 @@ class WorkshopDetailsController extends Controller
             DB::beginTransaction();
             try
             {
-                $WorkshopDetail = WorkshopDetail::addOrUpdateWorkshopDetails($request, true);
-                if(is_object($WorkshopDetail)){
+                $workshopDetail = WorkshopDetail::addOrUpdateWorkshopDetails($request, true);
+                if(is_object($workshopDetail)){
                     DB::commit();
                     return Redirect::to('admin/manageWorkshopDetails')->with('message', 'Workshop Details updated successfully!');
                 }
@@ -113,6 +113,36 @@ class WorkshopDetailsController extends Controller
             {
                 DB::rollback();
                 return redirect()->back()->withErrors('something went wrong.');
+            }
+        }
+        return Redirect::to('admin/manageWorkshopDetails');
+    }
+
+    /**
+     *  delete workshop
+     */
+    protected function delete(Request $request){
+        $workshopId = InputSanitise::inputInt($request->get('workshop_id'));
+        if(isset($workshopId)){
+            $workshopDetail = WorkshopDetail::find($workshopId);
+            if(is_object($workshopDetail)){
+                DB::beginTransaction();
+                try
+                {
+                    if(is_object($workshopDetail->workshopVideos) && false == $workshopDetail->workshopVideos->isEmpty()){
+                        foreach($workshopDetail->workshopVideos as $workshopVideo){
+                            $workshopVideo->delete();
+                        }
+                    }
+                    $workshopDetail->delete();
+                    DB::commit();
+                    return Redirect::to('admin/manageWorkshopDetails')->with('message', 'Workshop deleted successfully!');
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors('something went wrong.');
+                }
             }
         }
         return Redirect::to('admin/manageWorkshopDetails');

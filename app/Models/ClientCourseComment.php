@@ -37,11 +37,15 @@ class ClientCourseComment extends Model
     }
 
     public function children(){
-    	return $this->hasMany(ClientCourseSubComment::class)->orderby('id', 'desc');
+    	return $this->hasMany(ClientCourseSubComment::class);
     }
 
     public function deleteLikes(){
         return $this->hasMany(ClientCourseCommentLike::class);
+    }
+
+    public function user(){
+        return $this->belongsTo(Clientuser::class, 'user_id');
     }
 
     public static function getCommentsByVideoId($id, Request $request){

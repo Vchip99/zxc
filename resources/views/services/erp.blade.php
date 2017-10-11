@@ -69,7 +69,7 @@
                         </div>
                     </div>
                     <div class="media-body">
-                        <h4 class="media-heading">Bridge the gap between industries and educational organizations</h4>
+                        <h4 class="media-heading">Bridging the gap between industries and educational organizations</h4>
                         <p>We provide aptitude test series for students of second year and above. Also, toppers will get a certificate of appreciation and gift vouchers.
                            Online course for aptitude by experts.
                         Throughout practice of placement procedure in the form of screening test (aptitude and technical) at first stage, and then conduction of interviews on skype by industry experts. The whole procedure will be designed according to the recruitment pattern of different companies.

@@ -39,6 +39,11 @@ use App\Models\Score;
 use App\Models\UserSolution;
 use App\Models\Notification;
 use App\Models\ReadNotification;
+use App\Models\PlacementProcessLike;
+use App\Models\PlacementProcessCommentLike;
+use App\Models\PlacementProcessSubCommentLike;
+use App\Models\PlacementProcessComment;
+use App\Models\PlacementProcessSubComment;
 use Auth, DB;
 
 class User extends Authenticatable
@@ -284,6 +289,15 @@ class User extends Authenticatable
         VkitProjectCommentLike::deleteVkitProjectCommentLikesByUserId($userId);
         VkitProjectSubComment::deleteVkitProjectSubCommentsByUserId($userId);
         VkitProjectSubCommentLike::deleteVkitProjectSubCommentLikesByUserId($userId);
+
+        PlacementProcessComment::deletePlacementProcessCommentsByUserId($userId);
+        PlacementProcessSubComment::deletePlacementProcessSubCommentsByUserId($userId);
+
+        PlacementProcessLike::deletePlacementProcessLikesByUserId($userId);
+        PlacementProcessCommentLike::deletePlacementProcessCommentLikesByUserId($userId);
+        PlacementProcessSubCommentLike::deletePlacementProcessSubCommentLikesByUserId($userId);
+
+
         return;
     }
 
@@ -366,12 +380,19 @@ class User extends Authenticatable
     }
 
     protected static function getTeachers($collegeDept=NULL){
-        if( self::Lecturer == Auth::user()->user_type){
+        if( self::Student == Auth::user()->user_type){
             return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
                 ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
                 ->where('users.college_id', Auth::user()->college_id)
                 ->where('users.college_dept_id', Auth::user()->college_dept_id)
                 ->where('assignment_questions.year', Auth::user()->year)
+                ->select('users.id', 'users.*')->groupBy('users.id')->get();
+        } else if( self::Lecturer == Auth::user()->user_type){
+            return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
+                ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
+                ->where('users.college_id', Auth::user()->college_id)
+                ->where('users.college_dept_id', Auth::user()->college_dept_id)
+                // ->where('assignment_questions.year', Auth::user()->year)
                 ->select('users.id', 'users.*')->groupBy('users.id')->get();
         } else if( self::Hod == Auth::user()->user_type){
             return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')

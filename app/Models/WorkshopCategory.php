@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB;
 use App\Libraries\InputSanitise;
+use App\Models\WorkshopDetail;
 
 class WorkshopCategory extends Model
 {
@@ -34,5 +35,9 @@ class WorkshopCategory extends Model
         $category->name = $categoryName;
         $category->save();
         return $category;
+    }
+
+    public function workshops(){
+        return $this->hasMany(WorkshopDetail::class, 'workshop_category_id');
     }
 }

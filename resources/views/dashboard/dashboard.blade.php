@@ -233,6 +233,7 @@
               <li><a href="{{ url('studentTestResults')}}"><i class="fa fa-circle-o"></i>Test Result</a></li>
               <li><a href="{{ url('studentCourses')}}"><i class="fa fa-circle-o"></i>Course</a></li>
               @if(2 == $selectedUserType)
+                <li><a href="{{ url('studentVideo')}}"><i class="fa fa-circle-o"></i> Video </a></li>
                 <li><a href="{{ url('studentPlacement')}}"><i class="fa fa-circle-o"></i>Placement</a></li>
               @endif
             </ul>

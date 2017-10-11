@@ -85,7 +85,7 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     	if(isset($catId)){
     		$testCategory = ClientOnlineTestCategory::find($catId);
     		if(is_object($testCategory)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $testCategory->client_institute_course_id)->get();
+                $instituteCourses = ClientInstituteCourse::where('client_id', $testCategory->client_id)->get();
     			return view('client.onlineTest.category.create', compact('instituteCourses','testCategory'));
     		}
     	}

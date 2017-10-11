@@ -34,7 +34,7 @@ class PlacementExperiance extends Model
         $title = $request->get('title');
         $question = $request->get('question');
         $areaId   = InputSanitise::inputInt($request->get('area'));
-        $companyId   = InputSanitise::inputInt($request->get('company'));
+        $companyId   = InputSanitise::inputInt($request->get('company_id'));
 
         $placementExperiance = new static;
         $placementExperiance->placement_area_id = $areaId;
@@ -49,5 +49,15 @@ class PlacementExperiance extends Model
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    protected static function deletePlacementExperiancesByCompanyId($companyId){
+        $placementExperiances = static::where('placement_company_id', $companyId)->get();
+        if(is_object($placementExperiances) && false == $placementExperiances->isEmpty()){
+            foreach($placementExperiances as $placementExperiance){
+                $placementExperiance->delete();
+            }
+        }
+        return;
     }
 }

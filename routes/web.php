@@ -196,11 +196,11 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('episode/{id}/{subcomment?}', [ 'as' => 'episode', 'uses' => 'CourseController@episode' ]);
 	Route::post('getOnlineCourseBySearchArray', 'CourseController@getOnlineCourseBySearchArray');
 	Route::post('createCourseComment', 'CourseController@createCourseComment');
-	Route::put('updateCourseComment', 'CourseController@updateCourseComment');
-	Route::delete('deleteCourseComment', 'CourseController@deleteCourseComment');
+	Route::post('updateCourseComment', 'CourseController@updateCourseComment');
+	Route::post('deleteCourseComment', 'CourseController@deleteCourseComment');
 	Route::post('createCourseSubComment', 'CourseController@createCourseSubComment');
-	Route::put('updateCourseSubComment', 'CourseController@updateCourseSubComment');
-	Route::delete('deleteCourseSubComment', 'CourseController@deleteCourseSubComment');
+	Route::post('updateCourseSubComment', 'CourseController@updateCourseSubComment');
+	Route::post('deleteCourseSubComment', 'CourseController@deleteCourseSubComment');
 	Route::post('likeCourseVideo', 'CourseController@likeCourseVideo');
 	Route::post('likeCourseVideoComment', 'CourseController@likeCourseVideoComment');
 	Route::post('likeCourseVideoSubComment', 'CourseController@likeCourseVideoSubComment');
@@ -248,11 +248,11 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getVkitProjectsBySearchArray', 'VkitController@getVkitProjectsBySearchArray');
 	Route::post('registerProject', 'VkitController@registerProject');
 	Route::post('createProjectComment', 'VkitController@createProjectComment');
-	Route::delete('deleteVkitProjectComment', 'VkitController@deleteVkitProjectComment');
-	Route::put('updateVkitProjectComment', 'VkitController@updateVkitProjectComment');
+	Route::post('deleteVkitProjectComment', 'VkitController@deleteVkitProjectComment');
+	Route::post('updateVkitProjectComment', 'VkitController@updateVkitProjectComment');
 	Route::post('createVkitProjectSubComment', 'VkitController@createVkitProjectSubComment');
-	Route::put('updateVkitProjectSubComment', 'VkitController@updateVkitProjectSubComment');
-	Route::delete('deleteVkitProjectSubComment', 'VkitController@deleteVkitProjectSubComment');
+	Route::post('updateVkitProjectSubComment', 'VkitController@updateVkitProjectSubComment');
+	Route::post('deleteVkitProjectSubComment', 'VkitController@deleteVkitProjectSubComment');
 	Route::post('likeVkitProject', 'VkitController@likeVkitProject');
 	Route::post('likeVkitProjectComment', 'VkitController@likeVkitProjectComment');
 	Route::post('likekitProjectSubComment', 'VkitController@likekitProjectSubComment');
@@ -264,10 +264,10 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('createBlogSubComment', 'BlogController@createBlogSubComment');
 	Route::post('getBlogsByCategoryId', 'BlogController@getBlogsByCategoryId');
 	Route::get('getBlogsByCategoryId', 'BlogController@getBlogsByCategoryId');
-	Route::put('updateBlogComment', 'BlogController@updateBlogComment');
-	Route::delete('deleteBlogComment', 'BlogController@deleteBlogComment');
-	Route::put('updateBlogSubComment', 'BlogController@updateBlogSubComment');
-	Route::delete('deleteBlogSubComment', 'BlogController@deleteBlogSubComment');
+	Route::post('updateBlogComment', 'BlogController@updateBlogComment');
+	Route::post('deleteBlogComment', 'BlogController@deleteBlogComment');
+	Route::post('updateBlogSubComment', 'BlogController@updateBlogSubComment');
+	Route::post('deleteBlogSubComment', 'BlogController@deleteBlogSubComment');
 	Route::get('tagBlogs/{id}', 'BlogController@tagBlogs');
 
 
@@ -333,12 +333,12 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('createSubComment', 'DiscussionController@createSubComment');
 	Route::post('getDiscussionPostsByCategoryId', 'DiscussionController@getDiscussionPostsByCategoryId');
 	Route::post('getDuscussionPostsBySearchArray', 'DiscussionController@getDuscussionPostsBySearchArray');
-	Route::delete('deleteSubComment', 'DiscussionController@deleteSubComment');
-	Route::delete('deleteComment', 'DiscussionController@deleteComment');
-	Route::delete('deletePost', 'DiscussionController@deletePost');
-	Route::put('updatePost', 'DiscussionController@updatePost');
-	Route::put('updateComment', 'DiscussionController@updateComment');
-	Route::put('updateSubComment', 'DiscussionController@updateSubComment');
+	Route::post('deleteSubComment', 'DiscussionController@deleteSubComment');
+	Route::post('deleteComment', 'DiscussionController@deleteComment');
+	Route::post('deletePost', 'DiscussionController@deletePost');
+	Route::post('updatePost', 'DiscussionController@updatePost');
+	Route::post('updateComment', 'DiscussionController@updateComment');
+	Route::post('updateSubComment', 'DiscussionController@updateSubComment');
 	Route::post('goToPost', 'DiscussionController@goToPost');
 	Route::post('goToComment', 'DiscussionController@goToComment');
 
@@ -352,11 +352,11 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('saveTimeSecurity', 'LiveCourseVideoController@saveTimeSecurity');
 	Route::post('registerLiveCourse', 'LiveCourseVideoController@registerLiveCourse');
 	Route::post('createLiveCourseComment', 'LiveCourseVideoController@createLiveCourseComment');
-	Route::put('updateLiveCourseComment', 'LiveCourseVideoController@updateLiveCourseComment');
-	Route::delete('deleteLiveCourseComment', 'LiveCourseVideoController@deleteLiveCourseComment');
+	Route::post('updateLiveCourseComment', 'LiveCourseVideoController@updateLiveCourseComment');
+	Route::post('deleteLiveCourseComment', 'LiveCourseVideoController@deleteLiveCourseComment');
 	Route::post('createLiveCourseSubComment', 'LiveCourseVideoController@createLiveCourseSubComment');
-	Route::put('updateLiveCourseSubComment', 'LiveCourseVideoController@updateLiveCourseSubComment');
-	Route::delete('deleteLiveCourseSubComment', 'LiveCourseVideoController@deleteLiveCourseSubComment');
+	Route::post('updateLiveCourseSubComment', 'LiveCourseVideoController@updateLiveCourseSubComment');
+	Route::post('deleteLiveCourseSubComment', 'LiveCourseVideoController@deleteLiveCourseSubComment');
 	Route::post('likeLiveVideo', 'LiveCourseVideoController@likeLiveVideo');
 	Route::post('likeLiveVideoComment', 'LiveCourseVideoController@likeLiveVideoComment');
 	Route::post('likeLiveVideoSubComment', 'LiveCourseVideoController@likeLiveVideoSubComment');
@@ -426,6 +426,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('studentsAssignment', 'AccountController@studentsAssignment');
 	Route::get('assignmentRemark/{assignmentId}/{studentId}', 'AccountController@assignmentRemark');
 	Route::post('getDepartmentLecturers', 'AccountController@getDepartmentLecturers');
+	Route::get('studentVideo/{id?}', 'AccountController@studentVideo');
+	Route::put('updateStudentVideo', 'AccountController@updateStudentVideo');
+
 
 
 	// like- dis-like count front
@@ -507,6 +510,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/createWorkshopCategory', 'Workshop\WorkshopCategoryController@store');
 	Route::get('admin/workshopCategory/{id}/edit', 'Workshop\WorkshopCategoryController@edit');
 	Route::put('admin/updateWorkshopCategory', 'Workshop\WorkshopCategoryController@update');
+	Route::delete('admin/deleteWorkshopCategory', 'Workshop\WorkshopCategoryController@delete');
 
 	// workshop Details
 	Route::get('admin/manageWorkshopDetails', 'Workshop\WorkshopDetailsController@show');
@@ -514,6 +518,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/createWorkshopDetails', 'Workshop\WorkshopDetailsController@store');
 	Route::get('admin/workshopDetails/{id}/edit', 'Workshop\WorkshopDetailsController@edit');
 	Route::put('admin/updateWorkshopDetails', 'Workshop\WorkshopDetailsController@update');
+	Route::delete('admin/deleteWorkshopDetails', 'Workshop\WorkshopDetailsController@delete');
 
 	// workshop Videos
 	Route::get('admin/manageWorkshopVideos', 'Workshop\WorkshopVideosController@show');
@@ -522,6 +527,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/workshopVideo/{id}/edit', 'Workshop\WorkshopVideosController@edit');
 	Route::put('admin/updateWorkshopVideo', 'Workshop\WorkshopVideosController@update');
 	Route::post('admin/getWorkshopsByCategory', 'Workshop\WorkshopVideosController@getWorkshopsByCategory');
+	Route::delete('admin/deleteWorkshopVideo', 'Workshop\WorkshopVideosController@delete');
 
 	// workshop front
 	Route::get('workshops', 'WorkshopController@show');
@@ -535,6 +541,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/createPlacementArea', 'Placement\PlacementAreaController@store');
 	Route::get('admin/placementArea/{id}/edit', 'Placement\PlacementAreaController@edit');
 	Route::put('admin/updatePlacementArea', 'Placement\PlacementAreaController@update');
+	Route::delete('admin/deletePlacementArea', 'Placement\PlacementAreaController@delete');
 
 	// placement company
 	Route::get('admin/managePlacementCompany', 'Placement\PlacementCompanyController@show');
@@ -542,6 +549,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/createPlacementCompany', 'Placement\PlacementCompanyController@store');
 	Route::get('admin/placementCompany/{id}/edit', 'Placement\PlacementCompanyController@edit');
 	Route::put('admin/updatePlacementCompany', 'Placement\PlacementCompanyController@update');
+	Route::delete('admin/deletePlacementCompany', 'Placement\PlacementCompanyController@delete');
 
 	// placement Details
 	Route::get('admin/managePlacementCompanyDetails', 'Placement\PlacementCompanyDetailsController@show');
@@ -551,6 +559,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updatePlacementCompanyDetails', 'Placement\PlacementCompanyDetailsController@update');
 	Route::post('admin/getPlacementCompaniesByArea', 'Placement\PlacementCompanyDetailsController@getPlacementCompaniesByArea');
 	Route::post('admin/checkCompanyDetails', 'Placement\PlacementCompanyDetailsController@checkCompanyDetails');
+	Route::delete('admin/deleteCompanyDetails', 'Placement\PlacementCompanyDetailsController@delete');
+
 
 	// placement process
 	Route::get('admin/managePlacementProcess', 'Placement\PlacementProcessController@show');
@@ -559,6 +569,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/placementCompanyProcess/{id}/edit', 'Placement\PlacementProcessController@edit');
 	Route::put('admin/updatePlacementProcess', 'Placement\PlacementProcessController@update');
 	Route::post('admin/checkPlacementCompanyProcesss', 'Placement\PlacementProcessController@checkPlacementCompanyProcesss');
+	Route::delete('admin/deletePlacementProcess', 'Placement\PlacementProcessController@delete');
 
 
 	// placement front
@@ -568,6 +579,15 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getPlacementCompaniesByAreaForFront', 'PlacementController@getPlacementCompaniesByAreaForFront');
 	Route::post('createPlacementExperiance', 'PlacementController@createPlacementExperiance');
 	Route::get('placementExperiance/{id}', 'PlacementController@placementExperiance');
+	Route::post('createPlacementProcessComment', 'PlacementController@createPlacementProcessComment');
+	Route::post('updatePlacementProcessComment', 'PlacementController@createPlacementProcessComment');
+	Route::post('createPlacementProcessSubComment', 'PlacementController@createPlacementProcessSubComment');
+	Route::post('deletePlacementProcessComment', 'PlacementController@deletePlacementProcessComment');
+	Route::post('updatePlacementProcessSubComment', 'PlacementController@updatePlacementProcessSubComment');
+	Route::post('deletePlacementProcessSubComment', 'PlacementController@deletePlacementProcessSubComment');
+	Route::post('likePlacementProcessComment', 'PlacementController@likePlacementProcessComment');
+	Route::post('likePlacementProcessSubComment', 'PlacementController@likePlacementProcessSubComment');
+	Route::post('likePlacementProcess', 'PlacementController@likePlacementProcess');
 
 	// placement faq
 	Route::get('admin/managePlacementFaq', 'Placement\PlacementFaqController@show');
@@ -575,6 +595,15 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/createPlacementFaq', 'Placement\PlacementFaqController@store');
 	Route::get('admin/placementFaq/{id}/edit', 'Placement\PlacementFaqController@edit');
 	Route::put('admin/updatePlacementFaq', 'Placement\PlacementFaqController@update');
+	Route::delete('admin/deletePlacementFaq', 'Placement\PlacementFaqController@delete');
+
+	// placement ApplyJob
+	Route::get('admin/manageApplyJob', 'Placement\PlacementApplyJobController@show');
+	Route::get('admin/createApplyJob', 'Placement\PlacementApplyJobController@create');
+	Route::post('admin/createApplyJob', 'Placement\PlacementApplyJobController@store');
+	Route::get('admin/applyJob/{id}/edit', 'Placement\PlacementApplyJobController@edit');
+	Route::put('admin/updateApplyJob', 'Placement\PlacementApplyJobController@update');
+	Route::delete('admin/deleteApplyJob', 'Placement\PlacementApplyJobController@delete');
 
 });
 
@@ -722,11 +751,11 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('registerClientUserCourse', 'Client\Front\ClientOnlineCourseFrontController@registerClientUserCourse');
   	Route::post('getRegisteredOnlineCourseByCatIdBySubCatId', 'Client\Front\ClientOnlineCourseFrontController@getRegisteredOnlineCourseByCatIdBySubCatId');
   	Route::post('createClientCourseComment', 'Client\Front\ClientOnlineCourseFrontController@createClientCourseComment');
-  	Route::put('updateClientCourseComment', 'Client\Front\ClientOnlineCourseFrontController@updateClientCourseComment');
-  	Route::delete('deleteClientCourseComment', 'Client\Front\ClientOnlineCourseFrontController@deleteClientCourseComment');
+  	Route::post('updateClientCourseComment', 'Client\Front\ClientOnlineCourseFrontController@updateClientCourseComment');
+  	Route::post('deleteClientCourseComment', 'Client\Front\ClientOnlineCourseFrontController@deleteClientCourseComment');
 	Route::post('createClientCourseSubComment', 'Client\Front\ClientOnlineCourseFrontController@createClientCourseSubComment');
-	Route::put('updateClientCourseSubComment', 'Client\Front\ClientOnlineCourseFrontController@updateClientCourseSubComment');
-	Route::delete('deleteClientCourseSubComment', 'Client\Front\ClientOnlineCourseFrontController@deleteClientCourseSubComment');
+	Route::post('updateClientCourseSubComment', 'Client\Front\ClientOnlineCourseFrontController@updateClientCourseSubComment');
+	Route::post('deleteClientCourseSubComment', 'Client\Front\ClientOnlineCourseFrontController@deleteClientCourseSubComment');
 	Route::post('likeClientCourseVideo', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideo');
 	Route::post('likeClientCourseVideoComment', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideoComment');
 	Route::post('likeClientCourseVideoSubComment', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideoSubComment');

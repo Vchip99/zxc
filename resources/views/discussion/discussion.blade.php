@@ -87,11 +87,6 @@ margin-left: -13px;}
                       <button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button>
                       <ul role="menu" class="dropdown-menu dropdown-menu-right">
                         <li><a id="{{$post->id}}" onclick="confirmPostDelete(this);">Delete</a></li>
-                        <form id="deletePost_{{$post->id}}" action="{{ url('deletePost')}}" method="POST" style="display: none;">
-                            {{ csrf_field() }}
-                            {{ method_field('DELETE') }}
-                            <input type="hidden" name="post_id" value="{{$post->id}}">
-                        </form>
                         <li><a id="{{$post->id}}" onclick="editPost(this);">Edit</a></li>
                       </ul>
                       @endif
@@ -111,13 +106,10 @@ margin-left: -13px;}
                       <br/>
                       <div class="more bold img-ckeditor img-responsive cmt-left-margin" id="editPostHide_{{$post->id}}">{!! $post->body !!}</div>
                        <br/>
-                      <form action="{{ url('updatePost')}}" method="POST" id="formUpdatePost{{$post->id}}">
-                            {{csrf_field()}}
-                            {{ method_field('PUT') }}
                         <div class="form-group hide" id="editPostShow_{{$post->id}}" >
                           <textarea name="update_question" placeholder="Answer 1" type="text" id="updatequestion_{{$post->id}}" required>{!! $post->body !!}</textarea>
                             <script type="text/javascript">
-                              CKEDITOR.replace( 'updatequestion_{{$post->id}}', { enterMode: CKEDITOR.ENTER_BR } );
+                              CKEDITOR.replace('updatequestion_{{$post->id}}', { enterMode: CKEDITOR.ENTER_BR } );
                               CKEDITOR.config.width="100%";
                               CKEDITOR.config.height="auto";
                               CKEDITOR.on('dialogDefinition', function (ev) {
@@ -130,21 +122,19 @@ margin-left: -13px;}
 
                                       dialogDefinition.onOk = function (e) {
                                           var width = this.getContentElement('info', 'txtWidth');
-                                          width.setValue('100%');//Set Default Width
+                                          width.setValue('100%');
 
                                           var height = this.getContentElement('info', 'txtHeight');
-                                          height.setValue('auto');////Set Default height
+                                          height.setValue('auto');
 
                                           onOk && onOk.apply(this, e);
                                       };
                                   }
                               });
                             </script>
-                          <input type="hidden" name="post_id" value="{{$post->id}}">
-                          <button type="submit" class="btn btn-primary">Update</button>
+                          <button class="btn btn-primary" data-post_id="{{$post->id}}"  onclick="updatePost(this);">Update</button>
                           <button type="button" class="btn btn-default" id="{{$post->id}}" onclick="canclePost(this);">Cancle</button>
                         </div>
-                      </form>
                       <div class="border-bottom"></div>
                       <div class="comment-meta main-reply-box cmt-left-margin">
                           <span id="like_{{$post->id}}" >
@@ -160,15 +150,12 @@ margin-left: -13px;}
                           <a class="" role="button" data-toggle="collapse" href="#replyToPost{{$post->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
                         </span>
                         <div class="collapse replyComment" id="replyToPost{{$post->id}}">
-                          <form action="{{ url('createComment')}}" method="POST" id="formReplyToPost{{$post->id}}">
-                            {{csrf_field()}}
                             <div class="form-group">
                               <label for="comment">Your Comment</label>
-                              <textarea name="comment" class="form-control" ></textarea>
+                              <textarea name="comment" id="comment_{{$post->id}}" class="form-control" ></textarea>
                             </div>
-                            <input type="hidden" name="discussion_post_id" value="{{$post->id}}">
-                            <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoPost(this);" id="formReplyToPost{{$post->id}}">Send</button>
-                          </form>
+                            <button class="btn btn-default" onclick="confirmSubmitReplytoPost(this);" data-post_id="{{$post->id}}">Send</button>
+                            <button type="button" class="btn btn-default" data-id="replyToPost{{$post->id}}" onclick="cancleReply(this);">Cancle</button>
                         </div>
                       </div>
                       <div class="cmt-bg">
@@ -190,11 +177,6 @@ margin-left: -13px;}
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                                       @if(Auth::user()->id == $comment->user_id || Auth::user()->id == $post->user_id)
                                         <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
-                                        <form id="deleteComment_{{$comment->id}}" action="{{ url('deleteComment')}}" method="POST" style="display: none;">
-                                          {{ csrf_field() }}
-                                          {{ method_field('DELETE') }}
-                                          <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                        </form>
                                       @endif
                                       @if(Auth::user()->id == $comment->user_id)
                                         <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
@@ -204,17 +186,11 @@ margin-left: -13px;}
                                   @endif
                                     <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
                                     <p class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</p>
-                                    <form action="{{ url('updateComment')}}" method="POST" id="formUpdateComment{{$comment->id}}">
-                                          {{csrf_field()}}
-                                          {{ method_field('PUT') }}
                                       <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
-                                        <textarea class="form-control" name="comment" rows="3">{!! $comment->body !!}</textarea>
-                                        <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                        <input type="hidden" name="post_id" value="{{$post->id}}">
-                                        <button type="submit" class="btn btn-primary">Update</button>
+                                        <textarea class="form-control" name="comment" id="comment_{{$post->id}}_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
+                                        <button class="btn btn-primary" data-post_id="{{$post->id}}" data-comment_id="{{$comment->id}}" onclick="updateComment(this);">Update</button>
                                         <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
                                       </div>
-                                    </form>
                                   </div>
                                   <div class="comment-meta reply-1 cmt-left-margin">
                                     <span id="cmt_like_{{$comment->id}}" >
@@ -231,16 +207,12 @@ margin-left: -13px;}
                                   </span>
                                   <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                                   <div class="collapse replyComment" id="replyToComment{{$post->id}}-{{$comment->id}}">
-                                    <form action="{{ url('createSubComment')}}" method="POST" id="formReplyToComment{{$post->id}}{{$comment->id}}">
-                                       {{csrf_field()}}
                                       <div class="form-group">
                                         <label for="subcomment">Your Sub Comment</label>
-                                          <textarea name="subcomment" class="form-control" rows="3"></textarea>
+                                          <textarea name="subcomment" id="subcomment_{{$post->id}}_{{$comment->id}}" class="form-control" rows="3"></textarea>
                                       </div>
-                                      <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                      <input type="hidden" name="discussion_post_id" value="{{$post->id}}">
-                                      <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToComment{{$post->id}}{{$comment->id}}">Send</button>
-                                    </form>
+                                      <button class="btn btn-default" data-post_id="{{$post->id}}" data-comment_id="{{$comment->id}}" onclick="confirmSubmitReplytoComment(this);">Send</button>
+                                      <button type="button" class="btn btn-default" data-id="replyToComment{{$post->id}}-{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
                                   </div>
                                 </div>
                               </div>
@@ -263,7 +235,7 @@ margin-left: -13px;}
               <div class="modal-content">
                 <div class="modal-header">
                   <select id="post_category" class="form-control" name="post_category" required>
-                      <option value = ""> Select Category ...</option>
+                      <option value = "0"> Select Category ...</option>
                       @if(count($discussionCategories) > 0)
                         @foreach($discussionCategories as $discussionCategory)
                           <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
@@ -274,8 +246,6 @@ margin-left: -13px;}
                 <div class="modal-body" style="padding: 0px;">
                   <div class="widget-area no-padding blank">
                         <div class="status-upload">
-                            <form action="{{url('createPost')}}" method="POST" id="createPost">
-                        {{csrf_field()}}
                          <div class="input-group">
                             <span class="input-group-addon">Title</span>
                             <input id="title" type="text" class="form-control" name="title" placeholder="Add Title Here">
@@ -305,9 +275,7 @@ margin-left: -13px;}
                                 }
                             });
                           </script>
-                          <input type="hidden" name="post_category_id" value="" id="post_category_id">
-                          <button type="button" class="btn btn-success btn-circle text-uppercase" onclick=" confirmSubmit(this);" id="createPost" title="Share"><i class="fa fa-share"></i> Share</button>
-                      </form>
+                          <button type="button" class="btn btn-success btn-circle text-uppercase" onclick="confirmSubmit(this);" id="createPost" title="Share"><i class="fa fa-share"></i> Share</button>
                         </div><!-- Status Upload  -->
                       </div>
                 </div>
@@ -331,13 +299,23 @@ margin-left: -13px;}
     var userId = parseInt(document.getElementById('user_id').value);
     var categoryId = parseInt(document.getElementById('post_category').value);
     var questionLength = CKEDITOR.instances.question.getData().length;
+    var title = document.getElementById('title').value;
 
-    if(0 < userId && 0 < categoryId && questionLength > 0){
-        var category = document.getElementById('post_category_id');
-        category.value= categoryId;
-        formId = $(ele).attr('id');
-        form = document.getElementById(formId);
-        form.submit();
+    if(0 < userId && 0 < categoryId && questionLength > 0 && title){
+      var question = CKEDITOR.instances.question.getData();
+        $.ajax({
+            method: "POST",
+            url: "{{url('createPost')}}",
+            data: {title:title,post_category_id:categoryId,question:question}
+        })
+        .done(function( msg ) {
+          $('#askQuestion').modal('hide');
+          document.getElementById('post_category').value = 0;
+          document.getElementById('title').value = '';
+          CKEDITOR.instances.question.setData('');
+          renderPosts(msg);
+        });
+
     } else if( isNaN(userId)) {
       $.confirm({
         title: 'Confirmation',
@@ -404,34 +382,84 @@ margin-left: -13px;}
     document.getElementById('editSubCommentHide_'+id).classList.remove("hide");
     document.getElementById('editSubCommentShow_'+id).classList.add("hide");
   }
-    function confirmSubCommentDelete(ele){
-      $.confirm({
-        title: 'Confirmation',
-        content: 'You want to delete this comment?',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-            Ok: {
-                text: 'Ok',
-                btnClass: 'btn-red',
-                action: function(){
-                  var id = $(ele).attr('id');
-                  formId = 'deleteSubComment_'+id;
-                  document.getElementById(formId).submit();
-                }
-            },
-            Cancle: function () {
-            }
-        }
-      });
-    }
+  function confirmSubCommentDelete(ele){
+    $.confirm({
+      title: 'Confirmation',
+      content: 'You want to delete this comment?',
+      type: 'red',
+      typeAnimated: true,
+      buttons: {
+          Ok: {
+              text: 'Ok',
+              btnClass: 'btn-red',
+              action: function(){
+                var subcommentId = $(ele).data('subcomment_id');
+                $.ajax({
+                    method: "POST",
+                    url: "{{url('deleteSubComment')}}",
+                    data: {subcomment_id:subcommentId}
+                })
+                .done(function( msg ) {
+                  renderPosts(msg);
+                });
+              }
+          },
+          Cancle: function () {
+          }
+      }
+    });
+  }
 
   function confirmSubmitReplytoComment(ele){
     var userId = parseInt(document.getElementById('user_id').value);
     if(0 < userId){
-        formId = $(ele).data('id');
-        form = document.getElementById(formId);
-        form.submit();
+        var postId = $(ele).data('post_id');
+        var commentId = $(ele).data('comment_id');
+        var subcomment = document.getElementById('subcomment_'+postId+'_'+commentId).value;
+        $.ajax({
+            method: "POST",
+            url: "{{url('createSubComment')}}",
+            data: {discussion_post_id:postId,comment_id:commentId,subcomment:subcomment}
+        })
+        .done(function( msg ) {
+          renderPosts(msg);
+        });
+    } else if( isNaN(userId)) {
+      $.confirm({
+        title: 'Confirmation',
+        content: 'Please login first. Click "Ok" button to login.',
+        type: 'red',
+        typeAnimated: true,
+        buttons: {
+              Ok: {
+                  text: 'Ok',
+                  btnClass: 'btn-red',
+                  action: function(){
+                    window.location="{{url('/home')}}";
+                  }
+              },
+              Cancle: function () {
+              }
+          }
+        });
+    }
+  }
+
+  function confirmSubmitReplytoSubComment(ele){
+    var userId = parseInt(document.getElementById('user_id').value);
+    if(0 < userId){
+        var postId = $(ele).data('post_id');
+        var commentId = $(ele).data('comment_id');
+        var parentId = $(ele).data('parent_id');
+        var subcomment = document.getElementById('create_subcomment_'+parentId).value;
+        $.ajax({
+            method: "POST",
+            url: "{{url('createSubComment')}}",
+            data: {discussion_post_id:postId,comment_id:commentId,parent_id:parentId,subcomment:subcomment}
+        })
+        .done(function( msg ) {
+          renderPosts(msg);
+        });
     } else if( isNaN(userId)) {
       $.confirm({
         title: 'Confirmation',
@@ -455,9 +483,87 @@ margin-left: -13px;}
   function confirmSubmitReplytoPost(ele){
     var userId = parseInt(document.getElementById('user_id').value);
     if(0 < userId){
-        formId = $(ele).attr('id');
-        form = document.getElementById(formId);
-        form.submit();
+      var postId = $(ele).data('post_id');
+      var comment = document.getElementById('comment_'+postId).value
+      $.ajax({
+          method: "POST",
+          url: "{{url('createComment')}}",
+          data: {discussion_post_id:postId, comment:comment}
+      })
+      .done(function( msg ) {
+        renderPosts(msg);
+      });
+    } else if( isNaN(userId)) {
+      $.confirm({
+        title: 'Confirmation',
+        content: 'Please login first. Click "Ok" button to login.',
+        type: 'red',
+        typeAnimated: true,
+        buttons: {
+              Ok: {
+                  text: 'Ok',
+                  btnClass: 'btn-red',
+                  action: function(){
+                    window.location="{{url('/home')}}";
+                  }
+              },
+              Cancle: function () {
+              }
+          }
+        });
+    }
+  }
+
+  function updateComment(ele){
+    var userId = parseInt(document.getElementById('user_id').value);
+    if(0 < userId){
+      var postId = $(ele).data('post_id');
+      var commentId = $(ele).data('comment_id');
+      var comment = document.getElementById('comment_'+postId+'_'+commentId).value;
+      $.ajax({
+          method: "POST",
+          url: "{{url('updateComment')}}",
+          data: {post_id:postId,comment_id:commentId,comment:comment}
+      })
+      .done(function( msg ) {
+        renderPosts(msg);
+      });
+    } else if( isNaN(userId)) {
+      $.confirm({
+        title: 'Confirmation',
+        content: 'Please login first. Click "Ok" button to login.',
+        type: 'red',
+        typeAnimated: true,
+        buttons: {
+              Ok: {
+                  text: 'Ok',
+                  btnClass: 'btn-red',
+                  action: function(){
+                    window.location="{{url('/home')}}";
+                  }
+              },
+              Cancle: function () {
+              }
+          }
+        });
+    }
+  }
+
+  function updateSubComment(ele){
+    var userId = parseInt(document.getElementById('user_id').value);
+    if(0 < userId){
+      var postId = $(ele).data('post_id');
+      var commentId = $(ele).data('comment_id');
+      var subcommentId = $(ele).data('subcomment_id');
+      var comment = document.getElementById('update_subcomment_'+commentId+'_'+subcommentId).value;
+      $.ajax({
+          method: "POST",
+          url: "{{url('updateSubComment')}}",
+          data: {post_id:postId,comment_id:commentId,subcomment_id:subcommentId,comment:comment}
+      })
+      .done(function( msg ) {
+        renderPosts(msg);
+      });
     } else if( isNaN(userId)) {
       $.confirm({
         title: 'Confirmation',
@@ -491,8 +597,14 @@ margin-left: -13px;}
                   btnClass: 'btn-red',
                   action: function(){
                     var id = $(ele).attr('id');
-                    formId = 'deleteComment_'+id;
-                    document.getElementById(formId).submit();
+                    $.ajax({
+                        method: "POST",
+                        url: "{{url('deleteComment')}}",
+                        data: {comment_id:id}
+                    })
+                    .done(function( msg ) {
+                      renderPosts(msg);
+                    });
                   }
           },
           Cancle: function () {
@@ -513,14 +625,35 @@ margin-left: -13px;}
                   btnClass: 'btn-red',
                   action: function(){
                     var id = $(ele).attr('id');
-                    formId = 'deletePost_'+id;
-                    document.getElementById(formId).submit();
+                    if( 0 < id ){
+                       $.ajax({
+                          method: "POST",
+                          url: "{{url('deletePost')}}",
+                          data: {post_id:id}
+                      })
+                      .done(function( msg ) {
+                        renderPosts(msg);
+                      });
+                    }
                   }
               },
               Cancle: function () {
               }
           }
         });
+  }
+
+  function updatePost(ele){
+    var postId = $(ele).data('post_id');
+    var updateQuestion = CKEDITOR.instances['updatequestion_'+postId].getData();
+    $.ajax({
+        method: "POST",
+        url: "{{url('updatePost')}}",
+        data: {post_id:postId, update_question:updateQuestion}
+    })
+    .done(function( msg ) {
+      renderPosts(msg);
+    });
   }
 
   function renderPosts(msg){
@@ -530,7 +663,13 @@ margin-left: -13px;}
     }
     showPostsDiv = document.getElementById('showAllPosts');
     showPostsDiv.innerHTML = '';
-      $.each(msg['posts'], function(idx, obj) {
+    arrayComments = [];
+    $.each(msg['posts'], function(idx, obj) {
+      arrayComments[idx] = obj;
+    });
+    var sortedArray = arrayComments.reverse();
+      $.each(sortedArray, function(idx, obj) {
+        if(false == $.isEmptyObject(obj)){
         var divMedia = document.createElement('div');
         divMedia.className = 'media';
         divMedia.id = 'showPosts_'+obj.id;
@@ -546,10 +685,7 @@ margin-left: -13px;}
         boxDiv.className = 'box-tools';
         boxDivInnerHtml = '<button type="button" data-toggle="collapse" data-target="#post'+ obj.id +'" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i></button>';
         if(userId == obj.user_id){
-          var url = "{{ url('deletePost')}}";
-          var csrfField = '{{ csrf_field() }}';
-          var methodField = '{{ method_field('DELETE') }}';
-          boxDivInnerHtml += '<button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button><ul role="menu" class="dropdown-menu dropdown-menu-right"><li><a id="'+obj.id+'" onclick="confirmPostDelete(this);">Delete</a></li><form id="deletePost_'+obj.id+'" action="'+ url +'" method="POST" style="display: none;">"'+csrfField+''+methodField+'"<input type="hidden" name="post_id" value="'+obj.id+'"></form><li><a id="'+obj.id+'" onclick="editPost(this);">Edit</a></li></ul>'
+          boxDivInnerHtml += '<button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button><ul role="menu" class="dropdown-menu dropdown-menu-right"><li><a id="'+obj.id+'" onclick="confirmPostDelete(this);">Delete</a></li><li><a id="'+obj.id+'" onclick="editPost(this);">Edit</a></li></ul>'
         }
         boxDiv.innerHTML = boxDivInnerHtml;
         divMediaHeading.appendChild(boxDiv);
@@ -561,10 +697,11 @@ margin-left: -13px;}
 
         var commentBlockDiv = document.createElement('div');
         commentBlockDiv.className = 'user-block cmt-left-margin';
-        var userImagePath = "{{ asset('images/user1.png') }}";
         if(obj.user_image){
-          var userImage = '<img class="img-circle" src="'+obj.user_image+'" alt="User Image" />';
+          var userImagePath = "{{ asset('') }}"+obj.user_image;
+          var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
         } else {
+          var userImagePath = "{{ asset('images/user1.png') }}";
           var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
         }
         commentBlockDiv.innerHTML = ''+userImage+'<span class="username">'+ obj.user_name +'</span><span class="description">Shared publicly - '+ obj.updated_at+'</span>';
@@ -574,18 +711,17 @@ margin-left: -13px;}
         divMediaBody.className = 'media-body';
         divMediaBody.setAttribute('data-toggle', 'lightbox');
         divMediaBody.innerHTML = '<br/>';
-        var pBody = document.createElement('p');
-        pBody.className = 'more bold cmt-left-margin';
+        var pBody = document.createElement('div');
+        pBody.className = 'more bold img-ckeditor img-responsive cmt-left-margin';
         pBody.id ='editPostHide_'+ obj.id;
         pBody.innerHTML = obj.body + ' <br/>';
         divMediaBody.appendChild(pBody);
 
-        var spanEle = document.createElement('span');
-        var formCsrfField = '{{ csrf_field() }}';
-        var putMethodField = '{{ method_field('PUT') }}';
-        var formUrl ="{{ url('updatePost')}}";
+        var divForm = document.createElement('div');
+        divForm.className = 'form-group hide';
+        divForm.id = 'editPostShow_'+obj.id;
 
-        spanInnerHTML = '<form action="'+formUrl+'" method="POST" id="formUpdatePost'+ obj.id +'">'+formCsrfField+''+putMethodField+'<div class="form-group hide" id="editPostShow_'+ obj.id +'" ><textarea name="update_question" placeholder="update here" type="text" id="updatequestion_'+ obj.id +'" required>"'+ obj.body +'"</textarea>';
+        divFormInnerHTML = '<textarea name="update_question" placeholder="update here" type="text" id="updatequestion_'+ obj.id +'" required>"'+ obj.body +'"</textarea>';
           var formUpdateId = 'updatequestion_'+ obj.id;
           $( document ).ready(function() {
             CKEDITOR.replace( formUpdateId, { enterMode: CKEDITOR.ENTER_BR } );
@@ -606,9 +742,9 @@ margin-left: -13px;}
                 }
             });
           });
-        spanInnerHTML += '<input type="hidden" name="post_id" value="'+ obj.id +'"><button type="submit" class="btn btn-primary">Update</button><button type="button" class="btn btn-default" id="'+ obj.id +'" onclick="canclePost(this);">Cancle</button></div></form>';
-        spanEle.innerHTML = spanInnerHTML;
-        divMediaBody.appendChild(spanEle);
+        divFormInnerHTML += '<button class="btn btn-primary" data-post_id="'+ obj.id +'"  onclick="updatePost(this);">Update</button><button class="btn btn-default" id="'+ obj.id +'" onclick="canclePost(this);">Cancle</button></div></form>';
+        divForm.innerHTML = divFormInnerHTML;
+        divMediaBody.appendChild(divForm);
 
         var borderDiv = document.createElement('div');
         borderDiv.className = 'border-bottom';
@@ -629,22 +765,9 @@ margin-left: -13px;}
           }
         commentInnerHtml +='</span>';
         commentInnerHtml += '<span class="mrgn_5_left"><a class="" role="button" data-toggle="collapse" href="#replyToPost'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a></span>';
-        var commentCsrfField = '{{ csrf_field() }}';
-        var commentFormUrl ="{{ url('createComment')}}";
 
-        commentInnerHtml += '<div class="collapse replyComment" id="replyToPost'+obj.id+'"><form action="'+commentFormUrl+'" method="POST" id="formReplyToPost'+obj.id+'">'+commentCsrfField+'<div class="form-group"><label for="comment">Your Comment</label><textarea name="comment" class="form-control" ></textarea></div><input type="hidden" name="discussion_post_id" value="'+obj.id+'"><button type="button" class="btn btn-default" onclick="confirmSubmitReplytoPost(this);" id="formReplyToPost'+obj.id+'">Send</button></form></div>';
+        commentInnerHtml += '<div class="collapse replyComment" id="replyToPost'+obj.id+'"><div class="form-group"><label for="comment">Your Comment</label><textarea name="comment" id="comment_'+obj.id+'"  class="form-control" ></textarea></div><button class="btn btn-default" onclick="confirmSubmitReplytoPost(this);" data-post_id="'+obj.id+'">Send</button><button type="button" class="btn btn-default" data-id="replyToPost'+obj.id+'" onclick="cancleReply(this);">Cancle</button></div>';
         divComment.innerHTML = commentInnerHtml;
-
-        var divPostReply = document.createElement('div');
-        divPostReply.className = 'collapse';
-        divPostReply.id = 'replyToPost'+obj.id;
-        var postReplyForm = ''
-        var postReplyurl ="{{ url('createComment')}}";
-        var csrfField = '{{csrf_field()}}';
-        postReplyForm += '<form action='+ postReplyurl +' method="POST" id="formReplyToPost'+ obj.id +'">'+ csrfField +'<div class="form-group"><label for="comment">Your Comment</label><textarea name="comment" class="form-control" ></textarea></div><input type="hidden" name="discussion_post_id" value="'+ obj.id +'"><button type="button" class="btn btn-default" onclick="confirmSubmitReply(this);" id="formReplyToPost'+ obj.id +'">Send</button></form>';
-
-        divPostReply.innerHTML = postReplyForm;
-        divComment.appendChild(divPostReply);
         divMediaBody.appendChild(divComment);
 
         var commentBgDiv = document.createElement('div');
@@ -661,13 +784,14 @@ margin-left: -13px;}
         if(Object.keys(comments).length > 0){
           if(false == $.isEmptyObject(comments)){
             $.each(comments, function(idx, obj) {
+              if(false == $.isEmptyObject(obj)){
               var mainCommentDiv = document.createElement('div');
               mainCommentDiv.className = 'item cmt-left-margin-10';
               mainCommentDiv.id = 'showComment_'+obj.id;
 
               var commentImage = document.createElement('img');
               if(obj.user_image){
-                var imageUrl = obj.user_image;
+                var imageUrl =  "{{ asset('') }}"+obj.user_image;
               } else {
                 var imageUrl = "{{ asset('images/user1.png') }}";
               }
@@ -682,11 +806,7 @@ margin-left: -13px;}
                 editDeleteInnerHtml = '<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>';
                 editDeleteInnerHtml += '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
                 if( userId == obj.user_id || userId == postUserId ){
-                  var deleteComment = "{{ url('deleteComment')}}";
-                  var cmtCsrfField = '{{csrf_field()}}';
-                  var cmtDeleteField = '{{ method_field('DELETE') }}';
-                  editDeleteInnerHtml += '<li><a id="'+obj.id+'" onclick="confirmCommentDelete(this);">Delete</a></li><form id="deleteComment_'+obj.id+'" action="'+deleteComment+'" method="POST" style="display: none;">'+cmtCsrfField+''+cmtDeleteField;
-                  editDeleteInnerHtml += '<input type="hidden" name="comment_id" value="'+obj.id+'"></form>';
+                  editDeleteInnerHtml += '<li><a id="'+obj.id+'" onclick="confirmCommentDelete(this);">Delete</a></li>';
                 }
                 if( userId == obj.user_id ){
                   editDeleteInnerHtml += '<li><a id="'+obj.id+'" onclick="editComment(this);">Edit</a></li>';
@@ -706,17 +826,16 @@ margin-left: -13px;}
               pCommentBodyDiv.innerHTML = obj.body; //'{!! '+obj.body+' !!}';
               commentMessageDiv.appendChild(pCommentBodyDiv);
 
-              var spanUpdateComment = document.createElement('span');
-              var updateCommentCsrfField = '{{ csrf_field() }}';
-              var updateCommentMethodField = '{{ method_field("PUT") }}';
-              var updateCommentUrl ="{{ url('updateComment')}}";
+              var spanUpdateComment = document.createElement('div');
+              spanUpdateComment.className = 'form-group hide';
+              spanUpdateComment.id = 'editCommentShow_'+obj.id;
 
-              spanUpdateComment.innerHTML = '<form action="'+updateCommentUrl+'" method="POST" id="formUpdateComment'+ obj.id +'">'+updateCommentCsrfField+''+updateCommentMethodField+'<div class="form-group hide" id="editCommentShow_'+ obj.id +'" ><textarea class="form-control" name="comment" rows="3">'+ obj.body+'</textarea><input type="hidden" name="comment_id" value="'+ obj.id +'"><input type="hidden" name="post_id" value="'+ postId +'"><button type="submit" class="btn btn-primary">Update</button><button type="button" class="btn btn-default" id="'+ obj.id +'" onclick="cancleComment(this);">Cancle</button></div></form>';
+              spanUpdateComment.innerHTML = '<textarea class="form-control" name="comment" id="comment_'+ postId +'_'+ obj.id +'" rows="3">'+ obj.body+'</textarea><button class="btn btn-primary"  data-post_id="'+ postId +'" data-comment_id="'+ obj.id +'" onclick="updateComment(this);">Update</button><button class="btn btn-default" id="'+ obj.id +'" onclick="cancleComment(this);">Cancle</button>';
               commentMessageDiv.appendChild(spanUpdateComment);
               mainCommentDiv.appendChild(commentMessageDiv);
 
               var commentReplyDiv = document.createElement('div');
-              commentReplyDiv.className = 'comment-meta reply-1';
+              commentReplyDiv.className = 'comment-meta reply-1 cmt-left-margin';
 
               var spanCommenReply = document.createElement('span');
               spanCommenReply.id = 'cmt_like_'+obj.id;
@@ -746,9 +865,7 @@ margin-left: -13px;}
               var subCommenDiv = document.createElement('div');
               subCommenDiv.className = 'collapse replyComment';
               subCommenDiv.id = 'replyToComment'+postId+'-'+obj.id;
-              var urlCreateSubComment = "{{ url('createSubComment')}}";
-              var csrfCreateSubComment = '{{csrf_field()}}';
-              subCommenDiv.innerHTML = '<form action="'+urlCreateSubComment+'" method="POST" id="formReplyToComment'+postId+obj.id+'">'+csrfCreateSubComment+'<div class="form-group"><label for="subcomment">Your Sub Comment</label><textarea name="subcomment" class="form-control" rows="3"></textarea></div><input type="hidden" name="comment_id" value="'+ obj.id +'"><input type="hidden" name="discussion_post_id" value="'+postId+'"><button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToComment'+postId+obj.id+'">Send</button></form>';
+              subCommenDiv.innerHTML = '<div class="form-group"><label for="subcomment">Your Sub Comment</label><textarea name="subcomment" id="subcomment_'+postId+'_'+obj.id+'" class="form-control" rows="3"></textarea></div><input type="hidden" name="comment_id" value="'+ obj.id +'"><input type="hidden" name="discussion_post_id" value="'+postId+'"><button class="btn btn-default" data-post_id="'+postId+'" data-comment_id="'+obj.id+'"  onclick="confirmSubmitReplytoComment(this);">Send</button><button type="button" class="btn btn-default" data-id="replyToComment'+postId+'-'+obj.id+'" onclick="cancleReply(this);">Cancle</button>';
               commentReplyDiv.appendChild(subCommenDiv);
               mainCommentDiv.appendChild(commentReplyDiv);
               commentchatDiv.appendChild(mainCommentDiv);
@@ -758,6 +875,7 @@ margin-left: -13px;}
                   showSubComments(obj.subcomments, commentchatDiv, subcommentLikesCount, userId, commentUserId, postUserId);
                 }
               }
+            }
             });
           }
         }
@@ -768,8 +886,9 @@ margin-left: -13px;}
         divPanel.appendChild(divMediaBody);
         divMedia.appendChild(divPanel);
         showPostsDiv.appendChild(divMedia);
-        showMore();
+        }
       });
+      showMore();
   }
 
   function showPosts( ele ){
@@ -794,7 +913,7 @@ margin-left: -13px;}
 
         var subcommentImage = document.createElement('img');
         if(obj.user_image){
-          var subcommentImageUrl = obj.user_image;
+          var subcommentImageUrl = "{{ asset('') }}"+obj.user_image;
         } else {
           var subcommentImageUrl = "{{ asset('images/user1.png') }}";
         }
@@ -809,11 +928,7 @@ margin-left: -13px;}
           editDeleteInnerHtml = '<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>';
           editDeleteInnerHtml += '<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">';
           if(  userId == obj.user_id || userId == commentUserId || userId == postUserId ){
-            var deleteComment = "{{ url('deleteSubComment')}}";
-            var cmtCsrfField = '{{csrf_field()}}';
-            var cmtDeleteField = '{{ method_field('DELETE') }}';
-            editDeleteInnerHtml += '<li><a id="'+obj.discussion_comment_id+'_'+obj.id+'" onclick="confirmSubCommentDelete(this);">Delete</a></li><form id="deleteSubComment_'+obj.discussion_comment_id+'_'+obj.id+'" action="'+deleteComment+'" method="POST" style="display: none;">'+cmtCsrfField+''+cmtDeleteField;
-            editDeleteInnerHtml += '<input type="hidden" name="subcomment_id" value="'+obj.id+'"></form>';
+            editDeleteInnerHtml += '<li><a id="'+obj.discussion_comment_id+'_'+obj.id+'" onclick="confirmSubCommentDelete(this);">Delete</a></li>';
           }
           if( userId == obj.user_id ){
             editDeleteInnerHtml += '<li><a id="'+obj.id+'" onclick="editSubComment(this);">Edit</a></li>';
@@ -835,12 +950,11 @@ margin-left: -13px;}
         pSubcommentBodyDiv.appendChild(spanSubCommentBodyDiv);
         subCommentMessageDiv.appendChild(pSubcommentBodyDiv);
 
-        var spanUpdateSubComment = document.createElement('span');
-        var updateSubCommentCsrfField = '{{ csrf_field() }}';
-        var updateSubCommentMethodField = '{{ method_field("PUT") }}';
-        var updateSubCommentUrl ="{{ url('updateSubComment')}}";
+        var spanUpdateSubComment = document.createElement('div');
+        spanUpdateSubComment.className = 'form-group hide';
+        spanUpdateSubComment.id = 'editSubCommentShow_'+obj.id;
 
-        spanUpdateSubComment.innerHTML = '<form action="'+updateSubCommentUrl+'" method="POST" id="formUpdateSubComment'+ obj.id +'">'+updateSubCommentCsrfField+''+updateSubCommentMethodField+'<div class="form-group hide" id="editSubCommentShow_'+ obj.id +'" ><textarea class="form-control" name="comment" rows="3">'+ obj.body+'</textarea><input type="hidden" name="sub_comment_id" value="'+ obj.id +'"><input type="hidden" name="comment_id" value="'+ obj.discussion_comment_id +'"><input type="hidden" name="post_id" value="'+ obj.discussion_post_id +'"><button type="submit" class="btn btn-primary">Update</button><button type="button" class="btn btn-default" id="'+ obj.id +'" onclick="cancleSubComment(this);">Cancle</button></div></form>';
+        spanUpdateSubComment.innerHTML = '<textarea class="form-control" name="comment" id="update_subcomment_'+ obj.discussion_comment_id +'_'+ obj.id +'" rows="3">'+ obj.body+'</textarea><button class="btn btn-primary" data-post_id="'+ obj.discussion_post_id+'" data-comment_id="'+ obj.discussion_comment_id +'" data-subcomment_id="'+ obj.id +'" onclick="updateSubComment(this);">Update</button><button type="button" class="btn btn-default" id="'+ obj.id +'" onclick="cancleSubComment(this);">Cancle</button>';
         subCommentMessageDiv.appendChild(spanUpdateSubComment);
         mainSubCommentDiv.appendChild(subCommentMessageDiv);
 
@@ -875,15 +989,14 @@ margin-left: -13px;}
         var createSubCommenDiv = document.createElement('div');
         createSubCommenDiv.className = 'collapse replyComment';
         createSubCommenDiv.id = 'replySubComment'+obj.discussion_comment_id+'-'+obj.id;
-        var urlCreateSubComment = "{{ url('createSubComment')}}";
-        var createSubCommentCsrf = '{{csrf_field()}}';
-        createSubCommenDivInnerHTML = '<form action="'+urlCreateSubComment+'" method="POST" id="formReplyToSubComment'+obj.discussion_comment_id+obj.id+'">'+createSubCommentCsrf+'<div class="form-group"><label for="subcomment">Your Sub Comment</label>';
+        createSubCommenDivInnerHTML = '<div class="form-group"><label for="subcomment">Your Sub Comment</label>';
         if( userId != obj.user_id ){
-          createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" rows="3">'+obj.user_name+'</textarea>';
+          createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" id="create_subcomment_'+ obj.id +'"  rows="3">'+obj.user_name+'</textarea>';
         } else {
-          createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" rows="3"></textarea>';
+          createSubCommenDivInnerHTML += '<textarea name="subcomment" id="create_subcomment_'+ obj.id +'" class="form-control" rows="3"></textarea>';
         }
-        createSubCommenDivInnerHTML += '</div><input type="hidden" name="comment_id" value="'+ obj.id +'"><input type="hidden" name="comment_id" value="'+obj.discussion_comment_id+'"><input type="hidden" name="parent_id" value="'+obj.id+'"><input type="hidden" name="discussion_post_id" value="'+obj.discussion_post_id+'"><button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToSubComment'+obj.discussion_comment_id+obj.id+'">Send</button></form>';
+        createSubCommenDivInnerHTML += '</div><button class="btn btn-default"  data-post_id="'+ obj.discussion_post_id+'" data-comment_id="'+ obj.discussion_comment_id+'" data-parent_id="'+ obj.id+'" onclick="confirmSubmitReplytoSubComment(this);">Send</button><button type="button" class="btn btn-default" data-id="replySubComment'+obj.discussion_comment_id+'-'+obj.id+'" onclick="cancleReply(this);">Cancle</button>';
+        createSubCommenDiv.innerHTML = createSubCommenDivInnerHTML;
         subcommentReplyDiv.appendChild(createSubCommenDiv);
         mainSubCommentDiv.appendChild(subcommentReplyDiv);
         commentchatDiv.appendChild(mainSubCommentDiv);
@@ -923,6 +1036,11 @@ margin-left: -13px;}
         renderPosts(msg);
       });
     }
+  }
+
+  function cancleReply(ele){
+    var id = $(ele).data('id');
+    document.getElementById(id).classList.remove("in");
   }
 
   $(document).on("click", "i[id^=post_like_]", function(e) {
@@ -1104,13 +1222,6 @@ margin-left: -13px;}
         return false;
       });
   }
-  // $(".panel-collapse").on("hide.bs.collapse", function (event) {
-  //    $(".clickable-btn").find('i').addClass("fa-chevron-up").removeClass("fa-chevron-down");
-  // });
-  // $(".panel-collapse").on("show.bs.collapse", function () {
-  //    $(".clickable-btn .collapsed").find('i').addClass("fa-chevron-down").removeClass("fa-chevron-up");
-  // });
-
 </script>
 
 @stop

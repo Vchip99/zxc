@@ -54,6 +54,10 @@ class ClientCourseSubComment extends Model
         return $this->hasMany(ClientCourseSubCommentLike::class);
     }
 
+    public function user(){
+        return $this->belongsTo(Clientuser::class, 'user_id');
+    }
+
     protected static function deleteClientCourseSubCommentsByUserId($clientId){
         $subcomments = static::where('client_id', $clientId)->get();
         if(is_object($subcomments) && false == $subcomments->isEmpty()){

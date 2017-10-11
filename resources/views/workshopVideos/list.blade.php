@@ -31,7 +31,7 @@
           <th>Workshop Name</th>
           <th>Category Name</th>
           <th>Edit Category</th>
-          <!-- <th>Delete Workshop</th> -->
+          <th>Delete Workshop</th>
         </tr>
       </thead>
       <tbody>
@@ -46,19 +46,19 @@
               <a href="{{url('admin/workshopVideo')}}/{{$workshopVideo->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$workshopVideo->name}}" />
                 </a>
             </td>
-           <!--  <td>
-            <a id="{{$workshopVideo->id}}" ><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$workshopVideo->name}}" />
+            <td>
+            <a id="{{$workshopVideo->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$workshopVideo->name}}" />
                 </a>
-                <form id="deleteCategory_{{$workshopVideo->id}}" action="{{url('admin/deleteWorkshopCategory')}}" method="POST" style="display: none;">
+                <form id="deleteWorkshopVideo_{{$workshopVideo->id}}" action="{{url('admin/deleteWorkshopVideo')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
-                    <input type="hidden" name="category_id" value="{{$workshopVideo->id}}">
+                    <input type="hidden" name="video_id" value="{{$workshopVideo->id}}">
                 </form>
-            </td> -->
+            </td>
           </tr>
           @endforeach
         @else
-          <tr><td colspan="5">No workshop details is created.</td></tr>
+          <tr><td colspan="5">No workshop video is created.</td></tr>
         @endif
       </tbody>
     </table>
@@ -72,7 +72,7 @@
     function confirmDelete(ele){
       $.confirm({
           title: 'Confirmation',
-          content: 'If you delete this category, all associated projects of this category will be deleted.',
+          content: 'You want to delete this Workshop Video?',
           type: 'red',
           typeAnimated: true,
           buttons: {
@@ -81,7 +81,7 @@
                     btnClass: 'btn-red',
                     action: function(){
                       var id = $(ele).attr('id');
-                      formId = 'deleteCategory_'+id;
+                      formId = 'deleteWorkshopVideo_'+id;
                       document.getElementById(formId).submit();
                     }
                 },

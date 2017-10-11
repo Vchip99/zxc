@@ -181,19 +181,66 @@ class LiveCourseVideoController extends Controller
         try
         {
             $courseComment = LiveCourseComment::createComment($request);
-            Session::put('live_course_comment', $courseComment->id);
+            // Session::put('live_course_comment', $courseComment->id);
             DB::commit();
             $videoId = strip_tags(trim($request->get('video_id')));
-            if(0 < $videoId){
-                return redirect()->route('liveEpisode', ['id' => $videoId]);
-            }
+            // if(0 < $videoId){
+            //     return redirect()->route('liveEpisode', ['id' => $videoId]);
+            // }
         }
         catch(\Exception $e)
         {
             DB::rollback();
-            return back()->withErrors('something went wrong.');
+            // return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('liveCourse');
+        return $this->getComments($videoId);
+    }
+
+    /**
+     *  return comments
+     */
+    protected function getComments($videoId){
+        $comments = LiveCourseComment::where('live_course_video_id', $videoId)->orderBy('id', 'desc')->get();
+        $videoComments = [];
+        foreach($comments as $comment){
+            $videoComments['comments'][$comment->id]['body'] = $comment->body;
+            $videoComments['comments'][$comment->id]['id'] = $comment->id;
+            $videoComments['comments'][$comment->id]['live_course_video_id'] = $comment->live_course_video_id;
+            $videoComments['comments'][$comment->id]['user_id'] = $comment->user_id;
+            $videoComments['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $videoComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
+            $videoComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
+            if(is_object($comment->children) && false == $comment->children->isEmpty()){
+                $videoComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
+            }
+        }
+        $videoComments['commentLikesCount'] = LiveCourseCommentLike::getLikesByVideoId($videoId);
+        $videoComments['subcommentLikesCount'] = LiveCourseSubCommentLike::getLikesByVideoId($videoId);
+
+        return $videoComments;
+    }
+
+    /**
+     *  return child comments
+     */
+    protected function getSubComments($subComments){
+
+        $videoChildComments = [];
+        foreach($subComments as $subComment){
+            $videoChildComments[$subComment->id]['body'] = $subComment->body;
+            $videoChildComments[$subComment->id]['id'] = $subComment->id;
+            $videoChildComments[$subComment->id]['live_course_video_id'] = $subComment->live_course_video_id;
+            $videoChildComments[$subComment->id]['live_course_comment_id'] = $subComment->live_course_comment_id;
+            $videoChildComments[$subComment->id]['user_name'] = $subComment->user->name;
+            $videoChildComments[$subComment->id]['user_id'] = $subComment->user_id;
+            $videoChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
+            $videoChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
+            if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
+                $videoChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
+            }
+        }
+
+        return $videoChildComments;
     }
 
     protected function updateLiveCourseComment(Request $request){
@@ -209,17 +256,17 @@ class LiveCourseVideoController extends Controller
                     $comment->body = $commentBody;
                     $comment->save();
                     DB::commit();
-                    Session::put('live_course_comment', $comment->id);
-                    return redirect()->route('liveEpisode', ['id' => $videoId]);
+                    // Session::put('live_course_comment', $comment->id);
+                    // return redirect()->route('liveEpisode', ['id' => $videoId]);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
+                    // return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('liveCourse');
+        return $this->getComments($videoId);
     }
 
     protected function deleteLiveCourseComment(Request $request){
@@ -246,19 +293,19 @@ class LiveCourseVideoController extends Controller
                             $deleteLike->delete();
                         }
                     }
-                    Session::put('live_course_comment', 0);
+                    // Session::put('live_course_comment', 0);
                     $comment->delete();
                     DB::commit();
-                    return redirect()->route('liveEpisode', ['id' => $videoId]);
+                    // return redirect()->route('liveEpisode', ['id' => $videoId]);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
+                    // return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('liveCourse');
+        return $this->getComments($videoId);
     }
 
     protected function createLiveCourseSubComment(Request $request){
@@ -286,18 +333,18 @@ class LiveCourseVideoController extends Controller
                 Notification::addCommentNotification($notificationMessage, Notification::USERLIVECOURSENOTIFICATION, $subComment->id,$subComment->user_id,$parentComment->user_id);
             }
 
-            Session::set('live_course_comment', $request->get('comment_id'));
+            // Session::set('live_course_comment', $request->get('comment_id'));
             DB::commit();
-            if(0 < $videoId){
-                return redirect()->route('liveEpisode', ['id' => $videoId]);
-            }
+            // if(0 < $videoId){
+            //     return redirect()->route('liveEpisode', ['id' => $videoId]);
+            // }
         }
         catch(\Exception $e)
         {
             DB::rollback();
-            return back()->withErrors('something went wrong.');
+            // return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('liveCourse');
+        return $this->getComments($videoId);
     }
 
     protected function updateLiveCourseSubComment(Request $request){
@@ -314,17 +361,17 @@ class LiveCourseVideoController extends Controller
                     $subcomment->body = $commentBody;
                     $subcomment->save();
                     DB::commit();
-                    Session::put('live_course_comment', $commentId);
-                    return redirect()->route('liveEpisode', ['id' => $videoId]);
+                    // Session::put('live_course_comment', $commentId);
+                    // return redirect()->route('liveEpisode', ['id' => $videoId]);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
+                    // return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('liveCourse');
+        return $this->getComments($videoId);
     }
 
     protected function deleteLiveCourseSubComment(Request $request){
@@ -342,19 +389,19 @@ class LiveCourseVideoController extends Controller
                             $deleteLike->delete();
                         }
                     }
-                    Session::put('live_course_comment', $commentId);
+                    // Session::put('live_course_comment', $commentId);
                     $subcomment->delete();
                     DB::commit();
-                    return redirect()->route('liveEpisode', ['id' => $videoId]);
+                    // return redirect()->route('liveEpisode', ['id' => $videoId]);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
+                    // return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('liveCourse');
+        return $this->getComments($videoId);
     }
 
     protected function likeLiveVideo(Request $request){

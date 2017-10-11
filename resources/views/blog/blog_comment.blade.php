@@ -108,6 +108,19 @@ hr{
   margin-top: 20px;
   margin-bottom: 20px;
 }
+.ckeditor_list ul{
+  list-style: none !important;
+  }
+.ckeditor_list ul li:before{
+  content: "\f192" !important; /* FontAwesome Unicode */
+  font-family: FontAwesome !important;
+  display: inline-block;
+  font-size: 20px;
+  color: #339999;
+  margin-left: -20px; /* same as padding-left set on li */
+  margin-right: 5px;
+  width: 20px; /* same as padding-left set on li */
+}
 </style>
 <script type="text/javascript">
     $.ajaxSetup({
@@ -143,7 +156,7 @@ hr{
 <section id="" class="v_container v_bg_grey mrgn_50_top">
   <div class="container ">
     <div class="row">
-      <div class="col-md-9">
+      <div class="col-md-9 ckeditor_list">
          <h2 class="v_h2_title">The Vchip Blog</h2>
          <h3 class="v_h3_title ">{{$blog->title}}</h3>
          <p>
@@ -198,8 +211,6 @@ hr{
             </span>
             <hr />
             <div class="collapse replyComment" id="replyToBlog{{$blog->id}}">
-              <form action="{{ url('createBlogComment')}}" method="POST" id="createBlogComment">
-                {{csrf_field()}}
                 <div class="form-group">
                   <!-- <label for="comment">Your Comment</label> -->
                   <textarea name="comment" id="comment" placeholder="Comment here.." class="form-control"></textarea>
@@ -223,10 +234,9 @@ hr{
                     });
                   </script>
                 </div>
-                <input type="hidden" name="blog_id" value="{{$blog->id}}">
+                <input type="hidden" name="blog_id" id="blog_id" value="{{$blog->id}}">
                 <button type="button" class="btn btn-default" onclick="confirmSubmit(this);" id="formReplyToBlog{{$blog->id}}">Send</button>
                 <button type="button" class="btn btn-default" data-id="replyToBlog{{$blog->id}}" onclick="cancleReply(this);">Cancle</button>
-              </form>
             </div>
           </div>
         </div>
@@ -234,7 +244,7 @@ hr{
           <div class="tab-content">
             <div class="tab-pane fade in active" id="questions">
               <div class="post-comments">
-                <div class="row" id="showAllPosts">
+                <div class="row" id="showAllComments">
                   @if(count($comments) > 0)
                     @foreach($comments as $comment)
                     <div class="box-body chat" id="chat-box">
@@ -252,13 +262,7 @@ hr{
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                               @if(Auth::user()->id == $comment->user_id)
-                                <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
-                                <form id="deleteComment_{{$comment->id}}" action="{{ url('deleteBlogComment')}}" method="POST" style="display: none;">
-                                  {{ csrf_field() }}
-                                  {{ method_field('DELETE') }}
-                                  <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                  <input type="hidden" name="blog_id" value="{{$blog->id}}">
-                                </form>
+                                <li><a id="{{$comment->id}}" data-blog_id="{{$blog->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
                               @endif
                               @if(Auth::user()->id == $comment->user_id)
                                 <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
@@ -268,9 +272,6 @@ hr{
                           @endif
                             <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
                             <div class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
-                            <form action="{{ url('updateBlogComment')}}" method="POST" id="formUpdateComment{{$comment->id}}">
-                                  {{csrf_field()}}
-                                  {{ method_field('PUT') }}
                               <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
                                 <textarea class="form-control" name="comment" id="comment_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
                                     <script type="text/javascript">
@@ -292,12 +293,9 @@ hr{
                                           }
                                       });
                                     </script>
-                                <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                <input type="hidden" name="blog_id" value="{{$blog->id}}">
-                                <button type="submit" class="btn btn-primary">Update</button>
+                                <button class="btn btn-primary" data-comment_id="{{$comment->id}}" data-blog_id="{{$blog->id}}" onclick="updateComment(this);">Update</button>
                                 <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
                               </div>
-                            </form>
                           </div>
                           <div class="comment-meta reply-1">
                             <span id="cmt_like_{{$comment->id}}" >
@@ -314,17 +312,12 @@ hr{
                           </span>
                           <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                           <div class="collapse replyComment" id="replyToComment{{$blog->id}}-{{$comment->id}}">
-                            <form action="{{ url('createBlogSubComment')}}" method="POST" id="formReplyToComment{{$blog->id}}{{$comment->id}}">
-                               {{csrf_field()}}
                               <div class="form-group">
                                 <label for="subcomment">Your Sub Comment</label>
-                                  <textarea name="comment" class="form-control" rows="3"></textarea>
+                                  <textarea name="comment" id="subcomment_{{$blog->id}}_{{$comment->id}}" class="form-control" rows="3"></textarea>
                               </div>
-                              <input type="hidden" name="blog_id" value="{{$blog->id}}">
-                              <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                              <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToComment{{$blog->id}}{{$comment->id}}">Send</button>
-                              <button type="button" class="btn btn-default" data-id="replyToComment{{$blog->id}}-{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
-                            </form>
+                              <button class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-comment_id="{{$comment->id}}" data-blog_id="{{$blog->id}}">Send</button>
+                              <button class="btn btn-default" data-id="replyToComment{{$blog->id}}-{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
                           </div>
                         </div>
                       </div>
@@ -351,12 +344,348 @@ hr{
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="{{ asset('js/togleForFilterBy.js') }}"></script>
   <script type="text/javascript">
-    function confirmSubmit(ele){
+  function confirmSubmit(ele){
+    var userId = parseInt(document.getElementById('user_id').value);
+    var blogId = parseInt(document.getElementById('blog_id').value);
+    var comment = CKEDITOR.instances.comment.getData();
+    document.getElementById('replyToBlog'+blogId).classList.remove("in");
+    CKEDITOR.instances.comment.setData('');
+    if(0 < userId && comment){
+       $.ajax({
+            method: "POST",
+            url: "{{url('createBlogComment')}}",
+            data: {blog_id:blogId, comment:comment}
+        })
+        .done(function( msg ) {
+          renderComments(msg, userId);
+        });
+    } else if( isNaN(userId)) {
+      $.confirm({
+      title: 'Confirmation',
+      content: 'Please login first. Click "Ok" button to login.',
+      type: 'red',
+      typeAnimated: true,
+      buttons: {
+            Ok: {
+                text: 'Ok',
+                btnClass: 'btn-red',
+                action: function(){
+                  window.location="{{url('/home')}}";
+                }
+            },
+            Cancle: function () {
+            }
+        }
+      });
+    }
+  }
+  function cancleReply(ele){
+    var id = $(ele).data('id');
+    document.getElementById(id).classList.remove("in");
+  }
+
+  function updateComment(ele){
+    var userId = parseInt(document.getElementById('user_id').value);
+    var commentId = $(ele).data('comment_id');
+    var blogId = $(ele).data('blog_id');
+    commentid = 'comment_'+commentId;
+    var comment = CKEDITOR.instances[commentid].getData();
+    if(comment){
+      $.ajax({
+          method: "POST",
+          url: "{{url('updateBlogComment')}}",
+          data: {blog_id:blogId, comment_id:commentId, comment:comment}
+      })
+      .done(function( msg ) {
+        renderComments(msg, userId);
+      });
+    }
+  }
+
+  function renderComments(msg, userId){
+    var allCommentsDiv = document.getElementById('showAllComments');
+    allCommentsDiv.innerHTML = '';
+    var commentLikesCount = msg['commentLikesCount'];
+    var subcommentLikesCount = msg['subcommentLikesCount'];
+    arrayComments = [];
+    $.each(msg['comments'], function(idx, obj) {
+      arrayComments[idx] = obj;
+    });
+    var sortedArray = arrayComments.reverse();
+    $.each(sortedArray, function(idx, obj) {
+      if(false == $.isEmptyObject(obj)){
+        var chatDiv = document.createElement('div');
+        chatDiv.className = 'box-body chat';
+        chatDiv.id = 'chat-box';
+
+        var mainCommentDiv = document.createElement('div');
+        mainCommentDiv.className = 'item';
+        mainCommentDiv.id = 'showComment_'+obj.id;
+
+        var commentImage = document.createElement('img');
+        if(obj.user_image){
+          var imageUrl =  "{{ asset('') }}"+obj.user_image;
+        } else {
+          var imageUrl = "{{ asset('images/user1.png') }}";
+        }
+        commentImage.setAttribute('src',imageUrl);
+        mainCommentDiv.appendChild(commentImage);
+
+        var commentMessageDiv = document.createElement('div');
+        commentMessageDiv.className = 'message';
+        if( userId == obj.user_id ){
+          var commentEditDeleteDiv = document.createElement('div');
+          commentEditDeleteDiv.className = 'dropdown pull-right';
+          editDeleteInnerHtml = '<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>';
+          editDeleteInnerHtml += '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
+          if( userId == obj.user_id ){
+            editDeleteInnerHtml += '<li><a id="'+obj.id+'" data-comment_id="'+obj.id+'" data-blog_id="'+obj.blog_id+'" onclick="confirmCommentDelete(this);">Delete</a></li>';
+          }
+          if( userId == obj.user_id ){
+            editDeleteInnerHtml += '<li><a id="'+obj.id+'" onclick="editComment(this);">Edit</a></li>';
+          }
+          editDeleteInnerHtml += '</ul>';
+          commentEditDeleteDiv.innerHTML = editDeleteInnerHtml;
+          commentMessageDiv.appendChild(commentEditDeleteDiv);
+        }
+
+        var ancUserNameDiv = document.createElement('a');
+        ancUserNameDiv.className = 'SubCommentName';
+        ancUserNameDiv.innerHTML = obj.user_name;
+        commentMessageDiv.appendChild(ancUserNameDiv);
+
+        var pCommentBodyDiv = document.createElement('p');
+        pCommentBodyDiv.className = 'more';
+        pCommentBodyDiv.id = 'editCommentHide_'+obj.id;
+        pCommentBodyDiv.innerHTML = obj.body; //'{!! '+obj.body+' !!}';
+        commentMessageDiv.appendChild(pCommentBodyDiv);
+
+        var divUpdateComment = document.createElement('div');
+        divUpdateComment.className = 'form-group hide';
+        divUpdateComment.id = 'editCommentShow_'+obj.id;
+        divUpdateComment.innerHTML = '<textarea class="form-control" name="comment" id="comment_'+ obj.id +'" rows="3">'+ obj.body+'</textarea><button class="btn btn-primary" data-comment_id="'+ obj.id +'" data-blog_id="'+ obj.blog_id +'" onclick="updateComment(this);">Update</button><button type="button" class="btn btn-default" id="'+ obj.id +'" onclick="cancleComment(this);">Cancle</button>';
+        commentMessageDiv.appendChild(divUpdateComment);
+        mainCommentDiv.appendChild(commentMessageDiv);
+        $( document ).ready(function() {
+          CKEDITOR.replace('comment_'+ obj.id);
+          CKEDITOR.config.width="100%";
+          CKEDITOR.config.height="auto";
+          CKEDITOR.on('dialogDefinition', function (ev) {
+              var dialogName = ev.data.name,
+                  dialogDefinition = ev.data.definition;
+              if (dialogName == 'image') {
+                  var onOk = dialogDefinition.onOk;
+                  dialogDefinition.onOk = function (e) {
+                      var width = this.getContentElement('info', 'txtWidth');
+                      width.setValue('100%');
+                      var height = this.getContentElement('info', 'txtHeight');
+                      height.setValue('400');
+                      onOk && onOk.apply(this, e);
+                  };
+              }
+          });
+        });
+
+        var commentReplyDiv = document.createElement('div');
+        commentReplyDiv.className = 'comment-meta reply-1';
+
+        var spanCommenReply = document.createElement('span');
+        spanCommenReply.id = 'cmt_like_'+obj.id;
+        var spanCommenInnerHtml = '';
+        if( commentLikesCount[obj.id] && commentLikesCount[obj.id]['user_id'][userId]){
+          spanCommenInnerHtml +='<i id="comment_like_'+obj.id+'" data-blog_id="'+obj.blog_id+'" data-comment_id="'+obj.id+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+          spanCommenInnerHtml +='<span id="like1-bs3">'+ Object.keys(commentLikesCount[obj.id]['like_id']).length +'</span>';
+        } else {
+          spanCommenInnerHtml +='<i id="comment_like_'+obj.id+'" data-blog_id="'+obj.blog_id+'" data-comment_id="'+obj.id+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+          if(commentLikesCount[obj.id]){
+            spanCommenInnerHtml +='<span id="like1-bs3">'+ Object.keys(commentLikesCount[obj.id]['like_id']).length +'</span>';
+          }
+        }
+        spanCommenReply.innerHTML = spanCommenInnerHtml;
+        commentReplyDiv.appendChild(spanCommenReply);
+
+        var spanCommenReplyButton = document.createElement('span');
+        spanCommenReplyButton.className = 'mrgn_5_left';
+        spanCommenReplyButton.innerHTML = '<a class="" role="button" data-toggle="collapse" href="#replyToComment'+obj.blog_id+'-'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a>';
+        commentReplyDiv.appendChild(spanCommenReplyButton);
+
+        var spanCommenReplyDate = document.createElement('span');
+        spanCommenReplyDate.className = 'text-muted time-of-reply';
+        spanCommenReplyDate.innerHTML = '<i class="fa fa-clock-o"></i>'+ obj.updated_at;
+        commentReplyDiv.appendChild(spanCommenReplyDate);
+
+        var subCommenDiv = document.createElement('div');
+        subCommenDiv.className = 'collapse replyComment';
+        subCommenDiv.id = 'replyToComment'+obj.blog_id+'-'+obj.id;
+        subCommenDiv.innerHTML = '<div class="form-group"><label for="subcomment">Your Sub Comment</label><textarea name="subcomment" class="form-control" rows="3"  id="subcomment_'+obj.blog_id+'_'+obj.id+'" ></textarea></div><button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-comment_id="'+obj.id+'" data-blog_id="'+obj.blog_id+'" >Send</button><button class="btn btn-default" data-id="replyToComment'+obj.blog_id+'-'+obj.id+'" onclick="cancleReply(this);">Cancle</button>';
+        commentReplyDiv.appendChild(subCommenDiv);
+        mainCommentDiv.appendChild(commentReplyDiv);
+        chatDiv.appendChild(mainCommentDiv);
+        allCommentsDiv.appendChild(chatDiv);
+        if( obj['subcomments'] ){
+          if(false == $.isEmptyObject(obj['subcomments'])){
+            var commentUserId = obj.user_id;
+            showSubComments(obj['subcomments'], chatDiv, subcommentLikesCount, userId, commentUserId, allCommentsDiv);
+          }
+        }
+      }
+    });
+    showMore();
+  }
+
+  function showSubComments(subcomments, commentchatDiv, subcommentLikesCount, userId, commentUserId, allCommentsDiv){
+    if(false == $.isEmptyObject(subcomments)){
+      $.each(subcomments, function(idx, obj) {
+        var mainSubCommentDiv = document.createElement('div');
+        mainSubCommentDiv.className = 'item replySubComment-1';
+
+        var subcommentImage = document.createElement('img');
+        if(obj.user_image){
+          var subcommentImageUrl = "{{ asset('') }}"+obj.user_image;
+        } else {
+          var subcommentImageUrl = "{{ asset('images/user1.png') }}";
+        }
+        subcommentImage.setAttribute('src',subcommentImageUrl);
+        mainSubCommentDiv.appendChild(subcommentImage);
+
+        var subCommentMessageDiv = document.createElement('div');
+        subCommentMessageDiv.className = 'message';
+        subCommentMessageDiv.id = 'subcomment_'+obj.id;
+        if( userId == obj.user_id || userId == commentUserId){
+          var subcommentEditDeleteDiv = document.createElement('div');
+          subcommentEditDeleteDiv.className = 'dropdown pull-right';
+          editDeleteInnerHtml = '<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>';
+          editDeleteInnerHtml += '<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">';
+          if(  userId == obj.user_id || userId == commentUserId){
+            editDeleteInnerHtml += '<li><a id="'+obj.blog_comment_id+'_'+obj.id+'" onclick="confirmSubCommentDelete(this);"  data-subcomment_id="'+obj.id+'" data-comment_id="'+obj.blog_comment_id+'" data-blog_id="'+obj.blog_id+'">Delete</a></li>';
+          }
+          if( userId == obj.user_id ){
+            editDeleteInnerHtml += '<li><a id="'+obj.id+'" onclick="editSubComment(this);">Edit</a></li>';
+          }
+          editDeleteInnerHtml += '</ul>';
+          subcommentEditDeleteDiv.innerHTML = editDeleteInnerHtml;
+          subCommentMessageDiv.appendChild(subcommentEditDeleteDiv);
+        }
+
+        var pSubcommentBodyDiv = document.createElement('p');
+        var ancUserNameDiv = document.createElement('a');
+        ancUserNameDiv.className = 'SubCommentName';
+        ancUserNameDiv.innerHTML = obj.user_name;
+        pSubcommentBodyDiv.appendChild(ancUserNameDiv);
+
+        var spanSubCommentBodyDiv = document.createElement('span');
+        spanSubCommentBodyDiv.className = 'more';
+        spanSubCommentBodyDiv.id = 'editSubCommentHide_'+obj.id;
+        spanSubCommentBodyDiv.innerHTML = obj.body; //'{!! '+obj.body+' !!}';
+        pSubcommentBodyDiv.appendChild(spanSubCommentBodyDiv);
+        subCommentMessageDiv.appendChild(pSubcommentBodyDiv);
+
+        var divUpdateSubComment = document.createElement('div');
+        divUpdateSubComment.className = 'form-group hide';
+        divUpdateSubComment.id = 'editSubCommentShow_'+obj.id;
+
+        divUpdateSubComment.innerHTML = '<textarea class="form-control" name="comment" id="updateSubComment_'+ obj.id +'" rows="3">'+ obj.body+'</textarea><button class="btn btn-primary"  data-subcomment_id="'+ obj.id +'" data-comment_id="'+ obj.blog_comment_id +'" data-blog_id="'+ obj.blog_id +'" onclick="updateSubComment(this);">Update</button><button type="button" class="btn btn-default" id="'+ obj.id +'" onclick="cancleSubComment(this);">Cancle</button></div></form>';
+        subCommentMessageDiv.appendChild(divUpdateSubComment);
+        mainSubCommentDiv.appendChild(subCommentMessageDiv);
+
+        var subcommentReplyDiv = document.createElement('div');
+        subcommentReplyDiv.className = 'comment-meta reply-1';
+
+        var spanCommenReply = document.createElement('span');
+        spanCommenReply.id = 'sub_cmt_like_'+obj.id;
+        var spanSubCommenInnerHtml = '';
+        if( subcommentLikesCount[obj.id] && subcommentLikesCount[obj.id]['user_id'][userId]){
+          spanSubCommenInnerHtml +='<i id="sub_comment_like_'+obj.id+'" data-blog_id="'+obj.blog_id+'" data-comment_id="'+obj.blog_comment_id+'"  data-sub_comment_id="'+obj.id+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+          spanSubCommenInnerHtml +='<span id="like1-bs3">'+ Object.keys(subcommentLikesCount[obj.id]['like_id']).length +'</span>';
+        } else {
+          spanSubCommenInnerHtml +='<i id="sub_comment_like_'+obj.id+'" data-blog_id="'+obj.blog_id+'" data-comment_id="'+obj.blog_comment_id+'" data-sub_comment_id="'+obj.id+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+          if(subcommentLikesCount[obj.id]){
+            spanSubCommenInnerHtml +='<span id="like1-bs3">'+ Object.keys(subcommentLikesCount[obj.id]['like_id']).length +'</span>';
+          }
+        }
+        spanCommenReply.innerHTML = spanSubCommenInnerHtml;
+        subcommentReplyDiv.appendChild(spanCommenReply);
+
+        var spanSubCommenReplyButton = document.createElement('span');
+        spanSubCommenReplyButton.className = 'mrgn_5_left';
+        spanSubCommenReplyButton.innerHTML = '<a class="" role="button" data-toggle="collapse" href="#replySubComment'+obj.blog_comment_id+'-'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a>';
+        subcommentReplyDiv.appendChild(spanSubCommenReplyButton);
+
+        var spanSubCommenReplyDate = document.createElement('span');
+        spanSubCommenReplyDate.className = 'text-muted time-of-reply';
+        spanSubCommenReplyDate.innerHTML = '<i class="fa fa-clock-o"></i>'+ obj.updated_at;
+        subcommentReplyDiv.appendChild(spanSubCommenReplyDate);
+
+        var createSubCommenDiv = document.createElement('div');
+        createSubCommenDiv.className = 'collapse replyComment';
+        createSubCommenDiv.id = 'replySubComment'+obj.blog_comment_id+'-'+obj.id;
+        createSubCommenDivInnerHTML = '<div class="form-group"><label for="subcomment">Your Sub Comment</label>';
+        if( userId != obj.user_id ){
+          createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" rows="3" id="createSubComment_'+ obj.id +'" >'+obj.user_name+'</textarea>';
+        } else {
+          createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" rows="3" id="createSubComment_'+ obj.id +'"></textarea>';
+        }
+        createSubCommenDivInnerHTML += '</div><button class="btn btn-default" onclick="confirmSubmitReplytoSubComment(this);" data-subcomment_id="'+ obj.id +'" data-comment_id="'+ obj.blog_comment_id +'" data-blog_id="'+ obj.blog_id +'" >Send</button><button class="btn btn-default" data-id="replySubComment'+ obj.blog_comment_id +'-'+ obj.id +'" onclick="cancleReply(this);">Cancle</button>';
+        createSubCommenDiv.innerHTML = createSubCommenDivInnerHTML;
+        subcommentReplyDiv.appendChild(createSubCommenDiv);
+        mainSubCommentDiv.appendChild(subcommentReplyDiv);
+        commentchatDiv.appendChild(mainSubCommentDiv);
+        allCommentsDiv.appendChild(commentchatDiv);
+      });
+    }
+  }
+   $(document).on("click", "i[id^=comment_like_]", function(e) {
+      var blogId = $(this).data('blog_id');
+      var commentId = $(this).data('comment_id');
+      var dislike = $(this).data('dislike');
       var userId = parseInt(document.getElementById('user_id').value);
-      var comment = CKEDITOR.instances.comment.getData().length;
-      if(0 < userId && comment){
-        document.getElementById('createBlogComment').submit();
-      } else if( isNaN(userId)) {
+       if( isNaN(userId)) {
+        $.confirm({
+      title: 'Confirmation',
+      content: 'Please login first. Click "Ok" button to login.',
+      type: 'red',
+      typeAnimated: true,
+      buttons: {
+            Ok: {
+                text: 'Ok',
+                btnClass: 'btn-red',
+                action: function(){
+                  window.location="{{url('/home')}}";
+                }
+            },
+            Cancle: function () {
+            }
+        }
+      });
+      } else {
+        $.ajax({
+            method: "POST",
+            url: "{{ url('likeBlogComment') }}",
+            data: {blog_id:blogId, comment_id:commentId, dis_like:dislike}
+        })
+        .done(function( msg ) {
+          if( 'false' != msg ){
+            var likeSpan = document.getElementById('cmt_like_'+commentId);
+              likeSpan.innerHTML = '';
+              if( 1 == dislike ){
+                likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-blog_id="'+blogId+'" data-comment_id="'+commentId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+              } else {
+                likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-blog_id="'+blogId+'" data-comment_id="'+commentId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+              }
+          }
+        });
+      }
+    });
+
+   $(document).on("click", "i[id^=sub_comment_like_]", function(e) {
+      var blogId = $(this).data('blog_id');
+      var commentId = $(this).data('comment_id');
+      var subCommentId = $(this).data('sub_comment_id');
+      var dislike = $(this).data('dislike');
+      var userId = parseInt(document.getElementById('user_id').value);
+       if( isNaN(userId)) {
         $.confirm({
         title: 'Confirmation',
         content: 'Please login first. Click "Ok" button to login.',
@@ -374,20 +703,33 @@ hr{
               }
           }
         });
+      } else {
+        $.ajax({
+            method: "POST",
+            url: "{{url('likeBlogSubComment')}}",
+            data: {blog_id:blogId, comment_id:commentId, sub_comment_id:subCommentId, dis_like:dislike}
+        })
+        .done(function( msg ) {
+          if( 'false' != msg ){
+              var likeSpan = document.getElementById('sub_cmt_like_'+subCommentId);
+              likeSpan.innerHTML = '';
+              if( 1 == dislike ){
+                likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-blog_id="'+blogId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+              } else {
+                likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-blog_id="'+blogId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+              }
+        }
+        });
       }
-    }
-    function cancleReply(ele){
-      var id = $(ele).data('id');
-      document.getElementById(id).classList.remove("in");
-    }
-
-     $(document).on("click", "i[id^=comment_like_]", function(e) {
-        var blogId = $(this).data('blog_id');
-        var commentId = $(this).data('comment_id');
-        var dislike = $(this).data('dislike');
-        var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-          $.confirm({
+    });
+   $(document).on("click", "i[id^=blog_like_]", function(e) {
+      var blogId = $(this).data('blog_id');
+      var dislike = $(this).data('dislike');
+      var userId = parseInt(document.getElementById('user_id').value);
+       if( isNaN(userId)) {
+        $.confirm({
         title: 'Confirmation',
         content: 'Please login first. Click "Ok" button to login.',
         type: 'red',
@@ -404,115 +746,26 @@ hr{
               }
           }
         });
-        } else {
-          $.ajax({
-              method: "POST",
-              url: "{{ url('likeBlogComment') }}",
-              data: {blog_id:blogId, comment_id:commentId, dis_like:dislike}
-          })
-          .done(function( msg ) {
-            if( 'false' != msg ){
-              var likeSpan = document.getElementById('cmt_like_'+commentId);
-                likeSpan.innerHTML = '';
-                if( 1 == dislike ){
-                  likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-blog_id="'+blogId+'" data-comment_id="'+commentId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                } else {
-                  likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-blog_id="'+blogId+'" data-comment_id="'+commentId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                }
+      } else {
+        $.ajax({
+            method: "POST",
+            url: "{{url('likeBlog')}}",
+            data: {blog_id:blogId, dis_like:dislike}
+        })
+        .done(function( msg ) {
+          if( 'false' != msg ){
+            var likeSpan = document.getElementById('like_'+blogId);
+            likeSpan.innerHTML = '';
+            if( 1 == dislike ){
+              likeSpan.innerHTML +='<i id="blog_like_'+blogId+'" data-blog_id="'+blogId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>';
+              likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+            } else {
+              likeSpan.innerHTML +='<i id="blog_like_'+blogId+'" data-blog_id="'+blogId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>';
+              likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
             }
-          });
-        }
-      });
-
-     $(document).on("click", "i[id^=sub_comment_like_]", function(e) {
-        var blogId = $(this).data('blog_id');
-        var commentId = $(this).data('comment_id');
-        var subCommentId = $(this).data('sub_comment_id');
-        var dislike = $(this).data('dislike');
-        var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
-        } else {
-          $.ajax({
-              method: "POST",
-              url: "{{url('likeBlogSubComment')}}",
-              data: {blog_id:blogId, comment_id:commentId, sub_comment_id:subCommentId, dis_like:dislike}
-          })
-          .done(function( msg ) {
-            if( 'false' != msg ){
-                var likeSpan = document.getElementById('sub_cmt_like_'+subCommentId);
-                likeSpan.innerHTML = '';
-                if( 1 == dislike ){
-                  likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-blog_id="'+blogId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                } else {
-                  likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-blog_id="'+blogId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                }
           }
-          });
-        }
-      });
-     $(document).on("click", "i[id^=blog_like_]", function(e) {
-        var blogId = $(this).data('blog_id');
-        var dislike = $(this).data('dislike');
-        var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
-        } else {
-          $.ajax({
-              method: "POST",
-              url: "{{url('likeBlog')}}",
-              data: {blog_id:blogId, dis_like:dislike}
-          })
-          .done(function( msg ) {
-            if( 'false' != msg ){
-              var likeSpan = document.getElementById('like_'+blogId);
-              likeSpan.innerHTML = '';
-              if( 1 == dislike ){
-                likeSpan.innerHTML +='<i id="blog_like_'+blogId+'" data-blog_id="'+blogId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>';
-                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-              } else {
-                likeSpan.innerHTML +='<i id="blog_like_'+blogId+'" data-blog_id="'+blogId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>';
-                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-              }
-            }
-          });
-        }
+        });
+      }
     });
 
     function editComment(ele){
@@ -532,9 +785,17 @@ hr{
                   text: 'Ok',
                   btnClass: 'btn-red',
                   action: function(){
+                    var userId = parseInt(document.getElementById('user_id').value);
                     var id = $(ele).attr('id');
-                    formId = 'deleteComment_'+id;
-                    document.getElementById(formId).submit();
+                    var blogId = $(ele).data('blog_id');
+                     $.ajax({
+                        method: "POST",
+                        url: "{{url('deleteBlogComment')}}",
+                        data: {blog_id:blogId, comment_id:id}
+                    })
+                    .done(function( msg ) {
+                      renderComments(msg, userId);
+                    });
                   }
               },
               Cancle: function () {
@@ -545,9 +806,20 @@ hr{
     function confirmSubmitReplytoComment(ele){
       var userId = parseInt(document.getElementById('user_id').value);
       if(0 < userId){
-          formId = $(ele).data('id');
-          form = document.getElementById(formId);
-          form.submit();
+        var commentId = $(ele).data('comment_id');
+        var blogId = $(ele).data('blog_id');
+        commentid = 'subcomment_'+blogId+'_'+commentId;
+        var comment = document.getElementById(commentid).value;
+        if(comment){
+          $.ajax({
+              method: "POST",
+              url: "{{url('createBlogSubComment')}}",
+              data: {blog_id:blogId, comment_id:commentId, comment:comment}
+          })
+          .done(function( msg ) {
+            renderComments(msg, userId);
+          });
+        }
       } else if( isNaN(userId)) {
         $.confirm({
           title: 'Confirmation',
@@ -568,6 +840,46 @@ hr{
           });
       }
     }
+
+    function confirmSubmitReplytoSubComment(ele){
+      var userId = parseInt(document.getElementById('user_id').value);
+      if(0 < userId){
+        var commentId = $(ele).data('comment_id');
+        var blogId = $(ele).data('blog_id');
+        var subcommentId = $(ele).data('subcomment_id');
+        subcommentid = 'createSubComment_'+subcommentId;
+        var comment = document.getElementById(subcommentid).value;
+        if(comment){
+          $.ajax({
+              method: "POST",
+              url: "{{url('createBlogSubComment')}}",
+              data: {blog_id:blogId, comment_id:commentId, subcomment_id:subcommentId, comment:comment}
+          })
+          .done(function( msg ) {
+            renderComments(msg, userId);
+          });
+        }
+      } else if( isNaN(userId)) {
+        $.confirm({
+          title: 'Confirmation',
+          content: 'Please login first. Click "Ok" button to login.',
+          type: 'red',
+          typeAnimated: true,
+          buttons: {
+                Ok: {
+                    text: 'Ok',
+                    btnClass: 'btn-red',
+                    action: function(){
+                      window.location="{{url('/home')}}";
+                    }
+                },
+                Cancle: function () {
+                }
+            }
+          });
+      }
+    }
+
     function editSubComment(ele){
       var id = $(ele).attr('id');
       document.getElementById('editSubCommentHide_'+id).classList.add("hide");
@@ -585,9 +897,18 @@ hr{
                   text: 'Ok',
                   btnClass: 'btn-red',
                   action: function(){
-                    var id = $(ele).attr('id');
-                    formId = 'deleteSubComment_'+id;
-                    document.getElementById(formId).submit();
+                    var userId = parseInt(document.getElementById('user_id').value);
+                    var commentId = $(ele).data('comment_id');
+                    var subcommentId = $(ele).data('subcomment_id');
+                    var blogId = $(ele).data('blog_id');
+                      $.ajax({
+                          method: "POST",
+                          url: "{{url('deleteBlogSubComment')}}",
+                          data: {blog_id:blogId, comment_id:commentId, subcomment_id:subcommentId}
+                      })
+                      .done(function( msg ) {
+                        renderComments(msg, userId);
+                      });
                   }
               },
               Cancle: function () {
@@ -595,6 +916,22 @@ hr{
           }
         });
     }
+
+    function updateSubComment(ele){
+      var commentId = $(ele).data('comment_id');
+      var blogId = $(ele).data('blog_id');
+      var subcommentId = $(ele).data('subcomment_id');
+      var comment = document.getElementById('updateSubComment_'+subcommentId).value;
+      var userId = parseInt(document.getElementById('user_id').value);
+      $.ajax({
+          method: "POST",
+          url: "{{url('updateBlogSubComment')}}",
+          data: {blog_id:blogId, comment_id:commentId, subcomment_id:subcommentId, comment:comment}
+      })
+      .done(function( msg ) {
+        renderComments(msg, userId);
+      });
+  }
 
     function showMore(){
       var showChar = 400;

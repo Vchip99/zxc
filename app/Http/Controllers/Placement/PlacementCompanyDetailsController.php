@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PlacementArea;
 use App\Models\PlacementCompany;
 use App\Models\CompanyDetails;
+use App\Models\PlacementProcess;
 use Redirect;
 use Validator, Auth, DB;
 use App\Libraries\InputSanitise;
@@ -143,6 +144,41 @@ class PlacementCompanyDetailsController extends Controller
 
     protected function checkCompanyDetails(Request $request){
         return CompanyDetails::checkCompanyDetails($request->id);
+    }
+
+    /**
+     *  delete placement Company Details
+     */
+    protected function delete(Request $request){
+        $detailsId = InputSanitise::inputInt($request->get('details_id'));
+        if(isset($detailsId)){
+            $companyDetail = CompanyDetails::find($detailsId);
+            if(is_object($companyDetail)){
+                DB::beginTransaction();
+                try
+                {
+                    $placementProcess = PlacementProcess::find($companyDetail->placement_company_id);
+                    if(is_object($placementProcess)){
+                        if(is_object($placementProcess->deleteFaqs) && false == $placementProcess->deleteFaqs->isEmpty()){
+                            foreach($placementProcess->deleteFaqs as $placementFaq){
+                                $placementFaq->delete();
+                            }
+                        }
+                        $placementProcess->deletePlacementProcessComments();
+                        $placementProcess->delete();
+                    }
+                    $companyDetail->delete();
+                    DB::commit();
+                    return Redirect::to('admin/managePlacementCompanyDetails')->with('message', 'Placement Company Details deleted successfully!');
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors('something went wrong.');
+                }
+            }
+        }
+        return Redirect::to('admin/managePlacementCompanyDetails');
     }
 }
 

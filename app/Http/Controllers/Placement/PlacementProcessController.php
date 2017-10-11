@@ -142,4 +142,34 @@ class PlacementProcessController extends Controller
         return PlacementProcess::checkPlacementCompanyProcesss($request->id);
     }
 
+    /**
+     *  delete placement process
+     */
+    protected function delete(Request $request){
+        $processId = InputSanitise::inputInt($request->get('process_id'));
+        if(isset($processId)){
+            $placementProcess = PlacementProcess::find($processId);
+            if(is_object($placementProcess)){
+                DB::beginTransaction();
+                try
+                {
+                    if(is_object($placementProcess->deleteFaqs) && false == $placementProcess->deleteFaqs->isEmpty()){
+                        foreach($placementProcess->deleteFaqs as $placementFaq){
+                            $placementFaq->delete();
+                        }
+                    }
+                    $placementProcess->deletePlacementProcessComments();
+                    $placementProcess->delete();
+                    DB::commit();
+                    return Redirect::to('admin/managePlacementProcess')->with('message', 'Placement Process deleted successfully!');
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors('something went wrong.');
+                }
+            }
+        }
+        return Redirect::to('admin/managePlacementProcess');
+    }
 }

@@ -51,8 +51,6 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 	protected function create(Request $request){
 		$clientId = Auth::guard('client')->user()->id;
         $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
-
-		// $testCategories    = ClientOnlineTestCategory::showCategories($request);
 		$testCategories    = new ClientOnlineTestCategory;
 		$testSubCategories = new ClientOnlineTestSubCategory;
 		$subject = new ClientOnlineTestSubject;

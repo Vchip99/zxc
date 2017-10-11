@@ -30,7 +30,7 @@
           <th>Company Name</th>
           <th>Area Name</th>
           <th>Edit Company</th>
-          <!-- <th>Delete Company</th> -->
+          <th>Delete Details</th>
         </tr>
       </thead>
       <tbody>
@@ -44,14 +44,14 @@
               <a href="{{url('admin/placementCompanyDetail')}}/{{$companyDetail->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$companyDetail->name}}" />
                 </a>
             </td>
-            <!-- <td>
+            <td>
                 <a id="{{$companyDetail->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$companyDetail->name}}" />
-                <form id="deleteSubCategory_{{$companyDetail->id}}" action="{{url('admin/deleteSubCategory')}}" method="POST" style="display: none;">
+                <form id="deleteCompanyDetail_{{$companyDetail->id}}" action="{{url('admin/deleteCompanyDetails')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
-                    <input type="hidden" name="subcat_id" value="{{$companyDetail->id}}">
+                    <input type="hidden" name="details_id" value="{{$companyDetail->id}}">
                 </form>
-            </td> -->
+            </td>
           </tr>
           @endforeach
         @else
@@ -70,7 +70,7 @@
     function confirmDelete(ele){
       $.confirm({
           title: 'Confirmation',
-          content: 'If you delete this sub category, all associated subjects, papers and questions of this sub category will be deleted.',
+          content: 'If you delete this company details, its process and all associated faq will be deleted.',
           type: 'red',
           typeAnimated: true,
           buttons: {
@@ -79,7 +79,7 @@
                     btnClass: 'btn-red',
                     action: function(){
                       var id = $(ele).attr('id');
-                      formId = 'deleteSubCategory_'+id;
+                      formId = 'deleteCompanyDetail_'+id;
                       document.getElementById(formId).submit();
                     }
                 },

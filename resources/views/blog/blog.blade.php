@@ -39,6 +39,10 @@ margin-right: 5px;
 .date{
 color: #b6b6b6;
 }
+.row {
+    margin-right: -15px !important;
+    margin-left: -15px !important;
+}
   </style>
 @stop
 @section('header-js')
@@ -73,7 +77,6 @@ color: #b6b6b6;
                         </p>
                         <figcaption class="blog-by">
                           <span>
-                            <!-- <img class="img-circle" src="{{ asset('images/user/user.png')}}" alt="User Image" /> -->
                             @if(!empty($blog->user->photo))
                               <img src="{{ asset($blog->user->photo)}} " class="img-circle" alt="User Image">
                             @else

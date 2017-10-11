@@ -18,4 +18,14 @@ class ExamPattern extends Model
      * @var array
      */
     protected $fillable = ['placement_area_id', 'placement_company_id', 'testing_area','no_of_question', 'duration'];
+
+    protected static function deleteExamPatternsByCompanyId($companyId){
+        $examPatterns = static::where('placement_company_id', $companyId)->get();
+        if(is_object($examPatterns) && false == $examPatterns->isEmpty()){
+            foreach($examPatterns as $examPattern){
+                $examPattern->delete();
+            }
+        }
+        return;
+    }
 }

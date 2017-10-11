@@ -34,7 +34,7 @@ class VkitProjectComment extends Model
     }
 
     public function children(){
-    	return $this->hasMany(VkitProjectSubComment::class)->orderBy('id', 'desc');
+    	return $this->hasMany(VkitProjectSubComment::class);
     }
 
     public function deleteLikes(){

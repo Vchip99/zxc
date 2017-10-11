@@ -201,29 +201,19 @@ class ClientOnlineCourseFrontController extends ClientHomeController
     }
 
     protected function createClientCourseComment(Request $request){
-        $v = Validator::make($request->all(), $this->validateCourseComment);
-        if ($v->fails())
-        {
-            return redirect()->back()->withErrors($v->errors());
-        }
+        $videoId = strip_tags(trim($request->get('video_id')));
         DB::connection('mysql2')->beginTransaction();
         try
         {
             $courseComment = ClientCourseComment::createComment($request);
             Session::put('client_course_comment', $courseComment->id);
             DB::connection('mysql2')->commit();
-            $videoId = strip_tags(trim($request->get('video_id')));
-            $subdomain = explode('.',$request->getHost());
-            if(0 < $videoId){
-                return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
-            }
         }
         catch(\Exception $e)
         {
             DB::connection('mysql2')->rollback();
-            return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('online-courses');
+        return $this->getComments($videoId,$request);
     }
 
     protected function updateClientCourseComment(Request $request){
@@ -239,18 +229,17 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                     $comment->body = $commentBody;
                     $comment->save();
                     DB::connection('mysql2')->commit();
-                    Session::put('client_course_comment', $comment->id);
-                    $subdomain = explode('.',$request->getHost());
-                    return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
+                    // Session::put('client_course_comment', $comment->id);
+                    // $subdomain = explode('.',$request->getHost());
+                    // return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
                 }
                 catch(\Exception $e)
                 {
                     DB::connection('mysql2')->rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('online-courses');
+        return $this->getComments($videoId,$request);
     }
 
     protected function deleteClientCourseComment(Request $request){
@@ -277,35 +266,28 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                             $deleteLike->delete();
                         }
                     }
-                    Session::put('client_course_comment', 0);
+                    // Session::put('client_course_comment', 0);
                     $comment->delete();
                     DB::connection('mysql2')->commit();
-                    return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
+                    // return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
                 }
                 catch(\Exception $e)
                 {
                     DB::connection('mysql2')->rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('courses');
+        return $this->getComments($videoId,$request);
     }
 
     protected function createClientCourseSubComment(Request $request){
-        $v = Validator::make($request->all(), $this->validateCourseSubComment);
-        if ($v->fails())
-        {
-            return redirect()->back()->withErrors($v->errors());
-        }
+        $videoId = strip_tags(trim($request->get('video_id')));
         DB::connection('mysql2')->beginTransaction();
         try
         {
-
             $subComment = ClientCourseSubComment::createSubComment($request);
             Session::put('client_course_comment', $subComment->client_course_comment_id);
 
-            $videoId = strip_tags(trim($request->get('video_id')));
             $subdomain = explode('.',$request->getHost());
             $commentId = $request->get('comment_id');
             $subcommentId = $request->get('subcomment_id');
@@ -321,17 +303,15 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                 ClientNotification::addCommentNotification($notificationMessage, ClientNotification::USERCOURSEVIDEONOTIFICATION, $subComment->id,$subComment->user_id,$parentComment->user_id);
             }
             DB::connection('mysql2')->commit();
-            if(0 < $videoId){
-                return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
-            }
+            // if(0 < $videoId){
+            //     return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
+            // }
         }
         catch(\Exception $e)
         {
             DB::connection('mysql2')->rollback();
-            return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('online-courses');
-
+        return $this->getComments($videoId,$request);
     }
 
     protected function updateClientCourseSubComment(Request $request){
@@ -348,17 +328,16 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                     $subcomment->body = $commentBody;
                     $subcomment->save();
                     DB::connection('mysql2')->commit();
-                    Session::put('client_course_comment', $commentId);
-                    return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
+                    // Session::put('client_course_comment', $commentId);
+                    // return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
                 }
                 catch(\Exception $e)
                 {
                     DB::connection('mysql2')->rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('online-courses');
+        return $this->getComments($videoId,$request);
     }
 
     protected function deleteClientCourseSubComment(Request $request){
@@ -376,18 +355,63 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                             $deleteLike->delete();
                         }
                     }
-                    Session::put('client_course_comment', $commentId);
+                    // Session::put('client_course_comment', $commentId);
                     $subcomment->delete();
                     DB::connection('mysql2')->commit();
-                    return Redirect::to(route('client.episode', ['subdomain' => $subdomain[0],'id' => $videoId]));
                 }
                 catch(\Exception $e)
                 {
                     DB::connection('mysql2')->rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('online-courses');
+        return $this->getComments($videoId,$request);
+    }
+
+        /**
+     *  return comments
+     */
+    protected function getComments($videoId, Request $request){
+        $comments = ClientCourseComment::getCommentsByVideoId($videoId, $request);
+        $videoComments = [];
+        foreach($comments as $comment){
+            $videoComments['comments'][$comment->id]['body'] = $comment->body;
+            $videoComments['comments'][$comment->id]['id'] = $comment->id;
+            $videoComments['comments'][$comment->id]['client_online_video_id'] = $comment->client_online_video_id;
+            $videoComments['comments'][$comment->id]['user_id'] = $comment->user_id;
+            $videoComments['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $videoComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
+            $videoComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
+            if(is_object($comment->children) && false == $comment->children->isEmpty()){
+                $videoComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
+            }
+        }
+        $videoComments['commentLikesCount'] = ClientCourseCommentLike::getLikesByVideoId($videoId, $request);
+        $videoComments['subcommentLikesCount'] = ClientCourseSubCommentLike::getLikesByVideoId($videoId, $request);
+
+        return $videoComments;
+    }
+
+    /**
+     *  return child comments
+     */
+    protected function getSubComments($subComments){
+
+        $videoChildComments = [];
+        foreach($subComments as $subComment){
+            $videoChildComments[$subComment->id]['body'] = $subComment->body;
+            $videoChildComments[$subComment->id]['id'] = $subComment->id;
+            $videoChildComments[$subComment->id]['client_online_video_id'] = $subComment->client_online_video_id;
+            $videoChildComments[$subComment->id]['client_course_comment_id'] = $subComment->client_course_comment_id;
+            $videoChildComments[$subComment->id]['user_name'] = $subComment->user->name;
+            $videoChildComments[$subComment->id]['user_id'] = $subComment->user_id;
+            $videoChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
+            $videoChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
+            if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
+                $videoChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
+            }
+        }
+
+        return $videoChildComments;
     }
 }

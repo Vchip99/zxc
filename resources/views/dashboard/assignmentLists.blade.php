@@ -85,7 +85,7 @@
       // get assignments
       $.ajax({
         method: "POST",
-        url: "{{url('getLecturerAssignments')}}",
+        url: "{{url('getAssignments')}}",
         data: {lecturer_id:id}
       })
       .done(function( msgs ) {

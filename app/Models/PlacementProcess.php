@@ -9,7 +9,13 @@ use App\Libraries\InputSanitise;
 use App\Models\PlacementArea;
 use App\Models\PlacementCompany;
 use App\Models\ExamPattern;
-
+use App\Models\PlacementFaq;
+use App\Models\PlacementProcessComment;
+use App\Models\PlacementProcessCommentLike;
+use App\Models\PlacementProcessSubComment;
+use App\Models\PlacementProcessSubCommentLike;
+use App\Models\PlacementProcessLike;
+use App\Models\PlacementExperiance;
 
 class PlacementProcess extends Model
 {
@@ -145,5 +151,20 @@ class PlacementProcess extends Model
             return 'true';
         }
         return 'false';
+    }
+
+    public function deleteFaqs(){
+        return $this->hasMany(PlacementFaq::class, 'placement_company_id');
+    }
+
+    public function deletePlacementProcessComments(){
+        PlacementProcessComment::deletePlacementProcessCommentsByCompanyId($this->placement_company_id);
+        PlacementProcessCommentLike::deletePlacementProcessCommentLikesByCompanyId($this->placement_company_id);
+        PlacementProcessSubComment::deletePlacementProcessSubCommentsByCompanyId($this->placement_company_id);
+        PlacementProcessSubCommentLike::deletePlacementProcessSubCommentLikesByCompanyId($this->placement_company_id);
+        PlacementProcessLike::deletePlacementProcessLikesByCompanyId($this->placement_company_id);
+        PlacementExperiance::deletePlacementExperiancesByCompanyId($this->placement_company_id);
+        ExamPattern::deleteExamPatternsByCompanyId($this->placement_company_id);
+        return;
     }
 }

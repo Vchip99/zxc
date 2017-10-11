@@ -435,8 +435,8 @@ margin-right: 10px;
                         <img class="img-circle" src="{{ asset('images/testimonial/testimonial-1.jpg') }}" style="width: 100px;height:100px;" alt="Testimonial" />
                       </div>
                       <div class="col-sm-9">
-                        <p>The teaching approach of the teacher is very practical. My learning experience from books and online tutorials never brought such perfection. </p>
-                        <h6>Student Name</h6>
+                        <p>Thanks to Vchip-edu, i have able to start my online classes on Vchip-edu platform within a day and now growth  of my institute is nearly double.</p>
+                        <h6>Ajay Joshi</h6>
                       </div>
                     </div>
                   </blockquote>
@@ -449,8 +449,8 @@ margin-right: 10px;
                         <img class="img-circle" src="{{ asset('images/testimonial/testimonial-2.jpg') }}" style="width: 100px;height:100px;">
                       </div>
                       <div class="col-sm-9">
-                        <p>It is a wonderful experience to include at APEX Class, I have learned a lot and this knowledge will not be taken away from me and I know it will help me to grow more in my career</p>
-                        <h6>Student Name</h6>
+                        <p>Vchip-edu platform help to my student at the time of preparation of placement</p>
+                        <h6>Vishal Langote</h6>
                       </div>
                     </div>
                   </blockquote>
@@ -463,8 +463,8 @@ margin-right: 10px;
                         <img class="img-circle" src="{{ asset('images/testimonial/testimonial-3.jpg') }}" style="width: 100px;height:100px;">
                       </div>
                       <div class="col-sm-9">
-                        <p>The APEX TECHNICAL COMPETITIVE ACADEMY  was awesome. One of the best classes I have ever attended. Teachers in APEX was very knowledgeable. They kept my interest during the whole class</p>
-                        <h6>Student Name</h6>
+                        <p>One of the great digital education platform. It is help me for preparation of placement.</p>
+                        <h6>Rashmi Raut</h6>
                       </div>
                     </div>
                   </blockquote>

@@ -28,8 +28,8 @@
      <h2 class="v_h2_title text-center"> Digital Education</h2>
      <hr class="section-dash-dark "/>
       <div class="container">
-      <p>If you are looking to expand your network and reach to new customers then you are at right place. Digital marketing work on the principle of Attract, Engage and convert your targeted audiences into customers. </p>
-      <p>Our expert team good experience of Google Online Marketing and they know the major Challenges of Digital Marketing. They have good hands-on AdWords so you will get the most out of AdWords for your business growth. </p>
+      <p>If you are looking to expand your network and in search of new customers then you are at right place. Digital marketing work on the principle of Attract, Engage and convert your targeted audiences into customers. </p>
+      <p>Our expert team have good experience of Google Online Marketing and they know the major Challenges of Digital Marketing. They have good hands-on AdWords so you will get the most out of AdWords for your business growth. </p>
       </div>
   </section>
   <section id="feature" class="v_container ">
@@ -132,7 +132,7 @@
                                   <div class="input-group">
                                       <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span>
                                       </span>
-                                      <input type="phone" class="form-control" id="phone" name="phone" placeholder="Enter your phone no." required="true" /></div>
+                                      <input type="phone" class="form-control" id="phone" name="phone" placeholder="Enter phone number" required="true" /></div>
                               </div>
                         </div>
                         <div class="col-md-6">

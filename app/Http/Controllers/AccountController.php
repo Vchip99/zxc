@@ -29,6 +29,7 @@ use App\Models\AssignmentQuestion;
 use App\Models\AssignmentAnswer;
 use App\Models\AssignmentSubject;
 use App\Models\AssignmentTopic;
+use App\Models\DiscussionCategory;
 use Excel;
 use Auth,Hash,DB, Redirect,Session,Validator,Input;
 use App\Libraries\InputSanitise;
@@ -186,7 +187,7 @@ class AccountController extends Controller
         $allPostModuleId = self::AllPostModuleIdForMyQuestions;
         $likesCount = DiscussionPostLike::getLikes();
         $currentUser = Auth::user()->id;
-        $discussionCategories = [];
+        $discussionCategories =DiscussionCategory::all();
         return view('dashboard.myQuestions', compact('posts', 'user', 'allPostModuleId', 'likesCount', 'currentUser', 'discussionCategories'));
     }
 
@@ -226,7 +227,7 @@ class AccountController extends Controller
         if(5 == $user->user_type || 6 == $user->user_type){
             $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
         }
-        return view('dashboard.students', compact('students', 'collegeDepts'));
+        return view('dashboard.students', compact('collegeDepts'));
     }
 
     protected function changeApproveStatus(Request $request){
@@ -665,5 +666,59 @@ class AccountController extends Controller
 
     protected function getDepartmentLecturers(Request $request){
         return User::getTeachers($request->department);
+    }
+
+    protected function studentVideo($id=Null){
+        $students = [];
+        $collegeDepts = [];
+        $selectedStudent = '';
+        $user = Auth::user();
+        if(empty($id)){
+            $id = Session::get('selected_student');
+        }
+        if($id > 0){
+            $selectedStudent = User::find($id);
+            if(!is_object($selectedStudent)){
+                return redirect()->back();
+            }
+            if(4 == $user->user_type){
+                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
+            } else {
+                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
+            }
+            Session::set('selected_student', $id);
+            Session::set('selected_user_type', $selectedStudent->user_type);
+        }
+        if(5 == $user->user_type || 6 == $user->user_type){
+            $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        }
+
+        return view('dashboard.studentVideo', compact('students', 'selectedStudent', 'collegeDepts'));
+    }
+
+    protected function updateStudentVideo(Request $request){
+        $student = User::find($request->student);
+        if(is_object($student)){
+
+            $dom = new \DOMDocument;
+            $dom->loadHTML($request->recorded_video);
+            $iframes = $dom->getElementsByTagName('iframe');
+            foreach ($iframes as $iframe) {
+                $url =  '?enablejsapi=1';
+                if (strpos($iframe->getAttribute('src'), $url) === false) {
+                    $iframe->setAttribute('src', $iframe->getAttribute('src').$url);
+                }
+            }
+            $html = $dom->saveHTML();
+            $body = explode('<body>', $html);
+            $body = explode('</body>', $body[1]);
+
+            $student->recorded_video = $body[0];
+            $student->save();
+            Session::set('selected_student', $student->id);
+            Session::set('selected_user_type', $student->user_type);
+            return Redirect::to('studentVideo')->with('message', 'User video url updated successfully.');
+        }
+        return Redirect::to('studentVideo');
     }
 }

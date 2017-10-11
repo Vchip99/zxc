@@ -65,7 +65,7 @@
     </div>
     <div class="row">
       <div>
-        <table class="table admin_table">
+        <table class="table ">
           <thead class="thead-inverse">
             <tr>
               <th>#</th>

@@ -183,8 +183,6 @@ hr{
             </span>
             <hr/>
             <div class="collapse replyComment" id="replyToEpisode{{$video->id}}">
-              <form action="{{ url('createClientCourseComment')}}" method="POST" id="createClientCourseComment">
-                {{csrf_field()}}
                 <div class="form-group">
                   <!-- <label for="comment">Your Comment</label> -->
                   <textarea name="comment" id="comment" placeholder="Comment here.." class="form-control"></textarea>
@@ -211,7 +209,6 @@ hr{
                 <input type="hidden" id="video_id" name="video_id" value="{{$video->id}}">
                 <button type="button" class="btn btn-default" onclick="confirmSubmit(this);" >Send</button>
                 <button type="button" class="btn btn-default" data-id="replyToEpisode{{$video->id}}" onclick="cancleReply(this);">Cancle</button>
-              </form>
             </div>
           </div>
         </div>
@@ -224,7 +221,11 @@ hr{
                     @if(count( $comments) > 0)
                       @foreach($comments as $comment)
                         <div class="item" id="showComment_{{$comment->id}}">
-                          <img src="{{ asset('images/user1.png') }}" alt="User Image" />
+                          @if(!empty($comment->user->photo))
+                            <img src="{{ asset($comment->user->photo) }}" alt="User Image" />
+                          @else
+                            <img src="{{ asset('images/user1.png') }}" alt="User Image" />
+                          @endif
                           <div class="message">
                             @if(is_object(Auth::guard('clientuser')->user()) && (Auth::guard('clientuser')->user()->id == $comment->user_id))
                             <div class="dropdown pull-right">
@@ -233,13 +234,7 @@ hr{
                               </button>
                               <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                                 @if(Auth::guard('clientuser')->user()->id == $comment->user_id)
-                                  <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
-                                  <form id="deleteComment_{{$comment->id}}" action="{{ url('deleteClientCourseComment')}}" method="POST" style="display: none;">
-                                    {{ csrf_field() }}
-                                    {{ method_field('DELETE') }}
-                                    <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                    <input type="hidden" name="video_id" value="{{$video->id}}" >
-                                  </form>
+                                  <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);" data-comment_id="{{$comment->id}}" data-video_id="{{$video->id}}">Delete</a></li>
                                 @endif
                                 @if(Auth::guard('clientuser')->user()->id == $comment->user_id)
                                   <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
@@ -249,9 +244,6 @@ hr{
                             @endif
                               <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
                               <div class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
-                              <form action="{{ url('updateClientCourseComment')}}" method="POST" id="formUpdateComment{{$comment->id}}">
-                                    {{csrf_field()}}
-                                    {{ method_field('PUT') }}
                                 <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
                                   <textarea class="form-control" name="comment" id="comment_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
                                   <script type="text/javascript">
@@ -275,10 +267,9 @@ hr{
                                   </script>
                                   <input type="hidden" name="comment_id" value="{{$comment->id}}">
                                   <input type="hidden" name="video_id" value="{{$video->id}}" >
-                                  <button type="submit" class="btn btn-primary">Update</button>
-                                  <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
+                                  <button class="btn btn-primary"  data-comment_id="{{$comment->id}}" data-video_id="{{$video->id}}" onclick="updateComment(this);">Update</button>
+                                  <button class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
                                 </div>
-                              </form>
                             </div>
                             <div class="comment-meta reply-1">
                               <span id="cmt_like_{{$comment->id}}" >
@@ -295,17 +286,12 @@ hr{
                             </span>
                             <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                             <div class="collapse replyComment" id="replyToComment{{$comment->id}}">
-                              <form action="{{ url('createClientCourseSubComment')}}" method="POST" id="formReplyToComment{{$comment->id}}">
-                                 {{csrf_field()}}
                                 <div class="form-group">
                                   <label for="subcomment">Your Sub Comment</label>
-                                    <textarea name="subcomment" class="form-control" rows="3"></textarea>
+                                    <textarea name="subcomment" class="form-control" id="subcomment_{{$video->id}}_{{$comment->id}}" rows="3"></textarea>
                                 </div>
-                                <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                <input type="hidden" name="video_id" value="{{$video->id}}" >
-                                <button type="button" class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-id="formReplyToComment{{$comment->id}}">Send</button>
-                                <button type="button" class="btn btn-default" data-id="replyToComment{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
-                              </form>
+                                <button class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-comment_id="{{$comment->id}}" data-video_id="{{$video->id}}">Send</button>
+                                <button class="btn btn-default" data-id="replyToComment{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
                             </div>
                           </div>
                         </div>
@@ -329,10 +315,318 @@ hr{
 @section('footer')
   @include('footer.client-footer')
   <script type="text/javascript">
-    function confirmSubmit(ele){
+
+  function renderComments(msg, userId){
+    var chatDiv = document.getElementById('chat-box');
+    chatDiv.innerHTML = '';
+    var commentLikesCount = msg['commentLikesCount'];
+    var subcommentLikesCount = msg['subcommentLikesCount'];
+    arrayComments = [];
+    $.each(msg['comments'], function(idx, obj) {
+      arrayComments[idx] = obj;
+    });
+    var sortedArray = arrayComments.reverse();
+    $.each(sortedArray, function(idx, obj) {
+      if(false == $.isEmptyObject(obj)){
+        var mainCommentDiv = document.createElement('div');
+        mainCommentDiv.className = 'item';
+        mainCommentDiv.id = 'showComment_'+obj.id;
+
+        var commentImage = document.createElement('img');
+        if(obj.user_image){
+          var imageUrl =  "{{ asset('') }}"+obj.user_image;
+        } else {
+          var imageUrl = "{{ asset('images/user1.png') }}";
+        }
+        commentImage.setAttribute('src',imageUrl);
+        mainCommentDiv.appendChild(commentImage);
+
+        var commentMessageDiv = document.createElement('div');
+        commentMessageDiv.className = 'message';
+        if( userId == obj.user_id ){
+          var commentEditDeleteDiv = document.createElement('div');
+          commentEditDeleteDiv.className = 'dropdown pull-right';
+          editDeleteInnerHtml = '<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>';
+          editDeleteInnerHtml += '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
+          if( userId == obj.user_id ){
+            editDeleteInnerHtml += '<li><a id="'+obj.id+'" data-comment_id="'+obj.id+'" data-video_id="'+obj.client_online_video_id+'" onclick="confirmCommentDelete(this);">Delete</a></li>';
+          }
+          if( userId == obj.user_id ){
+            editDeleteInnerHtml += '<li><a id="'+obj.id+'" onclick="editComment(this);">Edit</a></li>';
+          }
+          editDeleteInnerHtml += '</ul>';
+          commentEditDeleteDiv.innerHTML = editDeleteInnerHtml;
+          commentMessageDiv.appendChild(commentEditDeleteDiv);
+        }
+
+        var ancUserNameDiv = document.createElement('a');
+        ancUserNameDiv.className = 'SubCommentName';
+        ancUserNameDiv.innerHTML = obj.user_name;
+        commentMessageDiv.appendChild(ancUserNameDiv);
+
+        var pCommentBodyDiv = document.createElement('p');
+        pCommentBodyDiv.className = 'more';
+        pCommentBodyDiv.id = 'editCommentHide_'+obj.id;
+        pCommentBodyDiv.innerHTML = obj.body; //'{!! '+obj.body+' !!}';
+        commentMessageDiv.appendChild(pCommentBodyDiv);
+
+        var divUpdateComment = document.createElement('div');
+        divUpdateComment.className = 'form-group hide';
+        divUpdateComment.id = 'editCommentShow_'+obj.id;
+        divUpdateComment.innerHTML = '<textarea class="form-control" name="comment" id="comment_'+ obj.id +'" rows="3">'+ obj.body+'</textarea><button class="btn btn-primary" data-comment_id="'+ obj.id +'" data-video_id="'+ obj.client_online_video_id +'" onclick="updateComment(this);">Update</button><button type="button" class="btn btn-default" id="'+ obj.id +'" onclick="cancleComment(this);">Cancle</button>';
+        commentMessageDiv.appendChild(divUpdateComment);
+        mainCommentDiv.appendChild(commentMessageDiv);
+        $( document ).ready(function() {
+          CKEDITOR.replace('comment_'+ obj.id);
+          CKEDITOR.config.width="100%";
+          CKEDITOR.config.height="auto";
+          CKEDITOR.on('dialogDefinition', function (ev) {
+              var dialogName = ev.data.name,
+                  dialogDefinition = ev.data.definition;
+              if (dialogName == 'image') {
+                  var onOk = dialogDefinition.onOk;
+                  dialogDefinition.onOk = function (e) {
+                      var width = this.getContentElement('info', 'txtWidth');
+                      width.setValue('100%');
+                      var height = this.getContentElement('info', 'txtHeight');
+                      height.setValue('400');
+                      onOk && onOk.apply(this, e);
+                  };
+              }
+          });
+        });
+
+        var commentReplyDiv = document.createElement('div');
+        commentReplyDiv.className = 'comment-meta reply-1';
+
+        var spanCommenReply = document.createElement('span');
+        spanCommenReply.id = 'cmt_like_'+obj.id;
+        var spanCommenInnerHtml = '';
+        if( commentLikesCount[obj.id] && commentLikesCount[obj.id]['user_id'][userId]){
+          spanCommenInnerHtml +='<i id="comment_like_'+obj.id+'" data-video_id="'+obj.client_online_video_id+'" data-comment_id="'+obj.id+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+          spanCommenInnerHtml +='<span id="like1-bs3">'+ Object.keys(commentLikesCount[obj.id]['like_id']).length +'</span>';
+        } else {
+          spanCommenInnerHtml +='<i id="comment_like_'+obj.id+'" data-video_id="'+obj.client_online_video_id+'" data-comment_id="'+obj.id+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+          if(commentLikesCount[obj.id]){
+            spanCommenInnerHtml +='<span id="like1-bs3">'+ Object.keys(commentLikesCount[obj.id]['like_id']).length +'</span>';
+          }
+        }
+        spanCommenReply.innerHTML = spanCommenInnerHtml;
+        commentReplyDiv.appendChild(spanCommenReply);
+
+        var spanCommenReplyButton = document.createElement('span');
+        spanCommenReplyButton.className = 'mrgn_5_left';
+        spanCommenReplyButton.innerHTML = '<a class="" role="button" data-toggle="collapse" href="#replyToComment'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a>';
+        commentReplyDiv.appendChild(spanCommenReplyButton);
+
+        var spanCommenReplyDate = document.createElement('span');
+        spanCommenReplyDate.className = 'text-muted time-of-reply';
+        spanCommenReplyDate.innerHTML = '<i class="fa fa-clock-o"></i>'+ obj.updated_at;
+        commentReplyDiv.appendChild(spanCommenReplyDate);
+
+        var subCommenDiv = document.createElement('div');
+        subCommenDiv.className = 'collapse replyComment';
+        subCommenDiv.id = 'replyToComment'+obj.id;
+        subCommenDiv.innerHTML = '<div class="form-group"><label for="subcomment">Your Sub Comment</label><textarea name="subcomment" class="form-control" rows="3"  id="subcomment_'+obj.client_online_video_id+'_'+obj.id+'" ></textarea></div><button class="btn btn-default" onclick="confirmSubmitReplytoComment(this);" data-comment_id="'+obj.id+'" data-video_id="'+obj.client_online_video_id+'" >Send</button><button type="button" class="btn btn-default" data-id="replyToComment'+obj.id+'" onclick="cancleReply(this);">Cancle</button>';
+        commentReplyDiv.appendChild(subCommenDiv);
+        mainCommentDiv.appendChild(commentReplyDiv);
+        chatDiv.appendChild(mainCommentDiv);
+        if( obj['subcomments'] ){
+          if(false == $.isEmptyObject(obj['subcomments'])){
+            var commentUserId = obj.user_id;
+            showSubComments(obj['subcomments'], chatDiv, subcommentLikesCount, userId, commentUserId);
+          }
+        }
+      }
+    });
+    showMore();
+  }
+
+  function showSubComments(subcomments, commentchatDiv, subcommentLikesCount, userId, commentUserId){
+    if(false == $.isEmptyObject(subcomments)){
+      $.each(subcomments, function(idx, obj) {
+        var mainSubCommentDiv = document.createElement('div');
+        mainSubCommentDiv.className = 'item replySubComment-1';
+
+        var subcommentImage = document.createElement('img');
+        if(obj.user_image){
+          var subcommentImageUrl = "{{ asset('') }}"+obj.user_image;
+        } else {
+          var subcommentImageUrl = "{{ asset('images/user1.png') }}";
+        }
+        subcommentImage.setAttribute('src',subcommentImageUrl);
+        mainSubCommentDiv.appendChild(subcommentImage);
+
+        var subCommentMessageDiv = document.createElement('div');
+        subCommentMessageDiv.className = 'message';
+        subCommentMessageDiv.id = 'subcomment_'+obj.id;
+        if( userId == obj.user_id || userId == commentUserId){
+          var subcommentEditDeleteDiv = document.createElement('div');
+          subcommentEditDeleteDiv.className = 'dropdown pull-right';
+          editDeleteInnerHtml = '<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>';
+          editDeleteInnerHtml += '<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">';
+          if(  userId == obj.user_id || userId == commentUserId){
+            editDeleteInnerHtml += '<li><a id="'+obj.client_course_comment_id+'_'+obj.id+'" onclick="confirmSubCommentDelete(this);"  data-subcomment_id="'+obj.id+'" data-comment_id="'+obj.client_course_comment_id+'" data-video_id="'+obj.client_online_video_id+'">Delete</a></li>';
+          }
+          if( userId == obj.user_id ){
+            editDeleteInnerHtml += '<li><a id="'+obj.id+'" onclick="editSubComment(this);">Edit</a></li>';
+          }
+          editDeleteInnerHtml += '</ul>';
+          subcommentEditDeleteDiv.innerHTML = editDeleteInnerHtml;
+          subCommentMessageDiv.appendChild(subcommentEditDeleteDiv);
+        }
+
+        var pSubcommentBodyDiv = document.createElement('p');
+        var ancUserNameDiv = document.createElement('a');
+        ancUserNameDiv.className = 'SubCommentName';
+        ancUserNameDiv.innerHTML = obj.user_name + ' ';
+        pSubcommentBodyDiv.appendChild(ancUserNameDiv);
+
+        var spanSubCommentBodyDiv = document.createElement('span');
+        spanSubCommentBodyDiv.className = 'more';
+        spanSubCommentBodyDiv.id = 'editSubCommentHide_'+obj.id;
+        spanSubCommentBodyDiv.innerHTML = obj.body; //'{!! '+obj.body+' !!}';
+        pSubcommentBodyDiv.appendChild(spanSubCommentBodyDiv);
+        subCommentMessageDiv.appendChild(pSubcommentBodyDiv);
+
+        var divUpdateSubComment = document.createElement('div');
+        divUpdateSubComment.className = 'form-group hide';
+        divUpdateSubComment.id = 'editSubCommentShow_'+obj.id;
+
+        divUpdateSubComment.innerHTML = '<textarea class="form-control" name="comment" id="updateSubComment_'+ obj.id +'" rows="3">'+ obj.body+'</textarea><button class="btn btn-primary"  data-subcomment_id="'+ obj.id +'" data-comment_id="'+ obj.client_course_comment_id +'" data-video_id="'+ obj.client_online_video_id +'" onclick="updateCourseSubComment(this);">Update</button><button type="button" class="btn btn-default" id="'+ obj.id +'" onclick="cancleSubComment(this);">Cancle</button></div></form>';
+        subCommentMessageDiv.appendChild(divUpdateSubComment);
+        mainSubCommentDiv.appendChild(subCommentMessageDiv);
+
+        var subcommentReplyDiv = document.createElement('div');
+        subcommentReplyDiv.className = 'comment-meta reply-1';
+
+        var spanCommenReply = document.createElement('span');
+        spanCommenReply.id = 'sub_cmt_like_'+obj.id;
+        var spanSubCommenInnerHtml = '';
+        if( subcommentLikesCount[obj.id] && subcommentLikesCount[obj.id]['user_id'][userId]){
+          spanSubCommenInnerHtml +='<i id="sub_comment_like_'+obj.id+'" data-video_id="'+obj.client_online_video_id+'" data-comment_id="'+obj.client_course_comment_id+'"  data-sub_comment_id="'+obj.id+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+          spanSubCommenInnerHtml +='<span id="like1-bs3">'+ Object.keys(subcommentLikesCount[obj.id]['like_id']).length +'</span>';
+        } else {
+          spanSubCommenInnerHtml +='<i id="sub_comment_like_'+obj.id+'" data-video_id="'+obj.client_online_video_id+'" data-comment_id="'+obj.client_course_comment_id+'" data-sub_comment_id="'+obj.id+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+          if(subcommentLikesCount[obj.id]){
+            spanSubCommenInnerHtml +='<span id="like1-bs3">'+ Object.keys(subcommentLikesCount[obj.id]['like_id']).length +'</span>';
+          }
+        }
+        spanCommenReply.innerHTML = spanSubCommenInnerHtml;
+        subcommentReplyDiv.appendChild(spanCommenReply);
+
+        var spanSubCommenReplyButton = document.createElement('span');
+        spanSubCommenReplyButton.className = 'mrgn_5_left';
+        spanSubCommenReplyButton.innerHTML = '<a class="" role="button" data-toggle="collapse" href="#replySubComment'+obj.client_course_comment_id+'-'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a>';
+        subcommentReplyDiv.appendChild(spanSubCommenReplyButton);
+
+        var spanSubCommenReplyDate = document.createElement('span');
+        spanSubCommenReplyDate.className = 'text-muted time-of-reply';
+        spanSubCommenReplyDate.innerHTML = '<i class="fa fa-clock-o"></i>'+ obj.updated_at;
+        subcommentReplyDiv.appendChild(spanSubCommenReplyDate);
+
+        var createSubCommenDiv = document.createElement('div');
+        createSubCommenDiv.className = 'collapse replyComment';
+        createSubCommenDiv.id = 'replySubComment'+obj.client_course_comment_id+'-'+obj.id;
+        createSubCommenDivInnerHTML = '<div class="form-group"><label for="subcomment">Your Sub Comment</label>';
+        if( userId != obj.user_id ){
+          createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" rows="3" id="createSubComment_'+ obj.id +'" >'+obj.user_name+'</textarea>';
+        } else {
+          createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" rows="3" id="createSubComment_'+ obj.id +'"></textarea>';
+        }
+        createSubCommenDivInnerHTML += '</div><button class="btn btn-default" onclick="confirmSubmitReplytoSubComment(this);" data-subcomment_id="'+ obj.id +'" data-comment_id="'+ obj.client_course_comment_id +'" data-video_id="'+ obj.client_online_video_id +'" >Send</button><button class="btn btn-default" data-id="replySubComment'+ obj.client_course_comment_id +'-'+ obj.id +'" onclick="cancleReply(this);">Cancle</button>';
+        createSubCommenDiv.innerHTML = createSubCommenDivInnerHTML;
+        subcommentReplyDiv.appendChild(createSubCommenDiv);
+        mainSubCommentDiv.appendChild(subcommentReplyDiv);
+        commentchatDiv.appendChild(mainSubCommentDiv);
+      });
+    }
+  }
+
+  function updateComment(ele){
+    var userId = parseInt(document.getElementById('user_id').value);
+    var commentId = $(ele).data('comment_id');
+    var videoId = $(ele).data('video_id');
+    commentid = 'comment_'+commentId;
+    var comment = CKEDITOR.instances[commentid].getData();
+    $.ajax({
+        method: "POST",
+        url: "{{url('updateClientCourseComment')}}",
+        data: {video_id:videoId, comment_id:commentId, comment:comment}
+    })
+    .done(function( msg ) {
+      renderComments(msg, userId);
+    });
+
+  }
+
+  function updateCourseSubComment(ele){
+      var commentId = $(ele).data('comment_id');
+      var videoId = $(ele).data('video_id');
+      var subcommentId = $(ele).data('subcomment_id');
+      var subcomment = document.getElementById('updateSubComment_'+subcommentId).value;
+      var userId = parseInt(document.getElementById('user_id').value);
+      $.ajax({
+          method: "POST",
+          url: "{{url('updateClientCourseSubComment')}}",
+          data: {video_id:videoId, comment_id:commentId, subcomment_id:subcommentId, subcomment:subcomment}
+      })
+      .done(function( msg ) {
+        renderComments(msg, userId);
+      });
+  }
+
+  function confirmSubmitReplytoSubComment(ele){
+    var userId = parseInt(document.getElementById('user_id').value);
+    if(0 < userId){
+        var commentId = $(ele).data('comment_id');
+        var videoId = $(ele).data('video_id');
+        var subcommentId = $(ele).data('subcomment_id');
+        var subcomment = document.getElementById('createSubComment_'+subcommentId).value;
+
+        $.ajax({
+            method: "POST",
+            url: "{{url('createClientCourseSubComment')}}",
+            data: {video_id:videoId, comment_id:commentId, subcomment:subcomment, subcomment_id:subcommentId}
+        })
+        .done(function( msg ) {
+          renderComments(msg, userId);
+        });
+    } else if( isNaN(userId)) {
+      $.confirm({
+          title: 'Confirmation',
+          content: 'Please login first. Click "Ok" button to login.',
+          type: 'red',
+          typeAnimated: true,
+          buttons: {
+                Ok: {
+                    text: 'Ok',
+                    btnClass: 'btn-red',
+                    action: function(){
+                      window.location="{{url('/home')}}";
+                    }
+                },
+                Cancle: function () {
+                }
+            }
+          });
+    }
+  }
+  function confirmSubmit(ele){
     var userId = parseInt(document.getElementById('user_id').value);
     if(userId > 0){
-      document.getElementById('createClientCourseComment').submit();
+      var comment = CKEDITOR.instances.comment.getData();
+      var videoId = parseInt(document.getElementById('video_id').value);
+      document.getElementById('replyToEpisode'+videoId).classList.remove("in");
+      CKEDITOR.instances.comment.setData('');
+      $.ajax({
+              method: "POST",
+              url: "{{url('createClientCourseComment')}}",
+              data: {video_id:videoId, comment:comment}
+          })
+          .done(function( msg ) {
+            renderComments(msg, userId);
+          });
     } else if( isNaN(userId)) {
       $.confirm({
           title: 'Confirmation',
@@ -357,9 +651,20 @@ hr{
   function confirmSubmitReplytoComment(ele){
     var userId = parseInt(document.getElementById('user_id').value);
     if(0 < userId){
-        formId = $(ele).data('id');
-        form = document.getElementById(formId);
-        form.submit();
+        var userId = parseInt(document.getElementById('user_id').value);
+        var commentId = $(ele).data('comment_id');
+        var videoId = $(ele).data('video_id');
+        commentid = 'subcomment_'+videoId+'_'+commentId;
+        var subcomment = document.getElementById(commentid).value;
+        $.ajax({
+            method: "POST",
+            url: "{{url('createClientCourseSubComment')}}",
+            data: {video_id:videoId, comment_id:commentId, subcomment:subcomment}
+        })
+        .done(function( msg ) {
+          renderComments(msg, userId);
+        });
+
     } else if( isNaN(userId)) {
       $.confirm({
           title: 'Confirmation',
@@ -409,9 +714,17 @@ hr{
                   text: 'Ok',
                   btnClass: 'btn-red',
                   action: function(){
-                    var id = $(ele).attr('id');
-                    formId = 'deleteComment_'+id;
-                    document.getElementById(formId).submit();
+                    var commentId = $(ele).data('comment_id');
+                    var videoId = $(ele).data('video_id');
+                    var userId = parseInt(document.getElementById('user_id').value);
+                    $.ajax({
+                        method: "POST",
+                        url: "{{url('deleteClientCourseComment')}}",
+                        data: {video_id:videoId, comment_id:commentId}
+                    })
+                    .done(function( msg ) {
+                      renderComments(msg, userId);
+                    });
                   }
               },
               Cancle: function () {
@@ -442,9 +755,18 @@ hr{
                   text: 'Ok',
                   btnClass: 'btn-red',
                   action: function(){
-                    var id = $(ele).attr('id');
-                    formId = 'deleteSubComment_'+id;
-                    document.getElementById(formId).submit();
+                    var commentId = $(ele).data('comment_id');
+                    var subcommentId = $(ele).data('subcomment_id');
+                    var videoId = $(ele).data('video_id');
+                    var userId = parseInt(document.getElementById('user_id').value);
+                    $.ajax({
+                        method: "POST",
+                        url: "{{url('deleteClientCourseSubComment')}}",
+                        data: {video_id:videoId, comment_id:commentId, subcomment_id:subcommentId}
+                    })
+                    .done(function( msg ) {
+                      renderComments(msg, userId);
+                    });
                   }
               },
               Cancle: function () {
@@ -468,35 +790,6 @@ hr{
       } else if(showSubCommentEle > 0 && showCommentEle == 0){
         window.location.hash = '#subcomment_'+showSubCommentEle;
       }
-
-      var showChar = 400;
-      var ellipsestext = "...";
-      var moretext = "Read more";
-      var lesstext = "less";
-      $('.more').each(function() {
-        var content = $(this).html();
-
-        if(content.length > showChar) {
-
-          var c = content.substr(0, showChar);
-          var h = content.substr(0, content.length);
-          var html = '<div class="zxc">'+ c + '<span style="color:#01bafd; margin-left:5px;">' + ellipsestext+ '</span><br /><a href="" class="morelink" style="color:#01bafd";>' + moretext + '</a></div><div class="zxc1" style="display:none;">'+ h + '<br /><a href="" class="morelink1" style="color:#01bafd";>' + lesstext + '</a></div>';
-
-          $(this).html(html);
-        }
-
-      });
-
-      $(".morelink").click(function(){
-        $(this).closest('.zxc').toggle();
-        $(this).closest('.zxc').siblings('.zxc1').toggle();
-        return false;
-      });
-      $(".morelink1").click(function(){
-        $(this).closest('.zxc1').toggle();
-        $(this).closest('.zxc1').siblings('.zxc').toggle();
-        return false;
-      });
 
     $(document).on("click", "i[id^=video_like_]", function(e) {
         var videoId = $(this).data('video_id');
@@ -531,10 +824,10 @@ hr{
               var likeSpan = document.getElementById('like_'+videoId);
               likeSpan.innerHTML = '';
               if( 1 == dislike ){
-                likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+                likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>';
                 likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
               } else {
-                likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+                likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>';
                 likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
               }
             }
@@ -634,6 +927,35 @@ hr{
     });
 
   });
+function showMore(){
+     var showChar = 400;
+      var ellipsestext = "...";
+      var moretext = "Read more";
+      var lesstext = "less";
+      $('.more').each(function() {
+        var content = $(this).html();
 
+        if(content.length > showChar) {
+
+          var c = content.substr(0, showChar);
+          var h = content.substr(0, content.length);
+          var html = '<div class="zxc">'+ c + '<span style="color:#01bafd; margin-left:5px;">' + ellipsestext+ '</span><br /><a href="" class="morelink" style="color:#01bafd";>' + moretext + '</a></div><div class="zxc1" style="display:none;">'+ h + '<br /><a href="" class="morelink1" style="color:#01bafd";>' + lesstext + '</a></div>';
+
+          $(this).html(html);
+        }
+
+      });
+
+      $(".morelink").click(function(){
+        $(this).closest('.zxc').toggle();
+        $(this).closest('.zxc').siblings('.zxc1').toggle();
+        return false;
+      });
+      $(".morelink1").click(function(){
+        $(this).closest('.zxc1').toggle();
+        $(this).closest('.zxc1').siblings('.zxc').toggle();
+        return false;
+      });
+  }
 </script>
 @stop

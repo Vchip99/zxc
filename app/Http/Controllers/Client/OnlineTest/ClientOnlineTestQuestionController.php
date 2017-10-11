@@ -224,7 +224,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
     	if(isset($id)){
     		$testQuestion = ClientOnlineTestQuestion::find($id);
     		if(is_object($testQuestion)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $testQuestion->client_institute_course_id)->get();
+                $instituteCourses = ClientInstituteCourse::where('client_id', $testQuestion->client_id)->get();
 
                 $testCategories = ClientOnlineTestCategory::showCategories($request);
                 $testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($testQuestion->category_id, $request);

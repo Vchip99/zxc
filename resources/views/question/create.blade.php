@@ -49,13 +49,14 @@
 		}
 	@endphp
 	<div id="main ">
-		@if(Session::has('message'))
-			<div class="alert alert-success" id="message">
-				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-			  	{{ Session::get('message') }}
-			</div>
-		@endif
+
 		<ul id ="ul">
+			@if(Session::has('message'))
+				<div class="alert alert-success" id="message">
+					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				  	{{ Session::get('message') }}
+				</div>
+			@endif
 	  		<li title="ADD MCQ"><a class="btn active" id="mcq_ques">ADD MCQ</a></li>
 	  		<li title="ADD NUMERICAL"><a class="btn" id="num_ques">ADD NUMERICAL</a></li>
 	  		@if($prevQuestionId > 0)

@@ -1,6 +1,10 @@
 @foreach($comments as $subcomment)
 	<div class="item replySubComment-1">
-	  	<img src="{{ asset('images/user1.png') }}" alt="User Image" />
+	  	@if(!empty($subcomment->user->photo))
+          <img class="img-circle" src="{{ asset($subcomment->user->photo) }}" alt="User Image" />
+        @else
+          <img class="img-circle" src="{{ asset('images/user1.png') }}" alt="User Image" />
+        @endif
 	  	<div class="message">
 	    	<p><a id="{{$comment->id}}" class="SubCommentName" onClick="goToComment(this);" style="cursor: pointer;">{{ $user->find($subcomment->user_id)->name }}</a>
 	    	<span class="more" id="editSubCommentHide_{{$subcomment->id}}">

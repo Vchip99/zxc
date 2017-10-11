@@ -9,4 +9,6 @@
 /public/userStorage
 /public/assignmentStorage
 /public/clientAssignmentStorage
+/public/workshopImages
+/vendor
 .env

@@ -28,11 +28,12 @@
                 <li>
                   <a href="{{ url('profile')}}" data-toggle="tooltip" title="Dashbord">
                   @if(!empty(Auth::user()->photo))
-                    <img src="{{asset(Auth::user()->photo)}}" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
+                    <img src="{{asset(Auth::user()->photo)}}" class="img-circle user-profile1" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
                   @else
-                    <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
+                    <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
                   @endif
-                  {{Auth::user()->name}}</a>
+                  {{Auth::user()->name}}
+                  </a>
                 </li>
                 <li role="separator" class="divider"></li>
                 <li>
@@ -64,7 +65,7 @@
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Digital Education">Digital Education <span class="caret"></span>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Digital Education">Digital Edu <span class="caret"></span>
               </a>
               <ul class="dropdown-menu" role="menu">
                 <div class="navbar-content">
@@ -73,7 +74,7 @@
                  <li class="divider"></li>
                  <li><a href="{{ url('workshops') }}" title="Workshop">Workshop</a></li>
                  <li class="divider"></li>
-                 <li><a href="{{url('vkits')}}" title="Hoby Project">Hoby Project</a></li>
+                 <li><a href="{{url('vkits')}}" title="Hobby Project">Hobby Project</a></li>
                  <li class="divider"></li>
                   <li><a href="{{url('documents')}}" title="Documents">Documents</a></li>
                 </div>
@@ -103,7 +104,7 @@
                <li> <b style="color: #01bafd;">Collage</b></li>
                  <li class="mrgn_10_left"><a href="{{ url('erp') }}" title="Digital edu & ERP">Digital edu & ERP</a></li>
                 <li class="divider"></li>
-                <li> <b style="color: #01bafd;">Cotching Institute</b></li>
+                <li> <b style="color: #01bafd;">Coaching Institute</b></li>
                  <li class="mrgn_10_left"><a href="{{ url('educationalPlatform') }}" title="Education Platform">Education Platform</a></li>
                  <li class="mrgn_10_left"><a href="{{ url('digitalMarketing') }}" title="Digital Marketing">Digital Marketing</a></li>
                  <li class="mrgn_10_left"><a href="{{ url('pricing') }}" title="pricing">pricing</a></li>

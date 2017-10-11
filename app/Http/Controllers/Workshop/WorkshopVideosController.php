@@ -124,4 +124,29 @@ class WorkshopVideosController extends Controller
     protected function getWorkshopsByCategory(Request $request){
         return WorkshopDetail::getWorkshopsByCategory($request->id);
     }
+
+    /**
+     *  delete video
+     */
+    protected function delete(Request $request){
+        $videoId = InputSanitise::inputInt($request->get('video_id'));
+        if(isset($videoId)){
+            $workshopVideo = WorkshopVideo::find($videoId);
+            if(is_object($workshopVideo)){
+                DB::beginTransaction();
+                try
+                {
+                    $workshopVideo->delete();
+                    DB::commit();
+                    return Redirect::to('admin/manageWorkshopVideos')->with('message', 'Workshop Video deleted successfully!');
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors('something went wrong.');
+                }
+            }
+        }
+        return Redirect::to('admin/manageWorkshopVideos');
+    }
 }

@@ -103,43 +103,30 @@ class BlogController extends Controller
      *  create/store blog comment
      */
     protected function createBlogComment(Request $request){
-        $v = Validator::make($request->all(), $this->validateBlogComment);
-        if ($v->fails())
-        {
-            return redirect()->back()->withErrors($v->errors());
-        }
+        $blogId = strip_tags(trim($request->get('blog_id')));
         DB::beginTransaction();
         try
         {
             $blogComment = BlogComment::createComment($request);
             Session::put('blog_comment_area', $blogComment->id);
             DB::commit();
-            $blogId = strip_tags(trim($request->get('blog_id')));
-            if(0 < $blogId){
-                return redirect()->route('blogComment', ['id' => $blogId]);
-            }
         }
         catch(\Exception $e)
         {
             DB::rollback();
-            return back()->withErrors('something went wrong.');
+            // return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('blog');
+        return $this->getComments($blogId);
     }
 
     /**
      *  create/store blog child comment
      */
     protected function createBlogSubComment(Request $request){
-        $v = Validator::make($request->all(), $this->validateBlogChildComment);
-        if ($v->fails())
-        {
-            return redirect()->back()->withErrors($v->errors());
-        }
         DB::beginTransaction();
+        $blogId = strip_tags(trim($request->get('blog_id')));
         try
         {
-            $blogId = strip_tags(trim($request->get('blog_id')));
             $commentId = $request->get('comment_id');
             $subcommentId = $request->get('subcomment_id');
             $blogComment = BlogSubComment::createSubComment($request);
@@ -156,16 +143,12 @@ class BlogController extends Controller
 
             DB::commit();
             Session::put('blog_comment_area', $blogComment->blog_comment_id);
-            if(is_object($blogComment)){
-                return redirect()->route('blogComment', ['id' => $blogId]);
-            }
         }
         catch(\Exception $e)
         {
             DB::rollback();
-            return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('blog');
+        return $this->getComments($blogId);
     }
 
     /**
@@ -211,17 +194,16 @@ class BlogController extends Controller
                     $comment->body = $commentBody;
                     $comment->save();
                     DB::commit();
-                    Session::put('blog_comment_area', $comment->id);
-                    return redirect()->route('blogComment', ['id' => $blogId]);
+                    // Session::put('blog_comment_area', $comment->id);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
+                    // return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('blog');
+        return $this->getComments($blogId);
     }
 
     protected function deleteBlogComment(Request $request){
@@ -248,19 +230,17 @@ class BlogController extends Controller
                             $deleteLike->delete();
                         }
                     }
-                    Session::put('blog_comment_area', 0);
+                    // Session::put('blog_comment_area', 0);
                     $comment->delete();
                     DB::commit();
-                    return redirect()->route('blogComment', ['id' => $blogId]);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('blog');
+        return $this->getComments($blogId);
     }
 
     protected function updateBlogSubComment(Request $request){
@@ -277,17 +257,15 @@ class BlogController extends Controller
                     $subcomment->body = $commentBody;
                     $subcomment->save();
                     DB::commit();
-                    Session::put('blog_comment_area', $commentId);
-                    return redirect()->route('blogComment', ['id' => $blogId]);
+                    // Session::put('blog_comment_area', $commentId);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('blog');
+        return $this->getComments($blogId);
     }
 
     protected function deleteBlogSubComment(Request $request){
@@ -304,19 +282,17 @@ class BlogController extends Controller
                             $deleteLike->delete();
                         }
                     }
-                    Session::put('blog_comment_area', $commentId);
+                    // Session::put('blog_comment_area', $commentId);
                     $subcomment->delete();
                     DB::commit();
-                    return redirect()->route('blogComment', ['id' => $blogId]);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('blog');
+        return $this->getComments($blogId);
     }
 
     protected function tagBlogs($id){
@@ -337,5 +313,52 @@ class BlogController extends Controller
             }
         }
         return Redirect::to('blog');
+    }
+
+       /**
+     *  return child comments
+     */
+    protected function getComments($blogId){
+        $comments = BlogComment::where('blog_id', $blogId)->orderBy('id', 'desc')->get();
+        $blogComments = [];
+        foreach($comments as $comment){
+            $blogComments['comments'][$comment->id]['body'] = $comment->body;
+            $blogComments['comments'][$comment->id]['id'] = $comment->id;
+            $blogComments['comments'][$comment->id]['blog_id'] = $comment->blog_id;
+            $blogComments['comments'][$comment->id]['user_id'] = $comment->user_id;
+            $blogComments['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $blogComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
+            $blogComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
+            if(is_object($comment->children) && false == $comment->children->isEmpty()){
+                $blogComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
+            }
+        }
+        $blogComments['commentLikesCount'] = BlogCommentLike::getLikesByBlogId($blogId);
+        $blogComments['subcommentLikesCount'] = BlogSubCommentLike::getLikesByBlogId($blogId);
+
+        return $blogComments;
+    }
+
+    /**
+     *  return child comments
+     */
+    protected function getSubComments($subComments){
+
+        $blogChildComments = [];
+        foreach($subComments as $subComment){
+            $blogChildComments[$subComment->id]['body'] = $subComment->body;
+            $blogChildComments[$subComment->id]['id'] = $subComment->id;
+            $blogChildComments[$subComment->id]['blog_id'] = $subComment->blog_id;
+            $blogChildComments[$subComment->id]['blog_comment_id'] = $subComment->blog_comment_id;
+            $blogChildComments[$subComment->id]['user_name'] = $subComment->user->name;
+            $blogChildComments[$subComment->id]['user_id'] = $subComment->user_id;
+            $blogChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
+            $blogChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
+            if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
+                $blogChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
+            }
+        }
+
+        return $blogChildComments;
     }
 }

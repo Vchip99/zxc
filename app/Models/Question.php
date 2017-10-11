@@ -113,7 +113,7 @@ class Question extends Model
         } else {
             $formatedQuestion = $question;
         }
-        return trim($formatedQuestion, 'src="');
+        return ltrim($formatedQuestion, 'src="');
     }
 
     /**

@@ -138,53 +138,6 @@
       </div>
   </div>
 </section>
-<section id="education" class="v_container" >
-  <div class="container">
-    <div class="row">
-      <div class="col-md-8 col-md-offset-2 text-center mrgn-60-top"">
-        <h2 class="v_h2_title">Education at Vchip-edu</h2>
-        <hr class="section-dash-dark"/>
-        <h3 class="v_h3_title ">Earn a Professional Certificate, Nano degree course...</p>
-      </div>
-    </div>
-      <div class="row text-center mrgn_30_top ">
-        <div class="col-md-4 col-sm-12 mrgn_40_top ">
-          <div class="feature-center">
-            <img src="{{ asset('images/courses/univercity-at-home.png')}}" width="100"
-            height="100"
-            class="img-responsive center-block" alt="University at Home"/>
-            <ul class="vchip_categories list-inline">
-              <li>University at Home</li>
-            </ul>
-            <p class="">You can learn a you want at your home.</p>
-          </div>
-        </div>
-        <div class="col-md-4 col-sm-12 mrgn_40_top ">
-          <div class="feature-center">
-            <img src="{{ asset('images/courses/professional-certificate.png')}}"
-            width="100" height="100"
-            class="img-responsive center-block" alt="Professional Certificate"/>
-            <ul class="vchip_categories list-inline">
-              <li>Professional Certificate</li>
-            </ul>
-            <p class="">After successfully completion of certificate course, you will get certificate that enhance level of your resumes and accelerate your career.</p>
-          </div>
-        </div>
-        <div class="col-md-4 col-sm-12 mrgn_40_top ">
-          <div class="feature-center">
-            <img src="{{ asset('images/courses/nano-degree-course.png')}}" width="100"
-            height="100"
-            class="img-responsive center-block" alt="Nano degree course"/>
-            <ul class="vchip_categories list-inline">
-              <li>Nano degree course</li>
-            </ul>
-            <p class="">A graduate and master level courses use to get mastery in that field. </p>
-          </div>
-        </div>
-      </div>
-    </div>
-</section>
-
 @stop
 @section('footer')
 	@include('footer.client-footer')

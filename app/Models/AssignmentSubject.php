@@ -59,6 +59,7 @@ class AssignmentSubject extends Model
     }
 
     protected static function getAssignmentSubjectsOfGivenAssignmentByLecturer(Request $request){
-        return static::join('assignment_questions', 'assignment_questions.assignment_subject_id', '=', 'assignment_subjects.id')->where('assignment_questions.lecturer_id',$request->lecturer_id)->select('assignment_subjects.*')->get();
+        return static::join('assignment_questions', 'assignment_questions.assignment_subject_id', '=', 'assignment_subjects.id')->where('assignment_questions.lecturer_id',$request->lecturer_id)
+            ->select('assignment_subjects.id','assignment_subjects.*')->groupBy('assignment_subjects.id')->get();
     }
 }

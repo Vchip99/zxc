@@ -129,4 +129,29 @@ class PlacementFaqController extends Controller
         }
         return Redirect::to('admin/managePlacementFaq');
     }
+
+    /**
+     *  delete faq
+     */
+    protected function delete(Request $request){
+        $faqId = InputSanitise::inputInt($request->get('faq_id'));
+        if(isset($faqId)){
+            $placementFaq = PlacementFaq::find($faqId);
+            if(is_object($placementFaq)){
+                DB::beginTransaction();
+                try
+                {
+                    $placementFaq->delete();
+                    DB::commit();
+                    return Redirect::to('admin/managePlacementFaq')->with('message', 'Placement Faq deleted successfully!');
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors('something went wrong.');
+                }
+            }
+        }
+        return Redirect::to('admin/managePlacementFaq');
+    }
 }

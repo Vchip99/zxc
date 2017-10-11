@@ -29,9 +29,9 @@
               <li>
                 <a href="{{ url('profile')}}" title="Dashbord">
                   @if(!empty(Auth::guard('clientuser')->user()->photo))
-                    <img src="{{ asset(Auth::guard('clientuser')->user()->photo) }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
+                    <img src="{{ asset(Auth::guard('clientuser')->user()->photo) }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
                   @else
-                    <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
+                    <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
                   @endif
                   {{Auth::guard('clientuser')->user()->name}}
                 </a>

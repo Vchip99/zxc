@@ -63,7 +63,7 @@ class WorkshopVideo extends Model
     	date_default_timezone_set('Asia/Calcutta');
     	$currentTime = date("Y-m-d H:i:s");
 		$videoTime = date("Y-m-d H:i:s", (strtotime(date($this->date)) + $this->duration));
-		if($currentTime <= $videoTime){
+		if($currentTime >= $videoTime){
 			return 'true';
 		}
 		return 'false';

@@ -313,7 +313,7 @@ font-size: 20px;
         <h3 class="v_h3_title ">About</h3>
           <p class="more"> Vchip-edu is the part of Vchip Technology. Vchip Technology is IoT base young start-up company having head office in Pune. Vchip Technology is working in Education, Health and Agriculture sectores.
           <br/>
-          Vchip-edu believes that better education is right of everyone. In our country (India), most of people live in villages. So Vchip-edu is working on Digital Education platform, so that we can provide a quality education equally in villages and remote areas along with urban area. In other word everyone can learn with fun from anywhere in the world at any time.
+          We at <b>Vchip-edu</b> believes that better education is right of everyone. In our country (India), most of people live in villages. So Vchip-edu is working on Digital Education platform, so that we can provide a quality education equally in villages and remote areas along with urban area. In other word everyone can learn with fun from anywhere in the world at any time.
           <br/><br/>
           Currently, we are focusing on bridging a gap between industries and educational organizations along with digital villages. In that we are working on direct interaction of students with industries and our experts who belong to different industries. Also, interaction of students with Founder and CEO’s of successful start-ups. Also, our platform have all the require things which are needed for placement like online test (design according to pattern of the major companies), online course for aptitude preparation, discussion forum etc.
           <br/><br/>
@@ -356,16 +356,16 @@ font-size: 20px;
             <div class="tree-menu"><a href="#">Bridging a gap between industries & Students</a></div>
             <div class="tree-menu"><a href="#">Placement, Internship, Sponsor projects</a></div>
             <div class="tree-menu"><a href="#">Workshops on emerging Technology </a></div>
-            <div class="tree-menu"><a href="#">ERP Management, Discussion forum</a></div>
+            <div class="tree-menu"><a href="#">Digital Education & ERP Management </a></div>
             <div class="tree-menu"><a href="#">Start-ups</a></div>
-            <div class="tree-menu"><a href="#">Online Courses, Test-series, Doc & projects  </a></div>
+
 
     </div>
       <div class="col-md-2 " style="padding: 4% 0;">
-           <p class="tree-tital" >COTCHING INSTITUTE</p>
+           <p class="tree-tital" >COACHING INSTITUTE</p>
             <div class="tree-menu"><a href="#">Digital Education Platform</a></div>
             <div class="tree-menu"><a href="#">ERP Management</a></div>
-            <div class="tree-menu"><a href="#">Web Site Development</a></div>
+            <div class="tree-menu"><a href="#">Web and Mobile App Development</a></div>
             <div class="tree-menu"><a href="#">Digital Marketing</a></div>
             <div class="tree-menu"><a href="#">SEO</a></div>
       </div>
@@ -378,7 +378,7 @@ font-size: 20px;
      <div class="col-md-8 col-md-offset-2 text-center mrgn-60-top">
       <h2 class="v_h2_title">Digital Education</h2>
       <hr class="section-dash-dark"/>
-      <h3 class="v_h3_title">Digital villege is our dream...</h3>
+      <h3 class="v_h3_title">Digital village is our dream...</h3>
      </div>
     </div>
     <div class="row">
@@ -430,7 +430,7 @@ font-size: 20px;
 
       </div>
       <div class="text-center">
-      <h3 class="v_h3_title">Vchip-kit</h3>
+      <h3 class="v_h3_title">Hobby Project</h3>
       <p>We provide hobby projects...</p>
       <p class="mrgn_20_top">
         <a href="{{ url('vkits') }}" class="btn-link">Learn More

@@ -29,7 +29,7 @@
           <th>#</th>
           <th>Area Name</th>
           <th>Edit Area</th>
-          <!-- <th>Delete Area</th> -->
+          <th>Delete Area</th>
         </tr>
       </thead>
       <tbody>
@@ -42,7 +42,7 @@
               <a href="{{url('admin/placementArea')}}/{{$placementArea->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$placementArea->name}}" />
                 </a>
             </td>
-            <!-- <td>
+            <td>
             <a id="{{$placementArea->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$placementArea->name}}" />
                 </a>
                 <form id="deletePlacementArea_{{$placementArea->id}}" action="{{url('admin/deletePlacementArea')}}" method="POST" style="display: none;">
@@ -50,7 +50,7 @@
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="area_id" value="{{$placementArea->id}}">
                 </form>
-            </td> -->
+            </td>
           </tr>
           @endforeach
         @else
@@ -68,7 +68,7 @@
     function confirmDelete(ele){
       $.confirm({
         title: 'Confirmation',
-        content: 'If you delete this category, all associated sub categories, subjects, papers and questions of this category will be deleted.',
+        content: 'If you delete this area, all companies associated with this area, companies details and its process, its associated faq will be deleted.',
         type: 'red',
         typeAnimated: true,
         buttons: {

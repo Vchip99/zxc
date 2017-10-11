@@ -95,7 +95,7 @@ class ClientOnlineTestSubCategoryController extends ClientBaseController
         if(isset($id)){
             $testSubcategory = ClientOnlineTestSubCategory::find($id);
             if(is_object($testSubcategory)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $testSubcategory->client_institute_course_id)->get();
+                $instituteCourses = ClientInstituteCourse::where('client_id', $testSubcategory->client_id)->get();
                 $testCategories = ClientOnlineTestCategory::all();
                 return view('client.onlineTest.subcategory.create', compact('instituteCourses','testCategories', 'testSubcategory'));
             }

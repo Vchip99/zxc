@@ -136,28 +136,18 @@ class VkitController extends Controller
     }
 
     protected function createProjectComment(Request $request){
-        $v = Validator::make($request->all(), $this->validateProjectComment);
-        if ($v->fails())
-        {
-            return redirect()->back()->withErrors($v->errors());
-        }
+        $projectId = strip_tags(trim($request->get('project_id')));
         DB::beginTransaction();
         try
         {
             $VkitProjectComment = VkitProjectComment::createComment($request);
-            Session::put('project_comment_area', $VkitProjectComment->id);
             DB::commit();
-            $projectId = strip_tags(trim($request->get('project_id')));
-            if(0 < $projectId){
-                return redirect()->route('vkitproject', ['id' => $projectId]);
-            }
         }
         catch(\Exception $e)
         {
             DB::rollback();
-            return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('vkits');
+        return $this->getComments($projectId);
     }
 
     protected function updateVkitProjectComment(Request $request){
@@ -173,17 +163,14 @@ class VkitController extends Controller
                     $comment->body = $commentBody;
                     $comment->save();
                     DB::commit();
-                    Session::put('project_comment_area', $comment->id);
-                    return redirect()->route('vkitproject', ['id' => $projectId]);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('vkits');
+        return $this->getComments($projectId);
     }
 
     protected function deleteVkitProjectComment(Request $request){
@@ -211,33 +198,24 @@ class VkitController extends Controller
                             $deleteLike->delete();
                         }
                     }
-                    Session::put('project_comment_area', 0);
                     $comment->delete();
                     DB::commit();
-                    return redirect()->route('vkitproject', ['id' => $projectId]);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('vkits');
+        return $this->getComments($projectId);
     }
 
     protected function createVkitProjectSubComment(Request $request){
-        $v = Validator::make($request->all(), $this->validateProjectSubComment);
-
-        if ($v->fails())
-        {
-            return redirect()->back()->withErrors($v->errors());
-        }
+        $projectId = InputSanitise::inputInt($request->get('project_id'));
         DB::beginTransaction();
         try
         {
             $VkitProjectSubComment = VkitProjectSubComment::createSubComment($request);
-            $projectId = InputSanitise::inputInt($request->get('project_id'));
             $commentId = InputSanitise::inputInt($request->get('comment_id'));
             $subcommentId = InputSanitise::inputInt($request->get('subcomment_id'));
 
@@ -252,18 +230,13 @@ class VkitController extends Controller
                 $notificationMessage = '<a href="'.$request->root().'/vkitproject/'.$projectId.'/'.$VkitProjectSubComment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
                 Notification::addCommentNotification($notificationMessage, Notification::USERVKITPROJECTNOTIFICATION, $VkitProjectSubComment->id,$VkitProjectSubComment->user_id,$parentComment->user_id);
             }
-            Session::put('project_comment_area', $request->get('comment_id'));
             DB::commit();
-            if(0 < $projectId){
-                return redirect()->route('vkitproject', ['id' => $projectId]);
-            }
         }
         catch(\Exception $e)
         {
             DB::rollback();
-            return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('vkits');
+        return $this->getComments($projectId);
     }
 
     protected function updateVkitProjectSubComment(Request $request){
@@ -280,17 +253,14 @@ class VkitController extends Controller
                     $subcomment->body = $commentBody;
                     $subcomment->save();
                     DB::commit();
-                    Session::put('project_comment_area', $commentId);
-                    return redirect()->route('vkitproject', ['id' => $projectId]);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('vkits');
+        return $this->getComments($projectId);
     }
 
     protected function deleteVkitProjectSubComment(Request $request){
@@ -308,19 +278,16 @@ class VkitController extends Controller
                             $deleteLike->delete();
                         }
                     }
-                    Session::put('project_comment_area', $commentId);
                     $subcomment->delete();
                     DB::commit();
-                    return redirect()->route('vkitproject', ['id' => $projectId]);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('vkits');
+        return $this->getComments($projectId);
     }
 
     protected function likeVkitProject(Request $request){
@@ -333,5 +300,52 @@ class VkitController extends Controller
 
     protected function likekitProjectSubComment(Request $request){
         return VkitProjectSubCommentLike::getLikeVkitProject($request);
+    }
+
+       /**
+     *  return comments
+     */
+    protected function getComments($projectId){
+        $comments = VkitProjectComment::where('vkit_project_id', $projectId)->orderBy('id', 'desc')->get();
+        $videoComments = [];
+        foreach($comments as $comment){
+            $videoComments['comments'][$comment->id]['body'] = $comment->body;
+            $videoComments['comments'][$comment->id]['id'] = $comment->id;
+            $videoComments['comments'][$comment->id]['vkit_project_id'] = $comment->vkit_project_id;
+            $videoComments['comments'][$comment->id]['user_id'] = $comment->user_id;
+            $videoComments['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $videoComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
+            $videoComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
+            if(is_object($comment->children) && false == $comment->children->isEmpty()){
+                $videoComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
+            }
+        }
+        $videoComments['commentLikesCount'] = VkitProjectCommentLike::getLikesByVkitProjectId($projectId);
+        $videoComments['subcommentLikesCount'] = VkitProjectSubCommentLike::getLikesByVkitProjectId($projectId);
+
+        return $videoComments;
+    }
+
+    /**
+     *  return child comments
+     */
+    protected function getSubComments($subComments){
+
+        $videoChildComments = [];
+        foreach($subComments as $subComment){
+            $videoChildComments[$subComment->id]['body'] = $subComment->body;
+            $videoChildComments[$subComment->id]['id'] = $subComment->id;
+            $videoChildComments[$subComment->id]['vkit_project_id'] = $subComment->vkit_project_id;
+            $videoChildComments[$subComment->id]['vkit_project_comment_id'] = $subComment->vkit_project_comment_id;
+            $videoChildComments[$subComment->id]['user_name'] = $subComment->user->name;
+            $videoChildComments[$subComment->id]['user_id'] = $subComment->user_id;
+            $videoChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
+            $videoChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
+            if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
+                $videoChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
+            }
+        }
+
+        return $videoChildComments;
     }
 }

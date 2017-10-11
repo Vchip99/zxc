@@ -64,7 +64,7 @@
       </form>
     </div>
     <div class="row">
-    <table class="table admin_table">
+    <table class="table">
       <thead class="thead-inverse">
         <tr>
           <th>Message</th>

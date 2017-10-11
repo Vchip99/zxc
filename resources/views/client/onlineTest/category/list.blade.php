@@ -39,7 +39,7 @@
           <tr>
             <th scope="row">{{$index + 1}}</th>
             <td>{{$testCategory->name}}</td>
-            <td>{{$testCategory->name}}</td>
+            <td>{{$testCategory->instituteCourse->name}}</td>
             <td>
               <a href="{{url('onlinetestcategory')}}/{{$testCategory->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testCategory->name}}" />

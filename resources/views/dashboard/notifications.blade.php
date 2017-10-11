@@ -27,7 +27,7 @@
 @section('dashboard_content')
   <div class="container ">
   <div>
-    <table class="table admin_table">
+    <table class="table">
       <thead class="thead-inverse">
         <tr>
           <th>#</th>

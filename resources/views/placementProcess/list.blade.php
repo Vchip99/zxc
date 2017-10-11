@@ -30,7 +30,7 @@
           <th>Company Name</th>
           <th>Area Name</th>
           <th>Edit Placement Process</th>
-          <!-- <th>Delete Company</th> -->
+          <th>Delete Process</th>
         </tr>
       </thead>
       <tbody>
@@ -44,14 +44,14 @@
               <a href="{{url('admin/placementCompanyProcess')}}/{{$placementProcess->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$placementProcess->name}}" />
                 </a>
             </td>
-            <!-- <td>
+            <td>
                 <a id="{{$placementProcess->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$placementProcess->name}}" />
-                <form id="deleteSubCategory_{{$placementProcess->id}}" action="{{url('admin/deleteSubCategory')}}" method="POST" style="display: none;">
+                <form id="deletePlacementProcess_{{$placementProcess->id}}" action="{{url('admin/deletePlacementProcess')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
-                    <input type="hidden" name="subcat_id" value="{{$placementProcess->id}}">
+                    <input type="hidden" name="process_id" value="{{$placementProcess->id}}">
                 </form>
-            </td> -->
+            </td>
           </tr>
           @endforeach
         @else
@@ -70,7 +70,7 @@
     function confirmDelete(ele){
       $.confirm({
           title: 'Confirmation',
-          content: 'If you delete this sub category, all associated subjects, papers and questions of this sub category will be deleted.',
+          content: 'If you delete this placement process, all associated faq will be deleted.',
           type: 'red',
           typeAnimated: true,
           buttons: {
@@ -79,7 +79,7 @@
                     btnClass: 'btn-red',
                     action: function(){
                       var id = $(ele).attr('id');
-                      formId = 'deleteSubCategory_'+id;
+                      formId = 'deletePlacementProcess_'+id;
                       document.getElementById(formId).submit();
                     }
                 },

@@ -12,7 +12,7 @@
   </section>
 @stop
 @section('dashboard_content')
-  <section   class="v_container">
+  <section class="v_container">
     <div class="container ">
       <div class="row">
         <div class="col-sm-9">
@@ -35,52 +35,60 @@
                       </div>
                     </div>
                     <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
-                    <div class="user-block cmt-left-margin">
-                      <img class="img-circle" src="{{ asset('images/user1.png') }}" alt="User Image" />
-                      <span class="username">{{ $user->find($post->user_id)->name }} </span>
-                      <span class="description">Shared publicly - {{$post->updated_at->diffForHumans()}}</span>
-                    </div>
-                    <div  class="media-body" data-toggle="lightbox">
-                      <br/>
-                      <div class="more bold cmt-left-margin" id="editPostHide_{{$post->id}}">{!! $post->body !!}</div>
-                      <br/>
-                      <div class="border-bottom"></div>
-                      <div class="comment-meta main-reply-box cmt-left-margin">
-                          <span id="like_{{$post->id}}" >
-                            @if( isset($likesCount[$post->id]) && isset($likesCount[$post->id]['user_id'][$currentUser]))
-                                 <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                 <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
-                            @else
-                                 <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
-                                 <span id="like1-bs3">@if( isset($likesCount[$post->id])) {{count($likesCount[$post->id]['like_id'])}} @endif</span>
-                            @endif
-                          </span>
-                        </div>
+                      <div class="user-block cmt-left-margin">
+                        @if(!empty($post->user->photo))
+                          <img class="img-circle" src="{{ asset($post->user->photo) }}" alt="User Image" />
+                        @else
+                          <img class="img-circle" src="{{ asset('images/user1.png') }}" alt="User Image" />
+                        @endif
+                        <span class="username">{{ $user->find($post->user_id)->name }} </span>
+                        <span class="description">Shared publicly - {{$post->updated_at->diffForHumans()}}</span>
+                      </div>
+                      <div  class="media-body" data-toggle="lightbox">
+                        <br/>
+                        <div class="more bold cmt-left-margin" id="editPostHide_{{$post->id}}">{!! $post->body !!}</div>
+                        <br/>
+                        <div class="border-bottom"></div>
+                        <div class="comment-meta main-reply-box cmt-left-margin">
+                            <span id="like_{{$post->id}}" >
+                              @if( isset($likesCount[$post->id]) && isset($likesCount[$post->id]['user_id'][$currentUser]))
+                                   <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                   <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
+                              @else
+                                   <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                   <span id="like1-bs3">@if( isset($likesCount[$post->id])) {{count($likesCount[$post->id]['like_id'])}} @endif</span>
+                              @endif
+                            </span>
+                          </div>
                       </div>
                       <div class="cmt-bg">
                         <div class="box-body chat" id="chat-box">
                           @if(count( $post->comments) > 0)
                             @foreach($post->comments as $comment)
                               <div class="item cmt-left-margin-10" id="showComment_{{$comment->id}}">
-                                <img src="{{ asset('images/user1.png') }}" alt="User Image" />
+                                @if(!empty($comment->user->photo))
+                                  <img class="img-circle" src="{{ asset($comment->user->photo) }}" alt="User Image" />
+                                @else
+                                  <img class="img-circle" src="{{ asset('images/user1.png') }}" alt="User Image" />
+                                @endif
                                 <div class="message">
-                                    <a class="SubCommentName" id="{{$comment->id}}" onClick="goToComment(this);" style="cursor: pointer;">{{ $user->find($comment->user_id)->name }}</a>
-                                    <form id="goToComment_{{$comment->id}}" action="{{ url('goToComment')}}" method="POST" style="display: none;">
-                                      {{ csrf_field() }}
-                                      <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                    </form>
-                                    <div class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
-                                  </div>
-                                  <div class="comment-meta reply-1">
-                                    <span id="cmt_like_{{$comment->id}}" >
-                                      @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
-                                           <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                           <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
-                                      @else
-                                           <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
-                                           <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
-                                      @endif
-                                    </span>
+                                  <a class="SubCommentName" id="{{$comment->id}}" onClick="goToComment(this);" style="cursor: pointer;">{{ $user->find($comment->user_id)->name }}</a>
+                                  <form id="goToComment_{{$comment->id}}" action="{{ url('goToComment')}}" method="POST" style="display: none;">
+                                    {{ csrf_field() }}
+                                    <input type="hidden" name="comment_id" value="{{$comment->id}}">
+                                  </form>
+                                  <div class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
+                                </div>
+                                <div class="comment-meta reply-1">
+                                  <span id="cmt_like_{{$comment->id}}" >
+                                    @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
+                                         <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                         <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
+                                    @else
+                                         <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                         <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
+                                    @endif
+                                  </span>
                                   <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                                 </div>
                               </div>
@@ -92,10 +100,10 @@
                         </div>
                       </div>
                     </div>
-                    </div>
                   </div>
                 @endforeach
               @endif
+            </div>
           </div>
         </div>
       </div>

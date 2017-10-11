@@ -16,7 +16,7 @@
       <div class="row">
         <div class="col-sm-9">
             <div class="ask-qst">
-              <button class="btn btn-primary "  data-toggle="modal" data-target="#askQuestion"> Ask Question</button>
+              <button class="btn btn-primary "  data-toggle="modal" data-target="#askQuestion" style="width: 100px;"> Ask Question</button>
              </div>
                 <div class="post-comments ">
                   <div class="row" id="showAllPosts">
@@ -25,7 +25,7 @@
                        <div class="media" id="showPost_{{$post->id}}">
                           <div class="media-heading" >
                             <div class="user-block ">
-                              <a id="{{$post->id}}"class="tital" onClick="goToPost(this);" style="cursor: pointer;">{{$post->title}} </a>
+                              <a id="{{$post->id}}" class="tital" onClick="goToPost(this);" style="cursor: pointer;">{{$post->title}} </a>
                                 <form id="goToPost_{{$post->id}}" action="{{ url('goToPost')}}" method="POST" style="display: none;">
                                   {{ csrf_field() }}
                                   <input type="hidden" name="post_id" value="{{$post->id}}">
@@ -38,7 +38,11 @@
                           </div>
                           <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
                           <div class="user-block cmt-left-margin">
-                            <img class="img-circle" src="{{ asset('images/user1.png') }}" alt="User Image" />
+                            @if(!empty($post->user->photo))
+                              <img class="img-circle" src="{{ asset($post->user->photo) }}" alt="User Image" />
+                            @else
+                              <img class="img-circle" src="{{ asset('images/user1.png') }}" alt="User Image" />
+                            @endif
                             <span class="username">{{ $user->find($post->user_id)->name }} </span>
                             <span class="description">Shared publicly - {{$post->updated_at->diffForHumans()}}</span>
                           </div>
@@ -70,7 +74,7 @@
                     <div class="modal-content">
                       <div class="modal-header">
                         <select id="post_category" class="form-control" name="post_category" required>
-                            <option value = ""> Select Category ...</option>
+                            <option value = "0"> Select Category ...</option>
                             @if(count($discussionCategories) > 0)
                               @foreach($discussionCategories as $discussionCategory)
                                 <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
@@ -81,8 +85,6 @@
                       <div class="modal-body" style="padding: 0px;">
                         <div class="widget-area  blank">
                               <div class="status-upload">
-                                <form action="{{url('createPost')}}" method="POST" id="createPost">
-                                  {{csrf_field()}}
                                    <div class="input-group">
                                       <span class="input-group-addon">Title</span>
                                       <input id="title" type="text" class="form-control" name="title" placeholder="Add Title Here">
@@ -112,16 +114,7 @@
                                           }
                                       });
                                     </script>
-                                    <ul>
-                                      <li><a title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Audio"><i class="fa fa-music"></i></a></li>
-                                      <li><a title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Video"><i class="fa fa-video-camera"></i></a></li>
-                                      <li><a title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Sound Record"><i class="fa fa-microphone"></i></a></li>
-                                      <li><a title="" data-toggle="tooltip" data-placement="bottom" data-original-title="Picture"><i class="fa fa-picture-o"></i></a></li>
-                                    </ul>
-                                    <input type="hidden" name="post_category_id" value="" id="post_category_id">
-                                    <input type="hidden" name="all_post_module_id" value="{{$allPostModuleId}}" id="all_post_module_id">
-                                    <button type="button" class="btn btn-success btn-circle text-uppercase" onclick=" confirmSubmit(this);" id="createPost"><i class="fa fa-share"></i> Share</button>
-                                </form>
+                                    <button type="button" class="btn btn-success btn-circle text-uppercase" onclick="confirmSubmit(this);" id="createPost"><i class="fa fa-share"></i> Share</button>
                               </div><!-- Status Upload  -->
                             </div>
                       </div>
@@ -139,43 +132,140 @@
     function confirmSubmit(ele){
       var userId = parseInt(document.getElementById('user_id').value);
       var categoryId = parseInt(document.getElementById('post_category').value);
-       var questionLength = CKEDITOR.instances.question.getData().length;
-
-      if(0 < userId && 0 < categoryId && questionLength > 0){
-          var category = document.getElementById('post_category_id');
-          category.value= categoryId;
-          formId = $(ele).attr('id');
-          form = document.getElementById(formId);
-          form.submit();
+      var questionLength = CKEDITOR.instances.question.getData().length;
+      var title = document.getElementById('title').value;
+      if(0 < userId && 0 < categoryId && questionLength > 0 && title){
+        var question = CKEDITOR.instances.question.getData();
+          $.ajax({
+              method: "POST",
+              url: "{{url('createPost')}}",
+              data: {title:title,post_category_id:categoryId,question:question}
+          })
+          .done(function( msg ) {
+            $('#askQuestion').modal('hide');
+            document.getElementById('post_category').value = 0;
+            document.getElementById('title').value = '';
+            CKEDITOR.instances.question.setData('');
+            renderPosts(msg);
+          });
       } else if( isNaN(userId)) {
-        $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
+          $.confirm({
+          title: 'Confirmation',
+          content: 'Please login first. Click "Ok" button to login.',
+          type: 'red',
+          typeAnimated: true,
+          buttons: {
+                Ok: {
+                    text: 'Ok',
+                    btnClass: 'btn-red',
+                    action: function(){
+                      window.location="{{url('/home')}}";
+                    }
+                },
+                Cancle: function () {
+                }
+            }
+          });
+        }else if( isNaN(categoryId)) {
+          $.alert({
+            title: 'Alert!',
+            content: 'Please select post category.',
+          });
+        } else if( questionLength < 0){
+          $.alert({
+            title: 'Alert!',
+            content: 'Please enter something in a question. ',
+          });
+        }
+    }
+
+    function renderPosts(msg){
+      var userId = parseInt(document.getElementById('user_id').value);
+      if(0 > userId){
+        userId = 0;
+      }
+      showPostsDiv = document.getElementById('showAllPosts');
+      showPostsDiv.innerHTML = '';
+      arrayComments = [];
+      $.each(msg['posts'], function(idx, obj) {
+        arrayComments[idx] = obj;
+      });
+      var sortedArray = arrayComments.reverse();
+        $.each(sortedArray, function(idx, obj) {
+          if(false == $.isEmptyObject(obj)){
+          var divMedia = document.createElement('div');
+          divMedia.className = 'media';
+          divMedia.id = 'showPosts_'+obj.id;
+
+          var divMediaHeading = document.createElement('div');
+          divMediaHeading.className = 'media-heading';
+
+          var titleDiv = document.createElement('div');
+          titleDiv.className = 'user-block';
+          var url = "{{ url('goToPost')}}";
+          var csrfField = '{{ csrf_field() }}';
+          titleDiv.innerHTML = '<a  id="'+ obj.id +'" class="tital" onClick="goToPost(this);" style="cursor: pointer;">'+ obj.title +'</a><form id="goToPost_'+ obj.id +'" action="'+url+'" method="POST" style="display: none;">'+csrfField+'<input type="hidden" name="post_id" value="'+obj.id+'"></form>';
+          divMediaHeading.appendChild(titleDiv);
+          var boxDiv = document.createElement('div');
+          boxDiv.className = 'box-tools';
+          boxDivInnerHtml = '<button type="button" data-toggle="collapse" data-target="#post'+ obj.id +'" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i></button>';
+          boxDiv.innerHTML = boxDivInnerHtml;
+          divMediaHeading.appendChild(boxDiv);
+          divMedia.appendChild(divMediaHeading);
+
+          var divPanel = document.createElement('div');
+          divPanel.className = 'cmt-parent panel-collapse collapse in';
+          divPanel.id = 'post'+obj.id;
+
+          var commentBlockDiv = document.createElement('div');
+          commentBlockDiv.className = 'user-block cmt-left-margin';
+          if(obj.user_image){
+            var userImagePath = "{{ asset('') }}"+obj.user_image;
+            var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
+          } else {
+            var userImagePath = "{{ asset('images/user1.png') }}";
+            var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
+          }
+          commentBlockDiv.innerHTML = ''+userImage+'<span class="username">'+ obj.user_name +'</span><span class="description">Shared publicly - '+ obj.updated_at+'</span>';
+          divPanel.appendChild(commentBlockDiv);
+
+          var divMediaBody = document.createElement('div');
+          divMediaBody.className = 'media-body';
+          divMediaBody.setAttribute('data-toggle', 'lightbox');
+          divMediaBody.innerHTML = '<br/>';
+          var pBody = document.createElement('div');
+          pBody.className = 'more bold img-ckeditor img-responsive cmt-left-margin';
+          pBody.id ='editPostHide_'+ obj.id;
+          pBody.innerHTML = obj.body + ' <br/>';
+          divMediaBody.appendChild(pBody);
+
+          var borderDiv = document.createElement('div');
+          borderDiv.className = 'border-bottom';
+          divMediaBody.appendChild(borderDiv);
+
+          var divComment = document.createElement('div');
+          divComment.className = 'comment-meta main-reply-box cmt-left-margin';
+          commentInnerHtml = '<span id="like_'+obj.id+'">';
+
+            if( msg['likesCount'][obj.id] && msg['likesCount'][obj.id]['user_id'][userId]){
+              commentInnerHtml +='<i id="post_like_'+obj.id+'" data-post_id="'+obj.id+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+              commentInnerHtml +='<span id="like1-bs3">'+ Object.keys(msg['likesCount'][obj.id]['like_id']).length +'</span>';
+            } else {
+              commentInnerHtml +='<i id="post_like_'+obj.id+'" data-post_id="'+obj.id+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+              if(msg['likesCount'][obj.id]){
+                commentInnerHtml +='<span id="like1-bs3">'+ Object.keys(msg['likesCount'][obj.id]['like_id']).length +'</span>';
               }
+            }
+          commentInnerHtml +='</span>';
+          divComment.innerHTML = commentInnerHtml;
+          divMediaBody.appendChild(divComment);
+
+          divPanel.appendChild(divMediaBody);
+          divMedia.appendChild(divPanel);
+          showPostsDiv.appendChild(divMedia);
           }
         });
-      }else if( isNaN(categoryId)) {
-        $.alert({
-          title: 'Alert!',
-          content: 'Please select post category.',
-        });
-      } else if( questionLength < 0){
-        $.alert({
-          title: 'Alert!',
-          content: 'Please enter something in a question. ',
-        });
-      }
+        showMore();
     }
 
     function confirmSubmitReply(ele){

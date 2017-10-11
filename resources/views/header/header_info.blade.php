@@ -29,7 +29,7 @@
                 <span class="about-video-tital"><em>COLLAGE / STUDENT</em></span>
               </p>
               <p data-toggle="modal" data-target="#instituteModal" id="cotching-inst">  <i class="fa fa-play-circle-o" aria-hidden="true" ></i>
-                <span class="about-video-tital"><em>COTCHING INSTITUTE</em></span>
+                <span class="about-video-tital"><em>COACHING INSTITUTE</em></span>
               </p>
             </div>
           </div>

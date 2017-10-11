@@ -109,4 +109,39 @@ class WorkshopCategoryController extends Controller
         }
         return Redirect::to('admin/manageWorkshopCategory');
     }
+
+    /**
+     *  delete workshop category
+     */
+    protected function delete(Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('category_id'));
+        if(isset($categoryId)){
+            $workshopCategory = WorkshopCategory::find($categoryId);
+            if(is_object($workshopCategory)){
+                DB::beginTransaction();
+                try
+                {
+                    if(is_object($workshopCategory->workshops) && false == $workshopCategory->workshops->isEmpty()){
+                        foreach($workshopCategory->workshops as $workshopDetail){
+                            if(is_object($workshopDetail->workshopVideos) && false == $workshopDetail->workshopVideos->isEmpty()){
+                                foreach($workshopDetail->workshopVideos as $workshopVideo){
+                                    $workshopVideo->delete();
+                                }
+                            }
+                            $workshopDetail->delete();
+                        }
+                    }
+                    $workshopCategory->delete();
+                    DB::commit();
+                    return Redirect::to('admin/manageWorkshopCategory')->with('message', 'Workshop category deleted successfully!');
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors('something went wrong.');
+                }
+            }
+        }
+        return Redirect::to('admin/manageWorkshopCategory');
+    }
 }

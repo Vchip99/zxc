@@ -282,6 +282,7 @@
               <li title="Placement Company Details"><a href="{{ url('admin/managePlacementCompanyDetails')}}"><i class="fa fa-circle-o"></i> Company Details</a></li>
               <li title="Placement Process"><a href="{{ url('admin/managePlacementProcess')}}"><i class="fa fa-circle-o"></i> Placement Process</a></li>
               <li title="Placement Faq"><a href="{{ url('admin/managePlacementFaq')}}"><i class="fa fa-circle-o"></i> Placement Faq</a></li>
+              <li title="Apply Job"><a href="{{ url('admin/manageApplyJob')}}"><i class="fa fa-circle-o"></i> Apply Job</a></li>
             </ul>
           </li>
           <li class="treeview">
@@ -313,13 +314,13 @@
   </aside>
   <div class="content-wrapper">
     @yield('module_title')
-    <section class="content">
+    <div class="content">
       <div class="row">
         <!-- <div class="col-sm-12"> -->
           @yield('admin_content')
         <!-- </div> -->
       </div>
-    </section>
+    </div>
   </div>
 <script type="text/javascript">
   $(document).ready(function(){

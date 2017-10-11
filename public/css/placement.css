@@ -91,6 +91,7 @@ ul.custom-list-style li:before{
   margin-right: 5px;
   width: 20px; /* same as padding-left set on li */
 }
+
 .tab-pane .panel-title{font-weight: bolder;}
 .tab-pane .panel{  border: none !important;    box-shadow: none;}
 .tab-pane .panel-body{text-align: justify;}

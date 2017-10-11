@@ -221,9 +221,14 @@
     if(document.getElementById("user")){
         var user_type = parseInt(document.getElementById("user").value);
     } else {
-        var user_type = 0;
+        var login_User_Type = parseInt(document.getElementById('login_User_Type').value);
+        if(3 == login_User_Type){
+          var user_type = 2;
+        } else {
+          var user_type = 0;
+        }
     }
-    if(user_type > 0) {
+
       $.ajax({
         method: "POST",
         url: "{{url('searchStudent')}}",
@@ -232,21 +237,19 @@
       .done(function( msg ) {
         if(2 == user_type){
           body = document.getElementById('students');
-          document.getElementById('lecture_hods').innerHTML = '';
-        } else if(3 == user_type){
+        } else if(3 == user_type || 4 == user_type){
           body = document.getElementById('lecture_hods');
-          document.getElementById('students').innerHTML = '';
         }
         body.innerHTML = '';
         if( 0 < msg.length){
           renderResult(msg,body,user_type);
         } else {
           if(2 == user_type){
-            body = document.getElementById('students');
-            document.getElementById('lecture_hods').innerHTML = '';
-          } else if(3 == user_type){
-            body = document.getElementById('lecture_hods');
             document.getElementById('students').innerHTML = '';
+            body = document.getElementById('students');
+          } else if(3 == user_type){
+            document.getElementById('lecture_hods').innerHTML = '';
+            body = document.getElementById('lecture_hods');
           }
           var eleTr = document.createElement('tr');
           var eleIndex = document.createElement('td');
@@ -256,37 +259,6 @@
           body.appendChild(eleTr);
         }
       });
-    } else {
-      if(2 == user_type){
-        body = document.getElementById('students');
-        document.getElementById('lecture_hods').innerHTML = '';
-        document.getElementById('students').innerHTML = '';
-      } else if(3 == user_type){
-        body = document.getElementById('lecture_hods');
-        document.getElementById('students').innerHTML = '';
-        document.getElementById('lecture_hods').innerHTML = '';
-      } else {
-        document.getElementById('student-record').classList.remove('hide');
-        body = document.getElementById('students');
-        body.innerHTML = '';
-        document.getElementById('lecture_hods').innerHTML = '';
-        document.getElementById('students').innerHTML = '';
-      }
-      var eleTr = document.createElement('tr');
-      var eleIndex = document.createElement('td');
-      if(0 == user_type) {
-        eleIndex.innerHTML = 'Select user type.';
-      } else {
-        eleIndex.innerHTML = 'Enter search string.';
-      }
-      if(3 == user_type){
-        eleIndex.setAttribute('colspan', '5');
-      } else {
-        eleIndex.setAttribute('colspan', '6');
-      }
-      eleTr.appendChild(eleIndex);
-      body.appendChild(eleTr);
-    }
   }
 
   function renderResult(msg,body,user_type){
@@ -333,6 +305,7 @@
       var urlStudentTest = "{{url('studentTestResults')}}/"+obj.id;
       var urlStudentCourse = "{{url('studentCourses')}}/"+obj.id;
       var urlStudentPlacement = "{{url('studentPlacement')}}/"+obj.id;
+      var urlStudentVideo = "{{url('studentVideo')}}/"+obj.id;
       var modelInnerHTML = '';
       modelInnerHTML='<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">Student Details</h4></div><div class="modal-body">';
       if(2 == user_type ){
@@ -340,6 +313,7 @@
       }
       modelInnerHTML +='<div class="form-group"><label>Email:</label> '+obj.email+'</div><div class="form-group"><label>Phone:</label> '+obj.phone+'</div><div class="form-group"><a href="'+urlStudentTest+'">Test Result</a></div><div class="form-group"><a href="'+urlStudentCourse+'">Course</a></div>';
       if(2 == user_type ){
+        modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Video</a></div>';
         modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
       }
       modelInnerHTML +='</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div>';

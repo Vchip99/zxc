@@ -108,6 +108,19 @@ hr{
   margin-top: 20px;
   margin-bottom: 20px;
 }
+.ckeditor_list ul{
+  list-style: none !important;
+  }
+.ckeditor_list ul li:before{
+  content: "\f192" !important; /* FontAwesome Unicode */
+  font-family: FontAwesome !important;
+  display: inline-block;
+  font-size: 20px;
+  color: #339999;
+  margin-left: -20px; /* same as padding-left set on li */
+  margin-right: 5px;
+  width: 20px; /* same as padding-left set on li */
+}
 </style>
 <script type="text/javascript">
     $.ajaxSetup({
@@ -140,16 +153,16 @@ hr{
     value="{{Auth::user()->id}}"
   @endif
 >
-<section id="" class="v_container v_bg_grey mrgn_50_top">
+<section id="" class="v_container v_bg_grey mrgn_50_top" style="min-height: 635px;">
   <div class="container ">
     <div class="row">
-      <div class="col-md-9">
+      <div class="col-md-9 ckeditor_list">
          <h2 class="v_h2_title">Placement Experiance</h2>
          <h3 class="v_h3_title ">{{$placementExperiance->title}}</h3>
          <p>
             {{ date('F d, Y', strtotime($placementExperiance->created_at))}} by <a>{{$placementExperiance->user->name}}</a>
          </p>
-         <p>{!! $placementExperiance->question !!}</p>
+         <p >{!! $placementExperiance->question !!}</p>
       </div>
       <div class="col-md-3">
         <div class="vchip-right-sidebar mrgn_30_top_btm">

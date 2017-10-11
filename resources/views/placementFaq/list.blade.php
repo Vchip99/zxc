@@ -41,7 +41,7 @@
           <th>Question</th>
           <!-- <th>Answer</th> -->
           <th>Edit Faq</th>
-          <!-- <th>Delete Company</th> -->
+          <th>Delete Company</th>
         </tr>
       </thead>
       <tbody>
@@ -57,14 +57,14 @@
               <a href="{{url('admin/placementFaq')}}/{{$placementFaq->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$placementFaq->name}}" />
                 </a>
             </td>
-            <!-- <td>
+            <td>
                 <a id="{{$placementFaq->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$placementFaq->name}}" />
-                <form id="deleteSubCategory_{{$placementFaq->id}}" action="{{url('admin/deleteSubCategory')}}" method="POST" style="display: none;">
+                <form id="deleteFaq_{{$placementFaq->id}}" action="{{url('admin/deletePlacementFaq')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
-                    <input type="hidden" name="subcat_id" value="{{$placementFaq->id}}">
+                    <input type="hidden" name="faq_id" value="{{$placementFaq->id}}">
                 </form>
-            </td> -->
+            </td>
           </tr>
           @endforeach
         @else
@@ -83,7 +83,7 @@
     function confirmDelete(ele){
       $.confirm({
           title: 'Confirmation',
-          content: 'If you delete this sub category, all associated subjects, papers and questions of this sub category will be deleted.',
+          content: 'Do you want to delete this faq.',
           type: 'red',
           typeAnimated: true,
           buttons: {
@@ -92,7 +92,7 @@
                     btnClass: 'btn-red',
                     action: function(){
                       var id = $(ele).attr('id');
-                      formId = 'deleteSubCategory_'+id;
+                      formId = 'deleteFaq_'+id;
                       document.getElementById(formId).submit();
                     }
                 },

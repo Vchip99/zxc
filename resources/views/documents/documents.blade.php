@@ -80,7 +80,7 @@
             <label><input class="search" type="checkbox" value="3" data-filter="difficulty" onclick="searchDocuments();"> Advanced</label>
           </div>
         </div>
-        <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Fees"> Fees</p>
+        <!-- <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Fees"> Fees</p>
         <div class="panel">
          <div class="checkbox">
             <label><input class="search" name="fees" type="radio" value="1" data-filter="fees" onclick="searchDocuments();"> Paid</label>
@@ -88,7 +88,7 @@
           <div class="checkbox">
             <label><input class="search" name="fees" type="radio" value="0" data-filter="fees" onclick="searchDocuments();"> Free</label>
           </div>
-        </div>
+        </div> -->
         <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Type of Document"> Type of Document </p>
         <div class="panel">
            <div class="checkbox">

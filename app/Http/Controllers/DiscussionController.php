@@ -98,44 +98,25 @@ class DiscussionController extends Controller
      *  create discussin post
      */
     protected function createPost(Request $request){
-        $v = Validator::make($request->all(), $this->validatePost);
-        if ($v->fails())
-        {
-            return redirect()->back()->withErrors($v->errors());
-        }
-
         DB::beginTransaction();
         try
         {
             $post = DiscussionPost::createPost($request);
             $postModuleId = trim($request->get('all_post_module_id'));
             DB::commit();
-            if(is_object($post)){
-                if( 1 == $postModuleId){
-                    return redirect()->route('myQuestions');
-                }
-            }
-            Session::put('show_comment_area', 0);
-            Session::put('show_post_area', $post->id);
         }
         catch(\Exception $e)
         {
             DB::rollback();
             return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('discussion');
+        return $this->getPosts();
     }
 
     /**
      *  create discussin post comment
      */
     protected function createComment(Request $request){
-        $v = Validator::make($request->all(), $this->validateComment);
-
-        if ($v->fails())
-        {
-            return redirect()->back()->withErrors($v->errors());
-        }
         DB::beginTransaction();
         try
         {
@@ -148,26 +129,18 @@ class DiscussionController extends Controller
                 Notification::addCommentNotification($notificationMessage, Notification::USERDISCUSSIONCOMMENTNOTIFICATION, $comment->id,$comment->user_id,$post->user_id);
             }
             DB::commit();
-            Session::put('show_comment_area', 0);
-            Session::put('show_post_area', $comment->discussion_post_id);
         }
         catch(\Exception $e)
         {
             DB::rollback();
-            return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('discussion');
+        return $this->getPosts();
     }
 
     /**
      *  create discussin post child comment
      */
     protected function createSubComment(Request $request){
-        $v = Validator::make($request->all(), $this->validateSubComment);
-        if ($v->fails())
-        {
-            return redirect()->back()->withErrors($v->errors());
-        }
         DB::beginTransaction();
         try
         {
@@ -187,15 +160,12 @@ class DiscussionController extends Controller
 
             $postModuleId = trim($request->get('all_post_module_id'));
             DB::commit();
-            Session::put('show_comment_area', 0);
-            Session::put('show_post_area', $subcomment->discussion_post_id);
         }
         catch(\Exception $e)
         {
             DB::rollback();
-            return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('discussion');
+        return $this->getPosts();
     }
 
     /**
@@ -203,13 +173,12 @@ class DiscussionController extends Controller
      */
     protected function getSubComments($subComments,$title){
         $postChildComments = [];
-        $user = new user ;
         foreach($subComments as $subComment){
             $postChildComments[$subComment->id]['body'] = $subComment->body;
             $postChildComments[$subComment->id]['id'] = $subComment->id;
             $postChildComments[$subComment->id]['discussion_post_id'] = $subComment->discussion_post_id;
             $postChildComments[$subComment->id]['discussion_comment_id'] = $subComment->discussion_comment_id;
-            $postChildComments[$subComment->id]['user_name'] = $user->find($subComment->user_id)->name;
+            $postChildComments[$subComment->id]['user_name'] = $subComment->user->name;
             $postChildComments[$subComment->id]['user_id'] = $subComment->user_id;
             $postChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
             $postChildComments[$subComment->id]['title'] = $title;
@@ -234,7 +203,7 @@ class DiscussionController extends Controller
             $postComments[$comment->id]['id'] = $comment->id;
             $postComments[$comment->id]['discussion_post_id'] = $comment->discussion_post_id;
             $postComments[$comment->id]['user_id'] = $comment->user_id;
-            $postComments[$comment->id]['user_name'] = $user->find($comment->user_id)->name;
+            $postComments[$comment->id]['user_name'] = $comment->user->name;
             $postComments[$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
             $postComments[$comment->id]['title'] = $title;
             $postComments[$comment->id]['user_image'] = $comment->user->photo;
@@ -251,13 +220,38 @@ class DiscussionController extends Controller
     protected function getDiscussionPostsByCategoryId(Request $request){
         $allPosts = [];
         $posts = DiscussionPost::where('category_id', $request->get('id'))->orderBy('id', 'desc')->get();
-        $user = new user ;
+        // $user = new user ;
         foreach ($posts as $post) {
             $allPosts['posts'][$post->id]['title'] = $post->title;
             $allPosts['posts'][$post->id]['body'] = $post->body;
             $allPosts['posts'][$post->id]['id'] = $post->id;
             $allPosts['posts'][$post->id]['user_id'] = $post->user_id;
-            $allPosts['posts'][$post->id]['user_name'] = $user->find($post->user_id)->name;
+            $allPosts['posts'][$post->id]['user_name'] = $post->user->name;
+            $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
+            $allPosts['posts'][$post->id]['user_image'] = $post->user->photo;
+
+            if($post->descComments){
+                $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
+            }
+        }
+        $allPosts['likesCount'] = DiscussionPostLike::getLikes();
+        $allPosts['commentLikesCount'] = DiscussionCommentLike::getLiksByPosts($posts);
+        $allPosts['subcommentLikesCount'] = DiscussionSubCommentLike::getLiksByPosts($posts);
+        return $allPosts;
+    }
+
+    /**
+     *  return posts
+     */
+    protected function getPosts(){
+        $allPosts = [];
+        $posts = DiscussionPost::orderBy('id', 'desc')->get();
+        foreach ($posts as $post) {
+            $allPosts['posts'][$post->id]['title'] = $post->title;
+            $allPosts['posts'][$post->id]['body'] = $post->body;
+            $allPosts['posts'][$post->id]['id'] = $post->id;
+            $allPosts['posts'][$post->id]['user_id'] = $post->user_id;
+            $allPosts['posts'][$post->id]['user_name'] = $post->user->name;
             $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
             $allPosts['posts'][$post->id]['user_image'] = $post->user->photo;
 
@@ -284,6 +278,7 @@ class DiscussionController extends Controller
             $allPosts['posts'][$post->id]['id'] = $post->id;
             $allPosts['posts'][$post->id]['user_name'] = $user->find($post->user_id)->name;
             $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
+            $allPosts['posts'][$post->id]['user_image'] = $post->user->photo;
 
             if($post->descComments){
                 $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
@@ -318,18 +313,15 @@ class DiscussionController extends Controller
                         $subcommentLike->delete();
                     }
                 }
-                Session::put('show_comment_area', $subcomment->discussion_comment_id);
-                Session::put('show_post_area', 0);
                 $subcomment->delete();
                 DB::commit();
             }
             catch(\Exception $e)
             {
                 DB::rollback();
-                return back()->withErrors('something went wrong.');
             }
         }
-        return Redirect::to('discussion');
+        return $this->getPosts();
     }
 
     protected function deleteComment(Request $request){
@@ -353,18 +345,15 @@ class DiscussionController extends Controller
                         $commentLike->delete();
                     }
                 }
-                Session::put('show_comment_area', 0);
-                Session::put('show_post_area', $comment->discussion_post_id);
                 $comment->delete();
                 DB::commit();
             }
             catch(\Exception $e)
             {
                 DB::rollback();
-                return back()->withErrors('something went wrong.');
             }
         }
-        return Redirect::to('discussion');
+        return $this->getPosts();
     }
 
     protected function deletePost(Request $request){
@@ -377,16 +366,13 @@ class DiscussionController extends Controller
                 $post->deleteCommantsAndSubComments();
                 $post->delete();
                 DB::commit();
-                Session::put('show_comment_area', 0);
-                Session::put('show_post_area', 0);
             }
             catch(\Exception $e)
             {
                 DB::rollback();
-                return back()->withErrors('something went wrong.');
             }
         }
-        return Redirect::to('discussion');
+        return $this->getPosts();
     }
 
     protected function updatePost(Request $request){
@@ -401,17 +387,14 @@ class DiscussionController extends Controller
                     $post->body = $question;
                     $post->save();
                     DB::commit();
-                    Session::put('show_comment_area', 0);
-                    Session::put('show_post_area', $post->id);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('discussion');
+        return $this->getPosts();
     }
 
     protected function updateComment(Request $request){
@@ -428,17 +411,14 @@ class DiscussionController extends Controller
                     $comment->discussion_post_id = $postId;
                     $comment->save();
                     DB::commit();
-                    Session::put('show_comment_area', 0);
-                    Session::put('show_post_area', $comment->discussion_post_id);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('discussion');
+        return $this->getPosts();
     }
 
     protected function updateSubComment(Request $request){
@@ -468,17 +448,14 @@ class DiscussionController extends Controller
                     $comment->discussion_comment_id = $commentId;
                     $comment->save();
                     DB::commit();
-                    Session::put('show_comment_area', 0);
-                    Session::put('show_post_area', $comment->discussion_post_id);
                 }
                 catch(\Exception $e)
                 {
                     DB::rollback();
-                    return back()->withErrors('something went wrong.');
                 }
             }
         }
-        return Redirect::to('discussion');
+        return $this->getPosts();
     }
 
     function goToPost(Request $request){

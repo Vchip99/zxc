@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Redirect, DB;
 use App\Libraries\InputSanitise;
 use App\Models\WorkshopCategory;
+use App\Models\WorkshopVideo;
 
 class WorkshopDetail extends Model
 {
@@ -90,6 +91,10 @@ class WorkshopDetail extends Model
 
     public function category(){
     	return $this->belongsTo(WorkshopCategory::class, 'workshop_category_id');
+    }
+
+    public function workshopVideos(){
+        return $this->hasMany(WorkshopVideo::class, 'workshop_details_id');
     }
 
     protected function getWorkshopsByCategory($categoryId){

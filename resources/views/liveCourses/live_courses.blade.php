@@ -120,7 +120,7 @@
             <label><input class="search" type="checkbox" value="3" data-filter="difficulty" onclick="searchLiveCourse();"> Advanced</label>
           </div>
         </div>
-        <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Fees" > Fees</p>
+        <!-- <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Fees" > Fees</p>
         <div class="panel">
           <div class="checkbox">
             <label><input class="search" name="fees" type="radio" value="1" data-filter="fees" onclick="searchLiveCourse();"> Paid</label>
@@ -128,7 +128,7 @@
           <div class="checkbox">
             <label><input class="search" name="fees" type="radio" value="0" data-filter="fees" onclick="searchLiveCourse();"> Free</label>
           </div>
-        </div>
+        </div> -->
         <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Others" > Others</p>
         <div class="panel">
           <div class="checkbox">
@@ -246,7 +246,7 @@
             <div class="icon " title="ANYTIME ANYWHERE LEARNING"><i class="fa fa-sun-o" aria-hidden="true"></i></div>
             <h3>ANYTIME ANYWHERE LEARNING</h3>
             <p>Choice of Web and Mobile Platform</p>
-            <p>Choose your own topic/time & pace</p>
+            <p>Choose your own topic, time & place</p>
             <a class="read_more" href="{{ asset('saveTimeSecurity')}}">Read More</a>
           </a>
         </div>
@@ -256,7 +256,7 @@
           <a href="{{ asset('saveTimeSecurity')}}" target="_blank">
             <div class="icon " title="SAFETY"><i class="fa fa-expeditedssl" aria-hidden="true"></i></div>
             <h3>SAFETY</h3>
-            <p>Learn @ safety of home</p>
+            <p>Learn safety @ home</p>
             <p>No traffic annoyance</p>
             <a class="read_more" href="{{ asset('saveTimeSecurity')}}">Read More</a>
           </a>
