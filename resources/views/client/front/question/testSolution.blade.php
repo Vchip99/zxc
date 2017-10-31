@@ -121,8 +121,10 @@
 							                    	B
 							                    @elseif($result->answer==3)
 							                    	C
-							                    @else
+							                    @elseif($result->answer==4)
 							                    	D
+							                    @else
+							                    	E
 							                    @endif
 							                @endif
 						                	</h4></b><br/>
@@ -142,6 +144,8 @@
 							                    	C
 							                    @elseif( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer == 4)
 							                    	D
+							                    @elseif( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer == 5)
+							                    	E
 							                    @else
 							                    	unsolved
 							                    @endif

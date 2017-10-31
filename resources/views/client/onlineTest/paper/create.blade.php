@@ -156,9 +156,9 @@
     <label for="name" class="col-sm-2 col-form-label">Paper Time:</label>
     <div class="col-sm-3">
       @if(isset($paper->id))
-        <input type="text" class="form-control" name="time" value="{{$paper->time}}" required="true">
+        <input type="text" class="form-control" name="time" id="time" value="{{$paper->time}}" required="true">
       @else
-        <input type="text" class="form-control" name="time" value="" required="true">
+        <input type="text" class="form-control" name="time" id="time" value="" >
       @endif
       @if($errors->has('time')) <p class="help-block">{{ $errors->first('time') }}</p> @endif
     </div>
@@ -336,14 +336,13 @@
   }
 
   function selectedSession(ele){
+    document.getElementById('selected_time_out').value = $(ele).val();
     if(1 == $(ele).val()){
-      document.getElementById('selected_time_out').value = $(ele).val();
       $('.duration').addClass('hide');
       $('.paper_duration').removeClass('hide');
       $.each($('.duration > input'), function(idx, obj){ $(obj).prop('required', false); });
       $('#time').prop('required', true);
     } else {
-      document.getElementById('selected_time_out').value = $(ele).val();
       $('.duration').removeClass('hide');
       $('.paper_duration').addClass('hide');
       $.each($('.duration > input'), function(idx, obj){ $(obj).prop('required', true); });
@@ -461,11 +460,13 @@
       $('.paper_duration').removeClass('hide');
       $.each($('.duration > input'), function(idx, obj){ $(obj).prop('required', false); });
       $('#time').prop('required', true);
+      document.getElementById('selected_time_out').value = 1;
     } else {
       $('.duration').removeClass('hide');
       $('.paper_duration').addClass('hide');
       $.each($('.duration > input'), function(idx, obj){ $(obj).prop('required', true); });
       $('#time').prop('required', false);
+      document.getElementById('selected_time_out').value = 0;
     }
   });
 </script>

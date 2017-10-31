@@ -53,7 +53,9 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
-                        $sections[$paperSection->id] = $paperSection;
+                        if(in_array($paperSection->id, array_keys($results['questions']))){
+                            $sections[$paperSection->id] = $paperSection;
+                        }
                     }
                 }
             }
@@ -191,7 +193,9 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
-                    $sections[$paperSection->id] = $paperSection;
+                    if(in_array($paperSection->id, array_keys($results['questions']))){
+                        $sections[$paperSection->id] = $paperSection;
+                    }
                 }
             }
         }
@@ -218,7 +222,9 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paper->id);
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
-                        $sections[$paperSection->id] = $paperSection;
+                        if(in_array($paperSection->id, array_keys($results['questions']))){
+                            $sections[$paperSection->id] = $paperSection;
+                        }
                     }
                 }
             }
@@ -250,7 +256,9 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
-                    $sections[$paperSection->id] = $paperSection;
+                    if(in_array($paperSection->id, array_keys($questions))){
+                        $sections[$paperSection->id] = $paperSection;
+                    }
                 }
             }
         }
@@ -277,7 +285,9 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
-                    $sections[$paperSection->id] = $paperSection;
+                    if(in_array($paperSection->id, array_keys($questions))){
+                        $sections[$paperSection->id] = $paperSection;
+                    }
                 }
             }
         }

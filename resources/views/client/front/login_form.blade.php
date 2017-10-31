@@ -66,7 +66,7 @@
                           </div>
                           <div id="loginErrorMsg" class="alert alert-error hide">Wrong username or password</div>
                           <div class="checkbox">
-                            <label title="Remember login">
+                            <label style="color: white;">
                               <input type="checkbox" name="remember" id="remember"> Remember login
                             </label>
                           </div>

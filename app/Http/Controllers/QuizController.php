@@ -59,7 +59,9 @@ class QuizController extends Controller
                 $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
-                        $sections[$paperSection->id] = $paperSection;
+                        if(in_array($paperSection->id, array_keys($results['questions']))){
+                            $sections[$paperSection->id] = $paperSection;
+                        }
                     }
                 }
             }
@@ -91,7 +93,9 @@ class QuizController extends Controller
             $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
-                    $sections[$paperSection->id] = $paperSection;
+                    if(in_array($paperSection->id, array_keys($questions))){
+                        $sections[$paperSection->id] = $paperSection;
+                    }
                 }
             }
         }
@@ -247,7 +251,9 @@ class QuizController extends Controller
             $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
-                    $sections[$paperSection->id] = $paperSection;
+                    if(in_array($paperSection->id, array_keys($results['questions']))){
+                        $sections[$paperSection->id] = $paperSection;
+                    }
                 }
             }
         }
@@ -275,7 +281,9 @@ class QuizController extends Controller
                 $paperSections = PaperSection::where('test_subject_paper_id', $paper->id)->get();
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
-                        $sections[$paperSection->id] = $paperSection;
+                        if(in_array($paperSection->id, array_keys($results['questions']))){
+                            $sections[$paperSection->id] = $paperSection;
+                        }
                     }
                 }
             }
@@ -307,7 +315,9 @@ class QuizController extends Controller
             $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
-                    $sections[$paperSection->id] = $paperSection;
+                    if(in_array($paperSection->id, array_keys($questions))){
+                        $sections[$paperSection->id] = $paperSection;
+                    }
                 }
             }
         }

@@ -144,7 +144,7 @@
       @if(isset($paper->id))
         <input type="text" class="form-control" name="time" id="time" value="{{$paper->time}}"  placeholder="time in seconds" required="true">
       @else
-        <input type="text" class="form-control" name="time" id="time" value="" placeholder="time in seconds" required="true">
+        <input type="text" class="form-control" name="time" id="time" value="" placeholder="time in seconds">
       @endif
       @if($errors->has('time')) <p class="help-block">{{ $errors->first('time') }}</p> @endif
     </div>
@@ -399,11 +399,13 @@
         $('.paper_duration').removeClass('hide');
         $.each($('.duration > input'), function(idx, obj){ $(obj).prop('required', false); });
         $('#time').prop('required', true);
+        document.getElementById('selected_time_out').value = 1;
       } else {
         $('.duration').removeClass('hide');
         $('.paper_duration').addClass('hide');
         $.each($('.duration > input'), function(idx, obj){ $(obj).prop('required', true); });
         $('#time').prop('required', false);
+        document.getElementById('selected_time_out').value = 0;
       }
     });
 </script>

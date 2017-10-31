@@ -742,14 +742,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('getOnlinePapersBySubjectId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@getOnlinePapersBySubjectId');
   	Route::post('getOnlinePaperSectionsByInstituteCourseId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@getOnlinePaperSectionsByInstituteCourseId');
 
-  	// // paper sessions
-  	// Route::get('manageOnlinePaperSession', 'Client\OnlineTest\ClientOnlinePaperSessionController@show');
-  	// Route::get('createOnlinePaperSession', 'Client\OnlineTest\ClientOnlinePaperSessionController@create');
-  	// Route::post('createOnlinePaperSession', 'Client\OnlineTest\ClientOnlinePaperSessionController@store');
-  	// Route::get('onlinepapersession/{id}/edit', 'Client\OnlineTest\ClientOnlinePaperSessionController@edit');
-  	// Route::put('updateOnlinePaperSession', 'Client\OnlineTest\ClientOnlinePaperSessionController@update');
-  	// Route::post('getOnlinePaperSectionsByInstituteCourseId', 'Client\OnlineTest\ClientOnlinePaperSessionController@getOnlinePaperSectionsByInstituteCourseId');
-
   	// test question
   	Route::get('manageOnlineTestQuestion', 'Client\OnlineTest\ClientOnlineTestQuestionController@index');
   	Route::post('showOnlineTestQuestion', 'Client\OnlineTest\ClientOnlineTestQuestionController@show');

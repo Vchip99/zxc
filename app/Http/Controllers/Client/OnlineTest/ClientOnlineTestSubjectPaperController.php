@@ -135,7 +135,7 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
                 }
             }
             catch(\Exception $e)
-            {   dd($e);
+            {
                 DB::connection('mysql2')->rollback();
                 return redirect()->back()->withErrors('something went wrong.');
             }

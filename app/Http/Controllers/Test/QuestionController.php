@@ -442,20 +442,21 @@ class QuestionController extends Controller
                         'answer2' => ($question->option_b)?:'',
                         'answer3' => ($question->option_c)?:'',
                         'answer4' => ($question->option_d)?:'',
-                        'answer5' => 0,
+                        'answer5' => ($question->option_e)?:'',
                         'answer6' => 0,
                         'answer' => $question->right_answer,
                         'min' => ($question->min)?:0,
                         'max' => ($question->max)?:0,
-                        'section_type' => (int) $question->section_type,
                         'question_type' => (int) $question->question_type,
                         'solution' => $question->solution,
                         'positive_marks' => $question->positive_mark,
                         'negative_marks' => $question->negative_mark,
+                        'common_data' => $question->common_data,
                         'category_id' => $request->get('category'),
                         'subcat_id' =>  $request->get('subcategory'),
                         'subject_id' => $request->get('subject'),
                         'paper_id' => $request->get('paper'),
+                        'section_type' => $request->get('section_type')
                     ];
                 }
 

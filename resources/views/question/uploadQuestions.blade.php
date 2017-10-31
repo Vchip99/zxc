@@ -60,12 +60,21 @@
 		    <div class="form-group row @if ($errors->has('paper')) has-error @endif">
 			    <label for="name" class="col-sm-2 col-form-label">Paper Name:</label>
 			    <div class="col-sm-3">
-			    	<select id="paper" class="form-control" name="paper" required title="Paper">
+			    	<select id="paper" class="form-control" name="paper" required title="Paper" onChange="selectPaperSection();">
 			    		<option value="">Select Paper</option>
 			    	</select>
 			    	@if($errors->has('paper')) <p class="help-block">{{ $errors->first('paper') }}</p> @endif
 			    </div>
 		  	</div>
+		  	<div class="form-group row @if ($errors->has('section_type')) has-error @endif">
+		    	<label class="col-sm-2 col-form-label">Select Section:</label>
+			    <div class="col-sm-3">
+		    		<select id="section_type" class="form-control" name="section_type" required title="Section">
+			    		<option value="">Select Section</option>
+			    	</select>
+			        @if($errors->has('section_type')) <p class="help-block">{{ $errors->first('section_type') }}</p> @endif
+			    </div>
+		    </div>
 		  	<div class="form-group row">
 		    	<label class="col-sm-2 col-form-label">Upload File:</label>
 			    <div class="col-sm-3">
@@ -169,6 +178,32 @@
     	subjectId = parseInt($(ele).val());
     	getPapersBySubjectId(subjectId);
   	}
+
+  	function selectPaperSection(){
+  		var paperId = parseInt(document.getElementById('paper').value);
+		if( 0 < paperId ){
+	      	$.ajax({
+	             	method: "POST",
+	              	url: "{{url('admin/getPaperSectionsByPaperId')}}",
+	              	data: {paper_id:paperId}
+          	}).done(function( msg ) {
+	            select = document.getElementById('section_type');
+	            select.innerHTML = '';
+	            var opt = document.createElement('option');
+	            opt.value = '';
+	            opt.innerHTML = 'Select Section';
+	            select.appendChild(opt);
+	            if( 0 < msg.length){
+		            $.each(msg, function(idx, obj) {
+		                var opt = document.createElement('option');
+		                opt.value = obj.id;
+		                opt.innerHTML = obj.name;
+		                select.appendChild(opt);
+		            });
+	            }
+          	});
+    	}
+	}
 
 </script>
 
