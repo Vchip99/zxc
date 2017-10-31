@@ -366,13 +366,13 @@ _.menuDir = function(dir, e) {
     });
 
     // DOWNLOAD
-    if (_.support.zip) {
-        _.menu.addDivider();
-        _.menu.addItem("kcact:download", _.label("Download"), function() {
-            _.post(_.getURL("downloadDir"), {dir:data.path});
-            return false;
-        });
-    }
+    // if (_.support.zip) {
+    //     _.menu.addDivider();
+    //     _.menu.addItem("kcact:download", _.label("Download"), function() {
+    //         _.post(_.getURL("downloadDir"), {dir:data.path});
+    //         return false;
+    //     });
+    // }
 
     if (_.access.dirs.create || _.access.dirs.rename || _.access.dirs['delete'])
         _.menu.addDivider();

@@ -14,6 +14,8 @@ use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientScore;
 use App\Models\ClientUserSolution;
+use App\Models\ClientOnlinePaperSection;
+use App\Models\RegisterClientOnlinePaper;
 use Elibyy\TCPDF\Facades\TCPDF;
 
 class ClientOnlineQuestionFrontController extends ClientHomeController
@@ -36,6 +38,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
      */
     protected function getQuestions(Request $request){
         $results = [];
+        $sections = [];
         $categoryId = $request->get('category_id');
         $subcategoryId = $request->get('sub_category_id');
         $subjectId = $request->get('subject_id');
@@ -46,10 +49,17 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             foreach($questions as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
-
+            if(count(array_keys($results['questions'])) > 0){
+                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
+                if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                    foreach($paperSections as $paperSection){
+                        $sections[$paperSection->id] = $paperSection;
+                    }
+                }
+            }
             $paper = ClientOnlineTestSubjectPaper::getOnlineTestSubjectPaperById($paperId, $request);
 
-        	return view('client.front.question.questions', compact('results','paper'));
+        	return view('client.front.question.questions', compact('results','paper', 'sections'));
         } else {
             return Redirect::to('/');
         }
@@ -59,7 +69,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
      *  show results of questions
      */
     protected function getResult(Request $request){
-    	if(is_array($request->except(['_token', 'show-tech', 'show-apt']))){
+    	if(is_array($request->except(['_token']))){
             DB::connection('mysql2')->beginTransaction();
             try
             {
@@ -71,6 +81,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $totalMarks=0;
                 $instituteCourseId = 0;
                 $userAnswers = [];
+                $questionIds = [];
                 $userId = Auth::guard('clientuser')->user()->id;
 
                 $categoryId = $request->get('category_id');
@@ -78,9 +89,14 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $subjectId = $request->get('subject_id');
                 $paperId = $request->get('paper_id');
 
-                $quesResults = $request->except(['_token', 'show-tech', 'show-apt']);
-                $ids = array_keys($quesResults);
-                $questions = ClientOnlineTestQuestion::getQuestionsByIds($ids);
+                $quesResults = $request->except(['_token', 'category_id', 'sub_category_id', 'subject_id', 'paper_id']);
+                foreach($quesResults as $index => $quesResult){
+                    if($index > 0){
+                        $questionIds[] = $index;
+                    }
+                }
+                $questions = ClientOnlineTestQuestion::getQuestionsByIds($questionIds);
+
 
                 foreach($questions as $index => $question){
                     if( 0 == $index){
@@ -137,10 +153,11 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 }
 
                 ClientUserSolution::saveUserAnswers($userAnswers);
+                RegisterClientOnlinePaper::registerTestPaper($userId, $paperId);
+                DB::connection('mysql2')->commit();
                 $rank =ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$score->test_score);
                 $totalRank =ClientScore::getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId);
-                 DB::connection('mysql2')->commit();
-            	return view('client.front.question.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank'));
+            	return view('client.front.question.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank', 'score'));
             }
             catch(\Exception $e)
             {
@@ -157,6 +174,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
     protected function getSolutions(Request $request){
         $results     = [];
         $userResults = [];
+        $sections = [];
         $userId = Auth::guard('clientuser')->user()->id;
         $categoryId = $request->get('category_id');
         $subcategoryId = $request->get('sub_category_id');
@@ -169,16 +187,25 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         foreach($questions as $question){
             $results['questions'][$question->section_type][] = $question;
         }
+        if(count(array_keys($results['questions'])) > 0){
+            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
+            if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                foreach($paperSections as $paperSection){
+                    $sections[$paperSection->id] = $paperSection;
+                }
+            }
+        }
         $userSolutions = ClientUserSolution::getClientUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $score->id, $subjectId, $paperId);
         foreach ($userSolutions  as $key => $result) {
             $userResults[$result->ques_id] = $result;
         }
-        return view('client.front.question.solutions', compact('results', 'userResults', 'score'));
+        return view('client.front.question.solutions', compact('results', 'userResults', 'score', 'sections'));
     }
 
     protected function showUserTestSolution(Request $request){
         $paper = ClientOnlineTestSubjectPaper::find($request->paper_id);
-
+        $sections = [];
+        $userResults = [];
         $userId = $request->user_id;
         $scoreId = $request->score_id;
         if(is_object($paper)){
@@ -187,13 +214,20 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             foreach($questions as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
-
+            if(count(array_keys($results['questions'])) > 0){
+                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paper->id);
+                if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                    foreach($paperSections as $paperSection){
+                        $sections[$paperSection->id] = $paperSection;
+                    }
+                }
+            }
             $userSolutions = ClientUserSolution::getClientUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $scoreId, $paper->subject_id, $paper->id);
 
             foreach ($userSolutions  as $key => $result) {
                 $userResults[$result->ques_id] = $result;
             }
-            return view('client.front.question.testSolution', compact('results', 'userResults', 'paper'));
+            return view('client.front.question.testSolution', compact('results', 'userResults', 'paper', 'sections'));
         }
     }
 
@@ -202,7 +236,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
      *  show all question by categoryId by sub categoryId by subjectId by paperId
      */
     protected function getAllQuestions(Request $request){
-
+        $sections = [];
         $categoryId = $request->get('category');
         $subcategoryId = $request->get('subcategory');
         $subjectId = $request->get('subject');
@@ -212,14 +246,23 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
+        if(count(array_keys($questions)) > 0){
+            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
+            if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                foreach($paperSections as $paperSection){
+                    $sections[$paperSection->id] = $paperSection;
+                }
+            }
+        }
         $clientSubdomain = $request->route()->getParameter('client');
-        return view('client.front.question.show_questions', compact('questions', 'clientSubdomain'));
+        return view('client.front.question.show_questions', compact('questions', 'clientSubdomain', 'sections'));
     }
 
     /**
      *  show all question  and their results by categoryId by sub categoryId by subjectId by paperId and download as pdf
      */
     protected function downloadQuestions($subdomain, $category, $subcategory, $subject, $paper,Request $request){
+        $sections = [];
         $categoryId = $category;
         $subcategoryId = $subcategory;
         $subjectId = $subject;
@@ -230,58 +273,60 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
+        if(count(array_keys($questions)) > 0){
+            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
+            if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                foreach($paperSections as $paperSection){
+                    $sections[$paperSection->id] = $paperSection;
+                }
+            }
+        }
 
         $html = '';
         $html .= '<style>'.file_get_contents(asset('/css/bootstrap.min.css')).'</style>';
         $html .= '<style>'.file_get_contents(asset('/css/main.css')).'</style>';
         $html .= '<style>.watermark {
-    position: absolute;
-    opacity: 0.25;
-    font-size: 50px;
-    width: 30%;
-    text-align: center;
-    z-index: 1000;
-    color: #ddd;
-}</style>';
-
-        if( !empty($questions[0]) && count($questions[0]) > 0){
-            $html .= '<a class="btn btn-primary" style="width:100px;" title="Technical">Technical</a>';
-            foreach($questions[0] as $index => $question){
-                $number = $index + 1;
-                $html .= '<div class="panel-body">
-                            <div ><span class="watermark">'.$clientSubdomain.'</span>
-                                <p class="questions" >
-                                    <span class="btn btn-sq-xs btn-info">'.$number .'.</span> '.$question->name.'</p>';
-                $html .= '<p>';
-                if(1 == $question->question_type){
-                    $html .= '<div class="row">A. '.$question->answer1.'</div>';
-                    $html .= '<div class="row">B. '.$question->answer2.'</div>';
-                    $html .= '<div class="row">C. '.$question->answer3.'</div>';
-                    $html .= '<div class="row">D. '.$question->answer4.'</div>';
-                } else {
-                    $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
-                }
-                $html .= '</p></div></div>';
-            }
+            position: absolute;
+            opacity: 0.25;
+            font-size: 50px;
+            width: 30%;
+            text-align: center;
+            z-index: 1000;
+            color: #ddd;
         }
-        if( !empty($questions[1]) && count($questions[1]) > 0){
-            $html .= '<a class="btn btn-primary" style="width:100px; padding: 6px 12px;" title="Aptitude">Aptitude</a>';
-            foreach($questions[1] as $index => $question){
-                $number = $index + 1;
-                $html .= '<div class="panel-body">
-                            <div ><span class="watermark">'.$clientSubdomain.'</span>
-                                <p class="questions" >
-                                    <span class="btn btn-sq-xs btn-info">'. $number .'.</span> '.$question->name.'</p>';
-                $html .= '<p>';
-                if(1 == $question->question_type){
-                    $html .= '<div class="row">A. '.$question->answer1.'</div>';
-                    $html .= '<div class="row">B. '.$question->answer2.'</div>';
-                    $html .= '<div class="row">C. '.$question->answer3.'</div>';
-                    $html .= '<div class="row">D. '.$question->answer4.'</div>';
-                } else {
-                    $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
+        .answer{
+            padding-left: 20px !important;
+        }</style>';
+
+        if(count($sections) > 0){
+            foreach($sections as $section){
+                if(count($questions[$section->id]) > 0){
+                    $html .= '<a class="btn btn-primary" style="width:100px;" title="'.$section->name.'">'.$section->name.'</a>';
+                    foreach($questions[$section->id] as $index => $question){
+                        $number = $index + 1;
+                        $html .= '<div class="panel-body">
+                                    <div ><span class="watermark">'.$clientSubdomain.'</span>
+                                        <p class="questions" >';
+                        if(!empty($question->common_data)){
+                            $html .= '<b>Common Data:</b>';
+                            $html .= '<span>'.$question->common_data.'</span><hr/>';
+                        }
+                        $html .= '<span class="btn btn-sq-xs btn-info">'.$number .'.</span> '.$question->name.'</p><p>';
+                        // $html .= '<p>';
+                        if(1 == $question->question_type){
+                            $html .= '<div class="row">A. '.$question->answer1.'</div>';
+                            $html .= '<div class="row">B. '.$question->answer2.'</div>';
+                            $html .= '<div class="row">C. '.$question->answer3.'</div>';
+                            $html .= '<div class="row">D. '.$question->answer4.'</div>';
+                            if(!empty($question->answer5)){
+                                $html .= '<div class="row">E. '.$question->answer5.'</div>';
+                            }
+                        } else {
+                            $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
+                        }
+                        $html .= '</p></div></div>';
+                    }
                 }
-                $html .= '</p></div></div>';
             }
         }
 

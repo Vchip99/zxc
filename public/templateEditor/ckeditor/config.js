@@ -20,7 +20,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.toolbar = [
 		{ name: 'links', items: [ 'Link' ] },
 		// { name: 'insert' },
-		{ name: 'insert', items: [ 'Image', 'Youtube', ] },
+		{ name: 'insert', items: [ 'Image', 'Youtube', 'EqnEditor'] },
 		{ name: 'basicstyles', groups: [ 'basicstyles' ], items: [ 'Bold', 'Italic' ] },
 		{ name: 'paragraph', groups: [ 'list' ], items: [ 'NumberedList', 'BulletedList' ] }
 	];
@@ -38,6 +38,6 @@ CKEDITOR.editorConfig = function( config ) {
 	// config.autoParagraph = false;
 	config.removePlugins = 'pastefromword';
 	config.forcePasteAsPlainText = true;
-	config.extraPlugins = 'youtube';
+	config.extraPlugins = 'youtube,eqneditor';
 
 };

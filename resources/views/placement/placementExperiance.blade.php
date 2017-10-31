@@ -180,7 +180,8 @@ hr{
   </div>
 </section>
   <footer class="blog-footer ">
-    <p>Blog  by <a href="http://vchiptech.com/">Vishes Agrawal</a>.</p>
+    <!-- <p>Blog  by <a href="http://vchiptech.com/">Vishes Agrawal</a>.</p> -->
+    <p>Shared by {{$placementExperiance->user->name}}</p>
     <p>
       <a href="#">Back to top</a>
     </p>

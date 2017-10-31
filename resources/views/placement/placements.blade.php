@@ -326,7 +326,7 @@ ul.table_list{ margin-left: -30px; }
                           @endforeach
                         @endif
                         </ul>
-                        <p><b>official Website :</b> {{ (is_object($companyDetails))?$companyDetails->website:NULL}}</p>
+                        <p><b>Official Website :</b> {{ (is_object($companyDetails))?$companyDetails->website:NULL}}</p>
                       </div>
                     </div>
                   </div>
@@ -392,7 +392,7 @@ ul.table_list{ margin-left: -30px; }
                       <div class="panel-heading link"><a href="{!! (is_object($companyDetails))?$companyDetails->mock_test_link:NULL !!}">Sample Paper</a>
                       </div>
                     </div>
-                    <span>NOTE</span> all information provide about BHEL is not directly come from BHEL . we put this information from net.
+                    <span>NOTE: </span> all information provide about {{ (is_object($companyDetails))?$companyDetails->company->name:'company'}} is not directly come from {{ (is_object($companyDetails))?$companyDetails->company->name:'company'}} . we put this information from net.
                     <br/><br/>
                     <div class="">
                       <div class=" with-nav-tabs">

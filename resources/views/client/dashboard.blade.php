@@ -93,7 +93,6 @@
                   <span class="pull-right-container"></span>
                 </a>
               </li>
-               <!-- <li><a href="#nav-logo"><i class="fa fa-circle-o"></i> Nav-logo</a></li> -->
                 <li><a href="#vchip-header" title="Header"><i class="fa fa-circle-o"></i>Header</a></li>
                 @if(1 == $subdomain->about_show_hide)
                 <li><a href="#about1" title="About us"><i class="fa fa-circle-o"></i>About us

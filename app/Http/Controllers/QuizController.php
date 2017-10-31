@@ -9,6 +9,8 @@ use App\Models\Score;
 use App\Models\Question;
 use App\Models\UserSolution;
 use App\Models\TestSubjectPaper;
+use App\Models\PaperSection;
+use App\Models\RegisterPaper;
 use Session, Redirect, DB;
 use Elibyy\TCPDF\Facades\TCPDF;
 
@@ -40,6 +42,7 @@ class QuizController extends Controller
      */
     protected function getQuestions(Request $request){
         $results = [];
+        $sections = [];
         $categoryId = $request->get('category_id');
         $subcategoryId = $request->get('sub_category_id');
         $subjectId = $request->get('subject_id');
@@ -51,9 +54,19 @@ class QuizController extends Controller
             foreach($questions as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
+
+            if(count(array_keys($results['questions'])) > 0){
+                $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
+                if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                    foreach($paperSections as $paperSection){
+                        $sections[$paperSection->id] = $paperSection;
+                    }
+                }
+            }
+
             $paper = $this->getPaperById($paperId);
 
-    	   return view('quiz.questions', compact('results','paper'));
+    	   return view('quiz.questions', compact('results','paper', 'sections'));
         } else {
             return Redirect::to('/');
         }
@@ -63,6 +76,8 @@ class QuizController extends Controller
      *  show all question by categoryId by sub categoryId by subjectId by paperId
      */
     protected function getAllQuestions(Request $request){
+        $questions = [];
+        $sections = [];
         $categoryId = $request->get('category');
         $subcategoryId = $request->get('subcategory');
         $subjectId = $request->get('subject');
@@ -72,8 +87,16 @@ class QuizController extends Controller
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
+        if(count(array_keys($questions)) > 0){
+            $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
+            if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                foreach($paperSections as $paperSection){
+                    $sections[$paperSection->id] = $paperSection;
+                }
+            }
+        }
 
-        return view('quiz.show_questions', compact('questions'));
+        return view('quiz.show_questions', compact('questions', 'sections'));
     }
 
     /**
@@ -120,6 +143,7 @@ class QuizController extends Controller
                 $marks=0;
                 $totalMarks=0;
                 $userAnswers = [];
+                $questionIds = [];
                 $userId = Auth::user()->id;
                 $collegeId = Auth::user()->college_id;
 
@@ -128,10 +152,13 @@ class QuizController extends Controller
                 $subjectId = $request->get('subject_id');
                 $paperId = $request->get('paper_id');
 
-
-                $quesResults = $request->except('_token');
-                $ids = array_keys($quesResults);
-                $questions = Question::getQuestionsByIds($ids);
+                $quesResults = $request->except(['_token', 'category_id', 'sub_category_id', 'subject_id', 'paper_id']);
+                foreach($quesResults as $index => $quesResult){
+                    if($index > 0){
+                        $questionIds[] = $index;
+                    }
+                }
+                $questions = Question::getQuestionsByIds($questionIds);
                 foreach($questions as $question){
                     if($question->answer == $quesResults[$question->id] && $question->question_type == 1){
                         $rightAnswer++;
@@ -182,11 +209,12 @@ class QuizController extends Controller
                     $userAnswers[$ind]['score_id'] = $score->id;
                 }
                 UserSolution::saveUserAnswers($userAnswers);
+                RegisterPaper::registerTestPaper($userId, $paperId);
+                DB::commit();
                 $rank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId,$paperId,$score->test_score,$collegeId);
                 $totalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId,$collegeId);
 
-                DB::commit();
-                return view('quiz.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank'));
+                return view('quiz.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank', 'score'));
             }
             catch(\Exception $e)
             {
@@ -215,16 +243,25 @@ class QuizController extends Controller
         foreach($questions as $question){
             $results['questions'][$question->section_type][] = $question;
         }
+        if(count(array_keys($results['questions'])) > 0){
+            $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
+            if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                foreach($paperSections as $paperSection){
+                    $sections[$paperSection->id] = $paperSection;
+                }
+            }
+        }
         $userSolutions = UserSolution::getUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $score->id, $subjectId, $paperId);
 
         foreach ($userSolutions  as $key => $result) {
             $userResults[$result->ques_id] = $result;
         }
 
-        return view('quiz.solutions', compact('results', 'userResults', 'score'));
+        return view('quiz.solutions', compact('results', 'userResults', 'score', 'sections'));
     }
 
     protected function showUserTestSolution(Request $request){
+        $sections = [];
         $paper = TestSubjectPaper::find($request->paper_id);
         $userId = $request->user_id;
         $scoreId = $request->score_id;
@@ -234,13 +271,21 @@ class QuizController extends Controller
             foreach($questions as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
+            if(count(array_keys($results['questions'])) > 0){
+                $paperSections = PaperSection::where('test_subject_paper_id', $paper->id)->get();
+                if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                    foreach($paperSections as $paperSection){
+                        $sections[$paperSection->id] = $paperSection;
+                    }
+                }
+            }
+
             $userSolutions = UserSolution::getUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $scoreId, $paper->test_subject_id, $paper->id);
             foreach ($userSolutions  as $key => $result) {
                 $userResults[$result->ques_id] = $result;
             }
 
-
-            return view('quiz.testSolution', compact('results', 'userResults', 'paper'));
+            return view('quiz.testSolution', compact('results', 'userResults', 'paper', 'sections'));
         }
     }
 
@@ -248,6 +293,7 @@ class QuizController extends Controller
      *  show all question by categoryId by sub categoryId by subjectId by paperId
      */
     protected function downloadQuestions($category, $subcategory, $subject, $paper,Request $request){
+        $sections = [];
         $categoryId = $category;
         $subcategoryId = $subcategory;
         $subjectId = $subject;
@@ -257,61 +303,63 @@ class QuizController extends Controller
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
+        if(count(array_keys($questions)) > 0){
+            $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
+            if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                foreach($paperSections as $paperSection){
+                    $sections[$paperSection->id] = $paperSection;
+                }
+            }
+        }
         $html = '';
         $html .= '<style>'.file_get_contents(asset('/css/bootstrap.min.css')).'</style>';
         $html .= '<style>'.file_get_contents(asset('/css/main.css')).'</style>';
         $html .= '<style>.watermark {
-    position: absolute;
-    opacity: 0.25;
-    font-size: 30px;
-    width: 50%;
-    text-align: center;
-    z-index: 1000;
-    color: #ddd;
-}</style>';
-
-        if( !empty($questions[0]) && count($questions[0]) > 0){
-            $html .= '<a class="btn btn-primary" style="width:100px;" title="Technical">Technical</a>';
-            foreach($questions[0] as $index => $question){
-                $number = $index + 1;
-                $html .= '<div class="panel-body"><span class="watermark">Vchip Technology</span>
-                            <div >
-                                <p class="questions" >
-                                    <span class="btn btn-sq-xs btn-info">'.$number .'.</span> '.$question->name.'</p>';
-                $html .= '<p>';
-                if(1 == $question->question_type){
-                    $html .= '<div class="row">A. '.$question->answer1.'</div>';
-                    $html .= '<div class="row">B. '.$question->answer2.'</div>';
-                    $html .= '<div class="row">C. '.$question->answer3.'</div>';
-                    $html .= '<div class="row">D. '.$question->answer4.'</div>';
-                } else {
-                    $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
+            position: absolute;
+            opacity: 0.25;
+            font-size: 30px;
+            width: 50%;
+            text-align: center;
+            z-index: 1000;
+            color: #ddd;
+        }
+        .answer{
+            padding-left: 20px !important;
+        }
+        img{
+            max-width: 100%;
+            height: auto;
+        }</style>';
+        if(count($sections) > 0){
+            foreach($sections as $section){
+                if(count($questions[$section->id]) > 0){
+                    $html .= '<a class="btn btn-primary" style="width:100px;" title="'.$section->name.'">'.$section->name.'</a>';
+                    foreach($questions[$section->id] as $index => $question){
+                        $number = $index + 1;
+                        $html .= '<div class="panel-body"><span class="watermark">Vchip Technology</span>
+                                    <div >
+                                        <p class="questions" >';
+                        if(!empty($question->common_data)){
+                            $html .= '<b>Common Data:</b>';
+                            $html .= '<span>'.$question->common_data.'</span><hr/>';
+                        }
+                        $html .= '<span class="btn btn-sq-xs btn-info">'.$number .'.</span> '.$question->name.'</p><p>';
+                        if(1 == $question->question_type){
+                            $html .= '<div class="row answer">A. '.$question->answer1.'</div>';
+                            $html .= '<div class="row answer">B. '.$question->answer2.'</div>';
+                            $html .= '<div class="row answer">C. '.$question->answer3.'</div>';
+                            $html .= '<div class="row answer">D. '.$question->answer4.'</div>';
+                            if(!empty($question->answer5)){
+                                $html .= '<div class="row">E. '.$question->answer5.'</div>';
+                            }
+                        } else {
+                            $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
+                        }
+                        $html .= '</p></div></div>';
+                    }
                 }
-                $html .= '</p></div></div>';
             }
         }
-        if( !empty($questions[1]) && count($questions[1]) > 0){
-            $html .= '<a class="btn btn-primary" style="width:100px; padding: 6px 12px;" title="Aptitude">Aptitude</a>';
-            foreach($questions[1] as $index => $question){
-                $number = $index + 1;
-                $html .= '<div class="panel-body">
-                            <div ><span class="watermark">Vchip Technology</span>
-                                <p class="questions" >
-                                    <span class="btn btn-sq-xs btn-info">'. $number .'.</span> '.$question->name.'</p>';
-                $html .= '<p>';
-                if(1 == $question->question_type){
-                    $html .= '<div class="row">A. '.$question->answer1.'</div>';
-                    $html .= '<div class="row">B. '.$question->answer2.'</div>';
-                    $html .= '<div class="row">C. '.$question->answer3.'</div>';
-                    $html .= '<div class="row">D. '.$question->answer4.'</div>';
-                } else {
-                    $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
-                }
-                $html .= '</p></div></div>';
-            }
-        }
-
-
         $pdf = new TCPDF();
         $pdf::SetTitle('Vchip Technology');
         $pdf::AddPage();

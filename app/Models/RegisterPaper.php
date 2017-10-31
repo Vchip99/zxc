@@ -14,9 +14,7 @@ class RegisterPaper extends Model
      */
     protected $fillable = ['user_id', 'test_subject_paper_id'];
 
-    protected static function registerTestPaper(Request $request){
-    	$userId = $request->get('user_id');
-    	$paperId = $request->get('paper_id');
+    protected static function registerTestPaper($userId, $paperId){
     	if(isset($userId) && isset($paperId)){
     		$registeredTestPaper = static::firstOrNew(['user_id' => $userId, 'test_subject_paper_id' => $paperId]);
     		if(is_object($registeredTestPaper) && empty($registeredTestPaper->id)){
@@ -24,6 +22,7 @@ class RegisterPaper extends Model
     		}
     		return $registeredTestPaper;
     	}
+        return;
     }
 
     protected static function getRegisteredPapersByUserId($userId){

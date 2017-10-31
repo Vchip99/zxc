@@ -52,7 +52,7 @@
 			    <label class="col-sm-2 col-form-label">Category Name:</label>
 			    <div class="col-sm-3">
 			      <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-			          <option value="">Select Category ...</option>
+			          <option value="">Select Category</option>
 			          @if(count($testCategories) > 0)
 			            @foreach($testCategories as $testCategory)
 			              @if( $testCategory->id == $searchSelectedCategoryId )
@@ -70,7 +70,7 @@
 			    <label class="col-sm-2 col-form-label">Sub Category Name:</label>
 			    <div class="col-sm-3">
 			      <select id="subcategory" class="form-control" name="subcategory" onChange="selectSubject(this);" required title="Sub Category">
-			        <option value="">Select Sub Category ...</option>
+			        <option value="">Select Sub Category</option>
 			        @if(count($testSubCategories) > 0)
 			        	@foreach($testSubCategories as $testSubCategory)
 				            @if($searchSelectedSubcategoryId == $testSubCategory->id)
@@ -88,7 +88,7 @@
 		    <label class="col-sm-2 col-form-label">Subject Name:</label>
 			    <div class="col-sm-3">
 			      	<select id="subject" class="form-control" name="subject" onChange="selectPaper(this);" required title="Subject">
-			        	<option value="">Select Subject ...</option>
+			        	<option value="">Select Subject</option>
 			          	@if(count($testSubjects) > 0 )
 			          		@foreach($testSubjects as $testSubject)
 			          			@if($testSubject->id == $searchSelectedSubjectId)
@@ -105,8 +105,8 @@
 		    <div class="form-group row @if ($errors->has('paper')) has-error @endif">
 			    <label for="name" class="col-sm-2 col-form-label">Paper Name:</label>
 			    <div class="col-sm-3">
-			    	<select id="paper" class="form-control" name="paper" required title="Paper">
-			    		<option value="">Select Paper ...</option>
+			    	<select id="paper" class="form-control" name="paper" required title="Paper" onChange="selectPaperSession(this);" >
+			    		<option value="">Select Paper</option>
 			    		@if(count($papers)>0)
 			    			@foreach($papers as $paper)
 			    				@if($paper->id == $searchSelectedPaperId)
@@ -121,12 +121,19 @@
 			    </div>
 		  	</div>
 		  	<div class="form-group row">
-		    	<label class="col-sm-2 col-form-label">Section Type:</label>
+		    	<label class="col-sm-2 col-form-label">Section:</label>
 			    <div class="col-sm-3">
 			      	<select id="section_type" class="form-control" name="section_type" required title="Section">
-			    		<option value="">Select Section ...</option>
-		                <option value="1" @if(1 == $searchSelectedSectionId) selected @endif >Aptitude</option>
-				        <option value="0" @if(0 == $searchSelectedSectionId) selected @endif >Technical</option>
+			    		<option value="">Select Section</option>
+			    		@if(count($paperSections)>0)
+			    			@foreach($paperSections as $paperSection)
+			    				@if($searchSelectedSectionId == $paperSection->id)
+				                	<option value="{{$paperSection->id}}" selected="true">{{$paperSection->name}}</option>
+				                @else
+						        	<option value="{{$paperSection->id}}" >{{$paperSection->name}}</option>
+						        @endif
+							@endforeach
+			    		@endif
 			    	</select>
 			    </div>
 		    </div>
@@ -217,7 +224,7 @@
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Sub Category ...';
+	            opt.innerHTML = 'Select Sub Category';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -248,7 +255,7 @@
 	            selectSub.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Subject ...';
+	            opt.innerHTML = 'Select Subject';
 	            selectSub.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -274,7 +281,7 @@
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Paper ...';
+	            opt.innerHTML = 'Select Paper';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 		            $.each(msg, function(idx, obj) {
@@ -293,6 +300,32 @@
     	subjectId = parseInt($(ele).val());
     	getPapersBySubjectId(subjectId);
   	}
+
+  	function selectPaperSession(ele){
+  		paperId = parseInt($(ele).val());
+		if( 0 < paperId ){
+	      	$.ajax({
+	             	method: "POST",
+	              	url: "{{url('admin/getPaperSectionsByPaperId')}}",
+	              	data: {paper_id:paperId}
+          	}).done(function( msg ) {
+	            select = document.getElementById('section_type');
+	            select.innerHTML = '';
+	            var opt = document.createElement('option');
+	            opt.value = '';
+	            opt.innerHTML = 'Select Session';
+	            select.appendChild(opt);
+	            if( 0 < msg.length){
+		            $.each(msg, function(idx, obj) {
+		                var opt = document.createElement('option');
+		                opt.value = obj.id;
+		                opt.innerHTML = obj.name;
+		                select.appendChild(opt);
+		            });
+	            }
+          	});
+    	}
+	}
 
 </script>
 

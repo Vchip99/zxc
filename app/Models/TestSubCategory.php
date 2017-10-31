@@ -70,17 +70,19 @@ class TestSubCategory extends Model
     }
 
     /**
-     *  return test sub categories associated with question by categoryId
+     *  return test sub categories associated with question by categoryId if less than in paper active date
      */
     protected static function getSubcategoriesByCategoryId($categoryId){
         $categoryId = InputSanitise::inputInt($categoryId);
         return DB::table('test_sub_categories')
+                ->join('test_subject_papers', 'test_subject_papers.test_sub_category_id', 'test_sub_categories.id')
                 ->join('questions', 'questions.subcat_id', 'test_sub_categories.id')
                 ->join('test_categories', function($join){
                     $join->on('test_categories.id', '=', 'test_sub_categories.test_category_id');
                     $join->on('test_categories.id', '=', 'questions.category_id');
                 })
                 ->join('test_subjects', 'test_subjects.id', '=', 'questions.subject_id')
+                ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d'))
                 ->where('test_sub_categories.test_category_id', $categoryId)
                 ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path')
                 ->groupBy('test_sub_categories.id')->get();
@@ -132,12 +134,14 @@ class TestSubCategory extends Model
 
     protected static function getTestSubCategoriesAssociatedWithQuestion(){
         return DB::table('test_sub_categories')
+                ->join('test_subject_papers', 'test_subject_papers.test_sub_category_id', 'test_sub_categories.id')
                 ->join('questions', 'questions.subcat_id', 'test_sub_categories.id')
                 ->join('test_categories', function($join){
                     $join->on('test_categories.id', '=', 'test_sub_categories.test_category_id');
                     $join->on('test_categories.id', '=', 'questions.category_id');
                 })
                 ->join('test_subjects', 'test_subjects.test_sub_category_id', '=', 'test_sub_categories.id')
+                ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d'))
                 ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path')
                 ->groupBy('test_sub_categories.id')->get();
     }

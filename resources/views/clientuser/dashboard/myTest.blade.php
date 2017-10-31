@@ -49,7 +49,7 @@
           </div>
           <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm">
             <select class="form-control" id="subcategory" name="subcategory" onChange="selectPanel();" title="Sub Category">
-                <option>Select Sub Category ...</option>
+                <option>Select Sub Category</option>
               </select>
           </div>
         </div>
@@ -89,6 +89,7 @@
                           <th>Start test</th>
                           <th>Result</th>
                           <th>Date to Active</th>
+                          <th>Date to Inactive</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -121,6 +122,7 @@
                               @endif
                             </td>
                             <td class=" ">{{ $testSubjectPaper->date_to_active }}</td>
+                            <td class=" ">{{ $testSubjectPaper->date_to_inactive }}</td>
                         </tr>
                       @endforeach
                     </tbody>
@@ -162,6 +164,9 @@
                                           </li>
                                           <li>
                                             <button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span> {{ $testSubjectPaper->date_to_active }}</button>
+                                          </li>
+                                          <li>
+                                            <button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span> {{ $testSubjectPaper->date_to_inactive }}</button>
                                           </li>
                                         </ul>
                                       </div>
@@ -241,7 +246,7 @@
             select.innerHTML = '';
             var opt = document.createElement('option');
           opt.value = '';
-          opt.innerHTML = 'Select Sub Category ...';
+          opt.innerHTML = 'Select Sub Category';
           select.appendChild(opt);
           if( 0 < msg.length){
           $.each(msg, function(idx, obj) {
@@ -282,7 +287,7 @@
     if( 0 < cat && 0 < subcat ){
       $.ajax({
               method: "POST",
-              url: "{{url('getOnlineSubjectsAndPapersByCatIdBySubcatIdAssociatedWithQuestion')}}",
+              url: "{{url('getRegisteredSubjectsAndPapersByCatIdBySubcatId')}}",
               data: {cat:cat, subcat:subcat, userId:userId}
           })
           .done(function( msg ) {
@@ -332,6 +337,7 @@
                   trInnerhtml += '<th>Start Test</th>';
                   trInnerhtml += '<th>Result</th>';
                   trInnerhtml += '<th>Date to Active</th>';
+                  trInnerhtml += '<th>Date to Inactive</th>';
                   tableTr.innerHTML = trInnerhtml;
                   tableHead.appendChild(tableTr);
                   tableEle.appendChild(tableHead);
@@ -361,7 +367,7 @@
                       divInnerHtml += '<td class=" ">';
                       divInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
                       divInnerHtml += csrf_token;
-                      divInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.test_category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.test_sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.test_subject_id +'"></form>';
+                      divInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.subject_id +'"></form>';
                       divInnerHtml += '<button onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
                       divInnerHtml += '</td>';
                     } else {
@@ -370,6 +376,7 @@
                       divInnerHtml += '</td>';
                     }
                     divInnerHtml += '<td class=" ">'+ obj.date_to_active +'</td>';
+                    divInnerHtml += '<td class=" ">'+ obj.date_to_inactive +'</td>';
 
                     tbodyTr.innerHTML = divInnerHtml;
                     tableBody.appendChild(tbodyTr);
@@ -440,7 +447,7 @@
                       ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
                       ulDivInnerHtml += '</li>';
                     }
-                    ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li>';
+                    ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li><li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_inactive +'</button></li>';
                     ulDiv.innerHTML = ulDivInnerHtml;
                     rowDiv.appendChild(ulDiv);
                     containerDiv.appendChild(rowDiv);

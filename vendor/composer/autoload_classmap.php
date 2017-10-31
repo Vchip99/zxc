@@ -6,7 +6,11 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'AddCommonDataToClientOnlineTestQuestionTable' => $baseDir . '/database/migrations/2017_10_27_121547_add_common_data_to_client_online_test_question_table.php',
+    'AddCommonDataToQuestionTable' => $baseDir . '/database/migrations/2017_10_27_083707_add_common_data_to_question_table.php',
     'AddInstituteCourseToClientOnlineVideos' => $baseDir . '/database/migrations/2017_08_01_071533_add_institute_course_to_client_online_videos.php',
+    'AddNewColumnsToClientOnlineTestSubjectPapersTable' => $baseDir . '/database/migrations/2017_10_16_111949_add_new_columns_to_client_online_test_subject_papers_table.php',
+    'AddNewColumnsToTestSubjectPapersTable' => $baseDir . '/database/migrations/2017_10_16_052341_add_new_columns_to_test_subject_papers_table.php',
     'AddPhotoToClientusers' => $baseDir . '/database/migrations/2017_07_31_072410_add_photo_to_clientusers.php',
     'App\\Libraries\\InputSanitise' => $baseDir . '/app/Libraries/InputSanitise.php',
     'CreateAdminPermissionTable' => $baseDir . '/database/migrations/2017_03_11_055904_create_admin_permission_table.php',
@@ -41,6 +45,7 @@ return array(
     'CreateClientNotificationsTable' => $baseDir . '/database/migrations/2017_08_22_120759_create_client_notifications_table.php',
     'CreateClientOnlineCategoriesTable' => $baseDir . '/database/migrations/2017_04_08_081956_create_client_online_categories_table.php',
     'CreateClientOnlineCoursesTable' => $baseDir . '/database/migrations/2017_04_08_101331_create_client_online_courses_table.php',
+    'CreateClientOnlinePaperSectionsTable' => $baseDir . '/database/migrations/2017_10_26_051747_create_client_online_paper_sections_table.php',
     'CreateClientOnlineSubCategoriesTable' => $baseDir . '/database/migrations/2017_04_08_092404_create_client_online_sub_categories_table.php',
     'CreateClientOnlineTestCategoriesTable' => $baseDir . '/database/migrations/2017_04_08_122115_create_client_online_test_categories_table.php',
     'CreateClientOnlineTestQuestionsTable' => $baseDir . '/database/migrations/2017_04_09_041820_create_client_online_test_questions_table.php',
@@ -90,6 +95,7 @@ return array(
     'CreateLiveCoursesTable' => $baseDir . '/database/migrations/2017_02_28_102109_create_live_courses_table.php',
     'CreateLiveVideosTable' => $baseDir . '/database/migrations/2017_02_28_122137_create_live_videos_table.php',
     'CreateNotificationsTable' => $baseDir . '/database/migrations/2017_08_14_074040_create_notifications_table.php',
+    'CreatePaperSectionsTable' => $baseDir . '/database/migrations/2017_10_12_094919_create_paper_sections_table.php',
     'CreatePasswordResetsTable' => $baseDir . '/database/migrations/2014_10_12_100000_create_password_resets_table.php',
     'CreatePermissionRoleTable' => $baseDir . '/database/migrations/2017_03_11_055841_create_permission_role_table.php',
     'CreatePermissionsTable' => $baseDir . '/database/migrations/2017_03_11_055816_create_permissions_table.php',

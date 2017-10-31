@@ -60,15 +60,6 @@
             <label><input class="search" type="checkbox" value="3" data-filter="difficulty" onclick="searchCourse();"> Advanced</label>
           </div>
         </div>
-        <!-- <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Fees"> Fees</p>
-        <div class="panel">
-          <div class="checkbox">
-            <label><input class="search" name="fees" type="radio" value="1" data-filter="fees" onclick="searchCourse();"> Paid</label>
-          </div>
-          <div class="checkbox">
-            <label><input class="search" name="fees" type="radio" value="0" data-filter="fees" onclick="searchCourse();"> Free</label>
-          </div>
-        </div> -->
         <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Others"> Others</p>
         <div class="panel">
           <div class="checkbox">

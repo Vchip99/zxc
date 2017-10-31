@@ -68,7 +68,9 @@
 			            </tr>
 			    	</table>
 			    	<div class="text-center">
+			    		@if(is_object($score) && 1 == $score->paper->show_solution)
 						<button id="formButton" name="solution" type="submit" class="btn btn-success btn-lg">Solution</button>
+						@endif
 						<button type="submit" class="btn btn-success btn-lg" onclick="window.close();" title="Close">Close</button>
 					</div>
 					<input type="hidden" id="category_id" name="category_id" value="{{$result['category_id']}}">

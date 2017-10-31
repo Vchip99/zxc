@@ -26,7 +26,7 @@
             <div class="about-videos">
               <p data-toggle="modal" data-target="#myModal">
                 <i class="fa fa-play-circle-o" aria-hidden="true"  id="clg"></i>
-                <span class="about-video-tital"><em>COLLAGE / STUDENT</em></span>
+                <span class="about-video-tital"><em>COLLEGE / STUDENT</em></span>
               </p>
               <p data-toggle="modal" data-target="#instituteModal" id="cotching-inst">  <i class="fa fa-play-circle-o" aria-hidden="true" ></i>
                 <span class="about-video-tital"><em>COACHING INSTITUTE</em></span>
@@ -98,7 +98,7 @@
       <div class="modal-content" style="border-radius: 0px;">
         <div class="modal-header" style=" padding: 5px 10px; font-weight: bolder; text-align: center;">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h4 class="modal-title" id="myModalLabel">Collage</h4>
+          <h4 class="modal-title" id="myModalLabel">College</h4>
         </div>
         <div class="modal-body" style="padding: 0px; ">
           <div class="vid">

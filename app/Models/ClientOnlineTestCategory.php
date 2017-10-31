@@ -86,7 +86,8 @@ class ClientOnlineTestCategory extends Model
         } else {
             $result->where('clients.subdomain', $client);
         }
-        return $result->select('client_online_test_categories.id', 'client_online_test_categories.name', 'client_online_test_categories.client_institute_course_id')
+        return $result->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d'))
+            ->select('client_online_test_categories.id', 'client_online_test_categories.name', 'client_online_test_categories.client_institute_course_id')
             ->groupBy('client_online_test_categories.id')->get();
     }
 

@@ -10,6 +10,7 @@ use App\Models\TestSubject;
 use App\Models\TestSubjectPaper;
 use App\Models\Notification;
 use App\Models\UserSolution;
+use App\Models\PaperSection;
 use App\Models\Score;
 use Redirect,Validator, Auth, DB;
 use App\Libraries\InputSanitise;
@@ -44,7 +45,7 @@ class PaperController extends Controller
         'subject' => 'required|integer',
         'name' => 'required|string',
         'date_to_active' => 'required',
-        'time' => 'required',
+        'date_to_inactive' => 'required',
     ];
 
     /**
@@ -59,11 +60,12 @@ class PaperController extends Controller
      *  show create UI for paper
      */
     protected function create(){
-    	$testCategories    = TestCategory::all();
-		$testSubCategories = new TestSubCategory;
-		$testSubjects = new TestSubject;
-		$paper = new TestSubjectPaper;
-    	return view('paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper'));
+        $allSessions = [];
+        $testCategories    = TestCategory::all();
+        $testSubCategories = new TestSubCategory;
+        $testSubjects = new TestSubject;
+        $paper = new TestSubjectPaper;
+    	return view('paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
     }
 
     /**
@@ -103,7 +105,8 @@ class PaperController extends Controller
     			$testCategories    = TestCategory::all();
 				$testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($paper->test_category_id);
 				$testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($paper->test_category_id, $paper->test_sub_category_id);
-		    	return view('paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper'));
+                $allSessions = PaperSection::where('test_subject_paper_id', $paper->id)->get();
+		    	return view('paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
     		}
     	}
 		return Redirect::to('admin/managePaper');
@@ -181,5 +184,9 @@ class PaperController extends Controller
     		return TestSubject::getSubjectsByCatIdBySubcatidForAdmin($catId, $subcatId);
     	}
     	return Redirect::to('admin/managePaper');
+    }
+
+    public function getPaperSectionsByPaperId(Request $request){
+        return PaperSection::where('test_subject_paper_id', $request->get('paper_id'))->get();
     }
 }

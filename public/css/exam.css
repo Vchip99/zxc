@@ -46,7 +46,7 @@ background: #e8f6f3 ;}
 }
 /*table*/
 .select_cat_subcat input{ color: #000;}
- .divider {
+/*.divider {
   border-color: grey;
   border-style: solid;
   border-width: 0 0 1px;
@@ -54,7 +54,7 @@ background: #e8f6f3 ;}
   line-height: 20px;
   text-align:center;
   overflow: visible;
-}
+}*/
 .divider span {
  border-left: 3px solid #0077b3;
  border-right: 3px solid #0077b3;
@@ -120,8 +120,8 @@ button .fa{
   background-color: #bb39d7;
 }
 @media  (min-width: 617px) {
- .data-sm { display: none; }  
+ .data-sm { display: none; }
 }
 @media  (max-width: 616px) {
-  .data-lg { display: none; } 
+  .data-lg { display: none; }
 }

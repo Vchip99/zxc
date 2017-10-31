@@ -111,7 +111,8 @@ class PlacementController extends Controller
             } else {
                 $currentUser = 0;
             }
-            return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount'));
+            $applyJobs = ApplyJob::all();
+            return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount', 'applyJobs'));
         }
         return Redirect::to('placements');
     }

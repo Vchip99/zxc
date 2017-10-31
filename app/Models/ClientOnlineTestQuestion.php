@@ -8,6 +8,7 @@ use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
+use App\Models\ClientOnlineTestSubjectPaper;
 
 class ClientOnlineTestQuestion extends Model
 {
@@ -19,7 +20,7 @@ class ClientOnlineTestQuestion extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', 'answer6', 'answer', 'category_id', 'subcat_id', 'section_type', 'question_type','solution', 'positive_marks', 'negative_marks', 'min', 'max', 'subject_id', 'paper_id', 'client_id','client_institute_course_id'];
+    protected $fillable = ['name', 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', 'answer6', 'answer', 'category_id', 'subcat_id', 'section_type', 'question_type','solution', 'positive_marks', 'negative_marks', 'min', 'max', 'subject_id', 'paper_id', 'client_id','client_institute_course_id', 'common_data'];
 
     /**
      *  add/update question
@@ -35,9 +36,14 @@ class ClientOnlineTestQuestion extends Model
         $ans2 = '';
         $ans3 = '';
         $ans4 = '';
+        $ans5 = '';
         $solution = '';
+        $commonData = '';
         $newInstance = new static;
 
+        if(1 == $request->get('check_common_data') && !empty($request->get('common_data'))){
+            $commonData = $newInstance->changeSrc($request->get('common_data'));
+        }
         $question = $newInstance->changeSrc($request->get('question'));
         if(!empty($request->get('ans1'))){
             $ans1 = $newInstance->changeSrc($request->get('ans1'));
@@ -50,6 +56,9 @@ class ClientOnlineTestQuestion extends Model
         }
         if(!empty($request->get('ans4'))){
             $ans4 = $newInstance->changeSrc($request->get('ans4'));
+        }
+        if(!empty($request->get('ans5'))){
+            $ans5 = $newInstance->changeSrc($request->get('ans5'));
         }
         if(!empty($request->get('solution'))){
             $solution = $newInstance->changeSrc($request->get('solution'));
@@ -76,7 +85,7 @@ class ClientOnlineTestQuestion extends Model
         $testQuestion->answer2 = $ans2;
         $testQuestion->answer3 = $ans3;
         $testQuestion->answer4 = $ans4;
-        $testQuestion->answer5 = 0;
+        $testQuestion->answer5 = $ans5;
         $testQuestion->answer6 = 0;
         $testQuestion->category_id = $categoryId;
         $testQuestion->subcat_id = $subcategoryId;
@@ -100,29 +109,32 @@ class ClientOnlineTestQuestion extends Model
         $testQuestion->question_type = $question_type;
         $testQuestion->client_id = Auth::guard('client')->user()->id;
         $testQuestion->client_institute_course_id = $instituteCourseId;
+        $testQuestion->common_data = $commonData;
         $testQuestion->save();
         return $testQuestion;
     }
 
     protected function changeSrc($question){
         $formatedQuestion = '';
-        $contents   = explode("src=\"" , $question);
-        if(count($contents) > 0){
-            foreach($contents as  $index => $content) {
-                if(strstr($content, '/templateEditor') && !strstr($content, asset(''))){
-                    $formatedQuestion .= 'src="'.rtrim(asset(''),'/') . $content;
-                } else {
-                    if( 0 == $index && strstr($content, '<img alt=""')){
-                        $formatedQuestion .= $content;
+        if(preg_match('/src=\"/',$question)){
+            $contents   = explode("src=\"" , $question);
+            if(count($contents) > 0){
+                foreach($contents as  $index => $content) {
+                    if(strstr($content, '/templateEditor') && !strstr($content, asset(''))){
+                        $formatedQuestion .= 'src="'.rtrim(asset(''),'/') . $content;
                     } else {
-                        $formatedQuestion .= 'src="'.$content;
+                        if( 0 == $index && strstr($content, '<img alt=""')){
+                            $formatedQuestion .= $content;
+                        } else {
+                            $formatedQuestion .= 'src="'.$content;
+                        }
                     }
                 }
             }
         } else {
             $formatedQuestion = $question;
         }
-        return trim($formatedQuestion, 'src="');
+        return $formatedQuestion;
     }
 
     protected static function getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type){
@@ -229,5 +241,12 @@ class ClientOnlineTestQuestion extends Model
                 $question->delete();
             }
         }
+    }
+
+    /**
+     *  get paper of question
+     */
+    public function paper(){
+        return $this->belongsTo(ClientOnlineTestSubjectPaper::class, 'paper_id');
     }
 }

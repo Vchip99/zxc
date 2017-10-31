@@ -98,9 +98,11 @@ class ClientOnlineTestSubject extends Model
         }
         $result =  DB::connection('mysql2')->table('client_online_test_subjects')
                     ->join('client_online_test_questions', 'client_online_test_questions.subject_id', '=', 'client_online_test_subjects.id')
+                    ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.subject_id', '=', 'client_online_test_subjects.id')
                     ->join('clients', 'clients.id', '=', 'client_online_test_subjects.client_id')
                     ->where('client_online_test_subjects.category_id', $categoryId)
-                    ->where('client_online_test_subjects.sub_category_id', $subcategoryId);
+                    ->where('client_online_test_subjects.sub_category_id', $subcategoryId)
+                    ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d'));
         if(!empty($clientId)){
             $result->where('clients.id', $clientId);
         } else {

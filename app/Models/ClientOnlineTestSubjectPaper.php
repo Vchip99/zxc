@@ -12,6 +12,7 @@ use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\RegisterClientOnlinePaper;
 use App\Models\ClientInstituteCourse;
+use App\Models\ClientOnlinePaperSection;
 
 class ClientOnlineTestSubjectPaper extends Model
 {
@@ -23,22 +24,29 @@ class ClientOnlineTestSubjectPaper extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'sub_category_id', 'subject_id', 'price', 'date_to_active', 'time','client_id', 'client_institute_course_id'];
+    protected $fillable = ['name', 'category_id', 'sub_category_id', 'subject_id', 'price', 'date_to_active', 'time','client_id', 'client_institute_course_id', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by'];
 
     /**
      *  add/update paper
      */
     protected static function addOrUpdateOnlineTestSubjectPaper( Request $request, $isUpdate=false){
-
+        $sessions = [];
+        $addPaperSessions = [];
+        $updatePaperSessions = [];
         $paperId = InputSanitise::inputInt($request->get('paper_id'));
         $catId = InputSanitise::inputInt($request->get('category'));
         $subcatId = InputSanitise::inputInt($request->get('subcategory'));
         $subjectId = InputSanitise::inputInt($request->get('subject'));
-        $paperName = InputSanitise::inputString($request->get('name'));+
+        $paperName = InputSanitise::inputString($request->get('name'));
         $price = InputSanitise::inputInt($request->get('price'));
         $dateToActive = $request->get('date_to_active');
+        $dateToInactive = $request->get('date_to_inactive');
         $time = strip_tags(trim($request->get('time')));
         $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
+        $showCalculator = InputSanitise::inputInt($request->get('show_calculator'));
+        $showSolution = InputSanitise::inputInt($request->get('show_solution'));
+        $optionCount = InputSanitise::inputInt($request->get('option_count'));
+        $timeOutBy = $request->get('time_out_by');
 
         if( $isUpdate && isset($paperId)){
             $paper = static::find($paperId);
@@ -58,7 +66,88 @@ class ClientOnlineTestSubjectPaper extends Model
         $paper->time = $time;
         $paper->client_id = Auth::guard('client')->user()->id;
         $paper->client_institute_course_id = $instituteCourseId;
+        $paper->date_to_inactive = $dateToInactive;
+        $paper->show_calculator = $showCalculator;
+        $paper->show_solution = $showSolution;
+        $paper->option_count = $optionCount;
+        $paper->time_out_by = $timeOutBy;
         $paper->save();
+
+        if( $isUpdate && isset($paperId)){
+            $allSessions = $request->except('_token','_method', 'paper_id', 'category', 'subcategory','subject', 'name', 'price', 'date_to_active', 'date_to_inactive', 'time', 'institute_course', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'all_session_count');
+            if(count($allSessions) > 0){
+                foreach($allSessions as $index => $paperSession){
+                    $explodes = explode('_', $index);
+                    if('new' == $explodes[0]){
+                        $addPaperSessions[] = $explodes[1];
+                    } else {
+                        $updatePaperSessions[$explodes[1]][$explodes[0]] = $paperSession;
+                    }
+                }
+            }
+
+            if(count($updatePaperSessions) > 0){
+                $allSessions = ClientOnlinePaperSection::paperSectionsByInstituteCourseIdByPaperId($instituteCourseId,$paperId);
+                if(is_object($allSessions) && false == $allSessions->isEmpty()){
+                    // update or delete
+                    foreach($allSessions as $paperSession){
+                        if(false == in_array($paperSession->id, $addPaperSessions)){
+                            if(isset($updatePaperSessions[$paperSession->id])){
+                                $paperSession->name = $updatePaperSessions[$paperSession->id]['session'];
+                                $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
+                                $paperSession->category_id = $catId;
+                                $paperSession->sub_category_id =$subcatId;
+                                $paperSession->subject_id = $subjectId;
+                                $paperSession->paper_id = $paperId;
+                                $paperSession->client_id = Auth::guard('client')->user()->id;
+                                $paperSession->client_institute_course_id = $instituteCourseId;
+                                $paperSession->save();
+                            } else {
+                                $paperSession->delete();
+                            }
+                        }
+                    }
+                }
+                // add new
+                foreach($updatePaperSessions as $index => $updatePaperSession){
+                    if(true == in_array($index, $addPaperSessions)){
+                        $paperSession = new ClientOnlinePaperSection;
+                        $paperSession->name = $updatePaperSession['session'];
+                        $paperSession->duration = $updatePaperSession['duration'];
+                        $paperSession->category_id = $catId;
+                        $paperSession->sub_category_id =$subcatId;
+                        $paperSession->subject_id = $subjectId;
+                        $paperSession->paper_id = $paperId;
+                        $paperSession->client_id = Auth::guard('client')->user()->id;
+                        $paperSession->client_institute_course_id = $instituteCourseId;
+                        $paperSession->save();
+                    }
+                }
+            }
+        } else {
+            $allSessionCount = InputSanitise::inputInt($request->get('all_session_count'));
+            if($allSessionCount > 0){
+                for($i=1; $i<=$allSessionCount; $i++){
+                    $session = $request->get('session_'.$i);
+                    $duration = $request->get('duration_'.$i);
+                    if(!empty($session)){
+                        $sessions[] = [
+                                    'name' => $session,
+                                    'duration' => $duration,
+                                    'category_id' => $catId,
+                                    'sub_category_id' => $subcatId,
+                                    'subject_id' => $subjectId,
+                                    'paper_id' => $paper->id,
+                                    'client_id' => Auth::guard('client')->user()->id,
+                                    'client_institute_course_id' => $instituteCourseId
+                                ];
+                    }
+                }
+                if(count($sessions) > 0){
+                    DB::connection('mysql2')->table('client_online_paper_sections')->insert($sessions);
+                }
+            }
+        }
 
         return $paper;
     }
@@ -115,6 +204,34 @@ class ClientOnlineTestSubjectPaper extends Model
         return  $result->select('client_online_test_subject_papers.*')->get();
     }
 
+    protected static function getRegisteredPapersByCatIdBySubCatId($catId, $subcatId, $userId){
+        $testSubjectPapers = [];
+        $papers = [];
+        $result = DB::connection('mysql2')->table('client_online_test_subject_papers')
+                    ->join('client_online_test_categories', 'client_online_test_categories.id', '=', 'client_online_test_subject_papers.category_id' )
+                    ->join('client_online_test_sub_categories', 'client_online_test_sub_categories.id', '=', 'client_online_test_subject_papers.sub_category_id' )
+                    ->join('register_client_online_papers', 'register_client_online_papers.client_paper_id', '=', 'client_online_test_subject_papers.id' )
+                    ->join('clients', function($join){
+                        $join->on('clients.id', '=', 'register_client_online_papers.client_id');
+                        $join->on('clients.id', '=', 'client_online_test_subject_papers.client_id');
+                        $join->on('clients.id', '=', 'client_online_test_sub_categories.client_id');
+                        $join->on('clients.id', '=', 'client_online_test_categories.client_id');
+                    });
+
+        $papers = $result->where('client_online_test_subject_papers.category_id', $catId)
+                    ->where('client_online_test_subject_papers.sub_category_id', $subcatId)
+                    ->where('register_client_online_papers.client_user_id', $userId)
+                    ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d'))
+                    ->select('client_online_test_subject_papers.*')->groupBy('client_online_test_subject_papers.id')->get();
+
+        if(is_object($papers) && false == $papers->isEmpty()){
+            foreach($papers as $paper){
+                $testSubjectPapers[$paper->subject_id][] = $paper;
+            }
+        }
+        return $testSubjectPapers;
+    }
+
     protected static function getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request){
         $testSubjectPapers = [];
         $papers = [];
@@ -140,7 +257,9 @@ class ClientOnlineTestSubjectPaper extends Model
         }
         $papers = $result->where('client_online_test_subject_papers.category_id', $catId)
                     ->where('client_online_test_subject_papers.sub_category_id', $subcatId)
+                    ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d'))
                     ->select('client_online_test_subject_papers.*')->groupBy('client_online_test_subject_papers.id')->get();
+
         if(is_object($papers) && false == $papers->isEmpty()){
             foreach($papers as $paper){
                 $testSubjectPapers[$paper->subject_id][] = $paper;
@@ -148,7 +267,6 @@ class ClientOnlineTestSubjectPaper extends Model
         }
         return $testSubjectPapers;
     }
-
 
     /**
      *  return paper by Id
@@ -173,6 +291,7 @@ class ClientOnlineTestSubjectPaper extends Model
                     ->where('clientusers.id', $userId)
                     ->select('client_online_test_subject_papers.*')
                     ->get();
+
         if(false == $papers->isEmpty()){
             foreach($papers as $paper){
                 $testSubjectPapers[$paper->subject_id][] = $paper;

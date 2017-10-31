@@ -152,6 +152,31 @@ class ClientOnlineTestFrontController extends ClientHomeController
 		}
 	}
 
+	protected function getRegisteredSubjectsAndPapersByCatIdBySubcatId(Request $request){
+		if($request->ajax()){
+			$result = [];
+			$testSubjectPaperIds = [];
+			$assignedTestSubjectPapersIds = [];
+			$catId = InputSanitise::inputInt($request->get('cat'));
+			$subcatId = InputSanitise::inputInt($request->get('subcat'));
+			$userId = InputSanitise::inputInt($request->get('userId'));
+			$result['subjects'] = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
+			$result['papers'] = ClientOnlineTestSubjectPaper::getRegisteredPapersByCatIdBySubCatId($catId, $subcatId, $userId);
+			if(is_array($result['papers'])){
+				foreach($result['papers'] as $testPapers){
+					foreach($testPapers as $testPaper){
+						$testSubjectPaperIds[] = $testPaper->id;
+					}
+				}
+				$testSubjectPaperIds = array_values($testSubjectPaperIds);
+			}
+
+			$result['alreadyGivenPapers'] = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
+			$result['currentDate'] = date('Y-m-d');
+
+			return $result;
+		}
+	}
 
 	/**
 	 *	set sessions
@@ -200,7 +225,9 @@ class ClientOnlineTestFrontController extends ClientHomeController
     }
 
     protected function registerClientUserPaper(Request $request){
-    	return RegisterClientOnlinePaper::registerTestPaper($request);
+    	$userId = $request->get('user_id');
+    	$paperId = $request->get('paper_id');
+    	return RegisterClientOnlinePaper::registerTestPaper($userId, $paperId);
     }
 
     protected function showUserTestResult(Request $request){

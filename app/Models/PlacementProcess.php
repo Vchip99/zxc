@@ -65,7 +65,6 @@ class PlacementProcess extends Model
 
         if( $isUpdate && isset($placementProcessId)){
             $examPatterns = $request->except('_token','_method', 'area', 'company', 'selection_process','academic_criteria', 'aptitude_syllabus', 'hr_questions', 'job_link', 'placement_process_id', 'pattern_count', 'area_text', 'company_text');
-
             if(count($examPatterns) > 0){
                 foreach($examPatterns as $index => $examPattern){
                     $explodes = explode('_', $index);
@@ -76,10 +75,8 @@ class PlacementProcess extends Model
                     }
                 }
             }
-
             if(count($updateExamPatterns) > 0){
                 $examPatterns = ExamPattern::where('placement_company_id', $companyId)->get();
-
                 if(is_object($examPatterns) && false == $examPatterns->isEmpty()){
                     // update or delete
                     foreach($examPatterns as $examPattern){
@@ -95,7 +92,7 @@ class PlacementProcess extends Model
                         }
                     }
                 }
-                // add
+                // add new
                 foreach($updateExamPatterns as $index => $updateExamPattern){
                     if(true == in_array($index, $addExamPatterns)){
                         $newExamPattern = new ExamPattern;
@@ -110,7 +107,6 @@ class PlacementProcess extends Model
                 }
 
             }
-
         } else {
             $patternCount = InputSanitise::inputInt($request->get('pattern_count'));
             if($patternCount > 0){

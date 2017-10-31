@@ -16,6 +16,7 @@ use App\Mail\MailToSubscribedUser;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Models\UserSolution;
+use App\Models\PaperSection;
 use Excel;
 
 class QuestionController extends Controller
@@ -77,9 +78,13 @@ class QuestionController extends Controller
         } else {
            $papers =[];
         }
-
+        if(Session::has('search_selected_paper')){
+            $paperSections =  PaperSection::where('test_subject_paper_id', Session::get('search_selected_paper'))->get();
+        } else {
+            $paperSections = [];
+        }
     	$questions = new Question;
-    	return view('question.list', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers'));
+    	return view('question.list', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers', 'paperSections'));
     }
 
     /**
@@ -122,7 +127,8 @@ class QuestionController extends Controller
             $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($categoryId);
             $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($categoryId,$subcategoryId);
             $papers = TestSubjectPaper::getSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin($categoryId,$subcategoryId, $subjectId);
-    		return view('question.list', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers'));
+            $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
+    		return view('question.list', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers', 'paperSections'));
     	} else {
     		return Redirect::to('admin/manageQuestions');
     	}
@@ -136,17 +142,22 @@ class QuestionController extends Controller
         if(Session::has('selected_category')){
             $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin(Session::get('selected_category'));
         } else {
-            $testSubCategories = TestSubCategory::all();
+            $testSubCategories = [];
         }
         if(Session::has('selected_category') && Session::has('selected_subcategory')){
             $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin(Session::get('selected_category'), Session::get('selected_subcategory'));
         } else {
-           $testSubjects = TestSubject::all();
+           $testSubjects = [];
         }
         if(Session::has('selected_category') && Session::has('selected_subcategory') && Session::has('selected_subject')){
             $papers = TestSubjectPaper::getSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin(Session::get('selected_category'), Session::get('selected_subcategory'), Session::get('selected_subject'));
         } else {
-           $papers = TestSubjectPaper::all();
+           $papers = [];
+        }
+        if(Session::has('selected_paper')){
+            $paperSections =  PaperSection::where('test_subject_paper_id', Session::get('selected_paper'))->get();
+        } else {
+            $paperSections = [];
         }
 
 		$testQuestion = new Question;
@@ -155,7 +166,7 @@ class QuestionController extends Controller
         $nextQuestionId = 'new';
         $nextQuestionNo = $this->getNextQuestionNo(Session::get('selected_category'),Session::get('selected_subcategory'),Session::get('selected_subject'),Session::get('selected_paper'),Session::get('selected_section'));
         Session::put('next_question_no', $nextQuestionNo);
-		return view('question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId'));
+		return view('question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'paperSections'));
     }
 
     /**
@@ -178,6 +189,7 @@ class QuestionController extends Controller
                 $paperId = InputSanitise::inputInt($request->get('paper'));
                 $question_type = InputSanitise::inputInt($request->get('question_type'));
                 $section_type = InputSanitise::inputInt($request->get('section_type'));
+                $commonData = $request->get('common_data');
 
                 Session::put('selected_category', $categoryId);
                 Session::put('selected_subcategory', $subcategoryId);
@@ -186,6 +198,12 @@ class QuestionController extends Controller
                 Session::put('selected_section', $section_type);
                 Session::put('selected_question_type', $testQuestion->question_type);
                 Session::put('selected_prev_question', $testQuestion->id);
+                if(1 == $request->get('check_common_data') && !empty($commonData)){
+                    Session::put('last_common_data', $commonData);
+                } else {
+                    Session::remove('last_common_data');
+                }
+
                 $nextQuestionNo = $this->getNextQuestionNo($categoryId,$subcategoryId,$subjectId,$paperId,$section_type);
                 Session::put('next_question_no', $nextQuestionNo);
 
@@ -196,24 +214,25 @@ class QuestionController extends Controller
                         $messageBody = '';
                         $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'">'.$paper->name.'</a> has been added.';
                         Notification::addNotification($notificationMessage, Notification::ADMINPAPER, $paper->id);
-                        $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get()->toArray();
-                        $allUsers = array_chunk($subscriedUsers, 100);
-                        if(count($allUsers) > 0){
-                            foreach($allUsers as $selectedUsers){
-                                foreach($selectedUsers as $user){
-                                    $user = User::where('email', $user)->first();
-                                    $messageBody .= '<p> Hello '.$user->name.'</p>';
-                                    $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
-                                    $messageBody .= '<p><b> Thanks and Regard, </b></p>';
-                                    $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
-                                    $messageBody .= '<b> More about us... </b><br/>';
-                                    $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
-                                    $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
-                                    $mailSubject = 'Vchipedu added a new test paper';
-                                    Mail::to($user)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
-                                }
-                            }
-                        }
+
+                        // $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get()->toArray();
+                        // $allUsers = array_chunk($subscriedUsers, 100);
+                        // if(count($allUsers) > 0){
+                        //     foreach($allUsers as $selectedUsers){
+                        //         foreach($selectedUsers as $user){
+                        //             $user = User::where('email', $user)->first();
+                        //             $messageBody .= '<p> Hello '.$user->name.'</p>';
+                        //             $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
+                        //             $messageBody .= '<p><b> Thanks and Regard, </b></p>';
+                        //             $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
+                        //             $messageBody .= '<b> More about us... </b><br/>';
+                        //             $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
+                        //             $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
+                        //             $mailSubject = 'Vchipedu added a new test paper';
+                        //             Mail::to($user)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
+                        //         }
+                        //     }
+                        // }
                     }
                 }
 
@@ -238,7 +257,7 @@ class QuestionController extends Controller
     		$testQuestion = Question::find($id);
     		if(is_object($testQuestion)){
                 $testCategories = TestCategory::all();
-                $testSubCategories = TestSubCategory::getSubcategoriesByCategoryId($testQuestion->category_id);
+                $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($testQuestion->category_id);
                 $testSubjects = TestSubject::getSubjectsByCatIdBySubcatid($testQuestion->category_id, $testQuestion->subcat_id);
                 $papers = TestSubjectPaper::getSubjectPapersBySubjectId($testQuestion->subject_id);
                 $prevQuestionId = $this->getPrevQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
@@ -253,7 +272,9 @@ class QuestionController extends Controller
                 Session::put('selected_prev_question', $testQuestion->id);
                 $nextQuestionNo = $this->getNextQuestionNo($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type);
                 Session::put('next_question_no', $nextQuestionNo);
-                return view('question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'currentQuestionNo'));
+
+                $paperSections =  PaperSection::where('test_subject_paper_id', $testQuestion->paper_id)->get();
+                return view('question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'currentQuestionNo', 'paperSections'));
     		}
     	}
 		return Redirect::to('admin/manageQuestions');
@@ -281,6 +302,7 @@ class QuestionController extends Controller
                 $paperId = InputSanitise::inputInt($request->get('paper'));
                 $question_type = InputSanitise::inputInt($request->get('question_type'));
                 $section_type = InputSanitise::inputInt($request->get('section_type'));
+                $commonData = $request->get('common_data');
 
                 Session::put('selected_category', $categoryId);
                 Session::put('selected_subcategory', $subcategoryId);
@@ -288,6 +310,12 @@ class QuestionController extends Controller
                 Session::put('selected_paper', $paperId);
                 Session::put('selected_section', $section_type);
                 Session::put('selected_question_type', $question_type);
+                if(1 == $request->get('check_common_data') && !empty($commonData)){
+                    Session::put('last_common_data', $commonData);
+                } else {
+                    Session::remove('last_common_data');
+                }
+
                 $nextQuestionNo = $this->getNextQuestionNo($categoryId,$subcategoryId,$subjectId,$paperId,$section_type);
                 Session::put('next_question_no', $nextQuestionNo);
                 DB::commit();
@@ -365,7 +393,6 @@ class QuestionController extends Controller
 
     protected function getPrevQuestionIdWithQuestionId($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId){
          $testQuestion = Question::getPrevQuestionByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId);
-
         if(is_object($testQuestion)){
             return $testQuestion->id;
         }
@@ -449,5 +476,86 @@ class QuestionController extends Controller
             }
         }
         return Redirect::to('admin/uploadQuestions');
+    }
+
+        /**
+     *  show questions associated with subject and paper
+     */
+    protected function showSession(){
+        $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+        if(Session::has('search_selected_category')){
+            $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin(Session::get('search_selected_category'));
+        } else {
+            $testSubCategories = [];
+        }
+        if(Session::has('search_selected_category') && Session::has('search_selected_subcategory')){
+            $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin(Session::get('search_selected_category'), Session::get('search_selected_subcategory'));
+        } else {
+           $testSubjects = [];
+        }
+        if(Session::has('search_selected_category') && Session::has('search_selected_subcategory') && Session::has('search_selected_subject')){
+            $papers = TestSubjectPaper::getSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin(Session::get('search_selected_category'), Session::get('search_selected_subcategory'), Session::get('search_selected_subject'));
+        } else {
+           $papers =[];
+        }
+        if(Session::has('search_selected_paper')){
+            $paperSections =  PaperSection::where('test_subject_paper_id', Session::get('search_selected_paper'))->get();
+        } else {
+            $paperSections = [];
+        }
+        $questions = new Question;
+        return view('question.associateQuestion', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers', 'paperSections'));
+    }
+
+        /**
+     *  show all question associated with subject and paper
+     */
+    protected function associateSession(Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        $subjectId = InputSanitise::inputInt($request->get('subject'));
+        $paperId = InputSanitise::inputInt($request->get('paper'));
+        $sectionTypeId = InputSanitise::inputInt($request->get('section_type'));
+
+        if(isset($categoryId) && isset($subcategoryId) && isset($subjectId) && isset($paperId)){
+            Session::put('search_selected_category', $categoryId);
+            Session::put('search_selected_subcategory', $subcategoryId);
+            Session::put('search_selected_subject', $subjectId);
+            Session::put('search_selected_paper', $paperId);
+            Session::put('search_selected_section', $sectionTypeId);
+
+            $questions = Question::getQuestionsForSessionAssociation($categoryId,$subcategoryId,$subjectId, $paperId, $sectionTypeId);
+            $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+            $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($categoryId);
+            $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($categoryId,$subcategoryId);
+            $papers = TestSubjectPaper::getSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin($categoryId,$subcategoryId, $subjectId);
+            $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
+            return view('question.associateQuestion', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers', 'paperSections'));
+        } else {
+            return Redirect::to('admin/manageQuestions');
+        }
+    }
+
+    protected function updateQuestionSession(Request $request){
+        DB::beginTransaction();
+        try
+        {
+            $questionId = InputSanitise::inputInt($request->get('question_id'));
+            $sessionId = InputSanitise::inputInt($request->get('session_id'));
+            $testQuestion = Question::find($questionId);
+
+            if(is_object($testQuestion)){
+                $testQuestion->section_type = $sessionId;
+                $testQuestion->save();
+                DB::commit();
+                return 'true';
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return 'false';
+        }
+        return 'false';
     }
 }

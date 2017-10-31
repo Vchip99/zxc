@@ -21,6 +21,7 @@ class TestController extends Controller
 	 */
 	public function index(){
 		$testCategories = TestCategory::getTestCategoriesAssociatedWithQuestion();
+		// dd(DB::getQueryLog());
 		$testSubCategories = TestSubCategory::getTestSubCategoriesAssociatedWithQuestion();
 		$catId = 0;
 		return view('tests.test_info', compact('catId','testCategories', 'testSubCategories'));
@@ -56,6 +57,7 @@ class TestController extends Controller
 				$testSubCategories = TestSubCategory::getSubcategoriesByCategoryId($catId);
 				$testSubjects = TestSubject::getSubjectsByCatIdBySubcatid($catId, $subcatId);
 				$testSubjectPapers = TestSubjectPaper::getSubjectPapersByCatIdBySubCatId($catId, $subcatId);
+
 				if(is_array($testSubjectPapers)){
 					foreach($testSubjectPapers as $testPapers){
 						foreach($testPapers as $testPaper){
@@ -191,7 +193,9 @@ class TestController extends Controller
     }
 
     protected function registerPaper(Request $request){
-    	return RegisterPaper::registerTestPaper($request);
+    	$userId = $request->get('user_id');
+    	$paperId = $request->get('paper_id');
+    	return RegisterPaper::registerTestPaper($userId, $paperId);
     }
 
     protected function getRegisteredPaperIds(){
@@ -231,7 +235,7 @@ class TestController extends Controller
         }
     }
 
-        protected function isTestGiven(Request $request){
+    protected function isTestGiven(Request $request){
     	$categoryId = $request->get('category');
         $subcategoryId = $request->get('subcategory');
         $subjectId = $request->get('subject');

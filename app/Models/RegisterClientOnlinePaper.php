@@ -17,9 +17,7 @@ class RegisterClientOnlinePaper extends Model
      */
     protected $fillable = ['client_user_id', 'client_paper_id', 'client_id'];
 
-    protected static function registerTestPaper(Request $request){
-    	$userId = $request->get('user_id');
-    	$paperId = $request->get('paper_id');
+    protected static function registerTestPaper($userId, $paperId){
     	if(isset($userId) && isset($paperId)){
     		$registeredTestPaper = static::firstOrNew(['client_user_id' => $userId, 'client_paper_id' => $paperId, 'client_id' =>  Auth::guard('clientuser')->user()->client_id]);
     		if(is_object($registeredTestPaper) && empty($registeredTestPaper->id)){
@@ -27,6 +25,7 @@ class RegisterClientOnlinePaper extends Model
     		}
     		return $registeredTestPaper;
     	}
+        return;
     }
 
     protected static function getRegisteredPapersByUserId($userId, $clientId){

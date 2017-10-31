@@ -68,7 +68,9 @@
 			            </tr>
 			    	</table>
 			    	<div class="text-center">
+			    		@if(1 == $score->paper->show_solution)
 						<button id="formButton" name="solution" type="submit" class="btn btn-success btn-lg">Solution</button>
+						@endif
 						<button type="submit" class="btn btn-success btn-lg" onclick="window.close();" title="Close">Close</button>
 					</div>
 					<input type="hidden" id="category_id" name="category_id" value="{{$result['category_id']}}">
@@ -81,13 +83,13 @@
 	</section>
 <script type="text/javascript">
 	var category = parseInt(document.getElementById('category_id').value);
-			var subcategory = parseInt(document.getElementById('sub_category_id').value);
-			var subject = parseInt(document.getElementById('subject_id').value);
-			var paper = parseInt(document.getElementById('paper_id').value);
-			var userId ="{{Auth::guard('clientuser')->user()->id}}";
-	        window.onload = function()
-		    {
-		        window.opener.checkIsTestGiven(paper,subject,category,subcategory,userId);
-		    }
+	var subcategory = parseInt(document.getElementById('sub_category_id').value);
+	var subject = parseInt(document.getElementById('subject_id').value);
+	var paper = parseInt(document.getElementById('paper_id').value);
+	var userId ="{{Auth::guard('clientuser')->user()->id}}";
+    window.onload = function()
+    {
+        window.opener.checkIsTestGiven(paper,subject,category,subcategory,userId);
+    }
 </script>
 @stop

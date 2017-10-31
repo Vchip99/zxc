@@ -47,9 +47,13 @@
 		} else {
 			$nextQuestionNo = 1;
 		}
+		if(Session::has('last_common_data')){
+			$lastCommonData = Session::get('last_common_data');
+		} else {
+			$lastCommonData = '';
+		}
 	@endphp
 	<div id="main ">
-
 		<ul id ="ul">
 			@if(Session::has('message'))
 				<div class="alert alert-success" id="message">
@@ -94,7 +98,7 @@
 		            @endforeach
 			    @else
 			      <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-			          <option value="">Select Category ...</option>
+			          <option value="">Select Category</option>
 			            @foreach($testCategories as $testCategory)
 			            	@if($selectedCategoryId == $testCategory->id)
 			                	<option value="{{$testCategory->id}}" selected="true">{{$testCategory->name}}</option>
@@ -120,7 +124,7 @@
 			          	@endforeach
 			        @else
 				      <select id="subcategory" class="form-control" name="subcategory" onChange="selectSubject(this);" required title="Sub Category">
-				        <option value="">Select Sub Category ...</option>
+				        <option value="">Select Sub Category</option>
 				        	@foreach($testSubCategories as $testSubCategory)
 					            @if($selectedSubCategoryId == $testSubCategory->id)
 					                <option value="{{$testSubCategory->id}}" selected="true">{{$testSubCategory->name}}</option>
@@ -146,7 +150,7 @@
 		          		@endforeach
 	          		@else
 				      	<select id="subject" class="form-control" name="subject" onChange="selectPaper(this);" required title="Subject">
-				        	<option value="">Select Subject ...</option>
+				        	<option value="">Select Subject</option>
 				          	@foreach($testSubjects as $testSubject)
 			          			@if($selectedSubjectId == $testSubject->id)
 			            			<option value="{{$testSubject->id}}" selected="true">{{$testSubject->name}}</option>
@@ -170,14 +174,15 @@
 				                <input class="form-control" type="hidden" name="paper" value="{{$testQuestion->paper_id}}">
 				            @endif
 			          	@endforeach
+			          	<input type="hidden" id="selected_paper_option_count" value="{{$testQuestion->paper->option_count}}">
     			   	@else
 				      	<select id="paper" class="form-control" name="paper" onChange="showQuestionCount(this);" required title="Paper">
-				    		<option value="">Select Paper ...</option>
+				    		<option value="">Select Paper</option>
 					       		@foreach($papers as $paper)
 						            @if($selectedPaperId == $paper->id)
-						                <option value="{{$paper->id}}" selected="true">{{$paper->name}}</option>
+						                <option value="{{$paper->id}}" data-option_count="{{$paper->option_count}}" selected="true">{{$paper->name}}</option>
 						              @else
-						                <option value="{{$paper->id}}">{{$paper->name}}</option>
+						                <option value="{{$paper->id}}"  data-option_count="{{$paper->option_count}}" >{{$paper->name}}</option>
 						            @endif
 					          	@endforeach
 					        @if($errors->has('paper')) <p class="help-block">{{ $errors->first('paper') }}</p> @endif
@@ -190,28 +195,29 @@
 		    	<label class="col-sm-2 col-form-label">Select Section:</label>
 			    <div class="col-sm-3">
 			    	@if(isset($testQuestion->id))
-			    		@if(1== $testQuestion->section_type)
-			                <input class="form-control" type="text" name="section_type_text" value="Aptitude" readonly="true">
-			            @else
-			            	<input class="form-control" type="text" name="section_type_text" value="Technical" readonly="true">
-			            @endif
+			    		@if(count($paperSections)>0)
+			    			@foreach($paperSections as $paperSection)
+			    				@if($testQuestion->section_type == $paperSection->id)
+				                	<input class="form-control" type="text" name="section_type_text" value="{{$paperSection->name}}" readonly="true">
+						        @endif
+							@endforeach
+			    		@endif
 			            <input class="form-control" type="hidden" name="section_type" value="{{$testQuestion->section_type}}">
 			    	@else
-			      	<select id="section_type" class="form-control" name="section_type" onChange="showQuestionCountOnSectionChange(this);" required title="Section">
-			    		<option value="">Select Section ...</option>
-		                <option value="1"
-			    			@if((isset($testQuestion->id) && 1 == $testQuestion->section_type) || (empty($testQuestion->id) && 1 == $selectedSectionId))
-			    				selected = "true"
-			    			@endif
-		                 readonly="true">Aptitude</option>
-				        <option value="0"
-				        	@if((isset($testQuestion->id) && 0 == $testQuestion->section_type) || (empty($testQuestion->id) && 0 == $selectedSectionId))
-			    				selected = "true"
-			    			@endif
-				         readonly="true">Technical</option>
-			    	</select>
-				    @endif
+			    		<select id="section_type" class="form-control" name="section_type" onChange="showQuestionCountOnSectionChange(this);" required title="Section">
+				    		<option value="">Select Section</option>
+				    		@if(count($paperSections)>0)
+				    			@foreach($paperSections as $paperSection)
+				    				@if($selectedSectionId == $paperSection->id)
+					                	<option value="{{$paperSection->id}}" selected="true">{{$paperSection->name}}</option>
+					                @else
+							        	<option value="{{$paperSection->id}}" >{{$paperSection->name}}</option>
+							        @endif
+								@endforeach
+				    		@endif
+				    	</select>
 				        @if($errors->has('section_type')) <p class="help-block">{{ $errors->first('section_type') }}</p> @endif
+				    @endif
 			    </div>
 		    </div>
 		   	@if(!empty($testQuestion->id))
@@ -230,6 +236,47 @@
 		    </div>
 		    @endif
 		    <div class="form-group row">
+			    <label for="paper" class="col-sm-2 col-form-label">Common Data:</label>
+			    <div class="col-sm-3">
+			    	@if(isset($testQuestion->id))
+			        	<label class="radio-inline"><input type="radio" name="check_common_data" id="check_common_data" value="1" onClick="showHideCommonData(this);" @if(!empty($testQuestion->common_data)) checked @endif> Yes</label>
+			        	<label class="radio-inline"><input type="radio" name="check_common_data" id="check_common_data" value="0" onClick="showHideCommonData(this);" @if(empty($testQuestion->common_data)) checked @endif> No</label>
+			        @else
+			        	<label class="radio-inline"><input type="radio" name="check_common_data" id="check_common_data" value="1" onClick="showHideCommonData(this);" @if(!empty($lastCommonData)) checked @endif> Yes</label>
+			        	<label class="radio-inline"><input type="radio" name="check_common_data" id="check_common_data" value="0" onClick="showHideCommonData(this);" @if(empty($lastCommonData)) checked @endif> No</label>
+			        @endif
+			    </div>
+			</div>
+		    <div class="form-group row" id="show_common_data">
+		    	<label class="col-sm-2 col-form-label">Enter Common Data:</label>
+			    <div class="col-sm-10">
+			      	<textarea name="common_data" cols="60" rows="4" id="common_data" placeholder="Enter your Common Data" required>
+		    			@if(isset($testQuestion->id))
+			 				{!! $testQuestion->common_data !!}
+			 			@elseif(!empty($lastCommonData))
+			 				{!! $lastCommonData !!}
+			 			@endif
+		    		</textarea>
+				  	<script type="text/javascript">
+				    	CKEDITOR.replace( 'common_data', { enterMode: CKEDITOR.ENTER_BR } );
+				    	CKEDITOR.on('dialogDefinition', function (ev) {
+			              	var dialogName = ev.data.name,
+			                dialogDefinition = ev.data.definition;
+			              	if (dialogName == 'image') {
+			                  	var onOk = dialogDefinition.onOk;
+			                  	dialogDefinition.onOk = function (e) {
+			                      	var width = this.getContentElement('info', 'txtWidth');
+			                      	width.setValue('100%');//Set Default Width
+			                      	var height = this.getContentElement('info', 'txtHeight');
+			                      	height.setValue('400');////Set Default height
+			                      	onOk && onOk.apply(this, e);
+			                  };
+			              	}
+			          	});
+				  	</script>
+			    </div>
+		    </div>
+		    <div class="form-group row">
 		    	<label class="col-sm-2 col-form-label">Enter Question:</label>
 			    <div class="col-sm-10">
 			      	<textarea name="question" cols="60" rows="4" id="question" placeholder="Enter your Question" required>
@@ -239,6 +286,20 @@
 		    		</textarea>
 				  	<script type="text/javascript">
 				    	CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
+				    	CKEDITOR.on('dialogDefinition', function (ev) {
+			              	var dialogName = ev.data.name,
+			                dialogDefinition = ev.data.definition;
+			              	if (dialogName == 'image') {
+			                  	var onOk = dialogDefinition.onOk;
+			                  	dialogDefinition.onOk = function (e) {
+			                      	var width = this.getContentElement('info', 'txtWidth');
+			                      	width.setValue('100%');//Set Default Width
+			                      	var height = this.getContentElement('info', 'txtHeight');
+			                      	height.setValue('400');////Set Default height
+			                      	onOk && onOk.apply(this, e);
+			                  };
+			              	}
+			          	});
 				  	</script>
 			    	<div class="hide" role="alert" id="question_error">
 			    		<p>Please enter question.</p>
@@ -255,6 +316,20 @@
 	      			</textarea>
 					<script type="text/javascript">
 				    	CKEDITOR.replace( 'ans1', { enterMode: CKEDITOR.ENTER_BR } );
+				    	CKEDITOR.on('dialogDefinition', function (ev) {
+			              	var dialogName = ev.data.name,
+			                dialogDefinition = ev.data.definition;
+			              	if (dialogName == 'image') {
+			                  	var onOk = dialogDefinition.onOk;
+			                  	dialogDefinition.onOk = function (e) {
+			                      	var width = this.getContentElement('info', 'txtWidth');
+			                      	width.setValue('100%');//Set Default Width
+			                      	var height = this.getContentElement('info', 'txtHeight');
+			                      	height.setValue('400');////Set Default height
+			                      	onOk && onOk.apply(this, e);
+			                  };
+			              	}
+			          	});
 				  	</script>
 			    </div>
 		    </div>
@@ -268,6 +343,20 @@
 		      		</textarea>
 					<script type="text/javascript">
 				    	CKEDITOR.replace( 'ans2', { enterMode: CKEDITOR.ENTER_BR } );
+				    	CKEDITOR.on('dialogDefinition', function (ev) {
+			              	var dialogName = ev.data.name,
+			                dialogDefinition = ev.data.definition;
+			              	if (dialogName == 'image') {
+			                  	var onOk = dialogDefinition.onOk;
+			                  	dialogDefinition.onOk = function (e) {
+			                      	var width = this.getContentElement('info', 'txtWidth');
+			                      	width.setValue('100%');//Set Default Width
+			                      	var height = this.getContentElement('info', 'txtHeight');
+			                      	height.setValue('400');////Set Default height
+			                      	onOk && onOk.apply(this, e);
+			                  };
+			              	}
+			          	});
 				  	</script>
 			    </div>
 		    </div>
@@ -281,6 +370,20 @@
 		      		</textarea>
 					<script type="text/javascript">
 				    	CKEDITOR.replace( 'ans3' , { enterMode: CKEDITOR.ENTER_BR });
+				    	CKEDITOR.on('dialogDefinition', function (ev) {
+			              	var dialogName = ev.data.name,
+			                dialogDefinition = ev.data.definition;
+			              	if (dialogName == 'image') {
+			                  	var onOk = dialogDefinition.onOk;
+			                  	dialogDefinition.onOk = function (e) {
+			                      	var width = this.getContentElement('info', 'txtWidth');
+			                      	width.setValue('100%');//Set Default Width
+			                      	var height = this.getContentElement('info', 'txtHeight');
+			                      	height.setValue('400');////Set Default height
+			                      	onOk && onOk.apply(this, e);
+			                  };
+			              	}
+			          	});
 				  	</script>
 			    </div>
 		    </div>
@@ -294,15 +397,82 @@
 		      		</textarea>
 					<script type="text/javascript">
 				    	CKEDITOR.replace( 'ans4', { enterMode: CKEDITOR.ENTER_BR } );
+				    	CKEDITOR.on('dialogDefinition', function (ev) {
+			              	var dialogName = ev.data.name,
+			                dialogDefinition = ev.data.definition;
+			              	if (dialogName == 'image') {
+			                  	var onOk = dialogDefinition.onOk;
+			                  	dialogDefinition.onOk = function (e) {
+			                      	var width = this.getContentElement('info', 'txtWidth');
+			                      	width.setValue('100%');//Set Default Width
+			                      	var height = this.getContentElement('info', 'txtHeight');
+			                      	height.setValue('400');////Set Default height
+			                      	onOk && onOk.apply(this, e);
+			                  };
+			              	}
+			          	});
 				  	</script>
 			    </div>
 		    </div>
+		    @if(isset($testQuestion->id) && !empty($testQuestion->answer5))
+			    <div class="form-group row mcq_ans" id="show_option5">
+			    	<label class="col-sm-2 col-form-label">Enter Answer5:</label>
+				    <div class="col-sm-10">
+				      	<textarea name="ans5" type="text" placeholder="Answer 5" id="ans5" size="85" maxlength="85">
+			 					{!! $testQuestion->answer5 !!}
+			      		</textarea>
+						<script type="text/javascript">
+					    	CKEDITOR.replace( 'ans5', { enterMode: CKEDITOR.ENTER_BR } );
+					    	CKEDITOR.on('dialogDefinition', function (ev) {
+				              	var dialogName = ev.data.name,
+				                dialogDefinition = ev.data.definition;
+				              	if (dialogName == 'image') {
+				                  	var onOk = dialogDefinition.onOk;
+				                  	dialogDefinition.onOk = function (e) {
+				                      	var width = this.getContentElement('info', 'txtWidth');
+				                      	width.setValue('100%');//Set Default Width
+				                      	var height = this.getContentElement('info', 'txtHeight');
+				                      	height.setValue('400');////Set Default height
+				                      	onOk && onOk.apply(this, e);
+				                  };
+				              	}
+				          	});
+					  	</script>
+				    </div>
+			    </div>
+			@else
+				<div class="form-group row mcq_ans hide" id="show_option5">
+			    	<label class="col-sm-2 col-form-label">Enter Answer5:</label>
+				    <div class="col-sm-10">
+				      	<textarea name="ans5" type="text" placeholder="Answer 5" id="ans5" size="85" maxlength="85">
+			 					{!! $testQuestion->answer5 !!}
+			      		</textarea>
+						<script type="text/javascript">
+					    	CKEDITOR.replace( 'ans5', { enterMode: CKEDITOR.ENTER_BR } );
+					    	CKEDITOR.on('dialogDefinition', function (ev) {
+				              	var dialogName = ev.data.name,
+				                dialogDefinition = ev.data.definition;
+				              	if (dialogName == 'image') {
+				                  	var onOk = dialogDefinition.onOk;
+				                  	dialogDefinition.onOk = function (e) {
+				                      	var width = this.getContentElement('info', 'txtWidth');
+				                      	width.setValue('100%');//Set Default Width
+				                      	var height = this.getContentElement('info', 'txtHeight');
+				                      	height.setValue('400');////Set Default height
+				                      	onOk && onOk.apply(this, e);
+				                  };
+				              	}
+				          	});
+					  	</script>
+				    </div>
+			    </div>
+			@endif
 		    <div class="form-group row mcq_ans">
 		    	<label class="col-sm-2 col-form-label">Enter True Answer No:</label>
 			    <div class="col-sm-3">
 			      	<input class="form-control"  name="answer" type="text" placeholder="True Answer" id="answer" value="@if(isset($testQuestion->id)) {!! $testQuestion->answer !!} @endif" required>
 			    </div>
-			    <label class="col-sm-2 col-form-label">Ex. 1 or 2 or 3 or 4</label>
+			    <label class="col-sm-4 col-form-label">Ex. 1 or 2 or 3 or 4 or 5 ( if have )</label>
 		    </div>
 		    <div class="form-group row num_ans hide">
 		    	<label class="col-sm-2 col-form-label">Enter Answer:</label>
@@ -324,6 +494,20 @@
 		 			</textarea>
 					<script type="text/javascript">
 				    	CKEDITOR.replace( 'solution', { enterMode: CKEDITOR.ENTER_BR } );
+				    	CKEDITOR.on('dialogDefinition', function (ev) {
+			              	var dialogName = ev.data.name,
+			                dialogDefinition = ev.data.definition;
+			              	if (dialogName == 'image') {
+			                  	var onOk = dialogDefinition.onOk;
+			                  	dialogDefinition.onOk = function (e) {
+			                      	var width = this.getContentElement('info', 'txtWidth');
+			                      	width.setValue('100%');//Set Default Width
+			                      	var height = this.getContentElement('info', 'txtHeight');
+			                      	height.setValue('400');////Set Default height
+			                      	onOk && onOk.apply(this, e);
+			                  };
+			              	}
+			          	});
 				  	</script>
 					<div class="hide" role="alert" id="solution_error">
 			    		<p>Please enter solution.</p>
@@ -359,40 +543,49 @@
 			    </div>
 		    </div>
 		</div>
-
 	</form>
+	<input type="hidden" name="paper_option_count" id="paper_option_count" value="">
+
 <style>
-ul#ul {
-	width:1200px;
-    list-style-type: none;
-    margin-left: auto;
-	 margin-right: auto;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
-}
+	ul#ul {
+		width:1200px;
+	    list-style-type: none;
+	    margin-left: auto;
+		 margin-right: auto;
+	    padding: 0;
+	    overflow: hidden;
+	    background-color: #333;
+	}
 
-ul#ul > li {
-    float: left;
-}
+	ul#ul > li {
+	    float: left;
+	}
 
-ul#ul > li > a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
+	ul#ul > li > a {
+	    display: block;
+	    color: white;
+	    text-align: center;
+	    padding: 14px 16px;
+	    text-decoration: none;
+	}
 
-ul#ul > li > a:hover:not(.active) {
-    background-color: #111;
-}
+	ul#ul > li > a:hover:not(.active) {
+	    background-color: #111;
+	}
 
-.active {
-    background-color: #4CAF50;
-}
+	.active {
+	    background-color: #4CAF50;
+	}
 </style>
 <script type="text/javascript">
+
+    function showHideCommonData(ele){
+      if(1 == $(ele).val()){
+        $('#show_common_data').removeClass('hide');
+      } else {
+        $('#show_common_data').addClass('hide');
+      }
+    }
 
   	function selectSubcategory(ele){
 	    id = parseInt($(ele).val());
@@ -450,7 +643,6 @@ ul#ul > li > a:hover:not(.active) {
 	        });
     	}
   	}
-
 
 	function checkCkeditor(){
 		var errorCount = 0;
@@ -519,6 +711,7 @@ ul#ul > li > a:hover:not(.active) {
 		            $.each(msg, function(idx, obj) {
 		                var opt = document.createElement('option');
 		                opt.value = obj.id;
+		                opt.setAttribute('data-option_count', obj.option_count);
 		                opt.innerHTML = obj.name;
 		                if(0 < selectedPaperId){
 		                	opt.selected = true;
@@ -558,13 +751,18 @@ ul#ul > li > a:hover:not(.active) {
     	}
   	}
   	function showQuestionCount(ele){
-  		paperId = parseInt($(ele).val());
-  		categoryId = parseInt(document.getElementById('category').value);
-  		subcategoryId = parseInt(document.getElementById('subcategory').value);
-  		subjectId = parseInt(document.getElementById('subject').value);
-  		section_type = parseInt(document.getElementById('section_type').value);
-  		getQuestionCount(categoryId,subcategoryId,paperId,subjectId,section_type);
-  		toggleNextPrev();
+  		if( 5 == $(ele).find(':selected').data('option_count')){
+  			document.getElementById('paper_option_count').value = 5;
+  			if(document.getElementById('mcq_ques').classList.contains('active')){
+	  			document.getElementById('show_option5').classList.remove('hide');
+	  		}
+  		} else {
+  			document.getElementById('paper_option_count').value = 4;
+  			if(document.getElementById('mcq_ques').classList.contains('active')){
+	  			document.getElementById('show_option5').classList.add('hide');
+	  		}
+  		}
+  		selectPaperSection();
   	}
 
   	function showQuestionCountOnSectionChange(ele){
@@ -600,6 +798,32 @@ ul#ul > li > a:hover:not(.active) {
   		}
   	}
 
+  	function selectPaperSection(){
+  		var paperId = parseInt(document.getElementById('paper').value);
+		if( 0 < paperId ){
+	      	$.ajax({
+	             	method: "POST",
+	              	url: "{{url('admin/getPaperSectionsByPaperId')}}",
+	              	data: {paper_id:paperId}
+          	}).done(function( msg ) {
+	            select = document.getElementById('section_type');
+	            select.innerHTML = '';
+	            var opt = document.createElement('option');
+	            opt.value = '';
+	            opt.innerHTML = 'Select Section';
+	            select.appendChild(opt);
+	            if( 0 < msg.length){
+		            $.each(msg, function(idx, obj) {
+		                var opt = document.createElement('option');
+		                opt.value = obj.id;
+		                opt.innerHTML = obj.name;
+		                select.appendChild(opt);
+		            });
+	            }
+          	});
+    	}
+	}
+
   	$( document ).ready(function() {
 
 		$(document).on('click', '#mcq_ques', function(){
@@ -608,6 +832,11 @@ ul#ul > li > a:hover:not(.active) {
 			$('div.num_ans').addClass('hide');
 			$('div.mcq_ans').removeClass('hide');
 			$('#question_type').val(1);
+			if(5 == document.getElementById('paper_option_count').value){
+				document.getElementById('show_option5').classList.remove('hide');
+			} else {
+				document.getElementById('show_option5').classList.add('hide');
+			}
 		});
 
 		$(document).on('click', '#num_ques', function(){
@@ -634,10 +863,17 @@ ul#ul > li > a:hover:not(.active) {
 			}
 		}
 
-		// var selectedSubjectId = $('#selected_subject_id').val();
-		// if(0 < selectedSubjectId){
-		// 	getPapersBySubjectId(selectedSubjectId);
-		// }
+		if( (document.getElementById('selected_paper_option_count') && 5 == document.getElementById('selected_paper_option_count').value) || 5 == $('#paper').find('option:selected').data('option_count')){
+  			if(document.getElementById('mcq_ques').classList.contains('active')){
+	  			document.getElementById('show_option5').classList.remove('hide');
+	  		}
+  		}
+
+  		if(1 == $("#check_common_data:checked").val()){
+	  		$('#show_common_data').removeClass('hide');
+	    } else {
+	    	$('#show_common_data').addClass('hide');
+	    }
 	});
 </script>
 @stop

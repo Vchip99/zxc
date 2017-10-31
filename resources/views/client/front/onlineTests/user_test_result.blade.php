@@ -90,9 +90,11 @@
 						<input type="hidden" name="paper_id" value="{{$score->paper_id}}">
 						<input type="hidden" name="user_id" value="{{$score->client_user_id}}">
 						</table>
+					@if(1 == $score->paper->show_solution)
 			    	<div class="text-center">
 						<button id="formButton" name="solution" type="submit" class="btn btn-success btn-lg">Solution</button>
 					</div>
+					@endif
 				</form>
 			</div>
 		</div>

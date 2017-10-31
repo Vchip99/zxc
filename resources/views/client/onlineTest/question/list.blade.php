@@ -18,10 +18,10 @@
 		</div>
 	@endif
 	@php
-		if(Session::has('client_search_selected_institute_category')){
-			$clientSearchSelectedInstituteCategoryId = Session::get('client_search_selected_institute_category');
+		if(Session::has('client_search_selected_institute_course')){
+			$clientSearchSelectedInstituteCourseId = Session::get('client_search_selected_institute_course');
 		} else {
-			$clientSearchSelectedInstituteCategoryId = 0;
+			$clientSearchSelectedInstituteCourseId = 0;
 		}
 		if(Session::has('client_search_selected_category')){
 			$clientSearchSelectedCategoryId = Session::get('client_search_selected_category');
@@ -56,11 +56,11 @@
 		  	<div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
 			    <label class="col-sm-2 col-form-label">Institute Course Name:</label>
 			    <div class="col-sm-3">
-			      <select class="form-control" name="institute_course" required title="Category" onChange="selectCategory(this);" >
-			          <option value="">Select Institute Course ...</option>
+			      <select class="form-control" name="institute_course" id="institute_course" required title="Category" onChange="selectCategory(this);" >
+			          <option value="">Select Institute Course</option>
 			          @if(count($instituteCourses) > 0)
 			            @foreach($instituteCourses as $instituteCourse)
-			              @if( $clientSearchSelectedInstituteCategoryId == $instituteCourse->id)
+			              @if( $clientSearchSelectedInstituteCourseId == $instituteCourse->id)
 			                <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
 			              @else
 			                <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
@@ -75,10 +75,10 @@
 			    <label class="col-sm-2 col-form-label">Category Name:</label>
 			    <div class="col-sm-3">
 			      <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-			          <option value="">Select Category ...</option>
+			          <option value="">Select Category</option>
 			          @if( $clientSearchSelectedCategoryId > 0 && count($testCategories) > 0)
 			            @foreach($testCategories as $testCategory)
-			            	@if($clientSearchSelectedInstituteCategoryId == $testCategory->client_institute_course_id)
+			            	@if($clientSearchSelectedInstituteCourseId == $testCategory->client_institute_course_id)
 					            @if( $testCategory->id == $clientSearchSelectedCategoryId )
 					                <option value="{{$testCategory->id}}" selected="true" readonly="true">{{$testCategory->name}}</option>
 					            @else
@@ -95,7 +95,7 @@
 			    <label class="col-sm-2 col-form-label">Sub Category Name:</label>
 			    <div class="col-sm-3">
 			      <select id="subcategory" class="form-control" name="subcategory" onChange="selectSubject(this);" required title="Sub Category">
-			        <option value="">Select Sub Category ...</option>
+			        <option value="">Select Sub Category</option>
 			        @if(count($testSubCategories) > 0)
 			        	@foreach($testSubCategories as $testSubCategory)
 				            @if($clientSearchSelectedSubcategoryId == $testSubCategory->id)
@@ -113,7 +113,7 @@
 		    <label class="col-sm-2 col-form-label">Subject Name:</label>
 			    <div class="col-sm-3">
 			      	<select id="subject" class="form-control" name="subject" onChange="selectPaper(this);" required title="Subject">
-			        	<option value="">Select Subject ...</option>
+			        	<option value="">Select Subject</option>
 			          	@if(count($testSubjects) > 0 )
 			          		@foreach($testSubjects as $testSubject)
 			          			@if($clientSearchSelectedSubjectId == $testSubject->id)
@@ -130,8 +130,8 @@
 		    <div class="form-group row @if ($errors->has('paper')) has-error @endif">
 			    <label for="name" class="col-sm-2 col-form-label">Paper Name:</label>
 			    <div class="col-sm-3">
-			    	<select id="paper" class="form-control" name="paper" required title="Paper">
-			    		<option value="">Select Paper ...</option>
+			    	<select id="paper" class="form-control" name="paper" required title="Paper" onChange="selectSection(this);" >
+			    		<option value="">Select Paper</option>
 			    		@if(count($papers) > 0)
 				          @foreach($papers as $paper)
 				            @if($paper->id == $clientSearchSelectedPaperId)
@@ -146,12 +146,19 @@
 			    </div>
 		  	</div>
 		  	<div class="form-group row">
-		    	<label class="col-sm-2 col-form-label">Section Type:</label>
+		    	<label class="col-sm-2 col-form-label">Section Name:</label>
 			    <div class="col-sm-3">
 			      	<select id="section_type" class="form-control" name="section_type" required title="Section">
-			    		<option value="">Select Section ...</option>
-		                <option value="1" @if(1 == $clientSearchSelectedSectionId) selected="true" @endif >Aptitude</option>
-				        <option value="0" @if(0 == $clientSearchSelectedSectionId) selected="true" @endif >Technical</option>
+			    		<option value="">Select Section</option>
+				        @if(count($sessions) > 0)
+				          	@foreach($sessions as $session)
+				            	@if($session->id == $clientSearchSelectedSectionId)
+				                	<option value="{{$session->id}}" selected="true">{{$session->name}}</option>
+					              @else
+					                <option value="{{$session->id}}">{{$session->name}}</option>
+					            @endif
+				          	@endforeach
+				        @endif
 			    	</select>
 			    </div>
 		    </div>
@@ -219,7 +226,7 @@
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Category ...';
+	            opt.innerHTML = 'Select Category';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -235,7 +242,7 @@
 	      	select.innerHTML = '';
 	      	var opt = document.createElement('option');
 	      	opt.value = '';
-	      	opt.innerHTML = 'Select Category ...';
+	      	opt.innerHTML = 'Select Category';
 	      	select.appendChild(opt);
 	    }
 	      	document.getElementById("subcategory").selectedIndex = '';
@@ -279,7 +286,7 @@
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Sub Category ...';
+	            opt.innerHTML = 'Select Sub Category';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -310,7 +317,7 @@
 	            selectSub.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Subject ...';
+	            opt.innerHTML = 'Select Subject';
 	            selectSub.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -337,7 +344,7 @@
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Paper ...';
+	            opt.innerHTML = 'Select Paper';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 		            $.each(msg, function(idx, obj) {
@@ -356,6 +363,33 @@
     	subjectId = parseInt($(ele).val());
     	getPapersBySubjectId(subjectId);
   	}
+
+	function selectSection(){
+		var instituteCourse = document.getElementById("institute_course").value;
+		var paperId = parseInt(document.getElementById('paper').value);
+		if( 0 < instituteCourse ){
+	      	$.ajax({
+	             	method: "POST",
+	              	url: "{{url('getOnlinePaperSectionsByInstituteCourseId')}}",
+	              	data: {institute_course:instituteCourse, paper_id:paperId}
+          	}).done(function( msg ) {
+	            select = document.getElementById('section_type');
+	            select.innerHTML = '';
+	            var opt = document.createElement('option');
+	            opt.value = '';
+	            opt.innerHTML = 'Select Session';
+	            select.appendChild(opt);
+	            if( 0 < msg.length){
+		            $.each(msg, function(idx, obj) {
+		                var opt = document.createElement('option');
+		                opt.value = obj.id;
+		                opt.innerHTML = obj.name;
+		                select.appendChild(opt);
+		            });
+	            }
+          	});
+    	}
+	}
 
 </script>
 

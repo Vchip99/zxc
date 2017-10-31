@@ -74,12 +74,12 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/downloadExcelResult', 'Admin\AllUsersInfoController@downloadExcelResult');
 
 	// admin college info
-	Route::get('admin/manageCollegeInfo', 'Test\CollegeInfo@manageCollegeInfo');
-	Route::get('admin/createCollege', 'Test\CollegeInfo@create');
-	Route::post('admin/createCollege', 'Test\CollegeInfo@store');
-	Route::get('admin/college/{id}/edit', 'Test\CollegeInfo@edit');
-	Route::put('admin/updateCollege', 'Test\CollegeInfo@update');
-	Route::delete('admin/deleteCollege', 'Test\CollegeInfo@delete');
+	Route::get('admin/manageCollegeInfo', 'Test\CollegeInfoController@manageCollegeInfo');
+	Route::get('admin/createCollege', 'Test\CollegeInfoController@create');
+	Route::post('admin/createCollege', 'Test\CollegeInfoController@store');
+	Route::get('admin/college/{id}/edit', 'Test\CollegeInfoController@edit');
+	Route::put('admin/updateCollege', 'Test\CollegeInfoController@update');
+	Route::delete('admin/deleteCollege', 'Test\CollegeInfoController@delete');
 
 	// user login
 	Route::get('login', 'UserAuth\LoginController@showLoginForm');
@@ -139,6 +139,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updatePaper', 'Test\PaperController@update');
 	Route::delete('admin/deletePaper', 'Test\PaperController@delete');
 	Route::post('admin/getSubjectsByCatIdBySubcatId', [ 'as' => 'admin/getSubjectsByCatIdBySubcatId','uses' => 'Test\PaperController@getSubjectsByCatIdBySubcatId' ]);
+	Route::post('admin/getPaperSectionsByPaperId', [ 'as' => 'admin/getPaperSectionsByPaperId','uses' => 'Test\PaperController@getPaperSectionsByPaperId' ]);
+
 
 	// admin  test questions
 	Route::get('admin/manageQuestions', 'Test\QuestionController@index');
@@ -154,6 +156,10 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/getPrevQuestion', [ 'as' => 'admin/getPrevQuestion','uses' => 'Test\QuestionController@getPrevQuestion' ]);
 	Route::get('admin/uploadQuestions', 'Test\QuestionController@uploadQuestions');
 	Route::post('admin/uploadQuestions', 'Test\QuestionController@importQuestions');
+	Route::get('admin/associateSession', 'Test\QuestionController@showSession');
+	Route::post('admin/associateSession', 'Test\QuestionController@associateSession');
+	Route::post('admin/updateQuestionSession', 'Test\QuestionController@updateQuestionSession');
+
 
 
 	// verify account
@@ -605,6 +611,14 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateApplyJob', 'Placement\PlacementApplyJobController@update');
 	Route::delete('admin/deleteApplyJob', 'Placement\PlacementApplyJobController@delete');
 
+	// // paper section
+	// Route::get('admin/managePaperSection', 'Test\PaperSectionController@show');
+	// Route::get('admin/createPaperSection', 'Test\PaperSectionController@create');
+	// Route::post('admin/createPaperSection', 'Test\PaperSectionController@store');
+	// Route::get('admin/paperSection/{id}/edit', 'Test\PaperSectionController@edit');
+	// Route::put('admin/updatePaperSection', 'Test\PaperSectionController@update');
+	// Route::delete('admin/deletePaperSection', 'Placement\PlacementPaperSectionController@delete');
+
 });
 
 Route::group(['domain' => '{client}.localvchip.com'], function () {
@@ -726,6 +740,15 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::put('updateOnlineTestSubjectPaper', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@update');
   	Route::delete('deleteOnlineTestSubjectPaper', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@delete');
   	Route::post('getOnlinePapersBySubjectId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@getOnlinePapersBySubjectId');
+  	Route::post('getOnlinePaperSectionsByInstituteCourseId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@getOnlinePaperSectionsByInstituteCourseId');
+
+  	// // paper sessions
+  	// Route::get('manageOnlinePaperSession', 'Client\OnlineTest\ClientOnlinePaperSessionController@show');
+  	// Route::get('createOnlinePaperSession', 'Client\OnlineTest\ClientOnlinePaperSessionController@create');
+  	// Route::post('createOnlinePaperSession', 'Client\OnlineTest\ClientOnlinePaperSessionController@store');
+  	// Route::get('onlinepapersession/{id}/edit', 'Client\OnlineTest\ClientOnlinePaperSessionController@edit');
+  	// Route::put('updateOnlinePaperSession', 'Client\OnlineTest\ClientOnlinePaperSessionController@update');
+  	// Route::post('getOnlinePaperSectionsByInstituteCourseId', 'Client\OnlineTest\ClientOnlinePaperSessionController@getOnlinePaperSectionsByInstituteCourseId');
 
   	// test question
   	Route::get('manageOnlineTestQuestion', 'Client\OnlineTest\ClientOnlineTestQuestionController@index');
@@ -760,7 +783,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('likeClientCourseVideoComment', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideoComment');
 	Route::post('likeClientCourseVideoSubComment', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideoSubComment');
 
-
   	// online tests front
 	Route::get('online-tests', 'Client\Front\ClientOnlineTestFrontController@tests');
 	Route::post('getOnlineTestSubCategories', 'Client\Front\ClientOnlineTestFrontController@getOnlineTestSubCategories');
@@ -772,6 +794,8 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('registerClientUserPaper', 'Client\Front\ClientOnlineTestFrontController@registerClientUserPaper');
 	Route::post('showUserTestResult', 'Client\Front\ClientOnlineTestFrontController@showUserTestResult');
 	Route::post('isTestGiven', 'Client\Front\ClientOnlineTestFrontController@isTestGiven');
+	Route::post('getRegisteredSubjectsAndPapersByCatIdBySubcatId', 'Client\Front\ClientOnlineTestFrontController@getRegisteredSubjectsAndPapersByCatIdBySubcatId');
+
 
 	// client online question front
 	Route::post('questions', 'Client\Front\ClientOnlineQuestionFrontController@getQuestions');

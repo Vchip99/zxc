@@ -121,7 +121,8 @@ class ClientOnlineTestSubCategory extends Model
             $result->where('clients.subdomain', $client);
         }
 
-        return $result->where('client_online_test_sub_categories.category_id', $id)->select('client_online_test_sub_categories.*')->groupBy('client_online_test_sub_categories.category_id')->get();
+        return  $result->where('client_online_test_sub_categories.category_id', $id)->select('client_online_test_sub_categories.*')
+                ->groupBy('client_online_test_sub_categories.category_id')->get();
     }
 
 
@@ -150,6 +151,7 @@ class ClientOnlineTestSubCategory extends Model
 
         $result = DB::connection('mysql2')->table('client_online_test_sub_categories')
                 ->join('client_online_test_questions', 'client_online_test_questions.subcat_id', '=', 'client_online_test_sub_categories.id')
+                ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.sub_category_id', '=', 'client_online_test_sub_categories.id')
                 ->join('clients', function($join){
                     $join->on('clients.id', '=', 'client_online_test_questions.client_id');
                     $join->on('clients.id', '=', 'client_online_test_sub_categories.client_id');
@@ -160,7 +162,8 @@ class ClientOnlineTestSubCategory extends Model
         } else {
             $result->where('clients.subdomain', $client);
         }
-        return  $result->select('client_online_test_sub_categories.*')->groupBy('client_online_test_sub_categories.category_id')
+        return  $result->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d'))
+                ->select('client_online_test_sub_categories.*')->groupBy('client_online_test_sub_categories.category_id')
                 ->get();
     }
 

@@ -91,24 +91,24 @@ class AdminBlogController extends Controller
                 $tags = array_map('trim', $tags);
                 BlogTag::addTags($tags, $blog->id);
                 DB::commit();
-                $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get()->toArray();
-                $allUsers = array_chunk($subscriedUsers, 100);
-                if(count($allUsers) > 0){
-                    foreach($allUsers as $selectedUsers){
-                        foreach($selectedUsers as $user){
-                            $user = User::where('email', $user)->first();
-                            $messageBody .= '<p> Hello '.$user->name.'</p>';
-                            $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
-                            $messageBody .= '<p><b> Thanks and Regard, </b></p>';
-                            $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
-                            $messageBody .= '<b> More about us... </b><br/>';
-                            $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
-                            $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
-                            $mailSubject = 'Vchipedu added a new blog';
-                            Mail::to($user)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
-                        }
-                    }
-                }
+                // $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get()->toArray();
+                // $allUsers = array_chunk($subscriedUsers, 100);
+                // if(count($allUsers) > 0){
+                //     foreach($allUsers as $selectedUsers){
+                //         foreach($selectedUsers as $user){
+                //             $user = User::where('email', $user)->first();
+                //             $messageBody .= '<p> Hello '.$user->name.'</p>';
+                //             $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
+                //             $messageBody .= '<p><b> Thanks and Regard, </b></p>';
+                //             $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
+                //             $messageBody .= '<b> More about us... </b><br/>';
+                //             $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
+                //             $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
+                //             $mailSubject = 'Vchipedu added a new blog';
+                //             Mail::to($user)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
+                //         }
+                //     }
+                // }
                 return Redirect::to('admin/manageBlog')->with('message', 'Blog created successfully!');
             }
         }

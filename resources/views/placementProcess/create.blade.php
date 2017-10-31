@@ -254,23 +254,23 @@
               <td class="col-sm-3"><input type="text" class="form-control" name="area_{{$examPattern->id}}" value="{{$examPattern->testing_area}}" required="true"></td>
               <td class="col-sm-3"><input type="text" class="form-control" name="question_{{$examPattern->id}}" value="{{$examPattern->no_of_question}}" required="true"></td>
               <td class="col-sm-3"><input type="text" class="form-control" name="duration_{{$examPattern->id}}" value="{{$examPattern->duration}}" required="true"></td>
-              <td class=""><button onClick="AddExamPattern();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
+              <td class=""><button onClick="addExamPattern();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
               <td class=""><button onClick="removeElement('pattern',{{$examPattern->id}});"> <i class="fa fa-minus-circle" aria-hidden="true"></i></button></td>
             </tr>
           @endforeach
         @else
           <tr id="tr_1">
-              <td class="col-sm-3"><input type="text" class="form-control" name="area_1" value="" required="true"></td>
-              <td class="col-sm-3"><input type="text" class="form-control" name="question_1" value="" required="true"></td>
-              <td class="col-sm-3"><input type="text" class="form-control" name="duration_1" value="" required="true"></td>
-              <td class=""><button onClick="AddExamPattern();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
+            <td class="col-sm-3"><input type="text" class="form-control" name="area_1" value="" required="true"></td>
+            <td class="col-sm-3"><input type="text" class="form-control" name="question_1" value="" required="true"></td>
+            <td class="col-sm-3"><input type="text" class="form-control" name="duration_1" value="" required="true"></td>
+            <td class=""><button onClick="addExamPattern();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
 
-              @if(isset($placementProcess))
-                <td class=""><input type="hidden" name="new_1" value="new"></td>
-              @else
-                <td class=""></td>
-              @endif
-            </tr>
+            @if(isset($placementProcess))
+              <td class=""><input type="hidden" name="new_1" value="new"></td>
+            @else
+              <td class=""></td>
+            @endif
+          </tr>
         @endif
       </tbody>
     </table>
@@ -284,7 +284,7 @@
   </div>
 </form>
 <script type="text/javascript">
-  function AddExamPattern(){
+  function addExamPattern(){
     event.preventDefault();
     var pattern = document.getElementById('pattern');
     var count = parseInt(document.getElementById('pattern_count').value) + 1;
@@ -332,7 +332,7 @@
     var fourthTd = document.createElement('td');
 
     var fourthButton = document.createElement('button');
-    fourthButton.setAttribute("onClick", "AddExamPattern();");
+    fourthButton.setAttribute("onClick", "addExamPattern();");
     fourthButton.innerHTML = '<i class="fa fa-plus-circle" aria-hidden="true"></i>';
     fourthTd.appendChild(fourthButton);
     firstTr.appendChild(fourthTd);
