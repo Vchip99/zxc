@@ -10,7 +10,6 @@ use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
-use App\Models\ClientInstituteCourse;
 
 class ClientOnlineTestSubjectController extends ClientBaseController
 {
@@ -27,7 +26,6 @@ class ClientOnlineTestSubjectController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateCreateSubject = [
-    	'institute_course' => 'required|integer',
         'category' => 'required|integer',
         'subcategory' => 'required|integer',
         'name' => 'required|string',
@@ -37,10 +35,6 @@ class ClientOnlineTestSubjectController extends ClientBaseController
      *	show all subjects
      */
 	public function show(Request $request){
-		$coursePermission = InputSanitise::checkModulePermission($request, 'test');
-        if('false' == $coursePermission){
-            return Redirect::to('manageClientHome');
-        }
 		$testSubjects 	   = ClientOnlineTestSubject::showSubjects($request);
 		return view('client.onlineTest.subject.list', compact('testSubjects'));
 	}
@@ -50,11 +44,10 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 	 */
 	protected function create(Request $request){
 		$clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
-		$testCategories    = new ClientOnlineTestCategory;
+		$testCategories    = ClientOnlineTestCategory::where('client_id', $clientId)->get();
 		$testSubCategories = new ClientOnlineTestSubCategory;
 		$subject = new ClientOnlineTestSubject;
-		return view('client.onlineTest.subject.create', compact('instituteCourses','testCategories','testSubCategories','subject'));
+		return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject'));
 	}
 
 	/**
@@ -94,8 +87,7 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 			if(is_object($subject)){
 				$testCategories    = ClientOnlineTestCategory:: showCategories($request);
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($subject->category_id, $request);
-				$instituteCourses = ClientInstituteCourse::where('client_id', $subject->client_id)->get();
-				return view('client.onlineTest.subject.create', compact('instituteCourses','testCategories','testSubCategories','subject'));
+				return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject'));
 			}
 		}
 		return Redirect::to('manageOnlineTestSubject');

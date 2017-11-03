@@ -78,19 +78,39 @@
       </div>
       <div class="btn-group" role="group" title="Favourite">
         @if(is_object(Auth::guard('clientuser')->user()))
-          @if(is_object($userCoursePermissions) && false == $userCoursePermissions->isEmpty())
             @if('true' == $isCourseRegistered)
               <a class="btn btn-default voted-btn" id="favourite" data-favourite="true" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Favourite" style="color: rgb(233, 30, 99);"> <i class="fa fa-star " aria-hidden="true"></i> </a>
             @else
               <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
             @endif
-          @else
-            <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="checkFavouritePermission();" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
-          @endif
         @else
             <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="checkLogin();" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
         @endif
       </div>
+      @if($course->price > 0)
+        @if('true' == $isCoursePurchased)
+          <div class="btn-group" role="group" title="Pay Now">
+            <a href="" class="btn-tab btn btn-default" style="color: #e91e63;">
+                <span class="hidden-lg" aria-hidden="true">Paid</span>
+                <div class="hidden-sm">Paid</div>
+            </a>
+          </div>
+        @else
+          <div class="btn-group" role="group" title="Pay Now">
+            <a href="" class="btn-tab btn btn-default" style="color: #e91e63;">
+                <span class="hidden-lg" aria-hidden="true">Pay...</span>
+                <div class="hidden-sm">Pay Now</div>
+            </a>
+          </div>
+        @endif
+      @else
+        <div class="btn-group" role="group" title="Free">
+          <a href="" class="btn-tab btn btn-default" style="color: #e91e63;">
+              <span class="hidden-lg" aria-hidden="true">Free</span>
+              <div class="hidden-sm">Free</div>
+          </a>
+        </div>
+      @endif
     </div>
     <div class="tab-content">
       <div id="videoLectures" class="tab-pane fade in active">
@@ -99,27 +119,39 @@
           <div class="row mrgn_30_top border_box padding_10">
             <div class="col-md-3 ">
               @if(is_object(Auth::guard('clientuser')->user()))
-                @if(in_array($video->id, $onlineVideoIds))
+                @if('true' == $isCoursePurchased || 1 == $video->is_free)
                   <a href="{{ url('episode')}}/{{$video->id}}"><h1 class="video_id">{{ $index + 1}}</h1></a>
                 @else
-                  <a class="curser" onClick="checkPermission();"><h1 class="video_id">{{ $index + 1}}</h1></a>
+                  <a class="curser" onClick="purchaseCourse();"><h1 class="video_id">{{ $index + 1}}</h1></a>
                 @endif
               @else
-                <a class="curser" onClick="checkLogin();"><h1 class="video_id">{{ $index + 1}}</h1></a>
+                @if(1 == $video->is_free)
+                  <a href="{{ url('episode')}}/{{$video->id}}"><h1 class="video_id">{{ $index + 1}}</h1></a>
+                @else
+                  <a class="curser" onClick="checkLogin();"><h1 class="video_id">{{ $index + 1}}</h1></a>
+                @endif
               @endif
             </div>
             <div class="col-md-9 menu">
               <span class="divider">&#9679;</span>
               <span class="running-time">Run Time- {{ gmdate('H:i:s', $video->duration)}}</span>
+              @if(1 == $video->is_free)
+                <span class="divider">&#9679;</span>
+                <span style="color: #e91e63;">Free</span>
+              @endif
               <h4 class="v_h4_subtitle">
                 @if(is_object(Auth::guard('clientuser')->user()))
-                  @if(in_array($video->id, $onlineVideoIds))
+                  @if('true' == $isCoursePurchased || 1 == $video->is_free)
                     <a href="{{ url('episode')}}/{{$video->id}}">{{$video->name}}</a>
                   @else
-                    <a class="curser" onClick="checkPermission();">{{$video->name}}</a>
+                    <a class="curser" onClick="purchaseCourse();">{{$video->name}}</a>
                   @endif
                 @else
-                  <a class="curser" onClick="checkLogin();">{{$video->name}}</a>
+                  @if(1 == $video->is_free)
+                    <a href="{{ url('episode')}}/{{$video->id}}">{{$video->name}}</a>
+                  @else
+                    <a class="curser" onClick="checkLogin();">{{$video->name}}</a>
+                  @endif
                 @endif
               </h4>
               <p class="more data-lg">{{$video->description}}</p>
@@ -143,41 +175,41 @@
           @endforeach
         </div>
       </div>
-              <div id="briefCourse" class="tab-pane fade ">
-               <section class="v_container ">
-                 <div class="container">
-                   <div class="row">
-                     <h2 class="v_h2_title">Introduction</h2>
-                     <hr class="border_bottom"/>
-                     <p class="mrgn_20_top_btm">
-                      {!! $course->description !!}
-                    </p>
-                    <h2 class="v_h2_title mrgn_20_top_btm">Meet The Auther</h2>
-                    <hr class="border_bottom"/>
-                    <div class="row">
-                      <div class="col-md-4">
-                        @if(!empty($course->author_image))
-                          <img class="author-img img-responsive" src="{{ asset($course->author_image)}}" alt="Auther">
-                        @else
-                          <img class="author-img img-responsive" src="{{ asset('images/default_author_image.png')}}" alt="Auther">
-                        @endif
-                      </div>
-                      <div class="col-md-8 meet-the-author-description">
-                        <h3 class="meet-the-author-author-name">
-                          <a href="#">{{ $course->author }}</a>
-                        </h3>
-                        <div class="course-staff-info views-fieldset" data-module="views_fieldsets">
-                          <div class="course-staff-info views-fieldset" data-module="views_fieldsets">
-                            <p class="staff-title">{{ $course->author_introduction }}</p>
-                          </div>
-                        </div>
+          <div id="briefCourse" class="tab-pane fade ">
+           <section class="v_container ">
+             <div class="container">
+               <div class="row">
+                 <h2 class="v_h2_title">Introduction</h2>
+                 <hr class="border_bottom"/>
+                 <p class="mrgn_20_top_btm">
+                  {!! $course->description !!}
+                </p>
+                <h2 class="v_h2_title mrgn_20_top_btm">Meet The Auther</h2>
+                <hr class="border_bottom"/>
+                <div class="row">
+                  <div class="col-md-4">
+                    @if(!empty($course->author_image))
+                      <img class="author-img img-responsive" src="{{ asset($course->author_image)}}" alt="Auther">
+                    @else
+                      <img class="author-img img-responsive" src="{{ asset('images/default_author_image.png')}}" alt="Auther">
+                    @endif
+                  </div>
+                  <div class="col-md-8 meet-the-author-description">
+                    <h3 class="meet-the-author-author-name">
+                      <a href="#">{{ $course->author }}</a>
+                    </h3>
+                    <div class="course-staff-info views-fieldset" data-module="views_fieldsets">
+                      <div class="course-staff-info views-fieldset" data-module="views_fieldsets">
+                        <p class="staff-title">{{ $course->author_introduction }}</p>
                       </div>
                     </div>
                   </div>
-                </section><span>&nbsp;</span>
+                </div>
               </div>
-            </div>
+            </section><span>&nbsp;</span>
           </div>
+        </div>
+      </div>
         @else
       <ul class="nav nav-tabs nav-tabsVcourse">
         <li><a href="{{ url('courses')}}">Back</a></li>
@@ -199,11 +231,19 @@
     return false;
   }
 
+  function purchaseCourse(){
+    $.alert({
+        title: 'Alert!',
+        content: 'Please purchase course to acces this video.',
+    });
+    return false;
+  }
+
   function checkPermission(){
    $.alert({
-          title: 'Alert!',
-          content: 'Please register course to acces this video.',
-      });
+        title: 'Alert!',
+        content: 'Please register course to acces this video.',
+    });
     return false;
   }
 

@@ -217,7 +217,7 @@
             </ul>
         </li>
         <li class="header">Vchip TECHNOLOGY</li>
-        <li class="treeview">
+        <!-- <li class="treeview">
           <a href="#" title="Institute Courses">
             <i class="fa fa-university"></i>
             <span>Institute Courses</span>
@@ -228,7 +228,7 @@
           <ul class="treeview-menu">
             <li title="Manage Courses"><a href="{{ url('manageInstituteCourses')}}"><i class="fa fa-circle-o"></i> Manage Courses </a></li>
           </ul>
-        </li>
+        </li> -->
         @if(1 == $client->course_permission)
         <li class="treeview ">
           <a href="#" title="Online Courses">

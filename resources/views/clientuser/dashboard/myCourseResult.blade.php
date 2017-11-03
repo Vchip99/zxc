@@ -157,6 +157,13 @@
           });
         }
       });
+    } else {
+      select = document.getElementById('subcategory');
+      select.innerHTML = '';
+      var opt = document.createElement('option');
+      opt.value = 0;
+      opt.innerHTML = 'Select Sub Category';
+      select.appendChild(opt);
     }
   }
 

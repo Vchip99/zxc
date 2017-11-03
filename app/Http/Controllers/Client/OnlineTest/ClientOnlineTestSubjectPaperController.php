@@ -11,7 +11,6 @@ use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestSubjectPaper;
-use App\Models\ClientInstituteCourse;
 use App\Models\ClientUserSolution;
 use App\Models\ClientScore;
 use App\Models\ClientOnlinePaperSection;
@@ -31,7 +30,6 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validatePaper = [
-        'institute_course' => 'required|integer',
         'category' => 'required|integer',
         'subcategory' => 'required|integer',
         'subject' => 'required|integer',
@@ -44,10 +42,6 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
      * show all test paper
      */
     public function show(Request $request){
-        $coursePermission = InputSanitise::checkModulePermission($request, 'test');
-        if('false' == $coursePermission){
-            return Redirect::to('manageClientHome');
-        }
     	$testPapers = ClientOnlineTestSubjectPaper::showPaper($request);
     	return view('client.onlineTest.paper.list', compact('testPapers'));
     }
@@ -58,12 +52,11 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     protected function create(Request $request){
         $allSessions = [];
         $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
-    	$testCategories    = new ClientOnlineTestCategory;
+    	$testCategories    = ClientOnlineTestCategory::where('client_id', $clientId)->get();
 		$testSubCategories = new ClientOnlineTestSubCategory;
 		$testSubjects = new ClientOnlineTestSubject;
 		$paper = new ClientOnlineTestSubjectPaper;
-    	return view('client.onlineTest.paper.create', compact('instituteCourses','testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
+    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
     }
 
     /**
@@ -101,13 +94,12 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     	if(isset($id)){
     		$paper = ClientOnlineTestSubjectPaper::find($id);
     		if(is_object($paper)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $paper->client_id)->get();
     			$testCategories    = ClientOnlineTestCategory::showCategories($request);
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($paper->category_id, $request);
 				$testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId($paper->category_id, $paper->sub_category_id, $request);
-                $allSessions = ClientOnlinePaperSection::paperSectionsByInstituteCourseIdByPaperId($paper->client_institute_course_id,$paper->id);
+                $allSessions = ClientOnlinePaperSection::paperSectionsByPaperId($paper->id, Auth::guard('client')->user()->id);
 
-		    	return view('client.onlineTest.paper.create', compact('instituteCourses','testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
+		    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
     		}
     	}
 		return Redirect::to('manageOnlineTestSubjectPaper');
@@ -183,8 +175,8 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
         }
     }
 
-    protected function getOnlinePaperSectionsByInstituteCourseId(Request $request){
-        return ClientOnlinePaperSection::paperSectionsByInstituteCourseIdByPaperId($request->institute_course,$request->paper_id);
+    protected function paperSectionsByPaperId(Request $request){
+        return ClientOnlinePaperSection::paperSectionsByPaperId($request->paper_id, Auth::guard('client')->user()->id);
     }
 
 }

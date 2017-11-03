@@ -122,7 +122,11 @@ hr{
             @if(count($courseVideos)>0)
               @foreach($courseVideos as $courseVideo)
                 <li class="list-group-item" title="{{$courseVideo->name}}">
-                  <a class="ellipsis" href="{{url('episode')}}/{{$courseVideo->id}}">{{$courseVideo->name}} </a>
+                  @if('true' == $isCoursePurchased || 1 == $courseVideo->is_free)
+                    <a class="ellipsis" href="{{url('episode')}}/{{$courseVideo->id}}">{{$courseVideo->name}} </a>
+                  @else
+                    <a class="ellipsis" onClick="purchaseCourse();">{{$courseVideo->name}} </a>
+                  @endif
                   <span class="running-time"> {{ gmdate('H:i:s', $courseVideo->duration)}}</span>
                 </li>
               @endforeach
@@ -315,6 +319,13 @@ hr{
 @section('footer')
   @include('footer.client-footer')
   <script type="text/javascript">
+  function purchaseCourse(){
+    $.alert({
+        title: 'Alert!',
+        content: 'Please purchase course to acces this video.',
+    });
+    return false;
+  }
 
   function renderComments(msg, userId){
     var chatDiv = document.getElementById('chat-box');
@@ -781,15 +792,14 @@ hr{
   }
 
   $(document).ready(function() {
+    showCommentEle = "{{ Session::get('client_course_comment')}}";
+    showSubCommentEle = "{{ Session::get('client_subcomment_area')}}";
 
-      showCommentEle = "{{ Session::get('client_course_comment')}}";
-      showSubCommentEle = "{{ Session::get('client_subcomment_area')}}";
-
-      if(showCommentEle > 0 && showSubCommentEle == 0){
-        window.location.hash = '#showComment_'+showCommentEle;
-      } else if(showSubCommentEle > 0 && showCommentEle == 0){
-        window.location.hash = '#subcomment_'+showSubCommentEle;
-      }
+    if(showCommentEle > 0 && showSubCommentEle == 0){
+      window.location.hash = '#showComment_'+showCommentEle;
+    } else if(showSubCommentEle > 0 && showCommentEle == 0){
+      window.location.hash = '#subcomment_'+showSubCommentEle;
+    }
 
     $(document).on("click", "i[id^=video_like_]", function(e) {
         var videoId = $(this).data('video_id');
@@ -925,7 +935,6 @@ hr{
           });
         }
     });
-
   });
 function showMore(){
      var showChar = 400;

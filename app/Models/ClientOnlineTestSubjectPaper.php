@@ -11,7 +11,6 @@ use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\RegisterClientOnlinePaper;
-use App\Models\ClientInstituteCourse;
 use App\Models\ClientOnlinePaperSection;
 
 class ClientOnlineTestSubjectPaper extends Model
@@ -24,7 +23,7 @@ class ClientOnlineTestSubjectPaper extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'sub_category_id', 'subject_id', 'price', 'date_to_active', 'time','client_id', 'client_institute_course_id', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by'];
+    protected $fillable = ['name', 'category_id', 'sub_category_id', 'subject_id', 'date_to_active', 'time','client_id', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'is_free', 'allowed_unauthorised_user'];
 
     /**
      *  add/update paper
@@ -38,14 +37,14 @@ class ClientOnlineTestSubjectPaper extends Model
         $subcatId = InputSanitise::inputInt($request->get('subcategory'));
         $subjectId = InputSanitise::inputInt($request->get('subject'));
         $paperName = InputSanitise::inputString($request->get('name'));
-        $price = InputSanitise::inputInt($request->get('price'));
         $dateToActive = $request->get('date_to_active');
         $dateToInactive = $request->get('date_to_inactive');
         $time = strip_tags(trim($request->get('time')));
-        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
         $showCalculator = InputSanitise::inputInt($request->get('show_calculator'));
         $showSolution = InputSanitise::inputInt($request->get('show_solution'));
         $optionCount = InputSanitise::inputInt($request->get('option_count'));
+        $isFree = InputSanitise::inputInt($request->get('is_free'));
+        $unauthorisedUser = InputSanitise::inputInt($request->get('allowed_unauthorised_user'));
         $timeOutBy = $request->get('time_out_by');
 
         if( $isUpdate && isset($paperId)){
@@ -61,20 +60,20 @@ class ClientOnlineTestSubjectPaper extends Model
         $paper->category_id = $catId;
         $paper->sub_category_id = $subcatId;
         $paper->subject_id = $subjectId;
-        $paper->price = $price;
         $paper->date_to_active = $dateToActive;
         $paper->time = $time;
         $paper->client_id = Auth::guard('client')->user()->id;
-        $paper->client_institute_course_id = $instituteCourseId;
         $paper->date_to_inactive = $dateToInactive;
         $paper->show_calculator = $showCalculator;
         $paper->show_solution = $showSolution;
         $paper->option_count = $optionCount;
         $paper->time_out_by = $timeOutBy;
+        $paper->is_free = $isFree;
+        $paper->allowed_unauthorised_user = $unauthorisedUser;
         $paper->save();
 
         if( $isUpdate && isset($paperId)){
-            $allSessions = $request->except('_token','_method', 'paper_id', 'category', 'subcategory','subject', 'name', 'price', 'date_to_active', 'date_to_inactive', 'time', 'institute_course', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'all_session_count');
+            $allSessions = $request->except('_token','_method', 'paper_id', 'category', 'subcategory','subject', 'name', 'date_to_active', 'date_to_inactive', 'time', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'all_session_count', 'is_free', 'allowed_unauthorised_user');
             if(count($allSessions) > 0){
                 foreach($allSessions as $index => $paperSession){
                     $explodes = explode('_', $index);
@@ -87,7 +86,7 @@ class ClientOnlineTestSubjectPaper extends Model
             }
 
             if(count($updatePaperSessions) > 0){
-                $allSessions = ClientOnlinePaperSection::paperSectionsByInstituteCourseIdByPaperId($instituteCourseId,$paperId);
+                $allSessions = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, Auth::guard('client')->user()->id);
                 if(is_object($allSessions) && false == $allSessions->isEmpty()){
                     // update or delete
                     foreach($allSessions as $paperSession){
@@ -100,7 +99,6 @@ class ClientOnlineTestSubjectPaper extends Model
                                 $paperSession->subject_id = $subjectId;
                                 $paperSession->paper_id = $paperId;
                                 $paperSession->client_id = Auth::guard('client')->user()->id;
-                                $paperSession->client_institute_course_id = $instituteCourseId;
                                 $paperSession->save();
                             } else {
                                 $paperSession->delete();
@@ -119,7 +117,6 @@ class ClientOnlineTestSubjectPaper extends Model
                         $paperSession->subject_id = $subjectId;
                         $paperSession->paper_id = $paperId;
                         $paperSession->client_id = Auth::guard('client')->user()->id;
-                        $paperSession->client_institute_course_id = $instituteCourseId;
                         $paperSession->save();
                     }
                 }
@@ -138,8 +135,7 @@ class ClientOnlineTestSubjectPaper extends Model
                                     'sub_category_id' => $subcatId,
                                     'subject_id' => $subjectId,
                                     'paper_id' => $paper->id,
-                                    'client_id' => Auth::guard('client')->user()->id,
-                                    'client_institute_course_id' => $instituteCourseId
+                                    'client_id' => Auth::guard('client')->user()->id
                                 ];
                     }
                 }
@@ -175,10 +171,6 @@ class ClientOnlineTestSubjectPaper extends Model
 
     public function questions(){
         return $this->hasMany(ClientOnlineTestQuestion::class, 'paper_id');
-    }
-
-    public function instituteCourse(){
-        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
     }
 
     protected static function getOnlinePapersBySubjectId($subjectId){
@@ -341,10 +333,8 @@ class ClientOnlineTestSubjectPaper extends Model
         }
     }
 
-    protected static function getClientOnlineTestSubjectPapersByAssignedClientUserInstituteCourse(){
-        return static::join('client_user_institute_courses', 'client_user_institute_courses.client_institute_course_id', '=', 'client_online_test_subject_papers.client_institute_course_id')
-            ->where('client_online_test_subject_papers.client_id', Auth::guard('clientuser')->user()->client_id)
-            ->where('client_user_institute_courses.client_user_id', Auth::guard('clientuser')->user()->id)
-            ->where('client_user_institute_courses.test_permission', 1)->select('client_online_test_subject_papers.*')->get();
+    protected static function getClientOnlineTestSubjectPapersByClient(){
+        return static::where('client_online_test_subject_papers.client_id', Auth::guard('clientuser')->user()->client_id)
+            ->select('client_online_test_subject_papers.*')->get();
     }
 }

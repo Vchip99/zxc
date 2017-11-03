@@ -9,7 +9,6 @@ use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubjectPaper;
-use App\Models\ClientInstituteCourse;
 
 class ClientOnlineTestSubject extends Model
 {
@@ -21,7 +20,7 @@ class ClientOnlineTestSubject extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'sub_category_id', 'client_id', 'client_institute_course_id'];
+    protected $fillable = ['name', 'category_id', 'sub_category_id', 'client_id'];
 
      /**
      *  add/update subject
@@ -31,7 +30,6 @@ class ClientOnlineTestSubject extends Model
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
         $subjectName = InputSanitise::inputString($request->get('name'));
         $subjectId = InputSanitise::inputInt($request->get('subject_id'));
-        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
 
         if( $isUpdate && isset($subjectId)){
             $testSubject = static::find($subjectId);
@@ -45,7 +43,6 @@ class ClientOnlineTestSubject extends Model
         $testSubject->category_id = $categoryId;
         $testSubject->sub_category_id = $subcategoryId;
         $testSubject->client_id = Auth::guard('client')->user()->id;
-        $testSubject->client_institute_course_id = $instituteCourseId;
         $testSubject->save();
         return $testSubject;
     }
@@ -66,10 +63,6 @@ class ClientOnlineTestSubject extends Model
 
     public function papers(){
         return $this->hasMany(ClientOnlineTestSubjectPaper::class, 'subject_id');
-    }
-
-    public function instituteCourse(){
-        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
     }
 
     protected static function getOnlineSubjectsByCatIdBySubcatId($categoryId, $subcategoryId, $request){

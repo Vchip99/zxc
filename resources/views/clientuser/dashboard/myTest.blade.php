@@ -19,7 +19,16 @@
            margin-left: 0px;
      }
    }
-   .label-primary{margin-right: 2px;margin-left: 2px;}
+    .label-primary{margin-right: 2px;margin-left: 2px;}
+    .divider {
+      border-color: grey;
+      border-style: solid;
+      border-width: 0 0 1px;
+      height: 10px;
+      line-height: 20px;
+      text-align:center;
+      overflow: visible;
+    }
   </style>
 @stop
 @section('module_title')
@@ -41,9 +50,7 @@
             <select class="form-control" id="category" name="category" onChange="selectSubcategory(this);" title="Category">
               <option>Select Category</option>
               @foreach($testCategories as $testCategory)
-                @if(in_array($testCategory->client_institute_course_id, $clientApproveCourses))
-                  <option value="{{$testCategory->id}}"> {{$testCategory->name}} </option>
-                @endif
+                <option value="{{$testCategory->id}}"> {{$testCategory->name}} </option>
               @endforeach
             </select>
           </div>
@@ -69,7 +76,6 @@
     <div class="container exam-panel" id="subjects">
       @if(count($testSubjects)>0)
         @foreach($testSubjects as $testSubject)
-          @if(in_array($testSubject->client_institute_course_id, $clientApproveCourses))
           <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <div class="panel panel-default" >
               <div class="panel-heading" role="tab" id="headingOne">
@@ -180,7 +186,6 @@
               </div>
             </div>
           </div>
-          @endif
         @endforeach
       @else
         <div class="panel-heading" role="tab" id="headingOne">

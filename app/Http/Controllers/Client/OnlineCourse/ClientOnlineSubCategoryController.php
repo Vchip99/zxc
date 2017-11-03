@@ -9,7 +9,6 @@ use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineSubCategory;
-use App\Models\ClientInstituteCourse;
 
 class ClientOnlineSubCategoryController extends ClientBaseController
 {
@@ -26,7 +25,6 @@ class ClientOnlineSubCategoryController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateSubcategory = [
-        'institute_course' => 'required|integer',
         'category' => 'required|integer',
         'subcategory' => 'required|string',
     ];
@@ -35,10 +33,6 @@ class ClientOnlineSubCategoryController extends ClientBaseController
      *  show list of course sub category
      */
     protected function show(Request $request){
-        $coursePermission = InputSanitise::checkModulePermission($request, 'course');
-        if('false' == $coursePermission){
-            return Redirect::to('manageClientHome');
-        }
     	$subCategories = ClientOnlineSubCategory::showSubCategories($request);
     	return view('client.onlineCourse.subcategory.list', compact('subCategories'));
     }
@@ -48,10 +42,9 @@ class ClientOnlineSubCategoryController extends ClientBaseController
      */
     protected function create(Request $request){
         $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
-    	$categories = [];
+    	$categories = ClientOnlineCategory::where('client_id', $clientId)->get();
     	$subcategory = new ClientOnlineSubCategory;
-    	return view('client.onlineCourse.subcategory.create', compact('instituteCourses','subcategory','categories'));
+    	return view('client.onlineCourse.subcategory.create', compact('subcategory','categories'));
     }
 
     /**
@@ -90,8 +83,7 @@ class ClientOnlineSubCategoryController extends ClientBaseController
     		$subcategory = ClientOnlineSubCategory::find($id);
     		if(is_object($subcategory)){
                 $categories = ClientOnlineCategory::showCategories($request);
-                $instituteCourses = ClientInstituteCourse::where('client_id', $subcategory->client_id)->get();
-	    		return view('client.onlineCourse.subcategory.create', compact('instituteCourses','subcategory', 'categories'));
+	    		return view('client.onlineCourse.subcategory.create', compact('subcategory', 'categories'));
     		}
     	}
     	return Redirect::to('manageOnlineSubCategory');

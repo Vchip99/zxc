@@ -11,7 +11,6 @@ use App\Models\Client;
 use App\Models\Clientuser;
 use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
-use App\Models\ClientInstituteCourse;
 use App\Models\ClientAssignmentQuestion;
 use App\Models\ClientAssignmentAnswer;
 
@@ -33,7 +32,6 @@ class ClientAssignmentController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateAssignment = [
-        'institute_course' => 'required|integer',
         'subject' => 'required|integer',
         'topic' => 'required',
     ];
@@ -47,12 +45,10 @@ class ClientAssignmentController extends ClientBaseController
      *  create assignment
      */
     protected function create(){
-        $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
         $topics = [];
-        $subjects = [];
+        $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
         $assignment = new ClientAssignmentQuestion;
-        return view('client.assignment.create', compact('instituteCourses', 'subjects', 'topics', 'assignment'));
+        return view('client.assignment.create', compact('subjects', 'topics', 'assignment'));
     }
 
     /**
@@ -94,10 +90,9 @@ class ClientAssignmentController extends ClientBaseController
             $assignment = ClientAssignmentQuestion::find($id);
 
             if(is_object($assignment)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $assignment->client_id)->get();
-                $topics = ClientAssignmentTopic::getAssignmentTopicsBySubject($assignment->client_assignment_subject_id);;
-                $subjects = ClientAssignmentSubject::getAssignmentSubjectsByCourse($assignment->client_institute_course_id);
-                return view('client.assignment.create', compact('instituteCourses', 'subjects', 'topics', 'assignment'));
+                $topics = ClientAssignmentTopic::getAssignmentTopicsBySubject($assignment->client_assignment_subject_id);
+                $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
+                return view('client.assignment.create', compact('subjects', 'topics', 'assignment'));
             }
         }
         return Redirect::to('manageAssignment');
@@ -149,15 +144,13 @@ class ClientAssignmentController extends ClientBaseController
         $assignmentTopics = [];
         $assignmentUsers = [];
 
-        $selectedAssignmentCourse  = Session::get('client_selected_assignment_course');
         $selectedAssignmentSubject  = Session::get('client_selected_assignment_subject');
         $selectedAssignmentTopic = Session::get('client_selected_assignment_topic');
         $selectedAssignmentStudent = Session::get('client_selected_assignment_student');
 
-        if(!empty($selectedAssignmentCourse)){
-            $assignmentSubjects = ClientAssignmentSubject::getAssignmentSubjectsByCourse($selectedAssignmentCourse);
-            $assignmentUsers = Clientuser::searchStudentForAssignment($selectedAssignmentCourse);
-        }
+        $assignmentSubjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
+        $assignmentUsers = Clientuser::searchStudentForAssignment();
+
         if(!empty($selectedAssignmentSubject)){
             $assignmentTopics = ClientAssignmentTopic::getAssignmentTopicsBySubject($selectedAssignmentSubject);
         }
@@ -165,11 +158,7 @@ class ClientAssignmentController extends ClientBaseController
             $assignment = ClientAssignmentQuestion::where('client_id', Auth::guard('client')->user()->id)
                     ->where('client_assignment_topic_id', $selectedAssignmentTopic)->first();
         }
-        $instituteCourses = ClientInstituteCourse::join('client_assignment_questions', 'client_assignment_questions.client_institute_course_id', '=', 'client_institute_courses.id')
-                ->where('client_assignment_questions.client_id', Auth::guard('client')->user()->id)
-                ->select('client_institute_courses.id','client_institute_courses.*')
-                ->groupBy('client_institute_courses.id')->get();
-        return view('client.studentAssignment.studentsAssignment', compact('instituteCourses', 'assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'selectedAssignmentCourse', 'selectedAssignmentSubject', 'selectedAssignmentTopic', 'selectedAssignmentStudent', 'assignment'));
+        return view('client.studentAssignment.studentsAssignment', compact('assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'selectedAssignmentCourse', 'selectedAssignmentSubject', 'selectedAssignmentTopic', 'selectedAssignmentStudent', 'assignment'));
     }
 
     protected function searchStudentForAssignment(Request $request){
@@ -186,9 +175,7 @@ class ClientAssignmentController extends ClientBaseController
             $results['question'] = mb_strimwidth($assignment->question, 0, 400, "...");
             $results['subject'] = $assignment->subject->name;
             $results['topic'] = $assignment->topic->name;
-            $results['instituteCourse'] = $assignment->instituteCourse->name;
 
-            Session::set('client_selected_assignment_course', $assignment->client_institute_course_id);
             Session::set('client_selected_assignment_subject', $assignment->client_assignment_subject_id);
             Session::set('client_selected_assignment_topic', $assignment->client_assignment_topic_id);
             Session::set('client_selected_assignment_student', $request->student);
@@ -202,7 +189,7 @@ class ClientAssignmentController extends ClientBaseController
         $assignment = ClientAssignmentQuestion::find($id);
         $student = Clientuser::find($studentId);
         $answers = ClientAssignmentAnswer::where('client_id', $student->client_id)->where('student_id', $student->id)->where('client_assignment_question_id', $assignment->id)->get();
-        return view('client.studentAssignment.assignmentRemark', compact('assignment', 'instituteCourses', 'answers','student'));
+        return view('client.studentAssignment.assignmentRemark', compact('assignment', 'answers','student'));
     }
 
     protected function createAssignmentRemark(Request $request){

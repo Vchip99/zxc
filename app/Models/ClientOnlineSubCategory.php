@@ -8,7 +8,6 @@ use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineCourse;
-use App\Models\ClientInstituteCourse;
 
 class ClientOnlineSubCategory extends Model
 {
@@ -20,7 +19,7 @@ class ClientOnlineSubCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'client_id', 'client_institute_course_id'];
+    protected $fillable = ['name', 'category_id', 'client_id'];
 
     /**
      *  create/update course sub category
@@ -28,7 +27,6 @@ class ClientOnlineSubCategory extends Model
     protected static function addOrUpdateClientOnlineSubCategory( Request $request, $isUpdate=false){
 
     	$categoryId = InputSanitise::inputInt($request->get('category'));
-        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
     	$subCategoryId = InputSanitise::inputInt($request->get('subCategory_id'));
     	$subCategoryName = InputSanitise::inputString($request->get('subcategory'));
 
@@ -43,7 +41,6 @@ class ClientOnlineSubCategory extends Model
         $subcategory->name = $subCategoryName;
 		$subcategory->category_id = $categoryId;
 		$subcategory->client_id = Auth::guard('client')->user()->id;
-        $subcategory->client_institute_course_id = $instituteCourseId;
 		$subcategory->save();
 
         return $subcategory;
@@ -85,18 +82,13 @@ class ClientOnlineSubCategory extends Model
             $client = InputSanitise::getCurrentClient($request);
         }
 
-        $result = static::join('clients','clients.id', '=', 'client_online_sub_categories.client_id')
-                    ->join('client_institute_courses', 'client_institute_courses.id', '=', 'client_online_sub_categories.client_institute_course_id');
-                if(!empty($clientId)){
-                    $result->where('clients.id', $clientId);
-                } else {
-                    $result->where('clients.subdomain', $client);
-                }
-            return  $result->select('client_online_sub_categories.*')->get();
-    }
-
-    public function instituteCourse(){
-        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
+        $result = static::join('clients','clients.id', '=', 'client_online_sub_categories.client_id');
+        if(!empty($clientId)){
+            $result->where('clients.id', $clientId);
+        } else {
+            $result->where('clients.subdomain', $client);
+        }
+        return  $result->select('client_online_sub_categories.*')->get();
     }
 
     protected static function deleteClientOnlineSubCategoriesByClientId($clientId){

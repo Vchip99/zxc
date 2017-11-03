@@ -21,7 +21,7 @@
           <div class="mrgn_20_btm">
               <div class="col-sm-4 mrgn_10_btm">
                 <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" title="Category">
-                  <option value="">Select Category ...</option>
+                  <option value="">Select Category</option>
                   @if(count($categories) > 0)
                     @foreach($categories as $category)
                       <option value="{{$category->id}}">{{$category->name}}</option>
@@ -31,7 +31,7 @@
               </div>
               <div class="col-sm-4">
                 <select id="subcategory" class="form-control" name="subcategory" onChange="showResult(this);" title="Sub Category">
-                  <option value="">Select Sub Category ...</option>
+                  <option value="">Select Sub Category</option>
                 </select>
               </div>
           </div>
@@ -180,7 +180,7 @@
             select.innerHTML = '';
             var opt = document.createElement('option');
           opt.value = '';
-          opt.innerHTML = 'Select Sub Category ...';
+          opt.innerHTML = 'Select Sub Category';
           select.appendChild(opt);
           if( 0 < msg.length){
           $.each(msg, function(idx, obj) {

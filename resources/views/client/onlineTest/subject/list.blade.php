@@ -30,7 +30,6 @@
           <th>Subject Name</th>
           <th>Category Name</th>
           <th>Sub Category Name</th>
-          <th>Institute Course Name</th>
           <th>Edit Subject</th>
           <th>Delete Subject</th>
         </tr>
@@ -43,7 +42,6 @@
             <td>{{$testSubject->name}}</td>
             <td>{{$testSubject->category->name}}</td>
             <td>{{$testSubject->subcategory->name}}</td>
-            <td>{{$testSubject->instituteCourse->name}}</td>
             <td>
               <a href="{{url('onlinetestsubject')}}/{{$testSubject->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testSubject->name}}" />

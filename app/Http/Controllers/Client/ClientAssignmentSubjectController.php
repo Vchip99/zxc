@@ -9,7 +9,6 @@ use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\Client;
 use App\Models\ClientAssignmentSubject;
-use App\Models\ClientInstituteCourse;
 use App\Models\ClientAssignmentTopic;
 use App\Models\ClientAssignmentQuestion;
 use App\Models\ClientAssignmentAnswer;
@@ -32,7 +31,6 @@ class ClientAssignmentSubjectController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateSubject = [
-        'institute_course' => 'required|integer',
         'subject' => 'required',
     ];
 
@@ -45,10 +43,8 @@ class ClientAssignmentSubjectController extends ClientBaseController
      *  create assignment subject
      */
     protected function create(){
-        $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
         $subject = new ClientAssignmentSubject;
-        return view('client.assignmentSubject.create', compact('subject', 'instituteCourses'));
+        return view('client.assignmentSubject.create', compact('subject'));
     }
 
     /**
@@ -86,8 +82,7 @@ class ClientAssignmentSubjectController extends ClientBaseController
             $subject = ClientAssignmentSubject::find($id);
 
             if(is_object($subject)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $subject->client_id)->get();
-                return view('client.assignmentSubject.create', compact('subject', 'instituteCourses'));
+                return view('client.assignmentSubject.create', compact('subject'));
             }
         }
         return Redirect::to('manageAssignmentSubject');
@@ -124,7 +119,7 @@ class ClientAssignmentSubjectController extends ClientBaseController
     }
 
     protected function getAssignmentSubjectsByCourse(Request $request){
-        return ClientAssignmentSubject::getAssignmentSubjectsByCourse($request->institute_course_id);
+        return ClientAssignmentSubject::getAssignmentSubjectsByClient();
     }
 
     protected function delete(Request $request){

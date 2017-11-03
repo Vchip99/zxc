@@ -10,7 +10,6 @@ use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineSubCategory;
 use App\Models\RegisterClientOnlineCourses;
 use App\Models\ClientOnlineVideo;
-use App\Models\ClientInstituteCourse;
 
 class ClientOnlineCourse extends Model
 {
@@ -22,13 +21,12 @@ class ClientOnlineCourse extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path', 'release_date', 'client_id', 'client_institute_course_id'];
+    protected $fillable = ['name', 'category_id', 'sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path', 'release_date', 'client_id'];
 
     /**
      *  create/update course
      */
     protected static function addOrUpdateCourse(Request $request, $isUpdate = false){
-        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
     	$categoryId = InputSanitise::inputInt($request->get('category'));
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
         $courseName = InputSanitise::inputString($request->get('course'));
@@ -99,7 +97,6 @@ class ClientOnlineCourse extends Model
 
     	$course->release_date = $release_date;
     	$course->client_id = Auth::guard('client')->user()->id;
-        $course->client_institute_course_id = $instituteCourseId;
     	$course->save();
     	return $course;
 
@@ -123,12 +120,8 @@ class ClientOnlineCourse extends Model
         return $this->hasMany(ClientOnlineVideo::class, 'course_id');
     }
 
-    public function instituteCourse(){
-        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
-    }
-
-    protected static function getCourseAssocaitedWithVideos($subdomain){
-        return DB::connection('mysql2')->table('client_online_courses')
+    protected static function getCourseAssocaitedWithVideos($subdomain=NULL){
+        $query = DB::connection('mysql2')->table('client_online_courses')
                     ->join('client_online_videos', 'client_online_videos.course_id', '=', 'client_online_courses.id')
                     ->join('client_online_categories', 'client_online_categories.id', '=', 'client_online_courses.category_id')
                     ->join('client_online_sub_categories', 'client_online_sub_categories.id', '=', 'client_online_courses.sub_category_id')
@@ -136,11 +129,13 @@ class ClientOnlineCourse extends Model
                         $join->on('clients.id', '=', 'client_online_courses.client_id');
                         $join->on('clients.id', '=', 'client_online_videos.client_id');
                         $join->on('clients.id', '=', 'client_online_sub_categories.client_id');
-                    })
-                    ->where('clients.subdomain', $subdomain)
-                    ->select('client_online_courses.id','client_online_courses.*', 'client_online_sub_categories.name as subcategory', 'client_online_categories.name as category')
-                    ->groupBy('client_online_courses.id')
-                    ->get();
+                    });
+        if(is_object(Auth::guard('client')->user())){
+            $query->where('clients.id', Auth::guard('client')->user()->id);
+        } else if(!empty($subdomain)) {
+            $query->where('clients.subdomain', $subdomain);
+        }
+        return $query->select('client_online_courses.id','client_online_courses.*', 'client_online_sub_categories.name as subcategory', 'client_online_categories.name as category')->groupBy('client_online_courses.id')->get();
     }
 
     /**
@@ -203,7 +198,7 @@ class ClientOnlineCourse extends Model
     /**
      *  get registered online courses for user
      */
-    protected static function getRegisteredOnlineCourses($userId,$clientApproveCourses=[]){
+    protected static function getRegisteredOnlineCourses($userId){
         $userId = InputSanitise::inputInt($userId);
         $result = DB::connection('mysql2')->table('client_online_courses')
                 ->join('clients', 'clients.id', '=', 'client_online_courses.client_id')
@@ -212,9 +207,6 @@ class ClientOnlineCourse extends Model
                 ->join('client_online_sub_categories', 'client_online_sub_categories.id', '=', 'client_online_courses.sub_category_id')
                 ->join('client_online_categories', 'client_online_categories.id', '=', 'client_online_courses.category_id')
                 ->where('register_client_online_courses.client_user_id', $userId);
-        if(count($clientApproveCourses) > 0){
-            $result->whereIn('client_online_courses.client_institute_course_id', $clientApproveCourses);
-        }
         return $result->select('client_online_courses.id','client_online_courses.*', 'client_online_sub_categories.name as subCategory', 'client_online_categories.name as category')
                 ->groupBy('client_online_courses.id')
                 ->get();
@@ -267,10 +259,9 @@ class ClientOnlineCourse extends Model
         }
     }
 
-    protected static function getRegisteredOnlineCoursesByCourseidByUserId($courseId,$id){
+    protected static function getRegisteredOnlineCoursesByUserId($userId){
         return static::join('register_client_online_courses', 'register_client_online_courses.client_online_course_id', '=', 'client_online_courses.id')
-            ->where('client_online_courses.client_institute_course_id', $courseId)
-            ->where('register_client_online_courses.client_user_id', $id)
+            ->where('register_client_online_courses.client_user_id', $userId)
             ->get();
     }
 

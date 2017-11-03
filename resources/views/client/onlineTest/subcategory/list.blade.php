@@ -29,7 +29,6 @@
           <th>#</th>
           <th>Sub Category Name</th>
           <th>Category Name</th>
-          <th>Institute Course Name</th>
           <th>Edit Sub Category</th>
           <th>Delete Sub Category</th>
         </tr>
@@ -41,7 +40,6 @@
             <th scope="row">{{ $index + 1}}</th>
             <td>{{$testSubCategory->name}}</td>
             <td>{{$testSubCategory->category->name}}</td>
-            <td>{{$testSubCategory->instituteCourse->name}}</td>
             <td>
               <a href="{{url('onlinetestsubcategory')}}/{{$testSubCategory->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testSubCategory->name}}" />

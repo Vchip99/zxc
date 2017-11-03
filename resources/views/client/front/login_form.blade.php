@@ -99,16 +99,6 @@
                             <input id="confirm_password" name="confirm_password" type="text" class="form-control" data-type="password" onfocus="this.type='password'" autocomplete="off" placeholder="confirm password" required>
                             <span class="help-block"></span>
                           </div>
-                          <div class="form-group">
-                            <select class="multiselect form-control" name="course[]" title="course" multiple="multiple">
-                              @if(count($courses) > 0)
-                                @foreach($courses as $course)
-                                  <option value="{{$course->id}}">{{$course->name}}</option>
-                                @endforeach
-                              @endif
-                            </select>
-                            <span class="help-block"></span>
-                          </div>
                           </br>
                           <button type="submit" title="Register" name="register" class="btn btn-info btn-block">Register</button></br>
                         </form>

@@ -47,7 +47,7 @@
         <h4 class="v_h4_subtitle"> Filter By</h4>
         <div class="dropdown mrgn_20_top_btm" id="cat">
           <select class="form-control" id="category_id" name="category_id" onchange="showSubCategories(this);" title="Category">
-            <option>Select Category ...</option>
+            <option>Select Category</option>
             @if(count($testCategories) > 0)
               @foreach($testCategories as $testCategory)
                   <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>

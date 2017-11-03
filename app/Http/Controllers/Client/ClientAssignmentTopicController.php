@@ -10,7 +10,6 @@ use App\Libraries\InputSanitise;
 use App\Models\Client;
 use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
-use App\Models\ClientInstituteCourse;
 use App\Models\ClientAssignmentQuestion;
 use App\Models\ClientAssignmentAnswer;
 
@@ -32,7 +31,6 @@ class ClientAssignmentTopicController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateTopic = [
-        'institute_course' => 'required|integer',
         'subject' => 'required|integer',
         'topic' => 'required',
     ];
@@ -46,11 +44,9 @@ class ClientAssignmentTopicController extends ClientBaseController
      *  create assignment topic
      */
     protected function create(){
-        $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
         $topic = new ClientAssignmentTopic;
-        $subjects = [];
-        return view('client.assignmentTopic.create', compact('topic', 'instituteCourses', 'subjects'));
+        $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
+        return view('client.assignmentTopic.create', compact('topic', 'subjects'));
     }
 
     /**
@@ -87,9 +83,8 @@ class ClientAssignmentTopicController extends ClientBaseController
         if(isset($id)){
             $topic = ClientAssignmentTopic::find($id);
             if(is_object($topic)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $topic->client_id)->get();
-                $subjects = ClientAssignmentSubject::getAssignmentSubjectsByCourse($topic->client_institute_course_id);
-                return view('client.assignmentTopic.create', compact('topic', 'instituteCourses', 'subjects'));
+                $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
+                return view('client.assignmentTopic.create', compact('topic', 'subjects'));
             }
         }
         return Redirect::to('manageAssignmentTopic');

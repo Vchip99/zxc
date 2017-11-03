@@ -21,26 +21,12 @@
       <div class="top mrgn_40_btm"">
         <div class="container">
           <div class="row">
-            <div class="col-md-3 mrgn_10_btm">
-              <select class="form-control" id="course" name="course" onChange="showStudents(this.value);">
-                <option value="0"> Select Courses </option>
-                @if(count($instituteCourses) > 0)
-                  @foreach($instituteCourses as $instituteCourse)
-                    @if($courseId == $instituteCourse->id)
-                      <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-                    @else
-                      <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-                    @endif
-                  @endforeach
-                @endif
-              </select>
-            </div>
             <div class="col-md-3 mrgn_10_btm" id="student">
               <select class="form-control" id="selected_student" name="student" onChange="showResult();">
                 <option value="0"> Select User </option>
-                 @if(is_object($selectedStudent) && count($students) > 0)
+                 @if(count($students) > 0)
                   @foreach($students as $student)
-                    @if($selectedStudent->id == $student->id)
+                    @if(is_object($selectedStudent) && $selectedStudent->id == $student->id)
                       <option value="{{$student->id}}" selected="true"> {{$student->name}} </option>
                     @else
                       <option value="{{$student->id}}"> {{$student->name}} </option>
@@ -117,41 +103,12 @@
   </div>
 <script type="text/javascript">
 
-  function showStudents(){
-    var courseId = document.getElementById('course').value;
-    document.getElementById('selected_student').value = 0;
-    if(courseId > 0){
-      $.ajax({
-        method: "POST",
-        url: "{{url('searchUsers')}}",
-        data:{course_id:courseId}
-      })
-      .done(function( msg ) {
-        select = document.getElementById('selected_student');
-        select.innerHTML = '';
-        var opt = document.createElement('option');
-        opt.value = '0';
-        opt.innerHTML = 'Select User';
-        select.appendChild(opt);
-        if( 0 < msg['users'].length){
-          $.each(msg['users'], function(idx, obj) {
-              var opt = document.createElement('option');
-              opt.value = obj.id;
-              opt.innerHTML = obj.name;
-              select.appendChild(opt);
-          });
-        }
-      });
-    }
-  }
-
   function showResult(ele){
     var student = parseInt(document.getElementById('selected_student').value);
-    var courseId = parseInt(document.getElementById('course').value);
     $.ajax({
         method: "POST",
         url: "{{url('getStudentById')}}",
-        data: {student_id:student,course_id:courseId}
+        data: {student_id:student}
     })
     .done(function( msg ) {
       var divVideo = document.getElementById('video');

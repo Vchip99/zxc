@@ -24,15 +24,14 @@ class ClientNotification extends Model
      *
      * @var array
      */
-    protected $fillable = ['message', 'client_id', 'notification_module','created_module_id', ' client_institute_course_id', 'created_by', 'created_to', 'is_seen', 'created_at'];
+    protected $fillable = ['message', 'client_id', 'notification_module','created_module_id', 'created_by', 'created_to', 'is_seen', 'created_at'];
 
-    protected static function addNotification($notificationMessage, $notificationModule, $createdModuleId, $clientInstituteCourseId){
+    protected static function addNotification($notificationMessage, $notificationModule, $createdModuleId){
     	$notification = new static;
     	$notification->message = $notificationMessage;
     	$notification->client_id = Auth::guard('client')->user()->id;
         $notification->notification_module = $notificationModule;
         $notification->created_module_id = $createdModuleId;
-        $notification->client_institute_course_id = $clientInstituteCourseId;
     	$notification->created_by = 0;
     	$notification->created_to = 0;
         $notification->created_at = date('Y-m-d');
@@ -47,7 +46,6 @@ class ClientNotification extends Model
         $notification->client_id = Auth::guard('clientuser')->user()->client_id;;
         $notification->notification_module = $notificationModule;
         $notification->created_module_id = $createdModuleId;
-        $notification->client_institute_course_id = 0;
         $notification->created_by = $createdBy;
         $notification->created_to = $createdTo;
         $notification->created_at = date('Y-m-d');

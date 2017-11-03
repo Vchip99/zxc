@@ -20,9 +20,9 @@ use App\Models\ClientCourseCommentLike;
 use App\Models\ClientHomePage;
 use App\Models\ClientCourseSubCommentLike;
 use App\Models\ClientCourseSubComment;
-use App\Models\ClientUserInstituteCourse;
 use App\Models\ClientNotification;
 use App\Models\ClientReadNotification;
+use App\Models\ClientUserPurchasedCourse;
 
 class ClientOnlineCourseFrontController extends ClientHomeController
 {
@@ -40,21 +40,21 @@ class ClientOnlineCourseFrontController extends ClientHomeController
      *  show all courses associated with videos
      */
     protected function courses(Request $request){
+        $userPurchasedCourses = [];
         $subdomain = InputSanitise::checkDomain($request);
         if(!is_object($subdomain)){
             return Redirect::away('http://localvchip.com');
         }
         view::share('subdomain', $subdomain);
-
-        $coursePermission = InputSanitise::checkModulePermission($request, 'course');
-        if( 'false' == $coursePermission){
-            return Redirect::to('/');
-        }
     	$subdomainName = InputSanitise::getCurrentClient($request);
         $courseCategories = ClientOnlineCategory::getCategoriesAssocaitedWithVideos($subdomainName);
         $courses = ClientOnlineCourse::getCourseAssocaitedWithVideos($subdomainName);
-        $courseVideoCount = $this->getVideoCount($courses);
-        return view('client.front.onlineCourses.courses', compact('courseCategories', 'courses', 'courseVideoCount'));
+        if(is_object(Auth::guard('clientuser')->user())){
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+            $userId = Auth::guard('clientuser')->user()->id;
+            $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $userId);
+        }
+        return view('client.front.onlineCourses.courses', compact('courseCategories', 'courses', 'userPurchasedCourses'));
     }
 
     /**
@@ -86,22 +86,18 @@ class ClientOnlineCourseFrontController extends ClientHomeController
 
     protected function courseDetails($subdomain, $id,Request $request){
 	 	$onlineVideoIds = [];
-        $userCoursePermissions = '';
+        $isCoursePurchased = 'false';
         $courseId = json_decode(trim($id));
         $course = ClientOnlineCourse::find($courseId);
         if(is_object($course)){
-            if(is_object(Auth::guard('clientuser')->user())){
-                $userCoursePermissions = ClientUserInstituteCourse::getCoursePermissionsByUserByCourseIdsByModule(array($course->client_institute_course_id), 'course');
-                $onlineVideos = ClientOnlineVideo::getClientCourseVideosByAssignedClientUserInstituteCourse();
-                if(is_object($onlineVideos) && false == $onlineVideos->isEmpty()){
-                    foreach($onlineVideos as $onlineVideo){
-                        $onlineVideoIds[] = $onlineVideo->id;
-                    }
-                }
-            }
             $videos = ClientOnlineVideo::getClientCourseVideosByCourseId($courseId, $request);
             $isCourseRegistered = RegisterClientOnlineCourses::isCourseRegistered($courseId);
-            return view('client.front.onlineCourses.course_details', compact('videos', 'courseId', 'isCourseRegistered', 'course', 'onlineVideoIds', 'userCoursePermissions'));
+            if(is_object(Auth::guard('clientuser')->user())){
+                $clientId = Auth::guard('clientuser')->user()->client_id;
+                $userId = Auth::guard('clientuser')->user()->id;
+                $isCoursePurchased = ClientUserPurchasedCourse::isCoursePurchased($clientId, $userId, $courseId);
+            }
+            return view('client.front.onlineCourses.course_details', compact('videos', 'courseId', 'isCourseRegistered', 'course', 'isCoursePurchased'));
         }
         return redirect()->back();
     }
@@ -114,15 +110,6 @@ class ClientOnlineCourseFrontController extends ClientHomeController
         if(isset($videoId)){
             $video = ClientOnlineVideo::find($videoId);
             if(is_object($video)){
-                if(is_object(Auth::guard('clientuser')->user())){
-                    $onlineVideo = ClientOnlineVideo::getAssignedClientCourseVideo($video->id);
-                    if(!is_object($onlineVideo)){
-                        return Redirect::to('online-courses');
-                    }
-                } else {
-                    return Redirect::to('online-courses');
-                }
-
                 $user = new Clientuser;
                 $courseVideos = ClientOnlineVideo::getClientCourseVideosByCourseId($video->course_id, $request);
                 $comments = ClientCourseComment::getCommentsByVideoId($video->id, $request);
@@ -154,10 +141,16 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                     } else {
                         Session::set('client_subcomment_area', 0);
                     }
+                    $clientId = Auth::guard('clientuser')->user()->client_id;
+                    $isCoursePurchased = ClientUserPurchasedCourse::isCoursePurchased($clientId, $currentUser, $video->course_id);
                 } else {
                     $currentUser = 0;
+                    $isCoursePurchased = 'false';
+                    if(0 == $video->is_free){
+                        return Redirect::to('online-courses');
+                    }
                 }
-                return view('client.front.onlineCourses.episode', compact('video', 'courseVideos', 'comments', 'user', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
+                return view('client.front.onlineCourses.episode', compact('video', 'courseVideos', 'comments', 'user', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'isCoursePurchased'));
             }
         }
         return Redirect::to('online-courses');

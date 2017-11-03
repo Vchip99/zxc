@@ -5,14 +5,12 @@
         <div class="col-lg-6 col-md-6 col-sm-6">
           <h3> organizations</h3>
           <ul>
-            <li class="" title="Main Site"><a href="{{ $subdomain->institute_url }}" target="_blank">Main Site</a></li>
+            @if(is_object($subdomain))
+              <li class="" title="Main Site"><a href="{{ $subdomain->institute_url }}" target="_blank">Main Site</a></li>
+            @endif
             <li title="Home"><a href="/"> Home</a></li>
-            @if(1 == $client->course_permission)
-              <li title="Courses"><a href="{{ url('online-courses') }}" >Courses</a></li>
-            @endif
-            @if(1 == $client->test_permission)
-              <li title="Test Series"><a href="{{ url('online-tests') }}" >Test Series</a></li>
-            @endif
+            <li title="Courses"><a href="{{ url('online-courses') }}" >Courses</a></li>
+            <li title="Test Series"><a href="{{ url('online-tests') }}" >Test Series</a></li>
             <li title="Admin Log in"><a href="{{ url('client/login') }}" >Admin Log in</a></li>
           </ul>
         </div>

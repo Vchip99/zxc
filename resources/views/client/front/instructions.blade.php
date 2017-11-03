@@ -99,8 +99,10 @@ body{font-family:  Century Gothic, serif}
 								<img src="{{ asset('images/user/user.png') }}" class="img-responsive" alt="user" />
 								<br/>
 								<div class="form-group">
-									<span><b>Name :</b>{{Auth::guard('clientuser')->user()->name}}</span><br/>
-									<span><b>Email :</b> {{Auth::guard('clientuser')->user()->email}}</span>
+									@if(is_object(Auth::guard('clientuser')->user()))
+										<span><b>Name :</b>{{Auth::guard('clientuser')->user()->name}}</span><br/>
+										<span><b>Email :</b> {{Auth::guard('clientuser')->user()->email}}</span>
+									@endif
 								</div>
 							</div>
 						</div><br/>

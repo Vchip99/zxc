@@ -9,7 +9,6 @@ use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineVideo;
 use App\Models\ClientOnlineCourse;
-use App\Models\ClientInstituteCourse;
 use App\Models\ClientNotification;
 
 class ClientOnlineVideoController extends ClientBaseController
@@ -27,7 +26,6 @@ class ClientOnlineVideoController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateVideo = [
-        'institute_course' => 'required|integer',
         'video' => 'required|string',
         'description' => 'required|string',
         'duration' => 'required|integer',
@@ -39,10 +37,6 @@ class ClientOnlineVideoController extends ClientBaseController
      *  show list of course video
      */
     protected function show(Request $request){
-        $coursePermission = InputSanitise::checkModulePermission($request, 'course');
-        if('false' == $coursePermission){
-            return Redirect::to('manageClientHome');
-        }
     	$videos = ClientOnlineVideo::showVideos($request);
     	return view('client.onlineCourse.video.list', compact('videos'));
     }
@@ -52,8 +46,7 @@ class ClientOnlineVideoController extends ClientBaseController
      */
     protected function create(Request $request){
         $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
-    	$courses = [];
+    	$courses = ClientOnlineCourse::where('client_id', $clientId)->get();
     	$video = new ClientOnlineVideo;
     	return view('client.onlineCourse.video.create', compact('instituteCourses','courses', 'video'));
     }
@@ -73,7 +66,7 @@ class ClientOnlineVideoController extends ClientBaseController
         	$video = ClientOnlineVideo::addOrUpdateVideo($request);
             if(is_object($video)){
                 $notificationMessage = 'A new course video: <a href="'.$request->root().'/episode/'.$video->id.'">'.$video->name.'</a> has been added.';
-                ClientNotification::addNotification($notificationMessage, ClientNotification::CLIENTCOURSEVIDEO, $video->id, $video->client_institute_course_id);
+                ClientNotification::addNotification($notificationMessage, ClientNotification::CLIENTCOURSEVIDEO, $video->id);
                 DB::connection('mysql2')->commit();
             	return Redirect::to('manageOnlineVideo')->with('message', 'Video created successfully!');
             }
@@ -94,9 +87,8 @@ class ClientOnlineVideoController extends ClientBaseController
     	if(isset($id)){
     		$video = ClientOnlineVideo::find($id);
     		if(is_object($video)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $video->client_institute_course_id)->get();
     			$courses = ClientOnlineCourse::showCourses($request);
-    			return view('client.onlineCourse.video.create', compact('instituteCourses','courses', 'video'));
+    			return view('client.onlineCourse.video.create', compact('courses', 'video'));
     		}
     	}
     	return Redirect::to('manageOnlineVideo');

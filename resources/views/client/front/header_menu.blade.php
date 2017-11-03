@@ -68,17 +68,13 @@
             <ul class="nav navbar-nav">
           <li class="" title="Main Site"><a href="{{ $subdomain->institute_url }}" target="_blank">Main Site</a></li>
           <li class="" title="HOME"><a href="{{ url('/')}}">HOME</a></li>
-          @if(1 == $client->course_permission)
-              <li class="" title="Online Course">
-                <a href="{{ url('online-courses')}}"> Online Course </a>
-              </li>
-          @endif
-          @if(1 == $client->test_permission)
-              <li class="dropdown" title="Online Tests">
-                <a href="{{ url('online-tests')}}"> Online Tests </a>
-                </a>
-              </li>
-          @endif
+          <li class="" title="Online Course">
+            <a href="{{ url('online-courses')}}"> Online Course </a>
+          </li>
+          <li class="dropdown" title="Online Tests">
+            <a href="{{ url('online-tests')}}"> Online Tests </a>
+            </a>
+          </li>
         </ul>
    </div>
  </div>

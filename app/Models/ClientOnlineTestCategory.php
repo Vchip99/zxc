@@ -8,7 +8,6 @@ use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineTestSubCategory;
-use App\Models\ClientInstituteCourse;
 
 class ClientOnlineTestCategory extends Model
 {
@@ -20,7 +19,7 @@ class ClientOnlineTestCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'client_id', 'client_institute_course_id'];
+    protected $fillable = ['name', 'client_id'];
 
      /**
      *  add/update test category
@@ -28,7 +27,6 @@ class ClientOnlineTestCategory extends Model
     protected static function addOrUpdateCategory( Request $request, $isUpdate=false){
         $categoryName = InputSanitise::inputString($request->get('category'));
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
-        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
         if( $isUpdate && isset($categoryId)){
             $category = static::find($categoryId);
             if(!is_object($category)){
@@ -39,7 +37,6 @@ class ClientOnlineTestCategory extends Model
         }
         $category->name = $categoryName;
         $category->client_id = Auth::guard('client')->user()->id;
-        $category->client_institute_course_id = $instituteCourseId;
         $category->save();
         return $category;
     }
@@ -53,8 +50,7 @@ class ClientOnlineTestCategory extends Model
 
         $result = static::join('clients', function($join){
                     $join->on('clients.id', '=', 'client_online_test_categories.client_id');
-                })
-                ->join('client_institute_courses', 'client_institute_courses.id', '=', 'client_online_test_categories.client_institute_course_id');
+                });
         if(!empty($clientId)){
             $result->where('clients.id', $clientId);
         } else {
@@ -87,7 +83,7 @@ class ClientOnlineTestCategory extends Model
             $result->where('clients.subdomain', $client);
         }
         return $result->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d'))
-            ->select('client_online_test_categories.id', 'client_online_test_categories.name', 'client_online_test_categories.client_institute_course_id')
+            ->select('client_online_test_categories.id', 'client_online_test_categories.name')
             ->groupBy('client_online_test_categories.id')->get();
     }
 
@@ -95,24 +91,17 @@ class ClientOnlineTestCategory extends Model
         return $this->hasMany(ClientOnlineTestSubCategory::class, 'category_id');
     }
 
-    public function instituteCourse(){
-        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
-    }
-
     /**
      * return test categopries registered subject papers
      */
-    protected static function getTestCategoriesByRegisteredSubjectPapersByUserId($userId, $clientApproveCourses=[]){
+    protected static function getTestCategoriesByRegisteredSubjectPapersByUserId($userId){
         $userId = InputSanitise::inputInt($userId);
         $result =  DB::connection('mysql2')->table('client_online_test_categories')
                 ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.category_id', 'client_online_test_categories.id')
                 ->join('register_client_online_papers', 'register_client_online_papers.client_paper_id', 'client_online_test_subject_papers.id')
                 ->join('clientusers', 'clientusers.id', '=', 'register_client_online_papers.client_user_id')
                 ->where('register_client_online_papers.client_user_id', $userId);
-        if(count($clientApproveCourses) > 0){
-            $result->whereIn('client_online_test_categories.client_institute_course_id', $clientApproveCourses);
-        }
-        return $result->select('client_online_test_categories.id', 'client_online_test_categories.name', 'client_online_test_categories.client_institute_course_id')->groupBy('client_online_test_categories.id')->get();
+        return $result->select('client_online_test_categories.id', 'client_online_test_categories.name')->groupBy('client_online_test_categories.id')->get();
     }
 
     protected static function getCategoriesByInstituteCourseId($id){

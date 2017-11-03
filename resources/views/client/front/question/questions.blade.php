@@ -253,9 +253,11 @@
 					<input type="hidden" name="mode"  id="mode" value=""/>
 					<img src="{{ asset('images/user/user.png') }}" style="width: 100px; height: 100px;" />
 					<br/>
-					<span><b>Name :</b> </span>{{Auth::guard('clientuser')->user()->name}}
-					<br/>
-					<span><b>Email :</b> </span>{{Auth::guard('clientuser')->user()->email}}
+					@if(is_object(Auth::guard('clientuser')->user()))
+						<span><b>Name :</b> </span>{{Auth::guard('clientuser')->user()->name}}
+						<br/>
+						<span><b>Email :</b> </span>{{Auth::guard('clientuser')->user()->email}}
+					@endif
 	          	</div>
 	        </div>
 	      </div>

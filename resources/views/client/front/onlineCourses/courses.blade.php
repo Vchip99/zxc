@@ -65,7 +65,15 @@
                     <div class="course-box-content" >
                        <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
                        <div class="categoery" title="{{$course->category}}">
-                         <a  href="{{ url('courseDetails')}}/{{$course->id}}"> {{$course->category}}</a>
+                          <a  href="{{ url('courseDetails')}}/{{$course->id}}">
+                            @if(in_array($course->id, $userPurchasedCourses))
+                              Paid
+                            @elseif($course->price > 0)
+                              Price: {{$course->price}} Rs.
+                            @else
+                              Free
+                            @endif
+                          </a>
                        </div>
                        <br/>
                       <p class="block-with-text">
@@ -83,8 +91,21 @@
                         </div>
                       </div>
                       <div class="course-auther">
-                        <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
-                        </a>
+                        @if($course->price > 0)
+                          @if(in_array($course->id, $userPurchasedCourses))
+                            <a>
+                              <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Paid</i>
+                            </a>
+                          @else
+                            <a style="cursor: pointer;">
+                              <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Pay Now</i>
+                            </a>
+                          @endif
+                        @else
+                          <a>
+                            <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Free Course</i>
+                          </a>
+                        @endif
                       </div>
                     </div>
                   </div>
@@ -105,7 +126,7 @@
                     <div class="course-box-content" >
                        <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
                        <div class="categoery" title="{{$course->category}}">
-                         <a  href="{{ url('courseDetails')}}/{{$course->id}}"> {{$course->category}}</a>
+                         <a  href="{{ url('courseDetails')}}/{{$course->id}}"> {{($course->price > 0)? "Price: $course->price Rs." : 'Free' }}</a>
                        </div>
                        <br/>
                       <p class="block-with-text">
@@ -123,8 +144,15 @@
                         </div>
                       </div>
                       <div class="course-auther">
-                        <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true"> {{$course->author}}</i>
-                        </a>
+                        @if($course->price > 0)
+                          <a style="cursor: pointer;">
+                            <i class="fa fa-long-arrow-right block-with-text" onClick="checkLogin();">Pay Now</i>
+                          </a>
+                        @else
+                          <a>
+                            <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Free Course</i>
+                          </a>
+                        @endif
                       </div>
                     </div>
                   </div>
@@ -144,6 +172,13 @@
   <script type="text/javascript" src="{{ asset('js/togleForFilterBy.js')}}"></script>
   <script type="text/javascript" src="{{ asset('js/read_info.js')}}"></script>
   <script type="text/javascript">
+  function checkLogin(){
+    $.alert({
+          title: 'Alert!',
+          content: 'Please login first.',
+      });
+    return false;
+  }
   function getCourseSubCategories(id){
     if( 0 < id ){
       $.ajax({

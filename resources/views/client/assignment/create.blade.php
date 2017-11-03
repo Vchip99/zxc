@@ -21,31 +21,6 @@
    <form action="{{url('createAssignment')}}" method="POST" enctype="multipart/form-data">
   @endif
     {{ csrf_field() }}
-    <div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Institute Course Name:</label>
-      <div class="col-sm-3">
-        @if(isset($assignment->id) && count($instituteCourses) > 0)
-          @foreach($instituteCourses as $instituteCourse)
-            @if( $assignment->client_institute_course_id == $instituteCourse->id)
-              <input class="form-control" type="text" name="institute_course_text" value="{{$instituteCourse->name}}" readonly="true">
-              <input type="hidden" name="institute_course" value="{{$instituteCourse->id}}">
-            @endif
-          @endforeach
-        @else
-           <select class="form-control" id="institute_course" name="institute_course" required title="Institute Course" onClick="selectSubject(this);">
-            <option value="">Select Institute Course</option>
-          @foreach($instituteCourses as $instituteCourse)
-            @if( $assignment->client_institute_course_id == $instituteCourse->id)
-              <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-            @else
-              <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-            @endif
-          @endforeach
-          </select>
-          @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
-        @endif
-      </div>
-    </div>
     <div class="form-group row @if ($errors->has('subject')) has-error @endif">
       <label class="col-sm-2 col-form-label">Subject Name:</label>
       <div class="col-sm-3">
@@ -60,6 +35,9 @@
         @else
           <select class="form-control" id="subject" name="subject" required title="Subject" onClick="selectTopic(this);">
             <option value="">Select Subject</option>
+            @foreach($subjects as $subject)
+              <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+            @endforeach
           </select>
           @if($errors->has('subject')) <p class="help-block">{{ $errors->first('subject') }}</p> @endif
         @endif
@@ -121,33 +99,6 @@
     </form>
   </div>
 <script type="text/javascript">
-  function selectSubject(ele){
-    id = parseInt($(ele).val());
-    if( 0 < id ){
-      $.ajax({
-          method: "POST",
-          url: "{{url('getAssignmentSubjectsByCourse')}}",
-          data: {institute_course_id:id}
-      })
-      .done(function( msg ) {
-        select = document.getElementById('subject');
-        select.innerHTML = '';
-        var opt = document.createElement('option');
-        opt.value = '';
-        opt.innerHTML = 'Select Subject';
-        select.appendChild(opt);
-        if( 0 < msg.length){
-          $.each(msg, function(idx, obj) {
-              var opt = document.createElement('option');
-              opt.value = obj.id;
-              opt.innerHTML = obj.name;
-              select.appendChild(opt);
-          });
-        }
-      });
-    }
-  }
-
   function selectTopic(ele){
     id = parseInt($(ele).val());
     if( 0 < id ){
@@ -177,13 +128,12 @@
 
   function checkAssignmentExist(ele){
     var id = parseInt($(ele).val());
-    var course_id = document.getElementById('institute_course').value;
     var subject_id = document.getElementById('subject').value;
     if( 0 < id ){
       $.ajax({
           method: "POST",
           url: "{{url('checkAssignmentExist')}}",
-          data: {topic_id:id,subject_id:subject_id,course_id:course_id}
+          data: {topic_id:id,subject_id:subject_id}
       })
       .done(function( msg ) {
         if('true' == msg['status']){

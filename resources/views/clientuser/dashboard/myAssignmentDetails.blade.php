@@ -37,7 +37,7 @@
     .direct-chat-text img,
     .direct-chat-text-left img{
       max-width: 60% !important;
-      height: 200px !important;
+      max-height: 200px !important;
       margin: 10px;
 
     }
@@ -72,12 +72,6 @@
       <div class="col-md-12 ">
         <div class="box box-primary direct-chat direct-chat-warning">
           <div class="box-header with-border">
-            <div class="form-group row ">
-              <label class="col-sm-2 col-form-label">Institute Course:</label>
-              <div class="col-sm-3">
-                {{$assignment->instituteCourse->name}}
-              </div>
-            </div>
             <div class="form-group row ">
               <label class="col-sm-2 col-form-label">Subject Name:</label>
               <div class="col-sm-3">

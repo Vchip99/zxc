@@ -19,30 +19,12 @@
       <form action="{{url('createOnlineTestSubCategory')}}" method="POST" enctype="multipart/form-data">
   @endif
     {{ csrf_field() }}
-  <div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
-    <label class="col-sm-2 col-form-label">Institute Course Name:</label>
-    <div class="col-sm-3">
-      <select class="form-control" name="institute_course" required title="Category" onChange="selectCategory(this);" >
-          <option value="">Select Institute Course ...</option>
-          @if(count($instituteCourses) > 0)
-            @foreach($instituteCourses as $instituteCourse)
-              @if( $testSubcategory->client_institute_course_id == $instituteCourse->id)
-                <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-              @else
-                <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-              @endif
-            @endforeach
-          @endif
-        </select>
-        @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
-    </div>
-  </div>
   <div class="form-group row @if ($errors->has('category')) has-error @endif">
     <label class="col-sm-2 col-form-label">Category Name:</label>
     <div class="col-sm-3">
       <select class="form-control" id="category" name="category" required title="Category">
-          <option value="">Select Category ...</option>
-          @if( isset($testSubcategory->id) && count($testCategories) > 0)
+          <option value="">Select Category</option>
+          @if(count($testCategories) > 0)
             @foreach($testCategories as $testCategory)
               @if( $testSubcategory->category_id == $testCategory->id)
                 <option value="{{$testCategory->id}}" selected="true">{{$testCategory->name}}</option>
@@ -83,33 +65,4 @@
     </div>
   </div>
 </form>
-
-<script type="text/javascript">
-  function selectCategory(ele){
-    var id = parseInt($(ele).val());
-    if( 0 < id ){
-      $.ajax({
-              method: "POST",
-              url: "{{url('getOnlineTestCategories')}}",
-              data: {id:id}
-          })
-          .done(function( msg ) {
-            select = document.getElementById('category');
-            select.innerHTML = '';
-            var opt = document.createElement('option');
-            opt.value = '';
-            opt.innerHTML = 'Select Category ...';
-            select.appendChild(opt);
-            if( 0 < msg.length){
-              $.each(msg, function(idx, obj) {
-                  var opt = document.createElement('option');
-                  opt.value = obj.id;
-                  opt.innerHTML = obj.name;
-                  select.appendChild(opt);
-              });
-            }
-          });
-    }
-  }
-</script>
 @stop

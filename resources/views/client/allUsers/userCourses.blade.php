@@ -15,26 +15,12 @@
       <div class="top mrgn_40_btm">
         <div class="container">
           <div class="row">
-            <div class="col-md-3 mrgn_10_btm">
-              <select class="form-control" id="course" name="course" onChange="showStudents(this.value);">
-                <option value="0"> Select Courses </option>
-                @if(count($instituteCourses) > 0)
-                  @foreach($instituteCourses as $instituteCourse)
-                    @if($courseId == $instituteCourse->id)
-                      <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-                    @else
-                      <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-                    @endif
-                  @endforeach
-                @endif
-              </select>
-            </div>
             <div class="col-md-3 mrgn_10_btm" id="student">
               <select class="form-control" id="selected_student" name="student" onChange="showResult();">
                 <option value="0"> Select User </option>
-                 @if(is_object($selectedStudent) && count($students) > 0)
+                 @if(count($students) > 0)
                   @foreach($students as $student)
-                    @if($selectedStudent->id == $student->id)
+                    @if(is_object($selectedStudent) && $selectedStudent->id == $student->id)
                       <option value="{{$student->id}}" selected="true"> {{$student->name}} </option>
                     @else
                       <option value="{{$student->id}}"> {{$student->name}} </option>
@@ -95,12 +81,11 @@
 <script type="text/javascript">
 
   function showResult(ele){
-    var courseId = document.getElementById('course').value;
     var studentId = parseInt(document.getElementById('selected_student').value);
     $.ajax({
             method: "POST",
             url: "{{url('showUserCourses')}}",
-            data: {course_id:courseId,student_id:studentId}
+            data: {student_id:studentId}
         })
         .done(function( msg ) {
           body = document.getElementById('course-result');

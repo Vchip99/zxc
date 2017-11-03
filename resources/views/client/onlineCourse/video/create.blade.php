@@ -19,29 +19,11 @@
     <form action="{{url('createOnlineVideo')}}" method="POST" enctype="multipart/form-data">
   @endif
     {{ csrf_field() }}
-    <div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Institute Course Name:</label>
-      <div class="col-sm-3">
-        <select class="form-control" name="institute_course" required title="Institute Course" onChange="selectCourse(this);">
-            <option value="">Select Institute Course ...</option>
-            @if(count($instituteCourses) > 0)
-              @foreach($instituteCourses as $instituteCourse)
-                @if( $video->client_institute_course_id == $instituteCourse->id)
-                  <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-                @else
-                  <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-                @endif
-              @endforeach
-            @endif
-          </select>
-          @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
-      </div>
-    </div>
     <div class="form-group row @if ($errors->has('course')) has-error @endif">
       <label class="col-sm-2 col-form-label">Course Name</label>
       <div class="col-sm-3">
         <select id="course" class="form-control" name="course" required title="Course">
-            <option value="">Select Course ...</option>
+            <option value="">Select Course</option>
             @if(count($courses) > 0)
               @foreach($courses as $course)
                 @if( isset($video->id) && $video->course_id == $course->id)
@@ -94,6 +76,19 @@
         <input type="text" class="form-control"  name="video_path" value="{{($video->video_path)?$video->video_path:NULL}}" placeholder="Add video path with iframe" required="true">
       </div>
     </div>
+    <div class="form-group row @if ($errors->has('is_free')) has-error @endif">
+      <label for="course" class="col-sm-2 col-form-label">Free Video:</label>
+      <div class="col-sm-3">
+          @if(isset($video->id))
+          <label class="radio-inline"><input type="radio" name="is_free" value="1" @if(1 == $video->is_free) checked="true" @endif> Yes</label>
+          <label class="radio-inline"><input type="radio" name="is_free" value="0" @if(0 == $video->is_free) checked="true" @endif> No</label>
+          @else
+            <label class="radio-inline"><input type="radio" name="is_free" value="1"> Yes</label>
+            <label class="radio-inline"><input type="radio" name="is_free" value="0" checked> No</label>
+          @endif
+        @if($errors->has('is_free')) <p class="help-block">{{ $errors->first('is_free') }}</p> @endif
+      </div>
+    </div>
     <div class="form-group row">
         <div class="offset-sm-2 col-sm-3" title="Submit">
           <button type="submit" class="btn btn-primary">Submit</button>
@@ -116,7 +111,7 @@
             select.innerHTML = '';
             var opt = document.createElement('option');
             opt.value = '';
-            opt.innerHTML = 'Select Course ...';
+            opt.innerHTML = 'Select Course';
             select.appendChild(opt);
             if( 0 < msg.length){
               $.each(msg, function(idx, obj) {

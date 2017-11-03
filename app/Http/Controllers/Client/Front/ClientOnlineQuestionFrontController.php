@@ -28,7 +28,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
      */
     public function __construct(Request $request)
     {
-        $this->middleware('clientuser');
+        // $this->middleware('clientuser');
         parent::__construct($request);
     }
 
@@ -49,8 +49,15 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             foreach($questions as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
+
             if(count(array_keys($results['questions'])) > 0){
-                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
+                if(is_object(Auth::guard('clientuser')->user())){
+                    $clientId = Auth::guard('clientuser')->user()->client_id;
+                } else {
+                    $clientId = 0;
+                }
+                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
+                // dd(DB::connection('mysql2')->getQueryLog());
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
                         if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -59,6 +66,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                     }
                 }
             }
+// dd($sections);
             $paper = ClientOnlineTestSubjectPaper::getOnlineTestSubjectPaperById($paperId, $request);
 
         	return view('client.front.question.questions', compact('results','paper', 'sections'));
@@ -81,10 +89,13 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $userAnswer = 0;
                 $marks=0;
                 $totalMarks=0;
-                $instituteCourseId = 0;
                 $userAnswers = [];
                 $questionIds = [];
-                $userId = Auth::guard('clientuser')->user()->id;
+                if(is_object(Auth::guard('clientuser')->user())){
+                    $userId = Auth::guard('clientuser')->user()->id;
+                } else {
+                    $userId = 0;
+                }
 
                 $categoryId = $request->get('category_id');
                 $subcategoryId = $request->get('sub_category_id');
@@ -99,11 +110,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 }
                 $questions = ClientOnlineTestQuestion::getQuestionsByIds($questionIds);
 
-
                 foreach($questions as $index => $question){
-                    if( 0 == $index){
-                        $instituteCourseId = $question->client_institute_course_id;
-                    }
                     if($question->answer == $quesResults[$question->id] && $question->question_type == 1){
                         $rightAnswer++;
                         $marks = $marks + $question->positive_marks;
@@ -138,7 +145,6 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 }
 
                 $result = [];
-                $result['client_institute_course_id'] = (int) $instituteCourseId;
                 $result['category_id'] = (int) $categoryId;
                 $result['subcat_id'] = (int) $subcategoryId;
                 $result['subject_id'] = (int) $subjectId;
@@ -147,17 +153,20 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $result['wrong_answered'] = $wrongAnswer;
                 $result['unanswered'] = $unanswered;
                 $result['marks'] = $marks;
+                if($userId > 0){
+                    $score = ClientScore::addScore($userId, $result);
+                    foreach($userAnswers as $ind => $userAnswer){
+                        $userAnswers[$ind]['client_score_id'] = $score->id;
+                    }
 
-                $score = ClientScore::addScore($userId, $result);
-
-                foreach($userAnswers as $ind => $userAnswer){
-                    $userAnswers[$ind]['client_score_id'] = $score->id;
+                    ClientUserSolution::saveUserAnswers($userAnswers);
+                    RegisterClientOnlinePaper::registerTestPaper($userId, $paperId);
+                    DB::connection('mysql2')->commit();
+                    $rank =ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$score->test_score);
+                } else {
+                    $rank =ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$marks);
+                    $score = '';
                 }
-
-                ClientUserSolution::saveUserAnswers($userAnswers);
-                RegisterClientOnlinePaper::registerTestPaper($userId, $paperId);
-                DB::connection('mysql2')->commit();
-                $rank =ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$score->test_score);
                 $totalRank =ClientScore::getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId);
             	return view('client.front.question.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank', 'score'));
             }
@@ -190,7 +199,8 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             $results['questions'][$question->section_type][] = $question;
         }
         if(count(array_keys($results['questions'])) > 0){
-            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId);
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
                     if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -219,7 +229,8 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $results['questions'][$question->section_type][] = $question;
             }
             if(count(array_keys($results['questions'])) > 0){
-                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paper->id);
+                $clientId = Auth::guard('clientuser')->user()->client_id;
+                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paper->id, $clientId);
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
                         if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -253,7 +264,12 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             $questions[$question->section_type][] = $question;
         }
         if(count(array_keys($questions)) > 0){
-            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
+            if(is_object(Auth::guard('clientuser')->user())){
+                $clientId = Auth::guard('clientuser')->user()->client_id;
+            } else {
+                $clientId = 0;
+            }
+            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
                     if(in_array($paperSection->id, array_keys($questions))){
@@ -282,7 +298,8 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             $questions[$question->section_type][] = $question;
         }
         if(count(array_keys($questions)) > 0){
-            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId);
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId);
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
                     if(in_array($paperSection->id, array_keys($questions))){

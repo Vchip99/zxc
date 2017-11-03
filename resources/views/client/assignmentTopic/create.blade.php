@@ -20,32 +20,14 @@
    <form action="{{url('createAssignmentTopic')}}" method="POST">
   @endif
     {{ csrf_field() }}
-    <div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Institute Course Name:</label>
-      <div class="col-sm-3">
-        <select class="form-control" name="institute_course" required title="Institute Course" onClick="selectSubject(this);">
-            <option value="">Select Institute Course</option>
-            @if(count($instituteCourses) > 0)
-              @foreach($instituteCourses as $instituteCourse)
-                @if( $topic->client_institute_course_id == $instituteCourse->id)
-                  <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-                @else
-                  <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-                @endif
-              @endforeach
-            @endif
-          </select>
-          @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
-      </div>
-    </div>
     <div class="form-group row @if ($errors->has('subject')) has-error @endif">
       <label class="col-sm-2 col-form-label">Subject Name:</label>
       <div class="col-sm-3">
-        @if(isset($topic->id) && count($subjects) > 0)
+        @if(count($subjects) > 0)
           <select class="form-control" name="subject" required title="subject" >
             <option value="">Select Subject</option>
               @foreach($subjects as $subject)
-                @if( $topic->client_assignment_subject_id == $subject->id)
+                @if( is_object($topic) && $topic->client_assignment_subject_id == $subject->id)
                   <option value="{{$subject->id}}" selected="true">{{$subject->name}}</option>
                 @else
                   <option value="{{$subject->id}}">{{$subject->name}}</option>
@@ -75,32 +57,4 @@
     </div>
     </form>
   </div>
-<script type="text/javascript">
-  function selectSubject(ele){
-    id = parseInt($(ele).val());
-    if( 0 < id ){
-      $.ajax({
-          method: "POST",
-          url: "{{url('getAssignmentSubjectsByCourse')}}",
-          data: {institute_course_id:id}
-      })
-      .done(function( msg ) {
-        select = document.getElementById('subject');
-        select.innerHTML = '';
-        var opt = document.createElement('option');
-        opt.value = '';
-        opt.innerHTML = 'Select Subject';
-        select.appendChild(opt);
-        if( 0 < msg.length){
-          $.each(msg, function(idx, obj) {
-              var opt = document.createElement('option');
-              opt.value = obj.id;
-              opt.innerHTML = obj.name;
-              select.appendChild(opt);
-          });
-        }
-      });
-    }
-  }
-</script>
 @stop

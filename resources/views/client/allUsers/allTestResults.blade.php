@@ -16,18 +16,13 @@
         <div class="container">
           <div class="row">
             <div class="col-md-3 mrgn_10_btm">
-              <select class="form-control" id="course" name="course" onChange="selectCategory(this);">
-                <option value="0"> Select Course </option>
-                @if(count($instituteCourses) > 0)
-                  @foreach($instituteCourses as $instituteCourse)
-                    <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-                  @endforeach
-                @endif
-              </select>
-            </div>
-            <div class="col-md-3 mrgn_10_btm">
              <select class="form-control" id="category" id="category" name="category" title="Category" onChange="selectSubcategory(this);">
               <option value="0">Select Category</option>
+              @if(count($categories) > 0)
+                @foreach($categories as $category)
+                  <option value="{{$category->id}}">{{$category->name}}</option>
+                @endforeach
+              @endif
              </select>
             </div>
             <div class="col-md-3 mrgn_10_btm">
@@ -53,7 +48,6 @@
           <div class="col-md-3 mrgn_10_btm">
             <button class="btn btn-info" onClick="downloadExcelResult();">Download Result</button>
             <form action="{{ url('downloadExcelResult') }}" method="GET" id="export_result">
-              <input type="hidden" name="course" id="export_course" value="">
               <input type="hidden" name="category" id="export_category" value="">
               <input type="hidden" name="subcategory" id="export_subcategory" value="">
               <input type="hidden" name="subject" id="export_subject" value="">
@@ -89,18 +83,10 @@
 <script type="text/javascript">
 
   function downloadExcelResult(){
-    var course = document.getElementById('course').value;
     var category = document.getElementById('category').value;
     var subcategory = document.getElementById('subcategory').value;
     var subject = document.getElementById('subject').value;
     var paper = document.getElementById('paper').value;
-    if(0 == course){
-      $.alert({
-          title: 'Alert!',
-          content: 'Please select course.',
-      });
-      return false;
-    }
     if(0 == category){
       alert('Please select category.');
       $.alert({
@@ -130,8 +116,7 @@
       });
       return false;
     }
-    if(0 != course && 0 != category && 0 != subcategory && 0 != subject && 0 != paper){
-      document.getElementById('export_course').value = course;
+    if(0 != category && 0 != subcategory && 0 != subject && 0 != paper){
       document.getElementById('export_category').value = category;
       document.getElementById('export_subcategory').value = subcategory;
       document.getElementById('export_subject').value = subject;
@@ -177,7 +162,6 @@
     }
   }
   function showResult(){
-    var course = document.getElementById('course').value;
     var category = document.getElementById('category').value;
     var subcategory = document.getElementById('subcategory').value;
     var subject = document.getElementById('subject').value;
@@ -185,7 +169,7 @@
     $.ajax({
       method: "POST",
       url: "{{url('getAllTestResults')}}",
-      data:{category:category,subcategory:subcategory,course:course,subject:subject,paper:paper}
+      data:{category:category,subcategory:subcategory,subject:subject,paper:paper}
     })
     .done(function( msg ) {
       body = document.getElementById('all_test_result');

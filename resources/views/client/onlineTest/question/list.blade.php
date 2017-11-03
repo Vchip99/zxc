@@ -53,30 +53,12 @@
 	<div  class="admin_div">
 		<form id="questionForm" action="{{url('showOnlineTestQuestion')}}" method="POST">
 			{{csrf_field()}}
-		  	<div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
-			    <label class="col-sm-2 col-form-label">Institute Course Name:</label>
-			    <div class="col-sm-3">
-			      <select class="form-control" name="institute_course" id="institute_course" required title="Category" onChange="selectCategory(this);" >
-			          <option value="">Select Institute Course</option>
-			          @if(count($instituteCourses) > 0)
-			            @foreach($instituteCourses as $instituteCourse)
-			              @if( $clientSearchSelectedInstituteCourseId == $instituteCourse->id)
-			                <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-			              @else
-			                <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-			              @endif
-			            @endforeach
-			          @endif
-			        </select>
-			        @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
-			    </div>
-		  	</div>
 			<div class="form-group row @if ($errors->has('category')) has-error @endif">
 			    <label class="col-sm-2 col-form-label">Category Name:</label>
 			    <div class="col-sm-3">
 			      <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
 			          <option value="">Select Category</option>
-			          @if( $clientSearchSelectedCategoryId > 0 && count($testCategories) > 0)
+			          @if(count($testCategories) > 0)
 			            @foreach($testCategories as $testCategory)
 			            	@if($clientSearchSelectedInstituteCourseId == $testCategory->client_institute_course_id)
 					            @if( $testCategory->id == $clientSearchSelectedCategoryId )
@@ -213,43 +195,6 @@
   	</div>
   	</div>
 <script type="text/javascript">
-	function selectCategory(ele){
-	    var id = parseInt($(ele).val());
-	    if( 0 < id ){
-	      $.ajax({
-	              method: "POST",
-	              url: "{{url('getOnlineTestCategories')}}",
-	              data: {id:id}
-	          })
-	          .done(function( msg ) {
-	            select = document.getElementById('category');
-	            select.innerHTML = '';
-	            var opt = document.createElement('option');
-	            opt.value = '';
-	            opt.innerHTML = 'Select Category';
-	            select.appendChild(opt);
-	            if( 0 < msg.length){
-	              $.each(msg, function(idx, obj) {
-	                  var opt = document.createElement('option');
-	                  opt.value = obj.id;
-	                  opt.innerHTML = obj.name;
-	                  select.appendChild(opt);
-	              });
-	            }
-	          });
-	    } else {
-		    select = document.getElementById('category');
-	      	select.innerHTML = '';
-	      	var opt = document.createElement('option');
-	      	opt.value = '';
-	      	opt.innerHTML = 'Select Category';
-	      	select.appendChild(opt);
-	    }
-	      	document.getElementById("subcategory").selectedIndex = '';
-	      	document.getElementById("subject").selectedIndex = '';
-        	document.getElementById("paper").selectedIndex = '';
-        	document.getElementById("section_type").selectedIndex = '';
-	}
 
 	function confirmDelete(ele){
       $.confirm({
@@ -365,13 +310,12 @@
   	}
 
 	function selectSection(){
-		var instituteCourse = document.getElementById("institute_course").value;
 		var paperId = parseInt(document.getElementById('paper').value);
-		if( 0 < instituteCourse ){
+		if( 0 < paperId ){
 	      	$.ajax({
 	             	method: "POST",
-	              	url: "{{url('getOnlinePaperSectionsByInstituteCourseId')}}",
-	              	data: {institute_course:instituteCourse, paper_id:paperId}
+	              	url: "{{url('paperSectionsByPaperId')}}",
+	              	data: {paper_id:paperId}
           	}).done(function( msg ) {
 	            select = document.getElementById('section_type');
 	            select.innerHTML = '';

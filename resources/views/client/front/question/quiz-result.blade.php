@@ -62,13 +62,15 @@
 			                <td class="table-text">Test Score:</td>
 			                <td class="table-value">{{ (isset($result['marks']))? $result['marks']:''}}/{{$totalMarks}}</td>
 			            </tr>
+			            @if(is_object(Auth::guard('clientuser')->user()))
 			             <tr>
 			                <td class="table-text">Test Rank</td>
 			                <td class="table-value">{{ $rank + 1}}/{{$totalRank}}</td>
 			            </tr>
+			            @endif
 			    	</table>
 			    	<div class="text-center">
-			    		@if(1 == $score->paper->show_solution)
+			    		@if( is_object($score) && 1 == $score->paper->show_solution)
 						<button id="formButton" name="solution" type="submit" class="btn btn-success btn-lg">Solution</button>
 						@endif
 						<button type="submit" class="btn btn-success btn-lg" onclick="window.close();" title="Close">Close</button>
@@ -86,10 +88,12 @@
 	var subcategory = parseInt(document.getElementById('sub_category_id').value);
 	var subject = parseInt(document.getElementById('subject_id').value);
 	var paper = parseInt(document.getElementById('paper_id').value);
-	var userId ="{{Auth::guard('clientuser')->user()->id}}";
-    window.onload = function()
-    {
-        window.opener.checkIsTestGiven(paper,subject,category,subcategory,userId);
-    }
+	var userId ="{{(is_object(Auth::guard('clientuser')->user()))?Auth::guard('clientuser')->user()->id:0}}";
+	if(userId > 0){
+	    window.onload = function()
+	    {
+	        window.opener.checkIsTestGiven(paper,subject,category,subcategory,userId);
+	    }
+	}
 </script>
 @stop

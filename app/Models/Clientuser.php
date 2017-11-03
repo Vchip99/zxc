@@ -8,8 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use DB, Auth;
-use App\Models\ClientInstituteCourse;
-use App\Models\ClientUserInstituteCourse;
 use App\Models\RegisterClientOnlinePaper;
 use App\Models\RegisterClientOnlineCourses;
 use App\Models\ClientScore;
@@ -17,6 +15,8 @@ use App\Models\Client;
 use App\Models\ClientUserSolution;
 use App\Models\ClientNotification;
 use App\Models\ClientReadNotification;
+use App\Models\ClientOnlineCourse;
+use App\Models\ClientUserPurchasedCourse;
 
 class Clientuser extends Authenticatable
 {
@@ -80,41 +80,19 @@ class Clientuser extends Authenticatable
 
     protected static function searchUsers($request){
         $results = [];
-        $institueCourses = [];
         $courseId = InputSanitise::inputInt($request->get('course_id'));
         $clientId = Auth::guard('client')->user()->id;
-        $result = static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id')
-                ->join('client_institute_courses', 'client_institute_courses.id', '=', 'client_user_institute_courses.client_institute_course_id');
-        if($courseId > 0){
-            $result->where('client_user_institute_courses.client_institute_course_id', $courseId);
-        }
+        $result = static::where('client_id', $clientId);
+
         if(!empty($request->get('student'))){
-            $result->where('clientusers.name', 'LIKE', '%'.$request->get('student').'%');
-        }
-        $result->where('client_user_institute_courses.client_id', $clientId);
-
-        $results['users'] = $result->select('clientusers.*', 'client_institute_courses.id as course_id','client_institute_courses.name as courseName')
-                            ->groupBy('clientusers.id')->groupBy('client_institute_courses.id')->get();
-
-        $coursesResult = ClientUserInstituteCourse::join('client_institute_courses', 'client_institute_courses.id', '=', 'client_user_institute_courses.client_institute_course_id')
-                    ->join('clientusers', 'clientusers.id', '=', 'client_user_institute_courses.client_user_id');
-        if($courseId > 0){
-            $coursesResult->where('client_user_institute_courses.client_institute_course_id', $courseId);
-        }
-        if(!empty($request->get('student'))){
-            $coursesResult->where('clientusers.name', 'LIKE', '%'.$request->get('student').'%');
-        }
-        $coursesResult->where('client_user_institute_courses.client_id', $clientId);
-
-        $courses = $coursesResult->select('client_user_institute_courses.*', 'client_institute_courses.name as courseName')->get();
-
-        if(is_object($courses) && false == $courses->isEmpty($courses)){
-            foreach($courses as $course){
-                $institueCourses[$course->client_user_id][$course->client_institute_course_id] = $course;
-            }
+            $result->where('name', 'LIKE', '%'.$request->get('student').'%');
         }
 
-        $results['institueCourses'] = $institueCourses;
+        $results['users'] = $result->select('clientusers.*')->get();
+        $results['courses'] = ClientOnlineCourse::getCourseAssocaitedWithVideos();
+        $results['userPurchasedCourses'] = ClientUserPurchasedCourse::getClientUserCourses($clientId);
+        $results['testSubCategories'] = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
+        $results['userPurchasedTestSubCategories'] = ClientUserPurchasedTestSubCategory::getClientUserTestSubCategories($clientId);
         return $results;
     }
 
@@ -165,11 +143,8 @@ class Clientuser extends Authenticatable
         return 'false';
     }
 
-    protected static function getAllStudentsByClientIdByCourseId($clientId,$courseId){
-        return static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id')
-                ->join('client_institute_courses', 'client_institute_courses.id', '=', 'client_user_institute_courses.client_institute_course_id')
-                ->where('client_user_institute_courses.client_id', $clientId)
-                ->where('client_user_institute_courses.client_institute_course_id', $courseId)
+    protected static function getAllStudentsByClientId($clientId){
+        return static::where('client_id', $clientId)
                 ->select('clientusers.*')->get();
     }
 
@@ -244,23 +219,7 @@ class Clientuser extends Authenticatable
 
     function adminNotificationCount($year=NULL,$month=NULL){
         $ids = [];
-        $testCourseIds = [];
-        $courseCourseIds = [];
         $notificationCount = [];
-        $testCourses = ClientUserInstituteCourse::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('client_user_id', Auth::guard('clientuser')->user()->id)->where('test_permission', 1)->select('client_institute_course_id')->get();
-        if(is_object($testCourses) && false == $testCourses->isEmpty()){
-            foreach($testCourses as $testCourse){
-                $testCourseIds[] = $testCourse->client_institute_course_id;
-            }
-        }
-
-        $courseCourses = ClientUserInstituteCourse::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('client_user_id', Auth::guard('clientuser')->user()->id)->where('course_permission', 1)->select('client_institute_course_id')->get();
-        if(is_object($courseCourses) && false == $courseCourses->isEmpty()){
-            foreach($courseCourses as $courseCourse){
-                $courseCourseIds[] = $courseCourse->client_institute_course_id;
-            }
-        }
-
         $ids = ClientReadNotification::getReadNotificationIdsByUser($year,$month);
         $resultQuery = ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id)
                     ->where('is_seen', 0)->whereNotIn('id', $ids)->where('created_by',0)->where('created_to',0);
@@ -274,7 +233,7 @@ class Clientuser extends Authenticatable
 
         if(is_object($results) && false == $results->isEmpty()){
             foreach($results as $result){
-                if((1 == $result->notification_module && in_array($result->client_institute_course_id, $courseCourseIds)) || (2 == $result->notification_module && in_array($result->client_institute_course_id, $testCourseIds))){
+                if(1 == $result->notification_module || 2 == $result->notification_module ){
                     $notificationCount[] = $result->id;
                 }
             }
@@ -288,15 +247,7 @@ class Clientuser extends Authenticatable
 
     }
 
-    protected static function searchStudentForAssignment($courseId){
-
-        $clientId = Auth::guard('client')->user()->id;
-        $result = static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id');
-        if($courseId > 0){
-            $result->where('client_user_institute_courses.client_institute_course_id', $courseId);
-        }
-        $result->where('client_user_institute_courses.client_id', $clientId);
-
-        return $result->select('clientusers.*')->groupBy('clientusers.id')->get();
+    protected static function searchStudentForAssignment(){
+        return static::where('client_id', Auth::guard('client')->user()->id)->select('clientusers.*')->get();
     }
 }

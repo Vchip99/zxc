@@ -19,30 +19,12 @@
     <form action="{{url('createOnlineTestSubject')}}" method="POST">
   @endif
     {{ csrf_field() }}
-    <div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
-    <label class="col-sm-2 col-form-label">Institute Course Name:</label>
-    <div class="col-sm-3">
-      <select class="form-control" name="institute_course" required title="Category" onChange="selectCategory(this);" >
-          <option value="">Select Institute Course ...</option>
-          @if(count($instituteCourses) > 0)
-            @foreach($instituteCourses as $instituteCourse)
-              @if( $subject->client_institute_course_id == $instituteCourse->id)
-                <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-              @else
-                <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-              @endif
-            @endforeach
-          @endif
-        </select>
-        @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
-    </div>
-  </div>
   <div class="form-group row @if ($errors->has('category')) has-error @endif">
     <label class="col-sm-2 col-form-label">Category Name:</label>
     <div class="col-sm-3">
       <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-          <option value="">Select Category ...</option>
-          @if( isset($subject->id) && count($testCategories) > 0)
+          <option value="">Select Category</option>
+          @if(count($testCategories) > 0)
             @foreach($testCategories as $testCategory)
               @if( isset($subject->id) && $subject->category_id == $testCategory->id)
                 <option value="{{$testCategory->id}}" selected="true">{{$testCategory->name}}</option>
@@ -59,7 +41,7 @@
     <label class="col-sm-2 col-form-label">Sub Category Name:</label>
     <div class="col-sm-3">
       <select id="subcategory" class="form-control" name="subcategory" required title="Sub Category">
-        <option value="">Select Sub Category ...</option>
+        <option value="">Select Sub Category</option>
         @if(count($testSubCategories) > 0 && isset($subject->id))
           @foreach($testSubCategories as $testSubCategory)
             @if($subject->sub_category_id == $testSubCategory->id)
@@ -93,40 +75,6 @@
 </form>
 <script type="text/javascript">
 
-  function selectCategory(ele){
-    var id = parseInt($(ele).val());
-    if( 0 < id ){
-      $.ajax({
-              method: "POST",
-              url: "{{url('getOnlineTestCategories')}}",
-              data: {id:id}
-          })
-          .done(function( msg ) {
-            select = document.getElementById('category');
-            select.innerHTML = '';
-            var opt = document.createElement('option');
-            opt.value = '';
-            opt.innerHTML = 'Select Category ...';
-            select.appendChild(opt);
-            if( 0 < msg.length){
-              $.each(msg, function(idx, obj) {
-                  var opt = document.createElement('option');
-                  opt.value = obj.id;
-                  opt.innerHTML = obj.name;
-                  select.appendChild(opt);
-              });
-            }
-          });
-    } else {
-      select = document.getElementById('category');
-      select.innerHTML = '';
-      var opt = document.createElement('option');
-      opt.value = '';
-      opt.innerHTML = 'Select Category ...';
-      select.appendChild(opt);
-    }
-  }
-
   function selectSubcategory(ele){
     id = parseInt($(ele).val());
     if( 0 < id ){
@@ -140,7 +88,7 @@
             select.innerHTML = '';
             var opt = document.createElement('option');
             opt.value = '';
-            opt.innerHTML = 'Select Sub Category ...';
+            opt.innerHTML = 'Select Sub Category';
             select.appendChild(opt);
             if( 0 < msg.length){
             $.each(msg, function(idx, obj) {
@@ -156,7 +104,7 @@
       select.innerHTML = '';
       var opt = document.createElement('option');
       opt.value = '';
-      opt.innerHTML = 'Select Sub Category ...';
+      opt.innerHTML = 'Select Sub Category';
       select.appendChild(opt);
     }
   }

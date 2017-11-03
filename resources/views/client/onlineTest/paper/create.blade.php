@@ -22,30 +22,12 @@
     <form action="{{url('createOnlineTestSubjectPaper')}}" method="POST">
   @endif
     {{ csrf_field() }}
-  <div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
-    <label class="col-sm-2 col-form-label">Institute Course Name:</label>
-    <div class="col-sm-3">
-      <select class="form-control" name="institute_course" required title="Category" onChange="selectCategory(this);" >
-          <option value="">Select Institute Course</option>
-          @if(count($instituteCourses) > 0)
-            @foreach($instituteCourses as $instituteCourse)
-              @if( $paper->client_institute_course_id == $instituteCourse->id)
-                <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-              @else
-                <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-              @endif
-            @endforeach
-          @endif
-        </select>
-        @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
-    </div>
-  </div>
   <div class="form-group row @if ($errors->has('category')) has-error @endif">
     <label class="col-sm-2 col-form-label">Category Name:</label>
     <div class="col-sm-3">
       <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
           <option value="">Select Category</option>
-          @if(count($testCategories) > 0 && isset($paper->id)))
+          @if(count($testCategories) > 0))
             @foreach($testCategories as $testCategory)
               @if( isset($paper->id) && $paper->category_id == $testCategory->id)
                 <option value="{{$testCategory->id}}" selected="true">{{$testCategory->name}}</option>
@@ -62,7 +44,7 @@
     <label class="col-sm-2 col-form-label">Sub Category Name:</label>
     <div class="col-sm-3">
       <select id="subcategory" class="form-control" name="subcategory" onChange="selectSubject(this);" required title="Sub Category">
-        <option value="">Select Sub Category ...</option>
+        <option value="">Select Sub Category</option>
         @if(count($testSubCategories) > 0 && isset($paper->id))
           @foreach($testSubCategories as $testSubCategory)
             @if($paper->sub_category_id == $testSubCategory->id)
@@ -105,17 +87,32 @@
       @if($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
     </div>
   </div>
-  <div class="form-group row @if ($errors->has('price')) has-error @endif">
-      <label for="price" class="col-sm-2 col-form-label">Price:</label>
-      <div class="col-sm-3">
+  <div class="form-group row @if ($errors->has('is_free')) has-error @endif">
+    <label for="course" class="col-sm-2 col-form-label">Free Paper:</label>
+    <div class="col-sm-3">
         @if(isset($paper->id))
-          <input type="text" class="form-control" name="price" value="{{$paper->price}}" required="true">
+        <label class="radio-inline"><input type="radio" name="is_free" value="1" onClick="showUnAuthorisedUser(this);" @if(1 == $paper->is_free) checked="true" @endif> Yes</label>
+        <label class="radio-inline"><input type="radio" name="is_free" value="0" onClick="showUnAuthorisedUser(this);" @if(0 == $paper->is_free) checked="true" @endif> No</label>
         @else
-          <input type="text" class="form-control" name="price" value="" placeholder="price" required="true">
+          <label class="radio-inline"><input type="radio" name="is_free" value="1"  onClick="showUnAuthorisedUser(this);" > Yes</label>
+          <label class="radio-inline"><input type="radio" name="is_free" value="0" checked  onClick="showUnAuthorisedUser(this);" > No</label>
         @endif
-        @if($errors->has('price')) <p class="help-block">{{ $errors->first('price') }}</p> @endif
-      </div>
+      @if($errors->has('is_free')) <p class="help-block">{{ $errors->first('is_free') }}</p> @endif
     </div>
+  </div>
+  <div class="form-group row allowed_unauthorised_user hide @if ($errors->has('allowed_unauthorised_user')) has-error @endif">
+    <label for="course" class="col-sm-2 col-form-label">Allowed Non Login User:</label>
+    <div class="col-sm-3">
+        @if(isset($paper->id))
+        <label class="radio-inline"><input type="radio" name="allowed_unauthorised_user" value="1" @if(1 == $paper->allowed_unauthorised_user) checked="true" @endif> Yes</label>
+        <label class="radio-inline"><input type="radio" name="allowed_unauthorised_user" value="0" @if(0 == $paper->allowed_unauthorised_user) checked="true" @endif> No</label>
+        @else
+          <label class="radio-inline"><input type="radio" name="allowed_unauthorised_user" value="1"> Yes</label>
+          <label class="radio-inline"><input type="radio" name="allowed_unauthorised_user" value="0" checked> No</label>
+        @endif
+      @if($errors->has('allowed_unauthorised_user')) <p class="help-block">{{ $errors->first('allowed_unauthorised_user') }}</p> @endif
+    </div>
+  </div>
   <div class="form-group row">
     <label for="date_to_active" class="col-sm-2 col-form-label">Date To Active:</label>
     <div class="col-sm-3">
@@ -350,37 +347,11 @@
     }
   }
 
-  function selectCategory(ele){
-    var id = parseInt($(ele).val());
-    if( 0 < id ){
-      $.ajax({
-              method: "POST",
-              url: "{{url('getOnlineTestCategories')}}",
-              data: {id:id}
-          })
-          .done(function( msg ) {
-            select = document.getElementById('category');
-            select.innerHTML = '';
-            var opt = document.createElement('option');
-            opt.value = '';
-            opt.innerHTML = 'Select Category';
-            select.appendChild(opt);
-            if( 0 < msg.length){
-              $.each(msg, function(idx, obj) {
-                  var opt = document.createElement('option');
-                  opt.value = obj.id;
-                  opt.innerHTML = obj.name;
-                  select.appendChild(opt);
-              });
-            }
-          });
+  function showUnAuthorisedUser(ele){
+    if(1 == $(ele).val()){
+      $('.allowed_unauthorised_user').removeClass('hide');
     } else {
-      select = document.getElementById('category');
-      select.innerHTML = '';
-      var opt = document.createElement('option');
-      opt.value = '';
-      opt.innerHTML = 'Select Category';
-      select.appendChild(opt);
+      $('.allowed_unauthorised_user').addClass('hide');
     }
   }
 
@@ -467,6 +438,13 @@
       $.each($('.duration > input'), function(idx, obj){ $(obj).prop('required', true); });
       $('#time').prop('required', false);
       document.getElementById('selected_time_out').value = 0;
+    }
+
+    var isFreeTest = $("input:radio[name=is_free]:checked").val()
+    if(1 == isFreeTest){
+      $('.allowed_unauthorised_user').removeClass('hide');
+    } else {
+      $('.allowed_unauthorised_user').addClass('hide');
     }
   });
 </script>

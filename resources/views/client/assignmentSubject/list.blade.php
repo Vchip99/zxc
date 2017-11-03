@@ -29,7 +29,6 @@
         <tr>
           <th>#</th>
           <th>Subject Name</th>
-          <th>Institute Course Name</th>
           <th>Edit Subject</th>
           <th>Delete Subject</th>
         </tr>
@@ -40,7 +39,6 @@
           <tr>
             <td>{{$index + 1}}</td>
             <td>{{$subject->name}}</td>
-            <td>{{$subject->instituteCourse->name}}</td>
             <td>
               <a href="{{url('assignmentSubject')}}/{{$subject->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$subject->name}}" />
                 </a>

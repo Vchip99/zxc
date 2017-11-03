@@ -20,7 +20,7 @@ class ClientOnlineTestQuestion extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', 'answer6', 'answer', 'category_id', 'subcat_id', 'section_type', 'question_type','solution', 'positive_marks', 'negative_marks', 'min', 'max', 'subject_id', 'paper_id', 'client_id','client_institute_course_id', 'common_data'];
+    protected $fillable = ['name', 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', 'answer6', 'answer', 'category_id', 'subcat_id', 'section_type', 'question_type','solution', 'positive_marks', 'negative_marks', 'min', 'max', 'subject_id', 'paper_id', 'client_id', 'common_data'];
 
     /**
      *  add/update question
@@ -31,7 +31,6 @@ class ClientOnlineTestQuestion extends Model
         $questionId = InputSanitise::inputInt($request->get('question_id'));
         $subjectId = InputSanitise::inputInt($request->get('subject'));
         $paperId = InputSanitise::inputInt($request->get('paper'));
-        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
         $ans1 = '';
         $ans2 = '';
         $ans3 = '';
@@ -108,7 +107,6 @@ class ClientOnlineTestQuestion extends Model
         $testQuestion->paper_id = $paperId;
         $testQuestion->question_type = $question_type;
         $testQuestion->client_id = Auth::guard('client')->user()->id;
-        $testQuestion->client_institute_course_id = $instituteCourseId;
         $testQuestion->common_data = $commonData;
         $testQuestion->save();
         return $testQuestion;
@@ -181,7 +179,7 @@ class ClientOnlineTestQuestion extends Model
      *  return questions by questions Ids
      */
     protected static function getQuestionsByIds($ids){
-        return DB::connection('mysql2')->table('client_online_test_questions')->select('id','answer', 'question_type', 'min', 'max', 'positive_marks', 'negative_marks', 'client_institute_course_id')->whereIn('id', $ids)->orderBy('id')->get();
+        return DB::connection('mysql2')->table('client_online_test_questions')->select('id','answer', 'question_type', 'min', 'max', 'positive_marks', 'negative_marks')->whereIn('id', $ids)->orderBy('id')->get();
     }
 
     protected static function getClientCurrentQuestionNoByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId){

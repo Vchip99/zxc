@@ -9,7 +9,6 @@ use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCategory;
 use App\Models\Client;
-use App\Models\ClientInstituteCourse;
 
 class ClientOnlineCategoryController extends ClientBaseController
 {
@@ -26,19 +25,13 @@ class ClientOnlineCategoryController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateCategory = [
-        'institute_course' => 'required|integer',
-        'category' => 'required|string',
+        'category' => 'required|string'
     ];
 
     /**
      *  show list of course category
      */
     protected function show(Request $request){
-        $coursePermission = InputSanitise::checkModulePermission($request, 'course');
-        if('false' == $coursePermission){
-            return Redirect::to('manageClientHome');
-        }
-
     	$categories = ClientOnlineCategory::showCategories($request);
     	return view('client.onlineCourse.category.list', compact('categories'));
     }
@@ -47,10 +40,8 @@ class ClientOnlineCategoryController extends ClientBaseController
      *  show create course category UI
      */
     protected function create(){
-        $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
 		$category = new ClientOnlineCategory;
-		return view('client.onlineCourse.category.create', compact('category', 'instituteCourses'));
+		return view('client.onlineCourse.category.create', compact('category'));
     }
 
     /**
@@ -86,10 +77,8 @@ class ClientOnlineCategoryController extends ClientBaseController
         $id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$category = ClientOnlineCategory::find($id);
-
     		if(is_object($category)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $category->client_id)->get();
-    			return view('client.onlineCourse.category.create', compact('category', 'instituteCourses'));
+    			return view('client.onlineCourse.category.create', compact('category'));
     		}
     	}
     	return Redirect::to('manageOnlineCategory');

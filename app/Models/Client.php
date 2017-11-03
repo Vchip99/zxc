@@ -16,7 +16,6 @@ use App\Models\ClientCourseComment;
 use App\Models\ClientCourseCommentLike;
 use App\Models\ClientCourseSubComment;
 use App\Models\ClientCourseSubCommentLike;
-use App\Models\ClientInstituteCourse;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientOnlineSubCategory;
@@ -27,7 +26,6 @@ use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineVideo;
 use App\Models\ClientOnlineVideoLike;
-use App\Models\ClientUserInstituteCourse;
 
 class Client extends Authenticatable
 {
@@ -159,7 +157,6 @@ class Client extends Authenticatable
         ClientCourseCommentLike::deleteClientCourseCommentLikesByClientId($client->id);
         ClientCourseSubComment::deleteClientCourseSubCommentsByUserId($client->id);
         ClientCourseSubCommentLike::deleteClientCourseSubCommentLikesByUserId($client->id);
-        ClientInstituteCourse::deleteClientInstituteCoursesByClientId($client->id);
         ClientOnlineCategory::deleteClientOnlineCategoriesByClientId($client->id);
         ClientOnlineCourse::deleteClientOnlineCoursesByClientId($client->id);
         ClientOnlineSubCategory::deleteClientOnlineSubCategoriesByClientId($client->id);
@@ -170,7 +167,6 @@ class Client extends Authenticatable
         ClientOnlineTestSubjectPaper::deleteClientOnlineTestSubjectPapersByClientId($client->id);
         ClientOnlineVideo::deleteClientOnlineVideosByClientId($client->id);
         ClientOnlineVideoLike::deleteClientOnlineVideoLikesByClientId($client->id);
-        ClientUserInstituteCourse::deleteClientUserInstituteCourseByClientId($client->id);
         return;
     }
 }

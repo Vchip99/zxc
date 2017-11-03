@@ -24,22 +24,9 @@
       @endif
           <div class="row">
             <div class="col-md-3 mrgn_10_btm">
-              <select class="form-control" id="institute_course" name="institute_course" required title="Institute Course" onClick="selectSubject(this);">
-                <option value="">Select Institute Course</option>
-                @foreach($instituteCourses as $instituteCourse)
-                  @if( is_object($assignment) && $assignment->client_institute_course_id == $instituteCourse->id)
-                    <option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-                  @else
-                    <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-                  @endif
-                @endforeach
-                </select>
-                @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
-            </div>
-            <div class="col-md-3 mrgn_10_btm">
              <select class="form-control" id="subject" name="subject" title="Subject" onChange="selectTopic(this);">
               <option value="0">Select Subject</option>
-              @if($selectedAssignmentSubject > 0 && count($assignmentSubjects) > 0)
+              @if(count($assignmentSubjects) > 0)
                 @foreach($assignmentSubjects as $assignmentSubject)
                   @if($selectedAssignmentSubject == $assignmentSubject->id)
                     <option value="{{ $assignmentSubject->id }}" selected="true">{{ $assignmentSubject->name }}</option>
@@ -96,7 +83,6 @@
                       <th>Assignment</th>
                       <th>Subject Name</th>
                       <th>Topic Name</th>
-                      <th>Institute Course</th>
                       <th>Assignment Remark</th>
                     </tr>
                   </thead>
@@ -107,7 +93,6 @@
                       <td>{!! mb_strimwidth($assignment->question, 0, 400, "...") !!}</td>
                       <td>{{$assignment->subject->name}}</td>
                       <td>{{$assignment->topic->name}}</td>
-                      <td>{{$assignment->instituteCourse->name}}</td>
                       <td>
                         <a href="{{url('assignmentRemark')}}/{{$assignment->id}}/{{$selectedAssignmentStudent}}" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Assignment Remark" />
                           </a>
@@ -127,12 +112,11 @@
 
     function selectStudent(ele){
       document.getElementById('studentAssignment').innerHTML = '';
-      var instituteCourseId = document.getElementById('institute_course').value;
-      if( 0 < instituteCourseId){
+      var id = parseInt($(ele).val());
+      if( 0 < id){
         $.ajax({
           method: "POST",
-          url: "{{url('searchStudentForAssignment')}}",
-          data: {institute_course_id:instituteCourseId}
+          url: "{{url('searchStudentForAssignment')}}"
         })
         .done(function( msg ) {
           select = document.getElementById('student');
@@ -156,7 +140,7 @@
     }
 
   function selectSubject(ele){
-    id = parseInt($(ele).val());
+    var id = parseInt($(ele).val());
     document.getElementById('studentAssignment').innerHTML = '';
     if( 0 < id ){
       $.ajax({
@@ -187,7 +171,7 @@
     }
   }
   function selectTopic(ele){
-    id = parseInt($(ele).val());
+    var id = parseInt($(ele).val());
     document.getElementById('studentAssignment').innerHTML = '';
     if( 0 < id ){
       $.ajax({
@@ -217,7 +201,7 @@
     }
   }
     function getAssignments(ele){
-      id = parseInt($(ele).val());
+      var id = parseInt($(ele).val());
       topic = parseInt(document.getElementById('topic').value);
       if( 0 < id ){
         $.ajax({
@@ -248,9 +232,9 @@
             eleTopic.innerHTML = msg['topic'];
             eleTr.appendChild(eleTopic);
 
-            var eleAttachment = document.createElement('td');
-            eleAttachment.innerHTML = msg['instituteCourse'];
-            eleTr.appendChild(eleAttachment);
+            // var eleAttachment = document.createElement('td');
+            // eleAttachment.innerHTML = msg['instituteCourse'];
+            // eleTr.appendChild(eleAttachment);
 
             var url = "{{url('assignmentRemark')}}/"+ msg['id']+"/"+studentId;
             var imageSrc = "{{asset('images/edit1.png')}}";

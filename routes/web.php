@@ -633,26 +633,27 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('verifyClientEmail', 'Client\ClientHomeController@verifyClientEmail');
 
   	// client institute courses
-  	Route::get('manageInstituteCourses', 'Client\InstituteCourse\ClientInstituteCourseController@show');
-  	Route::get('createClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@create');
-  	Route::post('createClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@store');
-  	Route::get('clientInstituteCourse/{id}/edit', 'Client\InstituteCourse\ClientInstituteCourseController@edit');
-  	Route::put('updateClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@update');
-  	Route::delete('deleteClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@delete');
+  	// Route::get('manageInstituteCourses', 'Client\InstituteCourse\ClientInstituteCourseController@show');
+  	// Route::get('createClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@create');
+  	// Route::post('createClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@store');
+  	// Route::get('clientInstituteCourse/{id}/edit', 'Client\InstituteCourse\ClientInstituteCourseController@edit');
+  	// Route::put('updateClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@update');
+  	// Route::delete('deleteClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@delete');
 
   	// client users info
   	Route::get('allUsers', 'Client\ClientUsersInfoController@allUsers');
   	Route::post('searchUsers', 'Client\ClientUsersInfoController@searchUsers');
-  	Route::post('changeClientPermissionStatus', 'Client\ClientUsersInfoController@changeClientPermissionStatus');
-  	Route::post('deleteStudent', 'Client\ClientUsersInfoController@deleteStudent');
   	Route::post('changeClientUserApproveStatus', 'Client\ClientUsersInfoController@changeClientUserApproveStatus');
-  	Route::get('userTestResults/{id?}/{course?}', 'Client\ClientUsersInfoController@userTestResults');
+  	Route::post('deleteStudent', 'Client\ClientUsersInfoController@deleteStudent');
+  	Route::post('changeClientUserCourseStatus', 'Client\ClientUsersInfoController@changeClientUserCourseStatus');
+  	Route::post('changeClientUserTestSubCategoryStatus', 'Client\ClientUsersInfoController@changeClientUserTestSubCategoryStatus');
+  	Route::get('userTestResults/{id?}', 'Client\ClientUsersInfoController@userTestResults');
   	Route::post('showUserTestResults', 'Client\ClientUsersInfoController@showUserTestResults');
-  	Route::get('userCourses/{id?}/{course?}', 'Client\ClientUsersInfoController@userCourses');
+  	Route::get('userCourses/{id?}', 'Client\ClientUsersInfoController@userCourses');
   	Route::post('showUserCourses', 'Client\ClientUsersInfoController@showUserCourses');
-  	Route::get('userPlacement/{id?}/{course?}', 'Client\ClientUsersInfoController@userPlacement');
+  	Route::get('userPlacement/{id?}', 'Client\ClientUsersInfoController@userPlacement');
   	Route::post('getStudentById', 'Client\ClientUsersInfoController@getStudentById');
-  	Route::get('userVideo/{id?}/{course?}', 'Client\ClientUsersInfoController@userVideo');
+  	Route::get('userVideo/{id?}', 'Client\ClientUsersInfoController@userVideo');
 	Route::put('updateUserVideo', 'Client\ClientUsersInfoController@updateUserVideo');
 	Route::get('allTestResults', 'Client\ClientUsersInfoController@allTestResults');
 	Route::post('getAllTestResults', 'Client\ClientUsersInfoController@getAllTestResults');
@@ -740,7 +741,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::put('updateOnlineTestSubjectPaper', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@update');
   	Route::delete('deleteOnlineTestSubjectPaper', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@delete');
   	Route::post('getOnlinePapersBySubjectId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@getOnlinePapersBySubjectId');
-  	Route::post('getOnlinePaperSectionsByInstituteCourseId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@getOnlinePaperSectionsByInstituteCourseId');
+  	Route::post('paperSectionsByPaperId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@paperSectionsByPaperId');
 
   	// test question
   	Route::get('manageOnlineTestQuestion', 'Client\OnlineTest\ClientOnlineTestQuestionController@index');

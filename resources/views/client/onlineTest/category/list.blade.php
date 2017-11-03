@@ -28,7 +28,6 @@
         <tr>
           <th>#</th>
           <th>Category Name</th>
-          <th>Institute Course Name</th>
           <th>Edit Category</th>
           <th>Delete Category</th>
         </tr>
@@ -39,7 +38,6 @@
           <tr>
             <th scope="row">{{$index + 1}}</th>
             <td>{{$testCategory->name}}</td>
-            <td>{{$testCategory->instituteCourse->name}}</td>
             <td>
               <a href="{{url('onlinetestcategory')}}/{{$testCategory->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testCategory->name}}" />

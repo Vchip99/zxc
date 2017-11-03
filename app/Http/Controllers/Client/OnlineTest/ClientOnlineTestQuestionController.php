@@ -12,7 +12,6 @@ use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineTestQuestion;
-use App\Models\ClientInstituteCourse;
 use App\Models\ClientNotification;
 use App\Models\ClientUserSolution;
 use App\Models\ClientOnlinePaperSection;
@@ -38,7 +37,6 @@ class ClientOnlineTestQuestionController extends ClientBaseController
     ];
 
     protected $validateCreateQuestion = [
-        'institute_course' => 'required|integer',
     	'category' => 'required|integer',
         'subcategory' => 'required|integer',
         'subject' => 'required|integer',
@@ -54,13 +52,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
      *  show questions associated with subject and paper
      */
     protected function index(Request $request){
-        $coursePermission = InputSanitise::checkModulePermission($request, 'test');
-        if('false' == $coursePermission){
-            return Redirect::to('manageClientHome');
-        }
         $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
-
         $testCategories = ClientOnlineTestCategory::showCategories($request);
 
         if(Session::has('client_search_selected_category')){
@@ -80,8 +72,8 @@ class ClientOnlineTestQuestionController extends ClientBaseController
            $papers = [];
         }
         $questions = new ClientOnlineTestQuestion();
-        if(Session::has('client_search_selected_institute_course') && Session::has('client_search_selected_paper')){
-            $sessions = ClientOnlinePaperSection::paperSectionsByInstituteCourseIdByPaperId(Session::get('client_search_selected_institute_course'),Session::get('client_search_selected_paper'));
+        if(Session::has('client_search_selected_paper')){
+            $sessions = ClientOnlinePaperSection::paperSectionsByPaperId(Session::get('client_search_selected_paper'), $clientId);
         } else {
             $sessions = [];
         }
@@ -93,11 +85,6 @@ class ClientOnlineTestQuestionController extends ClientBaseController
      *  show all question associated with subject and paper
      */
     protected function show(Request $request){
-        $coursePermission = InputSanitise::checkModulePermission($request, 'test');
-        if('false' == $coursePermission){
-            return Redirect::to('manageClientHome');
-        }
-        $instituteCourseId = InputSanitise::inputInt($request->get('institute_course'));
         $categoryId = InputSanitise::inputInt($request->get('category'));
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
     	$subjectId = InputSanitise::inputInt($request->get('subject'));
@@ -110,7 +97,6 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         }
 
     	if(isset($categoryId) && isset($subcategoryId) && isset($subjectId) && isset($paperId)){
-            Session::put('client_search_selected_institute_course', $instituteCourseId);
             Session::put('client_search_selected_category', $categoryId);
             Session::put('client_search_selected_subcategory', $subcategoryId);
             Session::put('client_search_selected_subject', $subjectId);
@@ -118,15 +104,14 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             Session::put('client_search_selected_section', $sectionType);
 
             $clientId = Auth::guard('client')->user()->id;
-            $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
 
             $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$sectionType);
             $testCategories = ClientOnlineTestCategory::showCategories($request);
             $testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId(Session::get('client_search_selected_category'), $request);
             $testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId(Session::get('client_search_selected_category'), Session::get('client_search_selected_subcategory'), $request);
             $papers = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCategoryIdBySubCategoryIdBySubjectId(Session::get('client_search_selected_category'), Session::get('client_search_selected_subcategory'), Session::get('client_search_selected_subject'));
-            $sessions = ClientOnlinePaperSection::paperSectionsByInstituteCourseIdByPaperId($instituteCourseId,$paperId);
-    		return view('client.onlineTest.question.list', compact('instituteCourses','testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions'));
+            $sessions = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId);
+    		return view('client.onlineTest.question.list', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions'));
     	} else {
     		return Redirect::to('manageOnlineTestQuestion');
     	}
@@ -137,8 +122,6 @@ class ClientOnlineTestQuestionController extends ClientBaseController
      */
     protected function create(Request $request){
         $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
-
         $testCategories = ClientOnlineTestCategory::showCategories($request);
 
         if(Session::has('client_selected_category')){
@@ -157,8 +140,8 @@ class ClientOnlineTestQuestionController extends ClientBaseController
            $papers = [];
         }
 
-        if(Session::has('client_selected_institute_course') && Session::has('client_selected_paper')){
-            $sessions = ClientOnlinePaperSection::paperSectionsByInstituteCourseIdByPaperId(Session::get('client_selected_institute_course'),Session::get('client_selected_paper'));
+        if(Session::has('client_selected_paper')){
+            $sessions = ClientOnlinePaperSection::paperSectionsByPaperId(Session::get('client_selected_paper'), $clientId);
         } else {
             $sessions = [];
         }
@@ -168,7 +151,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         $nextQuestionId = 'new';
         $nextQuestionNo = $this->getNextQuestionNo(Session::get('client_selected_category'), Session::get('client_selected_subcategory'), Session::get('client_selected_subject'),Session::get('client_selected_paper'),Session::get('client_selected_section'));
         Session::put('client_next_question_no', $nextQuestionNo);
-		return view('client.onlineTest.question.create', compact('instituteCourses','testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'sessions'));
+		return view('client.onlineTest.question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'sessions'));
     }
 
     /**
@@ -191,10 +174,8 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                 $paperId = InputSanitise::inputInt($request->get('paper'));
                 $question_type = InputSanitise::inputInt($request->get('question_type'));
                 $section_type = InputSanitise::inputInt($request->get('section_type'));
-                $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
                 $commonData = $request->get('common_data');
 
-                Session::put('client_selected_institute_course', $instituteCourseId);
                 Session::put('client_selected_category', $categoryId);
                 Session::put('client_selected_subcategory', $subcategoryId);
                 Session::put('client_selected_subject', $subjectId);
@@ -240,8 +221,6 @@ class ClientOnlineTestQuestionController extends ClientBaseController
     	if(isset($id)){
     		$testQuestion = ClientOnlineTestQuestion::find($id);
     		if(is_object($testQuestion)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $testQuestion->client_id)->get();
-
                 $testCategories = ClientOnlineTestCategory::showCategories($request);
                 $testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($testQuestion->category_id, $request);
                 $testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId($testQuestion->category_id, $testQuestion->subcat_id,$request);
@@ -253,15 +232,14 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                 Session::put('client_selected_paper', $testQuestion->paper_id);
                 Session::put('client_selected_section', $testQuestion->section_type);
                 Session::put('client_selected_question_type', $testQuestion->question_type);
-                Session::put('client_selected_institute_course', $testQuestion->client_institute_course_id);
 
                 $prevQuestionId = $this->getClientPrevQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
                 $nextQuestionId = $this->getClientNextQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
                 $currentQuestionNo = $this->getClientCurrentQuestionNo($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
                 $nextQuestionNo = $this->getNextQuestionNo($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type);
                 Session::put('client_next_question_no', $nextQuestionNo);
-                $sessions = ClientOnlinePaperSection::paperSectionsByInstituteCourseIdByPaperId($testQuestion->client_institute_course_id,$testQuestion->paper_id);
-                return view('client.onlineTest.question.create', compact('instituteCourses','testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'currentQuestionNo', 'sessions'));
+                $sessions = ClientOnlinePaperSection::paperSectionsByPaperId($testQuestion->paper_id, $testQuestion->client_id);
+                return view('client.onlineTest.question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'currentQuestionNo', 'sessions'));
     		}
     	}
 		return Redirect::to('manageOnlineTestQuestion');
@@ -296,7 +274,6 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                 Session::put('client_selected_section', $section_type);
                 Session::put('client_selected_question_type', $question_type);
                 Session::put('client_selected_prev_question', $testQuestion->id);
-                Session::put('client_selected_institute_course', $testQuestion->client_institute_course_id);
                 if(1 == $request->get('check_common_data') && !empty($commonData)){
                     Session::put('last_common_data', $commonData);
                 } else {
@@ -418,15 +395,13 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         if('false' == $coursePermission){
             return Redirect::to('manageClientHome');
         }
-        $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
 
         $testCategories = ClientOnlineTestCategory::showCategories($request);
         $testSubCategories = [];
         $testSubjects = [];
         $papers = [];
 
-        return view('client.onlineTest.question.uploadQuestions', compact('instituteCourses', 'testCategories', 'testSubCategories', 'testSubjects', 'papers'));
+        return view('client.onlineTest.question.uploadQuestions', compact('testCategories', 'testSubCategories', 'testSubjects', 'papers'));
     }
 
     protected function importQuestions(Request $request){
@@ -456,8 +431,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                         'subject_id' => $request->get('subject'),
                         'paper_id' => $request->get('paper'),
                         'section_type' => $request->get('section_type'),
-                        'client_id' => Auth::guard('client')->user()->id,
-                        'client_institute_course_id' => $request->get('institute_course')
+                        'client_id' => Auth::guard('client')->user()->id
                     ];
                 }
                 if(!empty($allQuestions)){

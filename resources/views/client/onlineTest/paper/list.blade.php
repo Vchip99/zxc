@@ -32,7 +32,6 @@
           <th>Category Name</th>
           <th>Sub Category Name</th>
           <th>Subject Name</th>
-          <th>Institute Course Name</th>
           <th>Edit Paper</th>
           <th>Delete Paper</th>
         </tr>
@@ -46,7 +45,6 @@
             <td>{{$testPaper->category->name}}</td>
             <td>{{$testPaper->subcategory->name}}</td>
             <td>{{$testPaper->subject->name}}</td>
-            <td>{{$testPaper->instituteCourse->name}}</td>
             <td>
               <a href="{{url('onlinetestsubjectpaper')}}/{{$testPaper->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testPaper->name}}" />

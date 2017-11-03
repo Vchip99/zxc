@@ -14,24 +14,21 @@ use DB, Session, Auth;
 class ClientScore extends Model
 {
 	protected $connection = 'mysql2';
-
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['client_user_id', 'client_institute_course_id','category_id', 'subcat_id','subject_id', 'paper_id', 'right_answered', 'wrong_answered', 'unanswered', 'test_score'];
+    protected $fillable = ['client_user_id', 'category_id', 'subcat_id','subject_id', 'paper_id', 'right_answered', 'wrong_answered', 'unanswered', 'test_score'];
 
     /**
      *  add score
      */
     protected static function addScore($userId, $result){
-        $userId     = Auth::guard('clientuser')->user()->id;
-
     	$score = new static();
     	$score->client_user_id = $userId;
     	$score->category_id = $result['category_id'];
-        $score->client_institute_course_id = $result['client_institute_course_id'];
     	$score->subcat_id = $result['subcat_id'];
         $score->paper_id = $result['paper_id'];
         $score->subject_id = $result['subject_id'];
@@ -94,14 +91,11 @@ class ClientScore extends Model
                 ->count();
     }
 
-    protected static function getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId, $courseId=NULL){
+    protected static function getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId){
         $result = static::where('category_id', $categoryId)
                 ->where('subcat_id', $subcategoryId)
                 ->where('paper_id', $paperId)
                 ->where('subject_id', $subjectId);
-        if($courseId > 0){
-            $result->where('client_institute_course_id', $courseId);
-        }
         return $result->count();
     }
 
@@ -139,7 +133,7 @@ class ClientScore extends Model
 
     public function rank(){
         $rank =$this->getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id,$this->test_score);
-        $totalRank =$this->getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id,$this->client_institute_course_id);
+        $totalRank =$this->getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id);
         return ($rank + 1).'/'.$totalRank;
     }
     public function totalMarks(){
@@ -159,12 +153,11 @@ class ClientScore extends Model
         return ['totalMarks' => $totalMarks, 'percentage' => $percentage];
     }
 
-    public static function getClientScoreByUserIdByScoreId($studentId,$courseId){
+    public static function getClientScoreByUserId($studentId){
         return static::join('clientusers', 'clientusers.id', '=', 'client_scores.client_user_id')
                 ->join('client_online_test_subjects', 'client_online_test_subjects.id' , '=', 'client_scores.subject_id' )
                 ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.id' , '=', 'client_scores.paper_id' )
                 ->where('client_scores.client_user_id', $studentId)
-                ->where('client_scores.client_institute_course_id', $courseId)
                 ->select('client_scores.*', 'client_online_test_subjects.name as subject', 'client_online_test_subject_papers.name as paper')
                 ->get();
     }
@@ -194,7 +187,6 @@ class ClientScore extends Model
     }
 
     protected static function getAllUsersResults(Request $request){
-        $courseId = $request->get('course');
         $categoryId = $request->get('category');
         $subcategoryId = $request->get('subcategory');
         $subjectId = $request->get('subject');
@@ -202,9 +194,6 @@ class ClientScore extends Model
 
         $result = static::join('clientusers', 'clientusers.id', '=', 'client_scores.client_user_id');
 
-        if($courseId > 0){
-            $result->where('client_scores.client_institute_course_id', $courseId);
-        }
         if($categoryId > 0 ) {
             $result->where('client_scores.category_id', $categoryId);
         }

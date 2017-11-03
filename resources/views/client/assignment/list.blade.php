@@ -31,7 +31,6 @@
           <th style="max-width: 800px;">Question</th>
           <th>Subject Name</th>
           <th>Topic Name</th>
-          <th>Institute Course Name</th>
           <th>Edit Subject</th>
           <th>Delete Subject</th>
         </tr>
@@ -44,7 +43,6 @@
             <td style="max-width: 800px;">{!! mb_strimwidth($assignment->question, 0, 400, "...") !!}</td>
             <td>{{$assignment->subject->name}}</td>
             <td>{{$assignment->topic->name}}</td>
-            <td>{{$assignment->instituteCourse->name}}</td>
             <td>
               <a href="{{url('assignment')}}/{{$assignment->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$assignment->name}}" />
                 </a>

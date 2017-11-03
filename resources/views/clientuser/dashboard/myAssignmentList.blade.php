@@ -30,16 +30,11 @@
 
   <div class="form-group row">
     <div class="col-md-3 mrgn_10_btm">
-       <select class="form-control" id="institute_course" name="institute_course" required title="Institute Course" onClick="selectSubject(this);">
-        <option value="">Select Institute Course</option>
-        @foreach($instituteCourses as $instituteCourse)
-          <option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-      @endforeach
-      </select>
-    </div>
-    <div class="col-md-3 mrgn_10_btm">
       <select class="form-control" id="subject" name="subject" title="Subject" onChange="selectTopic(this);">
         <option value="">Select Subject</option>
+        @foreach($subjects as $subject)
+          <option value="{{$subject->id}}">{{$subject->name}}</option>
+        @endforeach
       </select>
     </div>
     <div class="col-md-3 mrgn_10_btm">
@@ -56,7 +51,6 @@
           <th>Assignment</th>
           <th>Subject Name</th>
           <th>Topic Name</th>
-          <th>Course Name</th>
           <th>Do Assignment</th>
           <!-- <th>Delete Topic</th> -->
         </tr>
@@ -69,7 +63,6 @@
             <td>{!! mb_strimwidth($assignment->question, 0, 400, "...") !!}</td>
             <td>{{$assignment->subject->name}}</td>
             <td>{{$assignment->topic->name}}</td>
-            <td>{{$assignment->instituteCourse->name}}</td>
             <td>
               <a href="{{url('doAssignment')}}/{{$assignment->id}}" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Do Assignment " />
                 </a>
@@ -140,7 +133,6 @@
     var id = parseInt($(ele).val());
     document.getElementById('studentAssignment').innerHTML = '';
     document.getElementById('paginate').innerHTML = '';
-    var courseId = document.getElementById('institute_course').value;
     if( 0 < id ){
       $.ajax({
           method: "POST",
@@ -168,7 +160,7 @@
       $.ajax({
         method: "POST",
         url: "{{url('getAssignments')}}",
-        data: {institute_course_id:courseId, subject:id}
+        data: {subject:id}
       })
       .done(function( msgs ) {
         body = document.getElementById('studentAssignment');
@@ -232,10 +224,6 @@
       var eleTopic = document.createElement('td');
       eleTopic.innerHTML = msg['topic'];
       eleTr.appendChild(eleTopic);
-
-      var eleAttachment = document.createElement('td');
-      eleAttachment.innerHTML = msg['instituteCourse'];
-      eleTr.appendChild(eleAttachment);
 
       var url = "{{url('doAssignment')}}/"+ msg['id'];
       var imageSrc = "{{asset('images/edit1.png')}}";

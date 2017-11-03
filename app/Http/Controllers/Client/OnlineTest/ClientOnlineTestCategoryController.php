@@ -8,7 +8,6 @@ use Redirect;
 use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
-use App\Models\ClientInstituteCourse;
 
 class ClientOnlineTestCategoryController extends ClientBaseController
 {
@@ -25,7 +24,6 @@ class ClientOnlineTestCategoryController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateCreateCategory = [
-        'institute_course' => 'required|integer',
         'category' => 'required|string',
     ];
 
@@ -33,10 +31,6 @@ class ClientOnlineTestCategoryController extends ClientBaseController
      * show all category
      */
     protected function show(Request $request){
-        $coursePermission = InputSanitise::checkModulePermission($request, 'test');
-        if('false' == $coursePermission){
-            return Redirect::to('manageClientHome');
-        }
     	$testCategories = ClientOnlineTestCategory::showCategories($request);
     	return view('client.onlineTest.category.list', compact('testCategories'));
     }
@@ -45,10 +39,8 @@ class ClientOnlineTestCategoryController extends ClientBaseController
      * show UI for create category
      */
     protected function create(){
-        $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
     	$testCategory = new ClientOnlineTestCategory;
-    	return view('client.onlineTest.category.create', compact('instituteCourses','testCategory'));
+    	return view('client.onlineTest.category.create', compact('testCategory'));
     }
 
     /**
@@ -85,8 +77,7 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     	if(isset($catId)){
     		$testCategory = ClientOnlineTestCategory::find($catId);
     		if(is_object($testCategory)){
-                $instituteCourses = ClientInstituteCourse::where('client_id', $testCategory->client_id)->get();
-    			return view('client.onlineTest.category.create', compact('instituteCourses','testCategory'));
+    			return view('client.onlineTest.category.create', compact('testCategory'));
     		}
     	}
 		return Redirect::to('manageOnlineTestCategory');

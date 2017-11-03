@@ -40,7 +40,7 @@
 		if(Session::has('selected_question_type')){
 			$selectedQuestionType = Session::get('selected_question_type');
 		} else {
-			$selectedQuestionType = 2;
+			$selectedQuestionType = 1;
 		}
 		if(Session::has('next_question_no')){
 			$nextQuestionNo = Session::get('next_question_no');

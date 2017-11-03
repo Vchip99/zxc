@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
-use App\Models\ClientInstituteCourse;
 use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
 
@@ -19,7 +18,7 @@ class ClientAssignmentQuestion extends Model
      *
      * @var array
      */
-    protected $fillable = ['question', 'client_assignment_subject_id', 'client_assignment_topic_id', 'attached_link','client_id', 'client_institute_course_id'];
+    protected $fillable = ['question', 'client_assignment_subject_id', 'client_assignment_topic_id', 'attached_link','client_id'];
 
     /**
      *  add/update course category
@@ -29,7 +28,6 @@ class ClientAssignmentQuestion extends Model
         $subjectId   = InputSanitise::inputInt($request->get('subject'));
         $topicId   = InputSanitise::inputInt($request->get('topic'));
         $assignmentId   = InputSanitise::inputInt($request->get('assignment_id'));
-        $instituteCourseId   = InputSanitise::inputInt($request->get('institute_course'));
         $clientId = Auth::guard('client')->user()->id;
 
         if( $isUpdate && isset($assignmentId)){
@@ -45,7 +43,6 @@ class ClientAssignmentQuestion extends Model
         $assignment->client_assignment_subject_id = $subjectId;
         $assignment->client_assignment_topic_id = $topicId;
         $assignment->client_id = $clientId;
-        $assignment->client_institute_course_id = $instituteCourseId;
 
         if( $request->exists('attached_link')){
 	        $attachmentFolderPath = "clientAssignmentStorage/".$clientId."/topicId-".$topicId;
@@ -72,14 +69,9 @@ class ClientAssignmentQuestion extends Model
         return $this->belongsTo(ClientAssignmentTopic::class, 'client_assignment_topic_id');
     }
 
-    public function instituteCourse(){
-        return $this->belongsTo(ClientInstituteCourse::class, 'client_institute_course_id');
-    }
-
     protected static function checkAssignmentExist(Request $request){
     	$result = [];
-    	$query = static::where('client_institute_course_id', $request->course_id)
-    			->where('client_assignment_subject_id', $request->subject_id)
+    	$query = static::where('client_assignment_subject_id', $request->subject_id)
     			->where('client_assignment_topic_id', $request->topic_id)
     			->where('client_id', Auth::guard('client')->user()->id)
     			->first();

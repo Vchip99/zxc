@@ -24,6 +24,15 @@
 		   }
 		 }
 		 .label-primary{margin-right: 2px;margin-left: 2px;}
+		 .divider {
+		  border-color: grey;
+		  border-style: solid;
+		  border-width: 0 0 1px;
+		  height: 10px;
+		  line-height: 20px;
+		  text-align:center;
+		  overflow: visible;
+		}
   	</style>
 @stop
 @section('header-js')

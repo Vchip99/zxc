@@ -11,11 +11,6 @@
 @section('dashboard_content')
 	<script src="{{ asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
 	@php
-		if(Session::has('client_selected_institute_course')){
-			$clientSearchSelectedInstituteCourseId = Session::get('client_selected_institute_course');
-		} else {
-			$clientSearchSelectedInstituteCourseId = 0;
-		}
 		if(Session::has('client_selected_category')){
 			$clientSelectedCategoryId = Session::get('client_selected_category');
 		} else {
@@ -44,7 +39,7 @@
 		if(Session::has('client_selected_question_type')){
 			$clientSelectedQuestionType = Session::get('client_selected_question_type');
 		} else {
-			$clientSelectedQuestionType = 2;
+			$clientSelectedQuestionType = 1;
 		}
 		if(Session::has('client_next_question_no')){
 			$clientNextQuestionNo = Session::get('client_next_question_no');
@@ -89,33 +84,6 @@
 			<form id="createForm" name="createQuestion" action="{{url('createOnlineTestQuestion')}}" method="POST">
 		@endif
 		{{csrf_field()}}
-			<div class="form-group row @if ($errors->has('institute_course')) has-error @endif">
-			    <label class="col-sm-2 col-form-label">Institute Course Name:</label>
-			    <div class="col-sm-3">
-			    	@if(count($instituteCourses) > 0 && isset($testQuestion->id))
-		          		@foreach($instituteCourses as $instituteCourse)
-			              @if( $instituteCourse->id == $testQuestion->category_id )
-			                <input class="form-control"  type="text" name="institute_course_text" value="{{$instituteCourse->name}}" readonly="true">
-			                <input type="hidden" name="institute_course" value="{{$instituteCourse->id}}">
-			              @endif
-			            @endforeach
-		          	@else
-				      	<select class="form-control" name="institute_course" id="institute_course" required title="Category" onChange="selectCategory(this);" >
-				          	<option value="">Select Institute Course</option>
-				          	@if(count($instituteCourses) > 0)
-				            	@foreach($instituteCourses as $instituteCourse)
-				              		@if( $clientSearchSelectedInstituteCourseId == $instituteCourse->id)
-				                		<option value="{{$instituteCourse->id}}" selected="true">{{$instituteCourse->name}}</option>
-				              		@else
-				                		<option value="{{$instituteCourse->id}}">{{$instituteCourse->name}}</option>
-				              		@endif
-				            	@endforeach
-				          	@endif
-				        </select>
-			        @endif
-			        @if($errors->has('institute_course')) <p class="help-block">{{ $errors->first('institute_course') }}</p> @endif
-			    </div>
-		  	</div>
 			<div class="form-group row @if ($errors->has('category')) has-error @endif">
 			    <label class="col-sm-2 col-form-label">Category Name:</label>
 			    <div class="col-sm-3">
@@ -131,13 +99,11 @@
 				          	<option value="">Select Category</option>
 				          	@if(count($testCategories) > 0)
 					            @foreach($testCategories as $testCategory)
-					            	@if($clientSearchSelectedInstituteCourseId == $testCategory->client_institute_course_id)
-						            	@if($clientSelectedCategoryId == $testCategory->id)
-						                	<option value="{{$testCategory->id}}" selected="true">{{$testCategory->name}}</option>
-						                @else
-						                	<option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
-						                @endif
-						            @endif
+					            	@if($clientSelectedCategoryId == $testCategory->id)
+					                	<option value="{{$testCategory->id}}" selected="true">{{$testCategory->name}}</option>
+					                @else
+					                	<option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
+					                @endif
 					            @endforeach
 					        @endif
 				      	</select>
@@ -626,33 +592,6 @@ ul#ul > li > a:hover:not(.active) {
       }
     }
 
-	function selectCategory(ele){
-	    var id = parseInt($(ele).val());
-	    if( 0 < id ){
-	      $.ajax({
-	              method: "POST",
-	              url: "{{url('getOnlineTestCategories')}}",
-	              data: {id:id}
-	          })
-	          .done(function( msg ) {
-	            select = document.getElementById('category');
-	            select.innerHTML = '';
-	            var opt = document.createElement('option');
-	            opt.value = '';
-	            opt.innerHTML = 'Select Category';
-	            select.appendChild(opt);
-	            if( 0 < msg.length){
-	              $.each(msg, function(idx, obj) {
-	                  var opt = document.createElement('option');
-	                  opt.value = obj.id;
-	                  opt.innerHTML = obj.name;
-	                  select.appendChild(opt);
-	              });
-	            }
-	          });
-	    }
-	}
-
   	function selectSubcategory(ele){
 	    id = parseInt($(ele).val());
 	    if( 0 < id ){
@@ -866,13 +805,12 @@ ul#ul > li > a:hover:not(.active) {
   		}
   	}
   	function selectSection(){
-		var instituteCourse = document.getElementById("institute_course").value;
 		var paperId = parseInt(document.getElementById('paper').value);
-		if( 0 < instituteCourse ){
+		if( 0 < paperId ){
 	      	$.ajax({
 	             	method: "POST",
-	              	url: "{{url('getOnlinePaperSectionsByInstituteCourseId')}}",
-	              	data: {institute_course:instituteCourse, paper_id:paperId}
+	              	url: "{{url('paperSectionsByPaperId')}}",
+	              	data: {paper_id:paperId}
           	}).done(function( msg ) {
 	            select = document.getElementById('section_type');
 	            select.innerHTML = '';

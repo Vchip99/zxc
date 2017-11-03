@@ -11,11 +11,14 @@ use App\Models\ClientTestimonial;
 use App\Models\ClientTeam;
 use App\Models\ClientOnlineCourse;
 use App\Models\Clientuser;
-use App\Models\ClientInstituteCourse;
-use App\Models\ClientUserInstituteCourse;
 use App\Models\Client;
 use App\Models\ClientScore;
 use App\Models\ClientOnlineTestSubjectPaper;
+use App\Models\ClientOnlineTestSubject;
+use App\Models\ClientOnlineTestCategory;
+use App\Models\ClientUserPurchasedCourse;
+use App\Models\ClientUserPurchasedTestSubCategory;
+use App\Models\ClientOnlineTestSubCategory;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use Auth, Redirect, View, DB, Session;
@@ -43,19 +46,19 @@ class ClientUsersInfoController extends BaseController
         }
     }
 
-    protected function allUsers(){
+    protected function allUsers(Request $request){
         $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
-        return view('client.allUsers.allUsers', compact('instituteCourses'));
+        $clientusers = Clientuser::where('client_id', $clientId)->get();
+        $courses = ClientOnlineCourse::getCourseAssocaitedWithVideos();
+        $userPurchasedCourses = ClientUserPurchasedCourse::getClientUserCourses($clientId);
+        $userPurchasedTestSubCategories = ClientUserPurchasedTestSubCategory::getClientUserTestSubCategories($clientId);
+        $testSubCategories = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
+        // dd($testSubCategories);
+        return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories'));
     }
 
     protected function searchUsers(Request $request){
         return Clientuser::searchUsers($request);
-    }
-
-    protected function changeClientPermissionStatus(Request $request){
-
-        return ClientUserInstituteCourse::changeClientPermissionStatus($request);
     }
 
     protected function deleteStudent(Request $request){
@@ -94,44 +97,36 @@ class ClientUsersInfoController extends BaseController
         return $approveStatus;
     }
 
-    protected function userTestResults($subdomain,$id=NULL, $course=NULL){
+    protected function userTestResults($subdomain,$id=NULL){
         $results = [];
         $students = [];
         $collegeDepts = [];
-        $courseId = 0;
         $selectedStudent = '';
         $id = json_decode($id);
-        $courseId = json_decode($course);
         if(empty($id)){
             $id = Session::get('client_selected_user');
-            $courseId = Session::get('client_selected_course');
         }
         if($id > 0){
             $selectedStudent = Clientuser::find($id);
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            $instituteCourses = ClientInstituteCourse::where('client_id', $selectedStudent->client_id)->get();
-            if($courseId > 0){
-                $students = Clientuser::getAllStudentsByClientIdByCourseId($selectedStudent->client_id,$courseId);
-                $results = ClientScore::where('client_user_id', $id)->where('client_institute_course_id', $courseId)->get();
-                Session::set('client_selected_course', $courseId);
-            }
+            $students = Clientuser::getAllStudentsByClientId($selectedStudent->client_id);
+            $results = ClientScore::where('client_user_id', $id)->get();
             Session::set('client_selected_user', $id);
         } else {
-            $clientId = Auth::guard('client')->user()->id;
-            $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
+            $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
         }
+
         $barchartLimits = range(100, 0, 10);
-        return view('client.allUsers.userTestResults', compact('instituteCourses', 'courseId', 'students', 'results', 'selectedStudent','barchartLimits'));
+        return view('client.allUsers.userTestResults', compact('students', 'results', 'selectedStudent','barchartLimits'));
     }
 
     protected function showUserTestResults(Request $request){
         $ranks = [];
         $marks = [];
         $studentId = InputSanitise::inputInt($request->get('student_id'));
-        $courseId = InputSanitise::inputInt($request->get('course_id'));
-        $scores = ClientScore::getClientScoreByUserIdByScoreId($studentId,$courseId);
+        $scores = ClientScore::getClientScoreByUserId($studentId);
         if( false == $scores->isEmpty()){
             foreach($scores as $score){
                 $ranks[$score->id] = $score->rank();
@@ -143,110 +138,86 @@ class ClientUsersInfoController extends BaseController
         $result['marks'] = $marks;
         if($request->get('student_id') > 0){
             Session::set('client_selected_user', $studentId);
-            Session::set('client_selected_course', $courseId);
         }
         return $result;
     }
 
-    protected function userCourses($subdomain,$id=NULL, $courseId=NULL){
+    protected function userCourses($subdomain,$id=NULL){
         $students = [];
         $courses = [];
-        $courseId = 0;
         $selectedStudent = '';
         if(empty($id)){
             $id = Session::get('client_selected_user');
-            $courseId = Session::get('client_selected_course');
         }
+
         if($id > 0){
             $selectedStudent = Clientuser::find($id);
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            $instituteCourses = ClientInstituteCourse::where('client_id', $selectedStudent->client_id)->get();
-            if($courseId > 0){
-                $students = Clientuser::getAllStudentsByClientIdByCourseId($selectedStudent->client_id,$courseId);
-                $courses = ClientOnlineCourse::getRegisteredOnlineCoursesByCourseidByUserId($courseId,$id);
-                Session::set('client_selected_course', $courseId);
-            }
+            $students = Clientuser::getAllStudentsByClientId($selectedStudent->client_id);
+            $courses = ClientOnlineCourse::getRegisteredOnlineCoursesByUserId($id);
             Session::set('client_selected_user', $id);
         } else {
-            $clientId = Auth::guard('client')->user()->id;
-            $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
+            $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
         }
-        return view('client.allUsers.userCourses', compact('instituteCourses', 'students', 'courseId','courses', 'selectedStudent'));
+        return view('client.allUsers.userCourses', compact('students', 'courses', 'selectedStudent'));
     }
 
     protected function showUserCourses(Request $request){
         $studentId = InputSanitise::inputInt($request->get('student_id'));
-        $courseId = InputSanitise::inputInt($request->get('course_id'));
         Session::set('client_selected_user', $studentId);
-        Session::set('client_selected_course', $courseId);
-        return ClientOnlineCourse::getRegisteredOnlineCoursesByCourseidByUserId($courseId,$studentId);
+        return ClientOnlineCourse::getRegisteredOnlineCoursesByUserId($studentId);
     }
 
-    protected function userPlacement($subdomain,$id=NULL, $courseId=NULL){
+    protected function userPlacement($subdomain,$id=NULL){
         $students = [];
         $collegeDepts = [];
         $selectedStudent = '';
         if(empty($id)){
             $id = Session::get('client_selected_user');
-            $courseId = Session::get('client_selected_course');
         }
         if($id > 0){
             $selectedStudent = Clientuser::find($id);
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            $instituteCourses = ClientInstituteCourse::where('client_id', $selectedStudent->client_id)->get();
-            if($courseId > 0){
-                $students = Clientuser::getAllStudentsByClientIdByCourseId($selectedStudent->client_id,$courseId);
-                Session::set('client_selected_course', $courseId);
-            }
+            $students = Clientuser::getAllStudentsByClientId($selectedStudent->client_id);
             Session::set('client_selected_user', $id);
         } else {
-            $clientId = Auth::guard('client')->user()->id;
-            $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
+            $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
         }
-        return view('client.allUsers.userPlacement', compact('instituteCourses', 'students', 'courseId', 'selectedStudent'));
+        return view('client.allUsers.userPlacement', compact('students', 'selectedStudent'));
     }
 
     protected function getStudentById(Request $request){
         $studentId = InputSanitise::inputInt($request->get('student_id'));
-        $courseId = InputSanitise::inputInt($request->get('course_id'));
         Session::set('client_selected_user', $studentId);
-        Session::set('client_selected_course', $courseId);
         return Clientuser::getStudentById($studentId);
     }
 
-    protected function userVideo($subdomain,$id=NULL, $courseId=NULL){
+    protected function userVideo($subdomain,$id=NULL){
         $students = [];
         $collegeDepts = [];
         $selectedStudent = '';
         if(empty($id)){
             $id = Session::get('client_selected_user');
-            $courseId = Session::get('client_selected_course');
         }
         if($id > 0){
             $selectedStudent = Clientuser::find($id);
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            $instituteCourses = ClientInstituteCourse::where('client_id', $selectedStudent->client_id)->get();
-            if($courseId > 0){
-                $students = Clientuser::getAllStudentsByClientIdByCourseId($selectedStudent->client_id,$courseId);
-                Session::set('client_selected_course', $courseId);
-            }
+            $students = Clientuser::getAllStudentsByClientId($selectedStudent->client_id);
             Session::set('client_selected_user', $id);
         } else {
-            $clientId = Auth::guard('client')->user()->id;
-            $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
+            $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
         }
-        return view('client.allUsers.userVideo', compact('instituteCourses', 'students', 'courseId', 'selectedStudent'));
+        return view('client.allUsers.userVideo', compact('students', 'selectedStudent'));
     }
 
     protected function updateUserVideo(Request $request){
         $studentId = InputSanitise::inputInt($request->get('student_id'));
-        $courseId = InputSanitise::inputInt($request->get('course_id'));
         $student = Clientuser::getStudentById($studentId);
         if(is_object($student)){
 
@@ -266,17 +237,15 @@ class ClientUsersInfoController extends BaseController
             $student->recorded_video = $body[0];
             $student->save();
             Session::set('client_selected_user', $studentId);
-            Session::set('client_selected_course', $courseId);
             return Redirect::to('userVideo')->with('message', 'User updated successfully.');
         }
         return Redirect::to('userVideo');
     }
 
     protected function allTestResults(Request $request){
-        $clientId = Auth::guard('client')->user()->id;
-        $instituteCourses = ClientInstituteCourse::where('client_id', $clientId)->get();
         $scores =[];
-        return view('client.allUsers.allTestResults', compact('instituteCourses', 'scores'));
+        $categories = ClientOnlineTestCategory::where('client_id', Auth::guard('client')->user()->id)->get();
+        return view('client.allUsers.allTestResults', compact('scores', 'categories'));
     }
 
     protected function getAllTestResults(Request $request){
@@ -320,19 +289,27 @@ class ClientUsersInfoController extends BaseController
                 $resultArray[] = $result;
             }
         }
-        if($request->get('course') > 0){
-            $courseName = ClientInstituteCourse::find($request->get('course'))->name;
+        if($request->get('subject') > 0){
+            $subjectName = ClientOnlineTestSubject::find($request->get('subject'))->name;
         } else {
-            $courseName = $request->get('course');
+            $subjectName = $request->get('subject');
         }
 
-        $courseResult = $courseName.'_'.$paperName.'_result';
-        return \Excel::create($courseResult, function($excel) use ($sheetName,$resultArray) {
+        $downloadResult = $subjectName.'_'.$paperName.'_result';
+        return \Excel::create($downloadResult, function($excel) use ($sheetName,$resultArray) {
             $excel->sheet($sheetName , function($sheet) use ($resultArray)
             {
                 $sheet->fromArray($resultArray);
             });
         })->download('xls');
+    }
+
+    protected function changeClientUserCourseStatus(Request $request){
+        return ClientUserPurchasedCourse::changeClientUserCourseStatus($request);
+    }
+
+    protected function changeClientUserTestSubCategoryStatus(Request $request){
+        return ClientUserPurchasedTestSubCategory::changeClientUserTestSubCategoryStatus($request);
     }
 
 }
