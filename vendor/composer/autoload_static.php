@@ -336,6 +336,7 @@ class ComposerStaticInitafb21afa275a0cadb9a860f1ba9a48a8
         'AddIsFreeToClientOnlineVideo' => __DIR__ . '/../..' . '/database/migrations/2017_11_03_044633_AddIsFreeToClientOnlineVideo.php',
         'AddNewColumnsToClientOnlineTestSubjectPapersTable' => __DIR__ . '/../..' . '/database/migrations/2017_10_16_111949_add_new_columns_to_client_online_test_subject_papers_table.php',
         'AddNewColumnsToTestSubjectPapersTable' => __DIR__ . '/../..' . '/database/migrations/2017_10_16_052341_add_new_columns_to_test_subject_papers_table.php',
+        'AddPaymentIdToManyTables' => __DIR__ . '/../..' . '/database/migrations/2017_11_26_175247_AddPaymentIdToManyTables.php',
         'AddPhotoToClientTable' => __DIR__ . '/../..' . '/database/migrations/2017_11_07_085755_AddPhotoToClientTable.php',
         'AddPhotoToClientusers' => __DIR__ . '/../..' . '/database/migrations/2017_07_31_072410_add_photo_to_clientusers.php',
         'AddPlanIdToClientTable' => __DIR__ . '/../..' . '/database/migrations/2017_11_15_143537_AddPlanIdToClientTable.php',

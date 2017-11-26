@@ -13,6 +13,7 @@ return array(
     'AddIsFreeToClientOnlineVideo' => $baseDir . '/database/migrations/2017_11_03_044633_AddIsFreeToClientOnlineVideo.php',
     'AddNewColumnsToClientOnlineTestSubjectPapersTable' => $baseDir . '/database/migrations/2017_10_16_111949_add_new_columns_to_client_online_test_subject_papers_table.php',
     'AddNewColumnsToTestSubjectPapersTable' => $baseDir . '/database/migrations/2017_10_16_052341_add_new_columns_to_test_subject_papers_table.php',
+    'AddPaymentIdToManyTables' => $baseDir . '/database/migrations/2017_11_26_175247_AddPaymentIdToManyTables.php',
     'AddPhotoToClientTable' => $baseDir . '/database/migrations/2017_11_07_085755_AddPhotoToClientTable.php',
     'AddPhotoToClientusers' => $baseDir . '/database/migrations/2017_07_31_072410_add_photo_to_clientusers.php',
     'AddPlanIdToClientTable' => $baseDir . '/database/migrations/2017_11_15_143537_AddPlanIdToClientTable.php',
