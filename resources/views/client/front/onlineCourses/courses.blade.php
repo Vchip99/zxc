@@ -6,6 +6,11 @@
    @include('layouts.home-css')
   <link href="{{ asset('css/sidemenuindex.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/v_courses.css?ver=1.0')}}" rel="stylesheet"/>
+  <style type="text/css">
+    .pay-width{
+      min-width: 80px;
+    }
+  </style>
 @stop
 @section('header-js')
   @include('layouts.home-js')
@@ -28,6 +33,19 @@
 <section id="sidemenuindex" class="v_container">
   <div class="container ">
     <div class="row">
+      @if(count($errors) > 0)
+        <div class="alert alert-danger">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </div>
+      @endif
+      @if(Session::has('message'))
+        <div class="alert alert-success" id="message">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ Session::get('message') }}
+        </div>
+      @endif
       <div class="col-sm-3 ">
         <h4 class="v_h4_subtitle"> Sorted By</h4>
         <div class="mrgn_20_top_btm" >
@@ -49,7 +67,6 @@
     <div class="col-sm-9 ">
         <div class="row info" id="addCourses">
           @if(count($courses) > 0)
-            @if(Auth::guard('clientuser')->user())
               @foreach($courses as $course)
                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim">
                   <div class="course-box">
@@ -63,21 +80,16 @@
                     <div class="topleft">@if( 1 == $course->certified )Certified @else Non Certified @endif</div>
                     <div class="topright">{{($course->price > 0)? 'Paid' : 'Free' }}</div>
                     <div class="course-box-content" >
-                       <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
-                       <div class="categoery" title="{{$course->category}}">
-                          <a  href="{{ url('courseDetails')}}/{{$course->id}}">
-                            @if(in_array($course->id, $userPurchasedCourses))
-                              Paid
-                            @elseif($course->price > 0)
-                              Price: {{$course->price}} Rs.
-                            @else
-                              Free
-                            @endif
-                          </a>
-                       </div>
+                      <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom">
+                        <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p>
+                      </h4>
+                      <div class="categoery" title="{{$course->category}}">
+                        <a href="{{ url('courseDetails')}}/{{$course->id}}">
+                            {{($course->price > 0)? "Price: $course->price Rs." : 'Free' }}
+                        </a>
+                      </div>
                        <br/>
-                      <p class="block-with-text">
-                        {{$course->description}}
+                      <p class="block-with-text">{{$course->description}}
                         <a type="button" class="show " data-show="{{$course->id}}">Read More</a>
                       </p>
                       <div class="corse-detail" id="corse-detail-{{$course->id}}" >
@@ -88,76 +100,28 @@
                             <div class="text-center corse-detail-footer" >
                               <a href="{{ url('courseDetails')}}/{{$course->id}}" class="btn btn-primary btn-default" > Start Course</a>
                             </div>
-                        </div>
-                      </div>
-                      <div class="course-auther">
-                        @if($course->price > 0)
-                          @if(in_array($course->id, $userPurchasedCourses))
-                            <a>
-                              <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Paid</i>
-                            </a>
-                          @else
-                            <a style="cursor: pointer;">
-                              <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Pay Now</i>
-                            </a>
-                          @endif
-                        @else
-                          <a>
-                            <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Free Course</i>
-                          </a>
-                        @endif
                       </div>
                     </div>
-                  </div>
-              @endforeach
-            @else
-              @foreach($courses as $course)
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim">
-                  <div class="course-box">
-                    <a class="img-course-box" href="{{ url('courseDetails')}}/{{$course->id}}" title="{{$course->name}}">
-                      @if(!empty($course->image_path))
-                        <img class="img-responsive " src="{{ asset($course->image_path) }}" alt="course">
+                    <div class="course-auther text-center" >
+                      @if(is_object(Auth::guard('clientuser')->user()))
+                        @if(in_array($course->id, $userPurchasedCourses))
+                          <a class="btn btn-sm btn-primary pay-width"> Paid </a>
+                        @elseif($course->price > 0)
+                          <a href="{{ url('purchaseCourse')}}/{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" >Pay Now</a>
+                        @else
+                          <a class="btn btn-sm btn-primary pay-width" >Free</a>
+                        @endif
                       @else
-                        <img class="img-responsive " src="{{ asset('images/default_course_image.jpg') }}" alt="course">
-                      @endif
-                    </a>
-                    <div class="topleft">@if( 1 == $course->certified )Certified @else Non Certified @endif</div>
-                    <div class="topright">{{($course->price > 0)? 'Paid' : 'Free' }}</div>
-                    <div class="course-box-content" >
-                       <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
-                       <div class="categoery" title="{{$course->category}}">
-                         <a  href="{{ url('courseDetails')}}/{{$course->id}}"> {{($course->price > 0)? "Price: $course->price Rs." : 'Free' }}</a>
-                       </div>
-                       <br/>
-                      <p class="block-with-text">
-                        {{$course->description}}
-                        <a type="button" class="show " data-show="{{$course->id}}">Read More</a>
-                      </p>
-                      <div class="corse-detail" id="corse-detail-{{$course->id}}" >
-                          <div class="corse-detail-heder">
-                            <span class="card-title"><b>{{$course->name}}</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="{{$course->id}}"><span aria-hidden="true">×</span></button>
-                          </div><br/>
-                            <p>{{$course->description}}</p>
-                            <div class="text-center corse-detail-footer" >
-                              <a href="{{ url('courseDetails')}}/{{$course->id}}" class="btn btn-primary btn-default" > Start Course</a>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="course-auther">
                         @if($course->price > 0)
-                          <a style="cursor: pointer;">
-                            <i class="fa fa-long-arrow-right block-with-text" onClick="checkLogin();">Pay Now</i>
-                          </a>
+                          <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="checkLogin();">Pay Now</a>
                         @else
-                          <a>
-                            <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Free Course</i>
-                          </a>
+                          <a class="btn btn-sm btn-primary pay-width">Free Course</a>
                         @endif
-                      </div>
+                      @endif
                     </div>
                   </div>
+                </div>
               @endforeach
-            @endif
           @else
             No courses are available.
           @endif
@@ -173,17 +137,13 @@
   <script type="text/javascript" src="{{ asset('js/read_info.js')}}"></script>
   <script type="text/javascript">
   function checkLogin(){
-    $.alert({
-          title: 'Alert!',
-          content: 'Please login first.',
-      });
-    return false;
+    $('#loginUserModel').modal();
   }
   function getCourseSubCategories(id){
     if( 0 < id ){
       $.ajax({
           method: "POST",
-          url: "{{url('getOnlineSubCategories')}}",
+          url: "{{url('getOnlineSubCategoriesWithCourses')}}",
           data: {id:id}
       })
       .done(function( msg ) {
@@ -213,6 +173,7 @@
   function renderCourse(msg){
     divCourses = document.getElementById('addCourses');
     divCourses.innerHTML = '';
+    var userId = document.getElementById('user_id').value;
     if(undefined !== msg['courses'] && 0 < msg['courses'].length) {
       $.each(msg['courses'], function(idx, obj) {
           var firstDiv = document.createElement('div');
@@ -247,7 +208,24 @@
           thirdDiv.className = "course-box-content";
 
           var courseContent = '<h4 class="course-box-title" title="'+ obj.name +'" data-toggle="tooltip" data-placement="bottom"><p class="block-with-text"><a href="'+ url +'">'+ obj.name +'</a></p></h4>';
-           courseContent += '<div class="categoery"><a  href="'+ url +'">'+ obj.category +'</a></div><br/><p class="block-with-text">'+ obj.description+'<a type="button" class="show " data-show="'+ obj.id +'">Read More</a></p>';
+          courseContent += '<div class="categoery"><a  href="'+ url +'">';
+          if(userId > 0){
+            if(msg['userPurchasedCourses'].length && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
+              courseContent += 'Paid';
+            } else if(obj.price > 0){
+              courseContent += 'Price: '+ obj.price + ' Rs.';
+            } else {
+              courseContent += 'Free';
+            }
+          } else {
+            if(obj.price > 0){
+              courseContent += 'Price: '+ obj.price + ' Rs.';
+            } else {
+              courseContent += 'Free';
+            }
+          }
+
+          courseContent += '</a></div><br/><p class="block-with-text">'+ obj.description+'<a type="button" class="show " data-show="'+ obj.id +'">Read More</a></p>';
 
           courseContent += '<div class="corse-detail" id="corse-detail-'+ obj.id +'"><div class="corse-detail-heder"><span class="card-title"><b>'+ obj.name +'</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="'+ obj.id +'"><span aria-hidden="true">×</span></button></div></br/><p>'+ obj.description +'</p><div class="text-center corse-detail-footer" ><a href="'+ url +'" class="btn btn-primary btn-default" > Start Course</a></div></div>';
 
@@ -255,8 +233,22 @@
           secondDiv.appendChild(thirdDiv);
 
           var authorDiv = document.createElement('div');
-          authorDiv.className = "course-auther";
-          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
+          authorDiv.className = "course-auther text-center";
+          if(userId > 0){
+            if(msg['userPurchasedCourses'].length && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary">Paid</a>';
+            } else if(obj.price > 0){
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary">Pay Now</a>';
+            } else {
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary">Free</a>';
+            }
+          } else {
+            if(obj.price > 0){
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary" onClick="checkLogin();">Pay Now</a>';
+            } else {
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary">Free</a>';
+            }
+          }
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           divCourses.appendChild(firstDiv);

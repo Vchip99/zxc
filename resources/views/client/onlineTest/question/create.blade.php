@@ -243,7 +243,7 @@
 		    </div>
 		    @endif
 		    <div class="form-group row">
-			    <label for="paper" class="col-sm-2 col-form-label">Common Data:</label>
+			    <label for="paper" class="col-sm-2 col-form-label">Common Data Question:</label>
 			    <div class="col-sm-3">
 			    	@if(isset($testQuestion->id))
 			        	<label class="radio-inline"><input type="radio" name="check_common_data" id="check_common_data" value="1" onClick="showHideCommonData(this);" @if(!empty($testQuestion->common_data)) checked @endif> Yes</label>
@@ -255,7 +255,7 @@
 			    </div>
 			</div>
 		    <div class="form-group row" id="show_common_data">
-		    	<label class="col-sm-2 col-form-label">Enter Common Data:</label>
+		    	<label class="col-sm-2 col-form-label">Enter Common Data Question:</label>
 			    <div class="col-sm-10">
 			      	<textarea name="common_data" cols="60" rows="4" id="common_data" placeholder="Enter your Common Data" required>
 		    			@if(isset($testQuestion->id))
@@ -617,7 +617,12 @@ ul#ul > li > a:hover:not(.active) {
 	            }
 	            toggleNextPrev();
           	});
+	    } else {
+	    	resetSubCategory();
 	    }
+    	resetSubject();
+    	resetPaper();
+    	resetSection();
   	}
 
   	function selectSubject(ele){
@@ -646,7 +651,11 @@ ul#ul > li > a:hover:not(.active) {
 	            }
 	            toggleNextPrev();
 	        });
-    	}
+    	} else {
+    		resetSubject();
+	    }
+    	resetPaper();
+    	resetSection();
   	}
 
 	function checkCkeditor(){
@@ -698,6 +707,42 @@ ul#ul > li > a:hover:not(.active) {
 		}
 	}
 
+	function resetSubCategory(){
+		select = document.getElementById('subcategory');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = 'Select Sub Category';
+        select.appendChild(opt);
+	}
+
+	function resetSubject(){
+		selectSub = document.getElementById('subject');
+        selectSub.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = 'Select Subject';
+        selectSub.appendChild(opt);
+	}
+
+	function resetPaper(){
+		select = document.getElementById('paper');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = 'Select Paper';
+        select.appendChild(opt);
+	}
+
+	function resetSection(){
+		select = document.getElementById('section_type');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = 'Select Section';
+        select.appendChild(opt);
+	}
+
 	function getPapersBySubjectId(subjectId){
 	    if( 0 < subjectId ){
 	      	$.ajax({
@@ -725,7 +770,10 @@ ul#ul > li > a:hover:not(.active) {
 		            });
 	            }
           	});
-    	}
+    	} else {
+    		resetPaper();
+	    }
+    	resetSection();
   	}
 
 	function selectPaper(ele){
@@ -808,9 +856,9 @@ ul#ul > li > a:hover:not(.active) {
 		var paperId = parseInt(document.getElementById('paper').value);
 		if( 0 < paperId ){
 	      	$.ajax({
-	             	method: "POST",
-	              	url: "{{url('paperSectionsByPaperId')}}",
-	              	data: {paper_id:paperId}
+             	method: "POST",
+              	url: "{{url('paperSectionsByPaperId')}}",
+              	data: {paper_id:paperId}
           	}).done(function( msg ) {
 	            select = document.getElementById('section_type');
 	            select.innerHTML = '';
@@ -827,6 +875,8 @@ ul#ul > li > a:hover:not(.active) {
 		            });
 	            }
           	});
+    	} else {
+    		resetSection();
     	}
 	}
 

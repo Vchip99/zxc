@@ -258,6 +258,17 @@
             </ul>
           </li>
           <li class="treeview">
+            <a href="#" title="Subdomains/Clients Info">
+              <i class="fa fa-inr"></i> <span>Plans & Billing</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Manage History"><a href="{{ url('admin/manageClientHistory')}}"><i class="fa fa-circle-o"></i> History </a></li>
+            </ul>
+          </li>
+          <li class="treeview">
             <a href="#" title="Zero to Hero">
               <i class="fa fa-asterisk"></i> <span>Zero to Hero</span>
               <span class="pull-right-container">

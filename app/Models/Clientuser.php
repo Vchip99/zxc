@@ -205,18 +205,6 @@ class Clientuser extends Authenticatable
         RegisterClientOnlinePaper::deleteRegisteredPapersClientId($clientId);
     }
 
-    protected static function getUserCoursePermissionCount(){
-        return static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id')
-                ->where('client_user_institute_courses.client_user_id', Auth::guard('clientuser')->user()->id)
-                ->where('client_user_institute_courses.course_permission', 1)->count();
-    }
-
-    protected static function getUserTestPermissionCount(){
-        return static::join('client_user_institute_courses', 'client_user_institute_courses.client_user_id', '=', 'clientusers.id')
-                ->where('client_user_institute_courses.client_user_id', Auth::guard('clientuser')->user()->id)
-                ->where('client_user_institute_courses.test_permission', 1)->count();
-    }
-
     function adminNotificationCount($year=NULL,$month=NULL){
         $ids = [];
         $notificationCount = [];
@@ -249,5 +237,22 @@ class Clientuser extends Authenticatable
 
     protected static function searchStudentForAssignment(){
         return static::where('client_id', Auth::guard('client')->user()->id)->select('clientusers.*')->get();
+    }
+
+    protected static function isInBetweenFirstTwenty(){
+        $result = 'false';
+        $users = static::where('client_id', Auth::guard('clientuser')->user()->client_id)->take(20)->get();
+        if(is_object($users) && false == $users->isEmpty()){
+            foreach($users as $user){
+                if(Auth::guard('clientuser')->user()->id == $user->id){
+                    $result = 'true';
+                }
+            }
+        }
+        return $result;
+    }
+
+    public function client(){
+        return $this->belongsTo(Client::class, 'client_id');
     }
 }

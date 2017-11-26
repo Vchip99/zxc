@@ -50,6 +50,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/manageClients', 'Admin\AdminController@manageClients');
 	Route::post('admin/changeClientPermissionStatus', 'Admin\AdminController@changeClientPermissionStatus');
 	Route::delete('admin/deleteClient', 'Admin\AdminController@deleteClient');
+	Route::get('admin/manageClientHistory', 'Admin\AdminController@manageClientHistory');
+	Route::post('admin/getClientHistory', 'Admin\AdminController@getClientHistory');
 
 	// Admin all users
 	Route::get('admin/allUsers', 'Admin\AllUsersInfoController@allUsers');
@@ -85,6 +87,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('login', 'UserAuth\LoginController@showLoginForm');
 	Route::post('login', 'UserAuth\LoginController@login');
 	Route::post('/logout', 'UserAuth\LoginController@logout');
+	Route::post('userLogin', 'UserAuth\LoginController@userLogin');
 
 	//User Register
 	// Route::get('register', 'UserAuth\RegisterController@showRegistrationForm');
@@ -95,8 +98,13 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('password/reset', 'UserAuth\ResetPasswordController@reset');
 	Route::get('register/verify/{token}', 'UserAuth\RegisterController@verify');
 	Route::get('signup', 'HomeController@signup');
-
+	Route::get('clientsignup/{planId}', 'HomeController@clientsignup');
+	Route::post('isCLientExists', 'HomeController@isCLientExists');
 	Route::post('getDepartments', 'HomeController@getDepartments');
+	Route::post('doPayment', 'HomeController@doPayment');
+	Route::get('thankyou', 'HomeController@thankyou');
+	Route::any('webhook', 'HomeController@webhook');
+	Route::post('freeRegister', 'HomeController@freeRegister');
 
 
 	// manage sub admin
@@ -160,8 +168,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/associateSession', 'Test\QuestionController@associateSession');
 	Route::post('admin/updateQuestionSession', 'Test\QuestionController@updateQuestionSession');
 
-
-
 	// verify account
 	Route::get('verifyAccount', 'HomeController@verifyAccount');
 	Route::post('verifyEmail', 'HomeController@verifyEmail');
@@ -169,8 +175,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('register/verifySubscriedUser/{token}', 'HomeController@verifySubscriedUser');
 
 	// home
-	// Route::get('/', 'HomeController@home');
-	// Route::get('/home', 'HomeController@home');
 	Route::get('webinar', 'HomeController@webinar');
 	Route::get('webinarerror', 'HomeController@webinarerror');
 	Route::get('vEducation', 'HomeController@vEducation');
@@ -191,6 +195,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('educationalPlatform', 'HomeController@educationalPlatform');
 	Route::get('digitalMarketing', 'HomeController@digitalMarketing');
 	Route::get('pricing', 'HomeController@pricing');
+	Route::get('webdevelopment', 'HomeController@webdevelopment');
 	Route::get('us', 'HomeController@us');
 
 	// online courses front
@@ -435,8 +440,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('studentVideo/{id?}', 'AccountController@studentVideo');
 	Route::put('updateStudentVideo', 'AccountController@updateStudentVideo');
 
-
-
 	// like- dis-like count front
 	Route::post('likePost', 'CourseController@likePost');
 	Route::post('likeComment', 'CourseController@likeComment');
@@ -611,19 +614,10 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateApplyJob', 'Placement\PlacementApplyJobController@update');
 	Route::delete('admin/deleteApplyJob', 'Placement\PlacementApplyJobController@delete');
 
-	// // paper section
-	// Route::get('admin/managePaperSection', 'Test\PaperSectionController@show');
-	// Route::get('admin/createPaperSection', 'Test\PaperSectionController@create');
-	// Route::post('admin/createPaperSection', 'Test\PaperSectionController@store');
-	// Route::get('admin/paperSection/{id}/edit', 'Test\PaperSectionController@edit');
-	// Route::put('admin/updatePaperSection', 'Test\PaperSectionController@update');
-	// Route::delete('admin/deletePaperSection', 'Placement\PlacementPaperSectionController@delete');
-
 });
 
 Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('/', 'Client\ClientHomeController@clientHome');
-	// Route::get('clientHome', 'ClientController@client');
 	Route::get('client/login', 'ClientAuth\LoginController@showLoginForm');
   	Route::post('client/login', 'ClientAuth\LoginController@login');
   	Route::post('client/logout', 'ClientAuth\LoginController@logout');
@@ -631,14 +625,12 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	// verify account
   	Route::get('verifyAccount', 'Client\ClientHomeController@verifyAccount');
   	Route::post('verifyClientEmail', 'Client\ClientHomeController@verifyClientEmail');
-
-  	// client institute courses
-  	// Route::get('manageInstituteCourses', 'Client\InstituteCourse\ClientInstituteCourseController@show');
-  	// Route::get('createClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@create');
-  	// Route::post('createClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@store');
-  	// Route::get('clientInstituteCourse/{id}/edit', 'Client\InstituteCourse\ClientInstituteCourseController@edit');
-  	// Route::put('updateClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@update');
-  	// Route::delete('deleteClientInstituteCourse', 'Client\InstituteCourse\ClientInstituteCourseController@delete');
+  	// Route::get('clientforgotPassword', 'Client\ClientHomeController@clientforgotPassword');
+  	// Route::post('clientforgotPassword', 'Client\ClientHomeController@clientforgotPassword');
+  	Route::get('clientforgotPassword', 'ClientAuth\ForgotPasswordController@showLinkRequestForm');
+  	Route::post('clientpassword/email', 'ClientAuth\ForgotPasswordController@sendPasswordResetLink');
+  	Route::get('clientpassword/reset/{token}', 'ClientAuth\ResetPasswordController@showResetForm');
+  	Route::post('client/password/reset', 'ClientAuth\ResetPasswordController@reset');
 
   	// client users info
   	Route::get('allUsers', 'Client\ClientUsersInfoController@allUsers');
@@ -658,17 +650,36 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('allTestResults', 'Client\ClientUsersInfoController@allTestResults');
 	Route::post('getAllTestResults', 'Client\ClientUsersInfoController@getAllTestResults');
 	Route::get('downloadExcelResult', 'Client\ClientUsersInfoController@downloadExcelResult');
-
+	Route::get('myprofile', 'Client\ClientUsersInfoController@profile');
+	Route::put('updateClientProfile', 'Client\ClientUsersInfoController@updateClientProfile');
+	Route::put('updateClientPassword', 'Client\ClientUsersInfoController@updateClientPassword');
 
   	// register client user
   	Route::post('/register', 'ClientuserAuth\RegisterController@register');
   	Route::post('/login', 'ClientuserAuth\LoginController@login');
+  	Route::post('clientUserLogin', 'ClientuserAuth\LoginController@clientUserLogin');
 	Route::post('/logout', 'ClientuserAuth\LoginController@logout');
 	Route::get('register/verify/{token}', 'ClientuserAuth\RegisterController@verify');
+	Route::get('forgotPassword', 'ClientuserAuth\ForgotPasswordController@showLinkRequestForm');
+	Route::post('password/email', 'ClientuserAuth\ForgotPasswordController@sendPasswordResetLink');
+	Route::get('password/reset/{token}', 'ClientuserAuth\ResetPasswordController@showResetForm');
+	Route::post('clientuser/password/reset', 'ClientuserAuth\ResetPasswordController@reset');
 
   	// Route::get('client/home', 'Client\ClientBaseController@showDashBoard');
   	Route::get('manageClientHome', 'Client\ClientBaseController@manageClientHome');
 	Route::put('updateClientHome', 'Client\ClientBaseController@updateClientHome');
+	Route::get('managePlans', 'Client\ClientBaseController@managePlans');
+	Route::get('manageBillings', 'Client\ClientBaseController@manageBillings');
+	Route::get('manageHistory', 'Client\ClientBaseController@manageHistory');
+	Route::get('thankyou', 'Client\ClientBaseController@thankyou');
+	Route::any('webhook', 'Client\ClientBaseController@webhook');
+	Route::post('degradePayment', 'Client\ClientBaseController@degradePayment');
+	Route::post('upgradePayment', 'Client\ClientBaseController@upgradePayment');
+	Route::post('continuePayment', 'Client\ClientBaseController@continuePayment');
+	Route::post('deactivatePlan', 'Client\ClientBaseController@deactivatePlan');
+	Route::get('manageBankDetails', 'Client\ClientBaseController@manageBankDetails');
+	Route::post('updateBankDetails', 'Client\ClientBaseController@updateBankDetails');
+
 
   	// category
   	Route::get('manageOnlineCategory', 'Client\OnlineCourse\ClientOnlineCategoryController@show');
@@ -763,6 +774,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('getOnlineCourseByCatIdBySubCatId', 'Client\Front\ClientOnlineCourseFrontController@getOnlineCourseByCatIdBySubCatId');
 	Route::get('courseDetails/{id}', 'Client\Front\ClientOnlineCourseFrontController@courseDetails');
 	Route::get('episode/{id}/{subcomment?}', [ 'as' => 'client.episode', 'uses' => 'Client\Front\ClientOnlineCourseFrontController@episode' ]);
+	Route::post('getOnlineSubCategoriesWithCourses', 'Client\Front\ClientOnlineCourseFrontController@getOnlineSubCategoriesWithCourses');
   	Route::post('getOnlineSubCategories', 'Client\Front\ClientOnlineCourseFrontController@getOnlineSubCategories');
   	Route::post('registerClientUserCourse', 'Client\Front\ClientOnlineCourseFrontController@registerClientUserCourse');
   	Route::post('getRegisteredOnlineCourseByCatIdBySubCatId', 'Client\Front\ClientOnlineCourseFrontController@getRegisteredOnlineCourseByCatIdBySubCatId');
@@ -775,6 +787,8 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('likeClientCourseVideo', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideo');
 	Route::post('likeClientCourseVideoComment', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideoComment');
 	Route::post('likeClientCourseVideoSubComment', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideoSubComment');
+
+
 
   	// online tests front
 	Route::get('online-tests', 'Client\Front\ClientOnlineTestFrontController@tests');
@@ -819,6 +833,13 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('getAssignments', 'Client\ClientUserController@getAssignments');
   	Route::get('doAssignment/{id}', 'Client\ClientUserController@doAssignment');
   	Route::post('createAssignmentAnswer', 'Client\ClientUserController@createAssignmentAnswer');
+  	Route::get('purchaseCourse/{courseId}', 'Client\ClientUserController@purchaseCourse');
+  	Route::get('redirectCoursePayment', 'Client\ClientUserController@redirectCoursePayment');
+  	Route::post('webhook', 'Client\ClientUserController@webhook');
+
+  	Route::get('purchaseTestSubCategory/{subCategoryId}', 'Client\ClientUserController@purchaseTestSubCategory');
+  	Route::get('redirectTestSubCategoryPayment', 'Client\ClientUserController@redirectTestSubCategoryPayment');
+
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');

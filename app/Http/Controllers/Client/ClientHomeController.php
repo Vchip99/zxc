@@ -57,7 +57,11 @@ class ClientHomeController extends Controller
             $clientCustomers = ClientCustomer::getClientCustomer($subdomain->subdomain);
             return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers'));
         } else {
-            return Redirect::away('http://localvchip.com');
+            if('local' == \Config::get('app.env')){
+                return Redirect::away('http://localvchip.com');
+            } else {
+                return Redirect::away('https://vchipedu.com/');
+            }
         }
     }
 
@@ -96,6 +100,5 @@ class ClientHomeController extends Controller
         }
         return redirect()->back()->withErrors(['Please enter email id.']);
     }
-
 
 }

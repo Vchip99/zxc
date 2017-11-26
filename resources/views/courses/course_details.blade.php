@@ -173,10 +173,7 @@
     var userId = parseInt(document.getElementById('user_id').value);
     var courseId = parseInt($(ele).data('course_id'));
     if( true == isNaN(userId)){
-      $.alert({
-          title: 'Alert!',
-          content: 'Please login first and then register course.',
-      });
+      $('#loginUserModel').modal();
     } else {
       $.ajax({
         method: "POST",
@@ -230,7 +227,6 @@
   $(document).ready(function() {
     $(".btn-tab.btn").click(function () {
       $(".btn-tab.btn").removeClass("btn-primary").addClass("btn-default");
-      // $(".tab").addClass("active"); // instead of this do the below
       $(this).removeClass("btn-default").addClass("btn-primary");
     });
   });

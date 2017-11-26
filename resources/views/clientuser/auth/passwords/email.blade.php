@@ -1,8 +1,14 @@
-@extends('clientuser.layout.auth')
-
-<!-- Main Content -->
+@extends('layouts.master')
+@section('header-css')
+  @include('layouts.home-css')
+@stop
+@section('header-js')
+  @include('layouts.home-js')
+@stop
 @section('content')
-<div class="container">
+  @include('client.front.header_menu')
+  &nbsp;
+<section class="v_bg_grey v_container" >
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
@@ -14,15 +20,14 @@
                         </div>
                     @endif
 
-                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/clientuser/password/email') }}">
+                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/password/email') }}">
                         {{ csrf_field() }}
 
                         <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
                             <label for="email" class="col-md-4 control-label">E-Mail Address</label>
 
                             <div class="col-md-6">
-                                <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}">
-
+                                <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
                                 @if ($errors->has('email'))
                                     <span class="help-block">
                                         <strong>{{ $errors->first('email') }}</strong>
@@ -44,4 +49,4 @@
         </div>
     </div>
 </div>
-@endsection
+@stop

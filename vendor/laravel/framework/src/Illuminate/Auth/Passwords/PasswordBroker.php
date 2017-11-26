@@ -185,7 +185,6 @@ class PasswordBroker implements PasswordBrokerContract
     public function getUser(array $credentials)
     {
         $credentials = Arr::except($credentials, ['token']);
-
         $user = $this->users->retrieveByCredentials($credentials);
 
         if ($user && ! $user instanceof CanResetPasswordContract) {

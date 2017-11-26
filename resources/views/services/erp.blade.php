@@ -195,7 +195,7 @@
   <!-- modal for patterner of MoU to collage -->
   <div class="modal fade" id="mouCollege" tabindex="-1" role="dialog" aria-labelledby="myModal3Label" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <div class="modal-content ">
+      <div class="modal-content" style="background-color: white;">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
           <h4 class="modal-title text-center" id="myModal3Label">Vchip Technology
@@ -302,7 +302,7 @@
 <!-- modal for about vchip tech -->
   <div class="modal fade" id="movCompanies" tabindex="-1" role="dialog" aria-labelledby="myModal3Label" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <div class="modal-content">
+      <div class="modal-content" style="background-color: white;">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
           <h4 class="modal-title text-center" id="myModal3Label">Pattern of MoU to companies</h4>
@@ -384,7 +384,7 @@
 <!-- modal for about vchip tech -->
   <div class="modal fade" id="movVchip" tabindex="-1" role="dialog" aria-labelledby="myModal3Label" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <div class="modal-content">
+      <div class="modal-content" style="background-color: white;">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
           <h4 class="modal-title text-center" id="myModal3Label">About Vchip Technology </h4>

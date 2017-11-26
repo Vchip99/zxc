@@ -147,7 +147,11 @@ margin-left: -13px;}
                             @endif
                           </span>
                          <span class="mrgn_5_left">
-                          <a class="" role="button" data-toggle="collapse" href="#replyToPost{{$post->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                          @if(is_object(Auth::user()))
+                            <a class="" role="button" data-toggle="collapse" href="#replyToPost{{$post->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                          @else
+                            <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
+                          @endif
                         </span>
                         <div class="collapse replyComment" id="replyToPost{{$post->id}}">
                             <div class="form-group">
@@ -203,7 +207,11 @@ margin-left: -13px;}
                                       @endif
                                     </span>
                                    <span class="mrgn_5_left">
-                                    <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$post->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                                    @if(is_object(Auth::user()))
+                                      <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$post->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                                    @else
+                                      <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
+                                    @endif
                                   </span>
                                   <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                                   <div class="collapse replyComment" id="replyToComment{{$post->id}}-{{$comment->id}}">
@@ -317,23 +325,7 @@ margin-left: -13px;}
         });
 
     } else if( isNaN(userId)) {
-      $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+      $('#loginUserModel').modal();
     }else if( isNaN(categoryId)) {
       $.alert({
         title: 'Alert!',
@@ -425,23 +417,7 @@ margin-left: -13px;}
           renderPosts(msg);
         });
     } else if( isNaN(userId)) {
-      $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -461,23 +437,7 @@ margin-left: -13px;}
           renderPosts(msg);
         });
     } else if( isNaN(userId)) {
-      $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+      $('#loginUserModel').modal();
     }
   }
   function confirmSubmitReplytoPost(ele){
@@ -494,23 +454,7 @@ margin-left: -13px;}
         renderPosts(msg);
       });
     } else if( isNaN(userId)) {
-      $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -529,23 +473,7 @@ margin-left: -13px;}
         renderPosts(msg);
       });
     } else if( isNaN(userId)) {
-      $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -565,23 +493,7 @@ margin-left: -13px;}
         renderPosts(msg);
       });
     } else if( isNaN(userId)) {
-      $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -764,7 +676,11 @@ margin-left: -13px;}
             }
           }
         commentInnerHtml +='</span>';
-        commentInnerHtml += '<span class="mrgn_5_left"><a class="" role="button" data-toggle="collapse" href="#replyToPost'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a></span>';
+        if(userId > 0){
+          commentInnerHtml += '<span class="mrgn_5_left"><a class="" role="button" data-toggle="collapse" href="#replyToPost'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a></span>';
+        } else {
+          commentInnerHtml += '<span class="mrgn_5_left"><a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a></a></span>';
+        }
 
         commentInnerHtml += '<div class="collapse replyComment" id="replyToPost'+obj.id+'"><div class="form-group"><label for="comment">Your Comment</label><textarea name="comment" id="comment_'+obj.id+'"  class="form-control" ></textarea></div><button class="btn btn-default" onclick="confirmSubmitReplytoPost(this);" data-post_id="'+obj.id+'">Send</button><button type="button" class="btn btn-default" data-id="replyToPost'+obj.id+'" onclick="cancleReply(this);">Cancle</button></div>';
         divComment.innerHTML = commentInnerHtml;
@@ -854,7 +770,11 @@ margin-left: -13px;}
 
               var spanCommenReplyButton = document.createElement('span');
               spanCommenReplyButton.className = 'mrgn_5_left';
-              spanCommenReplyButton.innerHTML = '<a class="" role="button" data-toggle="collapse" href="#replyToComment'+postId+'-'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a>';
+              if(userId > 0){
+                spanCommenReplyButton.innerHTML = '<a class="" role="button" data-toggle="collapse" href="#replyToComment'+postId+'-'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a>';
+              } else {
+                spanCommenReplyButton.innerHTML = '<a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>';
+              }
               commentReplyDiv.appendChild(spanCommenReplyButton);
 
               var spanCommenReplyDate = document.createElement('span');
@@ -978,7 +898,11 @@ margin-left: -13px;}
 
         var spanSubCommenReplyButton = document.createElement('span');
         spanSubCommenReplyButton.className = 'mrgn_5_left';
-        spanSubCommenReplyButton.innerHTML = '<a class="" role="button" data-toggle="collapse" href="#replySubComment'+obj.discussion_comment_id+'-'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a>';
+        if(userId > 0){
+          spanSubCommenReplyButton.innerHTML = '<a class="" role="button" data-toggle="collapse" href="#replySubComment'+obj.discussion_comment_id+'-'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a>';
+        } else {
+          spanSubCommenReplyButton.innerHTML = '<a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>';
+        }
         subcommentReplyDiv.appendChild(spanSubCommenReplyButton);
 
         var spanSubCommenReplyDate = document.createElement('span');
@@ -1047,24 +971,8 @@ margin-left: -13px;}
         var postId = $(this).data('post_id');
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+        if( isNaN(userId)) {
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -1092,24 +1000,8 @@ margin-left: -13px;}
         var commentId = $(this).data('comment_id');
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+        if( isNaN(userId)) {
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -1138,24 +1030,8 @@ margin-left: -13px;}
         var subCommentId = $(this).data('sub_comment_id');
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+        if( isNaN(userId)) {
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -1199,16 +1075,12 @@ margin-left: -13px;}
       var lesstext = "less";
       $('.more').each(function() {
         var content = $(this).html();
-
         if(content.length > showChar) {
-
           var c = content.substr(0, showChar);
           var h = content.substr(0, content.length);
           var html = '<div class="zxc">'+ c + '<span style="color:#01bafd; margin-left:5px;">' + ellipsestext+ '</span><br /><a href="" class="morelink" style="color:#01bafd";>' + moretext + '</a></div><div class="zxc1" style="display:none;">'+ h + '<br /><a href="" class="morelink1" style="color:#01bafd";>' + lesstext + '</a></div>';
-
           $(this).html(html);
         }
-
       });
 
       $(".morelink").click(function(){

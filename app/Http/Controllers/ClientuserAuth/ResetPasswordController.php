@@ -7,6 +7,10 @@ use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Request;
+use App\Models\ClientHomePage;
+use Redirect, View, DB,Mail;
+use App\Models\Clientuser;
+use App\Models\Client;
 
 class ResetPasswordController extends Controller
 {
@@ -50,8 +54,18 @@ class ResetPasswordController extends Controller
      * @param  string|null  $token
      * @return \Illuminate\Http\Response
      */
-    public function showResetForm(Request $request, $token = null)
+    public function showResetForm($subdomain, Request $request, $token = null)
     {
+        $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
+        if(is_object($subdomain)){
+            view::share('subdomain', $subdomain);
+            $client = Client::where('subdomain', $subdomain->subdomain)->first();
+            if(is_object($client)){
+                view::share('client', $client);
+            }
+        } else {
+            return Redirect::to('/');
+        }
         return view('clientuser.auth.passwords.reset')->with(
             ['token' => $token, 'email' => $request->email]
         );

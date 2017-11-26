@@ -79,4 +79,13 @@ class LoginController extends Controller
         return redirect('/home');
     }
 
+    public function userLogin(Request $request){
+        if($this->guard('user')->attempt($this->credentials($request))){
+            $request->session()->regenerate();
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
+
 }

@@ -12,6 +12,7 @@ use App\Models\ClientTeam;
 use App\Models\ClientOnlineCourse;
 use App\Models\Clientuser;
 use App\Models\Client;
+use App\Models\User;
 use App\Models\ClientScore;
 use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineTestSubject;
@@ -21,7 +22,7 @@ use App\Models\ClientUserPurchasedTestSubCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
-use Auth, Redirect, View, DB, Session;
+use Auth, Redirect, View, DB, Session, Validator, Hash;
 use Excel;
 
 class ClientUsersInfoController extends BaseController
@@ -46,6 +47,16 @@ class ClientUsersInfoController extends BaseController
         }
     }
 
+    /**
+     * Define your validation rules in a property in
+     * the controller to reuse the rules.
+     */
+    protected $validateUpdatePassword = [
+        'old_password' => 'required',
+        'password' => 'required|different:old_password|confirmed',
+        'password_confirmation' => 'required|same:password',
+    ];
+
     protected function allUsers(Request $request){
         $clientId = Auth::guard('client')->user()->id;
         $clientusers = Clientuser::where('client_id', $clientId)->get();
@@ -53,7 +64,6 @@ class ClientUsersInfoController extends BaseController
         $userPurchasedCourses = ClientUserPurchasedCourse::getClientUserCourses($clientId);
         $userPurchasedTestSubCategories = ClientUserPurchasedTestSubCategory::getClientUserTestSubCategories($clientId);
         $testSubCategories = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
-        // dd($testSubCategories);
         return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories'));
     }
 
@@ -310,6 +320,48 @@ class ClientUsersInfoController extends BaseController
 
     protected function changeClientUserTestSubCategoryStatus(Request $request){
         return ClientUserPurchasedTestSubCategory::changeClientUserTestSubCategoryStatus($request);
+    }
+
+    protected function profile(){
+        // dd(Auth::guard('client')->user());
+        return view('client.clientLogin.profile');
+    }
+
+    protected function updateClientProfile(Request $request){
+        Client::updateClientProfile($request);
+        return Redirect::to('myprofile')->with('message', 'Client profile updated successfully!');
+    }
+
+    protected function updateClientPassword( Request $request){
+        $v = Validator::make($request->all(), $this->validateUpdatePassword);
+        if ($v->fails())
+        {
+            return redirect()->back()->withErrors($v->errors());
+        }
+        DB::beginTransaction();
+        try
+        {
+            $oldPassword = $request->get('old_password');
+            $newPassword = $request->get('password');
+            $user = Auth::guard('client')->user();
+            $hashedPassword = $user->password;
+            if(Hash::check($oldPassword, $hashedPassword)){
+                $user->password = bcrypt($newPassword);
+                $user->save();
+                DB::connection('mysql2')->commit();
+                Auth::logout();
+                return Redirect::to('client/login')->with('message', 'Password updated successfully. please login with new password.');
+            } else {
+                return redirect()->back()->withErrors('please enter correct old password.');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+
+        return redirect('/');
     }
 
 }

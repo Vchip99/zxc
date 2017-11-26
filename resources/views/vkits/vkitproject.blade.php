@@ -172,7 +172,11 @@ hr{
 
             <span class="mrgn_5_left">
               <i class="fa fa-comment-o" aria-hidden="true"></i>
-              <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToProject{{$project->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+                @if(is_object(Auth::user()))
+                  <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToProject{{$project->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+                @else
+                  <a class="your-cmt" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">Comment</a>
+                @endif
             </span>
             <hr />
             <div class="collapse replyComment" id="replyToProject{{$project->id}}">
@@ -272,7 +276,11 @@ hr{
                                 @endif
                               </span>
                              <span class="mrgn_5_left">
-                              <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                              @if(is_object(Auth::user()))
+                                <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                              @else
+                                <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
+                              @endif
                             </span>
                             <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                             <div class="collapse replyComment" id="replyToComment{{$comment->id}}">
@@ -319,10 +327,7 @@ hr{
     var userId = parseInt(document.getElementById('user_id').value);
     var projectId = parseInt($(ele).data('project_id'));
     if( true == isNaN(userId)){
-        $.alert({
-          title: 'Alert!',
-          content: 'Please login first and then add favourite project.',
-        });
+      $('#loginUserModel').modal();
     } else {
       $.ajax({
         method: "POST",
@@ -343,24 +348,8 @@ hr{
         var projectId = $(this).data('project_id');
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-           $.confirm({
-              title: 'Confirmation',
-              content: 'Please login first. Click "Ok" button to login.',
-              type: 'red',
-              typeAnimated: true,
-              buttons: {
-                  Ok: {
-                      text: 'Ok',
-                      btnClass: 'btn-red',
-                      action: function(){
-                        window.location="{{url('/home')}}";
-                      }
-                  },
-                  Cancle: function () {
-                  }
-              }
-          });
+        if( isNaN(userId)) {
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -387,24 +376,8 @@ hr{
         var commentId = $(this).data('comment_id');
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-          $.confirm({
-              title: 'Confirmation',
-              content: 'Please login first. Click "Ok" button to login.',
-              type: 'red',
-              typeAnimated: true,
-              buttons: {
-                  Ok: {
-                      text: 'Ok',
-                      btnClass: 'btn-red',
-                      action: function(){
-                        window.location="{{url('/home')}}";
-                      }
-                  },
-                  Cancle: function () {
-                  }
-              }
-          });
+        if( isNaN(userId)) {
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -433,24 +406,8 @@ hr{
         var subCommentId = $(this).data('sub_comment_id');
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-          $.confirm({
-              title: 'Confirmation',
-              content: 'Please login first. Click "Ok" button to login.',
-              type: 'red',
-              typeAnimated: true,
-              buttons: {
-                  Ok: {
-                      text: 'Ok',
-                      btnClass: 'btn-red',
-                      action: function(){
-                        window.location="{{url('/home')}}";
-                      }
-                  },
-                  Cancle: function () {
-                  }
-              }
-          });
+        if( isNaN(userId)) {
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -475,7 +432,6 @@ hr{
 
   function confirmSubmit(ele){
     var userId = parseInt(document.getElementById('user_id').value);
-
     if(0 < userId){
       var comment = CKEDITOR.instances.comment.getData();
       var projectId = parseInt(document.getElementById('project_id').value);
@@ -490,23 +446,7 @@ hr{
             renderComments(msg, userId);
           });
     } else if( isNaN(userId)) {
-      $.confirm({
-              title: 'Confirmation',
-              content: 'Please login first. Click "Ok" button to login.',
-              type: 'red',
-              typeAnimated: true,
-              buttons: {
-                  Ok: {
-                      text: 'Ok',
-                      btnClass: 'btn-red',
-                      action: function(){
-                        window.location="{{url('/home')}}";
-                      }
-                  },
-                  Cancle: function () {
-                  }
-              }
-          });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -754,23 +694,7 @@ hr{
           renderComments(msg, userId);
         });
     } else if( isNaN(userId)) {
-      $.confirm({
-              title: 'Confirmation',
-              content: 'Please login first. Click "Ok" button to login.',
-              type: 'red',
-              typeAnimated: true,
-              buttons: {
-                  Ok: {
-                      text: 'Ok',
-                      btnClass: 'btn-red',
-                      action: function(){
-                        window.location="{{url('/home')}}";
-                      }
-                  },
-                  Cancle: function () {
-                  }
-              }
-          });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -831,23 +755,7 @@ hr{
           renderComments(msg, userId);
         });
     } else if( isNaN(userId)) {
-      $.confirm({
-              title: 'Confirmation',
-              content: 'Please login first. Click "Ok" button to login.',
-              type: 'red',
-              typeAnimated: true,
-              buttons: {
-                  Ok: {
-                      text: 'Ok',
-                      btnClass: 'btn-red',
-                      action: function(){
-                        window.location="{{url('/home')}}";
-                      }
-                  },
-                  Cancle: function () {
-                  }
-              }
-          });
+      $('#loginUserModel').modal();
     }
   }
 

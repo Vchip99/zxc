@@ -71,8 +71,22 @@ class ClientOnlineSubCategory extends Model
                         ->where('client_online_sub_categories.category_id', $id)
                         ->where('clients.subdomain', $client)
                         ->select('client_online_sub_categories.*')
+                        ->groupBy('client_online_sub_categories.id')
                         ->get();
         }
+    }
+
+    protected static function getOnlineSubCategoriesWithCourses($id, Request $request){
+        $client = InputSanitise::getCurrentClient($request);
+        return DB::connection('mysql2')->table('client_online_sub_categories')
+                    ->join('clients', 'clients.id', '=', 'client_online_sub_categories.client_id')
+                    ->join('client_online_courses', 'client_online_courses.sub_category_id', '=', 'client_online_sub_categories.id')
+                    ->where('client_online_sub_categories.category_id', $id)
+                    ->where('clients.subdomain', $client)
+                    ->where('client_online_courses.release_date','<=', date('Y-m-d H:i'))
+                    ->select('client_online_sub_categories.*')
+                    ->groupBy('client_online_sub_categories.id')
+                    ->get();
     }
 
     protected static function showSubCategories(Request $request){

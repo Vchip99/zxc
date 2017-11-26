@@ -51,6 +51,7 @@ class ClientOnlineCategory extends Model
                         $join->on('clients.id', '=', 'client_online_videos.client_id');
                     })
                     ->where('clients.subdomain', $subdomain)
+                    ->where('client_online_courses.release_date','<=', date('Y-m-d H:i:s'))
                     ->select('client_online_categories.id', 'client_online_categories.name')
                     ->groupBy('client_online_categories.id')
                     ->get();

@@ -90,18 +90,28 @@ class ClientOnlineTestSubject extends Model
             $client = InputSanitise::getCurrentClient($request);
         }
         $result =  DB::connection('mysql2')->table('client_online_test_subjects')
-                    ->join('client_online_test_questions', 'client_online_test_questions.subject_id', '=', 'client_online_test_subjects.id')
-                    ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.subject_id', '=', 'client_online_test_subjects.id')
-                    ->join('clients', 'clients.id', '=', 'client_online_test_subjects.client_id')
-                    ->where('client_online_test_subjects.category_id', $categoryId)
-                    ->where('client_online_test_subjects.sub_category_id', $subcategoryId)
-                    ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d'));
+                    ->join('client_online_test_subject_papers', function($join){
+                        $join->on('client_online_test_subject_papers.subject_id', '=', 'client_online_test_subjects.id');
+                    })
+                    ->join('client_online_test_questions', function($join){
+                        $join->on('client_online_test_questions.subject_id', '=', 'client_online_test_subjects.id');
+                        $join->on('client_online_test_questions.paper_id', '=', 'client_online_test_subject_papers.id');
+                    })
+                    ->join('clients', function($join){
+                        $join->on('clients.id', '=', 'client_online_test_subjects.client_id');
+                        $join->on('clients.id', '=', 'client_online_test_subject_papers.client_id');
+                        $join->on('clients.id', '=', 'client_online_test_questions.client_id');
+                    });
+
         if(!empty($clientId)){
             $result->where('clients.id', $clientId);
         } else {
             $result->where('clients.subdomain', $client);
         }
-        return $result->select('client_online_test_subjects.id','client_online_test_subjects.*')->groupBy('client_online_test_subjects.id')->get();
+        return $result->where('client_online_test_subjects.category_id', $categoryId)
+                    ->where('client_online_test_subjects.sub_category_id', $subcategoryId)
+                    ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))
+                    ->select('client_online_test_subjects.*')->groupBy('client_online_test_subjects.id')->get();
     }
 
     protected static function showSubjects($request){

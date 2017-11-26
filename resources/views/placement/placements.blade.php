@@ -411,7 +411,11 @@ ul.table_list{ margin-left: -30px; }
                             @endif
                             <span class="mrgn_5_left">
                             <i class="fa fa-comment-o" aria-hidden="true"></i>
-                              <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{(is_object($companyDetails))?$companyDetails->id:NULL}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+                              @if(is_object(Auth::user()))
+                                <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{(is_object($companyDetails))?$companyDetails->id:NULL}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+                              @else
+                                <a class="your-cmt" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">Comment</a>
+                              @endif
                             </span>
                              <hr />
                             <div class="collapse replyComment" id="replyToEpisode{{(is_object($companyDetails))?$companyDetails->id:NULL}}" >
@@ -419,7 +423,7 @@ ul.table_list{ margin-left: -30px; }
                                   <textarea name="comment" id="comment" placeholder="Comment here.." class="form-control" rows="7"></textarea>
                                 </div>
                                 <input type="hidden" id="company_id" name="company_id" value="{{(is_object($companyDetails))?$companyDetails->placement_company_id:NULL}}">
-                                <button type="button" class="btn btn-default" onclick="confirmPlacementProcessComment(this);" title="Send" >
+                                <button type="button" id="replyToEpisode{{(is_object($companyDetails))?$companyDetails->id:NULL}}" class="btn btn-default" onclick="confirmPlacementProcessComment(this);" title="Send" >
                                   <span class="hidden-lg fa fa-share" aria-hidden="true"></span>
                                   <div class="hidden-sm">Send</div>
                                 </button>
@@ -480,7 +484,11 @@ ul.table_list{ margin-left: -30px; }
                                                   @endif
                                                 </span>
                                                <span class="mrgn_5_left">
-                                                <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                                                @if(is_object(Auth::user()))
+                                                  <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                                                @else
+                                                  <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
+                                                @endif
                                               </span>
                                               <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                                               <div class="collapse replyComment" id="replyToComment{{$comment->id}}">
@@ -686,7 +694,7 @@ ul.table_list{ margin-left: -30px; }
         @foreach($applyJobs as $applyJob)
           <div id="{{ $applyJob->company }}" class="modal fade" role="dialog">
             <div class="modal-dialog">
-              <div class="modal-content">
+              <div class="modal-content" style="background-color: white;">
                 <div class="modal-header">
                   <button class="close" data-dismiss="modal">×</button>
                   <h2  class="modal-title">{{ $applyJob->company }}</h2>
@@ -800,23 +808,7 @@ ul.table_list{ margin-left: -30px; }
       var dislike = $(this).data('dislike');
       var userId = parseInt(document.getElementById('user_id').value);
       if( isNaN(userId)) {
-        $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+        $('#loginUserModel').modal();
       } else {
         $.ajax({
             method: "POST",
@@ -846,23 +838,7 @@ ul.table_list{ margin-left: -30px; }
       var dislike = $(this).data('dislike');
       var userId = parseInt(document.getElementById('user_id').value);
        if( isNaN(userId)) {
-        $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+        $('#loginUserModel').modal();
       } else {
         $.ajax({
             method: "POST",
@@ -891,23 +867,7 @@ ul.table_list{ margin-left: -30px; }
       var dislike = $(this).data('dislike');
       var userId = parseInt(document.getElementById('user_id').value);
       if( isNaN(userId)) {
-        $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+        $('#loginUserModel').modal();
       } else {
         $.ajax({
             method: "POST",
@@ -1242,7 +1202,7 @@ ul.table_list{ margin-left: -30px; }
     var userId = parseInt(document.getElementById('user_id').value);
     var companyId = parseInt(document.getElementById('company_id').value);
     var comment = document.getElementById('comment').value;
-    document.getElementById('comment').innerHTML = '';
+    document.getElementById('comment').value = '';
     if(0 < userId && comment.length > 0){
       $.ajax({
           method: "POST",
@@ -1250,27 +1210,13 @@ ul.table_list{ margin-left: -30px; }
           data: {company_id:companyId, comment:comment}
       })
       .done(function( msg ) {
+        document.getElementById($(ele).attr('id')).classList.remove("in");
+
         renderComments(msg, userId);
       });
 
     } else if( isNaN(userId)) {
-      $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+      $('#loginUserModel').modal();
     } else if( comment.length == 0){
       $.alert({
         title: 'Alert!',
@@ -1296,23 +1242,7 @@ ul.table_list{ margin-left: -30px; }
           renderComments(msg, userId);
         });
     } else if( isNaN(userId)) {
-      $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -1331,23 +1261,7 @@ ul.table_list{ margin-left: -30px; }
           renderComments(msg, userId);
         });
     } else if( isNaN(userId)) {
-      $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -1395,23 +1309,7 @@ ul.table_list{ margin-left: -30px; }
         form = document.getElementById(formId);
         form.submit();
     } else if( isNaN(userId)) {
-      $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+      $('#loginUserModel').modal();
     }else if( areaId == 0)  {
       $.alert({
         title: 'Alert!',

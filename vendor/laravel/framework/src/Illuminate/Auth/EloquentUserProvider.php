@@ -100,7 +100,6 @@ class EloquentUserProvider implements UserProvider
                 $query->where($key, $value);
             }
         }
-
         return $query->first();
     }
 

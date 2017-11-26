@@ -68,10 +68,29 @@
                   <ul class="vchip_categories list-inline">
                     <li>{{$testSubCategory->name}}</li>
                   </ul>
+                  <div class="categoery" style="padding-left: 18px;">
+                  <span style="color: #e91e63;">Price: {{$testSubCategory->price}} Rs.</span>
+                    @if(is_object(Auth::guard('clientuser')->user()))
+                      @if( true == in_array($testSubCategory->id, $purchasedSubCategories))
+                        <a class="btn btn-primary" title="Paid" style="min-width: 100px;">Paid</a>
+                      @else
+                        @if($testSubCategory->price > 0)
+                          <a href="{{ url('purchaseTestSubCategory')}}/{{$testSubCategory->id}}" class="btn btn-primary" title="Pay Now" style="min-width: 100px;">Pay Now</a>
+                        @else
+                          <a class="btn btn-primary" title="Paid" style="min-width: 100px;">Free</a>
+                        @endif
+                      @endif
+                    @else
+                      @if($testSubCategory->price > 0)
+                        <a class="btn btn-primary" title="Pay Now" style="min-width: 100px;"  onClick="checkLogin();">Pay Now</a>
+                      @else
+                        <a class="btn btn-primary" title="Paid" style="min-width: 100px;">Free</a>
+                      @endif
+                    @endif
+                  </div>
                   <div class="vchip_product_content">
-                    <p class="mrgn_20_top"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">Start Test <i
-                      class="fa fa-angle-right"
-                      aria-hidden="true"></i></a>
+                    <p class="mrgn_20_top">
+                      <a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">Start Test <i class="fa fa-angle-right" aria-hidden="true"></i></a>
                     </p>
                   </div>
                 </div>
@@ -89,9 +108,13 @@
 @section('footer')
 	@include('footer.client-footer')
   <script type="text/javascript">
+    function checkLogin(){
+      $('#loginUserModel').modal();
+      return false;
+    }
       function showSubCategories(ele){
         var id = parseInt($(ele).val());
-        var userId = parseInt(document.getElementById('user_id'));
+        var userId = parseInt(document.getElementById('user_id').value);
         if( 0 < id ){
           $.ajax({
             method: "POST",
@@ -102,49 +125,36 @@
             var subcatDiv = document.getElementById('testSubCategories');
             subcatDiv.innerHTML = '';
             if( 0 < msg['sub_categories'].length){
-              if(userId > 0){
-                $.each(msg['sub_categories'], function(idx, obj) {
-                  if(msg['sub_category_permission'].length > 0 && true == msg['sub_category_permission'].indexOf(obj.id) > -1){
-                    var mainDiv = document.createElement('div');
-                    mainDiv.className = 'col-sm-6';
-
-                    var productDiv = document.createElement('div');
-                    productDiv.className = "vchip_product_item";
-                    var imageDiv = document.createElement('div');
-                    imageUrl = "{{ asset('')}}"+ obj.image_path;
-                    imageDiv.innerHTML = '<img src="'+ imageUrl +'"class="img-responsive" width="800"height="400" alt="test "/>';
-                    productDiv.appendChild(imageDiv);
-
-                    var eleUl = document.createElement('ul');
-                    eleUl.className="mrgn_5_top vchip_categories list-inline";
-                    eleUl.innerHTML='<li>'+ obj.name +'</li>';
-                    productDiv.appendChild(eleUl);
-
-                    var contentDiv = document.createElement('div');
-                    contentDiv.className ='vchip_product_content';
-                    contentUrl = "{{url('getTest')}}/"+obj.id;
-                    contentDiv.innerHTML = '<p class=""><a href="'+ contentUrl +'" class="btn-link">Start Test <i class="fa fa-angle-right"aria-hidden="true"></i></a></p>';
-                    productDiv.appendChild(contentDiv);
-                    mainDiv.appendChild(productDiv);
-                    subcatDiv.appendChild(mainDiv);
-                  }
-                });
-              } else {
                 $.each(msg['sub_categories'], function(idx, obj) {
                   var mainDiv = document.createElement('div');
-                  mainDiv.className = 'col-sm-6';
+                  mainDiv.className = 'col-lg-6 col-md-6 col-sm-6 small-img';
 
                   var productDiv = document.createElement('div');
-                  productDiv.className = "vchip_product_item";
-                  var imageDiv = document.createElement('div');
+                  productDiv.className = "vchip_product_itm text-left";
+                  var imageDiv = document.createElement('figure');
                   imageUrl = "{{ asset('')}}"+ obj.image_path;
-                  imageDiv.innerHTML = '<img src="'+ imageUrl +'"class="img-responsive" width="800"height="400" alt="test "/>';
+                  imageDiv.innerHTML = '<img src="'+ imageUrl +'"class="img-responsive" alt="test "/>';
                   productDiv.appendChild(imageDiv);
 
                   var eleUl = document.createElement('ul');
                   eleUl.className="mrgn_5_top vchip_categories list-inline";
                   eleUl.innerHTML='<li>'+ obj.name +'</li>';
                   productDiv.appendChild(eleUl);
+
+                  var priceDiv = document.createElement('div');
+                  priceDiv.className = 'categoery';
+                  priceDiv.setAttribute("style", "padding-left: 18px;");
+                  priceDiv.innerHTML = '<span style="color: #e91e63;">Price: '+ obj.price +' Rs.</span>';
+                  if(userId > 0){
+                    if(msg['purchasedSubCategories'].length > 0 && true == msg['purchasedSubCategories'].indexOf(obj.id) > -1){
+                      priceDiv.innerHTML += ' <a class="btn btn-primary" title="Paid" style="min-width: 100px;">Paid</a>';
+                    } else {
+                      priceDiv.innerHTML += ' <a class="btn btn-primary" title="Pay Now" style="min-width: 100px;">Pay Now</a>';
+                    }
+                  } else {
+                    priceDiv.innerHTML += ' <a class="btn btn-primary" title="Pay Now" style="min-width: 100px;"  onClick="checkLogin();">Pay Now</a>';
+                  }
+                  productDiv.appendChild(priceDiv);
 
                   var contentDiv = document.createElement('div');
                   contentDiv.className ='vchip_product_content';
@@ -154,7 +164,6 @@
                   mainDiv.appendChild(productDiv);
                   subcatDiv.appendChild(mainDiv);
                 });
-              }
             } else {
               subcatDiv.innerHTML = 'No sub categories are available.';
             }

@@ -107,6 +107,7 @@
                 <li> <b style="color: #01bafd;">Coaching Institute</b></li>
                  <li class="mrgn_10_left"><a href="{{ url('educationalPlatform') }}" title="Education Platform">Education Platform</a></li>
                  <li class="mrgn_10_left"><a href="{{ url('digitalMarketing') }}" title="Digital Marketing">Digital Marketing</a></li>
+                 <li class="mrgn_10_left"><a href="{{ url('webdevelopment') }}" title="web & app development">web & app development</a></li>
                  <li class="mrgn_10_left"><a href="{{ url('pricing') }}" title="pricing">pricing</a></li>
              </div>
             </ul>

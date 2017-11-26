@@ -49,7 +49,15 @@
               <div class="course-box-content" >
                  <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
                  <div class="categoery" title="{{$course->category}}">
-                   <a  href="{{ url('courseDetails')}}/{{$course->id}}"> {{$course->category}}</a>
+                   <a  href="{{ url('courseDetails')}}/{{$course->id}}">
+                    @if(in_array($course->id, $userPurchasedCourses))
+                      Paid
+                    @elseif($course->price > 0)
+                      Price: {{$course->price}} Rs.
+                    @else
+                      Free
+                    @endif
+                  </a>
                  </div>
                  <br/>
                 <p class="block-with-text">
@@ -67,8 +75,19 @@
                   </div>
                 </div>
                 <div class="course-auther">
-                  <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
-                  </a>
+                  @if(in_array($course->id, $userPurchasedCourses))
+                    <a>
+                      <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Paid</i>
+                    </a>
+                  @elseif($course->price > 0)
+                    <a style="cursor: pointer;">
+                      <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Pay Now</i>
+                    </a>
+                  @else
+                    <a>
+                      <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Free Course</i>
+                    </a>
+                  @endif
                 </div>
               </div>
             </div>
@@ -151,7 +170,15 @@
           thirdDiv.className = "course-box-content";
 
           var courseContent = '<h4 class="course-box-title" title="'+ obj.name +'" data-toggle="tooltip" data-placement="bottom"><p class="block-with-text"><a href="'+ url +'">'+ obj.name +'</a></p></h4>';
-           courseContent += '<div class="categoery" title="'+obj.category+'"><a  href="'+ url +'">'+ obj.category +'</a></div><br/><p class="block-with-text">'+ obj.description+'<a type="button" class="show " data-show="'+ obj.id +'">Read More</a></p>';
+          courseContent += '<div class="categoery" title="'+obj.category+'"><a  href="'+ url +'">';
+          if(msg['userPurchasedCourses'].length && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
+            courseContent += 'Paid';
+          } else if(obj.price > 0){
+            courseContent += 'Price: '+ obj.price + ' Rs.';
+          } else {
+            courseContent += 'Free';
+          }
+          courseContent +='</a></div><br/><p class="block-with-text">'+ obj.description+'<a type="button" class="show " data-show="'+ obj.id +'">Read More</a></p>';
 
           courseContent += '<div class="corse-detail" id="corse-detail-'+ obj.id +'"><div class="corse-detail-heder"><span class="card-title"><b>'+ obj.name +'</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="'+ obj.id +'"><span aria-hidden="true">×</span></button></div></br/><p>'+ obj.description +'</p><div class="text-center corse-detail-footer" ><a href="'+ url +'" class="btn btn-primary btn-default" > Start Course</a></div></div>';
 
@@ -160,7 +187,15 @@
 
           var authorDiv = document.createElement('div');
           authorDiv.className = "course-auther";
-          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
+          authorDiv.innerHTML = '<a><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >';
+          if(msg['userPurchasedCourses'].length && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
+            authorDiv.innerHTML += 'Paid';
+          } else if(obj.price > 0){
+            authorDiv.innerHTML += 'Pay Now';
+          } else {
+            authorDiv.innerHTML += 'Free';
+          }
+          authorDiv.innerHTML += '</i></a>';
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           divCourses.appendChild(firstDiv);
@@ -175,6 +210,8 @@
               $('[id ^=corse-detail-'+id).slideToggle('slow');
           });
       });
+    } else {
+      divCourses.innerHTML = 'No courses are registered for this sub category.';
     }
   }
 

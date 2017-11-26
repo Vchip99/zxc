@@ -165,7 +165,7 @@
       </div>
       <script type="text/javascript">
           $(function () {
-              $('#release_date').datetimepicker({format: 'YYYY-MM-DD hh:mm'});
+              $('#release_date').datetimepicker({format: 'YYYY-MM-DD HH:mm'});
           });
       </script>
     </div>

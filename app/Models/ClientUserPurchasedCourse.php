@@ -17,7 +17,7 @@ class ClientUserPurchasedCourse extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'course_id' ,'client_id'];
+    protected $fillable = ['user_id', 'course_id' ,'client_id', 'payment_id'];
 
     protected static function getClientUserCourses($clientId){
     	$userCourses = [];

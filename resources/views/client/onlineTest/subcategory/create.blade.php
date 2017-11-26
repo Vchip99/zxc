@@ -58,6 +58,17 @@
         @endif
       </div>
     </div>
+  <div class="form-group row @if ($errors->has('price')) has-error @endif">
+    <label for="price" class="col-sm-2 col-form-label">Sub Category Price:</label>
+    <div class="col-sm-3">
+      @if(isset($testSubcategory->id))
+        <input type="text" class="form-control" name="price" value="{{$testSubcategory->price}}" required="true">
+      @else
+        <input type="text" class="form-control" name="price" value="" placeholder="Sub Category price" required="true">
+      @endif
+      @if($errors->has('price')) <p class="help-block">{{ $errors->first('price') }}</p> @endif
+    </div>
+  </div>
   <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
         <button type="submit" class="btn btn-primary">Submit</button>

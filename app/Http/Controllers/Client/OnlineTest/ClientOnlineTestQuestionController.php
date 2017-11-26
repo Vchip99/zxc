@@ -391,11 +391,6 @@ class ClientOnlineTestQuestionController extends ClientBaseController
      *  show questions associated with subject and paper
      */
     protected function uploadQuestions(Request $request){
-        $coursePermission = InputSanitise::checkModulePermission($request, 'test');
-        if('false' == $coursePermission){
-            return Redirect::to('manageClientHome');
-        }
-
         $testCategories = ClientOnlineTestCategory::showCategories($request);
         $testSubCategories = [];
         $testSubjects = [];

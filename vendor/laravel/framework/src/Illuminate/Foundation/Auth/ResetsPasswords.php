@@ -6,6 +6,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
+use App\Models\Client;
+use DB;
 
 trait ResetsPasswords
 {
@@ -36,13 +38,9 @@ trait ResetsPasswords
     public function reset(Request $request)
     {
         $this->validate($request, [
-            'token' => 'required',
+            'token' => 'required', 'email' => 'required|email',
             'password' => 'required|confirmed',
         ]);
-        // $this->validate($request, [
-        //     'token' => 'required', 'email' => 'required|email',
-        //     'password' => 'required|confirmed',
-        // ]);
 
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
@@ -69,12 +67,13 @@ trait ResetsPasswords
      */
     protected function credentials(Request $request)
     {
-        return $request->only(
-            'password', 'password_confirmation', 'token'
-        );
         // return $request->only(
-        //     'email', 'password', 'password_confirmation', 'token'
+        //     'password', 'password_confirmation', 'token'
         // );
+
+        return $request->only(
+            'email', 'password', 'password_confirmation', 'token'
+        );
     }
 
     /**

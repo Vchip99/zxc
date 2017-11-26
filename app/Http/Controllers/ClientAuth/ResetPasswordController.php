@@ -28,7 +28,7 @@ class ResetPasswordController extends Controller
      *
      * @var string
      */
-    public $redirectTo = '/home';
+    public $redirectTo = 'client/login';
 
 
     /**
@@ -50,9 +50,9 @@ class ResetPasswordController extends Controller
      * @param  string|null  $token
      * @return \Illuminate\Http\Response
      */
-    public function showResetForm(Request $request, $token = null)
+    public function showResetForm($subdomain ,Request $request, $token = null)
     {
-        return view('subdomain.auth.passwords.reset')->with(
+        return view('client.clientLogin.resetpassword')->with(
             ['token' => $token, 'email' => $request->email]
         );
     }

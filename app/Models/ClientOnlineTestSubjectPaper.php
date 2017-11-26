@@ -29,6 +29,7 @@ class ClientOnlineTestSubjectPaper extends Model
      *  add/update paper
      */
     protected static function addOrUpdateOnlineTestSubjectPaper( Request $request, $isUpdate=false){
+        // dd($request->all());
         $sessions = [];
         $addPaperSessions = [];
         $updatePaperSessions = [];
@@ -60,7 +61,7 @@ class ClientOnlineTestSubjectPaper extends Model
         $paper->category_id = $catId;
         $paper->sub_category_id = $subcatId;
         $paper->subject_id = $subjectId;
-        $paper->date_to_active = $dateToActive;
+        $paper->date_to_active =  $dateToActive;
         $paper->time = $time;
         $paper->client_id = Auth::guard('client')->user()->id;
         $paper->date_to_inactive = $dateToInactive;
@@ -68,7 +69,12 @@ class ClientOnlineTestSubjectPaper extends Model
         $paper->show_solution = $showSolution;
         $paper->option_count = $optionCount;
         $paper->time_out_by = $timeOutBy;
-        $paper->is_free = $isFree;
+        $subCat = ClientOnlineTestSubCategory::find($subcatId);
+        if(is_object($subCat) && $subCat->price <=0){
+            $paper->is_free = 1;
+        }else {
+            $paper->is_free = $isFree;
+        }
         $paper->allowed_unauthorised_user = $unauthorisedUser;
         $paper->save();
 
@@ -92,7 +98,7 @@ class ClientOnlineTestSubjectPaper extends Model
                     foreach($allSessions as $paperSession){
                         if(false == in_array($paperSession->id, $addPaperSessions)){
                             if(isset($updatePaperSessions[$paperSession->id])){
-                                $paperSession->name = $updatePaperSessions[$paperSession->id]['session'];
+                                $paperSession->name =  str_replace(" ", "_", $updatePaperSessions[$paperSession->id]['session']);
                                 $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
                                 $paperSession->category_id = $catId;
                                 $paperSession->sub_category_id =$subcatId;
@@ -110,7 +116,7 @@ class ClientOnlineTestSubjectPaper extends Model
                 foreach($updatePaperSessions as $index => $updatePaperSession){
                     if(true == in_array($index, $addPaperSessions)){
                         $paperSession = new ClientOnlinePaperSection;
-                        $paperSession->name = $updatePaperSession['session'];
+                        $paperSession->name = str_replace(" ", "_", $updatePaperSession['session']);
                         $paperSession->duration = $updatePaperSession['duration'];
                         $paperSession->category_id = $catId;
                         $paperSession->sub_category_id =$subcatId;
@@ -193,7 +199,7 @@ class ClientOnlineTestSubjectPaper extends Model
         } else {
             $result->where('clients.subdomain', $client);
         }
-        return  $result->select('client_online_test_subject_papers.*')->get();
+        return $result->select('client_online_test_subject_papers.*')->get();
     }
 
     protected static function getRegisteredPapersByCatIdBySubCatId($catId, $subcatId, $userId){
@@ -213,7 +219,7 @@ class ClientOnlineTestSubjectPaper extends Model
         $papers = $result->where('client_online_test_subject_papers.category_id', $catId)
                     ->where('client_online_test_subject_papers.sub_category_id', $subcatId)
                     ->where('register_client_online_papers.client_user_id', $userId)
-                    ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d'))
+                    ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))
                     ->select('client_online_test_subject_papers.*')->groupBy('client_online_test_subject_papers.id')->get();
 
         if(is_object($papers) && false == $papers->isEmpty()){
@@ -232,16 +238,15 @@ class ClientOnlineTestSubjectPaper extends Model
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }
-        $result = DB::connection('mysql2')->table('client_online_test_subject_papers')
-                    ->join('client_online_test_categories', 'client_online_test_categories.id', '=', 'client_online_test_subject_papers.category_id' )
-                    ->join('client_online_test_sub_categories', 'client_online_test_sub_categories.id', '=', 'client_online_test_subject_papers.sub_category_id' )
-                    ->join('client_online_test_questions', 'client_online_test_questions.paper_id', '=', 'client_online_test_subject_papers.id' )
+        $result =   DB::connection('mysql2')->table('client_online_test_subject_papers')
+                    ->join('client_online_test_questions', function($join){
+                        $join->on('client_online_test_questions.paper_id', '=', 'client_online_test_subject_papers.id');
+                    })
                     ->join('clients', function($join){
-                        $join->on('clients.id', '=', 'client_online_test_questions.client_id');
                         $join->on('clients.id', '=', 'client_online_test_subject_papers.client_id');
-                        $join->on('clients.id', '=', 'client_online_test_sub_categories.client_id');
-                        $join->on('clients.id', '=', 'client_online_test_categories.client_id');
+                        $join->on('clients.id', '=', 'client_online_test_questions.client_id');
                     });
+
         if(!empty($clientId)){
             $result->where('clients.id', $clientId);
         } else {
@@ -249,7 +254,7 @@ class ClientOnlineTestSubjectPaper extends Model
         }
         $papers = $result->where('client_online_test_subject_papers.category_id', $catId)
                     ->where('client_online_test_subject_papers.sub_category_id', $subcatId)
-                    ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d'))
+                    ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))
                     ->select('client_online_test_subject_papers.*')->groupBy('client_online_test_subject_papers.id')->get();
 
         if(is_object($papers) && false == $papers->isEmpty()){

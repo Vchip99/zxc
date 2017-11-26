@@ -5,8 +5,12 @@ namespace App\Http\Controllers\ClientuserAuth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ClientUnAuthorisedUser;
 use Hesto\MultiAuth\Traits\LogsoutGuard;
 use Illuminate\Http\Request;
+use App\Models\Client;
+use App\Models\Clientuser;
 use Session;
 use Redirect;
 
@@ -79,5 +83,30 @@ class LoginController extends Controller
         Session::regenerate();
 
         return redirect('/');
+    }
+
+    public function clientUserLogin(Request $request){
+        if($this->guard('clientuser')->attempt($this->credentials($request))){
+            // if free plan and user is not in first 20 user then dont allow to login
+            $clientUser = Auth::guard('clientuser')->user();
+            if(1 == $clientUser->client->plan_id){
+                if( 'false' == $clientUser::isInBetweenFirstTwenty()){
+                    $data['name'] = $clientUser->name;
+                    $data['email'] = $clientUser->email;
+                    $data['client'] = $clientUser->client->name;
+                    // send mail to client
+                    Mail::to($clientUser->client->email)->send(new ClientUnAuthorisedUser($data));
+
+                    $this->guard('clientuser')->logout();
+                    Session::flush();
+                    Session::regenerate();
+                    return 'Try after some time.';
+                }
+            }
+            $request->session()->regenerate();
+            return 'true';
+        } else {
+            return 'false';
+        }
     }
 }

@@ -223,7 +223,6 @@
     border-radius: 50%;
     border: 2px solid #fff;
     }
-
   </style>
 @stop
 @section('dashboard_content')
@@ -255,12 +254,8 @@
             <ul class="nav navbar-nav">
              <li class="" title="Main Site"><a href="">Main Site</a></li>
              <li class="" title="HOME"><a href="">HOME</a></li>
-            @if(1 == $client->course_permission)
               <li id="courses5" class="" title="Course"><a href="">Course</a></li>
-            @endif
-            @if(1 == $client->test_permission)
               <li id="test5" class="" title="Test Series"><a href="">Test Series</a></li>
-            @endif
             </ul>
           </div>
        </div>

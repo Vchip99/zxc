@@ -108,8 +108,8 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function exists(CanResetPasswordContract $user, $token)
     {
-        $email = $user->getEmailForPasswordReset();
 
+        $email = $user->getEmailForPasswordReset();
         $token = (array) $this->getTable()->where('email', $email)->where('token', $token)->first();
 
         return $token && ! $this->tokenExpired($token);

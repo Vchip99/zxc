@@ -34,6 +34,12 @@
 		  text-align:center;
 		  overflow: visible;
 		}
+
+
+.pay-now span{
+color: #fff;
+font-weight: bold;
+}
   	</style>
 @stop
 @section('header-js')
@@ -60,36 +66,58 @@
 	   <hr class="section-dash-dark"/>
 	  <div class="row label-primary">
 	    <div class="col-md-8  col-md-offset-2  ">
-	      <div class="row text-center">
-	        <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm  ">
-	          <select class="form-control" id="category" name="category" onChange="selectSubcategory(this);" title="Category">
-          		<option>Select Category</option>
-          		@foreach($testCategories as $testCategory)
-          			@if( $catId == $testCategory->id)
-              			<option value="{{$testCategory->id}}" selected="true">
-              		@else
-              			<option value="{{$testCategory->id}}">
-              		@endif
-              			{{$testCategory->name}}
-              		</option>
-              	@endforeach
-          	</select>
-	        </div>
-	        <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm">
-	          	<select class="form-control" id="subcategory" name="subcategory" onChange="selectPanel();" title="Sub Category">
-	          		<option>Select Sub Category</option>
-	          		@foreach($testSubCategories as $testSubCategory)
-	          			@if($subcatId == $testSubCategory->id)
-	          				<option value="{{$testSubCategory->id}}" selected>
-	          			@else
-	          				<option value="{{$testSubCategory->id}}">
-	          			@endif
-	          				{{$testSubCategory->name}}
-	          			</option>
-	          		@endforeach
-	          	</select>
-	        </div>
-	      </div>
+	      	<div class="row text-center">
+		        <div class="col-md-4 col-sm-4  col-xs-12 mrgn_10_top_btm  ">
+		          	<select class="form-control" id="category" name="category" onChange="selectSubcategory(this);" title="Category">
+		          		<option>Select Category</option>
+		          		@foreach($testCategories as $testCategory)
+		          			@if( $catId == $testCategory->id)
+		              			<option value="{{$testCategory->id}}" selected="true">
+		              		@else
+		              			<option value="{{$testCategory->id}}">
+		              		@endif
+		              			{{$testCategory->name}}
+		              		</option>
+		              	@endforeach
+	          		</select>
+		        </div>
+		        <div class="col-md-4 col-sm-4  col-xs-12 mrgn_10_top_btm">
+		          	<select class="form-control" id="subcategory" name="subcategory" onChange="selectPanel(this);" title="Sub Category">
+		          		<option>Select Sub Category</option>
+		          		@foreach($testSubCategories as $testSubCategory)
+		          			@if($subcatId == $testSubCategory->id)
+		          				<option value="{{$testSubCategory->id}}" data-price="{{$testSubCategory->price}}" selected>
+		          			@else
+		          				<option value="{{$testSubCategory->id}}" data-price="{{$testSubCategory->price}}">
+		          			@endif
+		          				{{$testSubCategory->name}}
+		          			</option>
+		          		@endforeach
+		          	</select>
+		        </div>
+		        <div class="col-md-4 col-sm-4 mrgn_10_top_btm " style="display: inline-block !important; ">
+		        <div class="pay-now " >
+        			<span id="price">Price: {{$price}} Rs.</span>
+			       	@if(is_object(Auth::guard('clientuser')->user()))
+			        	@if('true' == $isTestSubCategoryPurchased)
+				        	<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" >Paid</a>
+				        @else
+				        	@if($price > 0)
+								<a id="paidStatus" href="{{ url('purchaseTestSubCategory')}}/{{$testSubCategory->id}}" class="btn btn-sm btn-default" style="cursor: pointer;" >Pay Now</a>
+							@else
+								<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" >Free</a>
+							@endif
+						@endif
+					@else
+						@if($price > 0)
+							<a class="btn btn-sm btn-default" style="cursor: pointer;" onClick="checkLogin();">Pay Now</a>
+						@else
+							<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" >Free</a>
+						@endif
+					@endif
+			     </div>
+	            </div>
+	      	</div>
 	    </div>
 	  </div>
 	  <div>
@@ -125,11 +153,10 @@
 					            <table class="table data-lg">
 					              	<thead>
 					                	<tr>
-						                  	<th>Test Number</th>
+						                  	<th>Test Name</th>
 						                  	<th>Start test</th>
 						                  	<th>Result</th>
 						                  	<th>Date to Active</th>
-						                  	<th>Date to Inactive</th>
 						                  	<th>Price</th>
 						                  	<th>Add to Favourite</th>
 					                	</tr>
@@ -149,7 +176,7 @@
 						                    		@if(1 == $testSubjectPaper->is_free && 1 == $testSubjectPaper->allowed_unauthorised_user)
 									                	<td id="startTest_{{$testSubjectPaper->id}}"><button onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button></td>
 									                @else
-						                    			<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Please login to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
+						                    			<td id="startTest_{{$testSubjectPaper->id}}"><button data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
 						                    		@endif
 						                    	@else
 						                    		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
@@ -165,7 +192,7 @@
 							                    	@if($currentDate < $testSubjectPaper->date_to_active)
 							                    		<button disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
 							                    	@elseif(!is_object(Auth::guard('clientuser')->user()))
-							                    		<button  disabled="true" data-toggle="tooltip" title="Please login to see result.""><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+							                    		<button data-toggle="tooltip" title="Please login to see result" onClick="checkLogin();"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
 							                    	@elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 							                    		<form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}">
 							                    			{{ csrf_field() }}
@@ -179,8 +206,7 @@
 								                    	<button  disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
 								                    @endif
 							                    </td>
-							                    <td class=" ">{{ $testSubjectPaper->date_to_active }}</td>
-							                    <td class=" ">{{ $testSubjectPaper->date_to_inactive }}</td>
+							                    <td class=" ">{{ date("Y-m-d", strtotime($testSubjectPaper->date_to_active)) }}</td>
 							                    <td class="">{{($testSubjectPaper->is_free)?'Free':'Paid'}}</td>
 							                    @if(is_object(Auth::guard('clientuser')->user()))
 								                    @if($currentDate < $testSubjectPaper->date_to_active)
@@ -188,12 +214,19 @@
 								                    @else
 								                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
 									                    	<td><button disabled="true" data-toggle="tooltip" title="Already Added to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true"></i></button></td>
-									                    @else
+									                    @elseif('true' == $isTestSubCategoryPurchased)
 									                    	<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
+									                    @else
+									                    	@if($price > 0)
+									                    		<td><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to Add to Favourite!"><i class="fa
+									                    		fa-cart-plus" aria-hidden="true"></i></button></td>
+									                    	@else
+									                    		<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
+									                    	@endif
 									                    @endif
 								                    @endif
 								                @else
-								                	<td onClick="loginAlert(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
+								                	<td onClick="checkLogin(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
 								                @endif
 							                </tr>
 					                		@endforeach
@@ -208,7 +241,7 @@
 					              			<div class=" panel panel-info" >
 					                			<div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">{{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
 					                			</div>
-							                  	<div id="paper{{$testSubjectPaper->id}}" class="panel-body">
+							                  	<div id="paper{{$testSubjectPaper->id}}" class="panel-body" style="padding:2px 0px;">
 								                    <div class="container">
 								                      	<div class="fluid-row">
 									                       	<ul class="">
@@ -218,11 +251,11 @@
 										                    		@if(1 == $testSubjectPaper->is_free && 1 == $testSubjectPaper->allowed_unauthorised_user)
 													                	<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true"></span>Start</button></li>
 													                @else
-										                    			<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please login to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
+										                    			<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
 										                    		@endif
 										                    	@else
 										                    		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-												                    		<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" >Start</span></button></li>
+											                    		<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" >Start</span></button></li>
 										                    		@elseif( 'true' == $isTestSubCategoryPurchased || (1 == $testSubjectPaper->is_free && 1 == $testSubjectPaper->allowed_unauthorised_user))
 													                	<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true"></span>Start</button></li>
 													                @else
@@ -234,7 +267,7 @@
 									                           		@if($currentDate < $testSubjectPaper->date_to_active)
 											                    		<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
 											                    	@elseif(!is_object(Auth::guard('clientuser')->user()))
-											                    		<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please login to see result.""><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
+											                    		<button class="btn-magick btn-sm btn3d" data-toggle="Please login to see result" onClick="checkLogin();"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
 											                    	@elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 											                    		<form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}">
 											                    			{{ csrf_field() }}
@@ -249,13 +282,10 @@
 												                    @endif
 									                           	</li>
 									                           	<li>
-									                           		<button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span> {{ $testSubjectPaper->date_to_active }}</button>
+									                           		<button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span> {{ date("Y-m-d", strtotime($testSubjectPaper->date_to_active)) }}</button>
 									                           	</li>
 									                           	<li>
-									                           		<button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span> {{ $testSubjectPaper->date_to_inactive }}</button>
-									                           	</li>
-									                           	<li>
-									                           		<button type="button" class="btn-magick btn-sm btn3d" disabled="true"></span> {{($testSubjectPaper->is_free)?'Free':'Paid'}} </button>
+									                           		<button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span> {{($testSubjectPaper->is_free)?'Free':'Paid'}} </button>
 									                           	</li>
 									                           	@if(is_object(Auth::guard('clientuser')->user()))
 									                           		@if($currentDate < $testSubjectPaper->date_to_active)
@@ -263,12 +293,18 @@
 												                    @else
 												                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
 													                    	<li><button disabled="true" class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Already Added to Favourite!"><span class="fa fa-cart-plus" aria-hidden="true"></span> Add</button></li>
-													                    @else
+													                    @elseif('true' == $isTestSubCategoryPurchased)
 													                    	<li id="registerPaper_mobile_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!" class="btn-magick btn-sm btn3d"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
+													                    @else
+													                    	@if($price > 0)
+													                    		<li><button disabled="true" class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please purchase sub category to Add to Favourite!"><span class="fa fa-cart-plus" aria-hidden="true"></span> Add</button></li>
+													                    	@else
+													                    		<li id="registerPaper_mobile_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!" class="btn-magick btn-sm btn3d"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
+													                    	@endif
 													                    @endif
 												                    @endif
 												                @else
-												                	<li onClick="loginAlert(this);"><button data-toggle="tooltip" title="Add to Favourite!" class="btn-magick btn-sm btn3d"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
+												                	<li onClick="checkLogin(this);"><button data-toggle="tooltip" title="Add to Favourite!" class="btn-magick btn-sm btn3d"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
 												                @endif
 								                         	</ul>
 								                       	</div>
@@ -294,6 +330,11 @@
 	@section('footer')
 	@include('footer.client-footer')
 	<script>
+	function checkLogin(){
+	    $('#loginUserModel').modal();
+	    return false;
+	}
+
 	function startTest(ele){
 		var paper = parseInt($(ele).data('paper'));
 		var subject = parseInt($(ele).data('subject'));
@@ -336,7 +377,6 @@
 				showUserResultBtnInnerHtml += '<button  onClick="showUserTestResult(this);" data-paper_id="'+paper+'" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
 				showUserResultBtn.innerHTML = showUserResultBtnInnerHtml;
 
-
 		        var showUserResultMobileBtn = document.getElementById('showUserResultMobileBtn_'+paper);
 		        showUserResultMobileBtnInnerHtml = '<form id="showUserTestResult_'+paper+'" method="POST" action="'+url+'">'+csrfToken;
 		        showUserResultMobileBtnInnerHtml += '<input type="hidden" name="paper_id" value="'+paper+'"><input type="hidden" name="category_id" value="'+category+'"><input type="hidden" name="subcategory_id" value="'+subcategory+'"><input type="hidden" name="subject_id" value="'+subject+'"></form>';
@@ -366,6 +406,7 @@
 		    		$.each(msg['sub_categories'], function(idx, obj) {
 					    var opt = document.createElement('option');
 					    opt.value = obj.id;
+					    opt.setAttribute('data-price', obj.price);
 					    opt.innerHTML = obj.name;
 					    select.appendChild(opt);
 					});
@@ -374,10 +415,27 @@
 		}
 	}
 
-	function selectPanel(argument) {
+	function selectPanel(ele) {
 		var cat = parseInt($('select#category').val());
 		var subcat = parseInt($('select#subcategory').val());
 		var userId = parseInt(document.getElementById('user_id').value);
+		if($(ele).find(':selected').data('price') > 0){
+			$('#price').html('Price: '+$(ele).find(':selected').data('price')+' Rs.');
+			if( userId > 0 ){
+				var url = "{{ url('purchaseTestSubCategory')}}/"+subcat;
+				document.getElementById('paidStatus').setAttribute('href', url);
+				document.getElementById('paidStatus').text = 'Pay Now';
+			} else {
+				document.getElementById('paidStatus').setAttribute('onClick', 'checkLogin();');
+				document.getElementById('paidStatus').text = 'Pay Now';
+			}
+		} else {
+			$('#price').html('Price: 0 Rs.');
+			document.getElementById('paidStatus').removeAttribute('href');
+			document.getElementById('paidStatus').removeAttribute('onClick');
+			document.getElementById('paidStatus').text = 'Free';
+		}
+
 		if( 0 < cat && 0 < subcat ){
 			$.ajax({
 	            method: "POST",
@@ -431,7 +489,6 @@
 				                trInnerhtml += '<th>Start Test</th>';
 				                trInnerhtml += '<th>Result</th>';
 				                trInnerhtml += '<th>Date to Active</th>';
-				                trInnerhtml += '<th>Date to Inactive</th>';
 				                trInnerhtml += '<th>Price</th>';
 				                trInnerhtml += '<th>Add to Favourite</th>';
 				                tableTr.innerHTML = trInnerhtml;
@@ -451,7 +508,7 @@
 		                				if(1 == obj.is_free && 1 == obj.allowed_unauthorised_user){
 		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 										} else {
-		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true" data-toggle="tooltip" title="Please login to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 										}
 		                			} else {
 	                					if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
@@ -459,7 +516,7 @@
 	                					} else if('true' == msg['isTestSubCategoryPurchased'] || (1 == obj.is_free && 1 == obj.allowed_unauthorised_user)) {
                 							divInnerHtml += '<td id="startTest_'+obj.id+'"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 	                					}else {
-		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true" data-toggle="tooltip" title="Add to cart to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 		                				}
 
 								    }
@@ -470,7 +527,7 @@
 									} else if(true == isNaN(userId)) {
 
 		                				divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
-									    divInnerHtml += '<button disabled="true" data-toggle="tooltip" title="Please login to see result."><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+									    divInnerHtml += '<button data-toggle="tooltip" title="Please login to see result" onClick="checkLogin();"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
 									    divInnerHtml += '</td>';
 		                			} else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
 								    	var testUrl = "{{ url('showUserTestResult') }}";
@@ -487,8 +544,7 @@
 									    divInnerHtml += '</td>';
 									}
 
-								    divInnerHtml += '<td class=" ">'+ obj.date_to_active +'</td>';
-								    divInnerHtml += '<td class=" ">'+ obj.date_to_inactive +'</td>';
+								    divInnerHtml += '<td class=" ">'+ format_time(new Date(obj.date_to_active)) +'</td>';
 								    divInnerHtml += '<td class="">';
 								    if(1 == obj.is_free){
 								    	divInnerHtml += 'Free';
@@ -503,12 +559,18 @@
 									    } else {
 										    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
 										    	divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Already Added to Favourite."><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
-										    } else {
+										    } else if('true' == msg['isTestSubCategoryPurchased']) {
 										    	divInnerHtml += '<td id="registerPaper_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" onClick="registerPaper(this);" ><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+										    } else {
+										    	if($(ele).find(':selected').data('price') > 0){
+													divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to Add to Favourite."><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+												} else {
+													divInnerHtml += '<td id="registerPaper_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" onClick="registerPaper(this);" ><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+												}
 										    }
 										}
 									} else {
-										divInnerHtml += '<td onClick="loginAlert(this);" ><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+										divInnerHtml += '<td onClick="checkLogin(this);" ><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
 									}
 								    tbodyTr.innerHTML = divInnerHtml;
 								    tableBody.appendChild(tbodyTr);
@@ -538,6 +600,7 @@
 		                			var panelContentDiv = document.createElement('div');
 		                			panelContentDiv.id = 'paper'+obj.id;
 		                			panelContentDiv.className = 'panel-body';
+		                			panelContentDiv.setAttribute('style', 'padding:2px 0px;');
 
 		                			var containerDiv = document.createElement('div');
 		                			containerDiv.className = 'container'
@@ -553,7 +616,7 @@
 		                				if(1 == obj.is_free && 1 == obj.allowed_unauthorised_user){
 		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 										} else {
-		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please login to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 		                				}
 		                			} else {
 	                					if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
@@ -562,7 +625,7 @@
                 							ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 
 	                					} else {
-		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to cart to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please purchase sub category to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 		                				}
 								    }
 								    if(msg['currentDate'] < obj.date_to_active){
@@ -571,7 +634,7 @@
 									    ulDivInnerHtml += '</li>';
 									} else if(true == isNaN(userId)) {
 		                				ulDivInnerHtml += '<li id="showUserResultMobileBtn_'+obj.id+'">';
-									    ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please login to see result."><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
+									    ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to see result" onClick="checkLogin();"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
 									    ulDivInnerHtml += '</li>';
 		                			} else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
 								    	var testUrl = "{{ url('showUserTestResult') }}";
@@ -588,8 +651,8 @@
 									    ulDivInnerHtml += '</li>';
 									}
 
-								    ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li><li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_inactive +'</button></li>';
-								    ulDivInnerHtml += '<li class=""><button type="button" class="btn-magick btn-sm btn3d" disabled="true">';
+								    ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span>'+ format_time(new Date(obj.date_to_active)) +'</button></li>';
+								    ulDivInnerHtml += '<li class=""><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-rs"></span>';
 								    if(1 == obj.is_free){
 								    	ulDivInnerHtml += 'Free';
 								    } else {
@@ -603,12 +666,18 @@
 									    } else {
 										    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
 										    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already Added to Cart."><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
-										    } else {
+										    } else if('true' == msg['isTestSubCategoryPurchased']) {
 										    	ulDivInnerHtml += '<li id="registerPaper_mobile_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" onClick="registerPaper(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Cart!"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+										    } else {
+										    	if($(ele).find(':selected').data('price') > 0){
+													ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please purchase sub category to Add to Cart."><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+												} else {
+													ulDivInnerHtml += '<li id="registerPaper_mobile_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" onClick="registerPaper(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Cart!"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+												}
 										    }
 										}
 									} else {
-										ulDivInnerHtml += '<li onClick="loginAlert(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Cart!"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+										ulDivInnerHtml += '<li onClick="checkLogin(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Cart!"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
 									}
 									ulDiv.innerHTML = ulDivInnerHtml;
 									rowDiv.appendChild(ulDiv);
@@ -625,6 +694,11 @@
 							divEle.appendChild(mainPanelDiv);
 						}
 		        	});
+					if( userId > 0 ){
+						if('true' == msg['isTestSubCategoryPurchased']){
+							document.getElementById('paidStatus').text = 'Paid';
+						}
+					}
 		    	} else {
 		    		var mainPanelDiv = document.createElement('div');
 	        		mainPanelDiv.className = "panel-group";
@@ -647,7 +721,6 @@
 	        		defaultPanelDiv.appendChild(firstMainDiv);
 					mainPanelDiv.appendChild(defaultPanelDiv);
 					divEle.appendChild(mainPanelDiv);
-
 		    	}
 		    	$('[id^=paper]').hide();
 		    	$('.toggle').click(function() {
@@ -669,9 +742,7 @@
 			       $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
 			       $input.find('.col-xs-2 i').addClass('fa-chevron-up');
 			     }
-
 			   	});
-
 	        });
 		} else {
 			divEle = document.getElementById('subjects');
@@ -702,6 +773,25 @@
 		}
 	}
 
+	function format_time(date_obj) {
+	  // formats a javascript Date object into a 12h AM/PM time string
+	  var day = date_obj.getDate();
+	  var month = date_obj.getMonth()+1;
+	  var year = date_obj.getFullYear();
+	  var hour = date_obj.getHours();
+	  var minute = date_obj.getMinutes();
+	  var amPM = (hour > 11) ? " PM" : " AM";
+	  if(hour > 12) {
+	    hour -= 12;
+	  } else if(hour == 0) {
+	    hour = "12";
+	  }
+	  if(minute < 10) {
+	    minute = "0" + minute;
+	  }
+	  return year+"-"+month+"-"+day;
+	}
+
 	function registerPaper(ele){
 		var paper = parseInt($(ele).data('paper'));
 		var subject = parseInt($(ele).data('subject'));
@@ -710,10 +800,7 @@
 		var userId = parseInt(document.getElementById('user_id').value);
 
 	    if( true == isNaN(userId)){
-	      	$.alert({
-			    title: 'Alert!',
-			    content: 'please login first and then add test.',
-			});
+	      	$('#loginUserModel').modal();
 	    } else if(paper > 0) {
 			$.confirm({
 		    title: 'Confirmation',
@@ -750,24 +837,6 @@
 								registerMobileEle.removeAttribute('onclick');
 						        registerMobileEle.innerHTML ='';
 						        registerMobileEle.innerHTML = '<button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Already Added to Cart!"><span class="fa fa-cart-plus" aria-hidden="true"></span>Add</button>';
-
-						  //       var startTestEle = document.getElementById('startTest_'+paper);
-						  //       startTestEle.setAttribute('data-paper', paper);
-								// startTestEle.setAttribute('data-subject', subject);
-								// startTestEle.setAttribute('data-category', category);
-								// startTestEle.setAttribute('data-subcategory', subcategory);
-								// startTestEle.setAttribute('onClick', 'startTest(this);');
-						  //       startTestEle.innerHTML = '';
-						  //       startTestEle.innerHTML = '<button data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button>';
-
-						  //       var startTestMobileEle = document.getElementById('startTest_mobile_'+paper);
-						  //       startTestMobileEle.setAttribute('data-paper', paper);
-								// startTestMobileEle.setAttribute('data-subject', subject);
-								// startTestMobileEle.setAttribute('data-category', category);
-								// startTestMobileEle.setAttribute('data-subcategory', subcategory);
-								// startTestMobileEle.setAttribute('onClick', 'startTest(this);');
-						  //       startTestMobileEle.innerHTML = '';
-						  //       startTestMobileEle.innerHTML = '<button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button>';
 					      	});
 				    	}
 			        },
@@ -779,7 +848,7 @@
 	}
 
 	function showUserTestResult(ele){
-		  $.confirm({
+	  	$.confirm({
 		    title: 'Confirmation',
 		    content: 'Do you want to see result?',
 		    type: 'red',
@@ -803,12 +872,6 @@
 		$.alert({
 		    title: 'Alert!',
 		    content: 'Please register this paper to add to cart.',
-		});
-	}
-	function loginAlert(ele){
-		$.alert({
-		    title: 'Alert!',
-		    content: 'please login first and then add to favourite.',
 		});
 	}
 </script>

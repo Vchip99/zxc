@@ -135,7 +135,7 @@ class ClientOnlineCourse extends Model
         } else if(!empty($subdomain)) {
             $query->where('clients.subdomain', $subdomain);
         }
-        return $query->select('client_online_courses.id','client_online_courses.*', 'client_online_sub_categories.name as subcategory', 'client_online_categories.name as category')->groupBy('client_online_courses.id')->get();
+        return $query->where('client_online_courses.release_date','<=', date('Y-m-d H:i'))->select('client_online_courses.*', 'client_online_sub_categories.name as subcategory', 'client_online_categories.name as category')->groupBy('client_online_courses.id')->get();
     }
 
     /**
@@ -162,6 +162,7 @@ class ClientOnlineCourse extends Model
         return  $result->where('clients.subdomain', $client)
             ->where('client_online_courses.category_id', $categoryId)
             ->where('client_online_courses.sub_category_id', $subcategoryId)
+            ->where('client_online_courses.release_date','<=', date('Y-m-d H:i:s'))
             ->select('client_online_courses.id','client_online_courses.*', 'client_online_sub_categories.name as subcategory', 'client_online_categories.name as category')
             ->groupBy('client_online_courses.id')
             ->get();
@@ -192,7 +193,8 @@ class ClientOnlineCourse extends Model
         } else {
             $result->where('clients.subdomain', $client);
         }
-        return  $result->select('client_online_courses.*', 'client_online_categories.name as category', 'client_online_sub_categories.name as subcategory', 'client_online_categories.name as category')->get();
+        return  $result->select('client_online_courses.*', 'client_online_categories.name as category', 'client_online_sub_categories.name as subcategory', 'client_online_categories.name as category')
+            ->groupBy('client_online_courses.id')->get();
     }
 
     /**

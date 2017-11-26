@@ -34,7 +34,17 @@
       .vote-btn.selected{
         color:#e91e63 !important;
       }
-
+  .pay-now{
+    text-align: right;
+    margin-bottom: 10px;
+  }
+  @media(max-width: 768px){
+    .pay-now{text-align: center;}
+  }
+  .pay-now span{
+    color: #e91e63;
+    font-weight: bold;
+  }
   </style>
 @stop
 @section('header-js')
@@ -59,6 +69,22 @@
   <div class="container">
     @if(count($videos) > 0)
     <div class="col-md-12">
+      <div class="pay-now">
+        <span>Price: {{ $course->price }} Rs.</span>
+        @if($course->price > 0)
+          @if('true' == $isCoursePurchased)
+            <a class="btn btn-sm btn-primary" style="cursor: pointer;" title="Paid">Paid</a>
+          @else
+            @if(is_object(Auth::guard('clientuser')->user()))
+              <a href="{{ url('purchaseCourse')}}/{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" >Pay Now</a>
+            @else
+              <a class="btn btn-sm btn-primary" style="cursor: pointer;" title="Pay Now" onClick="checkLogin();">Pay Now</a>
+            @endif
+          @endif
+        @else
+          <a class="btn btn-sm btn-primary" style="cursor: pointer;" title="Free">Free</a>
+        @endif
+      </div>
     <div class=" btn-group btn-group-justified btn-group-lg " role="group" aria-label="...">
       <div class="btn-group" role="group" title="Back">
           <a class=" btn btn-default btn-symboll" href="{{ url('online-courses')}}" title="Back"><span class="hidden-lg fa fa-arrow-circle-left" aria-hidden="true"></span>
@@ -87,30 +113,6 @@
             <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="checkLogin();" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
         @endif
       </div>
-      @if($course->price > 0)
-        @if('true' == $isCoursePurchased)
-          <div class="btn-group" role="group" title="Pay Now">
-            <a href="" class="btn-tab btn btn-default" style="color: #e91e63;">
-                <span class="hidden-lg" aria-hidden="true">Paid</span>
-                <div class="hidden-sm">Paid</div>
-            </a>
-          </div>
-        @else
-          <div class="btn-group" role="group" title="Pay Now">
-            <a href="" class="btn-tab btn btn-default" style="color: #e91e63;">
-                <span class="hidden-lg" aria-hidden="true">Pay...</span>
-                <div class="hidden-sm">Pay Now</div>
-            </a>
-          </div>
-        @endif
-      @else
-        <div class="btn-group" role="group" title="Free">
-          <a href="" class="btn-tab btn btn-default" style="color: #e91e63;">
-              <span class="hidden-lg" aria-hidden="true">Free</span>
-              <div class="hidden-sm">Free</div>
-          </a>
-        </div>
-      @endif
     </div>
     <div class="tab-content">
       <div id="videoLectures" class="tab-pane fade in active">
@@ -119,13 +121,13 @@
           <div class="row mrgn_30_top border_box padding_10">
             <div class="col-md-3 ">
               @if(is_object(Auth::guard('clientuser')->user()))
-                @if('true' == $isCoursePurchased || 1 == $video->is_free)
+                @if('true' == $isCoursePurchased || 1 == $video->is_free || $course->price <= 0)
                   <a href="{{ url('episode')}}/{{$video->id}}"><h1 class="video_id">{{ $index + 1}}</h1></a>
                 @else
                   <a class="curser" onClick="purchaseCourse();"><h1 class="video_id">{{ $index + 1}}</h1></a>
                 @endif
               @else
-                @if(1 == $video->is_free)
+                @if(1 == $video->is_free || $course->price <= 0)
                   <a href="{{ url('episode')}}/{{$video->id}}"><h1 class="video_id">{{ $index + 1}}</h1></a>
                 @else
                   <a class="curser" onClick="checkLogin();"><h1 class="video_id">{{ $index + 1}}</h1></a>
@@ -141,13 +143,13 @@
               @endif
               <h4 class="v_h4_subtitle">
                 @if(is_object(Auth::guard('clientuser')->user()))
-                  @if('true' == $isCoursePurchased || 1 == $video->is_free)
+                  @if('true' == $isCoursePurchased || 1 == $video->is_free || $course->price <= 0)
                     <a href="{{ url('episode')}}/{{$video->id}}">{{$video->name}}</a>
                   @else
                     <a class="curser" onClick="purchaseCourse();">{{$video->name}}</a>
                   @endif
                 @else
-                  @if(1 == $video->is_free)
+                  @if(1 == $video->is_free || $course->price <= 0)
                     <a href="{{ url('episode')}}/{{$video->id}}">{{$video->name}}</a>
                   @else
                     <a class="curser" onClick="checkLogin();">{{$video->name}}</a>
@@ -224,10 +226,7 @@
   <script type="text/javascript">
 
   function checkLogin(){
-    $.alert({
-          title: 'Alert!',
-          content: 'Please login first.',
-      });
+    $('#loginUserModel').modal();
     return false;
   }
 
@@ -259,10 +258,7 @@
     var userId = parseInt(document.getElementById('user_id').value);
     var courseId = parseInt($(ele).data('course_id'));
     if( true == isNaN(userId)){
-      $.alert({
-          title: 'Alert!',
-          content: 'Please login first and then register course.',
-      });
+      checkLogin();
     } else {
       $.ajax({
         method: "POST",

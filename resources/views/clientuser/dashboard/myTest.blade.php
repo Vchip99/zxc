@@ -486,7 +486,7 @@
                 h4Ele.className = 'panel-title';
                 h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
                 firstMainDiv.appendChild(h4Ele);
-                defaultPanelDiv.appendChild(secondMainDiv);
+                defaultPanelDiv.appendChild(firstMainDiv);
                 mainPanelDiv.appendChild(defaultPanelDiv);
                 divEle.appendChild(mainPanelDiv);
             }

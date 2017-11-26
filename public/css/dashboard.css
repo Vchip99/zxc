@@ -1,6 +1,6 @@
 #all-result{padding: 20px 0px;}
 #all-result .panel-heading{font-weight: bolder;}
-#all-result .panel-body{height: 400px;
+#all-result .panel-body{height: 600px;
 overflow: scroll;}
 .v-container{padding: 50px  0px;}
 @media (max-width: 678px){

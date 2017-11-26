@@ -43,7 +43,11 @@
                 @endif
      	    </span>
 	     	<span class="mrgn_5_left">
-	      		<a class="" role="button" data-toggle="collapse" href="#replySubComment{{$subcomment->placement_process_comment_id}}-{{$subcomment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+	      		@if(is_object(Auth::user()))
+	      			<a class="" role="button" data-toggle="collapse" href="#replySubComment{{$subcomment->placement_process_comment_id}}-{{$subcomment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                @else
+                	<a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
+                @endif
 	    	</span>
 	    	<span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$subcomment->updated_at->diffForHumans()}}</span>
 		    <div class="collapse replyComment" id="replySubComment{{$subcomment->placement_process_comment_id}}-{{$subcomment->id}}">

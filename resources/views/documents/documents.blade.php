@@ -17,6 +17,7 @@
       background:#337ab7
     }
     .modal-header h2{font-size: 15px; font-weight: bold; color:#e91e63; }
+    .modal-header button{font-size: 15px; font-weight: bold; color:#e91e63; }
   .iframe-container {
     padding-bottom: 60%;
     padding-top: 30px; height: 0; overflow: hidden;
@@ -80,15 +81,6 @@
             <label><input class="search" type="checkbox" value="3" data-filter="difficulty" onclick="searchDocuments();"> Advanced</label>
           </div>
         </div>
-        <!-- <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Fees"> Fees</p>
-        <div class="panel">
-         <div class="checkbox">
-            <label><input class="search" name="fees" type="radio" value="1" data-filter="fees" onclick="searchDocuments();"> Paid</label>
-          </div>
-          <div class="checkbox">
-            <label><input class="search" name="fees" type="radio" value="0" data-filter="fees" onclick="searchDocuments();"> Free</label>
-          </div>
-        </div> -->
         <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Type of Document"> Type of Document </p>
         <div class="panel">
            <div class="checkbox">
@@ -143,7 +135,7 @@
               </div>
               <div id="dynamic-modal-{{$document->id}}" class="modal fade" role="dialog">
                 <div class="modal-dialog">
-                  <div class="modal-content">
+                  <div class="modal-content"  style="background-color: white;">
                     <div class="modal-header">
                       <button class="close" data-dismiss="modal">×</button>
                       <h2  class="modal-title">{{$document->name}}</h2>
@@ -254,6 +246,7 @@
          modelDialogDiv.className = 'modal-dialog';
 
           var modelContentDiv = document.createElement('div');
+          modelContentDiv.setAttribute('style','background-color: white;');
           modelContentDiv.className = 'modal-content';
           modelDivInnerHtml += '<div class="modal-header"><button class="close" data-dismiss="modal">×</button><h2  class="modal-title">'+ obj.name+'</h2></div>';
           modelDivInnerHtml += '<div class="modal-body"><div class="iframe-container"><object data="'+ docPath +'" type="application/pdf" ><a href="'+ docPath +'"></a></object></div></div>';
@@ -344,10 +337,7 @@
     var userId = parseInt(document.getElementById('user_id').value);
     var documentId = parseInt($(ele).data('document_id'));
     if( true == isNaN(userId)){
-      $.alert({
-          title: 'Alert!',
-          content: 'Please login first and then register favourite document.',
-      });
+      $('#loginUserModel').modal();
     } else {
       $.ajax({
         method: "POST",

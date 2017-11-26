@@ -126,24 +126,28 @@ return [
         'clientusers' => [
             'provider' => 'clientusers',
             'table' => 'clientuser_password_resets',
+            'connection' => 'mysql2',
             'expire' => 60,
         ],
 
         'clients' => [
             'provider' => 'clients',
             'table' => 'client_password_resets',
+            'connection' => 'mysql2',
             'expire' => 60,
         ],
 
         'admins' => [
             'provider' => 'admins',
             'table' => 'password_resets',
+            'connection' => 'mysql',
             'expire' => 60,
         ],
 
         'users' => [
             'provider' => 'users',
             'table' => 'password_resets',
+            'connection' => 'mysql',
             'expire' => 60,
         ],
     ],

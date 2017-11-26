@@ -78,7 +78,8 @@
                           <!-- </br> -->
                         </form>
                         <div>
-                          <a href="{{ url('forgotPassword')}}" data-toggle="tooltip" title="Forgot Password">Forgot Password?</a></div>
+                          <a href="{{ url('forgotPassword')}}" data-toggle="tooltip" title="Forgot Password">Forgot Password?</a>
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -13,6 +13,7 @@ class ClientuserResetPassword extends Notification
      * @var string
      */
     public $token;
+    protected $connection = 'mysql2';
 
     /**
      * Create a new notification instance.

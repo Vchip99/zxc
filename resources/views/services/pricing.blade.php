@@ -7,18 +7,20 @@
   <link href="{{asset('css/service.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{asset('css/themify-icons/themify-icons.css?ver=1.0')}}" rel="stylesheet"/>
   <style type="text/css">
-      .panel.price>.panel-heading{
+ .panel.price>.panel-heading{
       border-radius:0px;
        -moz-transition: all .3s ease;
       -o-transition:  all .3s ease;
       -webkit-transition:  all .3s ease;
       height: 100px;
+
     }
     .panel.price:hover{
       box-shadow: 0px 0px 30px rgba(0,0,0, .2);
     }
     .panel.price:hover>.panel-heading{
       box-shadow: 0px 0px 30px rgba(0,0,0, .2) inset;
+
     }
 
 
@@ -26,7 +28,9 @@
       box-shadow: 0px 5px 0px rgba(50,50,50, .2) inset;
       text-shadow:0px 3px 0px rgba(50,50,50, .6);
     }
-
+    .panel.price>.panel-heading h2{
+      font-weight: bolder;
+    }
     .price .list-group-item{
       border-bottom-:1px solid rgba(250,250,250, .5);
     }
@@ -81,6 +85,26 @@
       font-weight:600;
       text-shadow: 0px 1px 0px rgba(250,250,250, .75);
     }
+    .read, .read-1, .read-2{
+    overflow: hidden;
+    /*font-size: 16px !important;*/
+    transition: all 0.3s;
+     height: 350px;
+     padding-top: 10px;
+
+
+}
+.read-more{
+    height: auto;
+}
+#readMore, #readMore-1, #readMore-2{
+  font-weight: bolder;
+  cursor: pointer;
+  color: #01bacd;
+  font-size: 15px;
+  text-align: center !important;
+  /*margin-bottom: 5px;*/
+}
  </style>
 @stop
 @section('header-js')
@@ -100,120 +124,138 @@
     </div>
   </section>
   <section id="" class="v_container ">
+    @if(count($errors) > 0)
+      <div class="alert alert-danger">
+          <ul>
+              @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+              @endforeach
+          </ul>
+      </div>
+    @endif
+    @if(Session::has('message'))
+      <div class="alert alert-success" id="message">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+          {{ Session::get('message') }}
+      </div>
+    @endif
     <h2 class="v_h2_title text-center">Pricing</h2>
     <hr class="section-dash-dark "/>
     <div class="container">
       <div class="container">
         <div class="row ">
-        <div class="col-md-3 col-sm-6">
-          <div class="panel price panel-blue">
-            <div class="panel-heading arrow_box text-center">
-            <h4>Digital Education platform</h4>
+            <div class="col-md-3 col-sm-6">
+                  <div class="panel price panel-blue">
+                    <div class="panel-heading arrow_box text-center">
+                     <h2>Free</h2>
+                    </div>
+                    <div class="panel-body text-center">
+                      <p class="lead" style="font-size:20px"><strong>Rs. 0000 / year</strong></p>
+                    </div>
+                    <ul class="list-group list-group-flush text-center">
+                      <li class="list-group-item" style="margin-top: 13px;">Online test series</li>
+                      <li class="list-group-item">Online Courses</li>
+                      <li class="list-group-item">Notification</li>
+                      <li class="list-group-item">Admin massage</li>
+                      <li class="list-group-item">Assignment</li>
+                      <li class="list-group-item">Payment Gateway</li>
+                      <li class="list-group-item">Dashboard for students</li>
+                      <li class="list-group-item">Admin panel (ERP)</li>
+                      <li class="list-group-item">Up-to 20 login</li>
+                    </ul>
+                    <div class="panel-footer">
+                      <a class="btn btn-lg btn-block btn-info" href="{{ url('clientsignup')}}/1">Register!</a>
+                    </div>
+                  </div>
             </div>
-            <div class="panel-body text-center">
-              <p class="lead" style="font-size:20px"><strong>Free</strong></p>
+            <div class="col-md-3 col-sm-6">
+                  <div class="panel price panel-blue">
+                    <div class="panel-heading arrow_box text-center">
+                    <h2>Gold</h2>
+                    </div>
+                    <div class="panel-body text-center">
+                      <p class="lead" style="font-size:20px"><strong> Rs. 2999 / year</strong></p>
+                    </div>
+                    <ul class="list-group list-group-flush text-center read">
+                      <li class="list-group-item">Online test series</li>
+                      <li class="list-group-item">Online Courses</li>
+                      <li class="list-group-item">Notification</li>
+                      <li class="list-group-item">Admin massage</li>
+                      <li class="list-group-item">Assignment</li>
+                      <li class="list-group-item">Payment Gateway</li>
+                      <li class="list-group-item">Dashboard for students</li>
+                      <li class="list-group-item">Admin panel (ERP)</li>
+                      <li class="list-group-item">Unlimited users</li>
+                      <li class="list-group-item">Digital Advertisement (1 month)  </li>
+                    </ul>
+                   <p id="readMore">Show More</p>
+                    <div class="panel-footer">
+                      <a class="btn btn-lg btn-block btn-info" href="{{ url('clientsignup')}}/2">BUY NOW!</a>
+                    </div>
+                  </div>
             </div>
-            <ul class="list-group list-group-flush text-center ">
-              <li class="list-group-item">Online test series</li>
-              <li class="list-group-item">Online Courses</li>
-              <li class="list-group-item">Notification</li>
-              <li class="list-group-item">Admin massage</li>
-              <li class="list-group-item">Assignment</li>
-              <li class="list-group-item">Payment Gateway</li>
-              <li class="list-group-item">Dashboard for students</li>
-              <li class="list-group-item">Admin panel (ERP)</li>
-              <li class="list-group-item " style="padding-bottom: 22px;">Up-to 20 login </li>
-            </ul>
-            <div class="panel-footer mrgn_10_top">
-              <a class="btn btn-lg btn-block btn-info" href="#">Free</a>
+            <div class="col-md-3 col-sm-6">
+                  <div class="panel price panel-blue">
+                    <div class="panel-heading arrow_box text-center">
+                    <h2>Platinum</h2>
+                    </div>
+                    <div class="panel-body text-center">
+                      <p class="lead" style="font-size:20px"><strong>Rs. 4999 / year</strong></p>
+                    </div>
+                    <ul class="list-group list-group-flush text-center read-1">
+                      <li class="list-group-item">Online test series</li>
+                      <li class="list-group-item">Online Courses</li>
+                      <li class="list-group-item">Notification</li>
+                      <li class="list-group-item">Admin massage</li>
+                      <li class="list-group-item">Assignment</li>
+                      <li class="list-group-item">Payment Gateway</li>
+                      <li class="list-group-item">Dashboard for students</li>
+                      <li class="list-group-item">Admin panel (ERP)</li>
+                      <li class="list-group-item">Unlimited users</li>
+                      <li class="list-group-item">Digital Advertisement (1 year)</li>
+                      <li class="list-group-item">SEO</li>
+                      <li class="list-group-item">Email marketing</li>
+                    </ul>
+                   <p id="readMore-1" class="text-center"> Show More</p>
+                    <div class="panel-footer">
+                    <a class="btn btn-lg btn-block btn-info" href="{{ url('clientsignup')}}/3">BUY NOW!</a>
+                    </div>
+                  </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-          <div class="panel price panel-blue">
-            <div class="panel-heading arrow_box text-center">
-            <h4>Digital Education platform</h4>
+            <div class="col-md-3 col-sm-6">
+                  <div class="panel price panel-blue">
+                    <div class="panel-heading arrow_box text-center">
+                    <h2>Diamond</h2>
+                    </div>
+                    <div class="panel-body text-center">
+                      <p class="lead" style="font-size:20px"><strong> Rs. 9999 / year</strong></p>
+                    </div>
+                    <ul class="list-group list-group-flush text-center read-2">
+                          <li class="list-group-item">Online test series</li>
+                          <li class="list-group-item">Online Courses</li>
+                          <li class="list-group-item">Notification</li>
+                          <li class="list-group-item">Admin massage</li>
+                          <li class="list-group-item">Assignment</li>
+                          <li class="list-group-item">Payment Gateway</li>
+                          <li class="list-group-item">Dashboard for students</li>
+                          <li class="list-group-item">Admin panel (ERP)</li>
+                          <li class="list-group-item">Unlimited users</li>
+                          <li class="list-group-item">Hosting for one year</li>
+                          <li class="list-group-item">Domain name</li>
+                          <li class="list-group-item">Design websites</li>
+                          <li class="list-group-item">Developed website</li>
+                          <li class="list-group-item">Editing in any page</li>
+                          <li class="list-group-item">Add/remove the page</li>
+                          <li class="list-group-item">Solving any technical issues</li>
+                          <li class="list-group-item">Digital Marketing (one Month)</li>
+                          <li class="list-group-item">SEO     </li>
+                    </ul>
+                   <p id="readMore-2">Show More</p>
+                    <div class="panel-footer">
+                      <a class="btn btn-lg btn-block btn-info" href="{{ url('clientsignup')}}/4">BUY NOW!</a>
+                    </div>
+                  </div>
             </div>
-            <div class="panel-body text-center">
-              <p class="lead" style="font-size:20px"><strong>2999 / Year</strong></p>
-            </div>
-            <ul class="list-group list-group-flush text-center read">
-                  <li class="list-group-item">Online test series</li>
-                  <li class="list-group-item">Online Courses</li>
-                  <li class="list-group-item">Notification</li>
-                  <li class="list-group-item">Admin massage</li>
-                  <li class="list-group-item">Assignment</li>
-                  <li class="list-group-item">Payment Gateway</li>
-                  <li class="list-group-item">Dashboard for students</li>
-                  <li class="list-group-item">Admin panel (ERP)</li>
-                  <li class="list-group-item">Unlimited users</li>
-                  <li class="list-group-item">Digital marketing for month</li>
-            </ul>
-           <p id="readMore">Show More</p>
-            <div class="panel-footer">
-              <a class="btn btn-lg btn-block btn-info" href="#">BUY NOW!</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-          <div class="panel price panel-blue">
-            <div class="panel-heading arrow_box text-center">
-            <h4>Custom Website Development</h4>
-            </div>
-            <div class="panel-body text-center">
-              <p class="lead" style="font-size:20px"><strong>3999 / Year</strong></p>
-            </div>
-            <ul class="list-group list-group-flush text-center read-1">
-                   <li class="list-group-item">Hosting for one year</li>
-                   <li class="list-group-item">Domain name</li>
-                   <li class="list-group-item">Design websites</li>
-                   <li class="list-group-item">Developed website</li>
-                   <li class="list-group-item">Editing in any page</li>
-                   <li class="list-group-item">Add/remove the page</li>
-                   <li class="list-group-item">Solving any technical issues</li>
-                   <li class="list-group-item">Digital Marketing (one Month)</li>
-                   <li class="list-group-item">SEO     </li>
-            </ul>
-           <p id="readMore-1" class="text-center"> Show More</p>
-            <div class="panel-footer">
-              <a class="btn btn-lg btn-block btn-info" href="#">BUY NOW!</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-          <div class="panel price panel-blue">
-            <div class="panel-heading arrow_box text-center">
-            <h4>Digital Education platform and<br/> Website Development</h4>
-            </div>
-            <div class="panel-body text-center">
-              <p class="lead" style="font-size:20px"><strong>5999 / Year</strong></p>
-            </div>
-            <ul class="list-group list-group-flush text-center read-2">
-                  <li class="list-group-item">Online test series</li>
-                  <li class="list-group-item">Online Courses</li>
-                  <li class="list-group-item">Notification</li>
-                  <li class="list-group-item">Admin massage</li>
-                  <li class="list-group-item">Assignment</li>
-                  <li class="list-group-item">Payment Gateway</li>
-                  <li class="list-group-item">Dashboard for students</li>
-                  <li class="list-group-item">Admin panel (ERP)</li>
-                  <li class="list-group-item">Unlimited users</li>
-                  <li class="list-group-item">Hosting for one year</li>
-                  <li class="list-group-item">Domain name</li>
-                  <li class="list-group-item">Design websites</li>
-                  <li class="list-group-item">Developed website</li>
-                  <li class="list-group-item">Editing in any page</li>
-                  <li class="list-group-item">Add/remove the page</li>
-                  <li class="list-group-item">Solving any technical issues</li>
-                  <li class="list-group-item">Digital Marketing (one Month)</li>
-                  <li class="list-group-item">SEO     </li>
-            </ul>
-           <p id="readMore-2">Show More</p>
-            <div class="panel-footer">
-              <a class="btn btn-lg btn-block btn-info" href="#">BUY NOW!</a>
-            </div>
-          </div>
-        </div>
         </div>
       </div>
       <br/>

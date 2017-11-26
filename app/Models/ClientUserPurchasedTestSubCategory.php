@@ -17,7 +17,7 @@ class ClientUserPurchasedTestSubCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'test_category_id', 'test_sub_category_id' ,'client_id'];
+    protected $fillable = ['user_id', 'test_category_id', 'test_sub_category_id' ,'client_id', 'payment_id'];
 
     protected static function getClientUserTestSubCategories($clientId){
     	$testSubCategories = [];

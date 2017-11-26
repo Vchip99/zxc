@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\ResetPasswordMailNotificatipn;
 use App\Libraries\InputSanitise;
+use App\Models\Client;
 use App\Models\CollegeDept;
 use App\Models\College;
 use App\Models\RegisterDocuments;
@@ -342,11 +343,7 @@ class User extends Authenticatable
     }
 
     protected static function getClients(){
-        $ids = static::where('user_type', 1)->get()->pluck('id');
-        if(is_object($ids) && false == $ids->isEmpty()){
-            return \DB::connection('mysql2')->table('clients')->whereIn('user_id', $ids)->get();
-        }
-        return 'false';
+        return Client::all();
     }
 
     protected static function unApproveUsers($collegeId){

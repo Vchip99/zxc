@@ -30,19 +30,28 @@ class NewRegisteration extends Mailable
      */
     public function build()
     {
-        return $this->subject('New Registration ')
-        ->view('emails.newRegistrationToAdmin')
-        ->with([
-                'name' => $this->data['name'],
-                'email' => $this->data['email'],
-                'userType' => $this->data['user_type'],
-                'degree' => $this->data['degree'],
-                'college' => $this->data['college'],
-                'department' => $this->data['department'],
-                'year' => $this->data['year'],
-                'rollNo' => $this->data['roll_no'],
-                'otherSource' => $this->data['other_source'],
-                'subdomain' => $this->data['subdomain'],
-            ]);
+        if(empty($this->data['subdomain'])){
+            return $this->subject('New User Registration ')
+            ->view('emails.newRegistrationToAdmin')
+            ->with([
+                    'name' => $this->data['name'],
+                    'email' => $this->data['email'],
+                    'userType' => $this->data['user_type'],
+                    'degree' => $this->data['degree'],
+                    'college' => $this->data['college'],
+                    'department' => $this->data['department'],
+                    'year' => $this->data['year'],
+                    'rollNo' => $this->data['roll_no'],
+                    'otherSource' => $this->data['other_source'],
+                ]);
+        } else {
+            return $this->subject('New Client Registration ')
+            ->view('emails.newRegistrationToAdmin')
+            ->with([
+                    'name' => $this->data['name'],
+                    'email' => $this->data['email'],
+                    'subdomain' => $this->data['subdomain']
+                ]);
+        }
     }
 }

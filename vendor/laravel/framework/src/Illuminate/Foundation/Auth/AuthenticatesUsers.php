@@ -5,6 +5,8 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ClientUnAuthorisedUser;
 use App\Models\Clientuser;
 use App\Models\Client;
 use App\Models\User;
@@ -74,7 +76,7 @@ trait AuthenticatesUsers
                     return redirect()->back()->withErrors('Given credential doesnot match with subdomain.');
                 }
             } else {
-                if ($this->guard('clientuser')->attempt($credentials, $request->has('remember'))) {
+                if($this->guard('clientuser')->attempt($credentials, $request->has('remember'))) {
                     $clientUser = Auth::guard('clientuser')->user();
                     if(0 == $clientUser->verified || 0 == $clientUser->client_approve){
                         $this->guard('clientuser')->logout();
@@ -84,6 +86,26 @@ trait AuthenticatesUsers
                             $this->incrementLoginAttempts($request);
                         }
                         return $this->sendFailedLoginResponse($request, 'true');
+                    } else {
+                        // if free plan and user is not in first 20 user then dont allow to login
+                        if(1 == $clientUser->client->plan_id){
+                            if( 'false' == $clientUser::isInBetweenFirstTwenty()){
+                                $data['name'] = $clientUser->name;
+                                $data['email'] = $clientUser->email;
+                                $data['client'] = $clientUser->client->name;
+
+                                // send mail to client
+                                Mail::to($clientUser->client->email)->send(new ClientUnAuthorisedUser($data));
+
+                                $this->guard('clientuser')->logout();
+                                Session::flush();
+                                Session::regenerate();
+                                if (! $lockedOut) {
+                                    $this->incrementLoginAttempts($request);
+                                }
+                                return redirect()->back()->withErrors(['Try after some time.']);
+                            }
+                        }
                     }
                     return $this->sendLoginResponse($request);
                 } else {
@@ -145,7 +167,6 @@ trait AuthenticatesUsers
                 return [
                         'email' => $request->email,
                         'password' => $request->password,
-                        'verified' => 1,
                         'admin_approve' => 1,
                         'subdomain' => (string) $request->getHost(),
                     ];

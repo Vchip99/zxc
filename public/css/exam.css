@@ -96,9 +96,9 @@ button .fa{
   transition: all 40ms linear;
   margin-top:10px;
   margin-bottom:10px;
-  margin-left:2px;
+  margin-left:0px;
   margin-right:2px;
-  min-width: 130px;
+  min-width:168px;
 }
 .data-sm .btn3d span{ color: #fff; margin-right: 10px; }
 .data-sm .btn3d:active:focus,

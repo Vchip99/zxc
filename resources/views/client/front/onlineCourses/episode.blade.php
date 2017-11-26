@@ -100,6 +100,7 @@ hr{
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
   </style>
 @stop
 @section('header-js')
@@ -174,21 +175,24 @@ hr{
           <div class="comment-meta">
             <span id="like_{{$video->id}}"  class="first-like">
               @if( isset($likesCount[$video->id]) && isset($likesCount[$video->id]['user_id'][$currentUser]))
-                   <i id="video_like_{{$video->id}}" data-video_id="{{$video->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>
-                   <span id="like1-bs3">{{count($likesCount[$video->id]['like_id'])}}</span>
+                 <i id="video_like_{{$video->id}}" data-video_id="{{$video->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>
+                 <span id="like1-bs3">{{count($likesCount[$video->id]['like_id'])}}</span>
               @else
-                   <i id="video_like_{{$video->id}}" data-video_id="{{$video->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>
-                   <span id="like1-bs3">@if( isset($likesCount[$video->id])) {{count($likesCount[$video->id]['like_id'])}} @endif</span>
+                 <i id="video_like_{{$video->id}}" data-video_id="{{$video->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>
+                 <span id="like1-bs3">@if( isset($likesCount[$video->id])) {{count($likesCount[$video->id]['like_id'])}} @endif</span>
               @endif
             </span>
             <span class="mrgn_5_left">
               <i class="fa fa-comment-o" aria-hidden="true"></i>
-              <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+              @if(is_object(Auth::guard('clientuser')->user()))
+                <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+              @else
+                <a class="your-cmt" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">Comment</a>
+              @endif
             </span>
             <hr/>
             <div class="collapse replyComment" id="replyToEpisode{{$video->id}}">
                 <div class="form-group">
-                  <!-- <label for="comment">Your Comment</label> -->
                   <textarea name="comment" id="comment" placeholder="Comment here.." class="form-control"></textarea>
                   <script type="text/javascript">
                     CKEDITOR.replace( 'comment');
@@ -285,8 +289,12 @@ hr{
                                      <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
                                 @endif
                               </span>
-                             <span class="mrgn_5_left">
-                              <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                            <span class="mrgn_5_left">
+                              @if(is_object(Auth::guard('clientuser')->user()))
+                                <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                              @else
+                                <a class="" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
+                              @endif
                             </span>
                             <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                             <div class="collapse replyComment" id="replyToComment{{$comment->id}}">
@@ -568,7 +576,6 @@ hr{
     .done(function( msg ) {
       renderComments(msg, userId);
     });
-
   }
 
   function updateCourseSubComment(ele){
@@ -604,23 +611,7 @@ hr{
           renderComments(msg, userId);
         });
     } else if( isNaN(userId)) {
-      $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+      $('#loginUserModel').modal();
     }
   }
   function confirmSubmit(ele){
@@ -639,23 +630,7 @@ hr{
             renderComments(msg, userId);
           });
     } else if( isNaN(userId)) {
-      $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -677,23 +652,7 @@ hr{
         });
 
     } else if( isNaN(userId)) {
-      $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -806,23 +765,7 @@ hr{
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
          if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -851,23 +794,7 @@ hr{
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
          if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -896,24 +823,8 @@ hr{
         var subCommentId = $(this).data('sub_comment_id');
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+        if( isNaN(userId)) {
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -936,7 +847,8 @@ hr{
         }
     });
   });
-function showMore(){
+
+  function showMore(){
      var showChar = 400;
       var ellipsestext = "...";
       var moretext = "Read more";
@@ -966,5 +878,6 @@ function showMore(){
         return false;
       });
   }
+
 </script>
 @stop

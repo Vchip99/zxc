@@ -11,6 +11,7 @@ use App\Models\SubscriedUser;
 use App\Models\User;
 use App\Models\Client;
 use App\Models\Clientuser;
+use App\Models\ClientPlan;
 use App\Mail\MailToSubscribedUser;
 use Auth,Hash,Session,Redirect,Validator,DB;
 use App\Libraries\InputSanitise;
@@ -59,9 +60,6 @@ class AdminController extends Controller
 
     protected function manageClients(){
         $clients = User::getClients();
-        if('false' == $clients){
-            $clients = [];
-        }
         return view('admin.clients', compact('clients'));
     }
 
@@ -71,16 +69,13 @@ class AdminController extends Controller
         {
             $client = Client::changeClientPermissionStatus($request);
             if(is_object($client)){
-                DB::connection('mysql')->commit();
                 DB::connection('mysql2')->commit();
             } else {
-                DB::connection('mysql')->rollback();
                 DB::connection('mysql2')->rollback();
             }
         }
         catch(\Exception $e)
         {
-            DB::connection('mysql')->rollback();
             DB::connection('mysql2')->rollback();
             return redirect()->back();
         }
@@ -89,40 +84,45 @@ class AdminController extends Controller
     }
 
     protected function deleteClient(Request $request){
-        DB::connection('mysql')->beginTransaction();
+        DB::connection('mysql2')->beginTransaction();
         try
         {
-            DB::connection('mysql2')->beginTransaction();
-            try
-            {
-                $client = Client::find($request->client_id);
-                if(is_object($client)){
-                    Clientuser::deleteAllClientUsersInfoByClientId($client->id);
-                    $client->deleteOtherInfoByClient($client);
-                    $client->delete();
-                    DB::connection('mysql2')->commit();
-                }
-            }
-            catch(\Exception $e)
-            {
-                DB::connection('mysql2')->rollback();
-                return redirect()->back();
-            }
-
-            $user = User::find($request->user_id);
-            if(is_object($user)){
-                $user->deleteOtherInfoByUserId($user->id);
-                $user->delete();
-                DB::connection('mysql')->commit();
+            $client = Client::find($request->client_id);
+            if(is_object($client)){
+                Clientuser::deleteAllClientUsersInfoByClientId($client->id);
+                $client->deleteOtherInfoByClient($client);
+                $client->delete();
+                DB::connection('mysql2')->commit();
                 return Redirect::to('admin/manageClients')->with('message', 'Client deleted successfully');
             }
         }
         catch(\Exception $e)
         {
-            DB::connection('mysql')->rollback();
             DB::connection('mysql2')->rollback();
             return redirect()->back();
         }
     }
 
+    protected function manageClientHistory(){
+        $clients = User::getClients();
+        return view('admin.clientHistory', compact('clients'));
+    }
+
+    protected function getClientHistory(Request $request){
+        $result = [];
+        $clientPlans = ClientPlan::where('client_id', $request->client_id)->get();
+        if(is_object($clientPlans) && false == $clientPlans->isEmpty()){
+            foreach($clientPlans as $clientPlan){
+                $result[]= [
+                                'start_date' => $clientPlan ->start_date,
+                                'plan' => $clientPlan->plan->name,
+                                'end_date' => $clientPlan->end_date,
+                                'final_amount' => $clientPlan->final_amount,
+                                'payment_status' => $clientPlan->payment_status,
+                                'plan_id' => $clientPlan->plan_id,
+                            ];
+            }
+        }
+        return $result;
+    }
 }

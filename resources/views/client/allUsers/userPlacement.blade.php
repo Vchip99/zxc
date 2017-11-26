@@ -103,6 +103,7 @@
   </div>
 <script type="text/javascript">
 
+
   function showResult(ele){
     var student = parseInt(document.getElementById('selected_student').value);
     $.ajax({
@@ -160,5 +161,8 @@
       iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
     }
   }
+  $('#student_video').on('hide.bs.modal', function (e) {
+    toggleVideo('hide')
+  })
 </script>
 @stop

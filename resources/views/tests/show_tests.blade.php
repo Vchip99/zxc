@@ -123,11 +123,10 @@
 					            <table class="table data-lg">
 					              	<thead>
 					                	<tr>
-						                  	<th>Test Number</th>
+						                  	<th>Test Name</th>
 						                  	<th>Start test</th>
 						                  	<th>Result</th>
 						                  	<th>Date to Active</th>
-						                  	<th>Date to InActive</th>
 						                  	<th>Price</th>
 						                  	<th>Add to cart</th>
 					                	</tr>
@@ -144,7 +143,7 @@
 							                    	@if($currentDate < $testSubjectPaper->date_to_active)
 							                    		<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
 							                    	@elseif(!is_object(Auth::user()))
-							                    		<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Please login to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
+							                    		<td id="startTest_{{$testSubjectPaper->id}}"><button data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
 							                    	@else
 							                    		@if(in_array($testSubjectPaper->id, $registeredPaperIds))
 							                    			@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
@@ -163,7 +162,7 @@
 								                    	@if($currentDate < $testSubjectPaper->date_to_active)
 								                    		<button disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
 								                    	@elseif(!is_object(Auth::user()))
-								                    		<button disabled="true" data-toggle="tooltip" title="Please login to see result.""><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+								                    		<button data-toggle="tooltip" title="Please login to see result." onClick="checkLogin();"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
 								                    	@elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 								                    		<form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}">
 								                    			{{ csrf_field() }}
@@ -178,7 +177,6 @@
 									                    @endif
 								                    </td>
 								                    <td class=" ">{{ $testSubjectPaper->date_to_active }}</td>
-								                    <td class=" ">{{ $testSubjectPaper->date_to_inactive }}</td>
 								                    <td class=""><i class="fa fa-inr"></i>{{ $testSubjectPaper->price }}</td>
 								                    @if($currentDate < $testSubjectPaper->date_to_active)
 								                    	<td><button disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled on date to active"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
@@ -209,7 +207,7 @@
 								                           		@if($currentDate < $testSubjectPaper->date_to_active)
 										                    		<li id="startTest_mobile_{{$testSubjectPaper->id}}" ><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
 										                    	@elseif(!is_object(Auth::user()))
-										                    		<li id="startTest_mobile_{{$testSubjectPaper->id}}" ><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please login to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
+										                    		<li id="startTest_mobile_{{$testSubjectPaper->id}}" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
 										                    	@else
 										                    		@if(in_array($testSubjectPaper->id, $registeredPaperIds))
 										                    			@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
@@ -227,7 +225,7 @@
 									                           		@if($currentDate < $testSubjectPaper->date_to_active)
 											                    		<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
 											                    	@elseif(!is_object(Auth::user()))
-											                    		<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please login to see result.""><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
+											                    		<button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to see result." onClick="checkLogin();"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
 											                    	@elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 											                    		<form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}">
 											                    			{{ csrf_field() }}
@@ -243,9 +241,6 @@
 									                           	</li>
 									                           	<li>
 									                           		<button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span> {{ $testSubjectPaper->date_to_active }}</button>
-									                           	</li>
-									                           	<li>
-									                           		<button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span> {{ $testSubjectPaper->date_to_inactive }}</button>
 									                           	</li>
 									                           	<li>
 									                           		<button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span> {{ $testSubjectPaper->price }} </button>
@@ -283,6 +278,10 @@
 @section('footer')
 	@include('footer.footer')
 	<script>
+	function checkLogin(){
+	    $('#loginUserModel').modal();
+	    return false;
+	}
 
 	function startTest(ele){
 		var paper = parseInt($(ele).data('paper'));
@@ -302,23 +301,7 @@
 	        	}
 	        });
 		} else {
-			$.confirm({
-	          title: 'Confirmation',
-	          content: 'Please login first to start test. Click "Ok" button to login.',
-	          type: 'red',
-	          typeAnimated: true,
-	          buttons: {
-	                Ok: {
-	                    text: 'Ok',
-	                    btnClass: 'btn-red',
-	                    action: function(){
-	                      window.location="{{url('/home')}}";
-	                    }
-	                },
-	                Cancle: function () {
-	                }
-	            }
-	          });
+			$('#loginUserModel').modal();
 		}
 	}
 	function checkIsTestGiven(paper,subject,category,subcategory,userId){
@@ -438,7 +421,6 @@
 				                trInnerhtml += '<th>Start Test</th>';
 				                trInnerhtml += '<th>Result</th>';
 				                trInnerhtml += '<th>Date to Active</th>';
-				                trInnerhtml += '<th>Date to Inactive</th>';
 				                trInnerhtml += '<th>Price</th>';
 				                trInnerhtml += '<th>Add to Cart</th>';
 				                tableTr.innerHTML = trInnerhtml;
@@ -455,7 +437,7 @@
 		                			if(msg['currentDate'] < obj.date_to_active){
 		                				divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 		                			} else if(true == isNaN(userId)) {
-		                				divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true" data-toggle="tooltip" title="Please login to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+		                				divInnerHtml += '<td id="startTest_'+obj.id+'"><button data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 		                			} else {
 		                				if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
 		                					if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
@@ -475,7 +457,7 @@
 									    divInnerHtml += '</td>';
 									} else if(true == isNaN(userId)) {
 		                				divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
-									    divInnerHtml += '<button disabled="true" data-toggle="tooltip" title="Please login to see result."><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+									    divInnerHtml += '<button data-toggle="tooltip" title="Please login to see result." onClick="checkLogin();"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
 									    divInnerHtml += '</td>';
 		                			} else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
 								    	var testUrl = "{{ url('showUserTestResult') }}";
@@ -493,7 +475,6 @@
 									}
 
 								    divInnerHtml += '<td class=" ">'+ obj.date_to_active +'</td>';
-								    divInnerHtml += '<td class=" ">'+ obj.date_to_inactive +'</td>';
 								    divInnerHtml += '<td class=""><i class="fa fa-inr"></i>'+ obj.price +'</td>';
 
 								    if(msg['currentDate'] < obj.date_to_active){
@@ -551,7 +532,7 @@
 		                			if(msg['currentDate'] < obj.date_to_active){
 		                				ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 		                			} else if(true == isNaN(userId)) {
-		                				ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please login to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+		                				ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 		                			} else {
 		                				if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
 		                					if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
@@ -571,7 +552,7 @@
 									    ulDivInnerHtml += '</li>';
 									} else if(true == isNaN(userId)) {
 		                				ulDivInnerHtml += '<li id="showUserResultMobileBtn_'+obj.id+'">';
-									    ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please login to see result."><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
+									    ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to see result." onClick="checkLogin();"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
 									    ulDivInnerHtml += '</li>';
 		                			} else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
 								    	var testUrl = "{{ url('showUserTestResult') }}";
@@ -588,7 +569,7 @@
 									    ulDivInnerHtml += '</li>';
 									}
 
-								    ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li><li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_inactive +'</button></li>';
+								    ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li>';
 								    ulDivInnerHtml += '<li class=""><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.price +'</button></li>';
 
 								    if(msg['currentDate'] < obj.date_to_active){
@@ -698,10 +679,7 @@
 		var subcategory = parseInt($(ele).data('subcategory'));
 		var userId = parseInt(document.getElementById('user_id').value);
 	    if( true == isNaN(userId)){
-	      $.alert({
-	          title: 'Alert!',
-	          content: 'Please login first and then add test.',
-	        });
+	    	$('#loginUserModel').modal();
 	    } else if(paper > 0 && subject > 0 && category > 0 && subcategory > 0) {
 	    	$.confirm({
 		    title: 'Confirmation',

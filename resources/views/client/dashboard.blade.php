@@ -62,11 +62,11 @@
     <section class="sidebar">
       <div class="user-panel">
         <div class="pull-left image">
-          <a href="">
+          <a href="{{ url('myprofile') }}">
           @if(!empty(Auth::guard('client')->user()->photo))
-            <img src="{{ asset(Auth::user()->photo)}} " class="img-circle" alt="User Image">
+            <img src="{{ asset(Auth::guard('client')->user()->photo)}} " class="img-circle" alt="User Image">
           @else
-            <img src="{{ url('images/user/user.png')}}" class="img-circle" alt="User Image">
+            <img src="{{ asset('images/user/user.png')}}" class="img-circle" alt="User Image">
           @endif
           </a>
         </div>
@@ -103,7 +103,7 @@
                   </span></a>
                 </li>
                 @endif
-              @if(1 == $subdomain->course_show_hide && 1 == $client->course_permission)
+              @if(1 == $subdomain->course_show_hide)
                <li><a href="#courses1" title="Online Courses"><i class="fa fa-circle-o"></i> Online Courses
                   <span class="pull-right-container">
                    <span class="label label-primary pull-right" data-toggle="tooltip"  title="Remove">
@@ -112,7 +112,7 @@
                   </span></a>
                 </li>
               @endif
-              @if(1 == $subdomain->test_show_hide && 1 == $client->test_permission)
+              @if(1 == $subdomain->test_show_hide)
                <li><a href="#test1" title="Online Test-series"><i class="fa fa-circle-o"></i> Online Test-series
                  <span class="pull-right-container">
                      <span class="label label-primary pull-right" data-toggle="tooltip" title="Remove">
@@ -169,7 +169,7 @@
                   </span></a>
                 </li>
                 @endif
-                @if(0 == $subdomain->course_show_hide && 1 == $client->course_permission)
+                @if(0 == $subdomain->course_show_hide)
                 <li><a href="#courses" title="Online Courses"><i class="fa fa-circle-o"></i> Online Courses
                   <span class="pull-right-container">
                    <span class="label label-primary pull-right" data-toggle="tooltip"  title="Add">
@@ -178,7 +178,7 @@
                   </span></a>
                 </li>
                 @endif
-                @if(0 == $subdomain->test_show_hide && 1 == $client->test_permission)
+                @if(0 == $subdomain->test_show_hide)
                 <li><a href="#test" title="Online Test-series"><i class="fa fa-circle-o"></i> Online Test-series
                  <span class="pull-right-container">
                      <span class="label label-primary pull-right" data-toggle="tooltip" title="Add">
@@ -229,7 +229,7 @@
             <li title="Manage Courses"><a href="{{ url('manageInstituteCourses')}}"><i class="fa fa-circle-o"></i> Manage Courses </a></li>
           </ul>
         </li> -->
-        @if(1 == $client->course_permission)
+
         <li class="treeview ">
           <a href="#" title="Online Courses">
             <i class="fa fa-dashboard"></i> <span>Online Courses</span>
@@ -244,8 +244,6 @@
               <li title="Manage Video"><a href="{{ url('manageOnlineVideo')}}"><i class="fa fa-circle-o"></i> Manage Video </a></li>
           </ul>
         </li>
-        @endif
-        @if(1 == $client->test_permission)
         <li class="treeview">
           <a href="#" title="Online Test">
             <i class="fa fa-files-o"></i>
@@ -263,7 +261,6 @@
               <li title="Upload Excel File"><a href="{{ url('manageUploadQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
           </ul>
         </li>
-        @endif
         <li class="treeview">
             <a href="#" title="Users Info">
               <i class="fa fa-group"></i> <span>Users Info</span>
@@ -304,7 +301,20 @@
               <li title="Students Assignment"><a href="{{ url('studentsAssignment')}}"><i class="fa fa-circle-o"></i>Students Assignment</a></li>
             </ul>
           </li>
-        <!-- <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li> -->
+        <li class="treeview">
+            <a href="#" title="Plans & Billing">
+              <i class="fa fa-inr"></i> <span>Plans & Billing</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Plans"><a href="{{ url('managePlans')}}"><i class="fa fa-circle-o"></i> Plans </a></li>
+              <li title="Billing"><a href="{{ url('manageBillings')}}"><i class="fa fa-circle-o"></i> Billing </a></li>
+              <li title="History"><a href="{{ url('manageHistory')}}"><i class="fa fa-circle-o"></i> History </a></li>
+              <li title="Bank Details"><a href="{{ url('manageBankDetails')}}"><i class="fa fa-circle-o"></i> Bank Details </a></li>
+            </ul>
+          </li>
         <li class="header">LABELS</li>
         <li title="Logout">
           <a href="{{ url('client/logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

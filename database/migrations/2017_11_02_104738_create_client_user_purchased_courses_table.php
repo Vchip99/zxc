@@ -18,6 +18,7 @@ class CreateClientUserPurchasedCoursesTable extends Migration
             $table->integer('user_id');
             $table->integer('course_id');
             $table->integer('client_id');
+            $table->string('payment_id');
         });
     }
 

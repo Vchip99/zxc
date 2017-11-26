@@ -22,15 +22,24 @@ use App\Models\ClientUserPurchasedTestSubCategory;
 class ClientOnlineTestFrontController extends ClientHomeController
 {
 	protected function tests(Request $request){
+		$purchasedSubCategories = [] ;
 		$subdomain = InputSanitise::checkDomain($request);
 		if(!is_object($subdomain)){
-			return Redirect::away('http://localvchip.com');
+			if('local' == \Config::get('app.env')){
+                return Redirect::away('http://localvchip.com');
+            } else {
+                return Redirect::away('https://vchipedu.com/');
+            }
 		}
 		view::share('subdomain', $subdomain);
 
         $testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
         $testSubCategories = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
-		return view('client.front.onlineTests.tests', compact('testCategories', 'testSubCategories'));
+
+        if(is_object(Auth::guard('clientuser')->user())){
+        	$purchasedSubCategories = ClientUserPurchasedTestSubCategory::getUserPurchasedTestSubCategories(Auth::guard('clientuser')->user()->client_id, Auth::guard('clientuser')->user()->id);
+        }
+		return view('client.front.onlineTests.tests', compact('testCategories', 'testSubCategories', 'purchasedSubCategories'));
 	}
 
     /**
@@ -53,6 +62,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 		if(isset($subcatId)){
 			$subcategory = ClientOnlineTestSubCategory::find($subcatId);
 			if(is_object($subcategory)){
+				$price = $subcategory->price;
 				$catId = $subcategory->category_id;
 				$testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($catId, $request);
@@ -68,18 +78,11 @@ class ClientOnlineTestFrontController extends ClientHomeController
 				}
 				$registeredPaperIds = $this->getRegisteredPaperIds();
 				$alreadyGivenPapers = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
-				$currentDate = date('Y-m-d');
+				$currentDate = date('Y-m-d H:i:s');
 				if(is_object(Auth::guard('clientuser')->user())){
-					// $assignedTestSubjectPapers= ClientOnlineTestSubjectPaper::getClientOnlineTestSubjectPapersByClient();
-			  //       if(is_object($assignedTestSubjectPapers) && false == $assignedTestSubjectPapers->isEmpty()){
-			  //           foreach($assignedTestSubjectPapers as $assignedTestSubjectPaper){
-			  //               $assignedTestSubjectPapersIds[] = $assignedTestSubjectPaper->id;
-			  //           }
-			  //       }
 			        $clientId = Auth::guard('clientuser')->user()->client_id;
 			        $userId = Auth::guard('clientuser')->user()->id;
 			        $isTestSubCategoryPurchased = ClientUserPurchasedTestSubCategory::isTestSubCategoryPurchased($clientId, $userId, $subcategory->id);
-			        // dd($isTestSubCategoryPurchased);
                     $currentUser = Auth::guard('clientuser')->user()->id;
                     if($subject > 0 && $paper > 0){
                         DB::connection('mysql2')->beginTransaction();
@@ -97,7 +100,8 @@ class ClientOnlineTestFrontController extends ClientHomeController
                         }
                     }
                 }
-				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper'));
+
+				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper', 'price'));
 			}
 		}
 		return Redirect::to('/');
@@ -105,15 +109,18 @@ class ClientOnlineTestFrontController extends ClientHomeController
 
 	protected function getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds){
 		return ClientScore::getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
-
 	}
 
 	protected function getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion(Request $request){
 		if($request->ajax()){
 			$result = [];
             $id = InputSanitise::inputInt($request->get('id'));
-            $testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($id, $request);
-        	$result['sub_categories'] = $testSubCategories;
+            $result['sub_categories'] = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($id, $request);
+            if(is_object(Auth::guard('clientuser')->user())){
+	        	$result['purchasedSubCategories'] = ClientUserPurchasedTestSubCategory::getUserPurchasedTestSubCategories(Auth::guard('clientuser')->user()->client_id, Auth::guard('clientuser')->user()->id);
+	        } else {
+	        	$result['purchasedSubCategories'] = [];
+	        }
         	return $result;
         }
 	}
@@ -130,14 +137,6 @@ class ClientOnlineTestFrontController extends ClientHomeController
 
 			$result['registeredPaperIds'] = $this->getRegisteredPaperIds();
 			if(is_object(Auth::guard('clientuser')->user())){
-				// $assignedTestSubjectPapers= ClientOnlineTestSubjectPaper::getClientOnlineTestSubjectPapersByClient();
-		  //       if(is_object($assignedTestSubjectPapers) && false == $assignedTestSubjectPapers->isEmpty()){
-		  //           foreach($assignedTestSubjectPapers as $assignedTestSubjectPaper){
-		  //               $assignedTestSubjectPapersIds[] = $assignedTestSubjectPaper->id;
-		  //           }
-		  //       }
-		  //       $result['assignedTestSubjectPapersIds'] = $assignedTestSubjectPapersIds;
-
 		        $clientId = Auth::guard('clientuser')->user()->client_id;
 		        $userId = Auth::guard('clientuser')->user()->id;
 		       	$result['isTestSubCategoryPurchased'] = ClientUserPurchasedTestSubCategory::isTestSubCategoryPurchased($clientId, $userId, $subcatId);
@@ -152,7 +151,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 				}
 
 				$result['alreadyGivenPapers'] = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
-				$result['currentDate'] = date('Y-m-d');
+				$result['currentDate'] = date('Y-m-d H:i:s');
 			}
 			return $result;
 		}
@@ -178,7 +177,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 			}
 
 			$result['alreadyGivenPapers'] = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
-			$result['currentDate'] = date('Y-m-d');
+			$result['currentDate'] = date('Y-m-d H:i:s');
 
 			return $result;
 		}

@@ -12,7 +12,7 @@
 @section('content')
 &nbsp;&nbsp;&nbsp;&nbsp;
 <div class="container">
-    <div class="row">
+    <div class="row" style="margin-top: 100px;">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
                 <div class="panel-heading">Reset Password</div>
@@ -23,13 +23,12 @@
                             {{ session('status') }}
                         </div>
                     @endif
-
                     <form class="form-horizontal" role="form" method="POST" action="{{ url('/password/reset') }}">
                         {{ csrf_field() }}
 
                         <input type="hidden" name="token" value="{{ $token }}">
 
-                        <!-- <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+                        <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
                             <label for="email" class="col-md-4 control-label">E-Mail Address</label>
 
                             <div class="col-md-6">
@@ -41,7 +40,7 @@
                                     </span>
                                 @endif
                             </div>
-                        </div> -->
+                        </div>
 
                         <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                             <label for="password" class="col-md-4 control-label">Password</label>

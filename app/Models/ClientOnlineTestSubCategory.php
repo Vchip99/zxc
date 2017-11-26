@@ -20,7 +20,7 @@ class ClientOnlineTestSubCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id','client_id'];
+    protected $fillable = ['name', 'category_id','client_id', 'image_path', 'price'];
 
     /**
      *  add/update sub category
@@ -29,6 +29,7 @@ class ClientOnlineTestSubCategory extends Model
         $subcatId = InputSanitise::inputInt($request->get('subcat_id'));
         $catId = InputSanitise::inputInt($request->get('category'));
         $name = InputSanitise::inputString($request->get('name'));
+        $price = InputSanitise::inputString($request->get('price'));
 
         if( $isUpdate && isset($subcatId)){
             $testSubcategory = static::find($subcatId);
@@ -41,6 +42,7 @@ class ClientOnlineTestSubCategory extends Model
         $testSubcategory->name = $name;
         $testSubcategory->category_id = $catId;
         $testSubcategory->client_id = Auth::guard('client')->user()->id;
+        $testSubcategory->price = $price;
 
         $subdomainArr = explode('.', Auth::guard('client')->user()->subdomain);
         $clientName = $subdomainArr[0];
@@ -100,12 +102,24 @@ class ClientOnlineTestSubCategory extends Model
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }
-
         $result = DB::connection('mysql2')->table('client_online_test_sub_categories')
-                ->join('client_online_test_questions', 'client_online_test_questions.subcat_id', '=', 'client_online_test_sub_categories.id')
+                ->join('client_online_test_subjects', function($join){
+                    $join->on('client_online_test_subjects.sub_category_id', '=', 'client_online_test_sub_categories.id');
+                })
+                ->join('client_online_test_subject_papers', function($join){
+                    $join->on('client_online_test_subject_papers.sub_category_id', '=', 'client_online_test_sub_categories.id');
+                    $join->on('client_online_test_subject_papers.subject_id', '=', 'client_online_test_subjects.id');
+                })
+                ->join('client_online_test_questions', function($join){
+                    $join->on('client_online_test_questions.subcat_id', '=', 'client_online_test_sub_categories.id');
+                    $join->on('client_online_test_questions.subject_id', '=', 'client_online_test_subjects.id');
+                    $join->on('client_online_test_questions.paper_id', '=', 'client_online_test_subject_papers.id');
+                })
                 ->join('clients', function($join){
                     $join->on('clients.id', '=', 'client_online_test_questions.client_id');
                     $join->on('clients.id', '=', 'client_online_test_sub_categories.client_id');
+                    $join->on('clients.id', '=', 'client_online_test_subject_papers.client_id');
+                    $join->on('clients.id', '=', 'client_online_test_subjects.client_id');
                 });
 
         if(!empty($clientId)){
@@ -114,8 +128,8 @@ class ClientOnlineTestSubCategory extends Model
             $result->where('clients.subdomain', $client);
         }
 
-        return  $result->where('client_online_test_sub_categories.category_id', $id)->select('client_online_test_sub_categories.*')
-                ->groupBy('client_online_test_sub_categories.category_id')->get();
+        return  $result->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))->where('client_online_test_sub_categories.category_id', $id)->select('client_online_test_sub_categories.*')
+                ->groupBy('client_online_test_sub_categories.id')->get();
     }
 
 
@@ -143,11 +157,23 @@ class ClientOnlineTestSubCategory extends Model
         }
 
         $result = DB::connection('mysql2')->table('client_online_test_sub_categories')
-                ->join('client_online_test_questions', 'client_online_test_questions.subcat_id', '=', 'client_online_test_sub_categories.id')
-                ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.sub_category_id', '=', 'client_online_test_sub_categories.id')
+                ->join('client_online_test_subjects', function($join){
+                    $join->on('client_online_test_subjects.sub_category_id', '=', 'client_online_test_sub_categories.id');
+                })
+                ->join('client_online_test_subject_papers', function($join){
+                    $join->on('client_online_test_subject_papers.sub_category_id', '=', 'client_online_test_sub_categories.id');
+                    $join->on('client_online_test_subject_papers.subject_id', '=', 'client_online_test_subjects.id');
+                })
+                ->join('client_online_test_questions', function($join){
+                    $join->on('client_online_test_questions.subcat_id', '=', 'client_online_test_sub_categories.id');
+                    $join->on('client_online_test_questions.subject_id', '=', 'client_online_test_subjects.id');
+                    $join->on('client_online_test_questions.paper_id', '=', 'client_online_test_subject_papers.id');
+                })
                 ->join('clients', function($join){
                     $join->on('clients.id', '=', 'client_online_test_questions.client_id');
                     $join->on('clients.id', '=', 'client_online_test_sub_categories.client_id');
+                    $join->on('clients.id', '=', 'client_online_test_subject_papers.client_id');
+                    $join->on('clients.id', '=', 'client_online_test_subjects.client_id');
                 });
 
         if(!empty($clientId)){
@@ -155,8 +181,8 @@ class ClientOnlineTestSubCategory extends Model
         } else {
             $result->where('clients.subdomain', $client);
         }
-        return  $result->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d'))
-                ->select('client_online_test_sub_categories.*')->groupBy('client_online_test_sub_categories.category_id')
+        return  $result->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))
+                ->select('client_online_test_sub_categories.*')->groupBy('client_online_test_sub_categories.id')
                 ->get();
     }
 

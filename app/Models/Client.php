@@ -26,6 +26,8 @@ use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineVideo;
 use App\Models\ClientOnlineVideoLike;
+use App\Models\Clientuser;
+use Auth;
 
 class Client extends Authenticatable
 {
@@ -38,7 +40,7 @@ class Client extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'user_id','email', 'password','phone', 'subdomain', 'verified', 'admin_approve', 'test_permission', 'course_permission','email_token', 'remember_token'
+        'name', 'email', 'password','phone', 'subdomain', 'admin_approve','remember_token', 'photo', 'plan_id'
     ];
 
     /**
@@ -70,54 +72,14 @@ class Client extends Authenticatable
         return;
     }
 
-    protected static function changeClientPermissionStatus(Request $request){
-        $userId = InputSanitise::inputInt($request->user_id);
-        $clientId = InputSanitise::inputInt($request->client_id);
-        $permissionType = InputSanitise::inputString($request->permission_type);
-
-        $client = static::where('id', $clientId)->where('user_id', $userId)->first();
-        if(is_object($client)){
-            if('test' == $permissionType){
-                if(1 == $client->test_permission){
-                    $client->test_permission = 0;
-                } else {
-                    $client->test_permission = 1;
-                }
-            } else if('course' == $permissionType){
-                if(1 == $client->course_permission){
-                    $client->course_permission = 0;
-                } else {
-                    $client->course_permission = 1;
-                }
-            } else if('admin_approve' == $permissionType){
-                if(1 == $client->admin_approve){
-                    $client->admin_approve = 0;
-                } else if(0 == $client->admin_approve) {
-                    $client->admin_approve = 1;
-                }
-                \DB::connection('mysql')->beginTransaction();
-                try
-                {
-                    $user = User::find($userId);
-                    if(is_object($user) && 1 == $user->admin_approve){
-                        $user->admin_approve   = 0;
-                        $user->save();
-                    } else if(is_object($user) && 0 == $user->admin_approve) {
-                        $user->admin_approve   = 1;
-                        $user->save();
-                    }
-                }
-                catch(\Exception $e)
-                {
-                    \DB::connection('mysql')->rollback();
-                    return redirect()->back();
-                }
-            }
-            $client->save();
-            return $client;
-        }
-        return 'false';
+    public function userCount(){
+        return Clientuser::where('client_id', Auth::guard('client')->user()->id)->count();
     }
+
+    public function userCountByClientId($clientId){
+        return Clientuser::where('client_id', $clientId)->count();
+    }
+
 
     public function deleteOtherInfoByClient($client){
         $subdomain = explode('.', $client->subdomain);
@@ -168,5 +130,68 @@ class Client extends Authenticatable
         ClientOnlineVideo::deleteClientOnlineVideosByClientId($client->id);
         ClientOnlineVideoLike::deleteClientOnlineVideoLikesByClientId($client->id);
         return;
+    }
+
+    protected static function changeClientPermissionStatus(Request $request){
+        $clientId = InputSanitise::inputInt($request->client_id);
+        $permissionType = $request->permission_type;
+        $client = static::find($clientId);
+        if(is_object($client)){
+            if('admin_approve' == $permissionType){
+                if(1 == $client->admin_approve){
+                    $client->admin_approve = 0;
+                } else if(0 == $client->admin_approve) {
+                    $client->admin_approve = 1;
+                }
+            }
+            $client->save();
+            return $client;
+        }
+        return 'false';
+    }
+
+    protected static function updateClientProfile(Request $request){
+        $dbUserImagePath = '';
+        $email = $request->get('email');
+        $phone = $request->get('phone');
+
+        $client = static::find(Auth::guard('client')->user()->id);
+        if(is_object($client)){
+            $client->email = $email;
+            $client->phone = $phone;
+            $userStoragePath = "client_images/".str_replace(' ', '_', $client->name)."/client";
+            if(!is_dir($userStoragePath)){
+                mkdir($userStoragePath, 0755, true);
+            }
+            if($request->exists('photo')){
+                $userImage = $request->file('photo')->getClientOriginalName();
+                $userImagePath = $userStoragePath."/".$client->photo;
+                if(!empty($client->photo) && file_exists($userImagePath)){
+                    unlink($userImagePath);
+                }
+                $request->file('photo')->move($userStoragePath, $userImage);
+                $dbUserImagePath = $userStoragePath."/".$userImage;
+            }
+
+            if(!empty($dbUserImagePath)){
+                $client->photo = $dbUserImagePath;
+            }
+            $client->save();
+        }
+        return;
+    }
+
+    protected static function isCLientExists(Request $request){
+        if('local' == \Config::get('app.env')){
+            $subdomain = $request->subdomain.'.localvchip.com';
+        } else {
+            $subdomain = $request->subdomain.'.vchipedu.com';
+        }
+        $client = static::where('subdomain', $subdomain)->first();
+        if(is_object($client)){
+            return 'true';
+        } else {
+            return 'false';
+        }
     }
 }

@@ -160,12 +160,4 @@ class ClientOnlineVideo extends Model
         return static::where('client_id', Auth::guard('clientuser')->user()->client_id)->select('client_online_videos.*')->get();
     }
 
-    protected static function getAssignedClientCourseVideo($videoId){
-        return static::join('client_user_institute_courses', 'client_user_institute_courses.client_institute_course_id', '=', 'client_online_videos.client_institute_course_id')
-            ->where('client_online_videos.client_id', Auth::guard('clientuser')->user()->client_id)
-            ->where('client_user_institute_courses.client_user_id', Auth::guard('clientuser')->user()->id)
-            ->where('client_user_institute_courses.course_permission', 1)
-            ->where('client_online_videos.id', $videoId)->select('client_online_videos.*')->first();
-    }
-
 }

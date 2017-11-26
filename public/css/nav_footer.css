@@ -604,90 +604,6 @@ display: none;
 }
 }
 
-/*        #vchip-background{
-          display: inline;
-          float: left;
-          width: 100%;
-        }
-        #vchip-background .vchip-background-single {
-          display: inline;
-          float: left;
-          width: 100%;
-          position: relative;
-        }
-        #vchip-background .vchip-background-single .vchip-background-img {
-          display: inline;
-          float: left;
-          width: 100%;
-          height: 500px;
-          margin-top:0px;
-
-
-        }
-        #vchip-background .vchip-background-single .vchip-background-img figure {
-          height: 100%;
-          width: 100%;
-        }
-        #vchip-background .vchip-background-single .vchip-background-img figure img {
-          width: 100%;
-          height: 100%;
-        }
-        #vchip-background .vchip-background-single .container {
-          color: #fff;
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 20%;
-          padding: 0 15%;
-          width: 100%;
-          text-align: center;
-          height: 100%;
-
-        }
-
-        #vchip-background .vchip-background-single  .vchip-background-content{
-          color: #fff;
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 20%;
-          padding: 0% 0%;
-          width: 100%;
-          text-align: center;
-          height: 100%;
-
-
-        }
-
-        #vchip-background .vchip-background-single  .vchip-background-content h2 {
-          font-size: 50px;
-          color: #fff;
-          font-weight: bold;
-          margin-top: 100px;
-          padding: 20px 0px;
-          background: rgba(0, 0, 0, 0.5);
-
-        }
-
-        @media (max-width: 767px) {
-          #vchip-background .vchip-background-single .container {
-            color: #fff;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 10px;
-            padding: 20px 15px;
-            width: 100%;
-            text-align: center;
-            height: 100%;
-          }
-          #vchip-background .vchip-background-single  .vchip-background-content h2 {
-            font-size: 30px;
-
-  margin-top: 100px;
-
-}
-}*/
   @media (max-width: 1000px){
  footer .footer-bottom  p.pull-right{display: none!important;}
 }
@@ -736,3 +652,30 @@ margin-left: 50%;}
    padding-left:0;
 }
 .navbar-content li>b{text-transform: uppercase;}
+
+#loginUserModel .modal-dialog{
+  border-top:10px solid #01bafd;
+}
+#loginUserModel .close{color: #fff;}
+#loginUserModel .modal, #loginUserModel .modal-content{border-radius:  0px;
+  background-color: rgba(0, 0, 0, 0.5);}
+#loginUserModel    div.modal-data{
+    background-color: rgba(0, 0, 0, 0.5);
+        padding: 30px;
+  }
+#loginUserModel   div.modal-data .form-control {
+background: transparent;
+color: #fff;
+font-size: 16px !important;
+width: 100%;
+border: 2px solid rgba(255, 255, 255, 0.2) !important;
+-webkit-transition: 0.5s;
+-o-transition: 0.5s;
+transition: 0.5s;
+border-radius: 0px!important
+}
+#loginUserModel  div.modal-data .form-group input:focus{border: 2px solid #fff !important;
+}
+#loginErrorMsg{
+  color: red;
+}

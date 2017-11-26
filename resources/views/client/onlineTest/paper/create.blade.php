@@ -91,11 +91,11 @@
     <label for="course" class="col-sm-2 col-form-label">Free Paper:</label>
     <div class="col-sm-3">
         @if(isset($paper->id))
-        <label class="radio-inline"><input type="radio" name="is_free" value="1" onClick="showUnAuthorisedUser(this);" @if(1 == $paper->is_free) checked="true" @endif> Yes</label>
-        <label class="radio-inline"><input type="radio" name="is_free" value="0" onClick="showUnAuthorisedUser(this);" @if(0 == $paper->is_free) checked="true" @endif> No</label>
+          <label class="radio-inline"><input type="radio" class="is_free" id="yes" name="is_free" value="1" onClick="showUnAuthorisedUser(this);" @if(1 == $paper->is_free) checked="true" @endif> Yes</label>
+          <label class="radio-inline"><input type="radio" class="is_free" id="no" name="is_free" value="0" onClick="showUnAuthorisedUser(this);" @if(0 == $paper->is_free) checked="true" @endif> No</label>
         @else
-          <label class="radio-inline"><input type="radio" name="is_free" value="1"  onClick="showUnAuthorisedUser(this);" > Yes</label>
-          <label class="radio-inline"><input type="radio" name="is_free" value="0" checked  onClick="showUnAuthorisedUser(this);" > No</label>
+          <label class="radio-inline"><input type="radio" class="is_free" id="yes" name="is_free" value="1"  onClick="showUnAuthorisedUser(this);" > Yes</label>
+          <label class="radio-inline"><input type="radio" class="is_free" id="no" name="is_free" value="0" checked  onClick="showUnAuthorisedUser(this);" > No</label>
         @endif
       @if($errors->has('is_free')) <p class="help-block">{{ $errors->first('is_free') }}</p> @endif
     </div>
@@ -113,15 +113,18 @@
       @if($errors->has('allowed_unauthorised_user')) <p class="help-block">{{ $errors->first('allowed_unauthorised_user') }}</p> @endif
     </div>
   </div>
-  <div class="form-group row">
+  <div class="form-group row ">
     <label for="date_to_active" class="col-sm-2 col-form-label">Date To Active:</label>
     <div class="col-sm-3">
       <input type="text"  class="form-control" name="date_to_active" id="date_to_active" @if(isset($paper->id)) value="{{$paper->date_to_active}}" @endif required="true" placeholder="date" required="true">
     </div>
     <script type="text/javascript">
         $(function () {
-            var currentDate = "{{ date('Y-m-d')}}";
-            $('#date_to_active').datetimepicker({defaultDate: currentDate,format: 'YYYY-MM-DD'});
+            var currentDate = "{{ date('Y-m-d H:i')}}";
+            $('#date_to_active').datetimepicker({
+              defaultDate: currentDate,
+              format: 'YYYY-MM-DD HH:mm'
+            });
         });
     </script>
   </div>
@@ -132,7 +135,7 @@
     </div>
     <script type="text/javascript">
         $(function () {
-            $('#date_to_inactive').datetimepicker({defaultDate: "2050-01-01",format: 'YYYY-MM-DD'});
+            $('#date_to_inactive').datetimepicker({defaultDate: "2050-01-01 01:00",format: 'YYYY-MM-DD HH:mm'});
         });
     </script>
   </div>
@@ -374,6 +377,7 @@
               $.each(msg, function(idx, obj) {
                   var opt = document.createElement('option');
                   opt.value = obj.id;
+                  opt.setAttribute('data-price', obj.price);
                   opt.innerHTML = obj.name;
                   select.appendChild(opt);
               });
@@ -387,9 +391,27 @@
       opt.innerHTML = 'Select Sub Category';
       select.appendChild(opt);
     }
+
+    selectSub = document.getElementById('subject');
+    selectSub.innerHTML = '';
+    var selectSubOpt = document.createElement('option');
+    selectSubOpt.value = '';
+    selectSubOpt.innerHTML = 'Select Subject';
+    selectSub.appendChild(selectSubOpt);
   }
 
   function selectSubject(ele){
+    if($(ele).find(':selected').data('price') > 0){
+      $('.is_free').prop('disabled',false);
+      $('#yes').prop('checked', false);
+      $('#no').prop('checked', true);
+      $($('.allowed_unauthorised_user')[0]).addClass('hide');
+    } else {
+      $('.is_free').prop('disabled',true);
+      $('#yes').prop('checked', true);
+      $('#no').prop('checked', false);
+      $($('.allowed_unauthorised_user')[0]).removeClass('hide');
+    }
     subcatId = parseInt($(ele).val());
     catId = parseInt(document.getElementById('category').value);
     if( 0 < catId && 0 < subcatId ){

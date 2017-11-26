@@ -6,10 +6,13 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PaymentGatewayErrors;
+use App\Mail\PaymentReceived;
 use App\Models\ClientHomePage;
 use App\Models\Client;
 use Illuminate\Http\Request;
-use Auth, Redirect, View, DB;
+use View,DB,Session,Redirect, Auth,Validator;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientOnlineTestSubjectPaper;
@@ -24,6 +27,11 @@ use App\Models\ClientAssignmentQuestion;
 use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
 use App\Models\ClientAssignmentAnswer;
+use App\Models\ClientUserPurchasedCourse;
+use App\Models\UserBasedAuthentication;
+use App\Models\ClientUserPayment;
+use App\Models\ClientOnlineTestSubCategory;
+use App\Models\ClientUserPurchasedTestSubCategory;
 use App\Libraries\InputSanitise;
 
 class ClientUserController extends BaseController
@@ -59,10 +67,11 @@ class ClientUserController extends BaseController
                 $categoryIds[] = $course->category_id;
             }
             $categories = ClientOnlineCategory::find($categoryIds);
-            $courseVideoCount = $this->getVideoCount($courses);
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+            $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $userId);
         }
 
-        return view('clientuser.dashboard.myCourses', compact('courses', 'categories', 'courseVideoCount'));
+        return view('clientuser.dashboard.myCourses', compact('courses', 'categories', 'userPurchasedCourses'));
     }
 
     protected function myCertificate(){
@@ -288,5 +297,359 @@ class ClientUserController extends BaseController
             return redirect()->back()->withErrors('something went wrong.');
         }
         return Redirect::to('doAssignment/'.$questionId);
+    }
+
+    protected function purchaseCourse($subdomain, $courseId){
+        $instamojoErrors = '';
+        $clientCourse = ClientOnlineCourse::find($courseId);
+        if(!is_object($clientCourse)){
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        Session::put('client_course_id', $clientCourse->id);
+        Session::save();
+        $purchasePostFields = [
+                                'purpose' => 'purchase '. $clientCourse->name,
+                                'amount'  =>   $clientCourse->price,
+                                'buyer_name' => Auth::guard('clientuser')->user()->name,
+                                'email'  => Auth::guard('clientuser')->user()->email,
+                                'phone'  => Auth::guard('clientuser')->user()->phone,
+                                'send_email' => 'True',
+                                'send_sms' => 'False',
+                                'redirect_url' => url('redirectCoursePayment'),
+                                'webhook'   => url('webhook'),
+                                'allow_repeated_payments' => 'False'
+                            ];
+
+        $clientUserAuth = UserBasedAuthentication::where('vchip_client_id', Auth::guard('clientuser')->user()->client_id)->first();
+
+        if(!is_object($clientUserAuth)){
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => "https://test.instamojo.com/v2/payment_requests/",
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => "",
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 60,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => "POST",
+          CURLOPT_POSTFIELDS => $purchasePostFields,
+          CURLOPT_HTTPHEADER => array(
+            "authorization: Bearer ".$clientUserAuth->access_token,
+            "cache-control: no-cache",
+            "content-type: multipart/form-data"
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+          $instamojoErrors = (string)$err;
+        } else {
+            $result = json_decode($response);
+            header("Location: $result->longurl");
+            exit();
+        }
+        if(!empty($instamojoErrors)){
+            Mail::to('vchipdesigng8@gmail.com')->send(new PaymentGatewayErrors($instamojoErrors));
+            return Redirect::to('online-courses')->withErrors(['some thing went wrong. please try after some time.']);
+        }
+    }
+
+    protected function redirectCoursePayment(Request $request){
+
+        $paymentRequestId = $request->get('payment_request_id');
+        $paymentId = $request->get('payment_id');
+        if(!empty($paymentRequestId) && !empty($paymentId)){
+            $userId = Auth::guard('clientuser')->user()->id;
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+            $clientUserAuth = UserBasedAuthentication::where('vchip_client_id', $clientId)->first();
+
+            if(!is_object($clientUserAuth)){
+                return redirect()->back()->withErrors('something went wrong.');
+            }
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => "https://test.instamojo.com/v2/payments/".$paymentId."/",
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => "",
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 30,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => "GET",
+              CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer ".$clientUserAuth->access_token,
+                "cache-control: no-cache"
+              ),
+            ));
+
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+
+            curl_close($curl);
+
+            if ($err) {
+              Mail::to('vchipdesigng8@gmail.com')->send(new PaymentGatewayErrors((string)$err));
+            } else {
+                $result = json_decode($response);
+
+                if( 'true' == $result->status){
+                    DB::connection('mysql2')->beginTransaction();
+                    try
+                    {
+                        $clientCourseId = Session::get('client_course_id');
+                        $newUserCourse = new ClientUserPurchasedCourse;
+                        $newUserCourse->user_id = $userId;
+                        $newUserCourse->course_id = $clientCourseId;
+                        $newUserCourse->client_id = $clientId;
+                        $newUserCourse->payment_id = $paymentId;
+                        $newUserCourse->save();
+
+                        $clientUserPayment = new ClientUserPayment;
+                        $clientUserPayment->client_id = $clientId;
+                        $clientUserPayment->clientuser_id = $userId;
+                        $clientUserPayment->payment_request_id = $paymentRequestId;
+                        $clientUserPayment->payment_id = $paymentId;
+                        $clientUserPayment->save();
+                        DB::connection('mysql2')->commit();
+                        Session::remove('client_course_id');
+
+                        // mail to client
+                        $to = Auth::guard('clientuser')->user()->client->email;
+                        $subject = 'Payment on your website:'. $result->title.' by '.$result->name.'';
+                        $message = "<h1>Payment Details</h1>";
+                        $message .= "<hr>";
+                        $message .= '<p><b>Payment Id:</b> '.$result->id.'</p>';
+                        $message .= '<p><b>Payment Status:</b> '.$result->status.'</p>';
+                        $message .= '<p><b>Amount:</b> '.$result->amount.'</p>';
+                        $message .= "<hr>";
+                        $message .= '<p><b>Name:</b> '.$result->name.'</p>';
+                        $message .= '<p><b>Email:</b> '.$result->email.'</p>';
+                        $message .= '<p><b>Phone:</b> '.$result->phone.'</p>';
+                        $message .= "<hr>";
+                        $headers .= "MIME-Version: 1.0\r\n";
+                        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+                        // send email
+                        mail($to, $subject, $message, $headers);
+                        return redirect('online-courses')->with('message', 'Thank you for paying. Your Payment has been successfully processed.');
+                    }
+                    catch(\Exception $e)
+                    {
+                        DB::connection('mysql2')->rollback();
+                        return Redirect::to('online-courses');
+                    }
+                }
+            }
+        }
+        return Redirect::to('online-courses');
+    }
+
+    public function webhook(Request $request){
+        $data = $request->all();
+        ksort($data, SORT_STRING | SORT_FLAG_CASE);
+        $clientUser = Clientuser::where('email',$data['buyer'])->first();
+        if(is_object($clientUser)){
+            $to = $clientUser->client->email;
+            $subject = 'Payment on your website:'. $data['purpose'].' by '.$data['buyer_name'].'';
+            $message = "<h1>Payment Details</h1>";
+            $message .= "<hr>";
+            $message .= '<p><b>Payment Id:</b> '.$data['payment_id'].'</p>';
+            $message .= '<p><b>Payment Status:</b> '.$data['status'].'</p>';
+            $message .= '<p><b>Amount:</b> '.$data['amount'].'</p>';
+            $message .= "<hr>";
+            $message .= '<p><b>Name:</b> '.$data['buyer_name'].'</p>';
+            $message .= '<p><b>Email:</b> '.$data['buyer'].'</p>';
+            $message .= '<p><b>Phone:</b> '.$data['buyer_phone'].'</p>';
+            $message .= "<hr>";
+
+            // send email
+            // mail($to, $subject, $message, $headers);
+            Mail::to($to)->send(new PaymentReceived($message));
+        } else {
+            $to = 'vchipdesign@gmail.com';
+            $subject = 'Payment on client website:'. $data['purpose'].' by '.$data['buyer_name'].'';
+            $message = "<h1>Payment Details</h1>";
+            $message .= "<hr>";
+            $message .= '<p><b>Payment Id:</b> '.$data['payment_id'].'</p>';
+            $message .= '<p><b>Payment Status:</b> '.$data['status'].'</p>';
+            $message .= '<p><b>Amount:</b> '.$data['amount'].'</p>';
+            $message .= "<hr>";
+            $message .= '<p><b>Name:</b> '.$data['buyer_name'].'</p>';
+            $message .= '<p><b>Email:</b> '.$data['buyer'].'</p>';
+            $message .= '<p><b>Phone:</b> '.$data['buyer_phone'].'</p>';
+            $message .= "<hr>";
+            $headers .= "MIME-Version: 1.0\r\n";
+            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+            // send email
+            // mail($to, $subject, $message, $headers);
+            Mail::to($to)->send(new PaymentReceived($message));
+        }
+    }
+
+    protected function purchaseTestSubCategory($subdomain, $subCategoryId){
+        $instamojoErrors = '';
+        $subCategory = ClientOnlineTestSubCategory::find($subCategoryId);
+        if(!is_object($subCategory)){
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+
+        Session::put('client_sub_category_id', $subCategory->id);
+        Session::put('client_category_id', $subCategory->category_id);
+        Session::save();
+        $purchasePostFields = [
+                                'purpose' => 'purchase '. $subCategory->name,
+                                'amount'  =>   $subCategory->price,
+                                'buyer_name' => Auth::guard('clientuser')->user()->name,
+                                'email'  => Auth::guard('clientuser')->user()->email,
+                                'phone'  => Auth::guard('clientuser')->user()->phone,
+                                'send_email' => 'True',
+                                'send_sms' => 'False',
+                                'redirect_url' => url('redirectTestSubCategoryPayment'),
+                                'webhook'   => url('webhook'),
+                                'allow_repeated_payments' => 'False'
+                            ];
+
+        $clientUserAuth = UserBasedAuthentication::where('vchip_client_id', Auth::guard('clientuser')->user()->client_id)->first();
+
+        if(!is_object($clientUserAuth)){
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => "https://test.instamojo.com/v2/payment_requests/",
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => "",
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 60,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => "POST",
+          CURLOPT_POSTFIELDS => $purchasePostFields,
+          CURLOPT_HTTPHEADER => array(
+            "authorization: Bearer ".$clientUserAuth->access_token,
+            "cache-control: no-cache",
+            "content-type: multipart/form-data"
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+          $instamojoErrors = (string)$err;
+        } else {
+            $result = json_decode($response);
+            if(is_object($result) && !empty($result->longurl)){
+                header("Location: $result->longurl");
+                exit();
+            } else {
+                return Redirect::to('online-tests')->withErrors(['some thing went wrong. please try after some time.']);
+            }
+        }
+        if(!empty($instamojoErrors)){
+            Mail::to('vchipdesigng8@gmail.com')->send(new PaymentGatewayErrors($instamojoErrors));
+            return Redirect::to('online-tests')->withErrors(['some thing went wrong. please try after some time.']);
+        }
+    }
+
+    protected function redirectTestSubCategoryPayment(Request $request){
+
+        $paymentRequestId = $request->get('payment_request_id');
+        $paymentId = $request->get('payment_id');
+        if(!empty($paymentRequestId) && !empty($paymentId)){
+            $userId = Auth::guard('clientuser')->user()->id;
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+            $clientUserAuth = UserBasedAuthentication::where('vchip_client_id', $clientId)->first();
+
+            if(!is_object($clientUserAuth)){
+                return redirect()->back()->withErrors('something went wrong.');
+            }
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => "https://test.instamojo.com/v2/payments/".$paymentId."/",
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => "",
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 30,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => "GET",
+              CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer ".$clientUserAuth->access_token,
+                "cache-control: no-cache"
+              ),
+            ));
+
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+
+            curl_close($curl);
+
+            if ($err) {
+              Mail::to('vchipdesigng8@gmail.com')->send(new PaymentGatewayErrors((string)$err));
+            } else {
+                $result = json_decode($response);
+                // dd($result);
+                if( 'true' == $result->status){
+                    DB::connection('mysql2')->beginTransaction();
+                    try
+                    {
+                        $clientSubCategoryId = Session::get('client_sub_category_id');
+                        $clientCategoryId = Session::get('client_category_id');
+                        $newTestSubCategory = new ClientUserPurchasedTestSubCategory;
+                        $newTestSubCategory->user_id = $userId;
+                        $newTestSubCategory->test_category_id = $clientCategoryId;
+                        $newTestSubCategory->test_sub_category_id = $clientSubCategoryId;
+                        $newTestSubCategory->client_id = $clientId;
+                        $newTestSubCategory->payment_id = $paymentId;
+                        $newTestSubCategory->save();
+
+                        $clientUserPayment = new ClientUserPayment;
+                        $clientUserPayment->client_id = $clientId;
+                        $clientUserPayment->clientuser_id = $userId;
+                        $clientUserPayment->payment_request_id = $paymentRequestId;
+                        $clientUserPayment->payment_id = $paymentId;
+                        $clientUserPayment->save();
+                        DB::connection('mysql2')->commit();
+                        Session::remove('client_sub_category_id');
+                        Session::remove('client_category_id');
+
+                        // mail to client
+                        $to = Auth::guard('clientuser')->user()->client->email;
+                        $subject = 'Payment on your website:'. $result->title.' by '.$result->name.'';
+                        $message = "<h1>Payment Details</h1>";
+                        $message .= "<hr>";
+                        $message .= '<p><b>Payment Id:</b> '.$result->id.'</p>';
+                        $message .= '<p><b>Payment Status:</b> '.$result->status.'</p>';
+                        $message .= '<p><b>Amount:</b> '.$result->amount.'</p>';
+                        $message .= "<hr>";
+                        $message .= '<p><b>Name:</b> '.$result->name.'</p>';
+                        $message .= '<p><b>Email:</b> '.$result->email.'</p>';
+                        $message .= '<p><b>Phone:</b> '.$result->phone.'</p>';
+                        $message .= "<hr>";
+                        $headers .= "MIME-Version: 1.0\r\n";
+                        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+                        // send email
+                        // mail($to, $subject, $message, $headers);
+                        Mail::to($to)->send(new PaymentReceived($message));
+                        return redirect('online-tests')->with('message', 'Thank you for paying. Your Payment has been successfully processed.');
+                    }
+                    catch(\Exception $e)
+                    {
+                        DB::connection('mysql2')->rollback();
+                        return Redirect::to('online-tests');
+                    }
+                }
+            }
+        }
+        return Redirect::to('online-tests');
     }
 }

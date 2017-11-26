@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\UpdateApplicationAccessToken::class,
+        Commands\UpdateClientAccessToken::class,
+        Commands\CreateApplicationUser::class,
     ];
 
     /**
@@ -24,8 +26,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->command('updateapplicationaccesstoken:cron');
+        $schedule->command('updateclientaccesstoken:cron');
+        $schedule->command('createapplicationuser:cron');
     }
 
     /**
@@ -38,3 +41,4 @@ class Kernel extends ConsoleKernel
         require base_path('routes/console.php');
     }
 }
+

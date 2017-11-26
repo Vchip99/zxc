@@ -171,10 +171,7 @@
       var courseId = parseInt($(ele).data('course_id'));
       var userId = parseInt(document.getElementById('user_id').value);
         if( true == isNaN(userId)){
-           $.alert({
-            title: 'Alert!',
-            content: 'Please login first and then register live course. ',
-          });
+          $('#loginUserModel').modal();
         } else if(courseId > 0) {
           $.ajax({
               method: "POST",
@@ -227,7 +224,6 @@
   $(document).ready(function() {
     $(".btn-tab.btn").click(function () {
       $(".btn-tab.btn").removeClass("btn-primary").addClass("btn-default");
-      // $(".tab").addClass("active"); // instead of this do the below
       $(this).removeClass("btn-default").addClass("btn-primary");
     });
   });

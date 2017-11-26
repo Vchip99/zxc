@@ -1,8 +1,14 @@
-@extends('clientuser.layout.auth')
-
+@extends('layouts.master')
+@section('header-css')
+  @include('layouts.home-css')
+@stop
+@section('header-js')
+  @include('layouts.home-js')
+@stop
 @section('content')
+  @include('client.front.header_menu')
 <div class="container">
-    <div class="row">
+    <div class="row" style="margin-top: 100px;">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
                 <div class="panel-heading">Reset Password</div>

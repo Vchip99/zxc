@@ -59,25 +59,14 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        if(empty($data['subdomain'])){
-            return Validator::make($data, [
-                'name' => 'required|max:255',
-                'phone' => 'required|regex:/[0-9]{10}/',
-                'email' => 'required|email|max:255|unique:users',
-                'password' => 'required',
-                'confirm_password' => 'required|same:password',
-                'user_type' => 'required',
-            ]);
-        } else {
-            return Validator::make($data, [
-                'name' => 'required|max:255',
-                'phone' => 'required|regex:/[0-9]{10}/',
-                'email' => 'required|email|max:255|unique:users',
-                'password' => 'required',
-                'confirm_password' => 'required|same:password',
-                'user_type' => 'required',
-            ]);
-        }
+        return Validator::make($data, [
+            'name' => 'required|max:255',
+            'phone' => 'required|regex:/[0-9]{10}/',
+            'email' => 'required|email|max:255|unique:users',
+            'password' => 'required',
+            'confirm_password' => 'required|same:password',
+            'user_type' => 'required',
+        ]);
     }
 
     /**
@@ -105,30 +94,6 @@ class RegisterController extends Controller
                 'other_source' => $data['other_source'],
                 'email_token' => $emailToken,
             ]);
-        if(!empty($data['subdomain'])){
-            $subdomain = $data['subdomain'].'.localvchip.com';
-        }
-        if(!empty($subdomain) && is_object($user)){
-            $isAlreadyExistClient = Client::where('subdomain', $subdomain)->first();
-            if(!is_object($isAlreadyExistClient)){
-            $client = Client::create([
-                'name' => $data['name'],
-                'user_id' => $user->id,
-                'phone' => $data['phone'],
-                'email' => $data['email'],
-                'password' => bcrypt($data['password']),
-                'subdomain' => $subdomain,
-                'email_token' => $emailToken,
-            ]);
-
-            ClientHomePage::addClientHomePage($client);
-            ClientTestimonial::addTestimonials($client);
-            ClientTeam::addTeam($client);
-            ClientCustomer::addCustomer($client);
-            } else {
-                return 'false';
-            }
-        }
 
         return $user;
     }
@@ -171,8 +136,8 @@ class RegisterController extends Controller
         try
         {
             $user = $this->create($request->all());
-            if( !is_object($user) && 'false' == $user){
-                return redirect('/')->withErrors('This subdomain is already exist.');
+            if( !is_object($user)){
+                return redirect('/')->withErrors('Something went wrong.');
             }
             DB::commit();
 
@@ -187,7 +152,7 @@ class RegisterController extends Controller
                 4 => 'Fourth Year',
             ];
             $users = [
-                1 => 'Admin/Owner of Institute ',
+                // 1 => 'Admin/Owner of Institute ',
                 2 => 'Student',
                 3 => 'Lecturer',
                 4 => 'HOD',
@@ -226,7 +191,6 @@ class RegisterController extends Controller
             }
             $data['roll_no'] = $request->get('roll_no')?:'';
             $data['other_source'] = $request->get('other_source')?:'';
-            $data['subdomain'] = $request->get('subdomain')?:'';
 
             // send mail to admin after new registration
             Mail::to('vchipdesigng8@gmail.com')->send(new NewRegisteration($data));
@@ -249,10 +213,6 @@ class RegisterController extends Controller
 
         if(is_object($user)){
             $user->verified();
-            $client = Client::where('email_token',$token)->first();
-            if(is_object($client)){
-                $client->verified();
-            }
             return redirect('login')->with('message', 'please login with credentials.');
         } else {
             return redirect('login')->withErrors('These credentials do not exist.');

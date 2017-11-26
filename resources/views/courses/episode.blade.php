@@ -179,8 +179,12 @@ hr{
             </span>
 
             <span class="mrgn_5_left">
-            <i class="fa fa-comment-o" aria-hidden="true"></i>
-              <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+              <i class="fa fa-comment-o" aria-hidden="true"></i>
+              @if(is_object(Auth::user()))
+                <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+              @else
+                <a class="your-cmt" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">Comment</a>
+              @endif
             </span>
              <hr />
             <div class="collapse replyComment" id="replyToEpisode{{$video->id}}" >
@@ -288,7 +292,11 @@ hr{
                                   @endif
                                 </span>
                                <span class="mrgn_5_left">
-                                <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                                @if(is_object(Auth::user()))
+                                  <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                                @else
+                                  <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
+                                @endif
                               </span>
                               <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                               <div class="collapse replyComment" id="replyToComment{{$comment->id}}">
@@ -463,23 +471,7 @@ hr{
             renderComments(msg, userId);
           });
     } else if( isNaN(userId)) {
-      $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -601,23 +593,7 @@ hr{
           renderComments(msg, userId);
         });
     } else if( isNaN(userId)) {
-      $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -638,23 +614,7 @@ hr{
           renderComments(msg, userId);
         });
     } else if( isNaN(userId)) {
-      $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+      $('#loginUserModel').modal();
     }
   }
 
@@ -784,23 +744,7 @@ hr{
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
         if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -829,23 +773,7 @@ hr{
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
         if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",
@@ -874,24 +802,8 @@ hr{
         var subCommentId = $(this).data('sub_comment_id');
         var dislike = $(this).data('dislike');
         var userId = parseInt(document.getElementById('user_id').value);
-         if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+        if( isNaN(userId)) {
+          $('#loginUserModel').modal();
         } else {
           $.ajax({
               method: "POST",

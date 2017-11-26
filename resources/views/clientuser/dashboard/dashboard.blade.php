@@ -94,7 +94,6 @@
             <li><a href="{{ url('clientMessages')}}"><i class="fa fa-circle-o"></i> Admin Messages : <b style="color: red;">{{Auth::guard('clientuser')->user()->adminNotificationCount()}} </b></a></li>
           </ul>
         </li>
-        @if(1 == $client->course_permission)
         <li class="treeview ">
           <a href="#" title="Online Courses">
             <i class="fa fa-dashboard"></i> <span>Online Courses</span>
@@ -109,8 +108,6 @@
             <li title="More Courses"><a href="{{ url('online-courses')}}"><i class="fa fa-circle-o"></i> More Courses</a></li>
           </ul>
         </li>
-        @endif
-        @if(1 == $client->test_permission)
         <li class="treeview">
           <a href="#" title="Online Test">
             <i class="fa fa-files-o"></i>
@@ -125,7 +122,6 @@
             <li title="More Test"><a href="{{ url('online-tests')}}"><i class="fa fa-circle-o"></i> More Test</a></li>
           </ul>
         </li>
-        @endif
         <li class="treeview">
           <a href="#">
             <i class="fa fa-tasks"></i> <span>Assignment</span>

@@ -45,18 +45,4 @@ class InputSanitise{
         return;
     }
 
-    public static function checkModulePermission(Request $request, $module){
-    	$client = Client::where('subdomain', $request->getHost())->first();
-        if(is_object($client)){
-            if('course' == $module && 0 == $client->course_permission){
-                return 'false';
-            }
-            if('test' == $module && 0 == $client->test_permission){
-                return 'false';
-            }
-            return 'true';
-        }
-        return 'false';
-    }
-
 }

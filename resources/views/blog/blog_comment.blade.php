@@ -121,6 +121,32 @@ hr{
   margin-right: 5px;
   width: 20px; /* same as padding-left set on li */
 }
+#loginUserModel .modal-dialog{
+  border-top:10px solid #01bafd;
+}
+#loginUserModel .close{color: #fff;}
+#loginUserModel .modal, .modal-content{border-radius:  0px;
+  background-color: rgba(0, 0, 0, 0.5);}
+#loginUserModel    div.modal-data{
+    background-color: rgba(0, 0, 0, 0.5);
+        padding: 30px;
+  }
+#loginUserModel   div.modal-data .form-control {
+background: transparent;
+color: #fff;
+font-size: 16px !important;
+width: 100%;
+border: 2px solid rgba(255, 255, 255, 0.2) !important;
+-webkit-transition: 0.5s;
+-o-transition: 0.5s;
+transition: 0.5s;
+border-radius: 0px!important
+}
+#loginUserModel  div.modal-data .form-group input:focus{border: 2px solid #fff !important;
+}
+#loginErrorMsg{
+  color: red;
+}
 </style>
 <script type="text/javascript">
     $.ajaxSetup({
@@ -207,12 +233,15 @@ hr{
             </span>
             <span class="mrgn_5_left">
               <i class="fa fa-comment-o" aria-hidden="true"></i>
-              <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToBlog{{$blog->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+              @if(is_object(Auth::user()))
+                <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToBlog{{$blog->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+              @else
+                <a class="your-cmt" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">Comment</a>
+              @endif
             </span>
             <hr />
             <div class="collapse replyComment" id="replyToBlog{{$blog->id}}">
                 <div class="form-group">
-                  <!-- <label for="comment">Your Comment</label> -->
                   <textarea name="comment" id="comment" placeholder="Comment here.." class="form-control"></textarea>
                   <script type="text/javascript">
                     CKEDITOR.replace( 'comment');
@@ -308,7 +337,11 @@ hr{
                               @endif
                             </span>
                            <span class="mrgn_5_left">
-                            <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$blog->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                            @if(is_object(Auth::user()))
+                              <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$blog->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                            @else
+                              <a class="" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
+                            @endif
                           </span>
                           <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                           <div class="collapse replyComment" id="replyToComment{{$blog->id}}-{{$comment->id}}">
@@ -328,6 +361,38 @@ hr{
                     @endforeach
                   @endif
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="loginUserModel" class="modal fade " role="dialog">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header"  style="border-bottom: none;">
+            <button class="close" data-dismiss="modal">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="modal-data">
+                <div class="form-group">
+                  <input id="email" name="email" type="text" class="form-control" placeholder="vchip@gmail.com" onfocus="changeType('email');" autocomplete="off" required>
+                  <span class="help-block"></span>
+                </div>
+                <div class="form-group">
+                  <input id="password" name="password" type="text" class="form-control" placeholder="password" data-type="password" onfocus="changeType('password');" autocomplete="off" required >
+                  <span class="help-block"></span>
+                </div>
+                <div id="loginErrorMsg" class="hide">Wrong username or password</div>
+                <button type="submit" value="login" name="submit" class="btn btn-info btn-block" onClick="loginUser();">Login</button>
+                <br />
+                <div class="form-group">
+                  <div class="col-md-12 control">
+                      <div style="margin-top: 10px; margin-bottom: 20px;  color:#fff;" >
+                          Need an account?
+                      <a href="{{ url('signup')}}" ">Sign Up</a>
+                      </div>
+                  </div>
               </div>
             </div>
           </div>
@@ -360,23 +425,7 @@ hr{
           renderComments(msg, userId);
         });
     } else if( isNaN(userId)) {
-      $.confirm({
-      title: 'Confirmation',
-      content: 'Please login first. Click "Ok" button to login.',
-      type: 'red',
-      typeAnimated: true,
-      buttons: {
-            Ok: {
-                text: 'Ok',
-                btnClass: 'btn-red',
-                action: function(){
-                  window.location="{{url('/home')}}";
-                }
-            },
-            Cancle: function () {
-            }
-        }
-      });
+      $('#loginUserModel').modal();
     }
   }
   function cancleReply(ele){
@@ -639,24 +688,8 @@ hr{
       var commentId = $(this).data('comment_id');
       var dislike = $(this).data('dislike');
       var userId = parseInt(document.getElementById('user_id').value);
-       if( isNaN(userId)) {
-        $.confirm({
-      title: 'Confirmation',
-      content: 'Please login first. Click "Ok" button to login.',
-      type: 'red',
-      typeAnimated: true,
-      buttons: {
-            Ok: {
-                text: 'Ok',
-                btnClass: 'btn-red',
-                action: function(){
-                  window.location="{{url('/home')}}";
-                }
-            },
-            Cancle: function () {
-            }
-        }
-      });
+      if( isNaN(userId)) {
+        $('#loginUserModel').modal();
       } else {
         $.ajax({
             method: "POST",
@@ -685,24 +718,8 @@ hr{
       var subCommentId = $(this).data('sub_comment_id');
       var dislike = $(this).data('dislike');
       var userId = parseInt(document.getElementById('user_id').value);
-       if( isNaN(userId)) {
-        $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+      if( isNaN(userId)) {
+        $('#loginUserModel').modal();
       } else {
         $.ajax({
             method: "POST",
@@ -728,24 +745,8 @@ hr{
       var blogId = $(this).data('blog_id');
       var dislike = $(this).data('dislike');
       var userId = parseInt(document.getElementById('user_id').value);
-       if( isNaN(userId)) {
-        $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+      if( isNaN(userId)) {
+        $('#loginUserModel').modal();
       } else {
         $.ajax({
             method: "POST",
@@ -821,23 +822,7 @@ hr{
           });
         }
       } else if( isNaN(userId)) {
-        $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+        $('#loginUserModel').modal();
       }
     }
 
@@ -860,23 +845,7 @@ hr{
           });
         }
       } else if( isNaN(userId)) {
-        $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
+        $('#loginUserModel').modal();
       }
     }
 
@@ -975,6 +944,29 @@ hr{
       showMore();
     });
 
+  function loginUser(){
+    var email = document.getElementById('email').value;
+    var password = document.getElementById('password').value;
+    if(email && password){
+      $.ajax({
+          method: "POST",
+          url: "{{ url('userLogin') }}",
+          data: {email:email, password:password}
+      })
+      .done(function( msg ) {
+        if('true' == msg){
+          window.location.reload(true);
+        } else {
+          document.getElementById('loginErrorMsg').classList.remove('hide');
+        }
+      });
+    }
+  }
+
+  function changeType(ele){
+    document.getElementById(ele).setAttribute('type', ele);
+    document.getElementById('loginErrorMsg').classList.add('hide');
+  }
   </script>
 </body>
 </html>

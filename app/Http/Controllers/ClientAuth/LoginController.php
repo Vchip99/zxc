@@ -52,10 +52,7 @@ class LoginController extends Controller
     public function showLoginForm(Request $request)
     {
         $client = Client::where('subdomain', $request->getHost())->first();
-        if(0 == $client->verified){
-            $error = 'verified';
-            return view('client.clientLogin.showError', compact('error'));
-        } else if(0 == $client->admin_approve){
+        if(0 == $client->admin_approve){
             $error = 'admin_approve';
             return view('client.clientLogin.showError', compact('error'));
         }

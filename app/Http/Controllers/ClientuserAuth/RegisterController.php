@@ -14,6 +14,7 @@ use DB;
 use Mail;
 use App\Mail\ClientUserEmailVerification;
 use App\Mail\NewClientUserRegistration;
+use App\Mail\ClientUnAuthorisedUser;
 
 class RegisterController extends Controller
 {
@@ -118,12 +119,24 @@ class RegisterController extends Controller
         if(!is_object($client)){
             return Redirect::to('/');
         }
+        // dd($client->userCountByClientId($client->id));
+        // if free plan & user count greter than 20 then dont allow to signup.
+        if(1 == $client->plan_id && 20 <= $client->userCountByClientId($client->id)){
+            $data['name'] = $request->name;
+            $data['email'] = $request->email;
+            $data['client'] = $client->name;
+
+            // send mail to client
+            Mail::to($client->email)->send(new ClientUnAuthorisedUser($data));
+            return Redirect::to('/')->withErrors('Try after some time');
+        }
+
         $checkEmail = Clientuser::where('email', $request->get('email'))->where('client_id', $client->id)->first();
         if(is_object($checkEmail)){
             return Redirect::to('/')->withErrors('The email id '.$request->get('email').' is already exist.');
         }
 
-        DB::beginTransaction();
+        DB::connection('mysql2')->beginTransaction();
         try
         {
             $user = $this->create($request->all(),$client->id);
@@ -139,12 +152,12 @@ class RegisterController extends Controller
                 ];
                 Mail::to($client->email)->send(new NewClientUserRegistration($data));
             }
-            DB::commit();
+            DB::connection('mysql2')->commit();
             return redirect('/')->with('message', 'Verify your email for your account activation.');
         }
         catch(Exception $e)
         {
-            DB::rollback();
+            DB::connection('mysql2')->rollback();
             return back();
         }
     }
