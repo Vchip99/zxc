@@ -97,20 +97,20 @@ font-weight: bold;
 		        </div>
 		        <div class="col-md-4 col-sm-4 mrgn_10_top_btm " style="display: inline-block !important; ">
 		        <div class="pay-now " >
-        			<span id="price">Price: {{$price}} Rs.</span>
+        			<span id="price">Price: {{$selectedSubCategory->price}} Rs.</span>
 			       	@if(is_object(Auth::guard('clientuser')->user()))
 			        	@if('true' == $isTestSubCategoryPurchased)
 				        	<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" >Paid</a>
 				        @else
-				        	@if($price > 0)
-								<a id="paidStatus" href="{{ url('purchaseTestSubCategory')}}/{{$testSubCategory->id}}" class="btn btn-sm btn-default" style="cursor: pointer;" >Pay Now</a>
+				        	@if($selectedSubCategory->price > 0)
+								<a id="paidStatus" href="{{ url('purchaseTestSubCategory')}}/{{$subcatId}}" class="btn btn-sm btn-default" style="cursor: pointer;" >Pay Now</a>
 							@else
 								<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" >Free</a>
 							@endif
 						@endif
 					@else
-						@if($price > 0)
-							<a class="btn btn-sm btn-default" style="cursor: pointer;" onClick="checkLogin();">Pay Now</a>
+						@if($selectedSubCategory->price > 0)
+							<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" onClick="checkLogin();">Pay Now</a>
 						@else
 							<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" >Free</a>
 						@endif
@@ -181,7 +181,7 @@ font-weight: bold;
 						                    	@else
 						                    		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 								                    	<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
-									                @elseif( 'true' == $isTestSubCategoryPurchased || (1 == $testSubjectPaper->is_free && 1 == $testSubjectPaper->allowed_unauthorised_user))
+									                @elseif( 'true' == $isTestSubCategoryPurchased || 1 == $testSubjectPaper->is_free || $selectedSubCategory->price <= 0)
 									                	<td id="startTest_{{$testSubjectPaper->id}}"><button onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button></td>
 									                @else
 									                	<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
@@ -214,10 +214,10 @@ font-weight: bold;
 								                    @else
 								                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
 									                    	<td><button disabled="true" data-toggle="tooltip" title="Already Added to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true"></i></button></td>
-									                    @elseif('true' == $isTestSubCategoryPurchased)
+									                    @elseif('true' == $isTestSubCategoryPurchased )
 									                    	<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
 									                    @else
-									                    	@if($price > 0)
+									                    	@if($selectedSubCategory->price > 0)
 									                    		<td><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to Add to Favourite!"><i class="fa
 									                    		fa-cart-plus" aria-hidden="true"></i></button></td>
 									                    	@else
@@ -256,7 +256,7 @@ font-weight: bold;
 										                    	@else
 										                    		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 											                    		<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" >Start</span></button></li>
-										                    		@elseif( 'true' == $isTestSubCategoryPurchased || (1 == $testSubjectPaper->is_free && 1 == $testSubjectPaper->allowed_unauthorised_user))
+										                    		@elseif( 'true' == $isTestSubCategoryPurchased  || 1 == $testSubjectPaper->is_free || $selectedSubCategory->price <= 0)
 													                	<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true"></span>Start</button></li>
 													                @else
 													                	<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please purchase sub category to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
@@ -296,7 +296,7 @@ font-weight: bold;
 													                    @elseif('true' == $isTestSubCategoryPurchased)
 													                    	<li id="registerPaper_mobile_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!" class="btn-magick btn-sm btn3d"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
 													                    @else
-													                    	@if($price > 0)
+													                    	@if($selectedSubCategory->price > 0)
 													                    		<li><button disabled="true" class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please purchase sub category to Add to Favourite!"><span class="fa fa-cart-plus" aria-hidden="true"></span> Add</button></li>
 													                    	@else
 													                    		<li id="registerPaper_mobile_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!" class="btn-magick btn-sm btn3d"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
@@ -513,7 +513,7 @@ font-weight: bold;
 		                			} else {
 	                					if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
 	                						divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
-	                					} else if('true' == msg['isTestSubCategoryPurchased'] || (1 == obj.is_free && 1 == obj.allowed_unauthorised_user)) {
+	                					} else if('true' == msg['isTestSubCategoryPurchased'] || 1 == obj.is_free || $(ele).find(':selected').data('price') <= 0) {
                 							divInnerHtml += '<td id="startTest_'+obj.id+'"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 	                					}else {
 		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
@@ -621,7 +621,7 @@ font-weight: bold;
 		                			} else {
 	                					if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
 	                						ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
-	                					} else if('true' == msg['isTestSubCategoryPurchased'] || (1 == obj.is_free && 1 == obj.allowed_unauthorised_user)){
+	                					} else if('true' == msg['isTestSubCategoryPurchased'] || 1 == obj.is_free || $(ele).find(':selected').data('price') <= 0){
                 							ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 
 	                					} else {

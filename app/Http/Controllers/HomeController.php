@@ -512,6 +512,164 @@ class HomeController extends Controller
             DB::connection('mysql')->beginTransaction();
             try
             {
+                $instamojoAuthErrors = '';
+                // check access token for application base auth
+                $instamojoDetail = InstamojoDetail::where('client_id', '4IfB5qdRnGjcq1LqCgkHLdARUvK3oAg1FyGdnqIR')->first();
+                if(is_object($instamojoDetail)){
+                    if(empty($instamojoDetail->application_base_access_token) && empty($instamojoDetail->application_base_token_type)){
+                        // get & store application token
+                        $applicationPostFields = [
+                                        'grant_type' => 'client_credentials',
+                                        'client_id' => $instamojoDetail->client_id,
+                                        'client_secret' => $instamojoDetail->client_secret
+                                      ];
+
+                        $curl = curl_init();
+                        curl_setopt_array($curl, array(
+                          CURLOPT_URL => "https://test.instamojo.com/oauth2/token/",
+                          CURLOPT_RETURNTRANSFER => true,
+                          CURLOPT_ENCODING => "",
+                          CURLOPT_MAXREDIRS => 10,
+                          CURLOPT_TIMEOUT => 60,
+                          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                          CURLOPT_CUSTOMREQUEST => "POST",
+                          CURLOPT_POSTFIELDS => $applicationPostFields,
+                          CURLOPT_HTTPHEADER => array(
+                            "cache-control: no-cache",
+                            "content-type: multipart/form-data;"
+                          ),
+                        ));
+
+                        $response = curl_exec($curl);
+                        $err = curl_error($curl);
+                        curl_close($curl);
+                        if ($err) {
+                            $instamojoAuthErrors.= 'application_auth_curl_error-' .(string)$err;
+                        } else {
+                            $results = json_decode($response, true);
+                            if(!empty($results['access_token']) && !empty($results['token_type'])){
+                                $instamojoDetail->application_base_access_token = $results['access_token'];
+                                $instamojoDetail->application_base_token_type = $results['token_type'];
+                                $instamojoDetail->save();
+
+                                $applicationAccessToken = $instamojoDetail->application_base_access_token;
+                                $applicationTokenType = $instamojoDetail->application_base_token_type;
+                            } else {
+                                if(count($results) > 0){
+                                    $instamojoAuthErrors.= '--------application_auth_error--------';
+                                    foreach($results as $key => $result){
+                                        $instamojoAuthErrors.= 'user -'.$client->email.'->'.$key.'->'.$result[0];
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        $applicationAccessToken = $instamojoDetail->application_base_access_token;
+                        $applicationTokenType = $instamojoDetail->application_base_token_type;
+                    }
+
+                    // sign up client
+                    $signupPostFields = [
+                                    'email'=> $client->email,
+                                    'password'=> $client->email,
+                                    'phone'=> $client->phone,
+                                    'referrer'=> $instamojoDetail->referrer
+                                  ];
+
+                    $curl = curl_init();
+
+                    curl_setopt_array($curl, array(
+                      CURLOPT_URL => "https://test.instamojo.com/v2/users/",
+                      CURLOPT_RETURNTRANSFER => true,
+                      CURLOPT_ENCODING => "",
+                      CURLOPT_MAXREDIRS => 10,
+                      CURLOPT_TIMEOUT => 60,
+                      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                      CURLOPT_CUSTOMREQUEST => "POST",
+                      CURLOPT_POSTFIELDS => $signupPostFields,
+                      CURLOPT_HTTPHEADER => array(
+                        "authorization: Bearer ".$applicationAccessToken."",
+                        "cache-control: no-cache",
+                        "content-type: multipart/form-data"
+                      ),
+                    ));
+
+                    $response = curl_exec($curl);
+                    $err = curl_error($curl);
+
+                    curl_close($curl);
+                    if($err) {
+                        $instamojoAuthErrors.= 'signup_curl_error-' .(string)$err;
+                    } else {
+                        $results = json_decode($response, true);
+
+                        if(!empty($results['id'])){
+                            $userAuth  = new UserBasedAuthentication;
+                            $userAuth->vchip_client_id = $client->id;
+                            $userAuth->instamojo_client_id = $results['id'];
+                            $userAuth->save();
+                        } else {
+                            if(count($results) > 0){
+                                $instamojoAuthErrors.= '--------signup_error--------';
+                                foreach($results as $key => $result){
+                                    $instamojoAuthErrors.= 'user -'.$client->email.'->'.$key.'->'.$result[0];
+                                }
+                            }
+                        }
+                    }
+                    // user based auth
+                    $userAuthPostFields = [
+                                    'grant_type'=>'password',
+                                    'client_id' => $instamojoDetail->client_id,
+                                    'client_secret' => $instamojoDetail->client_secret,
+                                    'username' => $client->email,
+                                    'password' => $client->email
+                                  ];
+
+                    $curl = curl_init();
+
+                    curl_setopt_array($curl, array(
+                      CURLOPT_URL => "https://test.instamojo.com/oauth2/token/",
+                      CURLOPT_RETURNTRANSFER => true,
+                      CURLOPT_ENCODING => "",
+                      CURLOPT_MAXREDIRS => 10,
+                      CURLOPT_TIMEOUT => 60,
+                      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                      CURLOPT_CUSTOMREQUEST => "POST",
+                      CURLOPT_POSTFIELDS => $userAuthPostFields,
+                      CURLOPT_HTTPHEADER => array(
+                        "cache-control: no-cache",
+                        "content-type: multipart/form-data"
+                      ),
+                    ));
+
+                    $response = curl_exec($curl);
+                    $err = curl_error($curl);
+
+                    curl_close($curl);
+
+                    if ($err) {
+                        $instamojoAuthErrors.= 'user_auth_curl_error-' .(string)$err;
+                    } else {
+                        $results = json_decode($response, true);
+                        if(!empty($results['access_token']) && !empty($results['refresh_token']) && !empty($results['token_type'])){
+                            $userAuth  = UserBasedAuthentication::where('vchip_client_id', $client->id)->first();
+                            if(is_object($userAuth)){
+                                $userAuth->access_token = $results['access_token'];
+                                $userAuth->refresh_token = $results['refresh_token'];
+                                $userAuth->token_type = $results['token_type'];
+                                $userAuth->save();
+                            }
+                        } else {
+                            if(count($results) > 0){
+                                $instamojoAuthErrors.= '--------user_auth_error--------';
+                                foreach($results as $key => $result){
+                                    $instamojoAuthErrors.= 'user -'.$client->email.'->'.$key.'->'.$result[0];
+                                }
+                            }
+                        }
+                    }
+                }
                 $clientPlanArray = [
                                         'client_id' => $client->id,
                                         'plan_id' => $planId,
@@ -523,6 +681,7 @@ class HomeController extends Controller
                                         'degrade_plan' => 0
                                     ];
                 ClientPlan::addFirstTimeClientPlan($clientPlanArray);
+
                 DB::connection('mysql')->commit();
             }
             catch(Exception $e)

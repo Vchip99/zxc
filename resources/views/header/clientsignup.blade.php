@@ -147,7 +147,7 @@
   function checkSubdomain(){
     var error = 0;
     var subdomain = document.getElementById('subdomain').value;
-    if(subdomain.length > 3){
+    if(subdomain.length > 2){
       //Build your expression
         var regex = new RegExp("^[a-zA-Z]+[a-zA-Z0-9\\-]*$");
         //Test your current value

@@ -422,7 +422,7 @@
 			    </div>
 		    </div>
 		    @if(isset($testQuestion->id) && !empty($testQuestion->answer5))
-			    <div class="form-group row ">
+			    <div class="form-group row " id="show_option5">
 			    	<label class="col-sm-2 col-form-label">Enter Answer5:</label>
 				    <div class="col-sm-10">
 				      	<textarea name="ans5" type="text" placeholder="Answer 5" id="ans5" size="85" maxlength="85">
@@ -479,6 +479,7 @@
 			    <div class="col-sm-3">
 			      	<input class="form-control"  name="answer" type="text" placeholder="True Answer" id="answer" value="@if(isset($testQuestion->id)) {!! $testQuestion->answer !!} @endif" required>
 			    </div>
+			    <label class="col-sm-4 col-form-label">Ex. 1 or 2 or 3 or 4 or 5 ( if have )</label>
 		    </div>
 		    <div class="form-group row num_ans hide">
 		    	<label class="col-sm-2 col-form-label">Enter Answer:</label>
@@ -881,6 +882,12 @@ ul#ul > li > a:hover:not(.active) {
 	}
 
   	$( document ).ready(function() {
+  		if( (document.getElementById('selected_paper_option_count') && 5 == document.getElementById('selected_paper_option_count').value) || 5 == $('#paper').find('option:selected').data('option_count')){
+  			if(document.getElementById('mcq_ques').classList.contains('active')){
+	  			document.getElementById('show_option5').classList.remove('hide');
+	  		}
+	  		document.getElementById('paper_option_count').value = 5;
+  		}
 
 		$(document).on('click', '#mcq_ques', function(){
 			$('#mcq_ques').addClass('active');
@@ -918,12 +925,6 @@ ul#ul > li > a:hover:not(.active) {
 				$('#num_ques').trigger("click");
 			}
 		}
-
-		if( (document.getElementById('selected_paper_option_count') && 5 == document.getElementById('selected_paper_option_count').value) || 5 == $('#paper').find('option:selected').data('option_count')){
-  			if(document.getElementById('mcq_ques').classList.contains('active')){
-	  			document.getElementById('show_option5').classList.remove('hide');
-	  		}
-  		}
 
   		if(1 == $("#check_common_data:checked").val()){
 	  		$('#show_common_data').removeClass('hide');

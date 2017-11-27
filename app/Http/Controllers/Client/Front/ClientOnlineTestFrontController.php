@@ -62,12 +62,13 @@ class ClientOnlineTestFrontController extends ClientHomeController
 		if(isset($subcatId)){
 			$subcategory = ClientOnlineTestSubCategory::find($subcatId);
 			if(is_object($subcategory)){
-				$price = $subcategory->price;
 				$catId = $subcategory->category_id;
+				$selectedSubCategory = $subcategory;
 				$testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($catId, $request);
 				$testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
 				$testSubjectPapers = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
+
 				if(is_array($testSubjectPapers)){
 					foreach($testSubjectPapers as $testPapers){
 						foreach($testPapers as $testPaper){
@@ -101,7 +102,8 @@ class ClientOnlineTestFrontController extends ClientHomeController
                     }
                 }
 
-				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper', 'price'));
+
+				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper', 'selectedSubCategory'));
 			}
 		}
 		return Redirect::to('/');

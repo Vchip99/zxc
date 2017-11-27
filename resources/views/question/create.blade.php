@@ -825,6 +825,12 @@
 	}
 
   	$( document ).ready(function() {
+  		if( (document.getElementById('selected_paper_option_count') && 5 == document.getElementById('selected_paper_option_count').value) || 5 == $('#paper').find('option:selected').data('option_count')){
+  			if(document.getElementById('mcq_ques').classList.contains('active')){
+	  			document.getElementById('show_option5').classList.remove('hide');
+	  		}
+	  		document.getElementById('paper_option_count').value = 5;
+  		}
 
 		$(document).on('click', '#mcq_ques', function(){
 			$('#mcq_ques').addClass('active');
@@ -862,12 +868,6 @@
 				$('#num_ques').trigger("click");
 			}
 		}
-
-		if( (document.getElementById('selected_paper_option_count') && 5 == document.getElementById('selected_paper_option_count').value) || 5 == $('#paper').find('option:selected').data('option_count')){
-  			if(document.getElementById('mcq_ques').classList.contains('active')){
-	  			document.getElementById('show_option5').classList.remove('hide');
-	  		}
-  		}
 
   		if(1 == $("#check_common_data:checked").val()){
 	  		$('#show_common_data').removeClass('hide');
