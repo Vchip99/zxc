@@ -14,6 +14,7 @@ use App\Models\DiscussionCategory;
 use App\Models\Notification;
 use App\Models\ReadNotification;
 use Auth,DB,Validator,Redirect,Session;
+use App\Models\Add;
 
 class DiscussionController extends Controller
 {
@@ -45,7 +46,7 @@ class DiscussionController extends Controller
     /**
      *  show list of discussion post
      */
-    protected function discussion($commentId=NULL, $subcommentId=NULL ){
+    protected function discussion(Request $request,$commentId=NULL, $subcommentId=NULL ){
         $postCategoryIds = [];
         $discussionCategories =DiscussionCategory::all();
         $posts = DiscussionPost::orderBy('id', 'desc')->get();
@@ -91,7 +92,9 @@ class DiscussionController extends Controller
         } else {
             $currentUser = 0;
         }
-        return view('discussion.discussion', compact('discussionCategories','posts', 'user', 'postCategoryIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
+        $date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+        return view('discussion.discussion', compact('discussionCategories','posts', 'user', 'postCategoryIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'ads'));
     }
 
     /**

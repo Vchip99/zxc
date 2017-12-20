@@ -43,11 +43,12 @@ class CreateApplicationUser extends Command
     {
         $this->info('create client on instamojo:');
         $errorCount = 0;
+
         DB::connection('mysql2')->beginTransaction();
         try
         {
             // check access token for application base auth
-            $instamojoDetail = InstamojoDetail::where('client_id', '4IfB5qdRnGjcq1LqCgkHLdARUvK3oAg1FyGdnqIR')->first();
+            $instamojoDetail = InstamojoDetail::first();
 
             if(!is_object($instamojoDetail)){
                 exit();
@@ -55,54 +56,59 @@ class CreateApplicationUser extends Command
             $applicationAccessToken = $instamojoDetail->application_base_access_token;
             $applicationTokenType = $instamojoDetail->application_base_token_type;
 
+            if('local' == \Config::get('app.env')){
+                $signUpUrl = "https://test.instamojo.com/v2/users/";
+                $userAuthUrl = "https://test.instamojo.com/oauth2/token/";
+            } else {
+                $signUpUrl = "https://api.instamojo.com/v2/users/";
+                $userAuthUrl = "https://api.instamojo.com/oauth2/token/";
+            }
+
             $clients = Client::all();
             if(is_object($clients) && false == $clients->isEmpty()){
-                foreach($clients as $client){
-                    $instamojoAuthErrors = '';
-                    // sign up client
-                    $signupPostFields = [
-                                    'email'=> $client->email,
-                                    'password'=> $client->email,
-                                    'phone'=> $client->phone,
-                                    'referrer'=> $instamojoDetail->referrer
-                                  ];
+              foreach($clients as $client){
+                // sign up client
+                $signupPostFields = [
+                                'email'=> $client->email,
+                                'password'=> $client->email,
+                                'phone'=> $client->phone,
+                                'referrer'=> $instamojoDetail->referrer
+                              ];
 
-                    $curl = curl_init();
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                  CURLOPT_URL => $signUpUrl,
+                  CURLOPT_RETURNTRANSFER => true,
+                  CURLOPT_ENCODING => "",
+                  CURLOPT_MAXREDIRS => 10,
+                  CURLOPT_TIMEOUT => 60,
+                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  CURLOPT_CUSTOMREQUEST => "POST",
+                  CURLOPT_POSTFIELDS => $signupPostFields,
+                  CURLOPT_HTTPHEADER => array(
+                    "authorization: Bearer ".$applicationAccessToken."",
+                    "cache-control: no-cache",
+                    "content-type: multipart/form-data"
+                  ),
+                ));
 
-                    curl_setopt_array($curl, array(
-                      CURLOPT_URL => "https://test.instamojo.com/v2/users/",
-                      CURLOPT_RETURNTRANSFER => true,
-                      CURLOPT_ENCODING => "",
-                      CURLOPT_MAXREDIRS => 10,
-                      CURLOPT_TIMEOUT => 60,
-                      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                      CURLOPT_CUSTOMREQUEST => "POST",
-                      CURLOPT_POSTFIELDS => $signupPostFields,
-                      CURLOPT_HTTPHEADER => array(
-                        "authorization: Bearer ".$applicationAccessToken."",
-                        "cache-control: no-cache",
-                        "content-type: multipart/form-data"
-                      ),
-                    ));
+                $response = curl_exec($curl);
+                $err = curl_error($curl);
 
-                    $response = curl_exec($curl);
-                    $err = curl_error($curl);
+                curl_close($curl);
 
-                    curl_close($curl);
-
-                    if($err) {
-                        $instamojoAuthErrors.= 'signup_error-' .(string)$err;
-                        $errorCount++;
-                    } else {
-                        $result = json_decode($response);
-                        if(!empty($result->id)){
-                            $userAuth  = new UserBasedAuthentication;
-                            $userAuth->vchip_client_id = $client->id;
-                            $userAuth->instamojo_client_id = $result->id;
-                            $userAuth->save();
-                            $this->info('sign up client:'. $client->name);
-                        }
-                    }
+                if($err) {
+                    $this->info('signup_error-' .(string)$err.'</br>');
+                    $errorCount++;
+                } else {
+                  $result = json_decode($response);
+                  if(!empty($result->id)){
+                    $userAuth  = new UserBasedAuthentication;
+                    $userAuth->vchip_client_id = $client->id;
+                    $userAuth->instamojo_client_id = $result->id;
+                    $userAuth->save();
+                    DB::connection('mysql2')->commit();
+                    $this->info('sign up client:'. $client->name);
 
                     // user based auth
                     $userAuthPostFields = [
@@ -114,9 +120,8 @@ class CreateApplicationUser extends Command
                                   ];
 
                     $curl = curl_init();
-
                     curl_setopt_array($curl, array(
-                      CURLOPT_URL => "https://test.instamojo.com/oauth2/token/",
+                      CURLOPT_URL => $userAuthUrl,
                       CURLOPT_RETURNTRANSFER => true,
                       CURLOPT_ENCODING => "",
                       CURLOPT_MAXREDIRS => 10,
@@ -136,7 +141,7 @@ class CreateApplicationUser extends Command
                     curl_close($curl);
 
                     if ($err) {
-                        $instamojoAuthErrors.= 'user_auth_error-' .(string)$err;
+                        $this->info('user_auth_error- ' .(string)$err);
                         $errorCount++;
                     } else {
                         $result = json_decode($response);
@@ -150,22 +155,39 @@ class CreateApplicationUser extends Command
                                 DB::connection('mysql2')->commit();
                                 $this->info('create user auth client:'. $client->name);
                             }
+                        } else {
+                          $errorCount++;
+                          $results = json_decode($response, true);
+                          if(count($results) > 0){
+                              $this->info('--------user_auth_error--------</br>');
+                              foreach($results as $key => $result){
+                                $this->info('user -'.$client->email.'->'.$key.'->'.$result[0].'</br>');
+                              }
+                          }
                         }
                     }
-                    if(!empty($instamojoAuthErrors)){
-                        $this->info($instamojoAuthErrors);
+                  } else {
+                    $errorCount++;
+                    $results = json_decode($response, true);
+                    if(count($results) > 0){
+                        $this->info('--------signup_error--------</br>');
+                        foreach($results as $key => $result){
+                            $this->info('user -'.$client->email.'->'.$key.'->'.$result[0].'</br>');
+                        }
                     }
+                  }
                 }
+                if( 0 == $errorCount ){
+                    $this->info('clients are successfully signup on instamojo.');
+                } else {
+                    $this->info('errors are created while client signup on instamojo.');
+                }
+              }
             }
         }
         catch(Exception $e)
         {
             DB::connection('mysql2')->rollback();
-        }
-        if( 0 == $errorCount ){
-            $this->info('clients are successfully signup on instamojo.');
-        } else {
-            $this->info('errors are created while client signup on instamojo.');
         }
     }
 }

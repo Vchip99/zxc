@@ -13,31 +13,35 @@ use App\Models\Question;
 use App\Models\Notification;
 use App\Models\ReadNotification;
 use Session, Redirect, Auth, DB;
+use App\Models\Add;
 
 class TestController extends Controller
 {
 	/**
 	 *	show test sub categories by categoryId
 	 */
-	public function index(){
+	public function index(Request $request){
 		$testCategories = TestCategory::getTestCategoriesAssociatedWithQuestion();
-		// dd(DB::getQueryLog());
 		$testSubCategories = TestSubCategory::getTestSubCategoriesAssociatedWithQuestion();
 		$catId = 0;
-		return view('tests.test_info', compact('catId','testCategories', 'testSubCategories'));
+		$date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+		return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads'));
 	}
 
 	/**
 	 *	show test info by categoryId
 	 */
-	protected function showTest($id){
+	protected function showTest(Request $request,$id){
 		$catId = json_decode($id);
 		if(isset($catId)){
 			$category = TestCategory::find($catId);
 			if(is_object($category)){
 				$testCategories = TestCategory::getTestCategoriesAssociatedWithQuestion();
 				$testSubCategories = TestSubCategory::getSubcategoriesByCategoryId($catId);
-				return view('tests.test_info', compact('catId','testCategories', 'testSubCategories'));
+				$date = date('Y-m-d');
+        		$ads = Add::getAdds($request->url(),$date);
+				return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads'));
 			}
 		}
 		return Redirect::to('/');
@@ -223,13 +227,23 @@ class TestController extends Controller
         $totalMarks = 0 ;
         $score = Score::getUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcatId,$paperId,$subjectId,$userId);
         if(is_object($score)){
-        	$rank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$score->test_score,$collegeId);
-        	$totalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcatId,$subjectId, $paperId,$collegeId);
+        	$collegeRank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$score->test_score,$collegeId);
+            $collegeTotalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcatId,$subjectId, $paperId,$collegeId);
+            $globalRank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$score->test_score,'all');
+            $globalTotalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcatId,$subjectId, $paperId,'all');
+
         	$questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcatId, $subjectId, $paperId);
         	foreach($questions as $question){
         		$totalMarks += $question->positive_marks;
         	}
-        	return view('tests.user_test_result', compact('score', 'rank', 'totalMarks', 'totalRank'));
+        	$percentile = ceil(((($globalTotalRank + 1) - ($globalRank +1) )/ $globalTotalRank)*100);
+            $percentage = ceil(($score->right_answered/$totalMarks)*100);
+            if(($score->right_answered + $score->wrong_answered) > 0){
+                $accuracy =  ceil(($score->right_answered/($score->right_answered + $score->wrong_answered))*100);
+            } else {
+                $accuracy = 0;
+            }
+        	return view('tests.user_test_result', compact('score', 'globalRank', 'totalMarks', 'globalTotalRank', 'percentile', 'percentage', 'accuracy', 'collegeRank', 'collegeTotalRank'));
         } else {
     		return Redirect::to('/');
         }

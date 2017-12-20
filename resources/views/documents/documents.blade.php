@@ -55,7 +55,7 @@
 <section id="sidemenuindex" class="v_container">
   <div class="container ">
     <div class="row">
-      <div class="col-sm-3 ">
+      <div class="col-sm-3 hidden-div">
         <h4 class="v_h4_subtitle"> Sorted By</h4>
         <div class="dropdown mrgn_20_top_btm" id="cat">
           <select class="form-control" id="category" name="category" onchange="showDocuments(this);">
@@ -90,8 +90,9 @@
             <label><input class="search" type="checkbox" value="2" data-filter="typeOfDoc" onclick="searchDocuments();">Documentry</label>
           </div>
         </div>
+
       </div>
-      <div class="col-sm-9 ">
+      <div class="col-sm-9 col-sm-push-3 ">
         <div class="row info" id="documents">
           @if(count($documents)>0)
             @foreach($documents as $document)
@@ -126,12 +127,12 @@
                           <a class="btn btn-primary vote-btn" id="favourite-{{$document->id}}" data-favourite="false" onClick="registerFavouriteDocuments(this);" data-document_id="{{$document->id}}" title="Favourite Document"> <i class="fa fa-star " aria-hidden="true"></i> </a>
                         @endif
                         </p>
-                    </div>
-                    <div class="course-auther">
-                      <a ><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$document->author}}"> {{$document->author}}</i>
-                      </a>
-                    </div>
                   </div>
+                  <div class="course-auther">
+                    <a ><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$document->author}}"> {{$document->author}}</i>
+                    </a>
+                  </div>
+                </div>
               </div>
               <div id="dynamic-modal-{{$document->id}}" class="modal fade" role="dialog">
                 <div class="modal-dialog">
@@ -163,9 +164,115 @@
             No documents are available.
           @endif
         </div>
-          <div style="float: right;" id="pagination">
-            {{ $documents->links() }}
+        <div  id="pagination">
+          {{ $documents->links() }}
+        </div>
+      </div>
+      <div class="col-sm-3 col-sm-pull-9">
+        <div class="hidden-div1">
+          <h4 class="v_h4_subtitle"> Sorted By</h4>
+          <div class="dropdown mrgn_20_top_btm" id="cat">
+            <select class="form-control" id="category" name="category" onchange="showDocuments(this);">
+               <option>Select Category ...</option>
+                @if(count($documentsCategories) > 0)
+                  @foreach($documentsCategories as $index => $documentsCategory)
+                    <option value="{{$documentsCategory->id}}">{{$documentsCategory->name}}</option>
+                  @endforeach
+                @endif
+            </select>
           </div>
+          <h4 class="v_h4_subtitle mrgn_20_top_btm"> Filter By</h4>
+          <div class="panel"></div>
+          <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Difficulty"> Difficulty</p>
+          <div class="panel">
+            <div class="checkbox">
+              <label><input class="search" type="checkbox" value="1" data-filter="difficulty" onclick="searchDocuments();"> Beginner</label>
+            </div>
+            <div class="checkbox">
+              <label><input class="search" type="checkbox" value="2" data-filter="difficulty" onclick="searchDocuments();">Intermediate</label>
+            </div>
+            <div class="checkbox">
+              <label><input class="search" type="checkbox" value="3" data-filter="difficulty" onclick="searchDocuments();"> Advanced</label>
+            </div>
+          </div>
+          <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Type of Document"> Type of Document </p>
+          <div class="panel">
+             <div class="checkbox">
+              <label><input class="search" type="checkbox" value="1" data-filter="typeOfDoc" onclick="searchDocuments();">Reasearch Paper</label>
+            </div>
+            <div class="checkbox">
+              <label><input class="search" type="checkbox" value="2" data-filter="typeOfDoc" onclick="searchDocuments();">Documentry</label>
+            </div>
+          </div>
+        </div>
+        <div class="advertisement-area">
+            <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
+        </div>
+        <br/>
+        @if(count($ads) > 0)
+          @foreach($ads as $ad)
+            <div class="add-1">
+              <div class="course-box">
+                <a class="img-course-box" href="{{ $ad->website_url }}" target="_blank">
+                  <img src="{{asset($ad->logo)}}" alt="{{ $ad->company }}"  class="img-responsive" />
+                </a>
+                <div class="course-box-content">
+                  <h4 class="course-box-title" title="{{ $ad->company }}" data-toggle="tooltip" data-placement="bottom">
+                    <a href="{{ $ad->website_url }}" target="_blank">{{ $ad->company }}</a>
+                  </h4>
+                  <p class="more"> {{ $ad->tag_line }}</p>
+                </div>
+              </div>
+            </div>
+          @endforeach
+        @endif
+        @if(count($ads) < 3)
+          @for($i = count($ads)+1; $i <=3; $i++)
+            @if(1 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">
+                    <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="SSGMCE"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="SSGMCE" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">SSGMCE</a>
+                    </h4>
+                    <p class="more"> SSGMCE</p>
+                  </div>
+                </div>
+              </div>
+            @elseif(2 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://ghrcema.raisoni.net/" target="_blank">
+                    <img src="{{ asset('images/logo/ghrcema_logo.png') }}" alt="G H RISONI"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="G H RISONI" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://ghrcema.raisoni.net/" target="_blank">G H RISONI</a>
+                    </h4>
+                    <p class="more"> G H RISONI</p>
+                  </div>
+                </div>
+              </div>
+            @elseif(3 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://hvpmcoet.in/" target="_blank">
+                    <img src="{{ asset('images/logo/hvpm.jpg') }}" alt="HVPM"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="HVPM" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://hvpmcoet.in/" target="_blank">HVPM College of Engineer And Technology</a>
+                    </h4>
+                    <p class="more"> HVPM College of Engineer And Technology</p>
+                  </div>
+                </div>
+              </div>
+            @endif
+          @endfor
+        @endif
       </div>
     </div>
   </div>

@@ -19,7 +19,7 @@ class WorkshopCategory extends Model
     protected $fillable = ['name'];
 
     /**
-     *  add/update course category
+     *  add/update category
      */
     protected static function addOrUpdateWorkshopCategory( Request $request, $isUpdate=false){
         $categoryName = InputSanitise::inputString($request->get('category'));

@@ -5,35 +5,50 @@
 @section('header-css')
 	@include('layouts.home-css')
   <style >
-    .video_id{font-weight: 900px;
-      font-size: 90px;
-      text-align: center;}
-      /*read-more*/
-      .morecontent span {
-          display: none;
-      }
-      .morelink {
-          display: block;
-      }
-      @media  (min-width: 617px) {
-       .data-sm { display: none; }
-      }
-      @media  (max-width: 616px) {
-        .data-lg { display: none; }
-      }
-      /*download*/
-      .download-item{width: 100px;}
-      .btn-group-lg .btn{border-radius: 0px;}
-      @media  (min-width: 350px) {
-          .hidden-lg { display: none; }
-        }
-      @media  (max-width: 349px) {
-          .hidden-sm { display: none; }
-          .top-btn-align, .bottom-btn-align{text-align: center;}
-        }
-      .vote-btn.selected{
-        color:#e91e63 !important;
-      }
+.video_id{font-weight: 900px;
+  font-size: 90px;
+  text-align: center;}
+  /*read-more*/
+  .morecontent span {
+      display: none;
+  }
+  .morelink {
+      display: block;
+  }
+  @media  (min-width: 617px) {
+   .data-sm { display: none; }
+  }
+  @media  (max-width: 616px) {
+    .data-lg { display: none; }
+  }
+  /*download*/
+  .download-item{width: 100px;}
+  .btn-group-lg .btn{border-radius: 0px;}
+  @media  (min-width: 350px) {
+    }
+  @media  (max-width: 349px) {
+      .top-btn-align, .bottom-btn-align{text-align: center;}
+    }
+  .vote-btn.selected{
+    color:#e91e63 !important;
+  }
+@media(max-width: 505px){
+.col-sm-12, .col-md-9{
+  padding-left: 0px;
+  padding-right: 0px;
+}
+}
+.download_iteam {
+border: 1px solid #ddd;
+width: 100px;
+border-radius: 20px;
+padding: 10px;
+margin-top: 10px;
+}
+.download_iteam .fa {
+font-size: 20px;
+margin: 0px 5px;
+}
   </style>
 @stop
 @section('header-js')
@@ -60,19 +75,18 @@
     <div class="col-md-12">
       <div class=" btn-group btn-group-justified btn-group-lg " role="group" aria-label="...">
           <div class="btn-group" role="group" title="Back">
-              <a class=" btn btn-default btn-symboll" href="{{ url('courses')}}" title="Back"><span class="hidden-lg fa fa-arrow-circle-left" aria-hidden="true"></span>
-                  <div class="hidden-sm fa fa-arrow-circle-left "> </div>
+              <a class=" btn btn-default btn-symboll" href="{{ url('courses')}}" title="Back">
+              <span class=" fa fa-arrow-circle-left" aria-hidden="true"></span>
               </a>
           </div>
           <div class="btn-group" role="group" title="Videos">
               <button type="button" id="stars" class="btn-tab btn btn-primary"  href="#videoLectures" data-toggle="tab" >
-              <span class="hidden-lg" aria-hidden="true">Vid..</span>
-                  <div class="hidden-sm">Videos</div>
+                  <div class="">Videos</div>
               </button>
           </div>
           <div class="btn-group" role="group" title="About Course">
-              <button type="button" id="favorites" class="btn-tab btn btn-default" href="#briefCourse" data-toggle="tab" ><span class="hidden-lg" aria-hidden="true">Abo...</span>
-                  <div class="hidden-sm">About</div>
+              <button type="button" id="favorites" class="btn-tab btn btn-default" href="#briefCourse" data-toggle="tab" >
+                  <div class="">About</div>
               </button>
           </div>
           <div class="btn-group" role="group" title="Favourite">
@@ -106,13 +120,13 @@
                 <a class="btn btn-primary is-bold" role="button" data-toggle="collapse" href="#collapseExample_{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">
                 Download</a>
               </span>
-              <div class="collapse download-item" id="collapseExample_{{$video->id}}">
-                <div class="well">
+              <div class="collapse download_iteam" id="collapseExample_{{$video->id}}">
+                <div class="">
                   <a download title="pdf">
-                    <i class="fa fa-file-pdf-o mrgn_5_left" aria-hidden="true"></i>
+                    <i class="fa fa-file-pdf-o " aria-hidden="true"></i>
                   </a>
                   <a download title="video">
-                    <i class="fa fa-video-camera mrgn_5_left" aria-hidden="true"></i>
+                    <i class="fa fa-video-camera " aria-hidden="true"></i>
                   </a>
                 </div>
               </div>

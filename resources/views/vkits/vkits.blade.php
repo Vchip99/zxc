@@ -44,7 +44,7 @@
 <section id="sidemenuindex"  class="v_container">
   <div class="container ">
     <div class="row">
-      <div class="col-sm-3 ">
+      <div class="col-sm-3  hidden-div">
         <h4 class="v_h4_subtitle "> Sorted By</h4>
         <div class="mrgn_20_top_btm" id="cat">
           <select class="form-control" id="category" name="category" title="Category" onchange="showProjects(this);">
@@ -88,8 +88,9 @@
             <label><input class="search" type="checkbox" value="1" data-filter="upcoming" onclick="searchVkitProjects();">Upcoming</label>
           </div>
         </div>
+
       </div>
-      <div class="col-sm-9 ">
+      <div class="col-sm-9 col-sm-push-3">
         <div class="row info" id="vkitprojects">
           @if(count($projects) > 0)
             @foreach($projects as $project)
@@ -130,10 +131,125 @@
               No projects are available.
             @endif
           </div>
-            <div style="float: right;" id="pagination">
+            <div  id="pagination">
               {{ $projects->links() }}
             </div>
+      </div>
+      <div class="col-sm-3 col-sm-pull-9">
+        <div class="hidden-div1">
+             <h4 class="v_h4_subtitle "> Sorted By</h4>
+              <div class="mrgn_20_top_btm" id="cat">
+                <select class="form-control" id="category" name="category" title="Category" onchange="showProjects(this);">
+                  <option value="">Select Category ...</option>
+                  @if(count($vkitCategories) > 0)
+                    @foreach($vkitCategories as $index => $vkitCategory)
+                      <option value="{{$vkitCategory->id}}">{{$vkitCategory->name}}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+              <h4 class="v_h4_subtitle mrgn_20_top_btm"> Filter By</h4>
+              <div class="panel"></div>
+              <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Gateway"> Gateway</p>
+              <div class="panel">
+                <div class="checkbox">
+                  <label><input class="search" type="checkbox" value="1" data-filter="gateway" onclick="searchVkitProjects();">Android</label>
+                </div>
+                <div class="checkbox">
+                  <label><input class="search" type="checkbox" value="2" data-filter="gateway" onclick="searchVkitProjects();">Raspberry-pi</label>
+                </div>
+                <div class="checkbox">
+                  <label><input class="search" type="checkbox" value="3" data-filter="gateway" onclick="searchVkitProjects();">Intel galileo</label>
+                </div>
+              </div>
+              <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm"  title="Microcontroller"> Microcontroller</p>
+              <div class="panel">
+                <div class="checkbox">
+                  <label><input class="search" type="checkbox" value="1" data-filter="microcontroller" onclick="searchVkitProjects();">AVR</label>
+                </div>
+                <div class="checkbox">
+                  <label><input class="search" type="checkbox" value="2" data-filter="microcontroller" onclick="searchVkitProjects();">Atmega328</label>
+                </div>
+                <div class="checkbox">
+                  <label><input class="search" type="checkbox" value="3" data-filter="microcontroller" onclick="searchVkitProjects();">8051/8052</label>
+                </div>
+              </div>
+              <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm"  title="Others"> Others</p>
+              <div class="panel">
+                <div class="checkbox">
+                  <label><input class="search" type="checkbox" value="1" data-filter="upcoming" onclick="searchVkitProjects();">Upcoming</label>
+                </div>
+              </div>
         </div>
+        <div class="advertisement-area">
+            <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
+        </div>
+        <br/>
+        @if(count($ads) > 0)
+          @foreach($ads as $ad)
+            <div class="add-1">
+              <div class="course-box">
+                <a class="img-course-box" href="{{ $ad->website_url }}" target="_blank">
+                  <img src="{{asset($ad->logo)}}" alt="{{ $ad->company }}"  class="img-responsive" />
+                </a>
+                <div class="course-box-content">
+                  <h4 class="course-box-title" title="{{ $ad->company }}" data-toggle="tooltip" data-placement="bottom">
+                    <a href="{{ $ad->website_url }}" target="_blank">{{ $ad->company }}</a>
+                  </h4>
+                  <p class="more"> {{ $ad->tag_line }}</p>
+                </div>
+              </div>
+            </div>
+          @endforeach
+        @endif
+        @if(count($ads) < 3)
+          @for($i = count($ads)+1; $i <=3; $i++)
+            @if(1 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">
+                    <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="SSGMCE"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="SSGMCE" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">SSGMCE</a>
+                    </h4>
+                    <p class="more"> SSGMCE</p>
+                  </div>
+                </div>
+              </div>
+            @elseif(2 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://ghrcema.raisoni.net/" target="_blank">
+                    <img src="{{ asset('images/logo/ghrcema_logo.png') }}" alt="G H RISONI"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="G H RISONI" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://ghrcema.raisoni.net/" target="_blank">G H RISONI</a>
+                    </h4>
+                    <p class="more"> G H RISONI</p>
+                  </div>
+                </div>
+              </div>
+            @elseif(3 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://hvpmcoet.in/" target="_blank">
+                    <img src="{{ asset('images/logo/hvpm.jpg') }}" alt="HVPM"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="HVPM" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://hvpmcoet.in/" target="_blank">HVPM College of Engineer And Technology</a>
+                    </h4>
+                    <p class="more"> HVPM College of Engineer And Technology</p>
+                  </div>
+                </div>
+              </div>
+            @endif
+          @endfor
+        @endif
+      </div>
     </div>
   </div>
 </section>

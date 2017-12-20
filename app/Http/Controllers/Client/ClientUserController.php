@@ -325,10 +325,15 @@ class ClientUserController extends BaseController
         if(!is_object($clientUserAuth)){
             return redirect()->back()->withErrors('something went wrong.');
         }
-        $curl = curl_init();
+        if('local' == \Config::get('app.env')){
+            $paymentRequestUrl = "https://test.instamojo.com/v2/payment_requests/";
+        } else {
+            $paymentRequestUrl = "https://api.instamojo.com/v2/payment_requests/";
+        }
 
+        $curl = curl_init();
         curl_setopt_array($curl, array(
-          CURLOPT_URL => "https://test.instamojo.com/v2/payment_requests/",
+          CURLOPT_URL => $paymentRequestUrl,
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => "",
           CURLOPT_MAXREDIRS => 10,
@@ -362,7 +367,6 @@ class ClientUserController extends BaseController
     }
 
     protected function redirectCoursePayment(Request $request){
-
         $paymentRequestId = $request->get('payment_request_id');
         $paymentId = $request->get('payment_id');
         if(!empty($paymentRequestId) && !empty($paymentId)){
@@ -373,10 +377,16 @@ class ClientUserController extends BaseController
             if(!is_object($clientUserAuth)){
                 return redirect()->back()->withErrors('something went wrong.');
             }
-            $curl = curl_init();
 
+            if('local' == \Config::get('app.env')){
+                $userPaymentUrl = "https://test.instamojo.com/v2/payments/".$paymentId."/";
+            } else {
+                $userPaymentUrl = "https://api.instamojo.com/v2/payments/".$paymentId."/";
+            }
+
+            $curl = curl_init();
             curl_setopt_array($curl, array(
-              CURLOPT_URL => "https://test.instamojo.com/v2/payments/".$paymentId."/",
+              CURLOPT_URL => $userPaymentUrl,
               CURLOPT_RETURNTRANSFER => true,
               CURLOPT_ENCODING => "",
               CURLOPT_MAXREDIRS => 10,
@@ -520,10 +530,15 @@ class ClientUserController extends BaseController
         if(!is_object($clientUserAuth)){
             return redirect()->back()->withErrors('something went wrong.');
         }
-        $curl = curl_init();
+        if('local' == \Config::get('app.env')){
+            $paymentRequestUrl = "https://test.instamojo.com/v2/payment_requests/";
+        } else {
+            $paymentRequestUrl = "https://api.instamojo.com/v2/payment_requests/";
+        }
 
+        $curl = curl_init();
         curl_setopt_array($curl, array(
-          CURLOPT_URL => "https://test.instamojo.com/v2/payment_requests/",
+          CURLOPT_URL => $paymentRequestUrl,
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => "",
           CURLOPT_MAXREDIRS => 10,
@@ -572,10 +587,15 @@ class ClientUserController extends BaseController
             if(!is_object($clientUserAuth)){
                 return redirect()->back()->withErrors('something went wrong.');
             }
-            $curl = curl_init();
+            if('local' == \Config::get('app.env')){
+                $paymentUrl = "https://test.instamojo.com/v2/payments/".$paymentId."/";
+            } else {
+                $paymentUrl = "https://api.instamojo.com/v2/payments/".$paymentId."/";
+            }
 
+            $curl = curl_init();
             curl_setopt_array($curl, array(
-              CURLOPT_URL => "https://test.instamojo.com/v2/payments/".$paymentId."/",
+              CURLOPT_URL => $paymentUrl,
               CURLOPT_RETURNTRANSFER => true,
               CURLOPT_ENCODING => "",
               CURLOPT_MAXREDIRS => 10,

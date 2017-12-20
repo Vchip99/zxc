@@ -77,14 +77,14 @@
                         @if($testSubCategory->price > 0)
                           <a href="{{ url('purchaseTestSubCategory')}}/{{$testSubCategory->id}}" class="btn btn-primary" title="Pay Now" style="min-width: 100px;">Pay Now</a>
                         @else
-                          <a class="btn btn-primary" title="Paid" style="min-width: 100px;">Free</a>
+                          <a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>
                         @endif
                       @endif
                     @else
                       @if($testSubCategory->price > 0)
                         <a class="btn btn-primary" title="Pay Now" style="min-width: 100px;"  onClick="checkLogin();">Pay Now</a>
                       @else
-                        <a class="btn btn-primary" title="Paid" style="min-width: 100px;">Free</a>
+                        <a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>
                       @endif
                     @endif
                   </div>

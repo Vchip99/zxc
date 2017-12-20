@@ -25,7 +25,7 @@ p img{margin-top: 30px;}
 	@if(count($sections) > 0)
 		@foreach($sections as $index => $section)
 			@if( isset($questions[$section->id]) && count($questions[$section->id]) > 0)
-			<a class="btn btn-primary" style="width:100px;">{{ $section->name }}</a>
+			<a class="btn btn-primary" style="min-width:100px; max-width:200px;">{{ $section->name }}</a>
 				@foreach($questions[$section->id] as $index => $question)
 					<div class="panel-body"><span class="watermark">{{ $clientSubdomain }}</span>
 						<div >

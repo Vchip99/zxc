@@ -17,13 +17,13 @@
           <ul >
              <li><a href="{{ url('courses')}}">Online Courses</a></li>
              <li><a href="{{ url('liveCourse') }}">Live Course</a></li>
-             <li class="divider"></li>
+             <li class=""></li>
              <li><a href="{{ url('online-tests') }}">Online Test Series</a></li>
-             <li class="divider"></li>
+             <li class=""></li>
              <li><a href="{{ url('workshops') }}">Workshops</a></li>
-             <li class="divider"></li>
+             <li class=""></li>
              <li><a href="{{ url('vkits') }}">Hobby Projects</a></li>
-             <li class="divider"></li>
+             <li class=""></li>
              <li><a href="{{ url('documents') }}">Documents</a></li>
           </ul>
         </div>

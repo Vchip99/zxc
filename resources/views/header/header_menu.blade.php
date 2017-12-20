@@ -102,7 +102,10 @@
             <ul class="dropdown-menu" role="menu">
              <div class="navbar-content">
                <li> <b style="color: #01bafd;">Collage</b></li>
-                 <li class="mrgn_10_left"><a href="{{ url('erp') }}" title="Digital edu & ERP">Digital edu & ERP</a></li>
+                <li class="mrgn_10_left"><a href="{{ url('erp') }}" title="Digital edu & ERP">Digital edu & ERP</a></li>
+                <li class="mrgn_10_left"><a href="{{ url('offlineworkshops') }}" title="workshops">workshops</a></li>
+                <li class="mrgn_10_left"><a href="{{ url('motivationalspeech') }}" title="motivational speech">motivational speech</a></li>
+                <li class="mrgn_10_left"><a href="{{ url('virtualplacementdrive') }}" title="virtual placement drive">virtual placement drive</a></li>
                 <li class="divider"></li>
                 <li> <b style="color: #01bafd;">Coaching Institute</b></li>
                  <li class="mrgn_10_left"><a href="{{ url('educationalPlatform') }}" title="Education Platform">Education Platform</a></li>

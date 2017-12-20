@@ -352,7 +352,7 @@ font-size: 20px;
         </figure>
       </div>
       <div class="col-md-2 col-md-pull-8 " style="padding: 4% 0;">
-          <p class="tree-tital">COLLAGE/STUDENTS</p>
+          <p class="tree-tital">COLLEGE/STUDENTS</p>
             <div class="tree-menu"><a href="#">Bridging a gap between industries & Students</a></div>
             <div class="tree-menu"><a href="#">Placement, Internship, Sponsor projects</a></div>
             <div class="tree-menu"><a href="#">Workshops on emerging Technology </a></div>

@@ -24,6 +24,7 @@ use App\Mail\NewRegisteration;
 use App\Mail\SubscribedUserVerification;
 use App\Mail\WelcomeClient;
 use App\Mail\PaymentGatewayErrors;
+use App\Mail\VirtualPlacementQuery;
 use App\Libraries\InputSanitise;
 use App\Models\ClientHomePage;
 use App\Models\ClientTestimonial;
@@ -34,6 +35,13 @@ use App\Models\ClientPlan;
 use App\Models\Payment;
 use App\Models\InstamojoDetail;
 use App\Models\UserBasedAuthentication;
+use App\Models\VirtualPlacementDrive;
+use App\Models\Add;
+use App\Models\AdvertisementPage;
+use MaddHatter\LaravelFullcalendar\Facades\Calendar;
+use DateTime;
+use App\Models\AdvertisementPayment;
+use App\Models\WebdevelopmentPayment;
 
 class HomeController extends Controller
 {
@@ -110,8 +118,11 @@ class HomeController extends Controller
         $planPrice = $plan->amount;
         $planName = 'register for '.$plan->name;
 
-
-        $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
 
         try {
             $response = $api->paymentRequestCreate(array(
@@ -138,7 +149,11 @@ class HomeController extends Controller
     }
 
     protected function thankyou(Request $request){
-        $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
 
         $payid = $request->get('payment_request_id');
 
@@ -171,9 +186,16 @@ class HomeController extends Controller
                 {
                     if('local' == \Config::get('app.env')){
                         $subdomain = $subdomain.'.localvchip.com';
+                        $appTokenUrl = "https://test.instamojo.com/oauth2/token/";
+                        $signUpUrl = "https://test.instamojo.com/v2/users/";
+                        $userAuthUrl = "https://test.instamojo.com/oauth2/token/";
                     } else {
                         $subdomain = $subdomain.'.vchipedu.com';
+                        $appTokenUrl = "https://api.instamojo.com/oauth2/token/";
+                        $signUpUrl = "https://api.instamojo.com/v2/users/";
+                        $userAuthUrl = "https://api.instamojo.com/oauth2/token/";
                     }
+
                     $client = Client::create([
                         'name' => $name,
                         'phone' => $phone,
@@ -199,7 +221,7 @@ class HomeController extends Controller
                     {
                         $instamojoAuthErrors = '';
                         // check access token for application base auth
-                        $instamojoDetail = InstamojoDetail::where('client_id', '4IfB5qdRnGjcq1LqCgkHLdARUvK3oAg1FyGdnqIR')->first();
+                        $instamojoDetail = InstamojoDetail::first();
 
                         if(is_object($instamojoDetail)){
                             if(empty($instamojoDetail->application_base_access_token) && empty($instamojoDetail->application_base_token_type)){
@@ -212,7 +234,7 @@ class HomeController extends Controller
 
                                 $curl = curl_init();
                                 curl_setopt_array($curl, array(
-                                  CURLOPT_URL => "https://test.instamojo.com/oauth2/token/",
+                                  CURLOPT_URL => $appTokenUrl,
                                   CURLOPT_RETURNTRANSFER => true,
                                   CURLOPT_ENCODING => "",
                                   CURLOPT_MAXREDIRS => 10,
@@ -263,9 +285,8 @@ class HomeController extends Controller
                                           ];
 
                             $curl = curl_init();
-
                             curl_setopt_array($curl, array(
-                              CURLOPT_URL => "https://test.instamojo.com/v2/users/",
+                              CURLOPT_URL => $signUpUrl,
                               CURLOPT_RETURNTRANSFER => true,
                               CURLOPT_ENCODING => "",
                               CURLOPT_MAXREDIRS => 10,
@@ -313,9 +334,8 @@ class HomeController extends Controller
                                           ];
 
                             $curl = curl_init();
-
                             curl_setopt_array($curl, array(
-                              CURLOPT_URL => "https://test.instamojo.com/oauth2/token/",
+                              CURLOPT_URL => $userAuthUrl,
                               CURLOPT_RETURNTRANSFER => true,
                               CURLOPT_ENCODING => "",
                               CURLOPT_MAXREDIRS => 10,
@@ -356,7 +376,6 @@ class HomeController extends Controller
                                 }
                             }
                         }
-
 
                         $clientPlanArray = [
                                                 'client_id' => $client->id,
@@ -424,7 +443,11 @@ class HomeController extends Controller
         unset($data['mac']);  // Remove the MAC key from the data.
         ksort($data, SORT_STRING | SORT_FLAG_CASE);
 
-        $mac_calculated = hash_hmac("sha1", implode("|", $data), "aa7af601d8f946c49653c14e6d88d6c6");
+        if('local' == \Config::get('app.env')){
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "aa7af601d8f946c49653c14e6d88d6c6");
+        } else {
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "adc79e762cf240f49022176bd21f20ce");
+        }
         if($mac_provided == $mac_calculated){
             $to = 'vchipdesign@gmail.com';
             $subject = 'Website Payment Request ' .$data['buyer_name'].'';
@@ -486,9 +509,16 @@ class HomeController extends Controller
         {
             if('local' == \Config::get('app.env')){
                 $subdomain = $request->get('subdomain').'.localvchip.com';
+                $appTokenUrl = "https://test.instamojo.com/oauth2/token/";
+                $signUpUrl = "https://test.instamojo.com/v2/users/";
+                $userAuthUrl = "https://test.instamojo.com/oauth2/token/";
             } else {
                 $subdomain = $request->get('subdomain').'.vchipedu.com';
+                $appTokenUrl = "https://api.instamojo.com/oauth2/token/";
+                $signUpUrl = "https://api.instamojo.com/v2/users/";
+                $userAuthUrl = "https://api.instamojo.com/oauth2/token/";
             }
+
             $client = Client::create([
                 'name' => $name ,
                 'phone' => $phone,
@@ -514,7 +544,7 @@ class HomeController extends Controller
             {
                 $instamojoAuthErrors = '';
                 // check access token for application base auth
-                $instamojoDetail = InstamojoDetail::where('client_id', '4IfB5qdRnGjcq1LqCgkHLdARUvK3oAg1FyGdnqIR')->first();
+                $instamojoDetail = InstamojoDetail::first();
                 if(is_object($instamojoDetail)){
                     if(empty($instamojoDetail->application_base_access_token) && empty($instamojoDetail->application_base_token_type)){
                         // get & store application token
@@ -526,7 +556,7 @@ class HomeController extends Controller
 
                         $curl = curl_init();
                         curl_setopt_array($curl, array(
-                          CURLOPT_URL => "https://test.instamojo.com/oauth2/token/",
+                          CURLOPT_URL => $appTokenUrl,
                           CURLOPT_RETURNTRANSFER => true,
                           CURLOPT_ENCODING => "",
                           CURLOPT_MAXREDIRS => 10,
@@ -577,9 +607,8 @@ class HomeController extends Controller
                                   ];
 
                     $curl = curl_init();
-
                     curl_setopt_array($curl, array(
-                      CURLOPT_URL => "https://test.instamojo.com/v2/users/",
+                      CURLOPT_URL => $signUpUrl,
                       CURLOPT_RETURNTRANSFER => true,
                       CURLOPT_ENCODING => "",
                       CURLOPT_MAXREDIRS => 10,
@@ -629,7 +658,7 @@ class HomeController extends Controller
                     $curl = curl_init();
 
                     curl_setopt_array($curl, array(
-                      CURLOPT_URL => "https://test.instamojo.com/oauth2/token/",
+                      CURLOPT_URL => $userAuthUrl,
                       CURLOPT_RETURNTRANSFER => true,
                       CURLOPT_ENCODING => "",
                       CURLOPT_MAXREDIRS => 10,
@@ -713,6 +742,17 @@ class HomeController extends Controller
     public function getDepartments(Request $request){
         $collegeId = $request->get('college');
         return CollegeDept::where('college_id', $collegeId)->get();
+    }
+
+    public function virtualplacementdrive(){
+        $virtualplacementdrive = VirtualPlacementDrive::first();
+        return view('virtualPlacementDrive.virtualplacementdrive', compact('virtualplacementdrive'));
+    }
+
+    protected function virtualplacementquery(Request $request){
+        // send mail to admin
+        Mail::to('vchipdesigng8@gmail.com')->send(new VirtualPlacementQuery($request->all()));
+        return redirect()->back()->with('message', 'Mail sent successfully. we will reply asap.');
     }
 
     /**
@@ -833,6 +873,162 @@ class HomeController extends Controller
     }
 
     /**
+     * webdevelopment
+     */
+    protected function getWebdevelopment(){
+        return view('services.getWebdevelopment');
+    }
+
+    protected function validateWebdevelopment(array $data){
+        return Validator::make($data, [
+            'name' => 'required',
+            'email' => 'required|email|max:255',
+            'domains' => 'required',
+            'phone' => 'required'
+        ]);
+    }
+
+    protected function doWebdevelopmentPayment(Request $request){
+        // Laravel validation
+        $validator = $this->validateWebdevelopment($request->all());
+
+        if ($validator->fails())
+        {
+            $this->throwValidationException($request, $validator);
+        }
+        $name = $request->get('name');
+        $email = $request->get('email');
+        $domains = $request->get('domains');
+        $phone = $request->get('phone');
+        $price = 2999;
+
+        Session::put('web_name', $name);
+        Session::put('web_email', $email);
+        Session::put('web_domains', $domains);
+        Session::put('web_phone', $phone);
+        Session::save();
+
+        $adName = substr('web dev for '.$name, 0, 29) ;
+
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        try {
+            $response = $api->paymentRequestCreate(array(
+                "purpose" => trim($adName),
+                "amount" => $price,
+                "buyer_name" => $name,
+                "phone" => $phone,
+                "send_email" => true,
+                "send_sms" => false,
+                "email" => $email,
+                'allow_repeated_payments' => false,
+                "redirect_url" => url('thankyouwebdevelopment'),
+                "webhook" => url('webhookwebdevelopment')
+                ));
+
+            $pay_ulr = $response['longurl'];
+            header("Location: $pay_ulr");
+            exit();
+        }
+        catch (Exception $e) {
+            return redirect('webdevelopment')->withErrors([$e->getMessage()]);
+        }
+    }
+
+    protected function thankyouwebdevelopment(Request $request){
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        $payid = $request->get('payment_request_id');
+
+        try {
+            $response = $api->paymentRequestStatus($payid);
+
+            if( 'Credit' == $response['payments'][0]['status']){
+                // create a client
+                $paymentRequestId = $response['id'];
+                $paymentId = $response['payments'][0]['payment_id'];
+                $email = $response['payments'][0]['buyer_email'];
+                $status = $response['payments'][0]['status'];
+                $price = $response['payments'][0]['amount'];
+
+                $name = Session::get('web_name');
+                $email = Session::get('web_email');
+                $domains = Session::get('web_domains');
+                $phone = Session::get('web_phone');
+                DB::connection('mysql')->beginTransaction();
+                try
+                {
+                    $paymentArray = [
+                                        'name' => $name,
+                                        'email' => $email,
+                                        'domains' => $domains,
+                                        'phone' => $phone,
+                                        'payment_id' => $paymentId,
+                                        'payment_request_id' => $paymentRequestId,
+                                        'status' => $status,
+                                        'price' => $price
+                                    ];
+                    WebdevelopmentPayment::addPayment($paymentArray);
+                    DB::commit();
+                }
+                catch(Exception $e)
+                {
+                    DB::connection('mysql')->rollback();
+                    return redirect('webdevelopment')->withErrors([$e->getMessage()]);
+                }
+                Session::remove('web_name');
+                Session::remove('web_email');
+                Session::remove('web_domains');
+                Session::remove('web_phone');
+                return redirect('webdevelopment')->with('message', 'your have successfully created a web development request. we will contact you asap.');
+            } else {
+                return redirect('webdevelopment')->with('message', 'Payment is failed.');
+            }
+        }
+        catch (Exception $e) {
+            return redirect('webdevelopment')->withErrors([$e->getMessage()]);
+        }
+    }
+
+    public function webhookwebdevelopment(Request $request){
+        $data = $request->all();
+        $mac_provided = $data['mac'];  // Get the MAC from the POST data
+        unset($data['mac']);  // Remove the MAC key from the data.
+        ksort($data, SORT_STRING | SORT_FLAG_CASE);
+
+        if('local' == \Config::get('app.env')){
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "aa7af601d8f946c49653c14e6d88d6c6");
+        } else {
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "adc79e762cf240f49022176bd21f20ce");
+        }
+        if($mac_provided == $mac_calculated){
+            $to = 'vchipdesign@gmail.com';
+            $subject = 'Web development Payment Request ' .$data['buyer_name'].'';
+            $message = "<h1>Payment Details</h1>";
+            $message .= "<hr>";
+            $message .= '<p><b>Payment Id:</b> '.$data['payment_id'].'</p>';
+            $message .= '<p><b>Payment Status:</b> '.$data['status'].'</p>';
+            $message .= '<p><b>Amount:</b> '.$data['amount'].'</p>';
+            $message .= "<hr>";
+            $message .= '<p><b>Name:</b> '.$data['buyer_name'].'</p>';
+            $message .= '<p><b>Email:</b> '.$data['buyer'].'</p>';
+            $message .= "<hr>";
+            $headers .= "MIME-Version: 1.0\r\n";
+            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+            // send email
+            mail($to, $subject, $message, $headers);
+        }
+    }
+
+    /**
      * us
      */
     protected function us(){
@@ -842,7 +1038,7 @@ class HomeController extends Controller
     /**
      *  show career
      */
-    protected function heros($id=NULL){
+    protected function heros(Request $request,$id=NULL){
         $designations = Designation::all();
         $courses = [];
         $heros = ZeroToHero::all();
@@ -864,7 +1060,9 @@ class HomeController extends Controller
                 }
             }
         }
-        return view('zerotohero.heros', compact('designations', 'heros', 'id'));
+        $date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+        return view('zerotohero.heros', compact('designations', 'heros', 'id', 'ads'));
     }
 
     protected function sendMail(Request $request){
@@ -975,4 +1173,279 @@ class HomeController extends Controller
         return ZeroToHero::getHeroByDesignationByArea($request);
     }
 
+    protected function createAd(Request $request){
+        if(!empty($request->get('page'))){
+            $data = Add::where('show_page_id', $request->get('page'))->get();
+            $selectedPage = $request->get('page');
+        } else {
+            $data = Add::all();
+            $selectedPage = '';
+        }
+        $events = [];
+        if($data->count()) {
+            foreach ($data as $key => $value) {
+                $events[] = \Calendar::event(
+                    $value->company,
+                    true,
+                    new \DateTime($value->start_date),
+                    new \DateTime($value->end_date.' +1 day'),
+                    null,
+                    // Add color and link on event
+                    [
+                        'color' => '#f05050',
+                        // 'url' => 'pass here url and any route',
+                    ]
+                );
+            }
+        }
+        $subPageArr = [];
+        $advertisementPages = [];
+        $calendar = \Calendar::addEvents($events);
+        $subPages = AdvertisementPage::where('parent_page', '>', 0)->get();
+        if(is_object($subPages) && false == $subPages->isEmpty()){
+            foreach($subPages as $subPage){
+                $subPageArr[$subPage->parent_page][] = $subPage;
+            }
+        }
+        $mainPages = AdvertisementPage::where('parent_page', 0)->get();
+        if(is_object($mainPages) && false == $mainPages->isEmpty()){
+            foreach($mainPages as $mainPage){
+                $advertisementPages[] = [
+                                            'id' => $mainPage->id,
+                                            'name' => $mainPage->name,
+                                            'parent_page' => $mainPage->parent_page
+                                        ];
+                if(isset($subPageArr[$mainPage->id])){
+                    foreach($subPageArr[$mainPage->id] as $subPage){
+                        $advertisementPages[] = [
+                                            'id' => $subPage->id,
+                                            'name' => '&nbsp;&nbsp;&nbsp;• &nbsp;'.$subPage->name,
+                                            'parent_page' => $subPage->parent_page
+                                        ];
+                    }
+                }
+            }
+        }
+        return view('createAdd.createAdd', compact('calendar', 'selectedPage', 'advertisementPages'));
+    }
+
+    protected function checkStartDate(Request $request){
+        $date = $request->get('date');
+        return DB::table('adds')
+            ->where('show_page_id', $request->get('selected_page'))
+            ->whereRaw('"'.$date.'" between `start_date` and `End_date`')
+            ->count();
+    }
+
+    protected function checkDateSlot(Request $request){
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $pageId = $request->get('selected_page');
+        $results = DB::table("adds")
+        ->where('show_page_id', $request->get('selected_page'))
+        ->where(function ($query) use ($startDate,$endDate) {
+            $query->Where(function ($query) use ($startDate) {
+                    $query->where('start_date', '<=', $startDate);
+                    $query->where('end_date', '>=', $startDate);
+                })
+                ->orWhereBetween('start_date', [$startDate,$endDate])
+                ->orWhere(function ($query) use ($endDate) {
+                    $query->where('start_date', '<=', $endDate);
+                    $query->where('end_date', '>=', $endDate);
+                })
+                ->orWhereBetween('end_date', [$startDate,$endDate]);
+        })
+        ->get();
+        $output = [];
+        if(is_object($results)){
+            if(3 <= count($results)){
+                $output['status'] = false;
+            } else {
+                $output['status'] = true;
+                $adPage = AdvertisementPage::find($pageId);
+                $dateDiff = date_diff( new DateTime($endDate), new DateTime($startDate));
+                $days = $dateDiff->d + 1;
+                $output['price'] = $adPage->price * $days;
+            }
+            $output['start_date'] = $startDate;
+            $output['end_date'] = $endDate;
+        }
+        return $output;
+    }
+
+    protected function validateAdvertisement(array $data){
+        return Validator::make($data, [
+            'name' => 'required',
+            'selected_page' => 'required',
+            'email' => 'required|email|max:255',
+            'tag_line' => 'required',
+            'website_url' => 'required',
+            'logo' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'phone' => 'required'
+        ]);
+    }
+
+    protected function doAdvertisementPayment(Request $request){
+        // Laravel validation
+        $validator = $this->validateAdvertisement($request->all());
+
+        if ($validator->fails())
+        {
+            $this->throwValidationException($request, $validator);
+        }
+        $name = $request->get('name');
+        $email = $request->get('email');
+        $selectedPage = $request->get('selected_page');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $phone = $request->get('phone');
+        DB::beginTransaction();
+        try
+        {
+            $advertisement = Add::addOrUpdateAd($request);
+            DB::commit();
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return redirect('createAd')->withErrors('something went wrong.');
+        }
+
+        $adPage = AdvertisementPage::find($selectedPage);
+        if(!is_object($adPage)){
+            return redirect('createAd');
+        }
+        $dateDiff = date_diff( new DateTime($endDate), new DateTime($startDate));
+        $days = $dateDiff->d + 1;
+        $price = $adPage->price * $days;
+
+        Session::put('ad_id', $advertisement->id);
+        Session::save();
+
+        $adName = substr('Ad by '.$name, 0, 29) ;
+
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        try {
+            $response = $api->paymentRequestCreate(array(
+                "purpose" => trim($adName),
+                "amount" => $price,
+                "buyer_name" => $name,
+                "phone" => $phone,
+                "send_email" => true,
+                "send_sms" => false,
+                "email" => $email,
+                'allow_repeated_payments' => false,
+                "redirect_url" => url('thankyouadvertisement'),
+                "webhook" => url('webhookAdvertisement')
+                ));
+
+            $pay_ulr = $response['longurl'];
+            header("Location: $pay_ulr");
+            exit();
+        }
+        catch (Exception $e) {
+            return redirect('createAd')->withErrors([$e->getMessage()]);
+        }
+    }
+
+    protected function thankyouadvertisement(Request $request){
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        $payid = $request->get('payment_request_id');
+
+        try {
+            $response = $api->paymentRequestStatus($payid);
+
+            if( 'Credit' == $response['payments'][0]['status']){
+                // create a client
+                $paymentRequestId = $response['id'];
+                $paymentId = $response['payments'][0]['payment_id'];
+                $email = $response['payments'][0]['buyer_email'];
+                $status = $response['payments'][0]['status'];
+                $adId = Session::get('ad_id');
+                DB::connection('mysql')->beginTransaction();
+                try
+                {
+                    $paymentArray = [
+                                        'add_id' => $adId,
+                                        'email' => $email,
+                                        'payment_id' => $paymentId,
+                                        'payment_request_id' => $paymentRequestId,
+                                        'status' => $status
+                                    ];
+                    AdvertisementPayment::addPayment($paymentArray);
+                    DB::commit();
+                }
+                catch(Exception $e)
+                {
+                    DB::connection('mysql')->rollback();
+                    return redirect('/')->withErrors([$e->getMessage()]);
+                }
+                Session::remove('ad_id');
+                return redirect('createAd')->with('message', 'your advertisement has been created successfully.');
+            } else {
+                $adId = Session::get('ad_id');
+                DB::connection('mysql')->beginTransaction();
+                try {
+                    $advertisement = Add::find($adId);
+                    if(file_exists($advertisement->logo)){
+                        unlink($advertisement->logo);
+                    }
+                    $advertisement->delete();
+                    Session::remove('ad_id');
+                    DB::commit();
+                    return redirect('createAd')->with('message', 'Payment is failed.');
+                }
+                catch(Exception $e)
+                {
+                    DB::connection('mysql')->rollback();
+                    return redirect('createAd')->withErrors([$e->getMessage()]);
+                }
+            }
+        }
+        catch (Exception $e) {
+            return redirect('createAd')->withErrors([$e->getMessage()]);
+        }
+    }
+
+    public function webhookAdvertisement(Request $request){
+        $data = $request->all();
+        $mac_provided = $data['mac'];  // Get the MAC from the POST data
+        unset($data['mac']);  // Remove the MAC key from the data.
+        ksort($data, SORT_STRING | SORT_FLAG_CASE);
+
+        if('local' == \Config::get('app.env')){
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "aa7af601d8f946c49653c14e6d88d6c6");
+        } else {
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "adc79e762cf240f49022176bd21f20ce");
+        }
+        if($mac_provided == $mac_calculated){
+            $to = 'vchipdesign@gmail.com';
+            $subject = 'Advertisement Payment Request ' .$data['buyer_name'].'';
+            $message = "<h1>Payment Details</h1>";
+            $message .= "<hr>";
+            $message .= '<p><b>Payment Id:</b> '.$data['payment_id'].'</p>';
+            $message .= '<p><b>Payment Status:</b> '.$data['status'].'</p>';
+            $message .= '<p><b>Amount:</b> '.$data['amount'].'</p>';
+            $message .= "<hr>";
+            $message .= '<p><b>Name:</b> '.$data['buyer_name'].'</p>';
+            $message .= '<p><b>Email:</b> '.$data['buyer'].'</p>';
+            $message .= "<hr>";
+            $headers .= "MIME-Version: 1.0\r\n";
+            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+            // send email
+            mail($to, $subject, $message, $headers);
+        }
+    }
 }

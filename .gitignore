@@ -10,6 +10,9 @@
 /public/assignmentStorage
 /public/clientAssignmentStorage
 /public/workshopImages
+/public/motivationalSpeechDetailsImages
+/public/offlineWorkshopImages
+/public/virtualPlacementDriveImages
 /vendor
 .env
 /storage/logs

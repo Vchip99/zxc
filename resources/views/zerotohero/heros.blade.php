@@ -150,11 +150,11 @@ option:not(:checked) {
 @media screen and (max-width: 768px) {
 
 }
-.vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; margin-bottom: 25px;}
+.vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; }
 .vid iframe, .vid object,.vid embed {position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
 .video-mobile-headline{display: none; margin:0px;}
 @media only screen and (max-device-width: 800px), only screen and (device-width: 1024px) and (device-height: 600px), only screen and (width: 1280px) and (orientation: landscape), only screen and (device-width: 800px), only screen and (max-width: 767px) {
-  .video-container{padding-bottom:10px;}
+  .video-container{ margin-bottom: 25px;}
   .flex-video { padding-top: 0;}
 }
 
@@ -172,7 +172,7 @@ option:not(:checked) {
   height: 100%;
   transition: all .25s ease;
 }
-.course-box {
+/*.course-box {
   display: block;
   margin-bottom: 20px;
   line-height: 1.42857143;
@@ -193,7 +193,7 @@ option:not(:checked) {
   text-align: center !important;
   width: 100% !important;
   font-weight: bolder !important;
-}
+}*/
 .course-box-content p{color: grey;}
 .add-view {
     border-top: 1px solid #D4D4D4;
@@ -245,6 +245,13 @@ option:not(:checked) {
   padding-right: 15px;
   padding-left: 15px;}
 }
+.block-with-text {
+    display: inline-block;
+    width: 180px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+}
 </style>
 @stop
 @section('header-js')
@@ -289,12 +296,6 @@ option:not(:checked) {
         <div class="panel"></div>
         <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Others"> Others</p>
         <div class="panel">
-          <!-- <div class="checkbox">
-            <label><input class="search" type="checkbox" value="1" data-filter="certified" onclick="searchCourse();">Certified</label>
-          </div>
-          <div class="checkbox">
-            <label><input class="search" type="checkbox" value="1" data-filter="startingsoon" onclick="searchCourse();">Starting soon</label>
-          </div> -->
           <div class="checkbox">
             <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Letest</label>
           </div>
@@ -304,15 +305,17 @@ option:not(:checked) {
         <div class="row info" id="addHeros">
           @if(count($heros) > 0)
             @foreach($heros as $hero)
-              <div class="col-md-4 col-sm-6 video-container">
+              <div class="col-md-4 col-sm-6  " title="{{$hero->name}}">
+              <div class="thumbnail" >
                 <div class="vid">
                   {!! $hero->url !!}
                 </div>
               @if($id == $hero->id)
-                <b  style="align-content: center;">  {{$hero->name}} <span style="color: red;">[new]</span></b>
+                <b  style="align-content: center;" class="block-with-text">  {{$hero->name}} <span style="color: red;">[new]</span></b>
               @else
-               <b  style="align-content: center;">  {{$hero->name}} </b>
+               <b  style="align-content: center;" class="block-with-text">  {{$hero->name}} </b>
               @endif
+              </div>
               </div>
             @endforeach
           @else
@@ -342,43 +345,79 @@ option:not(:checked) {
           <div class="panel"></div>
           <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Others"> Others</p>
           <div class="panel">
-            <!-- <div class="checkbox">
-              <label><input class="search" type="checkbox" value="1" data-filter="certified" onclick="searchCourse();">Certified</label>
-            </div>
-            <div class="checkbox">
-              <label><input class="search" type="checkbox" value="1" data-filter="startingsoon" onclick="searchCourse();">Starting soon</label>
-            </div> -->
             <div class="checkbox">
               <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Letest</label>
             </div>
           </div>
         </div>
-        <div class="add-1">
-          <div class="course-box">
-            <a class="img-course-box" href="http://gatethedirection.com/" target="_blank">
-              <img src="{{asset('images/logo/gatetheDirection.png')}}" alt="Gate The Direction"  class="img-responsive" />
-            </a>
-            <div class="course-box-content">
-              <h4 class="course-box-title" title="PROJECT 1" data-toggle="tooltip" data-placement="bottom">
-                <a href="http://gatethedirection.com/" target="_blank">GATE THE DIRECTION</a>
-              </h4>
-              <p class="more"> "Started by IITain so you become IITain"</p>
-            </div>
-          </div>
+        <div class="advertisement-area" style="padding-right: 5px;">
+          <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
         </div>
-        <div class="add-2">
-          <div class="course-box">
-            <a class="img-course-box" href="http://kaizenn.org/" target="_blank">
-              <img src="{{asset('images/logo/kaizen.jpg')}}" alt="Kaizen classes"  class="img-responsive" />
-            </a>
-            <div class="course-box-content">
-              <h4 class="course-box-title" title="PROJECT 1" data-toggle="tooltip" data-placement="bottom">
-                <a href="http://kaizenn.org/" target="_blank">kaizen coaching classes</a>
-              </h4>
-              <p class="more"> "Leading the success in "Banking Exams""</p>
+        <br/>
+        @if(count($ads) > 0)
+          @foreach($ads as $ad)
+            <div class="add-1">
+              <div class="course-box">
+                <a class="img-course-box" href="{{ $ad->website_url }}" target="_blank">
+                  <img src="{{asset($ad->logo)}}" alt="{{ $ad->company }}"  class="img-responsive" />
+                </a>
+                <div class="course-box-content">
+                  <h4 class="course-box-title" title="{{ $ad->company }}" data-toggle="tooltip" data-placement="bottom">
+                    <a href="{{ $ad->website_url }}" target="_blank">{{ $ad->company }}</a>
+                  </h4>
+                  <p class="more"> {{ $ad->tag_line }}</p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          @endforeach
+        @endif
+        @if(count($ads) < 3)
+          @for($i = count($ads)+1; $i <=3; $i++)
+            @if(1 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">
+                    <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="SSGMCE"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="SSGMCE" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">SSGMCE</a>
+                    </h4>
+                    <p class="more"> SSGMCE</p>
+                  </div>
+                </div>
+              </div>
+            @elseif(2 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://ghrcema.raisoni.net/" target="_blank">
+                    <img src="{{ asset('images/logo/ghrcema_logo.png') }}" alt="G H RISONI"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="G H RISONI" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://ghrcema.raisoni.net/" target="_blank">G H RISONI</a>
+                    </h4>
+                    <p class="more"> G H RISONI</p>
+                  </div>
+                </div>
+              </div>
+            @elseif(3 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://hvpmcoet.in/" target="_blank">
+                    <img src="{{ asset('images/logo/hvpm.jpg') }}" alt="HVPM"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="HVPM" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://hvpmcoet.in/" target="_blank">HVPM College of Engineer And Technology</a>
+                    </h4>
+                    <p class="more"> HVPM College of Engineer And Technology</p>
+                  </div>
+                </div>
+              </div>
+            @endif
+          @endfor
+        @endif
       </div>
     </div>
   </div>

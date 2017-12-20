@@ -55,7 +55,7 @@
 							        @endif
 							        <a class="btn btn-primary" title="Useful Data" role="button" data-toggle="modal" data-target="#useful_data"><i class="fa fa-book hidden-lg" aria-hidden="true"></i><div class="hidden-sm">Useful Data</div></a>&emsp;
 									@foreach($sections as $index => $section)
-										<button type="button" class="btn hide" title="Time" id="timer_{{$section->id}}"><i class="fa fa-clock-o hidden-lg" aria-hidden="true"></i> <b class="hidden-sm">Timer: <span id="timer_duration_{{$section->id}}">{{$section->duration}} </span></b></button >
+										<button type="button" class="btn hide" title="Time" id="timer_{{$section->id}}"><i class="fa fa-clock-o hidden-lg" aria-hidden="true"></i> <b><span class="hidden-sm">Timer:</span> <span id="timer_duration_{{$section->id}}">{{$section->duration}} </span></b></button >
 										<input type="hidden" id="timer_changed_{{$section->id}}" data-section="{{$section->name}}" value="{{$section->duration}}">
 									@endforeach
 								</div>

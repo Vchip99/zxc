@@ -45,20 +45,24 @@ class UpdateApplicationAccessToken extends Command
         try
         {
             // check access token for application base auth
-            $instamojoDetail = InstamojoDetail::where('client_id', '4IfB5qdRnGjcq1LqCgkHLdARUvK3oAg1FyGdnqIR')->first();
-
+            $instamojoDetail = InstamojoDetail::first();
+            $errorCount = 0;
             if(is_object($instamojoDetail)){
-
                 // get & store application token
                 $applicationPostFields = [
                                 'grant_type' => 'client_credentials',
                                 'client_id' => $instamojoDetail->client_id,
                                 'client_secret' => $instamojoDetail->client_secret
                               ];
+                if('local' == \Config::get('app.env')){
+                    $appTokenUrl = "https://test.instamojo.com/oauth2/token/";
+                } else {
+                    $appTokenUrl = "https://api.instamojo.com/oauth2/token/";
+                }
 
                 $curl = curl_init();
                 curl_setopt_array($curl, array(
-                  CURLOPT_URL => "https://test.instamojo.com/oauth2/token/",
+                  CURLOPT_URL => $appTokenUrl,
                   CURLOPT_RETURNTRANSFER => true,
                   CURLOPT_ENCODING => "",
                   CURLOPT_MAXREDIRS => 10,
@@ -77,6 +81,7 @@ class UpdateApplicationAccessToken extends Command
                 curl_close($curl);
                 if ($err) {
                     echo $err;
+                    $errorCount++;
                 } else {
                     $result = json_decode($response);
                     if(!empty($result->access_token) && !empty($result->token_type)){
@@ -85,7 +90,21 @@ class UpdateApplicationAccessToken extends Command
                         $instamojoDetail->save();
                         DB::connection('mysql')->commit();
                         $this->info($instamojoDetail->application_base_access_token);
+                    } else {
+                      $errorCount++;
+                      $results = json_decode($response, true);
+                      if(count($results) > 0){
+                          $this->info('--------update_application_access_token_error--------</br>');
+                          foreach($results as $key => $result){
+                              $this->info($key.'->'.$result[0].'</br>');
+                          }
+                      }
                     }
+                }
+                if( 0 == $errorCount ){
+                  $this->info('application access token successfully updated on instamojo.');
+                } else {
+                  $this->info('errors are created while application access token updated on instamojo.');
                 }
             }
         }

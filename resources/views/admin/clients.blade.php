@@ -25,7 +25,7 @@
               <div class="panel-heading text-center">
                 Clients Info
               </div>
-              <div class="panel-body">
+              <div class="panel-body" style="min-height: 700px !important; max-height: 900px !important; ">
                 <table>
                   <thead>
                     <tr>

@@ -58,7 +58,6 @@ class TestCategory extends Model
                 ->select('test_categories.id', 'test_categories.name')->groupBy('test_categories.id')->get();
     }
 
-
     protected static function getTestCategoriesAssociatedWithQuestion(){
         return DB::table('test_categories')
                 ->join('test_subject_papers', 'test_subject_papers.test_category_id', 'test_categories.id')
@@ -76,5 +75,4 @@ class TestCategory extends Model
     public function subcategories(){
         return $this->hasMany(TestSubCategory::class, 'test_category_id');
     }
-
 }

@@ -125,7 +125,12 @@ class ClientBaseController extends BaseController
         Session::put('client_selected_plan_id', $plan->id);
         Session::put('client_selected_plan_price', $finalAmount);
         Session::save();
-        $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
 
         try {
             $response = $api->paymentRequestCreate(array(
@@ -182,7 +187,12 @@ class ClientBaseController extends BaseController
         Session::put('client_selected_plan_id', $plan->id);
         Session::put('client_selected_plan_price', $finalAmount);
         Session::save();
-        $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
 
         try {
             $response = $api->paymentRequestCreate(array(
@@ -231,12 +241,16 @@ class ClientBaseController extends BaseController
         } else {
             return redirect('managePlans')->withErrors('something went wrong.');
         }
-        // dd();
+
         $purpose = 'register for '.$plan->name;
         Session::put('client_selected_plan_id', $plan->id);
         Session::put('client_selected_plan_price', $finalAmount);
         Session::save();
-        $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
 
         try {
             $response = $api->paymentRequestCreate(array(
@@ -263,7 +277,11 @@ class ClientBaseController extends BaseController
     }
 
     protected function thankyou(Request $request){
-        $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
 
         $payid = $request->get('payment_request_id');
 
@@ -457,7 +475,12 @@ class ClientBaseController extends BaseController
         unset($data['mac']);  // Remove the MAC key from the data.
         ksort($data, SORT_STRING | SORT_FLAG_CASE);
 
-        $mac_calculated = hash_hmac("sha1", implode("|", $data), "aa7af601d8f946c49653c14e6d88d6c6");
+        if('local' == \Config::get('app.env')){
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "aa7af601d8f946c49653c14e6d88d6c6");
+        } else {
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "adc79e762cf240f49022176bd21f20ce");
+        }
+
         if($mac_provided == $mac_calculated){
             $to = 'vchipdesign@gmail.com';
             $subject = 'Website Payment Request ' .$data['buyer_name'].'';
@@ -570,11 +593,15 @@ class ClientBaseController extends BaseController
                             'account_number' => $request->account_number,
                             'ifsc_code' => $request->ifsc_code
                         ];
+            if('local' == \Config::get('app.env')){
+                $bankUrl = "https://test.instamojo.com/v2/users/".$instamojoClientId."/inrbankaccount/";
+            } else {
+                $bankUrl = "https://api.instamojo.com/v2/users/".$instamojoClientId."/inrbankaccount/";
+            }
 
             $curl = curl_init();
-
             curl_setopt_array($curl, array(
-              CURLOPT_URL => "https://test.instamojo.com/v2/users/".$instamojoClientId."/inrbankaccount/",
+              CURLOPT_URL => $bankUrl,
               CURLOPT_RETURNTRANSFER => true,
               CURLOPT_ENCODING => "",
               CURLOPT_MAXREDIRS => 10,
@@ -615,6 +642,4 @@ class ClientBaseController extends BaseController
         }
         return redirect('manageBankDetails');
     }
-
-
 }

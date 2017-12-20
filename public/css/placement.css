@@ -112,7 +112,7 @@ ul.custom-list-style li:before{
   height: 100%;
   transition: all .25s ease;
 }
-.course-box {
+#placement-box .course-box {
   display: block;
   margin-bottom: 20px;
   line-height: 1.42857143;
@@ -124,17 +124,17 @@ ul.custom-list-style li:before{
   border-top: 18px solid #007ba7;
 
 }
-.course-box:hover {
+#placement-box .course-box:hover {
   box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
 }
-.course-box-content{padding: 15px;}
+#placement-box .course-box-content{padding: 15px;}
 
-.course-box-title {
+#placement-box .course-box-title {
   text-align: center;
   width: 100%;
   font-weight: bolder;
 }
-.course-box-content p{color: grey;}
+#placement-box .course-box-content p{color: grey;}
 .add-view {
     border-top: 1px solid #D4D4D4;
     text-align:center;

@@ -19,6 +19,7 @@ use App\Models\CourseCommentLike;
 use App\Models\CourseSubCommentLike;
 use App\Models\Notification;
 use App\Models\ReadNotification;
+use App\Models\Add;
 
 class CourseController extends Controller
 {
@@ -46,12 +47,14 @@ class CourseController extends Controller
     /**
      *  show all courses associated with videos
      */
-    protected function courses(){
+    protected function courses(Request $request){
         $courseIds = [];
         $courseCategories = CourseCategory::getCategoriesAssocaitedWithVideos();
         $courses = CourseCourse::getCourseAssocaitedWithVideos();
         $courseVideoCount = $this->getVideoCount($courses);
-        return view('courses.courses', compact('courseCategories', 'courses', 'courseVideoCount'));
+        $date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+        return view('courses.courses', compact('courseCategories', 'courses', 'courseVideoCount', 'ads'));
     }
 
     /**

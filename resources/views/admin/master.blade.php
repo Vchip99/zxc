@@ -310,6 +310,64 @@
               <li title="Workshop Videos"><a href="{{ url('admin/manageWorkshopVideos')}}"><i class="fa fa-circle-o"></i> Workshop Videos </a></li>
             </ul>
           </li>
+          <li class="treeview">
+            <a href="#" title="Offline Workshop">
+              <i class="fa fa-space-shuttle"></i> <span>Offline Workshop</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Offline Workshop Category"><a href="{{ url('admin/manageOfflineWorkshopCategory')}}"><i class="fa fa-circle-o"></i> Workshop Category </a></li>
+              <li title="Offline Workshop Details"><a href="{{ url('admin/manageOfflineWorkshopDetails')}}"><i class="fa fa-circle-o"></i> Workshop Details </a></li>
+            </ul>
+          </li>
+          <li class="treeview">
+            <a href="#" title="Motivational Speech">
+              <i class="fa fa-microphone"></i><span>Motivational Speech</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Motivational Speech Category"><a href="{{ url('admin/manageMotivationalSpeechCategory')}}"><i class="fa fa-circle-o"></i> Motivational Category </a></li>
+              <li title="Motivational Speech Details"><a href="{{ url('admin/manageMotivationalSpeechDetails')}}"><i class="fa fa-circle-o"></i> Motivational Details </a></li>
+              <li title="Motivational Videos"><a href="{{ url('admin/manageMotivationalSpeechVideos')}}"><i class="fa fa-circle-o"></i> Motivational Videos </a></li>
+            </ul>
+          </li>
+          <li class="treeview">
+            <a href="#" title="Virtual Placement Drive">
+              <i class="fa fa-handshake-o"></i><span>Virtual Placement</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Virtual Placement Drive"><a href="{{ url('admin/manageVirtualPlacementDrive')}}"><i class="fa fa-circle-o"></i> Virtual Placement </a></li>
+            </ul>
+          </li>
+          <li class="treeview">
+            <a href="#" title="Advertisement">
+              <i class="fa fa-television"></i><span>Advertisement</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Advertisement Pages"><a href="{{ url('admin/manageAdvertisementPages')}}"><i class="fa fa-circle-o"></i> Advertisement Pages </a></li>
+            </ul>
+          </li>
+          <li class="treeview">
+            <a href="#" title="Web Development">
+              <i class="fa fa-sitemap"></i><span>Web Development</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Web Development"><a href="{{ url('admin/manageWebDevelopments')}}"><i class="fa fa-circle-o"></i> Web Development </a></li>
+            </ul>
+          </li>
         @endif
         <li class="header">LABELS</li>
         <li>

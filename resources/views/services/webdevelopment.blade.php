@@ -153,6 +153,21 @@ box-shadow: 0 13px 40px 0 rgba(62,68,93,.3), 0 2px 4px 0 rgba(62,68,93,.06);
     </div>
   </section>
   <section id="feature" class="v_container ">
+    @if(Session::has('message'))
+      <div class="alert alert-success" id="message">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+          {{ Session::get('message') }}
+      </div>
+    @endif
+    @if(count($errors) > 0)
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+      @endif
    <h2 class="v_h2_title text-center"> Custom web & App Development</h2>
    <hr class="section-dash-dark mrgn_60_btm"/>
     <div class="container">
@@ -189,7 +204,7 @@ box-shadow: 0 13px 40px 0 rgba(62,68,93,.3), 0 2px 4px 0 rgba(62,68,93,.06);
             <!-- Wrapper for slides -->
             <div class="carousel-inner">
               <div class="item active">
-                <a href="http://vchiptech.org/" target="_blank"><img src="{{ asset('images/web&app/vchiptech.jpg')}}" alt="Vchip Technology"/></a>
+                <a href="http://vchiptech.com/" target="_blank"><img src="{{ asset('images/web&app/vchiptech.jpg')}}" alt="Vchip Technology"/></a>
               </div>
               <div class="item ">
                 <a href="http://vceinstitute.com/" target="_blank"><img src="{{ asset('images/web&app/vce.jpg')}}" alt="VCE"/></a>
@@ -299,52 +314,13 @@ box-shadow: 0 13px 40px 0 rgba(62,68,93,.3), 0 2px 4px 0 rgba(62,68,93,.06);
                 <div class="block">
                     <h2 class="title wow fadeInDown" data-wow-delay=".3s" data-wow-duration="500ms">Prize </h2>
                     <p class="wow fadeInDown" data-wow-delay=".5s" data-wow-duration="500ms">All the above mention facilities are at free of cost up-to 20 login.<br/>@ Rs. 2999 /year for unlimited logins.</p>
-                    <a href="#formModal" data-toggle="modal" class="btn btn-default btn-contact wow fadeInDown" data-wow-delay=".7s" data-wow-duration="500ms">Buy Now</a>
+                    <a href="{{ url('getWebdevelopment')}}" data-toggle="modal" class="btn btn-default btn-contact wow fadeInDown" data-wow-delay=".7s" data-wow-duration="500ms">Buy Now</a>
                 </div>
             </div>
 
         </div>
     </div>
 </section>
-<!-- MODAL LOGIN & SIGN UP -->
-<div class="modal fade  " id="formModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-  <div class="modal-dialog modal-sm formModal" role="document">
-    <div class="modal-content">
-      <div class="modal-header" style="border-bottom: none;">
-        <button class="close" data-dismiss="modal">×</button>
-
-      </div>
-
-      <div class="modal-body">
-      <form method="POST" action="#" role="form" id="loginbox">
-          <div class="form-group">
-            <input id="" type="text" maxlength="25" class="form-control" placeholder=" Name" length="40"  />
-          </div>
-           <div class="form-group">
-            <input id="" type="text" maxlength="50" class="form-control" placeholder="Email ">
-          </div>
-          <div class="form-group">
-            <input id="" type="text" maxlength="25" class="form-control" placeholder=" Name of institute" length="40"  />
-          </div>
-           <div class="form-group">
-            <input id="" type="phone" maxlength="25" class="form-control" placeholder="Phone number" length="10"  />
-          </div>
-           <div class="form-group">
-            <input id="" type="text" maxlength="50" class="form-control" placeholder="About institute (optional)" length="70" />
-           </div>
-
-          <div class="form-group">
-            <button id="signupSubmit" type="submit" class="btn btn-info btn-block">BUY NOW</button>
-
-          </div>
-
-
-      </form>
-
-      </div>
-    </div>
-  </div>
-</div
 @stop
 @section('footer')
   @include('footer.footer')

@@ -17,6 +17,7 @@ use App\Models\LiveCourseCommentLike;
 use App\Models\LiveCourseSubCommentLike;
 use App\Models\ReadNotification;
 use App\Models\Notification;
+use App\Models\Add;
 
 class LiveCourseVideoController extends Controller
 {
@@ -43,7 +44,7 @@ class LiveCourseVideoController extends Controller
     /**
      *  show list of all live courses associated with videos
      */
-    protected function show(){
+    protected function show(Request $request){
         $liveCourseCategoryIds = [];
         $liveCourses = LiveCourse::getLiveCoursesAssociatedWithVideos();
         if(false == $liveCourses->isEmpty()){
@@ -51,7 +52,9 @@ class LiveCourseVideoController extends Controller
                 $liveCourseCategoryIds[] = $liveCourse->category_id;
             }
         }
-        return view('liveCourses.live_courses', compact('liveCourses', 'liveCourseCategoryIds'));
+        $date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+        return view('liveCourses.live_courses', compact('liveCourses', 'liveCourseCategoryIds', 'ads'));
     }
 
     /**

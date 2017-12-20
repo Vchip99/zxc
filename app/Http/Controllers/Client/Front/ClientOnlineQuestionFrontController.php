@@ -152,6 +152,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $result['wrong_answered'] = $wrongAnswer;
                 $result['unanswered'] = $unanswered;
                 $result['marks'] = $marks;
+
                 if($userId > 0){
                     $score = ClientScore::addScore($userId, $result);
                     foreach($userAnswers as $ind => $userAnswer){
@@ -162,17 +163,36 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                     RegisterClientOnlinePaper::registerTestPaper($userId, $paperId);
                     DB::connection('mysql2')->commit();
                     $rank =ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$score->test_score);
+                    $percentage = ceil(($score->right_answered/$totalMarks)*100);
+                    if(($score->right_answered + $score->wrong_answered) > 0){
+                        $accuracy =  ceil(($score->right_answered/($score->right_answered + $score->wrong_answered))*100);
+                    } else {
+                        $accuracy = 0;
+                    }
                 } else {
                     $rank =ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$marks);
                     $score = '';
+                    $percentage = ceil(($result['right_answered']/$totalMarks)*100);
+                    if(($result['right_answered'] + $result['wrong_answered']) > 0){
+                        $accuracy =  ceil(($result['right_answered']/($result['right_answered'] + $result['wrong_answered']))*100);
+                    } else {
+                        $accuracy = 0;
+                    }
                 }
                 $totalRank =ClientScore::getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId);
-            	return view('client.front.question.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank', 'score'));
+
+                if($totalRank > 0){
+                    $percentile = ceil(((($totalRank + 1) - ($rank +1) )/ $totalRank)*100);
+                } else {
+                    $percentile = 0;
+                }
+
+            	return view('client.front.question.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank', 'score', 'percentile', 'percentage', 'accuracy'));
             }
             catch(\Exception $e)
             {
                 DB::connection('mysql2')->rollback();
-                return back()->withErrors('something went wrong.');
+                return Redirect::to('online-tests')->withErrors('something went wrong.');
             }
         }
         return Redirect::to('/');

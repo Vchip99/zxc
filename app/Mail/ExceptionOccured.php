@@ -26,6 +26,11 @@ class ExceptionOccured extends Mailable
     public function __construct($content)
     {
         $this->content = $content;
+        if('local' == \Config::get('app.env')){
+            $this->subject = 'Exception Occured on local';
+        } else {
+            $this->subject = 'Exception Occured on vchip';
+        }
     }
 
     /**
@@ -36,6 +41,7 @@ class ExceptionOccured extends Mailable
     public function build()
     {
         return $this->view('emails.exception')
+                    ->subject($this->subject)
                     ->with('content', $this->content);
     }
 }

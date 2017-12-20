@@ -16,6 +16,7 @@ use App\Models\Notification;
 use App\Models\ReadNotification;
 use DB, Auth, Session;
 use Validator, Redirect;
+use App\Models\Add;
 
 class BlogController extends Controller
 {
@@ -43,11 +44,12 @@ class BlogController extends Controller
     /**
      *  show all blog
      */
-    protected function show(){
+    protected function show(Request $request){
         $blogs = Blog::orderBy('id', 'desc')->paginate(5);
         $blogCategories = BlogCategory::all();
-
-        return view('blog.blog', compact('blogs', 'blogCategories'));
+        $date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+        return view('blog.blog', compact('blogs', 'blogCategories', 'ads'));
     }
 
     /**

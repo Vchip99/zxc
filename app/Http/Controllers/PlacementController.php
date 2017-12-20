@@ -20,7 +20,7 @@ use App\Models\ApplyJob;
 use DB, Auth, Session;
 use Validator, Redirect,Hash;
 use App\Libraries\InputSanitise;
-
+use App\Models\Add;
 
 class PlacementController extends Controller
 {
@@ -34,7 +34,7 @@ class PlacementController extends Controller
         parent::__construct();
     }
 
-    protected function show(){
+    protected function show(Request $request){
         $companyId = Session::get('front_selected_company_id');
         if($companyId > 0){
             $companyDetails = CompanyDetails::where('placement_company_id', $companyId)->first();
@@ -66,7 +66,9 @@ class PlacementController extends Controller
                 $currentUser = 0;
             }
             $applyJobs = ApplyJob::all();
-    	   return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount', 'applyJobs'));
+            $date = date('Y-m-d');
+            $ads = Add::getAdds($request->url(),$date);
+	        return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount', 'applyJobs', 'ads'));
         } else {
             $placementProcess = [];
             $companyDetails = '';
@@ -86,7 +88,9 @@ class PlacementController extends Controller
                 $currentUser = 0;
             }
             $applyJobs = ApplyJob::all();
-            return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount', 'applyJobs'));
+            $date = date('Y-m-d');
+            $ads = Add::getAdds($request->url(),$date);
+            return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount', 'applyJobs', 'ads'));
         }
 
     }
@@ -112,7 +116,12 @@ class PlacementController extends Controller
                 $currentUser = 0;
             }
             $applyJobs = ApplyJob::all();
-            return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount', 'applyJobs'));
+            $date = date('Y-m-d');
+            $ads = DB::table('adds')
+                ->where('show_page_id', 8)
+                ->whereRaw('"'.$date.'" between `start_date` and `End_date`')
+                ->get();
+            return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount', 'applyJobs', 'ads'));
         }
         return Redirect::to('placements');
     }

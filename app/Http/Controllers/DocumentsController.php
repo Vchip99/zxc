@@ -10,6 +10,7 @@ use App\Models\RegisterFavouriteDocuments;
 use App\Models\ReadNotification;
 use App\Models\Notification;
 use Auth,Hash,DB;
+use App\Models\Add;
 
 class DocumentsController extends Controller
 {
@@ -27,7 +28,7 @@ class DocumentsController extends Controller
     /**
      *  show list of all document
      */
-    protected function show($id=NULL){
+    protected function show(Request $request, $id=NULL){
         $registeredDocIds = [];
         $favouriteDocIds = [];
         $documents = DocumentsDoc::getDocumentsAssociatedWithCategory();
@@ -51,7 +52,9 @@ class DocumentsController extends Controller
                 return redirect()->back()->withErrors('something went wrong.');
             }
         }
-        return view('documents.documents', compact('documents', 'documentsCategories', 'registeredDocIds', 'favouriteDocIds', 'id'));
+        $date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+        return view('documents.documents', compact('documents', 'documentsCategories', 'registeredDocIds', 'favouriteDocIds', 'id', 'ads'));
     }
 
     /**

@@ -52,6 +52,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteClient', 'Admin\AdminController@deleteClient');
 	Route::get('admin/manageClientHistory', 'Admin\AdminController@manageClientHistory');
 	Route::post('admin/getClientHistory', 'Admin\AdminController@getClientHistory');
+	Route::get('admin/manageWebDevelopments', 'Admin\AdminController@manageWebDevelopments');
 
 	// Admin all users
 	Route::get('admin/allUsers', 'Admin\AllUsersInfoController@allUsers');
@@ -105,6 +106,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('thankyou', 'HomeController@thankyou');
 	Route::any('webhook', 'HomeController@webhook');
 	Route::post('freeRegister', 'HomeController@freeRegister');
+	Route::post('doAdvertisementPayment', 'HomeController@doAdvertisementPayment');
+	Route::get('thankyouadvertisement', 'HomeController@thankyouadvertisement');
+	Route::any('webhookAdvertisement', 'HomeController@webhookAdvertisement');
 
 
 	// manage sub admin
@@ -197,6 +201,17 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('pricing', 'HomeController@pricing');
 	Route::get('webdevelopment', 'HomeController@webdevelopment');
 	Route::get('us', 'HomeController@us');
+	Route::get('virtualplacementdrive', 'HomeController@virtualplacementdrive');
+	Route::post('virtualplacementquery', 'HomeController@virtualplacementquery');
+	Route::get('createAd/{page?}', 'HomeController@createAd');
+	Route::post('checkStartDate', 'HomeController@checkStartDate');
+	Route::post('checkDateSlot', 'HomeController@checkDateSlot');
+	Route::post('showCalendar', 'HomeController@showCalendar');
+	Route::get('getAllEvents', 'HomeController@getAllEvents');
+	Route::get('getWebdevelopment', 'HomeController@getWebdevelopment');
+	Route::post('doWebdevelopmentPayment', 'HomeController@doWebdevelopmentPayment');
+	Route::get('thankyouwebdevelopment', 'HomeController@thankyouwebdevelopment');
+	Route::post('webhookwebdevelopment', 'HomeController@webhookwebdevelopment');
 
 	// online courses front
 	Route::get('courses', 'CourseController@courses');
@@ -613,6 +628,74 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/applyJob/{id}/edit', 'Placement\PlacementApplyJobController@edit');
 	Route::put('admin/updateApplyJob', 'Placement\PlacementApplyJobController@update');
 	Route::delete('admin/deleteApplyJob', 'Placement\PlacementApplyJobController@delete');
+
+	// offline workshop category
+	Route::get('admin/manageOfflineWorkshopCategory', 'OfflineWorkshop\OfflineWorkshopCategoryController@show');
+	Route::get('admin/createOfflineWorkshopCategory', 'OfflineWorkshop\OfflineWorkshopCategoryController@create');
+	Route::post('admin/createOfflineWorkshopCategory', 'OfflineWorkshop\OfflineWorkshopCategoryController@store');
+	Route::get('admin/offlineWorkshopCategory/{id}/edit', 'OfflineWorkshop\OfflineWorkshopCategoryController@edit');
+	Route::put('admin/updateOfflineWorkshopCategory', 'OfflineWorkshop\OfflineWorkshopCategoryController@update');
+	Route::delete('admin/deleteOfflineWorkshopCategory', 'OfflineWorkshop\OfflineWorkshopCategoryController@delete');
+
+	// offline workshop Details
+	Route::get('admin/manageOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@show');
+	Route::get('admin/createOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@create');
+	Route::post('admin/createOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@store');
+	Route::get('admin/offlineWorkshopDetails/{id}/edit', 'OfflineWorkshop\OfflineWorkshopDetailsController@edit');
+	Route::put('admin/updateOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@update');
+	Route::delete('admin/deleteOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@delete');
+
+	// front offline workshop
+	Route::get('offlineworkshops', 'OfflineWorkshopController@show');
+	Route::get('offlineworkshopdetails/{id}', 'OfflineWorkshopController@offlineWorkshopDetails');
+	Route::post('workshopquery', 'OfflineWorkshopController@workshopQuery');
+	Route::post('getOfflineWorkshopsByCategory', 'OfflineWorkshopController@getOfflineWorkshopsByCategory');
+
+	// Motivational Speech Category
+	Route::get('admin/manageMotivationalSpeechCategory', 'MotivationalSpeech\MotivationalSpeechCategoryController@show');
+	Route::get('admin/createMotivationalSpeechCategory', 'MotivationalSpeech\MotivationalSpeechCategoryController@create');
+	Route::post('admin/createMotivationalSpeechCategory', 'MotivationalSpeech\MotivationalSpeechCategoryController@store');
+	Route::get('admin/motivationalSpeechCategory/{id}/edit', 'MotivationalSpeech\MotivationalSpeechCategoryController@edit');
+	Route::put('admin/updateMotivationalSpeechCategory', 'MotivationalSpeech\MotivationalSpeechCategoryController@update');
+	Route::delete('admin/deleteMotivationalSpeechCategory', 'MotivationalSpeech\MotivationalSpeechCategoryController@delete');
+
+	// Motivational Speech Details
+	Route::get('admin/manageMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@show');
+	Route::get('admin/createMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@create');
+	Route::post('admin/createMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@store');
+	Route::get('admin/motivationalSpeechDetails/{id}/edit', 'MotivationalSpeech\MotivationalSpeechDetailsController@edit');
+	Route::put('admin/updateMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@update');
+	Route::delete('admin/deleteMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@delete');
+
+	// Motivational Speech Video
+	Route::get('admin/manageMotivationalSpeechVideos', 'MotivationalSpeech\MotivationalSpeechVideoController@show');
+	Route::get('admin/createMotivationalSpeechVideo', 'MotivationalSpeech\MotivationalSpeechVideoController@create');
+	Route::post('admin/createMotivationalSpeechVideo', 'MotivationalSpeech\MotivationalSpeechVideoController@store');
+	Route::get('admin/motivationalSpeechVideo/{id}/edit', 'MotivationalSpeech\MotivationalSpeechVideoController@edit');
+	Route::put('admin/updateMotivationalSpeechVideo', 'MotivationalSpeech\MotivationalSpeechVideoController@update');
+	Route::delete('admin/deleteMotivationalSpeechVideo', 'MotivationalSpeech\MotivationalSpeechVideoController@delete');
+
+	// Motional speech front
+	Route::get('motivationalspeech', 'MotivationalSpeechController@show');
+	Route::post('getMotivationalSpeechesByCategory', 'MotivationalSpeechController@getMotivationalSpeechesByCategory');
+	Route::get('motivationalSpeechDetails/{id}', 'MotivationalSpeechController@motivationalSpeechDetails');
+	Route::post('motivationalspeechquery', 'MotivationalSpeechController@motivationalspeechquery');
+
+	// virtual placement drive
+	Route::get('admin/manageVirtualPlacementDrive', 'VirtualPlacement\VirtualPlacementDriveController@show');
+	Route::get('admin/createVirtualPlacementDrive', 'VirtualPlacement\VirtualPlacementDriveController@create');
+	Route::post('admin/createVirtualPlacementDrive', 'VirtualPlacement\VirtualPlacementDriveController@store');
+	Route::get('admin/virtualPlacementDrive/{id}/edit', 'VirtualPlacement\VirtualPlacementDriveController@edit');
+	Route::put('admin/updateVirtualPlacementDrive', 'VirtualPlacement\VirtualPlacementDriveController@update');
+	Route::delete('admin/deleteVirtualPlacementDrive', 'VirtualPlacement\VirtualPlacementDriveController@delete');
+
+	// admin advertisement page
+	Route::get('admin/manageAdvertisementPages', 'AdvertisementPage\AdvertisementPageController@show');
+	Route::get('admin/createAdvertisementPage', 'AdvertisementPage\AdvertisementPageController@create');
+	Route::post('admin/createAdvertisementPage', 'AdvertisementPage\AdvertisementPageController@store');
+	Route::get('admin/advertisementPage/{id}/edit', 'AdvertisementPage\AdvertisementPageController@edit');
+	Route::put('admin/updateAdvertisementPage', 'AdvertisementPage\AdvertisementPageController@update');
+	Route::delete('admin/deleteAdvertisementPage', 'AdvertisementPage\AdvertisementPageController@delete');
 
 });
 

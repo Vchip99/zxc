@@ -144,8 +144,8 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
     .done(function( msg ) {
       body = document.getElementById('client_history');
       body.innerHTML = '';
-      if( 0 < msg.length){
-        $.each(msg, function(idx, obj) {
+      if( 0 < msg['plans'].length){
+        $.each(msg['plans'], function(idx, obj) {
             var eleTr = document.createElement('tr');
             var eleIndex = document.createElement('td');
             eleIndex.innerHTML = idx + 1;
@@ -164,7 +164,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
             eleTr.appendChild(elePlan);
 
             var eleAmount = document.createElement('td');
-            eleAmount.innerHTML = obj.final_amount+' Rs.';
+            eleAmount.innerHTML = 'Rs. '+ obj.final_amount;
             eleTr.appendChild(eleAmount);
 
             var eleStatus = document.createElement('td');
@@ -181,6 +181,26 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
             eleTr.appendChild(eleStatus);
             body.appendChild(eleTr);
         });
+
+        var eleTr = document.createElement('tr');
+        var eleIndex = document.createElement('td');
+        eleIndex.innerHTML = '';
+        eleIndex.setAttribute('colspan', '3');
+        eleTr.appendChild(eleIndex);
+
+        var elePlan = document.createElement('td');
+        elePlan.innerHTML = '<b>Total:</b>';
+        eleTr.appendChild(elePlan);
+
+        var eleAmount = document.createElement('td');
+        eleAmount.innerHTML = 'Rs. '+ msg['total'];
+        eleTr.appendChild(eleAmount);
+
+        var eleStatus = document.createElement('td');
+        eleStatus.innerHTML = '';
+        eleTr.appendChild(eleStatus);
+
+        body.appendChild(eleTr);
       } else {
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');

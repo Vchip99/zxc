@@ -42,7 +42,7 @@ class UpdateClientAccessToken extends Command
     {
         set_time_limit(0);
         // check access token for application base auth
-        $instamojoDetail = InstamojoDetail::where('client_id', '4IfB5qdRnGjcq1LqCgkHLdARUvK3oAg1FyGdnqIR')->first();
+        $instamojoDetail = InstamojoDetail::first();
 
         if(!is_object($instamojoDetail)){
             exit();
@@ -56,15 +56,21 @@ class UpdateClientAccessToken extends Command
         DB::connection('mysql2')->beginTransaction();
         try
         {
+            if('local' == \Config::get('app.env')){
+                $userAuthUrl = "https://test.instamojo.com/oauth2/token/";
+            } else {
+                $userAuthUrl = "https://api.instamojo.com/oauth2/token/";
+            }
             $users = UserBasedAuthentication::all();
             if(is_object($users) && false == $users->isEmpty()){
+              $errorCount = 0;
                 foreach($users as $user){
                     $userPostFields['refresh_token'] =  $user->refresh_token;
 
                     $curl = curl_init();
 
                     curl_setopt_array($curl, array(
-                      CURLOPT_URL => "https://test.instamojo.com/oauth2/token/",
+                      CURLOPT_URL => $userAuthUrl,
                       CURLOPT_RETURNTRANSFER => true,
                       CURLOPT_ENCODING => "",
                       CURLOPT_MAXREDIRS => 10,
@@ -85,6 +91,7 @@ class UpdateClientAccessToken extends Command
 
                     if ($err) {
                       echo "cURL Error #:" . $err;
+                      $errorCount++;
                     } else {
                         $result = json_decode($response);
                         if(!empty($result->access_token) && !empty($result->refresh_token)){
@@ -97,7 +104,21 @@ class UpdateClientAccessToken extends Command
                                 DB::connection('mysql2')->commit();
                                 $this->info($result->access_token);
                             }
+                        } else {
+                          $errorCount++;
+                          $results = json_decode($response, true);
+                          if(count($results) > 0){
+                              $this->info('--------user_auth_error--------</br>');
+                              foreach($results as $key => $result){
+                                  $this->info($key.'->'.$result[0].'</br>');
+                              }
+                          }
                         }
+                    }
+                    if( 0 == $errorCount ){
+                      $this->info('clientId: '. $user->vchip_client_id .' is successfully updated on instamojo.');
+                    } else {
+                      $this->info('errors are created while clientId: '. $user->vchip_client_id .' updated on instamojo.');
                     }
                 }
             }

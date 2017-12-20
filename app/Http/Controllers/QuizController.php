@@ -135,7 +135,7 @@ class QuizController extends Controller
     /**
      *  show results of questions
      */
-     protected function getResult(Request $request){
+    protected function getResult(Request $request){
         if(is_array($request->except('_token'))){
             DB::beginTransaction();
             try
@@ -208,22 +208,29 @@ class QuizController extends Controller
                 $result['marks'] = $marks;
 
                 $score = Score::addScore($userId, $result);
-
                 foreach($userAnswers as $ind => $userAnswer){
                     $userAnswers[$ind]['score_id'] = $score->id;
                 }
                 UserSolution::saveUserAnswers($userAnswers);
                 RegisterPaper::registerTestPaper($userId, $paperId);
                 DB::commit();
-                $rank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId,$paperId,$score->test_score,$collegeId);
-                $totalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId,$collegeId);
-
-                return view('quiz.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank', 'score'));
+                $collegeRank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId,$paperId,$score->test_score,$collegeId);
+                $collegeTotalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId,$collegeId);
+                $globalRank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId,$paperId,$score->test_score,'all');
+                $globalTotalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId,'all');
+                $percentile = ceil(((($globalTotalRank + 1) - ($globalRank +1) )/ $globalTotalRank)*100);
+                $percentage = ceil(($score->right_answered/$totalMarks)*100);
+                if(($score->right_answered + $score->wrong_answered) > 0){
+                    $accuracy =  ceil(($score->right_answered/($score->right_answered + $score->wrong_answered))*100);
+                } else {
+                    $accuracy = 0;
+                }
+                return view('quiz.quiz-result', compact('result', 'collegeRank', 'totalMarks', 'collegeTotalRank', 'score', 'percentile', 'percentage', 'accuracy', 'globalRank', 'globalTotalRank'));
             }
             catch(\Exception $e)
-            {
+            {   dd($e);
                 DB::rollback();
-                return back()->withErrors('something went wrong.');
+                return Redirect::to('/')->withErrors('something went wrong.');
             }
         }
         return Redirect::to('/');

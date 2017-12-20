@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Client;
 use App\Models\Clientuser;
 use App\Models\ClientPlan;
+use App\Models\WebdevelopmentPayment;
 use App\Mail\MailToSubscribedUser;
 use Auth,Hash,Session,Redirect,Validator,DB;
 use App\Libraries\InputSanitise;
@@ -110,10 +111,11 @@ class AdminController extends Controller
 
     protected function getClientHistory(Request $request){
         $result = [];
+        $total = 0;
         $clientPlans = ClientPlan::where('client_id', $request->client_id)->get();
         if(is_object($clientPlans) && false == $clientPlans->isEmpty()){
             foreach($clientPlans as $clientPlan){
-                $result[]= [
+                $result['plans'][]= [
                                 'start_date' => $clientPlan ->start_date,
                                 'plan' => $clientPlan->plan->name,
                                 'end_date' => $clientPlan->end_date,
@@ -121,8 +123,23 @@ class AdminController extends Controller
                                 'payment_status' => $clientPlan->payment_status,
                                 'plan_id' => $clientPlan->plan_id,
                             ];
+                $total += $clientPlan->final_amount;
+            }
+        } else {
+            $result['plans'] = [];
+        }
+        $result['total'] = $total;
+        return $result;
+    }
+
+    protected function manageWebDevelopments(){
+        $totalSum = 0;
+        $webDevelopments = WebdevelopmentPayment::all();
+        if(is_object($webDevelopments) && false == $webDevelopments->isEmpty()){
+            foreach($webDevelopments as $webDevelopment){
+                $totalSum = $totalSum + $webDevelopment->price;
             }
         }
-        return $result;
+        return view('webDevelopment.webDevelopment', compact('webDevelopments', 'totalSum'));
     }
 }

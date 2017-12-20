@@ -18,6 +18,7 @@ use App\Libraries\InputSanitise;
 use App\Models\VkitProjectLike;
 use App\Models\Notification;
 use App\Models\ReadNotification;
+use App\Models\Add;
 
 class VkitController extends Controller
 {
@@ -45,10 +46,12 @@ class VkitController extends Controller
     /**
      *  show vkits projects
      */
-    protected function show(){
+    protected function show(Request $request){
         $projects = VkitProject::paginate(12);
         $vkitCategories = VkitCategory::getProjectCategoriesAssociatedWithProject();
-        return view('vkits.vkits', compact('projects', 'vkitCategories'));
+        $date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+        return view('vkits.vkits', compact('projects', 'vkitCategories', 'ads'));
     }
 
     /**

@@ -39,7 +39,7 @@
 						    <div align="left" style="background:#ADD8E6">
 						    	@foreach($results['questions'] as $index => $question)
 						    		@if(isset($sections[$index]) && count($results['questions'][$index]) > 0)
-							   			<a class="section btn btn-default" id="{{ $sections[$index]->name }}" style="width:100px;">{{ $sections[$index]->name }}</a>
+							   			<a class="section btn btn-default" id="{{ $sections[$index]->name }}" style="min-width:100px; max-width:200px;">{{ $sections[$index]->name }}</a>
 							   			<input type="hidden" id="show-{{ $sections[$index]->name }}" name="show-{{ $sections[$index]->name }}" value="1" />
 							   		@else
 							   			<input type="hidden" id="show-{{ $sections[$index]->name }}" name="show-{{ $sections[$index]->name }}" value="0" />

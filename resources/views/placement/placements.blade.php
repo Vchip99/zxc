@@ -221,7 +221,7 @@ ul.table_list{ margin-left: -30px; }
     <div class="row">
       <div class="col-sm-3 hidden-div">
         <div class="control mrgn_20_top_btm" >
-          <select id="area" class="form-control" name="area" data-toggle="tooltip" title="Area" onChange="selectCompany(this);" required>
+          <select id="area" class="form-control mrgn_20_btm" name="area" data-toggle="tooltip" title="Area" onChange="selectCompany(this);" required>
             <option value="0">Select Area</option>
             @if(count($placementAreas) > 0)
               @foreach($placementAreas as $placementArea)
@@ -247,7 +247,7 @@ ul.table_list{ margin-left: -30px; }
           </select>
         </div>
       </div>
-      <div class="col-sm-9 col-sm-push-3 data">
+      <div class="col-sm-9 col-sm-push-3 data" id="placement-box">
          <div class="portlet box grey-cascade">
             <div class="portlet-title">
               <ul class="nav nav-tabs nav-tabs-lg pull-left">
@@ -732,9 +732,8 @@ ul.table_list{ margin-left: -30px; }
             @endif
           </select>
         </div>
-        <div class="advertisement-area">
-            <span class="pull sponsored"><a href=""> Sponsored</a></span>
-            <span class="pull-right create-add"><a href=""> Create Advert</a></span>
+        <!-- <div class="advertisement-area">
+            <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
         </div>
         <br/>
         <div class="add-1">
@@ -772,7 +771,75 @@ ul.table_list{ margin-left: -30px; }
               <p class="ellipsed"> "Leading the success in "Banking Exams""</p>
             </div>
           </div>
+        </div> -->
+        <div class="advertisement-area">
+            <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
         </div>
+        <br/>
+        @if(count($ads) > 0)
+          @foreach($ads as $ad)
+            <div class="add-1">
+              <div class="course-box">
+                <a class="img-course-box" href="{{ $ad->website_url }}" target="_blank">
+                  <img src="{{asset($ad->logo)}}" alt="{{ $ad->company }}"  class="img-responsive" />
+                </a>
+                <div class="course-box-content">
+                  <h4 class="course-box-title" title="{{ $ad->company }}" data-toggle="tooltip" data-placement="bottom">
+                    <a href="{{ $ad->website_url }}" target="_blank">{{ $ad->company }}</a>
+                  </h4>
+                  <p class="more"> {{ $ad->tag_line }}</p>
+                </div>
+              </div>
+            </div>
+          @endforeach
+        @endif
+        @if(count($ads) < 3)
+          @for($i = count($ads)+1; $i <=3; $i++)
+            @if(1 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">
+                    <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="SSGMCE"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="SSGMCE" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">SSGMCE</a>
+                    </h4>
+                    <p class="more"> SSGMCE</p>
+                  </div>
+                </div>
+              </div>
+            @elseif(2 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://ghrcema.raisoni.net/" target="_blank">
+                    <img src="{{ asset('images/logo/ghrcema_logo.png') }}" alt="G H RISONI"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="G H RISONI" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://ghrcema.raisoni.net/" target="_blank">G H RISONI</a>
+                    </h4>
+                    <p class="more"> G H RISONI</p>
+                  </div>
+                </div>
+              </div>
+            @elseif(3 == $i)
+              <div class="add-1">
+                <div class="course-box">
+                  <a class="img-course-box" href="http://hvpmcoet.in/" target="_blank">
+                    <img src="{{ asset('images/logo/hvpm.jpg') }}" alt="HVPM"  class="img-responsive" />
+                  </a>
+                  <div class="course-box-content">
+                    <h4 class="course-box-title" title="HVPM" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://hvpmcoet.in/" target="_blank">HVPM College of Engineer And Technology</a>
+                    </h4>
+                    <p class="more"> HVPM College of Engineer And Technology</p>
+                  </div>
+                </div>
+              </div>
+            @endif
+          @endfor
+        @endif
       </div>
     </div>
   </div>
