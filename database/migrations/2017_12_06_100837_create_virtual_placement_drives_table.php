@@ -15,6 +15,7 @@ class CreateVirtualPlacementDrivesTable extends Migration
     {
         Schema::create('virtual_placement_drives', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('name');
             $table->text('about');
             $table->string('about_image');
             $table->text('online_test');

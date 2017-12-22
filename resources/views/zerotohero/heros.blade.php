@@ -172,28 +172,6 @@ option:not(:checked) {
   height: 100%;
   transition: all .25s ease;
 }
-/*.course-box {
-  display: block;
-  margin-bottom: 20px;
-  line-height: 1.42857143;
-  background-color: #fff;
-  border-radius: 2px;
-  position: relative;
-  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
-  transition: box-shadow .25s;
-  border-top: 18px solid #007ba7;
-
-}
-.course-box:hover {
-  box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-}
-.course-box-content{padding: 15px;}
-
-.course-box-title {
-  text-align: center !important;
-  width: 100% !important;
-  font-weight: bolder !important;
-}*/
 .course-box-content p{color: grey;}
 .add-view {
     border-top: 1px solid #D4D4D4;

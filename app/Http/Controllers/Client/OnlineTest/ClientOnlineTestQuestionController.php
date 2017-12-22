@@ -438,7 +438,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                         return Redirect::to('manageUploadQuestions')->with('message', 'Questions added successfully!');
                     }
                     catch(\Exception $e)
-                    {   dd($e);
+                    {
                         DB::connection('mysql2')->rollback();
                         return redirect()->back()->withErrors('something went wrong.');
                     }

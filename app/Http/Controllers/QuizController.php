@@ -228,7 +228,7 @@ class QuizController extends Controller
                 return view('quiz.quiz-result', compact('result', 'collegeRank', 'totalMarks', 'collegeTotalRank', 'score', 'percentile', 'percentage', 'accuracy', 'globalRank', 'globalTotalRank'));
             }
             catch(\Exception $e)
-            {   dd($e);
+            {
                 DB::rollback();
                 return Redirect::to('/')->withErrors('something went wrong.');
             }

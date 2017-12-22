@@ -37,7 +37,6 @@ class AdvertisementPageController extends Controller
 
 	protected function show(){
 		$advertisementPages = AdvertisementPage::paginate();
-    	// dd($advertisementPages);
     	return view('advertisementPage.list', compact('advertisementPages'));
 	}
 

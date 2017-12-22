@@ -16,7 +16,7 @@ class VirtualPlacementDriveController extends Controller
      *  check admin have permission or not, if not redirect to admin/home
      */
     public function __construct() {
-    	dd($request);
+
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
@@ -111,7 +111,7 @@ class VirtualPlacementDriveController extends Controller
                 }
             }
             catch(\Exception $e)
-            {	dd($e->getMessage());
+            {
                 DB::rollback();
                 return redirect()->back()->withErrors('something went wrong.');
             }

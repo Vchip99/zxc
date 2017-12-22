@@ -57,6 +57,7 @@ class ClientUserPurchasedTestSubCategory extends Model
     		$newTestSubCategory->test_category_id = $request->test_category_id;
     		$newTestSubCategory->test_sub_category_id = $request->test_sub_category_id;
     		$newTestSubCategory->client_id = $request->client_id;
+            $newTestSubCategory->payment_id = '';
     		$newTestSubCategory->save();
     		return 'true';
     	}elseif(true == is_object($testSubCategory)){

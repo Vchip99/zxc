@@ -68,7 +68,11 @@ margin-left: -13px;}
         </div>
         <div class="col-sm-9 col-sm-push-3">
           <div class="ask-qst">
-              <button class="btn btn-primary "  data-toggle="modal" data-target="#askQuestion"> Ask Question</button>
+              @if(is_object(Auth::user()))
+                <a class="btn btn-primary" data-toggle="modal" data-target="#askQuestion">Ask Question</a>
+              @else
+                <a class="btn btn-primary" data-toggle="modal" data-target="#loginUserModel">Ask Question</a>
+              @endif
               <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::user()))?Auth::user()->id:NULL}}">
           </div>
           <div class="post-comments ">

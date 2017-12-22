@@ -31,7 +31,6 @@
       <div class="col-sm-3 hidden-div">
         <h4 class="v_h4_subtitle"> Sorted By</h4>
         <div class="mrgn_20_top_btm" >
-
           <select id="category" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectSubcategory(this);" required>
             <option value="0">Select Category ...</option>
             @if(count($courseCategories) > 0)
@@ -72,74 +71,6 @@
             <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Letest</label>
           </div>
         </div>
-       <!--  <div class="advertisement-area">
-            <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
-        </div>
-        <br/>
-        @if(count($ads) > 0)
-          @foreach($ads as $ad)
-            <div class="add-1">
-              <div class="course-box">
-                <a class="img-course-box" href="{{ $ad->website_url }}" target="_blank">
-                  <img src="{{asset($ad->logo)}}" alt="{{ $ad->company }}"  class="img-responsive" />
-                </a>
-                <div class="course-box-content">
-                  <h4 class="course-box-title" title="{{ $ad->company }}" data-toggle="tooltip" data-placement="bottom">
-                    <a href="{{ $ad->website_url }}" target="_blank">{{ $ad->company }}</a>
-                  </h4>
-                  <p class="more"> {{ $ad->tag_line }}</p>
-                </div>
-              </div>
-            </div>
-          @endforeach
-        @endif
-        @if(count($ads) < 3)
-          @for($i = count($ads)+1; $i <=3; $i++)
-            @if(1 == $i)
-              <div class="add-1">
-                <div class="course-box">
-                  <a class="img-course-box" href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">
-                    <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="SSGMCE"  class="img-responsive" />
-                  </a>
-                  <div class="course-box-content">
-                    <h4 class="course-box-title" title="SSGMCE" data-toggle="tooltip" data-placement="bottom">
-                      <a href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">SSGMCE</a>
-                    </h4>
-                    <p class="more"> SSGMCE</p>
-                  </div>
-                </div>
-              </div>
-            @elseif(2 == $i)
-              <div class="add-1">
-                <div class="course-box">
-                  <a class="img-course-box" href="http://ghrcema.raisoni.net/" target="_blank">
-                    <img src="{{ asset('images/logo/ghrcema_logo.png') }}" alt="G H RISONI"  class="img-responsive" />
-                  </a>
-                  <div class="course-box-content">
-                    <h4 class="course-box-title" title="G H RISONI" data-toggle="tooltip" data-placement="bottom">
-                      <a href="http://ghrcema.raisoni.net/" target="_blank">G H RISONI</a>
-                    </h4>
-                    <p class="more"> G H RISONI</p>
-                  </div>
-                </div>
-              </div>
-            @elseif(3 == $i)
-              <div class="add-1">
-                <div class="course-box">
-                  <a class="img-course-box" href="http://hvpmcoet.in/" target="_blank">
-                    <img src="{{ asset('images/logo/hvpm.jpg') }}" alt="HVPM"  class="img-responsive" />
-                  </a>
-                  <div class="course-box-content">
-                    <h4 class="course-box-title" title="HVPM" data-toggle="tooltip" data-placement="bottom">
-                      <a href="http://hvpmcoet.in/" target="_blank">HVPM College of Engineer And Technology</a>
-                    </h4>
-                    <p class="more"> HVPM College of Engineer And Technology</p>
-                  </div>
-                </div>
-              </div>
-            @endif
-          @endfor
-        @endif -->
       </div>
       <div class="col-sm-9 col-sm-push-3 data ">
         <div class="row info" id="addCourses">
@@ -197,7 +128,7 @@
            <h4 class="v_h4_subtitle"> Sorted By</h4>
           <div class="mrgn_20_top_btm" >
 
-            <select id="category" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectSubcategory(this);" required>
+            <select id="categoryNew" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectSubcategoryNew(this);" required>
               <option value="0">Select Category ...</option>
               @if(count($courseCategories) > 0)
                 @foreach($courseCategories as $courseCategory)
@@ -207,7 +138,7 @@
             </select>
           </div>
           <div class="dropdown mrgn_20_top_btm" id="subcat">
-            <select id="subcategory" class="form-control" name="subcategory" data-toggle="tooltip" title="Sub Category" onChange="selectCourses(this);" required>
+            <select id="subcategoryNew" class="form-control" name="subcategory" data-toggle="tooltip" title="Sub Category" onChange="selectCoursesNew(this);" required>
                 <option value="">Select Sub Category ...</option>
               </select>
           </div>
@@ -354,9 +285,9 @@
                     </div>
 
                   </div>
-                  <!-- /.End Services Row -->
-                </div><!-- /.End Container -->
-              </section>
+    <!-- /.End Services Row -->
+  </div><!-- /.End Container -->
+</section>
 
 @stop
 @section('footer')
@@ -393,6 +324,33 @@
   function selectSubcategory(ele){
     var id = parseInt($(ele).val());
     getCourseSubCategories(id);
+  }
+
+  function selectSubcategoryNew(ele){
+    var id = parseInt($(ele).val());
+    if( 0 < id ){
+      $.ajax({
+          method: "POST",
+          url: "{{url('getCourseSubCategories')}}",
+          data: {id:id}
+      })
+      .done(function( msg ) {
+        select = document.getElementById('subcategoryNew');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = 'Select Sub Category ...';
+        select.appendChild(opt);
+        if( 0 < msg.length){
+          $.each(msg, function(idx, obj) {
+              var opt = document.createElement('option');
+              opt.value = obj.id;
+              opt.innerHTML = obj.name;
+              select.appendChild(opt);
+          });
+        }
+      });
+    }
   }
   function renderCourse(msg){
     divCourses = document.getElementById('addCourses');
@@ -464,6 +422,25 @@
   function selectCourses(ele){
     var subcatId = parseInt($(ele).val());
     var catId = parseInt(document.getElementById('category').value);
+    if(catId > 0 && subcatId > 0){
+      $.ajax({
+        method: "POST",
+        url: "{{url('getCourseByCatIdBySubCatId')}}",
+        data: {catId:catId, subcatId:subcatId}
+      })
+      .done(function( msg ) {
+        renderCourse(msg);
+        var searches = document.getElementsByClassName('search');
+        $.each(searches, function(ind, obj){
+          $(obj).attr('checked', false);
+        });
+      });
+    }
+  }
+
+  function selectCoursesNew(ele){
+    var subcatId = parseInt($(ele).val());
+    var catId = parseInt(document.getElementById('categoryNew').value);
     if(catId > 0 && subcatId > 0){
       $.ajax({
         method: "POST",

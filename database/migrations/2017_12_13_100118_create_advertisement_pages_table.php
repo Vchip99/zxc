@@ -16,6 +16,7 @@ class CreateAdvertisementPagesTable extends Migration
         Schema::create('advertisement_pages', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('url');
             $table->string('price');
             $table->integer('parent_page')->default(0);
             $table->timestamps();

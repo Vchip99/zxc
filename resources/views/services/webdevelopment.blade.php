@@ -313,7 +313,7 @@ box-shadow: 0 13px 40px 0 rgba(62,68,93,.3), 0 2px 4px 0 rgba(62,68,93,.06);
             <div class="col-md-12">
                 <div class="block">
                     <h2 class="title wow fadeInDown" data-wow-delay=".3s" data-wow-duration="500ms">Prize </h2>
-                    <p class="wow fadeInDown" data-wow-delay=".5s" data-wow-duration="500ms">All the above mention facilities are at free of cost up-to 20 login.<br/>@ Rs. 2999 /year for unlimited logins.</p>
+                    <p class="wow fadeInDown" data-wow-delay=".5s" data-wow-duration="500ms">Rs. 2999</p>
                     <a href="{{ url('getWebdevelopment')}}" data-toggle="modal" class="btn btn-default btn-contact wow fadeInDown" data-wow-delay=".7s" data-wow-duration="500ms">Buy Now</a>
                 </div>
             </div>

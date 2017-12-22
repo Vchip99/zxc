@@ -110,7 +110,7 @@ class VirtualPlacementDriveController extends Controller
                 }
             }
             catch(\Exception $e)
-            {	dd($e->getMessage());
+            {
                 DB::rollback();
                 return redirect()->back()->withErrors('something went wrong.');
             }

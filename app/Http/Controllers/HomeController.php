@@ -52,8 +52,6 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        // $testCategories = TestCategory::all();
-        // view::share('testCategories', $testCategories);
         parent::__construct();
     }
 
@@ -1226,6 +1224,7 @@ class HomeController extends Controller
                 }
             }
         }
+
         return view('createAdd.createAdd', compact('calendar', 'selectedPage', 'advertisementPages'));
     }
 

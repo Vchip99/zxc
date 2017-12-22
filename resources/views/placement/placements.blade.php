@@ -665,9 +665,9 @@ ul.table_list{ margin-left: -30px; }
                               @if(count($applyJobs) > 0)
                                 @foreach($applyJobs as $applyJob)
                                   <tr>
-                                    <td class="name">{{ $applyJob->company }}</td>
+                                    <td class="name"><b>{{ $applyJob->company }}</b></td>
                                     <td> {!! mb_strimwidth( $applyJob->job_description , 0, 400, '...') !!}</br>
-                                         <a type="button" class="btn btn-info btn-circle btn-xs" title="Read" data-toggle="modal" data-placement="bottom" href="#{{ $applyJob->company }}">Read More</a>
+                                         <a type="button" class="btn btn-info btn-circle btn-xs" title="Read" data-toggle="modal" data-placement="bottom" href="#company_{{$applyJob->id }}">Read More</a>
                                     </td>
                                     <td>
                                       <a class="btn btn-primary btn-xs delet-bt delet-btn" href="{{ $applyJob->mock_test }}">Mock Test</a>
@@ -692,7 +692,7 @@ ul.table_list{ margin-left: -30px; }
       </div>
       @if(count($applyJobs) > 0)
         @foreach($applyJobs as $applyJob)
-          <div id="{{ $applyJob->company }}" class="modal fade" role="dialog">
+          <div id="company_{{ $applyJob->id }}" class="modal fade" role="dialog">
             <div class="modal-dialog">
               <div class="modal-content" style="background-color: white;">
                 <div class="modal-header">

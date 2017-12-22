@@ -629,14 +629,14 @@ class ClientBaseController extends BaseController
                     BankDetail::updateBankDetails($request);
                 } else {
                     if(count($results) > 0){
-                        $instamojoAuthErrors.= '--------application_auth_error--------';
+                        $instamojoErrors.= '--------application_auth_error--------';
                         foreach($results as $key => $result){
-                            $instamojoAuthErrors.= 'user -'.Auth::guard('client')->user()->email.'->'.$key.'->'.$result[0];
+                            $instamojoErrors.= 'user -'.Auth::guard('client')->user()->email.'->'.$key.'->'.$result[0];
                         }
                     }
                 }
             }
-            if(count($instamojoErrors) > 0){
+            if(!empty($instamojoErrors)){
                 Mail::to('vchipdesigng8@gmail.com')->send(new PaymentGatewayErrors($instamojoErrors));
             }
         }
