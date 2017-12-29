@@ -17,11 +17,14 @@ use App\Models\ClientOnlineCourse;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientCustomer;
 use App\Models\Client;
+use App\Models\Clientuser;
 use App\Models\ClientPlan;
 use App\Models\Plan;
 use App\Models\Payment;
 use App\Models\BankDetail;
 use App\Models\UserBasedAuthentication;
+use App\Models\ClientUserPurchasedCourse;
+use App\Models\ClientUserPurchasedTestSubCategory;
 use Illuminate\Http\Request;
 use Auth, Redirect, View, DB, Session;
 use App\Http\Controllers\Instamojo;
@@ -97,9 +100,48 @@ class ClientBaseController extends BaseController
         return view('client.plansAndBilling.billing', compact('clientPlan', 'dueDate'));
     }
 
+    protected function manageUserPayments(){
+        $clientUsers = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
+        return view('client.plansAndBilling.userPayments', compact('clientUsers'));
+    }
+
     protected function manageHistory(){
         $clientPlans = ClientPlan::where('client_id', Auth::guard('client')->user()->id)->get();
         return view('client.plansAndBilling.history', compact('clientPlans'));
+    }
+
+    protected function getClientUserPayments(Request $request){
+        $results = [];
+        $total = 0;
+        $userCourses = ClientUserPurchasedCourse::getClientUserPurchasedCourses(Auth::guard('client')->user()->id, $request->get('client_user_id'));
+        if(is_object($userCourses) && false == $userCourses->isEmpty()){
+            foreach($userCourses as $userCourse){
+                $results['purchased'][] = [
+                                'type' => 'Course',
+                                'name' => $userCourse->course->name,
+                                'amount' => $userCourse->price,
+                                'date' => $userCourse->updated_at
+                            ];
+                $total += $userCourse->price;
+            }
+        }
+
+        $userTestSubCategories = ClientUserPurchasedTestSubCategory::getClientUserPurchasedTestSubCategories(Auth::guard('client')->user()->id, $request->get('client_user_id'));
+        if(is_object($userTestSubCategories) && false == $userTestSubCategories->isEmpty()){
+            foreach($userTestSubCategories as $userTestSubCategory){
+                $results['purchased'][] = [
+                                'type' => 'SubCategory',
+                                'name' => $userTestSubCategory->testSubCategory->name,
+                                'amount' => $userTestSubCategory->price,
+                                'date' => $userTestSubCategory->updated_at
+                            ];
+                $total += $userTestSubCategory->price;
+            }
+        }
+        // return \DB::connection('mysql2')->getQueryLog();
+        // dd($userCourses);
+        $results['total'] = $total;
+        return $results;
     }
 
     protected function continuePayment(Request $request){

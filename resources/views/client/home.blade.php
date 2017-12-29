@@ -289,8 +289,10 @@
               <script type="text/javascript">
                 CKEDITOR.disableAutoInline = true;
                 contentEditor = CKEDITOR.inline('home_content');
-                contentEditor.on('blur', function(event) {
-                  document.getElementById('home_content_value').value = this.getData();
+                contentEditor.on('key', function(event) {
+                  setTimeout(function(){
+                    document.getElementById('home_content_value').value = event.editor.getData();
+                  },10);
                 });
               </script>
             </div>
@@ -344,8 +346,10 @@
         <script type="text/javascript">
           CKEDITOR.disableAutoInline = true;
           aboutEditor = CKEDITOR.inline('home_about');
-          aboutEditor.on('blur', function(event) {
-            document.getElementById('home_about_value').value = this.getData();
+          aboutEditor.on('key', function(event) {
+            setTimeout(function(){
+                document.getElementById('home_about_value').value = event.editor.getData();
+            },10);
           });
         </script>
         <hr class="section-dash-dark"/>
@@ -364,8 +368,10 @@
         <script type="text/javascript">
           CKEDITOR.disableAutoInline = true;
           aboutEditorContent = CKEDITOR.inline('editable_about');
-          aboutEditorContent.on('blur', function(event) {
-            document.getElementById('home_about_content').value = this.getData();
+          aboutEditorContent.on('key', function(event) {
+            setTimeout(function(){
+                document.getElementById('home_about_content').value = event.editor.getData();
+            },10);
           });
         </script>
       </div>
@@ -376,8 +382,10 @@
         <script type="text/javascript">
           CKEDITOR.disableAutoInline = true;
           vissionEditorContent = CKEDITOR.inline('editable_vission');
-          vissionEditorContent.on('blur', function(event) {
-            document.getElementById('home_vission_content').value = this.getData();
+          vissionEditorContent.on('key', function(event) {
+            setTimeout(function(){
+                document.getElementById('home_vission_content').value = event.editor.getData();
+            },10);
           });
         </script>
       </div>
@@ -388,8 +396,10 @@
         <script type="text/javascript">
           CKEDITOR.disableAutoInline = true;
           missionEditorContent = CKEDITOR.inline('editable_mission');
-          missionEditorContent.on('blur', function(event) {
-            document.getElementById('home_mission_content').value = this.getData();
+          missionEditorContent.on('key', function(event) {
+            setTimeout(function(){
+                document.getElementById('home_mission_content').value = event.editor.getData();
+            },10);
           });
         </script>
       </div>
@@ -407,8 +417,10 @@
        <script type="text/javascript">
           CKEDITOR.disableAutoInline = true;
           onlineEditorValue = CKEDITOR.inline('editable_online_name');
-          onlineEditorValue.on('blur', function(event) {
-            document.getElementById('home_course_name').value = this.getData();
+          onlineEditorValue.on('key', function(event) {
+            setTimeout(function(){
+              document.getElementById('home_course_name').value = event.editor.getData();
+            },10);
           });
         </script>
       <hr class="section-dash-dark"/>
@@ -417,8 +429,10 @@
         <script type="text/javascript">
           CKEDITOR.disableAutoInline = true;
           onlineEditorContent = CKEDITOR.inline('editable_online_desc');
-          onlineEditorContent.on('blur', function(event) {
-            document.getElementById('home_course_content').value = this.getData();
+          onlineEditorContent.on('key', function(event) {
+            setTimeout(function(){
+              document.getElementById('home_course_content').value = event.editor.getData();
+            },10);
           });
         </script>
     </div>
@@ -477,8 +491,10 @@
         <script type="text/javascript">
           CKEDITOR.disableAutoInline = true;
           testEditorValue = CKEDITOR.inline('editable_test_series');
-          testEditorValue.on('blur', function(event) {
-            document.getElementById('home_test_value').value = this.getData();
+          testEditorValue.on('key', function(event) {
+            setTimeout(function(){
+              document.getElementById('home_test_value').value = event.editor.getData();
+            },10);
           });
         </script>
       <hr class="section-dash-dark"/>
@@ -487,8 +503,10 @@
         <script type="text/javascript">
           CKEDITOR.disableAutoInline = true;
           testEditorContent = CKEDITOR.inline('editable_test_desc');
-          testEditorContent.on('blur', function(event) {
-            document.getElementById('home_test_content').value = this.getData();
+          testEditorContent.on('key', function(event) {
+            setTimeout(function(){
+              document.getElementById('home_test_content').value = event.editor.getData();
+            },10);
           });
         </script>
     </div>
@@ -548,8 +566,10 @@
         <script type="text/javascript">
           CKEDITOR.disableAutoInline = true;
           testEditorContent = CKEDITOR.inline('editable_customer_value');
-          testEditorContent.on('blur', function(event) {
-            document.getElementById('home_customer_value').value = this.getData();
+          testEditorContent.on('key', function(event) {
+            setTimeout(function(){
+              document.getElementById('home_customer_value').value = event.editor.getData();
+            },10);
           });
         </script>
         <hr class="section-dash-dark"/>
@@ -558,8 +578,10 @@
         <script type="text/javascript">
           CKEDITOR.disableAutoInline = true;
           testEditorContent = CKEDITOR.inline('editable_customer_content');
-          testEditorContent.on('blur', function(event) {
-            document.getElementById('home_customer_content').value = this.getData();
+          testEditorContent.on('key', function(event) {
+            setTimeout(function(){
+              document.getElementById('home_customer_content').value = event.editor.getData();
+            },10);
           });
         </script>
       </div>
@@ -667,8 +689,10 @@
                 <script type="text/javascript">
                   CKEDITOR.disableAutoInline = true;
                   vissionEditorContent = CKEDITOR.inline('editable_testimonial_{{$testimonial->id}}');
-                  vissionEditorContent.on('blur', function(event) {
-                    document.getElementById('testimonial_{{$testimonial->id}}').value = this.getData();
+                  vissionEditorContent.on('key', function(event) {
+                    setTimeout(function(){
+                      document.getElementById('testimonial_{{$testimonial->id}}').value = event.editor.getData();
+                    },10);
                   });
                 </script>
 
@@ -677,8 +701,10 @@
                 <script type="text/javascript">
                   CKEDITOR.disableAutoInline = true;
                   vissionEditorContent = CKEDITOR.inline('editable_author_{{$testimonial->id}}');
-                  vissionEditorContent.on('blur', function(event) {
-                    document.getElementById('author_{{$testimonial->id}}').value = this.getData();
+                  vissionEditorContent.on('key', function(event) {
+                    setTimeout(function(){
+                      document.getElementById('author_{{$testimonial->id}}').value = event.editor.getData();
+                    },10);
                   });
                 </script>
             </div>
@@ -773,8 +799,10 @@
           <script type="text/javascript">
             CKEDITOR.disableAutoInline = true;
             vissionEditorContent = CKEDITOR.inline('editable_contact');
-            vissionEditorContent.on('blur', function(event) {
-              document.getElementById('contact_us').value = this.getData();
+            vissionEditorContent.on('key', function(event) {
+              setTimeout(function(){
+                  document.getElementById('contact_us').value = event.editor.getData();
+              },10);
             });
           </script>
        </div>

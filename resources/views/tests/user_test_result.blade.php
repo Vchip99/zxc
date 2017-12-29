@@ -461,7 +461,7 @@
                       <span class="ans ans-unseen" title="Unattempt"></span> {{$score->unanswered}}
                   </div>
 		               <div class="inline-block">
-		                  <span class="hidden-sm hidden-xs"><b> Score</b></span>
+		                  <span class="hidden-sm hidden-xs"><b> Score:</b></span>
 		                  <span class="ans ans-score hidden-md hidden-lg">
 		                      <i class="fa fa-line-chart"></i>
 		                  </span>
@@ -603,15 +603,15 @@
 		              <br/>
 		              <ul class="list-unstyled progress-list">
 		                <li class="">
-		                  <span class="name">Positive</span>
-		                  <span class="pull-right text-ellipsis value ng-binding">{{$score->right_answered}}</span>
+		                  <span class="name">Positive Marks</span>
+		                  <span class="pull-right text-ellipsis value ng-binding">{{$positiveMarks}}</span>
 		                </li>
 		                <li class="">
-		                  <span class="name">Negative</span>
-		                  <span class="pull-right text-ellipsis value ng-binding">{{$score->wrong_answered}}</span>
+		                  <span class="name">Negative Marks</span>
+		                  <span class="pull-right text-ellipsis value ng-binding">{{$negativeMarks}}</span>
 		                </li>
 		                <li class="">
-		                  <span class="name">Total Score</span>
+		                  <span class="name">Total Marks</span>
 		                  <span class="pull-right text-ellipsis value ng-binding">{{$score->test_score}}</span>
 		                </li>
 		              </ul>

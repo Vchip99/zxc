@@ -1,4 +1,4 @@
-# Hesto MultiAuth for Laravel 5.3 or higher
+# Hesto MultiAuth for Laravel 5.3 and 5.4
 
 - `php artisan multi-auth:install {guard} -f`
 - `php artisan multi-auth:install {guard} -f --domain`
@@ -85,7 +85,7 @@ php artisan migrate
 
 ### Step 5: Try it
 
-Go to: `http://url_to_your_proejct/guard/login`
+Go to: `http://url_to_your_project/guard/login`
 Example: `http://project/admin/login`
 
 ## Options

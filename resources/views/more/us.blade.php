@@ -503,11 +503,11 @@ margin-right: 10px;
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
                   <div class="tile">
-                        <img src="{{ asset('images/logo/gate-the-Direction.png') }}" alt="GATE THE Direction"/>
+                        <img src="{{ asset('images/logo/pote.jpg') }}" alt="P.R. Pote College of Engineering & Management"/>
                         <div class="text">
-                          <h1 title="GATE THE Direction">GATE THE Direction</h1>
+                          <h1 title="P.R. Pote College of Engineering & Management">P.R. Pote College of Engineering & Management</h1>
                           <p class="animate-text">
-                            <a href="http://gatethedirection.com/" target="_blank" class="btn-link">Learn More
+                            <a href="http://www.prpcem.org/" target="_blank" class="btn-link">Learn More
                               <i class="fa fa-angle-right" aria-hidden="true"></i>
                             </a>
                           </p>
@@ -516,11 +516,11 @@ margin-right: 10px;
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
                   <div class="tile">
-                        <img src="{{ asset('images/logo/kaizen.jpg') }}" alt="Kaizen Technology" />
+                        <img src="{{ asset('images/logo/hvpm.jpg') }}" alt="HVPM College of Engineer And Technology" />
                         <div class="text">
-                          <h1 title="Kaizen Technology">Kaizen Technology</h1>
+                          <h1 title="HVPM College of Engineer And Technology">HVPM College of Engineer And Technology</h1>
                           <p class="animate-text">
-                            <a href="http://kaizenn.org/" target="_blank" class="btn-link">Learn More
+                            <a href="http://hvpmcoet.in/" target="_blank" class="btn-link">Learn More
                               <i class="fa fa-angle-right" aria-hidden="true"></i>
                             </a>
                           </p>
@@ -571,7 +571,7 @@ margin-right: 10px;
       <div class="person-detail ">
         <div class="arrow-top"></div>
         <p><strong>Mr. Ajay Jangra</strong></p>
-        <p>Professor</p>
+        <p>Adjunct Professor</p>
         <p>M-Tech: IIT Kharagpur </p>
       </div>
       <div class="person slideanim">
@@ -586,7 +586,7 @@ margin-right: 10px;
       <div class="person-detail slideanim">
         <div class="arrow-bottom"></div>
         <p><strong>Mr. Vishal Kumar</strong></p>
-        <p>Adjoint Professor</p>
+        <p>Adjunct Professor</p>
         <p>M-Tech: IIT Kharagpur </p>
       </div>
     </div>
@@ -595,7 +595,7 @@ margin-right: 10px;
       <div class="person-detail">
         <div class="arrow-top"></div>
         <p><strong>Mr. Vishal Parvani</strong></p>
-        <p>Adjoint Professor</p>
+        <p>Adjunct Professor</p>
         <p>M-Tech: Bits Pilani </p>
       </div>
       <div class="person slideanim">
@@ -610,16 +610,15 @@ margin-right: 10px;
       <div class="person-detail slideanim">
         <div class="arrow-bottom"></div>
         <p><strong>Mr. Vartul Sharma</strong></p>
-        <p>Adjoint Professor</p>
+        <p>Adjunct Professor</p>
         <p>M-Tech: COEP Pune </p>
       </div>
     </div>
-
     <div class="col-md-2 single-member col-sm-4">
       <div class="person-detail">
         <div class="arrow-top"></div>
         <p><strong>Mr. Aditya Jagtap</strong></p>
-        <p>Adjoint Professor</p>
+        <p>Adjunct Professor</p>
         <p>M-Tech: VIT Vellore </p>
       </div>
       <div class="person slideanim">

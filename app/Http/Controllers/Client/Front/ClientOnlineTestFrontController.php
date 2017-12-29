@@ -18,6 +18,7 @@ use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientNotification;
 use App\Models\ClientReadNotification;
 use App\Models\ClientUserPurchasedTestSubCategory;
+use App\Models\ClientUserSolution;
 
 class ClientOnlineTestFrontController extends ClientHomeController
 {
@@ -49,6 +50,16 @@ class ClientOnlineTestFrontController extends ClientHomeController
         if($request->ajax()){
             $id = InputSanitise::inputInt($request->get('id'));
             return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($id, $request);
+        }
+    }
+
+    /**
+     *  return sub categories by categoryId
+     */
+    public function getOnlineTestSubcategoriesWithPapers(Request $request){
+        if($request->ajax()){
+            $id = InputSanitise::inputInt($request->get('id'));
+            return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdWithPapers($id, $request);
         }
     }
 
@@ -244,16 +255,59 @@ class ClientOnlineTestFrontController extends ClientHomeController
         $paperId = $request->get('paper_id');
         $userId = Auth::guard('clientuser')->user()->id;
         $totalMarks = 0 ;
+        $userAnswers = [];
+        $positiveMarks = 0;
+        $negativeMarks = 0;
         $score = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId);
 
         if(is_object($score)){
         	$rank =ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$score->test_score);
         	$totalRank =ClientScore::getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId);
-        	$questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
-        	foreach($questions as $question){
-        		$totalMarks += $question->positive_marks;
+
+        	$userSolutions = ClientUserSolution::getClientUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $score->id, $subjectId, $paperId);
+        	if(is_object($userSolutions) && false == $userSolutions->isEmpty()){
+        		foreach($userSolutions as $userSolution){
+        			$userAnswers[$userSolution->ques_id] = $userSolution->user_answer;
+        		}
         	}
-	        return view('client.front.onlineTests.user_test_result', compact('score', 'rank', 'totalMarks', 'totalRank'));
+        	$questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
+        	if(is_object($questions) && false == $questions->isEmpty()){
+	        	foreach($questions as $question){
+	        		$totalMarks += $question->positive_marks;
+	        		if($question->answer == $userAnswers[$question->id] && $question->question_type == 1){
+	                    $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
+	                } else if($userAnswers[$question->id] >= $question->min && $userAnswers[$question->id] <= $question->max && $question->question_type == 0){
+	                    $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
+	                } else if($userAnswers[$question->id]=='unsolved' || $userAnswers[$question->id] =='' ){
+	                	continue;
+	                } else {
+	                    $negativeMarks =  (float) $negativeMarks + (float) $question->negative_marks;
+	                }
+	        	}
+	        }
+        	$result = [];
+            $result['category_id'] = (int) $categoryId;
+            $result['subcat_id'] = (int) $subcategoryId;
+            $result['subject_id'] = (int) $subjectId;
+            $result['paper_id'] = (int) $paperId;
+            $result['right_answered'] = $score->right_answered;
+            $result['wrong_answered'] = $score->wrong_answered;
+            $result['unanswered'] = $score->unanswered;
+            $result['marks'] = $score->test_score;
+
+            if($totalRank > 0){
+                $percentile = ceil(((($totalRank + 1) - ($rank +1) )/ $totalRank)*100);
+            } else {
+                $percentile = 0;
+            }
+            $percentage = ceil(($score->test_score/$totalMarks)*100);
+            if(($score->right_answered + $score->wrong_answered) > 0){
+                $accuracy =  ceil(($score->right_answered/($score->right_answered + $score->wrong_answered))*100);
+            } else {
+                $accuracy = 0;
+            }
+
+	        return view('client.front.onlineTests.user_test_result', compact('score', 'rank', 'totalMarks', 'totalRank', 'percentile', 'percentage', 'accuracy','result','positiveMarks','negativeMarks'));
         } else {
     		return Redirect::to('/');
         }

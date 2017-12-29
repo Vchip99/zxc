@@ -158,6 +158,7 @@ class ClientScore extends Model
                 ->join('client_online_test_subjects', 'client_online_test_subjects.id' , '=', 'client_scores.subject_id' )
                 ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.id' , '=', 'client_scores.paper_id' )
                 ->where('client_scores.client_user_id', $studentId)
+                ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))
                 ->select('client_scores.*', 'client_online_test_subjects.name as subject', 'client_online_test_subject_papers.name as paper')
                 ->get();
     }

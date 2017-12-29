@@ -38,7 +38,8 @@ class Handler extends ExceptionHandler
     public function report(Exception $exception)
     {
         if ($this->shouldReport($exception)) {
-            $this->sendEmail($exception); // sends an email
+            $requestedUri = request()->getUri();
+            $this->sendEmail($exception,$requestedUri); // sends an email
         }
 
         parent::report($exception);
@@ -83,14 +84,16 @@ class Handler extends ExceptionHandler
      *  @param  \Exception  $exception
      */
 
-    public function sendEmail(Exception $exception)
+    public function sendEmail(Exception $exception, $requestedUri)
     {
+
         try {
             $e = FlattenException::create($exception);
 
             $handler = new SymfonyExceptionHandler();
 
-            $html = $handler->getHtml($e);
+            $html['error'] = $handler->getHtml($e);
+            $html['url'] = $requestedUri;
 
             Mail::to('vchipdesigng8@gmail.com')->send(new ExceptionOccured($html));
         } catch (Exception $ex) {

@@ -137,6 +137,7 @@
     document.getElementById('video').innerHTML = '';
     document.getElementById('resume').innerHTML = '';
   }
+
   function showStudents(){
     var year = parseInt(document.getElementById('selected_year').value);
     if(document.getElementById("dept")){
@@ -226,6 +227,13 @@
       var iframe = div.getElementsByTagName("iframe")[0].contentWindow;
       func = state == 'hide' ? 'pauseVideo' : 'playVideo';
       iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
+    }
+  }
+  // Get the modal
+  var modal = document.getElementById("student_video");
+  window.onclick = function(event) {
+    if(event.target == modal) {
+      toggleVideo('hide');
     }
   }
 </script>

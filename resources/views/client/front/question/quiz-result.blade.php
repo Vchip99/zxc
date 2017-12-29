@@ -589,15 +589,15 @@
 		              <br/>
 		              <ul class="list-unstyled progress-list">
 		                <li class="">
-		                  <span class="name">Positive</span>
-		                  <span class="pull-right text-ellipsis value ng-binding">{{ (isset($result['right_answered']))? $result['right_answered']:''}}</span>
-		                </li>
-		                <li class="">
-		                  <span class="name">Negative</span>
-		                  <span class="pull-right text-ellipsis value ng-binding">{{ (isset($result['wrong_answered']))? $result['wrong_answered']:''}}</span>
-		                </li>
-		                <li class="">
-		                  <span class="name">Total Score</span>
+                      <span class="name">Positive Marks</span>
+                      <span class="pull-right text-ellipsis value ng-binding">{{$positiveMarks}}</span>
+                    </li>
+                    <li class="">
+                      <span class="name">Negative Marks</span>
+                      <span class="pull-right text-ellipsis value ng-binding">{{$negativeMarks}}</span>
+                    </li>
+                    <li class="">
+                      <span class="name">Total Marks</span>
 		                  <span class="pull-right text-ellipsis value ng-binding">{{$result['marks']}}</span>
 		                </li>
 		              </ul>

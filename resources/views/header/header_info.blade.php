@@ -24,7 +24,7 @@
           <div class="col-md-7 mt-text animate-box " data-animate-effect="fadeInUp">
             <h1 class="cursive-font">Digital Education</h1>
             <div class="about-videos">
-              <p data-toggle="modal" data-target="#myModal">
+              <p data-toggle="modal" data-target="#collegeModal">
                 <i class="fa fa-play-circle-o" aria-hidden="true"  id="clg"></i>
                 <span class="about-video-tital"><em>COLLEGE / STUDENT</em></span>
               </p>
@@ -94,7 +94,7 @@
   </div>
 </header>
   <!-- Modal collage-->
-  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal fade" id="collegeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content" style="border-radius: 0px;">
         <div class="modal-header" style=" padding: 5px 10px; font-weight: bolder; text-align: center;">
@@ -102,8 +102,8 @@
           <h4 class="modal-title" id="myModalLabel">College</h4>
         </div>
         <div class="modal-body" style="padding: 0px; ">
-          <div class="vid">
-          <iframe width="560" height="315" src="https://www.youtube.com/embed/nYQairlPfbA" frameborder="0" allowfullscreen></iframe>
+          <div class="vid"  id="collegeVideo">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/nYQairlPfbA?enablejsapi=1" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
       </div>
@@ -118,14 +118,33 @@
           <h4 class="modal-title" id="myModalLabel">Private Institute</h4>
         </div>
         <div class="modal-body" style="padding: 0px; ">
-          <div class="vid">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/tAZDiJxIRZk" frameborder="0" allowfullscreen></iframe>
+          <div class="vid" id="instituteVideo">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/tAZDiJxIRZk?enablejsapi=1" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
       </div>
     </div>
   </div>
 <script type="text/javascript">
+  window.onclick = function(event) {
+    var modelId = $(event.target).attr('id');
+    if('collegeModal' == modelId){
+      toggleVideo('hide', 'collegeVideo');
+    } else if('instituteModal' == modelId){
+      toggleVideo('hide', 'instituteVideo');
+    }
+  }
+
+  function toggleVideo(state, videoId) {
+    // if state == 'hide', hide. Else: show video
+    var div = document.getElementById(videoId);
+    if(div.getElementsByTagName("iframe").length > 0){
+      var iframe = div.getElementsByTagName("iframe")[0].contentWindow;
+      func = state == 'hide' ? 'pauseVideo' : 'playVideo';
+      iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
+    }
+  }
+
   function confirmSubmit(){
     subdomain = document.getElementById('subdomain').value;
     if(subdomain){

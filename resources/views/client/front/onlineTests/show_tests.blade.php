@@ -886,6 +886,7 @@ font-weight: bold;
 	$('.panel-group').on('shown.bs.collapse', toggleIcon);
 
   	$(document).ready(function() {
+  		console.log(location.host);
 	    $('[id^=paper]').hide();
 	    $('.toggle').click(function() {
 	      $input = $( this );

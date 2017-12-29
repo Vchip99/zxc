@@ -94,7 +94,7 @@ class ClientUserController extends BaseController
         }
         $testCategories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($userId);
         $alreadyGivenPapers = ClientScore::getClientUserTestScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $userId);
-        $currentDate = date('Y-m-d');
+        $currentDate = date('Y-m-d H:i:s');
         return view('clientuser.dashboard.myTest', compact('testSubjects', 'testSubjectPapers', 'testCategories','currentDate', 'alreadyGivenPapers'));
     }
 
@@ -136,7 +136,8 @@ class ClientUserController extends BaseController
     protected function myTestResults(){
         $user = Auth::guard('clientuser')->user();
         $categories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($user->id);
-        $results = ClientScore::where('client_user_id', $user->id)->get();
+        // $results = ClientScore::where('client_user_id', $user->id)->get();
+        $results = ClientScore::getClientScoreByUserId($user->id);
         $barchartLimits = range(100, 0, 10);
         return view('clientuser.dashboard.myTestResults', compact('categories','results','barchartLimits'));
     }
@@ -419,6 +420,7 @@ class ClientUserController extends BaseController
                         $newUserCourse->course_id = $clientCourseId;
                         $newUserCourse->client_id = $clientId;
                         $newUserCourse->payment_id = $paymentId;
+                        $newUserCourse->price = $result->amount;
                         $newUserCourse->save();
 
                         $clientUserPayment = new ClientUserPayment;
@@ -630,6 +632,7 @@ class ClientUserController extends BaseController
                         $newTestSubCategory->test_sub_category_id = $clientSubCategoryId;
                         $newTestSubCategory->client_id = $clientId;
                         $newTestSubCategory->payment_id = $paymentId;
+                        $newTestSubCategory->price = $result->amount;
                         $newTestSubCategory->save();
 
                         $clientUserPayment = new ClientUserPayment;

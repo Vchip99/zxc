@@ -138,7 +138,7 @@
     if( 0 < id && 0 < userId){
       $.ajax({
           method: "POST",
-          url: "{{url('getOnlineSubCategories')}}",
+          url: "{{url('getOnlineSubCategoriesWithCourses')}}",
           data: {id:id, userId:userId}
       })
       .done(function( msg ) {

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Auth;
 use DB, Session;
+use App\Models\ClientOnlineCourse;
 
 class ClientUserPurchasedCourse extends Model
 {
@@ -17,7 +18,7 @@ class ClientUserPurchasedCourse extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'course_id' ,'client_id', 'payment_id'];
+    protected $fillable = ['user_id', 'course_id' ,'client_id', 'payment_id', 'price'];
 
     protected static function getClientUserCourses($clientId){
     	$userCourses = [];
@@ -39,6 +40,13 @@ class ClientUserPurchasedCourse extends Model
             }
         }
         return $userCourses;
+    }
+
+    protected static function getClientUserPurchasedCourses($clientId, $userId){
+        return static::join('client_user_payments', 'client_user_payments.payment_id', '=', 'client_user_purchased_courses.payment_id')
+                ->where('client_user_purchased_courses.client_id', $clientId)
+                ->where('client_user_purchased_courses.user_id', $userId)
+                ->select('client_user_purchased_courses.*', 'client_user_payments.updated_at')->get();
     }
 
     protected static function isCoursePurchased($clientId, $userId, $courseId){
@@ -64,5 +72,9 @@ class ClientUserPurchasedCourse extends Model
     	} else {
     		return 'false';
     	}
+    }
+
+    public function course(){
+        return $this->belongsTo(ClientOnlineCourse::class, 'course_id');
     }
 }

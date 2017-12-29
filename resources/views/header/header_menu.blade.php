@@ -101,7 +101,7 @@
             </a>
             <ul class="dropdown-menu" role="menu">
              <div class="navbar-content">
-               <li> <b style="color: #01bafd;">Collage</b></li>
+               <li> <b style="color: #01bafd;">College</b></li>
                 <li class="mrgn_10_left"><a href="{{ url('erp') }}" title="Digital edu & ERP">Digital edu & ERP</a></li>
                 <li class="mrgn_10_left"><a href="{{ url('offlineworkshops') }}" title="workshops">workshops</a></li>
                 <li class="mrgn_10_left"><a href="{{ url('motivationalspeech') }}" title="motivational speech">motivational speech</a></li>

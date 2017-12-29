@@ -45,6 +45,9 @@
     color: #e91e63;
     font-weight: bold;
   }
+  .pay-width{
+    min-width: 80px;
+  }
   </style>
 @stop
 @section('header-js')
@@ -73,16 +76,16 @@
         <span>Price: {{ $course->price }} Rs.</span>
         @if($course->price > 0)
           @if('true' == $isCoursePurchased)
-            <a class="btn btn-sm btn-primary" style="cursor: pointer;" title="Paid">Paid</a>
+            <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" title="Paid">Paid</a>
           @else
             @if(is_object(Auth::guard('clientuser')->user()))
               <a href="{{ url('purchaseCourse')}}/{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" >Pay Now</a>
             @else
-              <a class="btn btn-sm btn-primary" style="cursor: pointer;" title="Pay Now" onClick="checkLogin();">Pay Now</a>
+              <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" title="Pay Now" onClick="checkLogin();">Pay Now</a>
             @endif
           @endif
         @else
-          <a class="btn btn-sm btn-primary" style="cursor: pointer;" title="Free">Free</a>
+          <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" title="Free">Free</a>
         @endif
       </div>
     <div class=" btn-group btn-group-justified btn-group-lg " role="group" aria-label="...">
@@ -158,10 +161,10 @@
               </h4>
               <p class="more data-lg">{{$video->description}}</p>
               <p class="more data-sm">{{$video->description}}</p>
-              <span class="v_download" title="Download">
+              <!-- <span class="v_download" title="Download">
                 <a class="btn btn-primary is-bold" role="button" data-toggle="collapse" href="#collapseExample_{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">
                 Download</a>
-              </span>
+              </span> -->
               <div class="collapse download-item" id="collapseExample_{{$video->id}}">
                 <div class="well">
                   <a download title="pdf">

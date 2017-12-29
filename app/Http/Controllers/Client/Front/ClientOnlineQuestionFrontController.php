@@ -46,6 +46,10 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
 
         if(!empty($categoryId) && !empty($subcategoryId) && !empty($subjectId) && !empty($paperId)){
             $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
+
+            if(is_object($questions) && true == $questions->isEmpty()){
+                return Redirect::to('/');
+            }
             foreach($questions as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
@@ -88,6 +92,8 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $userAnswer = 0;
                 $marks=0;
                 $totalMarks=0;
+                $positiveMarks = 0;
+                $negativeMarks = 0;
                 $userAnswers = [];
                 $questionIds = [];
                 if(is_object(Auth::guard('clientuser')->user())){
@@ -113,14 +119,17 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                     if($question->answer == $quesResults[$question->id] && $question->question_type == 1){
                         $rightAnswer++;
                         $marks = $marks + $question->positive_marks;
+                        $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
                     } else if($quesResults[$question->id] >= $question->min && $quesResults[$question->id] <= $question->max && $question->question_type == 0){
                         $rightAnswer++;
                         $marks = $marks + $question->positive_marks;
+                        $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
                     } else if($quesResults[$question->id]=='unsolved' || $quesResults[$question->id] =='' ){
                         $unanswered++;
                     } else {
                         $wrongAnswer++;
                         $marks = $marks - $question->negative_marks;
+                        $negativeMarks =  (float) $negativeMarks + (float) $question->negative_marks;
                     }
                     if($quesResults[$question->id]=='unsolved' || $quesResults[$question->id] ==''){
                         $userAnswer = "unsolved";
@@ -154,16 +163,18 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $result['marks'] = $marks;
 
                 if($userId > 0){
-                    $score = ClientScore::addScore($userId, $result);
-                    foreach($userAnswers as $ind => $userAnswer){
-                        $userAnswers[$ind]['client_score_id'] = $score->id;
+                    $score = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId);
+                    if(!is_object($score)){
+                        $score = ClientScore::addScore($userId, $result);
+                        foreach($userAnswers as $ind => $userAnswer){
+                            $userAnswers[$ind]['client_score_id'] = $score->id;
+                        }
+                        ClientUserSolution::saveUserAnswers($userAnswers);
+                        RegisterClientOnlinePaper::registerTestPaper($userId, $paperId);
+                        DB::connection('mysql2')->commit();
                     }
-
-                    ClientUserSolution::saveUserAnswers($userAnswers);
-                    RegisterClientOnlinePaper::registerTestPaper($userId, $paperId);
-                    DB::connection('mysql2')->commit();
                     $rank =ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$score->test_score);
-                    $percentage = ceil(($score->right_answered/$totalMarks)*100);
+                    $percentage = ceil(($score->test_score/$totalMarks)*100);
                     if(($score->right_answered + $score->wrong_answered) > 0){
                         $accuracy =  ceil(($score->right_answered/($score->right_answered + $score->wrong_answered))*100);
                     } else {
@@ -172,7 +183,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 } else {
                     $rank =ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$marks);
                     $score = '';
-                    $percentage = ceil(($result['right_answered']/$totalMarks)*100);
+                    $percentage = ceil(($result['marks']/$totalMarks)*100);
                     if(($result['right_answered'] + $result['wrong_answered']) > 0){
                         $accuracy =  ceil(($result['right_answered']/($result['right_answered'] + $result['wrong_answered']))*100);
                     } else {
@@ -187,7 +198,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                     $percentile = 0;
                 }
 
-            	return view('client.front.question.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank', 'score', 'percentile', 'percentage', 'accuracy'));
+            	return view('client.front.question.quiz-result', compact('result', 'rank', 'totalMarks', 'totalRank', 'score', 'percentile', 'percentage', 'accuracy','positiveMarks', 'negativeMarks'));
             }
             catch(\Exception $e)
             {
@@ -235,7 +246,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         return view('client.front.question.solutions', compact('results', 'userResults', 'score', 'sections'));
     }
 
-    protected function showUserTestSolution(Request $request){
+    protected function showUserTestSolution(Request $request){// dd($request->all());
         $paper = ClientOnlineTestSubjectPaper::find($request->paper_id);
         $sections = [];
         $userResults = [];
@@ -259,10 +270,12 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 }
             }
             $userSolutions = ClientUserSolution::getClientUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $scoreId, $paper->subject_id, $paper->id);
-
+// dd(\DB::connection('mysql2')->getQueryLog());
+// dd($userSolutions);
             foreach ($userSolutions  as $key => $result) {
                 $userResults[$result->ques_id] = $result;
             }
+            // dd($userResults);
             return view('client.front.question.testSolution', compact('results', 'userResults', 'paper', 'sections'));
         }
     }

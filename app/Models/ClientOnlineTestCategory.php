@@ -116,7 +116,8 @@ class ClientOnlineTestCategory extends Model
                 ->join('client_online_test_subject_papers', 'client_online_test_subject_papers.category_id', 'client_online_test_categories.id')
                 ->join('register_client_online_papers', 'register_client_online_papers.client_paper_id', 'client_online_test_subject_papers.id')
                 ->join('clientusers', 'clientusers.id', '=', 'register_client_online_papers.client_user_id')
-                ->where('register_client_online_papers.client_user_id', $userId);
+                ->where('register_client_online_papers.client_user_id', $userId)
+                ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'));
         return $result->select('client_online_test_categories.id', 'client_online_test_categories.name')->groupBy('client_online_test_categories.id')->get();
     }
 

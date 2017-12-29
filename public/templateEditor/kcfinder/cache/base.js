@@ -3296,15 +3296,15 @@ _.menuFile = function(file, e) {
                 });
 
             // DOWNLOAD
-            // if (_.support.zip)
-            //     _.menu.addItem("kcact:download", _.label("Download"), function() {
-            //         var pfiles = [];
-            //         $.each(files, function(i, cfile) {
-            //             pfiles[i] = $(cfile).data('name');
-            //         });
-            //         _.post(_.getURL('downloadSelected'), {dir:_.dir, files:pfiles});
-            //         return false;
-            //     });
+            if (_.support.zip)
+                _.menu.addItem("kcact:download", _.label("Download"), function() {
+                    var pfiles = [];
+                    $.each(files, function(i, cfile) {
+                        pfiles[i] = $(cfile).data('name');
+                    });
+                    _.post(_.getURL('downloadSelected'), {dir:_.dir, files:pfiles});
+                    return false;
+                });
         }
 
         // ADD TO CLIPBOARD
@@ -3427,13 +3427,13 @@ _.menuFile = function(file, e) {
             });
 
         // DOWNLOAD
-        // _.menu.addItem("kcact:download", _.label("Download"), function() {
-        //     $('#menu').html('<form id="downloadForm" method="post" action="' + _.getURL('download') + '"><input type="hidden" name="dir" /><input type="hidden" name="file" /></form>');
-        //     $('#downloadForm input').get(0).value = _.dir;
-        //     $('#downloadForm input').get(1).value = data.name;
-        //     $('#downloadForm').submit();
-        //     return false;
-        // });
+        _.menu.addItem("kcact:download", _.label("Download"), function() {
+            $('#menu').html('<form id="downloadForm" method="post" action="' + _.getURL('download') + '"><input type="hidden" name="dir" /><input type="hidden" name="file" /></form>');
+            $('#downloadForm input').get(0).value = _.dir;
+            $('#downloadForm input').get(1).value = data.name;
+            $('#downloadForm').submit();
+            return false;
+        });
 
         // ADD TO CLIPBOARD
         if (_.access.files.copy || _.access.files.move) {

@@ -85,7 +85,7 @@
                     </a>
                   @else
                     <a>
-                      <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Free Course</i>
+                      <i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >Free</i>
                     </a>
                   @endif
                 </div>
@@ -104,7 +104,7 @@
     if( 0 < id && 0 < userId){
       $.ajax({
           method: "POST",
-          url: "{{url('getOnlineSubCategories')}}",
+          url: "{{url('getOnlineSubCategoriesWithCourses')}}",
           data: {id:id, userId:userId}
       })
       .done(function( msg ) {
@@ -187,15 +187,16 @@
 
           var authorDiv = document.createElement('div');
           authorDiv.className = "course-auther";
-          authorDiv.innerHTML = '<a><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >';
+          var authorDivInnerHTML = '<a><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" >';
           if(msg['userPurchasedCourses'].length && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
-            authorDiv.innerHTML += 'Paid';
+            authorDivInnerHTML += 'Paid';
           } else if(obj.price > 0){
-            authorDiv.innerHTML += 'Pay Now';
+            authorDivInnerHTML += 'Pay Now';
           } else {
-            authorDiv.innerHTML += 'Free';
+            authorDivInnerHTML += 'Free';
           }
-          authorDiv.innerHTML += '</i></a>';
+          authorDivInnerHTML += '</i></a>';
+          authorDiv.innerHTML = authorDivInnerHTML;
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           divCourses.appendChild(firstDiv);

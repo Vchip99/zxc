@@ -44,22 +44,23 @@ class ClientOnlineTestQuestion extends Model
             $commonData = $newInstance->changeSrc($request->get('common_data'));
         }
         $question = $newInstance->changeSrc($request->get('question'));
-        if(!empty($request->get('ans1'))){
+// dd(0 == $request->get('ans1'));
+        if(!empty($request->get('ans1')) || 0 == $request->get('ans1')){
             $ans1 = $newInstance->changeSrc($request->get('ans1'));
         }
-        if(!empty($request->get('ans2'))){
+        if(!empty($request->get('ans2')) || 0 == $request->get('ans2')){
             $ans2 = $newInstance->changeSrc($request->get('ans2'));
         }
-        if(!empty($request->get('ans3'))){
+        if(!empty($request->get('ans3')) || 0 == $request->get('ans3')){
             $ans3 = $newInstance->changeSrc($request->get('ans3'));
         }
-        if(!empty($request->get('ans4'))){
+        if(!empty($request->get('ans4')) || 0 == $request->get('ans4')){
             $ans4 = $newInstance->changeSrc($request->get('ans4'));
         }
-        if(!empty($request->get('ans5'))){
+        if(!empty($request->get('ans5')) || 0 == $request->get('ans5')){
             $ans5 = $newInstance->changeSrc($request->get('ans5'));
         }
-        if(!empty($request->get('solution'))){
+        if(!empty($request->get('solution')) || 0 == $request->get('solution')){
             $solution = $newInstance->changeSrc($request->get('solution'));
         }
 

@@ -4,17 +4,16 @@ namespace App\Http\Controllers\ClientuserAuth;
 
 use App\Models\Clientuser;
 use App\Models\Client;
-use Validator, Redirect;
+use Validator, Redirect,DB,Mail;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
-use DB;
-use Mail;
 use App\Mail\ClientUserEmailVerification;
 use App\Mail\NewClientUserRegistration;
 use App\Mail\ClientUnAuthorisedUser;
+use App\Jobs\SendMail;
 
 class RegisterController extends Controller
 {

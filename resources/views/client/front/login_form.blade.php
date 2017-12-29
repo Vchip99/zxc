@@ -100,7 +100,7 @@
                             <span class="help-block"></span>
                           </div>
                           </br>
-                          <button type="submit" title="Register" name="register" class="btn btn-info btn-block">Register</button></br>
+                          <button title="Register"  id="register" class="btn btn-info btn-block" onclick="event.preventDefault(); confirmSubmit();" >Register</button></br>
                         </form>
                         <div>
                           <a title="alredy member" data-toggle="tab" href="#home">Already member?</a>
@@ -121,6 +121,10 @@
    $(function() {
      $('.multiselect').multiselect();
    });
+  function confirmSubmit(){
+    document.getElementById('register').setAttribute("disabled",true);
+    document.getElementById('registerUser').submit();
+  }
 </script>
 <style type="text/css">
 #vchip-header .form-wrap .tab-content label {

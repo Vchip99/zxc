@@ -292,5 +292,12 @@ function showResult(ele){
     func = state == 'hide' ? 'pauseVideo' : 'playVideo';
     iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
   }
+
+  window.onclick = function(event) {
+    var modelId = $(event.target).attr('id');
+    if('student_video' == modelId){
+      toggleVideo('hide');
+    }
+  }
 </script>
 @stop

@@ -95,6 +95,30 @@ class ClientOnlineTestSubCategory extends Model
         return;
     }
 
+    protected static function getOnlineTestSubcategoriesByCategoryIdWithPapers($id, Request $request){
+        if(is_object(Auth::guard('client')->user())){
+            $clientId = Auth::guard('client')->user()->id;
+        } else if(is_object(Auth::guard('clientuser')->user())){
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+        }
+        if($clientId > 0 && $id > 0){
+            return DB::connection('mysql2')->table('client_online_test_sub_categories')
+                ->join('client_online_test_subjects', function($join){
+                    $join->on('client_online_test_subjects.sub_category_id', '=', 'client_online_test_sub_categories.id');
+                })
+                ->join('client_online_test_subject_papers', function($join){
+                    $join->on('client_online_test_subject_papers.sub_category_id', '=', 'client_online_test_sub_categories.id');
+                    $join->on('client_online_test_subject_papers.subject_id', '=', 'client_online_test_subjects.id');
+                })
+                ->where('client_online_test_sub_categories.category_id', $id)
+                ->where('client_online_test_sub_categories.client_id', $clientId)
+                ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))
+                ->select('client_online_test_sub_categories.*')
+                ->get();
+        }
+        return;
+    }
+
     protected static function getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($id, Request $request){
 
         if(is_object(Auth::guard('client')->user())){

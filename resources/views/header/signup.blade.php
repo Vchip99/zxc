@@ -123,7 +123,7 @@
                           </div>
                           <div class="form-group @if ($errors->has('college')) has-error @endif">
                             <select class="hide form-control  slt mrgn_20_top" id="clg" name="college" onChange="getDepartment(this);">
-                              <option value="0">Select Collage Name</option>
+                              <option value="0">Select College Name</option>
                               <option value="other" id="other" class="hide">Other</option>
                               @if(count($colleges) > 0)
                                 @foreach($colleges as $college)

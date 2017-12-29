@@ -549,5 +549,11 @@ $(".show_hide").hide();
           $('.alert-success').fadeOut('fast');
         }, 2000); // <-- time in milliseconds
     });
+window.onload = function(){
+  if (window.opener != null && false ==  window.closed) {
+    window.opener.location.reload(true);
+    window.close();
+  }
+}
 </script>
 @stop

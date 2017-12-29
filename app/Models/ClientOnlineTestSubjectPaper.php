@@ -286,6 +286,7 @@ class ClientOnlineTestSubjectPaper extends Model
                     ->join('register_client_online_papers', 'register_client_online_papers.client_paper_id', '=', 'client_online_test_subject_papers.id')
                     ->join('clientusers', 'clientusers.id', '=', 'register_client_online_papers.client_user_id')
                     ->where('clientusers.id', $userId)
+                    ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))
                     ->select('client_online_test_subject_papers.*')
                     ->get();
 

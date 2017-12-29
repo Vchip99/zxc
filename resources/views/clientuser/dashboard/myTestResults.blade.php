@@ -56,8 +56,8 @@
                       @foreach($results as $index => $result)
                         <tr class="">
                           <td>{{$index + 1}}</td>
-                          <td>{{$result->subject->name}}</td>
-                          <td>{{$result->paper->name}}</td>
+                          <td>{{$result->subject}}</td>
+                          <td>{{$result->paper}}</td>
                           <td class="center">{{$result->test_score}} / {{$result->totalMarks()['totalMarks']}}</td>
                           <td class="center">{{$result->rank()}}</td>
                         </tr>
@@ -91,8 +91,8 @@
                       @if(count($results) > 0)
                         @foreach($results as $index => $result)
                           <div class="barchart-Col">
-                            <div class="barchart-Bar" style="height: {{$result->totalMarks()['percentage']}}%;" title="{{$result->subject->name}}-{{$result->paper->name}}" attr-height="{{$result->totalMarks()['percentage']}}%"></div>
-                            <div class="barchart-BarFooter " title="{{$result->paper->name}}">{{$result->paper->name}}</div>
+                            <div class="barchart-Bar" style="height: {{$result->totalMarks()['percentage']}}%;" title="{{$result->subject}}-{{$result->paper}}" attr-height="{{$result->totalMarks()['percentage']}}%"></div>
+                            <div class="barchart-BarFooter " title="{{$result->paper}}">{{$result->paper}}</div>
                           </div>
                         @endforeach
                       @endif
@@ -172,7 +172,7 @@
     if( 0 < id && 0 < userId ){
       $.ajax({
               method: "POST",
-              url: "{{url('getOnlineTestSubCategories')}}",
+              url: "{{url('getOnlineTestSubcategoriesWithPapers')}}",
               data: {id:id, userId:userId}
           })
           .done(function( msg ) {

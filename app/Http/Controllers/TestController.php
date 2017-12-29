@@ -12,6 +12,7 @@ use App\Models\Score;
 use App\Models\Question;
 use App\Models\Notification;
 use App\Models\ReadNotification;
+use App\Models\UserSolution;
 use Session, Redirect, Auth, DB;
 use App\Models\Add;
 
@@ -225,6 +226,10 @@ class TestController extends Controller
         $userId = Auth::user()->id;
         $collegeId = Auth::user()->college_id;
         $totalMarks = 0 ;
+        $userAnswers = [];
+        $positiveMarks = 0;
+        $negativeMarks = 0;
+
         $score = Score::getUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcatId,$paperId,$subjectId,$userId);
         if(is_object($score)){
         	$collegeRank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$score->test_score,$collegeId);
@@ -232,18 +237,36 @@ class TestController extends Controller
             $globalRank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$score->test_score,'all');
             $globalTotalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcatId,$subjectId, $paperId,'all');
 
-        	$questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcatId, $subjectId, $paperId);
-        	foreach($questions as $question){
-        		$totalMarks += $question->positive_marks;
+            $userSolutions = UserSolution::getUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $score->id, $subjectId, $paperId);
+            if(is_object($userSolutions) && false == $userSolutions->isEmpty()){
+        		foreach($userSolutions as $userSolution){
+        			$userAnswers[$userSolution->ques_id] = $userSolution->user_answer;
+        		}
         	}
+
+        	$questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcatId, $subjectId, $paperId);
+        	if(is_object($questions) && false == $questions->isEmpty()){
+	        	foreach($questions as $question){
+	        		$totalMarks += $question->positive_marks;
+	        		if($question->answer == $userAnswers[$question->id] && $question->question_type == 1){
+	                    $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
+	                } else if($userAnswers[$question->id] >= $question->min && $userAnswers[$question->id] <= $question->max && $question->question_type == 0){
+	                    $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
+	                } else if($userAnswers[$question->id]=='unsolved' || $userAnswers[$question->id] =='' ){
+	                	continue;
+	                } else {
+	                    $negativeMarks =  (float) $negativeMarks + (float) $question->negative_marks;
+	                }
+	        	}
+	        }
         	$percentile = ceil(((($globalTotalRank + 1) - ($globalRank +1) )/ $globalTotalRank)*100);
-            $percentage = ceil(($score->right_answered/$totalMarks)*100);
+            $percentage = ceil(($score->test_score/$totalMarks)*100);
             if(($score->right_answered + $score->wrong_answered) > 0){
                 $accuracy =  ceil(($score->right_answered/($score->right_answered + $score->wrong_answered))*100);
             } else {
                 $accuracy = 0;
             }
-        	return view('tests.user_test_result', compact('score', 'globalRank', 'totalMarks', 'globalTotalRank', 'percentile', 'percentage', 'accuracy', 'collegeRank', 'collegeTotalRank'));
+        	return view('tests.user_test_result', compact('score', 'globalRank', 'totalMarks', 'globalTotalRank', 'percentile', 'percentage', 'accuracy', 'collegeRank', 'collegeTotalRank', 'positiveMarks', 'negativeMarks'));
         } else {
     		return Redirect::to('/');
         }

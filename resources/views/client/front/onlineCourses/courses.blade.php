@@ -115,7 +115,7 @@
                         @if($course->price > 0)
                           <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="checkLogin();">Pay Now</a>
                         @else
-                          <a class="btn btn-sm btn-primary pay-width">Free Course</a>
+                          <a class="btn btn-sm btn-primary pay-width">Free</a>
                         @endif
                       @endif
                     </div>
@@ -236,17 +236,17 @@
           authorDiv.className = "course-auther text-center";
           if(userId > 0){
             if(msg['userPurchasedCourses'].length && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
-              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary">Paid</a>';
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width">Paid</a>';
             } else if(obj.price > 0){
-              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary">Pay Now</a>';
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width">Pay Now</a>';
             } else {
-              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary">Free</a>';
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width">Free</a>';
             }
           } else {
             if(obj.price > 0){
-              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary" onClick="checkLogin();">Pay Now</a>';
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width" onClick="checkLogin();">Pay Now</a>';
             } else {
-              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary">Free</a>';
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width">Free</a>';
             }
           }
           secondDiv.appendChild(authorDiv);

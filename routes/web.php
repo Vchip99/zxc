@@ -400,7 +400,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('showUserTestResult', 'TestController@showUserTestResult');
 	Route::post('isTestGiven', 'TestController@isTestGiven');
 
-
 	// test Quiz front
 	Route::post('/start-quiz', 'QuizController@startQuiz');
 	Route::post('/questions', 'QuizController@getQuestions');
@@ -762,7 +761,8 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('deactivatePlan', 'Client\ClientBaseController@deactivatePlan');
 	Route::get('manageBankDetails', 'Client\ClientBaseController@manageBankDetails');
 	Route::post('updateBankDetails', 'Client\ClientBaseController@updateBankDetails');
-
+	Route::get('manageUserPayments', 'Client\ClientBaseController@manageUserPayments');
+	Route::post('getClientUserPayments', 'Client\ClientBaseController@getClientUserPayments');
 
   	// category
   	Route::get('manageOnlineCategory', 'Client\OnlineCourse\ClientOnlineCategoryController@show');
@@ -885,6 +885,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('showUserTestResult', 'Client\Front\ClientOnlineTestFrontController@showUserTestResult');
 	Route::post('isTestGiven', 'Client\Front\ClientOnlineTestFrontController@isTestGiven');
 	Route::post('getRegisteredSubjectsAndPapersByCatIdBySubcatId', 'Client\Front\ClientOnlineTestFrontController@getRegisteredSubjectsAndPapersByCatIdBySubcatId');
+	Route::post('getOnlineTestSubcategoriesWithPapers', 'Client\Front\ClientOnlineTestFrontController@getOnlineTestSubcategoriesWithPapers');
 
 
 	// client online question front

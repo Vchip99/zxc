@@ -25,10 +25,10 @@
     </div>
   </section>
   <section id="" class="v_container v_bg_grey">
-     <h2 class="v_h2_title text-center"> Collages & ERP</h2>
+     <h2 class="v_h2_title text-center"> Colleges & ERP</h2>
      <hr class="section-dash-dark "/>
       <div class="container">
-        <p>Vchip-edu is working on digital education platform namely Vchip-edu 1.0. Its the digital education platform design for all who wish to learn. Our main motive is to deliver quality education in villages and remote areas along with urban area to fulfill the dream of Digital Village. At first we are focusing on Engineering and management collages because we have lots of literature review on that.
+        <p>Vchip-edu is working on digital education platform namely Vchip-edu 1.0. Its the digital education platform design for all who wish to learn. Our main motive is to deliver quality education in villages and remote areas along with urban area to fulfill the dream of Digital Village. At first we are focusing on Engineering and management colleges because we have lots of literature review on that.
           </p>
           <p>
           We provide our all the service at free of cost  to college for non-commercial purpose only. We are mostly focusing on bridging a gap between industries and colleges/educational organizations.
@@ -192,7 +192,7 @@
         </div>
       </div>
   </section>
-  <!-- modal for patterner of MoU to collage -->
+  <!-- modal for patterner of MoU to college -->
   <div class="modal fade" id="mouCollege" tabindex="-1" role="dialog" aria-labelledby="myModal3Label" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content" style="background-color: white;">
@@ -391,9 +391,9 @@
         </div>
         <div class="modal-body">
 
-            <p>We are working on digital education platform namely V-edu 1.0 <a target="_blank" href="https://vchipedu.com">(https://vchipedu.com).</a> Its the digital education platform design for all who wish to learn. Our main motive is to deliver quality education in villages and remote areas along with urban area to fulfill the dream of Digital Village. At first we are focusing on Engineering collages because we have lots of literature review on that. </p>
+            <p>We are working on digital education platform namely V-edu 1.0 <a target="_blank" href="https://vchipedu.com">(https://vchipedu.com).</a> Its the digital education platform design for all who wish to learn. Our main motive is to deliver quality education in villages and remote areas along with urban area to fulfill the dream of Digital Village. At first we are focusing on Engineering colleges because we have lots of literature review on that. </p>
 
-            <p>We will provide all the basic need at free of cost like in engineering collages most of students (90%+) are prepare for placement. We will digitally provide all the required for placement at free of cost.</p>
+            <p>We will provide all the basic need at free of cost like in engineering colleges most of students (90%+) are prepare for placement. We will digitally provide all the required for placement at free of cost.</p>
             <br/>
             <br/>
             <b>Why Vchip Technology:</b>

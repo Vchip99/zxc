@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use App\Models\ClientOnlineTestSubCategory;
 use Auth;
 use DB, Session;
 
@@ -17,7 +18,7 @@ class ClientUserPurchasedTestSubCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'test_category_id', 'test_sub_category_id' ,'client_id', 'payment_id'];
+    protected $fillable = ['user_id', 'test_category_id', 'test_sub_category_id' ,'client_id', 'payment_id', 'price'];
 
     protected static function getClientUserTestSubCategories($clientId){
     	$testSubCategories = [];
@@ -39,6 +40,13 @@ class ClientUserPurchasedTestSubCategory extends Model
             }
         }
         return $userTestSubCategories;
+    }
+
+    protected static function getClientUserPurchasedTestSubCategories($clientId, $userId){
+        return static::join('client_user_payments', 'client_user_payments.payment_id', '=', 'client_user_purchased_test_sub_categories.payment_id')
+                ->where('client_user_purchased_test_sub_categories.client_id', $clientId)
+                ->where('client_user_purchased_test_sub_categories.user_id', $userId)
+                ->select('client_user_purchased_test_sub_categories.*', 'client_user_payments.updated_at')->get();
     }
 
     protected static function isTestSubCategoryPurchased($clientId, $userId, $testSubCategoryId){
@@ -66,5 +74,9 @@ class ClientUserPurchasedTestSubCategory extends Model
     	} else {
     		return 'false';
     	}
+    }
+
+    public function testSubCategory(){
+        return $this->belongsTo(ClientOnlineTestSubCategory::class, 'test_sub_category_id');
     }
 }

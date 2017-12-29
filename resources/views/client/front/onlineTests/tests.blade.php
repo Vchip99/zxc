@@ -149,10 +149,19 @@
                     if(msg['purchasedSubCategories'].length > 0 && true == msg['purchasedSubCategories'].indexOf(obj.id) > -1){
                       priceDiv.innerHTML += ' <a class="btn btn-primary" title="Paid" style="min-width: 100px;">Paid</a>';
                     } else {
-                      priceDiv.innerHTML += ' <a class="btn btn-primary" title="Pay Now" style="min-width: 100px;">Pay Now</a>';
+                      if(obj.price > 0){
+                        url = "{{ url('purchaseTestSubCategory')}}/"+obj.id;
+                        priceDiv.innerHTML += '<a href="'+ url +'" class="btn btn-primary" title="Pay Now" style="min-width: 100px;">Pay Now</a>';
+                      } else {
+                        priceDiv.innerHTML += ' <a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>';
+                      }
                     }
                   } else {
-                    priceDiv.innerHTML += ' <a class="btn btn-primary" title="Pay Now" style="min-width: 100px;"  onClick="checkLogin();">Pay Now</a>';
+                    if(obj.price > 0){
+                      priceDiv.innerHTML += ' <a class="btn btn-primary" title="Pay Now" style="min-width: 100px;"  onClick="checkLogin();">Pay Now</a>';
+                    } else {
+                      priceDiv.innerHTML += ' <a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>';
+                    }
                   }
                   productDiv.appendChild(priceDiv);
 

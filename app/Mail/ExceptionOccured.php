@@ -42,6 +42,7 @@ class ExceptionOccured extends Mailable
     {
         return $this->view('emails.exception')
                     ->subject($this->subject)
-                    ->with('content', $this->content);
+                    ->with('url', $this->content['url'])
+                    ->with('error', $this->content['error']);
     }
 }

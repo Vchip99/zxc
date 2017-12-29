@@ -146,6 +146,8 @@ class QuizController extends Controller
                 $userAnswer = 0;
                 $marks=0;
                 $totalMarks=0;
+                $positiveMarks = 0;
+                $negativeMarks = 0;
                 $userAnswers = [];
                 $questionIds = [];
                 $userId = Auth::user()->id;
@@ -167,14 +169,17 @@ class QuizController extends Controller
                     if($question->answer == $quesResults[$question->id] && $question->question_type == 1){
                         $rightAnswer++;
                         $marks = $marks + $question->positive_marks;
+                        $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
                     } else if($quesResults[$question->id] >= $question->min && $quesResults[$question->id] <= $question->max && $question->question_type == 0){
                         $rightAnswer++;
                         $marks = $marks + $question->positive_marks;
+                        $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
                     } else if($quesResults[$question->id]=='unsolved' || $quesResults[$question->id] =='' ){
                         $unanswered++;
                     } else {
                         $wrongAnswer++;
                         $marks = $marks - $question->negative_marks;
+                        $negativeMarks =  (float) $negativeMarks + (float) $question->negative_marks;
                     }
                     if($quesResults[$question->id]=='unsolved' || $quesResults[$question->id] ==''){
                         $userAnswer = "unsolved";
@@ -206,26 +211,28 @@ class QuizController extends Controller
                 $result['wrong_answered'] = $wrongAnswer;
                 $result['unanswered'] = $unanswered;
                 $result['marks'] = $marks;
-
-                $score = Score::addScore($userId, $result);
-                foreach($userAnswers as $ind => $userAnswer){
-                    $userAnswers[$ind]['score_id'] = $score->id;
+                $score = Score::getUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId);
+                if(!is_object($score)){
+                    $score = Score::addScore($userId, $result);
+                    foreach($userAnswers as $ind => $userAnswer){
+                        $userAnswers[$ind]['score_id'] = $score->id;
+                    }
+                    UserSolution::saveUserAnswers($userAnswers);
+                    RegisterPaper::registerTestPaper($userId, $paperId);
+                    DB::commit();
                 }
-                UserSolution::saveUserAnswers($userAnswers);
-                RegisterPaper::registerTestPaper($userId, $paperId);
-                DB::commit();
                 $collegeRank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId,$paperId,$score->test_score,$collegeId);
                 $collegeTotalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId,$collegeId);
                 $globalRank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId,$paperId,$score->test_score,'all');
                 $globalTotalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId,'all');
                 $percentile = ceil(((($globalTotalRank + 1) - ($globalRank +1) )/ $globalTotalRank)*100);
-                $percentage = ceil(($score->right_answered/$totalMarks)*100);
+                $percentage = ceil(($score->test_score/$totalMarks)*100);
                 if(($score->right_answered + $score->wrong_answered) > 0){
                     $accuracy =  ceil(($score->right_answered/($score->right_answered + $score->wrong_answered))*100);
                 } else {
                     $accuracy = 0;
                 }
-                return view('quiz.quiz-result', compact('result', 'collegeRank', 'totalMarks', 'collegeTotalRank', 'score', 'percentile', 'percentage', 'accuracy', 'globalRank', 'globalTotalRank'));
+                return view('quiz.quiz-result', compact('result', 'collegeRank', 'totalMarks', 'collegeTotalRank', 'score', 'percentile', 'percentage', 'accuracy', 'globalRank', 'globalTotalRank', 'positiveMarks', 'negativeMarks'));
             }
             catch(\Exception $e)
             {
