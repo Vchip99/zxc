@@ -79,24 +79,22 @@ class ZeroToHeroController extends Controller
                 $notificationMessage = 'A new zero to hero video: <a href="'.$request->root().'/heros/'.$hero->id.'">'.$hero->name.'</a> has been added.';
                 Notification::addNotification($notificationMessage, Notification::ADMINZEROTOHERO, $hero->id);
                 DB::commit();
-                // $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get()->toArray();
-                // $allUsers = array_chunk($subscriedUsers, 100);
-                // if(count($allUsers) > 0){
-                //     foreach($allUsers as $selectedUsers){
-                //         foreach($selectedUsers as $user){
-                //             $user = User::where('email', $user)->first();
-                //             $messageBody .= '<p> Hello '.$user->name.'</p>';
-                //             $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
-                //             $messageBody .= '<p><b> Thanks and Regard, </b></p>';
-                //             $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
-                //             $messageBody .= '<b> More about us... </b><br/>';
-                //             $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
-                //             $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
-                //             $mailSubject = 'Vchipedu added a new hero to zero video';
-                //             Mail::to($user)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
-                //         }
-                //     }
-                // }
+                $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();
+                $allUsers = $subscriedUsers->chunk(100);
+                set_time_limit(0);
+                if(count($allUsers) > 0){
+                    foreach($allUsers as $selectedUsers){
+                        $messageBody .= '<p> Dear User</p>';
+                        $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
+                        $messageBody .= '<p><b> Thanks and Regard, </b></p>';
+                        $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
+                        $messageBody .= '<b> More about us... </b><br/>';
+                        $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
+                        $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
+                        $mailSubject = 'Vchipedu added a new hero to zero video';
+                        Mail::bcc($selectedUsers)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
+                    }
+                }
                 return Redirect::to('admin/manageZeroToHero')->with('message', 'Zero To Hero created successfully!');
             }
         }

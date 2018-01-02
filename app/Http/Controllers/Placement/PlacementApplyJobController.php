@@ -7,6 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Models\ApplyJob;
 use Redirect,Validator, Auth, DB;
 use App\Libraries\InputSanitise;
+use App\Mail\MailToSubscribedUser;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
+use App\Models\Notification;
 
 class PlacementApplyJobController extends Controller
 {
@@ -66,7 +70,26 @@ class PlacementApplyJobController extends Controller
         {
             $applyJob = ApplyJob::addOrUpdateApplyJob($request);
             if(is_object($applyJob)){
+                $messageBody = '';
+                $notificationMessage = 'A new job vacancy of company: <a href="'.$request->root().'/placements/">'.$applyJob->company.'</a> has been added.';
+                Notification::addNotification($notificationMessage, Notification::ADMINCOMPANYJOB, $applyJob->id);
                 DB::commit();
+                $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();
+                $allUsers = $subscriedUsers->chunk(100);
+                set_time_limit(0);
+                if(false == $allUsers->isEmpty()){
+                    foreach($allUsers as $selectedUsers){
+                        $messageBody .= '<p> Dear User</p>';
+                        $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
+                        $messageBody .= '<p><b> Thanks and Regard, </b></p>';
+                        $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
+                        $messageBody .= '<b> More about us... </b><br/>';
+                        $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
+                        $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
+                        $mailSubject = 'Vchipedu added a new company job';
+                        Mail::bcc($selectedUsers)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
+                    }
+                }
                 return Redirect::to('admin/manageApplyJob')->with('message', 'Apply job created successfully!');
             }
         }

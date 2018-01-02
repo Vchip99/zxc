@@ -1,0 +1,32 @@
+change QUEUE_DRIVER=sync to QUEUE_DRIVER=database in .env file
+
+sudo apt-get install supervisor
+
+cd /etc/supervisor/conf.d
+save below as mail-worker.conf
+
+[program:mail-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/html/vchip/artisan queue:work --daemon --memory=2048 --tries=1
+autostart=true
+autorestart=true
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/var/www/html/vchip/storage/logs/worker.log
+
+
+sudo supervisorctl reread
+
+sudo supervisorctl update
+
+sudo supervisorctl start mail-worker:*
+
+
+sudo touch /var/run/supervisor.sock
+sudo chmod 777 /var/run/supervisor.sock
+sudo service supervisor restart
+
+sudo ln -s /etc/supervisor/supervisord.conf /etc/supervisord.conf
+
+sudo systemctl enable supervisor
+sudo systemctl start supervisor

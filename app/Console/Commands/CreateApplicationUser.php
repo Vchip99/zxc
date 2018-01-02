@@ -43,7 +43,7 @@ class CreateApplicationUser extends Command
     {
         $this->info('create client on instamojo:');
         $errorCount = 0;
-
+        set_time_limit(0);
         DB::connection('mysql2')->beginTransaction();
         try
         {

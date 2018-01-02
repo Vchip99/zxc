@@ -341,9 +341,28 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             }
         }
 
+        $bootstrapUrl = asset('css/bootstrap.min.css');
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $bootstrapUrl);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        $bootstrap = curl_exec($curl);
+        curl_close($curl);
+
+        $mainCssUrl = asset('css/main.css');
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $mainCssUrl);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        $mainCss = curl_exec($curl);
+        curl_close($curl);
+
+
         $html = '';
-        $html .= '<style>'.file_get_contents(asset('/css/bootstrap.min.css')).'</style>';
-        $html .= '<style>'.file_get_contents(asset('/css/main.css')).'</style>';
+        // $html .= '<style>'.file_get_contents(asset('css/bootstrap.min.css')).'</style>';
+        // $html .= '<style>'.file_get_contents(asset('css/main.css')).'</style>';
+        $html .= '<style>'.$bootstrap.'</style>';
+        $html .= '<style>'.$mainCss.'</style>';
         $html .= '<style>.watermark {
             position: absolute;
             opacity: 0.25;

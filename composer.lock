@@ -162,16 +162,16 @@
         },
         {
             "name": "elibyy/tcpdf-laravel",
-            "version": "5.3.3",
+            "version": "5.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/elibyy/tcpdf-laravel.git",
-                "reference": "102cfb38eab93208cdf6053b3e27a877f3fa1b80"
+                "reference": "46e2f8bc645ff5f771999d3463c0663c8e2392f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/elibyy/tcpdf-laravel/zipball/102cfb38eab93208cdf6053b3e27a877f3fa1b80",
-                "reference": "102cfb38eab93208cdf6053b3e27a877f3fa1b80",
+                "url": "https://api.github.com/repos/elibyy/tcpdf-laravel/zipball/46e2f8bc645ff5f771999d3463c0663c8e2392f9",
+                "reference": "46e2f8bc645ff5f771999d3463c0663c8e2392f9",
                 "shasum": ""
             },
             "require": {
@@ -200,7 +200,7 @@
                 "laravel",
                 "pdf"
             ],
-            "time": "2017-12-17T11:40:00+00:00"
+            "time": "2017-12-28T09:52:02+00:00"
         },
         {
             "name": "geniusts/roles",

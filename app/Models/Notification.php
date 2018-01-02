@@ -28,6 +28,7 @@ class Notification extends Model
     const ADMINBLOG = 11;
     const ADMINZEROTOHERO = 12;
     const ADMINPAPER = 13;
+    const ADMINCOMPANYJOB = 14;
 
     /**
      * The attributes that are mass assignable.

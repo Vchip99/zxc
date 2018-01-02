@@ -3534,50 +3534,6 @@
         ]
     },
     {
-        "name": "elibyy/tcpdf-laravel",
-        "version": "5.3.3",
-        "version_normalized": "5.3.3.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/elibyy/tcpdf-laravel.git",
-            "reference": "102cfb38eab93208cdf6053b3e27a877f3fa1b80"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/elibyy/tcpdf-laravel/zipball/102cfb38eab93208cdf6053b3e27a877f3fa1b80",
-            "reference": "102cfb38eab93208cdf6053b3e27a877f3fa1b80",
-            "shasum": ""
-        },
-        "require": {
-            "illuminate/support": "5.3.x",
-            "tecnickcom/tcpdf": "6.2.12"
-        },
-        "time": "2017-12-17T11:40:00+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Elibyy\\TCPDF\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "eli y",
-                "email": "elibyy@gmail.com"
-            }
-        ],
-        "description": "tcpdf support for laravel 5",
-        "keywords": [
-            "TCPDF",
-            "laravel",
-            "pdf"
-        ]
-    },
-    {
         "name": "maatwebsite/excel",
         "version": "2.1.23",
         "version_normalized": "2.1.23.0",
@@ -4117,6 +4073,50 @@
             "phpunit",
             "testing",
             "xunit"
+        ]
+    },
+    {
+        "name": "elibyy/tcpdf-laravel",
+        "version": "5.3.4",
+        "version_normalized": "5.3.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/elibyy/tcpdf-laravel.git",
+            "reference": "46e2f8bc645ff5f771999d3463c0663c8e2392f9"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/elibyy/tcpdf-laravel/zipball/46e2f8bc645ff5f771999d3463c0663c8e2392f9",
+            "reference": "46e2f8bc645ff5f771999d3463c0663c8e2392f9",
+            "shasum": ""
+        },
+        "require": {
+            "illuminate/support": "5.3.x",
+            "tecnickcom/tcpdf": "6.2.12"
+        },
+        "time": "2017-12-28T09:52:02+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Elibyy\\TCPDF\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "eli y",
+                "email": "elibyy@gmail.com"
+            }
+        ],
+        "description": "tcpdf support for laravel 5",
+        "keywords": [
+            "TCPDF",
+            "laravel",
+            "pdf"
         ]
     }
 ]
