@@ -1,41 +1,29 @@
 @extends('layouts.master')
 @section('content')
-<style>
-	.watermark {
-	    position: absolute;
-	    opacity: 0.25;
-	    font-size: 50px;
-	    width: 100%;
-	    text-align: center;
-	    z-index: 1000;
-	    color: grey;
-	}
-	.answer{
-		padding-left: 20px !important;
-	}
-</style>
 <div class="row">
 	@if(count($sections) > 0)
 		@foreach($sections as $index => $section)
 			@if( isset($questions[$section->id]) && count($questions[$section->id]) > 0)
-			<a class="btn btn-primary" style="width:100px;">{{ $section->name }}</a>
+			<span class="btn btn-info" style="min-width:100px;max-width:200px;"><b>{{ $section->name }}</b></span>
 				@foreach($questions[$section->id] as $index => $question)
-					<div class="panel-body"><span class="watermark">Vchip Technology</span>
+					<div class="panel-body">
 						<div >
-							<p class="questions" >
+							<p class="questions">
 								@if(!empty($question->common_data))
-									<span style="padding-left: 5px;">{!! $question->common_data !!}</span></br>
+									<span style="padding-left: 5px;"><b>Common Data:</b> {!! $question->common_data !!}</span><br/>
 								@endif
+								<br/>
 								<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
 								{!! $question->name !!}
 							</p>
+							<p>
 							@if( 1 == $question->question_type )
 								<div class="row answer">A. {!! $question->answer1 !!}
-								</div>
+								</div><br/>
 								<div class="row answer">B. {!! $question->answer2 !!}
-								</div>
+								</div><br/>
 								<div class="row answer">C. {!! $question->answer3 !!}
-								</div>
+								</div><br/>
 								<div class="row answer">D. {!! $question->answer4 !!}
 								</div>
 								@if(!empty($question->answer5))
@@ -45,8 +33,9 @@
 							@else
 								<input type="number" class="form-control numpad" id="numpad_{{$question->id}}" data-id="{{$question->id}}" name="{{$question->id}}" placeholder="Enter a number" readonly="true">
 							@endif
+							</p>
 						</div>
-					</div>
+					</div></br/>
 				@endforeach
 			@endif
 		@endforeach

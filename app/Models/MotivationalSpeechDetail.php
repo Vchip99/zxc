@@ -8,6 +8,7 @@ use Redirect, DB;
 use App\Libraries\InputSanitise;
 use App\Models\MotivationalSpeechDetail;
 use App\Models\MotivationalSpeechCategory;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class MotivationalSpeechDetail extends Model
 {
@@ -63,6 +64,12 @@ class MotivationalSpeechDetail extends Model
             }
             $request->file('about_image')->move($motivationalSpeechFolderPath, $aboutImage);
             $motivationalSpeechDetails->about_image = $aboutImagePath;
+            // open image
+            $img = Image::make($motivationalSpeechDetails->about_image);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
         }
 
     	$motivationalSpeechDetails->save();

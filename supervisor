@@ -21,7 +21,7 @@ sudo supervisorctl update
 
 sudo supervisorctl start mail-worker:*
 
-
+// no need to do following
 sudo touch /var/run/supervisor.sock
 sudo chmod 777 /var/run/supervisor.sock
 sudo service supervisor restart

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class ClientHomePage extends Model
 {
@@ -48,6 +49,12 @@ class ClientHomePage extends Model
                 // unlink($subDomainHome->background_image);
             }
             $request->file('background_image')->move($backgroundImageFolder, $backgroundImage);
+            // open image
+            $img = Image::make($backgroundImagePath);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
             $subDomainHomeArr['background_image'] = "background-image: url('".$backgroundImagePath."');background-attachment: fixed;
                   background-position: center;
                   background-size:cover;

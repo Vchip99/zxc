@@ -19,9 +19,9 @@ class CreateVirtualPlacementDrivesTable extends Migration
             $table->text('about');
             $table->string('about_image');
             $table->text('online_test');
-            $table->text('ti_basic');
-            $table->text('ti_machine_test');
-            $table->text('ti_puzzle');
+            $table->text('hr');
+            $table->text('suggestions');
+            $table->text('advantages');
             $table->text('gd');
             $table->text('pi');
             $table->text('program_arrangement');

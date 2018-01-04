@@ -8,7 +8,7 @@ use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubject;
-
+use Intervention\Image\ImageManagerStatic as Image;
 
 class ClientOnlineTestSubCategory extends Model
 {
@@ -63,6 +63,12 @@ class ClientOnlineTestSubCategory extends Model
             }
             $request->file('image_path')->move($subCategoryFolderPath, $subCategoryImage);
             $testSubcategory->image_path = $courseImagePath;
+            // open image
+            $img = Image::make($testSubcategory->image_path);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
         }
 
         $testSubcategory->save();

@@ -17,6 +17,7 @@ use App\Models\ClientNotification;
 use App\Models\ClientReadNotification;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientUserPurchasedCourse;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class Clientuser extends Authenticatable
 {
@@ -167,6 +168,12 @@ class Clientuser extends Authenticatable
             }
             $request->file('photo')->move($userStoragePath, $userImage);
             $dbUserImagePath = $userStoragePath."/".$userImage;
+            // open image
+            $img = Image::make($dbUserImagePath);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
         }
         if($request->exists('resume')){
             $userResume = $request->file('resume')->getClientOriginalName();

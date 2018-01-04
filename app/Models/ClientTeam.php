@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Intervention\Image\ImageManagerStatic as Image;
 use Auth;
 use DB, Session;
 
@@ -50,6 +51,12 @@ class ClientTeam extends Model
                     }
                     $request->file($imageInd)->move($teamImageFolder, $memberImage);
                     $memberArr['image'] = $memberImagePath;
+                    // open image
+                    $img = Image::make($memberImagePath);
+                    // enable interlacing
+                    $img->interlace(true);
+                    // save image interlaced
+                    $img->save();
                 }
                 if(count($memberArr) > 0){
                     $member->update($memberArr);

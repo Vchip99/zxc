@@ -47,7 +47,7 @@
 						    <div align="left" style="background:#ADD8E6">
 						    	@foreach($results['questions'] as $index => $question)
 						    		@if(isset($sections[$index]) && count($results['questions'][$index]) > 0)
-							   			<a class="section btn btn-default" id="{{ $sections[$index]->name }}" style="width:100px;">{{ $sections[$index]->name }}</a>
+							   			<a class="section btn btn-default" id="{{ $sections[$index]->name }}" style="min-width:100px;max-width:200px;">{{ $sections[$index]->name }}</a>
 							   			<input type="hidden" id="show-{{ $sections[$index]->name }}" name="show-{{ $sections[$index]->name }}" value="1" />
 							   		@else
 							   			<input type="hidden" id="show-{{ $sections[$index]->name }}" name="show-{{ $sections[$index]->name }}" value="0" />
@@ -131,6 +131,8 @@
 											@if(0 == $result->question_type)
 												@if( isset($userResults[$result->id]))
 													{!! $userResults[$result->id]->user_answer !!}
+							                    @elseif(!isset($userResults[$result->id]))
+													unsolved(New Question)
 							                    @else
 							                    	unsolved
 							                    @endif
@@ -145,6 +147,8 @@
 							                    	D
 							                    @elseif( isset($userResults[$result->id]) && $userResults[$result->id]->user_answer == 5)
 							                    	E
+							                    @elseif(!isset($userResults[$result->id]))
+													unsolved(New Question)
 							                    @else
 							                    	unsolved
 							                    @endif
@@ -177,9 +181,9 @@
 											      	<p id = "id1"></p>
 											      	@if(isset($results['questions']) && count($results['questions'][$section->id]) > 0)
 												    	@foreach($results['questions'][$section->id] as $index => $q)
-													 		@if('unsolved' == $userResults[$q->id]->user_answer)
-													 		<button type="button" id ="id_{{$q->id}}" data-type="{{$section->name}}" class="button1 btn btn-sq-xs btn-info" value="{{$q->id}}"  title='{{$index+1}}'>{{$index+1}}</button>
-													 		@elseif($q->answer == $userResults[$q->id]->user_answer || (0 == $q->question_type && $userResults[$q->id]->user_answer >= $q->min && $userResults[$q->id]->user_answer <= $q->max))
+													 		@if(!isset($userResults[$q->id]) || 'unsolved' == $userResults[$q->id]->user_answer)
+													 			<button type="button" id ="id_{{$q->id}}" data-type="{{$section->name}}" class="button1 btn btn-sq-xs btn-info" value="{{$q->id}}"  title='{{$index+1}}'>{{$index+1}}</button>
+													 		@elseif(isset($userResults[$q->id]) && ($q->answer == $userResults[$q->id]->user_answer || (0 == $q->question_type && $userResults[$q->id]->user_answer >= $q->min && $userResults[$q->id]->user_answer <= $q->max)))
 													 			<button type="button" id ="id_{{$q->id}}" data-type="{{$section->name}}" class="button1 btn btn-sq-xs" value="{{$q->id}}"  title='{{$index+1}}' style="background-color: green;">{{$index+1}}</button>
 													 		@else
 													 			<button type="button" id ="id_{{$q->id}}" data-type="{{$section->name}}" class="button1 btn btn-sq-xs" value="{{$q->id}}"  title='{{$index+1}}' style="background-color: red;">{{$index+1}}</button>

@@ -8,6 +8,7 @@ use Redirect, DB;
 use App\Libraries\InputSanitise;
 use App\Models\OfflineWorkshopCategory;
 use App\Models\OfflineWorkshopComponent;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class OfflineWorkshopDetail extends Model
 {
@@ -72,6 +73,12 @@ class OfflineWorkshopDetail extends Model
             }
             $request->file('about_image')->move($workshopFolderPath, $authorImage);
             $workshopDetails->about_image = $authorImagePath;
+            // open image
+            $img = Image::make($workshopDetails->about_image);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
         }
 
         if($request->exists('benefits_image')){
@@ -90,6 +97,12 @@ class OfflineWorkshopDetail extends Model
             }
             $request->file('benefits_image')->move($workshopFolderPath, $workshopImage);
             $workshopDetails->benefits_image = $workshopImagePath;
+            // open image
+            $img = Image::make($workshopDetails->benefits_image);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
         }
     	$workshopDetails->save();
 

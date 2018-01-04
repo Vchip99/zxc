@@ -10,6 +10,7 @@ use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineSubCategory;
 use App\Models\RegisterClientOnlineCourses;
 use App\Models\ClientOnlineVideo;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class ClientOnlineCourse extends Model
 {
@@ -75,6 +76,12 @@ class ClientOnlineCourse extends Model
             }
             $request->file('author_image')->move($courseFolderPath, $authorImage);
             $course->author_image = $authorImagePath;
+            // open image
+            $img = Image::make($course->author_image);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
         }
 
         if($request->exists('image_path')){
@@ -93,6 +100,12 @@ class ClientOnlineCourse extends Model
             }
             $request->file('image_path')->move($courseFolderPath, $courseImage);
             $course->image_path = $courseImagePath;
+            // open image
+            $img = Image::make($course->image_path);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
         }
 
     	$course->release_date = $release_date;

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use App\Models\TestSubject;
 use DB;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class TestSubCategory extends Model
 {
@@ -52,6 +53,12 @@ class TestSubCategory extends Model
             }
             $request->file('image_path')->move($subCategoryFolderPath, $subCategoryImage);
             $testSubcategory->image_path = $subCategoryImagePath;
+            // open image
+            $img = Image::make($testSubcategory->image_path);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
         }
         $testSubcategory->save();
         return $testSubcategory;

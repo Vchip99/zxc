@@ -116,10 +116,10 @@ margin: 0px 5px;
               </h4>
               <p class="more data-lg">{{$video->description}}</p>
               <p class="more data-sm">{{$video->description}}</p>
-              <span class="v_download" title="Download">
+              <!-- <span class="v_download" title="Download">
                 <a class="btn btn-primary is-bold" role="button" data-toggle="collapse" href="#collapseExample_{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">
                 Download</a>
-              </span>
+              </span> -->
               <div class="collapse download_iteam" id="collapseExample_{{$video->id}}">
                 <div class="">
                   <a download title="pdf">

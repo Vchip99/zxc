@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use App\Models\DocumentsCategory;
 use DB;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class DocumentsDoc extends Model
 {
@@ -33,6 +34,16 @@ class DocumentsDoc extends Model
         $documentDifficultyLevel = InputSanitise::inputInt($request->get('difficulty_level'));
         $documentTypeOfDocument = InputSanitise::inputInt($request->get('type_of_document'));
 
+        $documentDateOfUpdate = strip_tags(trim($request->get('date_of_update')));
+        $documentId = InputSanitise::inputInt($request->get('document_id'));
+        if( $isUpdate && isset($documentId)){
+            $documentsDoc = DocumentsDoc::find($documentId);
+            if(!is_object($documentsDoc)){
+                return Redirect::to('admin/manageDocumentsDoc');
+            }
+        } else{
+            $documentsDoc = new DocumentsDoc;
+        }
 
         $documentFolderPath = public_path()."/documentStorage/".str_replace(' ', '_', $documentName);
         if(!is_dir($documentFolderPath)){
@@ -43,7 +54,9 @@ class DocumentsDoc extends Model
 	        $documentFrontImagePath = $documentFolderPath."/".$documentFrontImage;
 	        if(file_exists($documentFrontImagePath)){
 	        	unlink($documentFrontImagePath);
-	        }
+	        } elseif(!empty($documentsDoc->id) && file_exists($documentsDoc->doc_image_path)){
+                unlink($documentsDoc->doc_image_path);
+            }
 	        $request->file('doc_image')->move($documentFolderPath, $documentFrontImage);
             $dbFrontImagePath = "documentStorage/".str_replace(' ', '_', $documentName)."/".$documentFrontImage;
 	    }
@@ -58,16 +71,7 @@ class DocumentsDoc extends Model
             $dbPdfPath = "documentStorage/".str_replace(' ', '_', $documentName)."/".$projectPdf;
 	    }
 
-        $documentDateOfUpdate = strip_tags(trim($request->get('date_of_update')));
-        $documentId = InputSanitise::inputInt($request->get('document_id'));
-        if( $isUpdate && isset($documentId)){
-            $documentsDoc = DocumentsDoc::find($documentId);
-            if(!is_object($documentsDoc)){
-            	return Redirect::to('admin/manageDocumentsDoc');
-            }
-        } else{
-            $documentsDoc = new DocumentsDoc;
-        }
+
         $documentsDoc->name = $documentName;
         $documentsDoc->author = $documentAuthor;
         $documentsDoc->introduction = $documentIntroduction;
@@ -80,6 +84,12 @@ class DocumentsDoc extends Model
 
         if(isset($dbFrontImagePath)){
             $documentsDoc->doc_image_path = $dbFrontImagePath;
+             // open image
+            $img = Image::make($documentsDoc->doc_image_path);
+            // enable interlacing
+            $img->interlace();
+            // save image interlaced
+            $img->save();
         }
         if(isset($dbPdfPath)){
             $documentsDoc->doc_pdf_path = $dbPdfPath;

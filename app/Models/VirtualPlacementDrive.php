@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use DB;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class VirtualPlacementDrive extends Model
 {
@@ -15,7 +16,7 @@ class VirtualPlacementDrive extends Model
      *
      * @var array
      */
-    protected $fillable = [ 'name', 'about','about_image','online_test','ti_basic','ti_machine_test','ti_puzzle','gd','pi','program_arrangement','program_arrangement_image'];
+    protected $fillable = [ 'name', 'about','about_image','online_test','hr','suggestions','advantages','gd','pi','program_arrangement','program_arrangement_image'];
 
     /**
      *  create/update virtualPlacementDrive
@@ -25,9 +26,9 @@ class VirtualPlacementDrive extends Model
         $name = $request->get('name');
         $about = $request->get('about');
         $onlineTest = $request->get('online_test');
-        $tiBasic = $request->get('ti_basic');
-        $tiMachineTest = $request->get('ti_machine_test');
-        $tiPuzzle = $request->get('ti_puzzle');
+        $hr = $request->get('hr');
+        $suggestions = $request->get('suggestions');
+        $advantages = $request->get('advantages');
         $gd = $request->get('gd');
         $pi = $request->get('pi');
         $programArrangement = $request->get('program_arrangement');
@@ -43,9 +44,9 @@ class VirtualPlacementDrive extends Model
     	$virtualPlacementDrive->name = $name;
     	$virtualPlacementDrive->about = $about;
         $virtualPlacementDrive->online_test = $onlineTest;
-    	$virtualPlacementDrive->ti_basic = $tiBasic;
-        $virtualPlacementDrive->ti_machine_test = $tiMachineTest;
-        $virtualPlacementDrive->ti_puzzle = $tiPuzzle;
+    	$virtualPlacementDrive->hr = $hr;
+        $virtualPlacementDrive->suggestions = $suggestions;
+        $virtualPlacementDrive->advantages = $advantages;
         $virtualPlacementDrive->gd = $gd;
     	$virtualPlacementDrive->pi = $pi;
         $virtualPlacementDrive->program_arrangement = $programArrangement;
@@ -63,6 +64,12 @@ class VirtualPlacementDrive extends Model
             }
             $request->file('about_image')->move($virtualPlacementDriveFolderPath, $authorImage);
             $virtualPlacementDrive->about_image = $authorImagePath;
+            // open image
+            $img = Image::make($virtualPlacementDrive->about_image);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
         }
 
         if($request->exists('program_arrangement_image')){

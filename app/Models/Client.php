@@ -28,6 +28,7 @@ use App\Models\ClientOnlineVideo;
 use App\Models\ClientOnlineVideoLike;
 use App\Models\Clientuser;
 use Auth;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class Client extends Authenticatable
 {
@@ -175,6 +176,12 @@ class Client extends Authenticatable
 
             if(!empty($dbUserImagePath)){
                 $client->photo = $dbUserImagePath;
+                // open image
+                $img = Image::make($client->photo);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
             }
             $client->save();
         }

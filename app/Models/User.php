@@ -46,6 +46,7 @@ use App\Models\PlacementProcessSubCommentLike;
 use App\Models\PlacementProcessComment;
 use App\Models\PlacementProcessSubComment;
 use Auth, DB;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class User extends Authenticatable
 {
@@ -232,6 +233,12 @@ class User extends Authenticatable
         }
         if(!empty($dbUserImagePath)){
             $user->photo = $dbUserImagePath;
+            // open image
+            $img = Image::make($user->photo);
+            // enable interlacing
+            $img->interlace(true);
+            // save image interlaced
+            $img->save();
         }
         if(!empty($dbUserResumePath)){
             $user->resume = $dbUserResumePath;

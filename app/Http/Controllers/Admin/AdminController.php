@@ -45,12 +45,13 @@ class AdminController extends Controller
             $img->setAttribute( 'src' , $src );
         }
         $body = $dom->saveHTML();
+
         try
         {
             $subscriedUsers = SubscriedUser::where('verified', 1)->select('email')->get()->toArray();
             $subscriedUsers = implode(',', array_column($subscriedUsers, 'email'));
             $mailSubject = 'Hello Vchip User';
-            Mail::to($subscriedUsers)->queue(new MailToSubscribedUser($body,$mailSubject));
+            Mail::bcc($subscriedUsers)->queue(new MailToSubscribedUser($body,$mailSubject));
             return redirect()->back()->with('message', 'Mail will be sent successfully to all subscribed users.');
         }
         catch(\Exception $e)

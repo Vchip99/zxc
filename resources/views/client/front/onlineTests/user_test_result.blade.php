@@ -520,8 +520,8 @@
 			                </li>
 			                @endif
 		                  <li class="">
-		                    <span class="name">Total Attempt</span>
-		                    <span class="pull-right text-ellipsis value ng-binding">{{$result['right_answered'] + $result['wrong_answered']}}</span>
+		                    <span class="name">Total Candidates</span>
+		                    <span class="pull-right text-ellipsis value ng-binding">{{$totalRank}}</span>
 		                  </li>
 		                  <li class="">
 		                    <span class="name">percentile</span>

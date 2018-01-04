@@ -142,9 +142,9 @@ hr{
         <a >{{$liveVideo->name}}</a>
          </h4>
          <p class="more">{{$liveVideo->description}}</p>
-         <span class="v_download" title="Download">
+         <!-- <span class="v_download" title="Download">
           <a class="btn btn-primary is-bold" role="button" data-toggle="collapse" href="#download_link" aria-expanded="false" aria-controls="collapseExample">
-          Download</a></span>
+          Download</a></span> -->
           <div class="collapse" id="download_link">
             <div class="download_iteam">
               <a download data-toggle="tooltip" data-placement="bottom" title="Pdf">

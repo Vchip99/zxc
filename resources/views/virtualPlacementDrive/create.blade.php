@@ -97,90 +97,6 @@
         @if($errors->has('online_test')) <p class="help-block">{{ $errors->first('online_test') }}</p> @endif
       </div>
     </div>
-    <div class="form-group row @if ($errors->has('ti_basic')) has-error @endif">
-      <label for="course" class="col-sm-2 col-form-label">Ti Basic:</label>
-      <div class="col-sm-10">
-        <textarea name="ti_basic" cols="60" rows="4" id="ti_basic" required>
-          @if(isset($virtualPlacementDrive->id))
-            {!! $virtualPlacementDrive->ti_basic !!}
-          @endif
-        </textarea>
-        <script type="text/javascript">
-          CKEDITOR.replace( 'ti_basic', { enterMode: CKEDITOR.ENTER_BR } );
-          CKEDITOR.on('dialogDefinition', function (ev) {
-                  var dialogName = ev.data.name,
-                  dialogDefinition = ev.data.definition;
-                  if (dialogName == 'image') {
-                      var onOk = dialogDefinition.onOk;
-                      dialogDefinition.onOk = function (e) {
-                          var width = this.getContentElement('info', 'txtWidth');
-                          width.setValue('100%');//Set Default Width
-                          var height = this.getContentElement('info', 'txtHeight');
-                          height.setValue('400');////Set Default height
-                          onOk && onOk.apply(this, e);
-                    };
-                    }
-                });
-        </script>
-        @if($errors->has('ti_basic')) <p class="help-block">{{ $errors->first('ti_basic') }}</p> @endif
-      </div>
-    </div>
-    <div class="form-group row @if ($errors->has('ti_machine_test')) has-error @endif">
-      <label for="course" class="col-sm-2 col-form-label">Ti Machine Test:</label>
-      <div class="col-sm-10">
-        <textarea name="ti_machine_test" cols="60" rows="4" id="ti_machine_test" required>
-          @if(isset($virtualPlacementDrive->id))
-            {!! $virtualPlacementDrive->ti_machine_test !!}
-          @endif
-        </textarea>
-        <script type="text/javascript">
-          CKEDITOR.replace( 'ti_machine_test', { enterMode: CKEDITOR.ENTER_BR } );
-          CKEDITOR.on('dialogDefinition', function (ev) {
-                  var dialogName = ev.data.name,
-                  dialogDefinition = ev.data.definition;
-                  if (dialogName == 'image') {
-                      var onOk = dialogDefinition.onOk;
-                      dialogDefinition.onOk = function (e) {
-                          var width = this.getContentElement('info', 'txtWidth');
-                          width.setValue('100%');//Set Default Width
-                          var height = this.getContentElement('info', 'txtHeight');
-                          height.setValue('400');////Set Default height
-                          onOk && onOk.apply(this, e);
-                    };
-                    }
-                });
-        </script>
-        @if($errors->has('ti_machine_test')) <p class="help-block">{{ $errors->first('ti_machine_test') }}</p> @endif
-      </div>
-    </div>
-    <div class="form-group row @if ($errors->has('ti_puzzle')) has-error @endif">
-      <label for="course" class="col-sm-2 col-form-label">Ti Puzzle:</label>
-      <div class="col-sm-10">
-        <textarea name="ti_puzzle" cols="60" rows="4" id="ti_puzzle" required>
-          @if(isset($virtualPlacementDrive->id))
-            {!! $virtualPlacementDrive->ti_puzzle !!}
-          @endif
-        </textarea>
-        <script type="text/javascript">
-          CKEDITOR.replace( 'ti_puzzle', { enterMode: CKEDITOR.ENTER_BR } );
-          CKEDITOR.on('dialogDefinition', function (ev) {
-                  var dialogName = ev.data.name,
-                  dialogDefinition = ev.data.definition;
-                  if (dialogName == 'image') {
-                      var onOk = dialogDefinition.onOk;
-                      dialogDefinition.onOk = function (e) {
-                          var width = this.getContentElement('info', 'txtWidth');
-                          width.setValue('100%');//Set Default Width
-                          var height = this.getContentElement('info', 'txtHeight');
-                          height.setValue('400');////Set Default height
-                          onOk && onOk.apply(this, e);
-                    };
-                    }
-                });
-        </script>
-        @if($errors->has('ti_puzzle')) <p class="help-block">{{ $errors->first('ti_puzzle') }}</p> @endif
-      </div>
-    </div>
     <div class="form-group row @if ($errors->has('gd')) has-error @endif">
       <label for="course" class="col-sm-2 col-form-label">GD:</label>
       <div class="col-sm-10">
@@ -210,7 +126,7 @@
       </div>
     </div>
     <div class="form-group row @if ($errors->has('pi')) has-error @endif">
-      <label for="course" class="col-sm-2 col-form-label">Pi:</label>
+      <label for="course" class="col-sm-2 col-form-label">TI/PI:</label>
       <div class="col-sm-10">
         <textarea name="pi" cols="60" rows="4" id="pi" required>
           @if(isset($virtualPlacementDrive->id))
@@ -235,6 +151,62 @@
                 });
         </script>
         @if($errors->has('pi')) <p class="help-block">{{ $errors->first('pi') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('hr')) has-error @endif">
+      <label for="course" class="col-sm-2 col-form-label">HR:</label>
+      <div class="col-sm-10">
+        <textarea name="hr" cols="60" rows="4" id="hr" required>
+          @if(isset($virtualPlacementDrive->id))
+            {!! $virtualPlacementDrive->hr !!}
+          @endif
+        </textarea>
+        <script type="text/javascript">
+          CKEDITOR.replace( 'hr', { enterMode: CKEDITOR.ENTER_BR } );
+          CKEDITOR.on('dialogDefinition', function (ev) {
+                  var dialogName = ev.data.name,
+                  dialogDefinition = ev.data.definition;
+                  if (dialogName == 'image') {
+                      var onOk = dialogDefinition.onOk;
+                      dialogDefinition.onOk = function (e) {
+                          var width = this.getContentElement('info', 'txtWidth');
+                          width.setValue('100%');//Set Default Width
+                          var height = this.getContentElement('info', 'txtHeight');
+                          height.setValue('400');////Set Default height
+                          onOk && onOk.apply(this, e);
+                    };
+                    }
+                });
+        </script>
+        @if($errors->has('hr')) <p class="help-block">{{ $errors->first('hr') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('suggestions')) has-error @endif">
+      <label for="course" class="col-sm-2 col-form-label">Suggestions:</label>
+      <div class="col-sm-10">
+        <textarea name="suggestions" cols="60" rows="4" id="suggestions" required>
+          @if(isset($virtualPlacementDrive->id))
+            {!! $virtualPlacementDrive->suggestions !!}
+          @endif
+        </textarea>
+        <script type="text/javascript">
+          CKEDITOR.replace( 'suggestions', { enterMode: CKEDITOR.ENTER_BR } );
+          CKEDITOR.on('dialogDefinition', function (ev) {
+                  var dialogName = ev.data.name,
+                  dialogDefinition = ev.data.definition;
+                  if (dialogName == 'image') {
+                      var onOk = dialogDefinition.onOk;
+                      dialogDefinition.onOk = function (e) {
+                          var width = this.getContentElement('info', 'txtWidth');
+                          width.setValue('100%');//Set Default Width
+                          var height = this.getContentElement('info', 'txtHeight');
+                          height.setValue('400');////Set Default height
+                          onOk && onOk.apply(this, e);
+                    };
+                    }
+                });
+        </script>
+        @if($errors->has('suggestions')) <p class="help-block">{{ $errors->first('suggestions') }}</p> @endif
       </div>
     </div>
     <div class="form-group row @if ($errors->has('program_arrangement')) has-error @endif">
@@ -266,13 +238,41 @@
       </div>
     </div>
     <div class="form-group row @if ($errors->has('program_arrangement_image')) has-error @endif">
-      <label class="col-sm-2 col-form-label" for="program_arrangement_image">About Virtual Placement Drive Image:</label>
+      <label class="col-sm-2 col-form-label" for="program_arrangement_image">Program Arrangement Image:</label>
       <div class="col-sm-3">
         <input type="file" class="form-control"  name="program_arrangement_image" id="program_arrangement_image" >
         @if($errors->has('program_arrangement_image')) <p class="has-error">{{ $errors->first('program_arrangement_image') }}</p> @endif
         @if(isset($virtualPlacementDrive->program_arrangement_image))
           <b><span>Existing Image: {!! basename($virtualPlacementDrive->program_arrangement_image) !!}</span></b>
         @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('advantages')) has-error @endif">
+      <label for="course" class="col-sm-2 col-form-label">Features and Advantages:</label>
+      <div class="col-sm-10">
+        <textarea name="advantages" cols="60" rows="4" id="advantages" required>
+          @if(isset($virtualPlacementDrive->id))
+            {!! $virtualPlacementDrive->advantages !!}
+          @endif
+        </textarea>
+        <script type="text/javascript">
+          CKEDITOR.replace( 'advantages', { enterMode: CKEDITOR.ENTER_BR } );
+          CKEDITOR.on('dialogDefinition', function (ev) {
+                  var dialogName = ev.data.name,
+                  dialogDefinition = ev.data.definition;
+                  if (dialogName == 'image') {
+                      var onOk = dialogDefinition.onOk;
+                      dialogDefinition.onOk = function (e) {
+                          var width = this.getContentElement('info', 'txtWidth');
+                          width.setValue('100%');//Set Default Width
+                          var height = this.getContentElement('info', 'txtHeight');
+                          height.setValue('400');////Set Default height
+                          onOk && onOk.apply(this, e);
+                    };
+                    }
+                });
+        </script>
+        @if($errors->has('advantages')) <p class="help-block">{{ $errors->first('advantages') }}</p> @endif
       </div>
     </div>
     <div class="form-group row">

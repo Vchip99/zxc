@@ -10,6 +10,7 @@ use App\Models\VkitProjectComment;
 use App\Models\VkitProjectLike;
 use App\Models\RegisterProject;
 use DB;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class VkitProject extends Model
 {
@@ -31,6 +32,19 @@ class VkitProject extends Model
         $projectCategoryId = InputSanitise::inputInt($request->get('category_id'));
         $projectGateway = InputSanitise::inputInt($request->get('gateway'));
         $projectMicrocontroller = InputSanitise::inputInt($request->get('microcontroller'));
+
+        $projectDate = strip_tags(trim($request->get('date')));
+        $projectDescription = trim($request->get('description'));
+        $projectId = InputSanitise::inputInt($request->get('project_id'));
+        if( $isUpdate && isset($projectId)){
+            $vkitProject = static::find($projectId);
+            if(!is_object($vkitProject)){
+                return Redirect::to('admin/manageVkitProject');
+            }
+        } else{
+            $vkitProject = new static;
+        }
+
         $projectFolderPath = public_path()."/projectStorage/".str_replace(' ', '_', $projectName);
         if(!is_dir($projectFolderPath)){
         	mkdir($projectFolderPath, 0755);
@@ -40,7 +54,9 @@ class VkitProject extends Model
 	        $projectFrontImagePath = $projectFolderPath."/".$projectFrontImage;
 	        if(file_exists($projectFrontImagePath)){
 	        	unlink($projectFrontImagePath);
-	        }
+	        } elseif(!empty($vkitProject->id) && file_exists($vkitProject->front_image_path)){
+                unlink($vkitProject->front_image_path);
+            }
 	        $request->file('front_image')->move($projectFolderPath, $projectFrontImage);
             $dbFrontImagePath = "projectStorage/".str_replace(' ', '_', $projectName)."/".$projectFrontImage;
 	    }
@@ -49,7 +65,9 @@ class VkitProject extends Model
 	        $projectHeaderImagePath = $projectFolderPath."/".$projectHeaderImage;
 	        if(file_exists($projectHeaderImagePath)){
 	        	unlink($projectHeaderImagePath);
-	        }
+	        } elseif(!empty($vkitProject->id) && file_exists($vkitProject->header_image_path)){
+                unlink($vkitProject->header_image_path);
+            }
 	        $request->file('header_image')->move($projectFolderPath, $projectHeaderImage);
             $dbHeaderImagePath = "projectStorage/".str_replace(' ', '_', $projectName)."/".$projectHeaderImage;
 	    }
@@ -64,17 +82,6 @@ class VkitProject extends Model
             $dbPdfPath = "projectStorage/".str_replace(' ', '_', $projectName)."/".$projectPdf;
 	    }
 
-        $projectDate = strip_tags(trim($request->get('date')));
-        $projectDescription = trim($request->get('description'));
-        $projectId = InputSanitise::inputInt($request->get('project_id'));
-        if( $isUpdate && isset($projectId)){
-            $vkitProject = static::find($projectId);
-            if(!is_object($vkitProject)){
-            	return Redirect::to('admin/manageVkitProject');
-            }
-        } else{
-            $vkitProject = new static;
-        }
         $vkitProject->name = $projectName;
         $vkitProject->author = $projectAuthor;
         $vkitProject->introduction = $projectIntroduction;
@@ -83,9 +90,21 @@ class VkitProject extends Model
         $vkitProject->microcontroller = $projectMicrocontroller;
         if(isset($dbFrontImagePath)){
             $vkitProject->front_image_path = $dbFrontImagePath;
+             // open image
+            $img = Image::make($vkitProject->front_image_path);
+            // enable interlacing
+            $img->interlace();
+            // save image interlaced
+            $img->save();
         }
         if(isset($dbHeaderImagePath)){
             $vkitProject->header_image_path = $dbHeaderImagePath;
+             // open image
+            $img = Image::make($vkitProject->header_image_path);
+            // enable interlacing
+            $img->interlace();
+            // save image interlaced
+            $img->save();
         }
         if(isset($dbPdfPath)){
             $vkitProject->project_pdf_path = $dbPdfPath;

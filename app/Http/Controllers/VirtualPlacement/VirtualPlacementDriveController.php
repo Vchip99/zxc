@@ -35,9 +35,9 @@ class VirtualPlacementDriveController extends Controller
         'name' => 'required',
         'about' => 'required',
         'online_test' => 'required',
-        'ti_basic' => 'required',
-        'ti_machine_test' => 'required',
-        'ti_puzzle' => 'required',
+        'hr' => 'required',
+        'suggestions' => 'required',
+        'advantages' => 'required',
         'gd' => 'required',
         'pi' => 'required',
         'program_arrangement' => 'required'

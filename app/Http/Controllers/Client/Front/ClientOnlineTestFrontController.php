@@ -273,16 +273,18 @@ class ClientOnlineTestFrontController extends ClientHomeController
         	$questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
         	if(is_object($questions) && false == $questions->isEmpty()){
 	        	foreach($questions as $question){
-	        		$totalMarks += $question->positive_marks;
-	        		if($question->answer == $userAnswers[$question->id] && $question->question_type == 1){
-	                    $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
-	                } else if($userAnswers[$question->id] >= $question->min && $userAnswers[$question->id] <= $question->max && $question->question_type == 0){
-	                    $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
-	                } else if($userAnswers[$question->id]=='unsolved' || $userAnswers[$question->id] =='' ){
-	                	continue;
-	                } else {
-	                    $negativeMarks =  (float) $negativeMarks + (float) $question->negative_marks;
-	                }
+	        		if(isset($userAnswers[$question->id])){
+	        			$totalMarks += $question->positive_marks;
+		        		if($question->answer == $userAnswers[$question->id] && $question->question_type == 1){
+		                    $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
+		                } else if($userAnswers[$question->id] >= $question->min && $userAnswers[$question->id] <= $question->max && $question->question_type == 0){
+		                    $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
+		                } else if($userAnswers[$question->id]=='unsolved' || $userAnswers[$question->id] =='' ){
+		                	continue;
+		                } else {
+		                    $negativeMarks =  (float) $negativeMarks + (float) $question->negative_marks;
+		                }
+		            }
 	        	}
 	        }
         	$result = [];

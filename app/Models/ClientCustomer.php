@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\ClientAllComment;
 use App\Libraries\InputSanitise;
 use Auth;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class ClientCustomer extends Model
 {
@@ -54,6 +55,12 @@ class ClientCustomer extends Model
                     }
                     $request->file($customer_img)->move($customerImageFolder, $customerImage);
                     $customerArr['image'] = $customerImagePath;
+                    // open image
+                    $img = Image::make($customerImagePath);
+                    // enable interlacing
+                    $img->interlace(true);
+                    // save image interlaced
+                    $img->save();
                 }
                 if(count($customerArr) > 0){
                     $customer->update($customerArr);

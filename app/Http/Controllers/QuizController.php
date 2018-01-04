@@ -12,7 +12,6 @@ use App\Models\TestSubjectPaper;
 use App\Models\PaperSection;
 use App\Models\RegisterPaper;
 use Session, Redirect, DB;
-use Elibyy\TCPDF\Facades\TCPDF;
 
 class QuizController extends Controller
 {
@@ -335,12 +334,19 @@ class QuizController extends Controller
                 }
             }
         }
+
+        $html = view('quiz.show_questions', compact('questions', 'sections'));
+        $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8','tempDir' => __DIR__ . '/mpdfFont']);
+        $mpdf->autoScriptToLang = true;
+        $mpdf->autoLangToFont = true;
+        $mpdf->SetWatermarkText('Vchip Technology', 0.4);
+        $mpdf->showWatermarkText = true;
         $bootstrapUrl = asset('css/bootstrap.min.css');
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $bootstrapUrl);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HEADER, false);
-        $bootstrap = curl_exec($curl);
+        $stylesheet1 = curl_exec($curl);
         curl_close($curl);
 
         $mainCssUrl = asset('css/main.css');
@@ -348,67 +354,12 @@ class QuizController extends Controller
         curl_setopt($curl, CURLOPT_URL, $mainCssUrl);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HEADER, false);
-        $mainCss = curl_exec($curl);
+        $stylesheet2 = curl_exec($curl);
         curl_close($curl);
-
-        $html = '';
-        // $html .= '<style>'.file_get_contents(asset('/css/bootstrap.min.css')).'</style>';
-        // $html .= '<style>'.file_get_contents(asset('/css/main.css')).'</style>';
-        $html .= '<style>'.$bootstrap.'</style>';
-        $html .= '<style>'.$mainCss.'</style>';
-        $html .= '<style>.watermark {
-            position: absolute;
-            opacity: 0.25;
-            font-size: 30px;
-            width: 50%;
-            text-align: center;
-            z-index: 1000;
-            color: #ddd;
-        }
-        .answer{
-            padding-left: 20px !important;
-        }
-        img{
-            max-width: 100%;
-            height: auto;
-        }</style>';
-        if(count($sections) > 0){
-            foreach($sections as $section){
-                if(count($questions[$section->id]) > 0){
-                    $html .= '<a class="btn btn-primary" style="width:100px;" title="'.$section->name.'">'.$section->name.'</a>';
-                    foreach($questions[$section->id] as $index => $question){
-                        $number = $index + 1;
-                        $html .= '<div class="panel-body"><span class="watermark">Vchip Technology</span>
-                                    <div >
-                                        <p class="questions" >';
-                        if(!empty($question->common_data)){
-                            $html .= '<b>Common Data:</b>';
-                            $html .= '<span>'.$question->common_data.'</span><hr/>';
-                        }
-                        $html .= '<span class="btn btn-sq-xs btn-info">'.$number .'.</span> '.$question->name.'</p><p>';
-                        if(1 == $question->question_type){
-                            $html .= '<div class="row answer">A. '.$question->answer1.'</div>';
-                            $html .= '<div class="row answer">B. '.$question->answer2.'</div>';
-                            $html .= '<div class="row answer">C. '.$question->answer3.'</div>';
-                            $html .= '<div class="row answer">D. '.$question->answer4.'</div>';
-                            if(!empty($question->answer5)){
-                                $html .= '<div class="row">E. '.$question->answer5.'</div>';
-                            }
-                        } else {
-                            $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
-                        }
-                        $html .= '</p></div></div>';
-                    }
-                }
-            }
-        }
-        $pdf = new TCPDF();
-        $pdf::SetTitle('Vchip Technology');
-        $pdf::AddPage();
-        $pdf::SetFont('freesans', '', 12);
-        $pdf::SetFontSubsetting(true);
-        $pdf::writeHTML($html, true, false, true, false, '');
-        return $pdf::Output('download_questions.pdf', 'D');
+        $mpdf->WriteHTML($stylesheet1,1);
+        $mpdf->WriteHTML($stylesheet2,1);
+        $mpdf->WriteHTML($html, 2);
+        return  $mpdf->Output("download_questions.pdf", "D");
     }
 
     /**

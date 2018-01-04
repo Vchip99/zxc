@@ -16,7 +16,6 @@ use App\Models\ClientScore;
 use App\Models\ClientUserSolution;
 use App\Models\ClientOnlinePaperSection;
 use App\Models\RegisterClientOnlinePaper;
-use Elibyy\TCPDF\Facades\TCPDF;
 
 class ClientOnlineQuestionFrontController extends ClientHomeController
 {
@@ -270,12 +269,11 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 }
             }
             $userSolutions = ClientUserSolution::getClientUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $scoreId, $paper->subject_id, $paper->id);
-// dd(\DB::connection('mysql2')->getQueryLog());
-// dd($userSolutions);
+
             foreach ($userSolutions  as $key => $result) {
                 $userResults[$result->ques_id] = $result;
             }
-            // dd($userResults);
+
             return view('client.front.question.testSolution', compact('results', 'userResults', 'paper', 'sections'));
         }
     }
@@ -341,12 +339,18 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             }
         }
 
+        $html = view('client.front.question.show_questions', compact('questions', 'clientSubdomain', 'sections'));
+        $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8','tempDir' => __DIR__ .'/../../mpdfFont']);
+        $mpdf->autoScriptToLang = true;
+        $mpdf->autoLangToFont = true;
+        $mpdf->SetWatermarkText($clientSubdomain, 0.4);
+        $mpdf->showWatermarkText = true;
         $bootstrapUrl = asset('css/bootstrap.min.css');
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $bootstrapUrl);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HEADER, false);
-        $bootstrap = curl_exec($curl);
+        $stylesheet1 = curl_exec($curl);
         curl_close($curl);
 
         $mainCssUrl = asset('css/main.css');
@@ -354,67 +358,11 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         curl_setopt($curl, CURLOPT_URL, $mainCssUrl);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HEADER, false);
-        $mainCss = curl_exec($curl);
+        $stylesheet2 = curl_exec($curl);
         curl_close($curl);
-
-
-        $html = '';
-        // $html .= '<style>'.file_get_contents(asset('css/bootstrap.min.css')).'</style>';
-        // $html .= '<style>'.file_get_contents(asset('css/main.css')).'</style>';
-        $html .= '<style>'.$bootstrap.'</style>';
-        $html .= '<style>'.$mainCss.'</style>';
-        $html .= '<style>.watermark {
-            position: absolute;
-            opacity: 0.25;
-            font-size: 50px;
-            width: 30%;
-            text-align: center;
-            z-index: 1000;
-            color: #ddd;
-        }
-        .answer{
-            padding-left: 20px !important;
-        }</style>';
-
-        if(count($sections) > 0){
-            foreach($sections as $section){
-                if(count($questions[$section->id]) > 0){
-                    $html .= '<a class="btn btn-primary" style="width:100px;" title="'.$section->name.'">'.$section->name.'</a>';
-                    foreach($questions[$section->id] as $index => $question){
-                        $number = $index + 1;
-                        $html .= '<div class="panel-body">
-                                    <div ><span class="watermark">'.$clientSubdomain.'</span>
-                                        <p class="questions" >';
-                        if(!empty($question->common_data)){
-                            $html .= '<b>Common Data:</b>';
-                            $html .= '<span>'.$question->common_data.'</span><hr/>';
-                        }
-                        $html .= '<span class="btn btn-sq-xs btn-info">'.$number .'.</span> '.$question->name.'</p><p>';
-                        // $html .= '<p>';
-                        if(1 == $question->question_type){
-                            $html .= '<div class="row">A. '.$question->answer1.'</div>';
-                            $html .= '<div class="row">B. '.$question->answer2.'</div>';
-                            $html .= '<div class="row">C. '.$question->answer3.'</div>';
-                            $html .= '<div class="row">D. '.$question->answer4.'</div>';
-                            if(!empty($question->answer5)){
-                                $html .= '<div class="row">E. '.$question->answer5.'</div>';
-                            }
-                        } else {
-                            $html .= '<div class="panel panel-default"><div class="panel-body">Enter a number </div></div>';
-                        }
-                        $html .= '</p></div></div>';
-                    }
-                }
-            }
-        }
-
-        $pdf = new TCPDF();
-        $pdf::SetTitle($clientSubdomain);
-        $pdf::AddPage();
-        $pdf::SetFont('freesans', '', 12);
-        $pdf::SetFontSubsetting(true);
-        $pdf::writeHTML($html, true, false, true, false, '');
-        return $pdf::Output('download_questions.pdf', 'D');
+        $mpdf->WriteHTML($stylesheet1,1);
+        $mpdf->WriteHTML($stylesheet2,1);
+        $mpdf->WriteHTML($html, 2);
+        return  $mpdf->Output("download_questions.pdf", "D");
     }
-
 }

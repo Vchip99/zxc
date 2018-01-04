@@ -533,8 +533,8 @@
 		                    <span class="pull-right text-ellipsis value ng-binding">{{$globalRank + 1}}</span>
 		                  </li>
 		                  <li class="">
-		                    <span class="name">Total Attempt</span>
-		                    <span class="pull-right text-ellipsis value ng-binding">{{$score->right_answered + $score->wrong_answered}}</span>
+		                    <span class="name">Total Candidates</span>
+		                    <span class="pull-right text-ellipsis value ng-binding">{{$globalTotalRank}}</span>
 		                  </li>
 		                  <li class="">
 		                    <span class="name">percentile</span>

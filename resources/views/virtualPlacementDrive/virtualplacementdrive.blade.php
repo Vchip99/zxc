@@ -48,14 +48,16 @@
    <div class="container">
      <div class="row">
       <div class="col-md-12 workshop_tital">
-        <h2 class="v_h2_title">how we conduct virtual placement drive</h2>
+        <h2 class="v_h2_title">Virtual Placement Drive by Vchip</h2>
       </div>
       <div class="col-md-12 workshop_detail">
         <div class="col-sm-4 col-sm-push-8 detail_img ">
           <img src="{{ asset($virtualplacementdrive->about_image) }}" class="img-responsive" alt="about_image" />
         </div>
         <div class="col-sm-8 col-sm-pull-4">
-          {!! $virtualplacementdrive->about !!}
+          <ul class="ul_custom">
+            {!! $virtualplacementdrive->about !!}
+          </ul>
         </div>
       </div>
      </div>
@@ -69,16 +71,10 @@
             <div class="panel-heading" style="margin-left: 0px; ">
                     <ul class="nav nav-tabs" style="margin-left: 0px; ">
                         <li class="active"><a href="#onlineTest" data-toggle="tab">Online Test</a></li>
-                        <li class="dropdown">
-                            <a href="#" data-toggle="dropdown">TI <span class="caret"></span></a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="#basic" data-toggle="tab">basic</a></li>
-                                <li><a href="#matchineTest" data-toggle="tab">matchine Testing</a></li>
-                                <li><a href="#puzzle" data-toggle="tab">puzzle</a></li>
-                            </ul>
-                        </li>
                         <li><a href="#gd" data-toggle="tab">GD</a></li>
-                        <li><a href="#pi" data-toggle="tab">PI</a></li>
+                        <li><a href="#pi" data-toggle="tab">TI/PI</a></li>
+                        <li><a href="#hr" data-toggle="tab">HR</a></li>
+                        <li><a href="#suggest" data-toggle="tab">Suggestions</a></li>
                     </ul>
             </div>
             <div class="panel-body">
@@ -90,36 +86,6 @@
                         <div class="col-md-12 workshop_detail">
                           <ul class="ul_custom">
                             {!! $virtualplacementdrive->online_test !!}
-                          </ul>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="basic">
-                        <div class="col-md-12 workshop_tital">
-                          <h2 class="v_h2_title">Basic</h2>
-                        </div>
-                        <div class="col-md-12 workshop_detail">
-                          <ul class="ul_custom">
-                            {!! $virtualplacementdrive->ti_basic !!}
-                          </ul>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="matchineTest">
-                        <div class="col-md-12 workshop_tital">
-                          <h2 class="v_h2_title">Matchine Testing</h2>
-                        </div>
-                        <div class="col-md-12 workshop_detail">
-                          <ul class="ul_custom">
-                            {!! $virtualplacementdrive->ti_machine_test !!}
-                          </ul>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="puzzle">
-                        <div class="col-md-12 workshop_tital">
-                          <h2 class="v_h2_title">Puzzle</h2>
-                        </div>
-                        <div class="col-md-12 workshop_detail">
-                          <ul class="ul_custom">
-                            {!! $virtualplacementdrive->ti_puzzle !!}
                           </ul>
                         </div>
                     </div>
@@ -135,11 +101,31 @@
                     </div>
                     <div class="tab-pane fade" id="pi">
                         <div class="col-md-12 workshop_tital">
-                          <h2 class="v_h2_title">Personal Interview</h2>
+                          <h2 class="v_h2_title">TI/PI</h2>
                         </div>
                         <div class="col-md-12 workshop_detail">
                           <ul class="ul_custom">
                             {!! $virtualplacementdrive->pi !!}
+                          </ul>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="hr">
+                        <div class="col-md-12 workshop_tital">
+                          <h2 class="v_h2_title">HR</h2>
+                        </div>
+                        <div class="col-md-12 workshop_detail">
+                          <ul class="ul_custom">
+                            {!! $virtualplacementdrive->hr !!}
+                          </ul>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="suggest">
+                        <div class="col-md-12 workshop_tital">
+                          <h2 class="v_h2_title">SUGGESTIONS</h2>
+                        </div>
+                        <div class="col-md-12 workshop_detail">
+                          <ul class="ul_custom">
+                            {!! $virtualplacementdrive->suggestions !!}
                           </ul>
                         </div>
                     </div>
@@ -165,7 +151,20 @@
             {!! $virtualplacementdrive->program_arrangement !!}
           </ul>
         </div>
-
+      </div>
+     </div>
+   </div>
+</section>
+<section id="benifit" class="v_container v_bg_grey">
+   <div class="container">
+     <div class="row">
+      <div class="col-md-12 workshop_tital">
+        <h2 class="v_h2_title">Features and Advantages</h2>
+      </div>
+      <div class="col-md-12 workshop_detail">
+          <ul class="ul_custom">
+            {!! $virtualplacementdrive->advantages !!}
+          </ul>
       </div>
      </div>
    </div>
@@ -174,7 +173,7 @@
   <div class="container">
     <div class="row v_bg_white ">
      <div class="col-md-12 workshop_tital">
-        <h2 class="v_h3_title">Related Workshops</h2>
+        <h2 class="v_h3_title">Gallery by Vchip</h2>
       </div>
       <div class="col-md-12 workshop_detail">
         <div class="MultiCarousel " data-items="1,3,3,4" data-slide="1" id="MultiCarousel"  data-interval="1000">
@@ -258,23 +257,23 @@
           <div class="carousel-inner" role="listbox">
             <div class="item active">
               <div class="testimonial4_slide">
-                <img src="http://via.placeholder.com/100x100" class="img-circle img-responsive" />
-                <p>Lorem ipsum dolor sit amet adipiscing elit am nibh unc varius facilisis eros ed erat in in velit quis arcu ornare laoreet urabitur.</p>
-                <h4>Ben Hanna</h4>
+                <img src="{{ asset('images/user/amol_sir.jpg')}}" class="img-circle img-responsive" />
+                <p>Vchip has conducted virtual placement drive at our college HVPM COET. We founded it very helpful to our students. It’s improve the performance of our students at the time of actual placement drive. Thanks to Vchip for a such great initiative. </p>
+                <h4>Amol Karmarkar (TPO of HVPM COET) </h4>
               </div>
             </div>
             <div class="item">
               <div class="testimonial4_slide">
-                <img src="http://via.placeholder.com/100x100" class="img-circle img-responsive" />
-                <p>Lorem ipsum dolor sit amet adipiscing elit am nibh unc varius facilisis eros ed erat in in velit quis arcu ornare laoreet urabitur.</p>
-                <h4>Ben Hanna</h4>
+                <img src="{{ asset('images/user/vinay.jpg')}}" class="img-circle img-responsive" />
+                <p>Team form Vchip was very supportive. At the last they given suggestions, which were help me to overcome the weakness of mine. Also, the session about current trends and demands of industries was help me to finalize the technology for my career.</p>
+                <h4>Vinay Motghare (Student of G. H. Raisoni)</h4>
               </div>
             </div>
             <div class="item">
               <div class="testimonial4_slide">
-                <img src="http://via.placeholder.com/100x100" class="img-circle img-responsive" />
-                <p>Lorem ipsum dolor sit amet adipiscing elit am nibh unc varius facilisis eros ed erat in in velit quis arcu ornare laoreet urabitur.</p>
-                <h4>Ben Hanna</h4>
+                <img src="{{ asset('images/user/user.png')}}" class="img-circle img-responsive" />
+                <p>Great work by Vchip. It’s help our students to perform well at the time of actual placement drive.</p>
+                <h4>Pournima Kawalkar (Lecturer at MGM COET)</h4>
               </div>
             </div>
           </div>
@@ -294,7 +293,7 @@
   <div class="container">
     <div class="row v_bg_white">
       <div class="col-md-12 workshop_tital">
-        <h2 class="v_h3_title">Contact Us</h2>
+        <h2 class="v_h3_title">Contact Us For Virtual Placement</h2>
       </div>
         <div class="col-md-12 workshop_detail">
           <form method="POST" action="{{ url('virtualplacementquery') }}">
@@ -330,7 +329,6 @@
                 <div class="form-group">
                       <label for="subject"> How you got to know about Vchipedu</label>
                       <select id="subject" name="subject" class="form-control" required="required">
-                          <option value=""></option>
                           <option value="Search Engine">Search Engine</option>
                           <option value="Referred By Friend">Referred By Friend</option>
                           <option value="Workshop/Training">Workshop/Training</option>
