@@ -188,4 +188,20 @@ class OfflineWorkshopDetail extends Model
         }
         return $data;
     }
+
+    protected static function isOfflineWorkshopExist(Request $request){
+        $workshop = InputSanitise::inputString($request->get('workshop'));
+        $workshopId   = InputSanitise::inputInt($request->get('workshop_id'));
+        $category   = InputSanitise::inputInt($request->get('category'));
+        $result = static::where('offline_workshop_category_id', $category)->where('name', '=',$workshop);
+        if(!empty($workshopId)){
+            $result->where('id', '!=', $workshopId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

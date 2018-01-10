@@ -161,4 +161,8 @@ class OfflineWorkshopDetailsController extends Controller
         }
         return Redirect::to('admin/manageOfflineWorkshopDetails');
     }
+
+    protected function isOfflineWorkshopExist(Request $request){
+        return OfflineWorkshopDetail::isOfflineWorkshopExist($request);
+    }
 }

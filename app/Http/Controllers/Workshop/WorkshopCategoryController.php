@@ -144,4 +144,8 @@ class WorkshopCategoryController extends Controller
         }
         return Redirect::to('admin/manageWorkshopCategory');
     }
+
+    protected function isOnlineWorkshopCategoryExist(Request $request){
+        return WorkshopCategory::isOnlineWorkshopCategoryExist($request);
+    }
 }

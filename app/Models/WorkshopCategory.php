@@ -40,4 +40,19 @@ class WorkshopCategory extends Model
     public function workshops(){
         return $this->hasMany(WorkshopDetail::class, 'workshop_category_id');
     }
+
+    protected static function isOnlineWorkshopCategoryExist(Request $request){
+        $category = InputSanitise::inputString($request->get('category'));
+        $categoryId   = InputSanitise::inputInt($request->get('category_id'));
+        $result = static::where('name', '=',$category);
+        if(!empty($categoryId)){
+            $result->where('id', '!=', $categoryId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

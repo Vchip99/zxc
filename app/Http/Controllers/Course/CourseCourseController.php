@@ -100,7 +100,7 @@ class CourseCourseController extends Controller
     		$course = CourseCourse::find($id);
     		if(is_object($course)){
     			$courseCategories   = CourseCategory::all();
-				$courseSubCategories = new CourseSubCategory;
+				$courseSubCategories = CourseSubCategory::getCourseSubCategoriesByCategoryId($course->course_category_id);
 				return view('courseCourse.create', compact('courseCategories','courseSubCategories','course'));
     		}
     	}
@@ -175,6 +175,10 @@ class CourseCourseController extends Controller
     	if(isset($id)){
     		return CourseSubCategory::getCourseSubCategoriesByCategoryId($id);
     	}
+    }
+
+    protected function isCourseCourseExist(Request $request){
+        return CourseCourse::isCourseCourseExist($request);
     }
 }
 

@@ -158,4 +158,8 @@ class PlacementAreaController extends Controller
         }
         return Redirect::to('admin/managePlacementArea');
     }
+
+    protected function isPlacementAreaExist(Request $request){
+        return PlacementArea::isPlacementAreaExist($request);
+    }
 }

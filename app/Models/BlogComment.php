@@ -46,7 +46,7 @@ class BlogComment extends Model
      */
     public function children()
     {
-        return $this->hasMany(BlogSubComment::class)->orderBy('id', 'desc');
+        return $this->hasMany(BlogSubComment::class);
     }
 
     /**

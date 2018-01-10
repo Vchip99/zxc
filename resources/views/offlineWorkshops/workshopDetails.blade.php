@@ -54,7 +54,11 @@
         <div class="col-sm-4 col-sm-push-8 detail_img ">
           <img src="{{ asset($workshop->about_image) }}" class="img-responsive" alt="workshop" />
         </div>
-        <div class="col-sm-8 col-sm-pull-4">{!! $workshop->about !!}</div>
+        <div class="col-sm-8 col-sm-pull-4">
+          <ul class="ul_custom">
+            {!! $workshop->about !!}
+          </ul>
+        </div>
       </div>
      </div>
    </div>
@@ -79,7 +83,7 @@
      </div>
    </div>
 </section>
-<section id="topic" class="v_container v_bg_grey">
+<section id="topic" class="v_container">
  <div class="container">
    <div class="row">
       <div class="col-md-12 workshop_duration">
@@ -159,7 +163,7 @@
     </div>
   </div>
 </section>
-<section id="" class="v_container ">
+<section id="" class="v_container v_bg_grey">
  <div class="container">
    <div class="row">
       <div class="col-md-12 workshop_tital">
@@ -173,11 +177,11 @@
     </div>
   </div>
 </section>
-<section id="" class="v_container v_bg_grey">
+<section id="" class="v_container ">
  <div class="container">
    <div class="row">
       <div class="col-md-12 workshop_tital">
-        <h2 class="v_h3_title">Why Learn From <b>Vchip Technologu</b> ?</h2>
+        <h2 class="v_h3_title">Why Learn From <b>Vchip Technology</b> ?</h2>
       </div>
       <div class="col-md-12 workshop_detail">
         <ul class="ul_custom" >{!! $workshop->learn_reason !!}
@@ -187,7 +191,7 @@
   </div>
 </section>
 <!-- Organise workshop -->
-<section id="" class="v_container ">
+<section id="" class="v_container v_bg_grey">
   <div class="container">
     <div class="row">
       <div class="col-md-12 workshop_tital">
@@ -198,8 +202,8 @@
         <div class="hover-img" data-toggle="modal" data-target="#collegeModal">
           <img src="{{asset('images/workshop/college.jpg')}}" class="img-responsive" alt="workshop" />
           <figcaption>
-            <h3>COLLEGE WORKSHOP</h3>
-            <p>To Organise College Workshop</p>
+            <h3>COLLEGE</h3>
+            <p>To organise workshop in ur college</p>
           </figcaption>
           <a><b>Click </b></a>
         </div>
@@ -208,8 +212,8 @@
         <div class="hover-img" data-toggle="modal" data-target="#corporateModal">
           <img src="{{asset('images/workshop/corporate.jpg')}}" class="img-responsive" alt="workshop" />
           <figcaption>
-            <h3>Corporate Workshop</h3>
-            <p>To Organise Corporate Workshop</p>
+            <h3>Corporate</h3>
+            <p>To organise workshop at corporate</p>
           </figcaption>
           <a><b>Click </b></a>
         </div>
@@ -245,8 +249,8 @@
                   <input type="text" class="form-control" name="mobile" name="mobile" placeholder="Mobile Number" required="required" />
               </div>
               <div class="form-group">
-                  <label for="name">Organization Name</label>
-                  <input type="text" class="form-control" name="org_name" placeholder="Enter Organization Name"  />
+                  <label for="name">College/University Name</label>
+                  <input type="text" class="form-control" name="org_name" placeholder="Enter College Name"  />
               </div>
                <div class="form-group">
                   <label for="name">Query</label>
@@ -306,7 +310,7 @@
   </div>
 </section>
 <!-- end -->
-<section id="" class="v_container v_bg_grey">
+<section id="" class="v_container ">
   <div class="container">
     <div class="row v_bg_white ">
      <div class="col-md-12 workshop_tital">
@@ -325,7 +329,7 @@
                       <div class="caption">
                         <div class="blur"></div>
                         <div class="caption-text">
-                          <h3 class="ellipsed" title="{{ $offlineworkshop->name }}">{{ $offlineworkshop->name }}</h3>
+                          <h3 class="ellipsed" ><a href="{{ url('offlineworkshopdetails')}}/{{$offlineworkshop->id }}" title="{{ $offlineworkshop->name }}">{{ $offlineworkshop->name }}</a></h3>
                           <hr class="hr" />
                           <p >{!!  substr($offlineworkshop->about, 0, 40) !!} ...</p>
 
@@ -345,7 +349,7 @@
   </div>
 </section>
 
-<section id="" class="v_container ">
+<section id="" class="v_container v_bg_grey">
   <div class="container">
     <div class="row">
       <div class="col-md-12 workshop_tital">
@@ -394,7 +398,7 @@
   </div>
 </section>
 <!-- contact -->
-<section id="" class="v_container  v_bg_grey">
+<!-- <section id="" class="v_container  v_bg_grey">
   <div class="container">
     <div class="row v_bg_white">
       <div class="col-md-12 workshop_tital">
@@ -461,7 +465,7 @@
         </div>
     </div>
   </div>
-</section>
+</section> -->
 @stop
 @section('footer')
 	@include('footer.footer')

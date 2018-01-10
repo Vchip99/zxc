@@ -164,4 +164,7 @@ class SubjectController extends Controller
 		return Redirect::to('admin/manageSubject');
 	}
 
+	protected function isTestSubjectExist(Request $request){
+		return TestSubject::isTestSubjectExist($request);
+	}
 }

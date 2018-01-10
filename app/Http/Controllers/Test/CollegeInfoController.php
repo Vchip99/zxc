@@ -115,4 +115,8 @@ class CollegeInfoController extends Controller
     	}
     	return Redirect::to('admin/manageCategory');
     }
+
+    protected function isCollegeExist(Request $request){
+        return College::isCollegeExist($request);
+    }
 }

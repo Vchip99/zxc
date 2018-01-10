@@ -56,7 +56,7 @@ class DiscussionComment extends Model
      */
     public function children()
     {
-        return $this->hasMany(DiscussionSubComment::class)->orderBy('id','desc');
+        return $this->hasMany(DiscussionSubComment::class);
     }
 
     /**

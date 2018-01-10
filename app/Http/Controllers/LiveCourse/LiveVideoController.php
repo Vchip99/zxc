@@ -169,4 +169,8 @@ class LiveVideoController extends Controller
         }
         return Redirect::to('admin/manageLiveVideo');
     }
+
+    protected function isLiveCourseVideoExist(Request $request){
+        return LiveVideo::isLiveCourseVideoExist($request);
+    }
 }

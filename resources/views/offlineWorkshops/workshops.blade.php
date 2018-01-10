@@ -69,8 +69,8 @@
                   <div class="caption">
                     <div class="blur"></div>
                     <div class="caption-text">
-                      <h3 class="ellipsed" title="{{ $workshop->name }}">{{ $workshop->name }}</h3>
-                      <p class="block-with-text">{{ $workshop->about }}</p>
+                      <h3 class="ellipsed" ><a href="{{ url('offlineworkshopdetails')}}/{{$workshop->id }}" title="{{ $workshop->name }}">{{ $workshop->name }}</a></h3>
+                      <p class="block-with-text">{!!  substr($workshop->about, 0, 60) !!} ...</p>
                     </div>
                   </div>
                 </div>
@@ -199,9 +199,10 @@
             secondDiv.innerHTML = '';
             var imgUrl = "{{ asset('') }}" + obj['about_image'];
             secondDiv.innerHTML +='<p style="text-align:center;"><img src="'+imgUrl+'" alt="workshop" class="img-responsive"/></p>';
-            secondDiv.innerHTML +='<div class="caption"><div class="blur"></div><div class="caption-text"><h3 class="ellipsed" title="'+ obj['name'] +'">'+ obj['name'] +'</h3><p class="block-with-text">'+ obj['about'] +'</p></div></div>'
-            firstDiv.appendChild(secondDiv);
             var url = "{{ url('offlineworkshopdetails')}}/"+  obj['id'];
+            var about = obj['about'];
+            secondDiv.innerHTML +='<div class="caption"><div class="blur"></div><div class="caption-text"><h3 class="ellipsed" title="'+ obj['name'] +'"><a href="'+ url +'">'+ obj['name'] +'</a></h3><p class="block-with-text">'+ about.substr(0, 60) +'...</p></div></div>'
+            firstDiv.appendChild(secondDiv);
             var pEle = document.createElement('p');
             pEle.className = "link";
             pEle.innerHTML ='<a href="'+ url +'"> Read More</a>';

@@ -196,4 +196,20 @@ class LiveCourse extends Model
         }
     }
 
+    protected static function isLiveCourseExist(Request $request){
+        $categoryId   = InputSanitise::inputInt($request->get('category'));
+        $liveCourse = InputSanitise::inputString($request->get('live_course'));
+        $liveCourseId   = InputSanitise::inputInt($request->get('live_course_id'));
+        $result = static::where('name', '=',$liveCourse)->where('category_id', $categoryId);
+        if(!empty($liveCourseId)){
+            $result->where('id', '!=', $liveCourseId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
+
 }

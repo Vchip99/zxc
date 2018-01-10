@@ -78,7 +78,7 @@ class DiscussionPost extends Model
      */
     public function descComments()
     {
-        return $this->hasMany(DiscussionComment::class)->orderBy('id','desc');
+        return $this->hasMany(DiscussionComment::class, 'discussion_post_id')->orderBy('id','desc');
     }
 
     public function comments(){

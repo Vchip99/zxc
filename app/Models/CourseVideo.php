@@ -110,4 +110,21 @@ class CourseVideo extends Model
             }
         }
     }
+
+    protected static function isCourseVideoExist($request){
+        $courseId = InputSanitise::inputInt($request->get('course'));
+        $videoName = InputSanitise::inputString($request->get('video'));
+        $videoId = InputSanitise::inputInt($request->get('video_id'));
+        $result = static::where('course_id', $courseId)->where('name', $videoName);
+        if(!empty($videoId)){
+            $result->where('id', '!=', $videoId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+        return 'false';
+    }
 }

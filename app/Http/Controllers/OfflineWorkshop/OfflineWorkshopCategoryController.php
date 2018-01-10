@@ -152,4 +152,8 @@ class OfflineWorkshopCategoryController extends Controller
         }
         return Redirect::to('admin/manageOfflineWorkshopCategory');
     }
+
+    protected function isOfflineWorkshopCategoryExist(Request $request){
+        return OfflineWorkshopCategory::isOfflineWorkshopCategoryExist($request);
+    }
 }

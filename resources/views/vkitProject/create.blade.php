@@ -13,34 +13,13 @@
   &nbsp;
   <div class="container admin_div">
   @if(isset($project->id))
-    <form action="{{url('admin/updateVkitProject')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/updateVkitProject')}}" method="POST" enctype="multipart/form-data" id="submitForm">
     {{method_field('PUT')}}
-    <input type="hidden" name="project_id" value="{{$project->id}}">
+    <input type="hidden" name="project_id" id="project_id" value="{{$project->id}}">
   @else
-    <form action="{{url('admin/createVkitProject')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/createVkitProject')}}" method="POST" enctype="multipart/form-data" id="submitForm">
   @endif
     {{ csrf_field() }}
-    <div class="form-group row @if ($errors->has('project')) has-error @endif">
-      <label class="col-sm-2 col-form-label" for="project">Project Name:</label>
-      <div class="col-sm-3">
-        <input type="text" class="form-control" id="project" name="project" value="{{($project->name)?$project->name:NULL}}" required="true">
-        @if($errors->has('project')) <p class="has-error">{{ $errors->first('project') }}</p> @endif
-      </div>
-    </div>
-    <div class="form-group row @if ($errors->has('author')) has-error @endif">
-      <label class="col-sm-2 col-form-label" for="author">Author:</label>
-      <div class="col-sm-3">
-        <input type="text" class="form-control" id="author" name="author" value="{{($project->author)?$project->author:NULL}}" required="true">
-        @if($errors->has('author')) <p class="has-error">{{ $errors->first('author') }}</p> @endif
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-sm-2 col-form-label" for="introduction">Introduction:</label>
-      <div class="col-sm-3">
-        <textarea class="form-control" id="introduction" name="introduction" required="true">{{($project->introduction)?$project->introduction:NULL}}</textarea>
-        @if($errors->has('introduction')) <p class="has-error">{{ $errors->first('introduction') }}</p> @endif
-      </div>
-    </div>
     <div class="form-group row  @if ($errors->has('category_id')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="category_id">Category:</label>
       <div class="col-sm-3">
@@ -57,6 +36,28 @@
           @endif
         </select>
         @if($errors->has('category_id')) <p class="has-error">{{ $errors->first('category_id') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('project')) has-error @endif">
+      <label class="col-sm-2 col-form-label" for="project">Project Name:</label>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" id="project" name="project" value="{{($project->name)?$project->name:NULL}}" required="true">
+        @if($errors->has('project')) <p class="has-error">{{ $errors->first('project') }}</p> @endif
+        <span class="hide" id="projectError" style="color: white;">Given name is already exist with selected category.Please enter another name.</span>
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('author')) has-error @endif">
+      <label class="col-sm-2 col-form-label" for="author">Author:</label>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" id="author" name="author" value="{{($project->author)?$project->author:NULL}}" required="true">
+        @if($errors->has('author')) <p class="has-error">{{ $errors->first('author') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label" for="introduction">Introduction:</label>
+      <div class="col-sm-3">
+        <textarea class="form-control" id="introduction" name="introduction" required="true">{{($project->introduction)?$project->introduction:NULL}}</textarea>
+        @if($errors->has('introduction')) <p class="has-error">{{ $errors->first('introduction') }}</p> @endif
       </div>
     </div>
     <div class="form-group row @if ($errors->has('gateway')) has-error @endif">
@@ -154,9 +155,40 @@
     </div>
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-primary" onclick="searchProject();">Submit</button>
       </div>
     </div>
   </div>
 </form>
+<script type="text/javascript">
+  function searchProject(){
+    var category = document.getElementById('category_id').value;
+    var project = document.getElementById('project').value;
+    if(document.getElementById('project_id')){
+      var projectId = document.getElementById('project_id').value;
+    } else {
+      var projectId = 0;
+    }
+    if(category && project){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isVkitProjectExist')}}",
+        data:{category:category,project:project,project_id:projectId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('projectError').classList.remove('hide');
+          document.getElementById('projectError').classList.add('has-error');
+        } else {
+          document.getElementById('projectError').classList.add('hide');
+          document.getElementById('projectError').classList.remove('has-error');
+          document.getElementById('submitForm').submit();
+        }
+      });
+    } else if(!category){
+      alert('please select category.');
+    } else if(!project){
+      alert('please enter name.');
+    }
+  }
+</script>
 @stop

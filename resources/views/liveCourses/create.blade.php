@@ -15,22 +15,34 @@
   &nbsp;
   <div class="container admin_div">
   @if(isset($liveCourse->id))
-    <form action="{{url('admin/updateLiveCourse')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/updateLiveCourse')}}" method="POST" enctype="multipart/form-data" id="submitForm">
     {{method_field('PUT')}}
     <input type="hidden" id="live_course_id" name="live_course_id" value="{{$liveCourse->id}}">
   @else
-    <form action="{{url('admin/createLiveCourse')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/createLiveCourse')}}" method="POST" enctype="multipart/form-data" id="submitForm">
   @endif
     {{ csrf_field() }}
-     <div class="form-group row @if ($errors->has('course')) has-error @endif">
+    <div class="form-group row @if ($errors->has('category')) has-error @endif">
+      <label class="col-sm-2 col-form-label">Category Name:</label>
+      <div class="col-sm-3">
+        <select id="category" class="form-control" name="category" required title="Category">
+            <option value="">Select Category ...</option>
+            <option value="1" @if('1' == $liveCourse->category_id ) selected @endif>Technology</option>
+            <option value="2" @if('2' == $liveCourse->category_id ) selected @endif>Science</option>
+        </select>
+        @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('course')) has-error @endif">
       <label for="course" class="col-sm-2 col-form-label">Course Name:</label>
       <div class="col-sm-3">
         @if(isset($liveCourse->id))
-          <input type="text" class="form-control" name="course" value="{{$liveCourse->name}}" required="true">
+          <input type="text" class="form-control" name="course" id="course" value="{{$liveCourse->name}}" required="true">
         @else
-          <input type="text" class="form-control" name="course" value="" placeholder="Course Name" required="true">
+          <input type="text" class="form-control" name="course" id="course" value="" placeholder="Course Name" required="true">
         @endif
         @if($errors->has('course')) <p class="help-block">{{ $errors->first('course') }}</p> @endif
+        <span class="hide" id="courseError" style="color: white;">Given name is already exist.Please enter another name.</span>
       </div>
     </div>
     <div class="form-group row @if ($errors->has('author')) has-error @endif">
@@ -86,17 +98,7 @@
         @if($errors->has('description')) <p class="help-block">{{ $errors->first('description') }}</p> @endif
       </div>
     </div>
-    <div class="form-group row @if ($errors->has('category')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Category Name:</label>
-      <div class="col-sm-3">
-        <select id="category" class="form-control" name="category" required title="Category">
-            <option value="">Select Category ...</option>
-            <option value="1" @if('1' == $liveCourse->category_id ) selected @endif>Technology</option>
-            <option value="2" @if('2' == $liveCourse->category_id ) selected @endif>Science</option>
-        </select>
-        @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
-      </div>
-    </div>
+
     <div class="form-group row @if ($errors->has('difficulty_level')) has-error @endif">
       <label class="col-sm-2 col-form-label">Difficulty Level:</label>
       <div class="col-sm-3">
@@ -173,10 +175,39 @@
     </div>
     <div class="form-group row">
         <div class="offset-sm-2 col-sm-3" title="Submit">
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+          <button type="button" class="btn btn-primary" onclick="searchCourse();">Submit</button>
         </div>
       </div>
   </div>
 </form>
-
+<script type="text/javascript">
+  function searchCourse(){
+    var category = document.getElementById('category').value;
+    var live_course = document.getElementById('course').value;
+    if(document.getElementById('live_course_id')){
+      var courseId = document.getElementById('live_course_id').value;
+    } else {
+      var courseId = 0;
+    }
+    if(live_course){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isLiveCourseExist')}}",
+        data:{category:category,live_course:live_course,live_course_id:courseId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('courseError').classList.remove('hide');
+          document.getElementById('courseError').classList.add('has-error');
+        } else {
+          document.getElementById('courseError').classList.add('hide');
+          document.getElementById('courseError').classList.remove('has-error');
+          document.getElementById('submitForm').submit();
+        }
+      });
+    } else {
+      alert('please enter name.');
+    }
+  }
+</script>
 @stop

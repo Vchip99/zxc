@@ -2,10 +2,10 @@
   &nbsp;
   @section('module_title')
   <section class="content-header">
-    <h1> Manage Workshop Details </h1>
+    <h1> Manage Motivational Speech Details </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-link"></i> Offline Workshop </li>
-      <li class="active"> Manage Workshop Details </li>
+      <li><i class="fa fa-microphone"></i> Motivational Speech </li>
+      <li class="active"> Manage Motivational Speech Details </li>
     </ol>
   </section>
 @stop
@@ -13,21 +13,21 @@
     <script src="{{asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
   <div class="container admin_div">
   @if(isset($motivationalSpeechDetail->id))
-    <form action="{{url('admin/updateMotivationalSpeechDetails')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/updateMotivationalSpeechDetails')}}" method="POST" enctype="multipart/form-data" id="submitForm">
     {{method_field('PUT')}}
     <input type="hidden" id="motivational_speech_id" name="motivational_speech_id" value="{{$motivationalSpeechDetail->id}}">
   @else
-    <form action="{{url('admin/createMotivationalSpeechDetails')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/createMotivationalSpeechDetails')}}" method="POST" enctype="multipart/form-data" id="submitForm">
   @endif
     {{ csrf_field() }}
     <div class="form-group row @if ($errors->has('category')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Category Name:</label>
+      <label class="col-sm-2 col-form-label">Speaker Name:</label>
       <div class="col-sm-3">
         @if(count($motivationalSpeechCategories) > 0 && isset($motivationalSpeechDetail->id))
           @foreach($motivationalSpeechCategories as $motivationalSpeechCategory)
             @if( isset($motivationalSpeechDetail->id) && $motivationalSpeechDetail->motivational_speech_category_id == $motivationalSpeechCategory->id)
               <input type="text" class="form-control" name="category_text" value="{{$motivationalSpeechCategory->name}}" readonly="true">
-              <input type="hidden" name="category" value="{{$motivationalSpeechCategory->id}}">
+              <input type="hidden" name="category" id="category" value="{{$motivationalSpeechCategory->id}}">
             @endif
           @endforeach
         @else
@@ -46,18 +46,15 @@
       </div>
     </div>
      <div class="form-group row @if ($errors->has('name')) has-error @endif">
-      <label for="name" class="col-sm-2 col-form-label">Motivational Speech Name:</label>
+      <label for="name" class="col-sm-2 col-form-label">Speech Name:</label>
       <div class="col-sm-3">
-        @if(isset($motivationalSpeechDetail->id))
-          <input type="text" class="form-control" name="name" value="{{$motivationalSpeechDetail->name}}" readonly="true">
-        @else
-          <input type="text" class="form-control" name="name" value="" placeholder="Name" required="true">
-        @endif
+        <input type="text" class="form-control" name="name" id="motivational_speech" value="{{$motivationalSpeechDetail->name}}" required="true">
         @if($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
+        <span class="hide" id="speechError" style="color: white;">Given name is already exist with selected speaker.Please enter another name.</span>
       </div>
     </div>
     <div class="form-group row @if ($errors->has('about')) has-error @endif">
-      <label for="course" class="col-sm-2 col-form-label">About Motivational Speech:</label>
+      <label for="course" class="col-sm-2 col-form-label">About Speaker:</label>
       <div class="col-sm-10">
         <textarea name="about" cols="60" rows="4" id="about" placeholder="About Motivational Speech" required>
           @if(isset($motivationalSpeechDetail->id))
@@ -85,7 +82,7 @@
       </div>
     </div>
     <div class="form-group row @if ($errors->has('about_image')) has-error @endif">
-      <label class="col-sm-2 col-form-label" for="about_image">About Motivational Speech Image:</label>
+      <label class="col-sm-2 col-form-label" for="about_image">Speaker Image:</label>
       <div class="col-sm-3">
         <input type="file" class="form-control"  name="about_image" id="about_image" >
         @if($errors->has('about_image')) <p class="has-error">{{ $errors->first('about_image') }}</p> @endif
@@ -152,7 +149,7 @@
     </div>
     <div class="form-group row">
         <div class="offset-sm-2 col-sm-3" title="Submit">
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-primary" onclick="searchSpeach();">Submit</button>
         </div>
       </div>
   </div>
@@ -237,6 +234,37 @@
       if(childBr){
         parent.removeChild(childBr);
       }
+  }
+
+  function searchSpeach(){
+    var category = document.getElementById('category').value;
+    var speech = document.getElementById('motivational_speech').value;
+
+    if(document.getElementById('motivational_speech_id')){
+      var speechId = document.getElementById('motivational_speech_id').value;
+    } else {
+      var speechId = 0;
+    }
+    if(category && speech){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isMotivationalSpeechExist')}}",
+        data:{category:category,speech:speech,motivational_speech_id:speechId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('speechError').classList.remove('hide');
+          document.getElementById('speechError').classList.add('has-error');
+        } else {
+          document.getElementById('speechError').classList.add('hide');
+          document.getElementById('speechError').classList.remove('has-error');
+          document.getElementById('submitForm').submit();
+        }
+      });
+    } else if(!category){
+      alert('please select speaker.');
+    } else {
+      alert('please enter name.');
+    }
   }
 </script>
 @stop

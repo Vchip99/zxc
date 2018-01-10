@@ -136,4 +136,22 @@ class TestSubject extends Model
     public function papers(){
         return $this->hasMany(TestSubjectPaper::class, 'test_subject_id');
     }
+
+    protected static function isTestSubjectExist(Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        $subjectName = InputSanitise::inputString($request->get('subject'));
+        $subjectId = InputSanitise::inputInt($request->get('subject_id'));
+        $result = static::where('test_category_id', $categoryId)->where('test_sub_category_id', $subcategoryId)->where('name', $subjectName);
+        if(!empty($subjectId)){
+            $result->where('id', '!=', $subjectId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+        return 'false';
+    }
 }

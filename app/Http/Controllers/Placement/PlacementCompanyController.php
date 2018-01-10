@@ -166,4 +166,7 @@ class PlacementCompanyController extends Controller
         return Redirect::to('admin/managePlacementCompany');
     }
 
+    protected function isPlacementCompanyExist(Request $request){
+        return PlacementCompany::isPlacementCompanyExist($request);
+    }
 }

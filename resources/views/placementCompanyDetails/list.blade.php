@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Manage Placement Company Details</h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-link"></i> Placement </li>
+      <li><i class="fa fa-gift"></i> Placement </li>
       <li class="active"> Manage Placement Company Details</li>
     </ol>
   </section>

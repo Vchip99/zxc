@@ -190,4 +190,8 @@ class VkitProjectController extends Controller
         }
         return Redirect::to('admin/manageVkitProject');
     }
+
+    protected function isVkitProjectExist(Request $request){
+        return VkitProject::isVkitProjectExist($request);
+    }
 }

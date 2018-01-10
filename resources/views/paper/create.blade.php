@@ -15,11 +15,11 @@
   &nbsp;
   <div class="container admin_div">
   @if(isset($paper->id))
-    <form action="{{url('admin/updatePaper')}}" method="POST">
+    <form action="{{url('admin/updatePaper')}}" method="POST" id="submitForm">
     {{method_field('PUT')}}
     <input type="hidden" name="paper_id" id="paper_id" value="{{$paper->id}}">
   @else
-    <form action="{{url('admin/createPaper')}}" method="POST">
+    <form action="{{url('admin/createPaper')}}" method="POST" id="submitForm">
   @endif
     {{ csrf_field() }}
   <div class="form-group row @if ($errors->has('category')) has-error @endif">
@@ -84,11 +84,12 @@
     <label for="name" class="col-sm-2 col-form-label">Paper Name:</label>
     <div class="col-sm-3">
       @if(isset($paper->id))
-        <input type="text" class="form-control" name="name" value="{{$paper->name}}" placeholder="paper name" required="true">
+        <input type="text" class="form-control" name="name" id="paper" value="{{$paper->name}}" placeholder="paper name" required="true">
       @else
-        <input type="text" class="form-control" name="name" value="" placeholder="paper name" required="true">
+        <input type="text" class="form-control" name="name" id="paper" value="" placeholder="paper name" required="true">
       @endif
       @if($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
+      <span class="hide" id="paperError" style="color: white;">Given name is already exist with selected category, sub category and subject.Please enter another name.</span>
     </div>
   </div>
   <div class="form-group row @if ($errors->has('price')) has-error @endif">
@@ -229,7 +230,7 @@
   </div>
   <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-primary" onclick="searchPaper();">Submit</button>
       </div>
     </div>
   </div>
@@ -408,5 +409,40 @@
         document.getElementById('selected_time_out').value = 0;
       }
     });
+    function searchPaper(){
+      var category = document.getElementById('category').value;
+      var subcategory = document.getElementById('subcategory').value;
+      var subject = document.getElementById('subject').value;
+      var paper = document.getElementById('paper').value;
+      if(document.getElementById('paper_id')){
+        var paperId = document.getElementById('paper_id').value;
+      } else {
+        var paperId = 0;
+      }
+      if(category && subcategory && subject && paper){
+        $.ajax({
+          method:'POST',
+          url: "{{url('admin/isTestPaperExist')}}",
+          data:{category:category,subcategory:subcategory,subject:subject,paper:paper,paper_id:paperId}
+        }).done(function( msg ) {
+          if('true' == msg){
+            document.getElementById('paperError').classList.remove('hide');
+            document.getElementById('paperError').classList.add('has-error');
+          } else {
+            document.getElementById('paperError').classList.add('hide');
+            document.getElementById('paperError').classList.remove('has-error');
+            document.getElementById('submitForm').submit();
+          }
+        });
+      } else if(!category){
+        alert('please select category.');
+      } else if(!subcategory){
+        alert('please select subcategory.');
+      } else if(!subject){
+        alert('please select subject.');
+      } else if(!paper){
+        alert('please enter paper name.');
+      }
+    }
 </script>
 @stop

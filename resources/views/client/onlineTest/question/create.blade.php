@@ -477,7 +477,13 @@
 		    <div class="form-group row mcq_ans">
 		    	<label class="col-sm-2 col-form-label">Enter True Answer No:</label>
 			    <div class="col-sm-3">
-			      	<input class="form-control"  name="answer" type="text" placeholder="True Answer" id="answer" value="@if(isset($testQuestion->id)) {!! $testQuestion->answer !!} @endif" required>
+			      	<input class="form-control"  name="answer" type="number" placeholder="True Answer" id="answer" value="{{$testQuestion->answer}}" min="1" max="5" required="true">
+			      	<div class="hide" role="alert" id="answer_error">
+			    		<p>Answer number in between 1 to 5.</p>
+					</div>
+					<div class="hide" role="alert" id="empty_answer_error">
+			    		<p>Please enter answer.</p>
+					</div>
 			    </div>
 			    <label class="col-sm-4 col-form-label">Ex. 1 or 2 or 3 or 4 or 5 ( if have )</label>
 		    </div>
@@ -524,20 +530,26 @@
 		    <div class="form-group row @if ($errors->has('pos_marks')) has-error @endif">
 		    	<label class="col-sm-2 col-form-label">Enter Positive Marks:</label>
 			    <div class="col-sm-3">
-			      	<input class="form-control" name="pos_marks" type="text" placeholder="Positive Marks" id="pos_marks" value="@if(isset($testQuestion->id)) {!! $testQuestion->positive_marks !!} @endif" required="true">
+			      	<input class="form-control" name="pos_marks" type="number" placeholder="Positive Marks" id="pos_marks" value="{{$testQuestion->positive_marks}}" step="1">
 			      	@if($errors->has('pos_marks')) <p class="help-block">{{ $errors->first('pos_marks') }}</p> @endif
 			      	<div class="hide" role="alert" id="pos_marks_error">
 			    		<p>Please enter positive marks.</p>
+					</div>
+					<div class="hide" role="alert" id="pos_num_error">
+			    		<p>Number should be positive.</p>
 					</div>
 			    </div>
 		    </div>
 		    <div class="form-group row @if ($errors->has('neg_marks')) has-error @endif">
 		    	<label class="col-sm-2 col-form-label">Enter Negative Marks:</label>
 			    <div class="col-sm-3">
-			      	<input class="form-control" name="neg_marks" type="text" placeholder="Negative Marks" id="neg_marks" required="true"@if(isset($testQuestion->id)) value="{!! $testQuestion->negative_marks !!}"@endif />
+			      	<input class="form-control" name="neg_marks" type="number" placeholder="Negative Marks" id="neg_marks" value="{{$testQuestion->negative_marks}}" min="0" step="0.001" />
 			      	@if($errors->has('neg_marks')) <p class="help-block">{{ $errors->first('neg_marks') }}</p> @endif
 			      	<div class="hide" role="alert" id="neg_marks_error">
 			    		<p>Please enter negative marks.</p>
+					</div>
+					<div class="hide" role="alert" id="neg_num_error">
+			    		<p>Number should be positive.</p>
 					</div>
 			    </div>
 		    </div>
@@ -687,18 +699,46 @@ ul#ul > li > a:hover:not(.active) {
 			$('#neg_marks_error').removeClass('hide');
 			$('#neg_marks_error').addClass('alert alert-danger');
 			errorCount += 1;
+		} else if(neg_marks < 0){
+			$('#neg_num_error').removeClass('hide');
+			$('#neg_num_error').addClass('alert alert-danger');
+			errorCount += 1;
 		} else{
 			$('#neg_marks_error').addClass('hide');
 			$('#neg_marks_error').removeClass('alert alert-danger');
+			$('#neg_num_error').addClass('hide');
+			$('#neg_num_error').removeClass('alert alert-danger');
 		}
 		var pos_marks= document.getElementById('pos_marks').value;
 		if( "" === pos_marks){
 			$('#pos_marks_error').removeClass('hide');
 			$('#pos_marks_error').addClass('alert alert-danger');
 			errorCount += 1;
+		} else if( pos_marks < 0){
+			$('#pos_num_error').removeClass('hide');
+			$('#pos_num_error').addClass('alert alert-danger');
+			errorCount += 1;
 		} else{
 			$('#pos_marks_error').addClass('hide');
 			$('#pos_marks_error').removeClass('alert alert-danger');
+			$('#pos_num_error').addClass('hide');
+			$('#pos_num_error').removeClass('alert alert-danger');
+		}
+
+		var answerNum= document.getElementById('answer').value;
+		if( "" == answerNum){
+			$('#empty_answer_error').removeClass('hide');
+			$('#empty_answer_error').addClass('alert alert-danger');
+			errorCount += 1;
+		}else if( answerNum >= 6){
+			$('#answer_error').removeClass('hide');
+			$('#answer_error').addClass('alert alert-danger');
+			errorCount += 1;
+		} else{
+			$('#answer_error').addClass('hide');
+			$('#answer_error').removeClass('alert alert-danger');
+			$('#empty_answer_error').addClass('hide');
+			$('#empty_answer_error').removeClass('alert alert-danger');
 		}
 		if( 0 == errorCount){
 			var form = document.getElementById('createForm');

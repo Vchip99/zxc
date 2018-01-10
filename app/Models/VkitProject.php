@@ -224,4 +224,20 @@ class VkitProject extends Model
         }
     }
 
+    protected static function isVkitProjectExist(Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $projectName = InputSanitise::inputString($request->get('project'));
+        $projectId = InputSanitise::inputInt($request->get('project_id'));
+        $result = static::where('category_id', $categoryId)->where('name', $projectName);
+        if(!empty($projectId)){
+            $result->where('id', '!=', $projectId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+        return 'false';
+    }
 }

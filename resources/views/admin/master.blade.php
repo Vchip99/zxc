@@ -330,7 +330,7 @@
               </span>
             </a>
             <ul class="treeview-menu">
-              <li title="Motivational Speech Category"><a href="{{ url('admin/manageMotivationalSpeechCategory')}}"><i class="fa fa-circle-o"></i> Motivational Category </a></li>
+              <li title="Motivational Speech Speaker"><a href="{{ url('admin/manageMotivationalSpeechCategory')}}"><i class="fa fa-circle-o"></i> Motivational Speaker </a></li>
               <li title="Motivational Speech Details"><a href="{{ url('admin/manageMotivationalSpeechDetails')}}"><i class="fa fa-circle-o"></i> Motivational Details </a></li>
               <li title="Motivational Videos"><a href="{{ url('admin/manageMotivationalSpeechVideos')}}"><i class="fa fa-circle-o"></i> Motivational Videos </a></li>
             </ul>

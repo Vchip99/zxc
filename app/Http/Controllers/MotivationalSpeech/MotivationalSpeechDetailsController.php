@@ -153,4 +153,8 @@ class MotivationalSpeechDetailsController extends Controller
         }
         return Redirect::to('admin/manageMotivationalSpeechDetails');
     }
+
+    protected function isMotivationalSpeechExist(Request $request){
+        return MotivationalSpeechDetail::isMotivationalSpeechExist($request);
+    }
 }

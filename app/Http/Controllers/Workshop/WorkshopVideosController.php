@@ -149,4 +149,7 @@ class WorkshopVideosController extends Controller
         }
         return Redirect::to('admin/manageWorkshopVideos');
     }
+    protected function isOnlineWorkshopVideoExist(Request $request){
+        return WorkshopVideo::isOnlineWorkshopVideoExist($request);
+    }
 }

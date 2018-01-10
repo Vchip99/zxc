@@ -172,4 +172,8 @@ class CourseVideoController extends Controller
     	}
     	return Redirect::to('admin/manageCourseVideo');
     }
+
+    protected function isCourseVideoExist(Request $request){
+        return CourseVideo::isCourseVideoExist($request);
+    }
 }

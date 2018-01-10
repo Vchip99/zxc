@@ -189,4 +189,8 @@ class PaperController extends Controller
     public function getPaperSectionsByPaperId(Request $request){
         return PaperSection::where('test_subject_paper_id', $request->get('paper_id'))->get();
     }
+
+    protected function isTestPaperExist(Request $request){
+        return TestSubjectPaper::isTestPaperExist($request);
+    }
 }

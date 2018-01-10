@@ -19,7 +19,7 @@ class DocumentsDoc extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'author', 'introduction', 'doc_category_id','is_paid', 'price', 'difficulty_level','type_of_document', 'date_of_update', 'doc_image', 'doc_pdf'];
+    protected $fillable = ['name', 'author', 'introduction', 'doc_category_id','price', 'difficulty_level','type_of_document', 'date_of_update', 'doc_image', 'doc_pdf'];
 
     /**
      *  create/update document
@@ -29,7 +29,6 @@ class DocumentsDoc extends Model
         $documentAuthor = InputSanitise::inputString($request->get('author'));
         $documentIntroduction = InputSanitise::inputString($request->get('introduction'));
         $documentCategoryId = InputSanitise::inputInt($request->get('doc_category_id'));
-        $documentIsPaid = InputSanitise::inputInt($request->get('is_paid'));
         $documentPrice = strip_tags(trim($request->get('price')));
         $documentDifficultyLevel = InputSanitise::inputInt($request->get('difficulty_level'));
         $documentTypeOfDocument = InputSanitise::inputInt($request->get('type_of_document'));
@@ -76,7 +75,6 @@ class DocumentsDoc extends Model
         $documentsDoc->author = $documentAuthor;
         $documentsDoc->introduction = $documentIntroduction;
         $documentsDoc->doc_category_id = $documentCategoryId;
-        $documentsDoc->is_paid = $documentIsPaid;
         $documentsDoc->difficulty_level = $documentDifficultyLevel;
         $documentsDoc->type_of_document = $documentTypeOfDocument;
         $documentsDoc->date_of_update = $documentDateOfUpdate;
@@ -206,4 +204,19 @@ class DocumentsDoc extends Model
         }
     }
 
+    protected static function isDocumentDocExist(Request $request){
+        $category = InputSanitise::inputInt($request->get('category'));
+        $documentId = InputSanitise::inputInt($request->get('document_id'));
+        $documentName = InputSanitise::inputString($request->get('document'));
+        $result = static::where('doc_category_id', $category)->where('name', $documentName);
+        if(!empty($documentId)){
+            $result->where('id', '!=', $documentId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

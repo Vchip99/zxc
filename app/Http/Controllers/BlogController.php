@@ -331,6 +331,7 @@ class BlogController extends Controller
             $blogComments['comments'][$comment->id]['user_name'] = $comment->user->name;
             $blogComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
             $blogComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
+            $blogComments['comments'][$comment->id]['image_exist'] = is_file($comment->user->photo);
             if(is_object($comment->children) && false == $comment->children->isEmpty()){
                 $blogComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
             }
@@ -356,6 +357,7 @@ class BlogController extends Controller
             $blogChildComments[$subComment->id]['user_id'] = $subComment->user_id;
             $blogChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
             $blogChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
+            $blogChildComments[$subComment->id]['image_exist'] = is_file($subComment->user->photo);
             if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
                 $blogChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
             }

@@ -42,4 +42,19 @@ class OfflineWorkshopCategory extends Model
     protected static function getWorkshopCategory(){
         return static::join('offline_workshop_details', 'offline_workshop_details.offline_workshop_category_id', '=', 'offline_workshop_categories.id')->select('offline_workshop_categories.*')->groupBy('offline_workshop_categories.id')->get();
     }
+
+    protected static function isOfflineWorkshopCategoryExist(Request $request){
+        $category = InputSanitise::inputString($request->get('category'));
+        $categoryId   = InputSanitise::inputInt($request->get('category_id'));
+        $result = static::where('name', '=',$category);
+        if(!empty($categoryId)){
+            $result->where('id', '!=', $categoryId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

@@ -281,4 +281,22 @@ class CourseCourse extends Model
         }
     }
 
+    protected static function isCourseCourseExist($request){
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        $courseName = InputSanitise::inputString($request->get('course'));
+        $courseId = InputSanitise::inputInt($request->get('course_id'));
+        $result = static::where('course_category_id', $categoryId)->where('course_sub_category_id', $subcategoryId)->where('name', $courseName);
+        if(!empty($courseId)){
+            $result->where('id', '!=', $courseId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+        return 'false';
+    }
+
 }

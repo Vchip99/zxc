@@ -15,22 +15,63 @@
     <link href="{{asset('css/bootstrap-datetimepicker.min.css?ver=1.0')}}" rel="stylesheet"/>
   <div class="container admin_div">
   @if(isset($course->id))
-    <form action="{{url('admin/updateCourseCourse')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/updateCourseCourse')}}" method="POST" enctype="multipart/form-data" id="submitForm">
     {{method_field('PUT')}}
     <input type="hidden" id="course_id" name="course_id" value="{{$course->id}}">
   @else
-    <form action="{{url('admin/createCourseCourse')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/createCourseCourse')}}" method="POST" enctype="multipart/form-data" id="submitForm">
   @endif
     {{ csrf_field() }}
-     <div class="form-group row @if ($errors->has('course')) has-error @endif">
+    <div class="form-group row @if ($errors->has('category')) has-error @endif">
+      <label class="col-sm-2 col-form-label">Category Name:</label>
+      <div class="col-sm-3">
+        <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
+            <option value="0">Select Category ...</option>
+            @if(count($courseCategories) > 0)
+              @foreach($courseCategories as $courseCategory)
+                @if( isset($course->id) && $course->course_category_id == $courseCategory->id)
+                  <option value="{{$courseCategory->id}}" selected="true">{{$courseCategory->name}}</option>
+                @else
+                  <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
+                @endif
+              @endforeach
+            @endif
+        </select>
+        @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
+      <label class="col-sm-2 col-form-label">Sub Category Name:</label>
+      <div class="col-sm-3">
+        @if(isset($course->id) && count($courseSubCategories) > 0)
+          <select id="subcategory" class="form-control" name="subcategory" required title="Sub Category">
+            <option value="0">Select Sub Category ...</option>
+            @foreach($courseSubCategories as $courseSubCategory)
+              @if($course->course_sub_category_id == $courseSubCategory->id)
+                <option value="{{$courseSubCategory->id}}" selected="true">{{$courseSubCategory->name}}</option>
+              @else
+                <option value="{{$courseSubCategory->id}}">{{$courseSubCategory->name}}</option>
+              @endif
+            @endforeach
+          </select>
+        @else
+          <select id="subcategory" class="form-control" name="subcategory" required title="Sub Category">
+            <option value="0">Select Sub Category ...</option>
+          </select>
+        @endif
+        @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('course')) has-error @endif">
       <label for="course" class="col-sm-2 col-form-label">Course Name:</label>
       <div class="col-sm-3">
         @if(isset($course->id))
-          <input type="text" class="form-control" name="course" value="{{$course->name}}" required="true">
+          <input type="text" class="form-control" name="course" id="course" value="{{$course->name}}" required="true">
         @else
-          <input type="text" class="form-control" name="course" value="" placeholder="Course Name" required="true">
+          <input type="text" class="form-control" name="course" id="course" value="" placeholder="Course Name" required="true">
         @endif
         @if($errors->has('course')) <p class="help-block">{{ $errors->first('course') }}</p> @endif
+        <span class="hide" id="courseError" style="color: white;">Given name is already exist with selected category and subcategory.Please enter another name.</span>
       </div>
     </div>
     <div class="form-group row @if ($errors->has('author')) has-error @endif">
@@ -87,33 +128,6 @@
         @if($errors->has('price')) <p class="help-block">{{ $errors->first('price') }}</p> @endif
       </div>
     </div>
-    <div class="form-group row @if ($errors->has('category')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Category Name:</label>
-      <div class="col-sm-3">
-        <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-            <option value="0">Select Category ...</option>
-            @if(count($courseCategories) > 0)
-              @foreach($courseCategories as $courseCategory)
-                @if( isset($course->id) && $course->course_category_id == $courseCategory->id)
-                  <option value="{{$courseCategory->id}}" selected="true">{{$courseCategory->name}}</option>
-                @else
-                  <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
-                @endif
-              @endforeach
-            @endif
-        </select>
-        @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
-      </div>
-    </div>
-    <div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Sub Category Name:</label>
-      <div class="col-sm-3">
-        <select id="subcategory" class="form-control" name="subcategory" required title="Sub Category">
-          <option value="0">Select Sub Category ...</option>
-        </select>
-        @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
-      </div>
-    </div>
     <div class="form-group row @if ($errors->has('difficulty_level')) has-error @endif">
       <label class="col-sm-2 col-form-label">Difficulty Level:</label>
       <div class="col-sm-3">
@@ -162,7 +176,7 @@
     </div>
     <div class="form-group row">
         <div class="offset-sm-2 col-sm-3" title="Submit">
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-primary" onclick="searchCourse();">Submit</button>
         </div>
       </div>
   </div>
@@ -203,12 +217,45 @@
     var id = parseInt($(ele).val());
     getCourseSubCategories(id);
   }
-  $(document).ready(function(){
-    var course = document.getElementById('course_id');
-    if( course && 0 < parseInt(course.value)){
-        categoryId = parseInt(document.getElementById('category').value);
-        getCourseSubCategories(categoryId);
+  // $(document).ready(function(){
+  //   var course = document.getElementById('course_id');
+  //   if( course && 0 < parseInt(course.value)){
+  //       categoryId = parseInt(document.getElementById('category').value);
+  //       getCourseSubCategories(categoryId);
+  //   }
+  // });
+
+  function searchCourse(){
+    var category = document.getElementById('category').value;
+    var subcategory = document.getElementById('subcategory').value;
+    var course = document.getElementById('course').value;
+    if(document.getElementById('course_id')){
+      var courseId = document.getElementById('course_id').value;
+    } else {
+      var courseId = 0;
     }
-  });
+    if(category && subcategory && course){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isCourseCourseExist')}}",
+        data:{category:category,subcategory:subcategory,course:course,course_id:courseId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('courseError').classList.remove('hide');
+          document.getElementById('courseError').classList.add('has-error');
+        } else {
+          document.getElementById('courseError').classList.add('hide');
+          document.getElementById('courseError').classList.remove('has-error');
+          document.getElementById('submitForm').submit();
+        }
+      });
+    } else if(!category){
+      alert('please select category.');
+    } else if(!subcategory){
+      alert('please select subcategory.');
+    } else if(!course){
+      alert('please enter name.');
+    }
+  }
 </script>
 @stop

@@ -38,33 +38,31 @@ class ClientOnlineTestQuestion extends Model
         $ans5 = '';
         $solution = '';
         $commonData = '';
-        $newInstance = new static;
 
         if(1 == $request->get('check_common_data') && !empty($request->get('common_data'))){
-            $commonData = $newInstance->changeSrc($request->get('common_data'));
+            $commonData = $request->get('common_data');
         }
-        $question = $newInstance->changeSrc($request->get('question'));
-// dd(0 == $request->get('ans1'));
+        $question = $request->get('question');
         if(!empty($request->get('ans1')) || 0 == $request->get('ans1')){
-            $ans1 = $newInstance->changeSrc($request->get('ans1'));
+            $ans1 = $request->get('ans1');
         }
         if(!empty($request->get('ans2')) || 0 == $request->get('ans2')){
-            $ans2 = $newInstance->changeSrc($request->get('ans2'));
+            $ans2 = $request->get('ans2');
         }
         if(!empty($request->get('ans3')) || 0 == $request->get('ans3')){
-            $ans3 = $newInstance->changeSrc($request->get('ans3'));
+            $ans3 = $request->get('ans3');
         }
         if(!empty($request->get('ans4')) || 0 == $request->get('ans4')){
-            $ans4 = $newInstance->changeSrc($request->get('ans4'));
+            $ans4 = $request->get('ans4');
         }
         if(!empty($request->get('ans5')) || 0 == $request->get('ans5')){
-            $ans5 = $newInstance->changeSrc($request->get('ans5'));
+            $ans5 = $request->get('ans5');
         }
         if(!empty($request->get('solution')) || 0 == $request->get('solution')){
-            $solution = $newInstance->changeSrc($request->get('solution'));
+            $solution = $request->get('solution');
         }
 
-        $answer = InputSanitise::inputString($request->get('answer'));
+        $answer = $request->get('answer');
         $question_type = InputSanitise::inputInt($request->get('question_type'));
         $section_type = InputSanitise::inputInt($request->get('section_type'));
         $pos_marks = trim($request->get('pos_marks'));
@@ -111,29 +109,6 @@ class ClientOnlineTestQuestion extends Model
         $testQuestion->common_data = $commonData;
         $testQuestion->save();
         return $testQuestion;
-    }
-
-    protected function changeSrc($question){
-        $formatedQuestion = '';
-        if(preg_match('/src=\"/',$question)){
-            $contents   = explode("src=\"" , $question);
-            if(count($contents) > 0){
-                foreach($contents as  $index => $content) {
-                    if(strstr($content, '/templateEditor') && !strstr($content, asset(''))){
-                        $formatedQuestion .= 'src="'.rtrim(asset(''),'/') . $content;
-                    } else {
-                        if( 0 == $index && strstr($content, '<img alt=""')){
-                            $formatedQuestion .= $content;
-                        } else {
-                            $formatedQuestion .= 'src="'.$content;
-                        }
-                    }
-                }
-            }
-        } else {
-            $formatedQuestion = $question;
-        }
-        return $formatedQuestion;
     }
 
     protected static function getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type){

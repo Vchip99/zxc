@@ -44,7 +44,7 @@
         {{ Session::get('message') }}
     </div>
   @endif
-<section id="topic" class="v_container v_bg_grey">
+<section id="topic" class="v_container">
   <div class="container">
     <div class="row">
       <div class="col-md-12 workshop_detail v_bg_white">
@@ -53,7 +53,7 @@
         <input id="tab2" type="radio" name="tabs">
         <label for="tab2">Topic</label>
         <input id="tab3" type="radio" name="tabs">
-        <label for="tab3">video</label>
+        <label for="tab3">Video</label>
         <section id="content1">
           <div class="col-md-12 workshop_tital">
               <h2 class="v_h3_title">About speaker</h2>
@@ -62,7 +62,11 @@
               <div class="col-sm-4 col-sm-push-8 detail_img ">
                 <img src="{{ asset($motivationalSpeechDetail->about_image) }}" class="img-responsive" alt="motivational speech" />
               </div>
-              <div class="col-sm-8 col-sm-pull-4">{{ $motivationalSpeechDetail->about }}</div>
+              <div class="col-sm-8 col-sm-pull-4">
+                <ul class="ul_custom">
+                  {!! $motivationalSpeechDetail->about !!}
+                </ul>
+              </div>
             </div>
         </section>
         <section id="content2">
@@ -70,7 +74,7 @@
               <h2 class="v_h3_title">Topic</h2>
            </div>
             <div class="col-md-12 workshop_detail">
-               <ul class="ul_custom">{{ $motivationalSpeechDetail->topics }}
+               <ul class="ul_custom">{!! $motivationalSpeechDetail->topics !!}
                </ul>
             </div>
         </section>
@@ -96,14 +100,16 @@
     </div>
   </div>
 </section>
-<section id="" class="v_container ">
+<section id="" class="v_container v_bg_grey">
   <div class="container">
     <div class="row">
       <div class="col-md-12 workshop_tital">
         <h2 class="v_h3_title">detail about how the program will arrange</h2>
       </div>
       <div class="col-md-12 workshop_detail">
-        {{ $motivationalSpeechDetail->program_details }}
+        <ul class="ul_custom">
+          {!! $motivationalSpeechDetail->program_details !!}
+        </ul>
       </div>
     </div>
   </div>
@@ -120,7 +126,7 @@
         <div class="hover-img" data-toggle="modal" data-target="#collegeModal">
           <img src="{{asset('images/workshop/college.jpg')}}" class="img-responsive" alt="workshop" />
           <figcaption>
-            <h3>COLLEGE WORKSHOP</h3>
+            <h3>COLLEGE</h3>
             <p>To Organise College  Motivational Speach</p>
           </figcaption>
           <a><b>Click </b></a>
@@ -130,7 +136,7 @@
         <div class="hover-img" data-toggle="modal" data-target="#corporateModal">
           <img src="{{asset('images/workshop/corporate.jpg')}}" class="img-responsive" alt="workshop" />
           <figcaption>
-            <h3>Corporate Workshop</h3>
+            <h3>Corporate</h3>
             <p>To Organise Industry  Motivational Speach</p>
           </figcaption>
           <a><b>Click </b></a>
@@ -167,8 +173,8 @@
                   <input type="text" class="form-control" name="mobile" name="mobile" placeholder="Mobile Number" required="required" />
               </div>
               <div class="form-group">
-                  <label for="name">Organization Name</label>
-                  <input type="text" class="form-control" name="org_name" placeholder="Enter Organization Name"  />
+                  <label for="name">College Name</label>
+                  <input type="text" class="form-control" name="org_name" placeholder="Enter College Name"  />
               </div>
                <div class="form-group">
                   <label for="name">Query</label>
@@ -248,9 +254,11 @@
                       <div class="caption">
                         <div class="blur"></div>
                         <div class="caption-text">
-                          <h3 class="ellipsed" title="{{ $motivationalSpeech->name }}">{{ $motivationalSpeech->name }} </h3>
+                          <h3 class="ellipsed" title="{{ $motivationalSpeech->name }}">
+                            <a href="{{ url('motivationalSpeechDetails')}}/{{$motivationalSpeech->id }}">{{ $motivationalSpeech->name }} </a>
+                          </h3>
                           <hr class="hr" />
-                          <p >{!!  substr($motivationalSpeech->about, 0, 40) !!} ...</p>
+                          <p >{!!  substr($motivationalSpeech->about, 0, 60) !!} ...</p>
                         </div>
                       </div>
                       <a href="{{ url('motivationalSpeechDetails')}}/{{$motivationalSpeech->id }}"> Read More</a>

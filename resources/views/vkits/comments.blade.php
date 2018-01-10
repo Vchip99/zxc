@@ -1,6 +1,6 @@
 @foreach($comments as $subcomment)
 	<div class="item replySubComment-1">
-	  	@if(!empty($subcomment->user->photo))
+	  	@if(is_file($subcomment->user->photo))
 	        <img src="{{ asset($subcomment->user->photo)}} " class="img-circle" alt="User Image">
       	@else
 	        <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -22,7 +22,7 @@
 		      	</ul>
 	    	</div>
 	    	@endif
-		    	<p><a class="SubCommentName">{{ $user->find($subcomment->user_id)->name }}</a>
+		    	<p><a class="SubCommentName"><i>{{ $user->find($subcomment->user_id)->name }}</i></a>
 		    	<span class="more" id="editSubCommentHide_{{$subcomment->id}}">
 		    	{!! $subcomment->body !!}
 		    	</span></p>

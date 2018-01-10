@@ -2,10 +2,10 @@
   &nbsp;
   @section('module_title')
   <section class="content-header">
-    <h1> Manage Workshop Details </h1>
+    <h1> Manage Motivational Video </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-link"></i> Offline Workshop </li>
-      <li class="active"> Manage Workshop Details </li>
+      <li><i class="fa fa-microphone"></i> Motivational Speech </li>
+      <li class="active"> Manage Motivational Video </li>
     </ol>
   </section>
 @stop

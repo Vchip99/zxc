@@ -217,7 +217,7 @@ hr{
                     @if(count( $comments) > 0)
                       @foreach($comments as $comment)
                         <div class="item" id="showComment_{{$comment->id}}">
-                          @if(!empty($comment->user->photo))
+                          @if(is_file($comment->user->photo))
                             <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
                           @else
                             <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -467,7 +467,7 @@ hr{
         mainCommentDiv.id = 'showComment_'+obj.id;
 
         var commentImage = document.createElement('img');
-        if(obj.user_image){
+        if(obj.image_exist){
           var imageUrl =  "{{ asset('') }}"+obj.user_image;
         } else {
           var imageUrl = "{{ asset('images/user1.png') }}";
@@ -583,7 +583,7 @@ hr{
         mainSubCommentDiv.className = 'item replySubComment-1';
 
         var subcommentImage = document.createElement('img');
-        if(obj.user_image){
+        if(obj.image_exist){
           var subcommentImageUrl = "{{ asset('') }}"+obj.user_image;
         } else {
           var subcommentImageUrl = "{{ asset('images/user1.png') }}";
@@ -613,7 +613,7 @@ hr{
         var pSubcommentBodyDiv = document.createElement('p');
         var ancUserNameDiv = document.createElement('a');
         ancUserNameDiv.className = 'SubCommentName';
-        ancUserNameDiv.innerHTML = obj.user_name+ ' ';
+        ancUserNameDiv.innerHTML = '<i>' + obj.user_name+ '</i>' + ' ';
         pSubcommentBodyDiv.appendChild(ancUserNameDiv);
 
         var spanSubCommentBodyDiv = document.createElement('span');

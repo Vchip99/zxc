@@ -43,4 +43,19 @@ class PlacementArea extends Model
             ->select('placement_areas.id', 'placement_areas.*')->groupBy('placement_areas.id')->get();
 
     }
+
+    protected static function isPlacementAreaExist(Request $request){
+        $area = InputSanitise::inputString($request->get('area'));
+        $areaId   = InputSanitise::inputInt($request->get('area_id'));
+        $result = static::where('name', $area);
+        if(!empty($areaId)){
+            $result->where('id', '!=', $areaId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

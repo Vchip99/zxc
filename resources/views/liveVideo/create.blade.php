@@ -12,11 +12,11 @@
   &nbsp;
   <div class="container admin_div">
   @if(isset($liveVideo->id))
-    <form action="{{url('admin/updateLiveVideo')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/updateLiveVideo')}}" method="POST" enctype="multipart/form-data" id="submitForm">
     {{method_field('PUT')}}
-    <input type="hidden" name="live_video_id" value="{{$liveVideo->id}}">
+    <input type="hidden" name="live_video_id" id="live_video_id" value="{{$liveVideo->id}}">
   @else
-    <form action="{{url('admin/createLiveVideo')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/createLiveVideo')}}" method="POST" enctype="multipart/form-data" id="submitForm">
   @endif
     {{ csrf_field() }}
     <div class="form-group row @if ($errors->has('course')) has-error @endif">
@@ -41,11 +41,12 @@
       <label for="course" class="col-sm-2 col-form-label">Video Name</label>
       <div class="col-sm-3">
         @if(isset($liveVideo->id))
-          <input type="text" class="form-control" name="video" value="{{$liveVideo->name}}" required="true">
+          <input type="text" class="form-control" name="video" id="video" value="{{$liveVideo->name}}" required="true">
         @else
-          <input type="text" class="form-control" name="video" value="" placeholder="Video Name" required="true">
+          <input type="text" class="form-control" name="video" id="video" value="" placeholder="Video Name" required="true">
         @endif
         @if($errors->has('video')) <p class="help-block">{{ $errors->first('video') }}</p> @endif
+        <span class="hide" id="videoError" style="color: white;">Given name is already exist with selected course.Please enter another name.</span>
       </div>
     </div>
     <div class="form-group row @if ($errors->has('description')) has-error @endif">
@@ -84,11 +85,42 @@
     </div>
     <div class="form-group row">
         <div class="offset-sm-2 col-sm-3" title="Submit">
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+          <button type="button" class="btn btn-primary" onclick="searchLiveCourseVideo();">Submit</button>
         </div>
       </div>
   </div>
 </form>
-
+<script type="text/javascript">
+  function searchLiveCourseVideo(){
+    var video = document.getElementById('video').value;
+    var course = document.getElementById('course').value;
+    if(document.getElementById('live_video_id')){
+      var videoId = document.getElementById('live_video_id').value;
+    } else {
+      var videoId = 0;
+    }
+    if(video && course){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isLiveCourseVideoExist')}}",
+        data:{video:video,course:course,live_video_id:videoId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('videoError').classList.remove('hide');
+          document.getElementById('videoError').classList.add('has-error');
+        } else {
+          document.getElementById('videoError').classList.add('hide');
+          document.getElementById('videoError').classList.remove('has-error');
+          document.getElementById('submitForm').submit();
+        }
+      });
+    } else if(!video){
+      alert('please select video.');
+    } else if(!course){
+      alert('please enter name.');
+    }
+  }
+</script>
 
 @stop

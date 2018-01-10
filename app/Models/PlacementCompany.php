@@ -57,4 +57,20 @@ class PlacementCompany extends Model
             ->where('placement_companies.placement_area_id',$areaId )
             ->select('placement_companies.id', 'placement_companies.*')->groupBy('placement_companies.id')->get();
     }
+
+    protected static function isPlacementCompanyExist(Request $request){
+        $company = InputSanitise::inputString($request->get('company'));
+        $companyId   = InputSanitise::inputInt($request->get('company_id'));
+        $area   = InputSanitise::inputInt($request->get('area'));
+        $result = static::where('placement_area_id', $area)->where('name', $company);
+        if(!empty($companyId)){
+            $result->where('id', '!=', $companyId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

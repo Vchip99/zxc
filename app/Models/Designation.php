@@ -40,4 +40,19 @@ class Designation extends Model
     public function areas(){
         return $this->hasMany(Area::class, 'designation_id');
     }
+
+    protected static function isDesignationExist(Request $request){
+        $designationName = InputSanitise::inputString($request->get('designation'));
+        $designationId   = InputSanitise::inputInt($request->get('designation_id'));
+        $result = static::where('name', '=',$designationName);
+        if(!empty($designationId)){
+            $result->where('id', '!=', $designationId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

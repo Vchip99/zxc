@@ -51,4 +51,19 @@ class CourseCategory extends Model
     public function subcategory(){
         return $this->hasMany(CourseSubCategory::class, 'course_category_id');
     }
+
+    protected static function isCourseCategoryExist(Request $request){
+        $category = InputSanitise::inputString($request->get('category'));
+        $categoryId   = InputSanitise::inputInt($request->get('category_id'));
+        $result = static::where('name', '=',$category);
+        if(!empty($categoryId)){
+            $result->where('id', '!=', $categoryId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

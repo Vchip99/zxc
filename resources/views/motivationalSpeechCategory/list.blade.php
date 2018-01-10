@@ -1,10 +1,10 @@
 @extends('admin.master')
 @section('module_title')
   <section class="content-header">
-    <h1> Manage Category </h1>
+    <h1> Manage Speaker </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-microphone"></i> Motivational Speech </li>
-      <li class="active"> Manage Category </li>
+      <li class="active"> Manage Speaker </li>
     </ol>
   </section>
 @stop
@@ -19,7 +19,7 @@
     @endif
     <div class="form-group row">
       <div >
-        <a href="{{url('admin/createMotivationalSpeechCategory')}}" type="button" class="btn btn-primary" style="float: right;" title="Add New Category">Add New Category</a>&nbsp;&nbsp;
+        <a href="{{url('admin/createMotivationalSpeechCategory')}}" type="button" class="btn btn-primary" style="float: right;" title="Add New Speaker">Add New Speaker</a>&nbsp;&nbsp;
       </div>
     </div>
   <div>
@@ -27,9 +27,9 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Category Name</th>
-          <th>Edit Category</th>
-          <th>Delete Category</th>
+          <th>Speaker Name</th>
+          <th>Edit Speaker</th>
+          <th>Delete Speaker</th>
         </tr>
       </thead>
       <tbody>
@@ -54,7 +54,7 @@
           </tr>
           @endforeach
         @else
-          <tr><td colspan="4">No category is created.</td></tr>
+          <tr><td colspan="4">No speaker is created.</td></tr>
         @endif
       </tbody>
     </table>
@@ -68,7 +68,7 @@
     function confirmDelete(ele){
       $.confirm({
           title: 'Confirmation',
-          content: 'If you delete this category, all associated motivational speeches will be deleted.',
+          content: 'If you delete this speaker, all associated motivational speeches will be deleted.',
           type: 'red',
           typeAnimated: true,
           buttons: {

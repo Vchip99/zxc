@@ -149,4 +149,8 @@ class DiscussionCategoryController extends Controller
     	}
     	return Redirect::to('admin/manageDiscussionCategory');
     }
+
+    protected function isDiscussionCategoryExist(Request $request){
+        return DiscussionCategory::isDiscussionCategoryExist($request);
+    }
 }

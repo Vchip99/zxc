@@ -163,4 +163,7 @@ class CourseCategoryController extends Controller
     	return Redirect::to('admin/manageCourseCategory');
     }
 
+    protected function isCourseCategoryExist(Request $request){
+        return CourseCategory::isCourseCategoryExist($request);
+    }
 }

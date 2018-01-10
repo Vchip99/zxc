@@ -136,7 +136,7 @@
       </div>
     </div>
 </section>
-<section id="benifit" class="v_container v_bg_grey">
+<section id="benifit" class="v_container ">
    <div class="container">
      <div class="row">
       <div class="col-md-12 workshop_tital">
@@ -169,7 +169,7 @@
      </div>
    </div>
 </section>
-<section id="" class="v_container v_bg_grey  gal-container">
+<section id="" class="v_container gal-container">
   <div class="container">
     <div class="row v_bg_white ">
      <div class="col-md-12 workshop_tital">
@@ -197,13 +197,6 @@
             <div class="item">
                 <div class="more-iteam " >
                   <p>
-                   <img src="{{ asset('images/placement/gallery/img-3.jpg')}}" class="thumbnail img-responsive" alt="placement" />
-                  </p>
-                </div>
-            </div>
-            <div class="item">
-                <div class="more-iteam " >
-                  <p>
                    <img src="{{ asset('images/placement/gallery/img-4.png')}}" class="thumbnail img-responsive" alt="placement" />
                   </p>
                 </div>
@@ -212,6 +205,13 @@
                 <div class="more-iteam " >
                   <p>
                    <img src="{{ asset('images/placement/gallery/img-5.jpg')}}" class="thumbnail img-responsive" alt="placement" />
+                  </p>
+                </div>
+            </div>
+            <div class="item">
+                <div class="more-iteam " >
+                  <p>
+                   <img src="{{ asset('images/placement/gallery/img-3.jpg')}}" class="thumbnail img-responsive" alt="placement" />
                   </p>
                 </div>
             </div>
@@ -289,7 +289,7 @@
   </div>
 </section>
 <!-- contact -->
-<section id="" class="v_container  v_bg_grey">
+<section id="" class="v_container ">
   <div class="container">
     <div class="row v_bg_white">
       <div class="col-md-12 workshop_tital">
@@ -303,7 +303,7 @@
                   <div class="form-group">
                       <label for="name">
                           Name</label>
-                      <input type="text" class="form-control" name="name" placeholder="Enter name" required="required" />
+                      <input type="text" class="form-control" name="name" placeholder="Enter Name" required="required" />
                   </div>
                   <div class="form-group">
                       <label for="email">
@@ -311,7 +311,7 @@
                       <div class="input-group">
                           <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span>
                           </span>
-                          <input type="email" class="form-control" name="email" placeholder="Enter email" required="required" /></div>
+                          <input type="email" class="form-control" name="email" placeholder="Enter Email" required="required" /></div>
                   </div>
                   <div class="form-group">
                       <label for="name">

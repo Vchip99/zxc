@@ -34,7 +34,7 @@ class CourseComment extends Model
     }
 
     public function children(){
-    	return $this->hasMany(CourseSubComment::class)->orderby('id', 'desc');
+    	return $this->hasMany(CourseSubComment::class)->orderby('id', 'asc');
     }
 
     public function deleteLikes(){

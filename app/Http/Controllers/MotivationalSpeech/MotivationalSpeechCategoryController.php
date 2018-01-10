@@ -152,4 +152,8 @@ class MotivationalSpeechCategoryController extends Controller
         }
         return Redirect::to('admin/manageMotivationalSpeechCategory');
     }
+
+    protected function isMotivationalSpeechCategoryExist(Request $request){
+        return MotivationalSpeechCategory::isMotivationalSpeechCategoryExist($request);
+    }
 }

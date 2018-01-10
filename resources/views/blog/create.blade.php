@@ -13,34 +13,13 @@
   &nbsp;
   <div class="container admin_div">
   @if(isset($blog->id))
-    <form action="{{url('admin/updateBlog')}}" method="POST">
+    <form action="{{url('admin/updateBlog')}}" method="POST" id="submitForm">
     {{ method_field('PUT') }}
-    <input type="hidden" name="blog_id" value="{{$blog->id}}">
+    <input type="hidden" name="blog_id" id="blog_id" value="{{$blog->id}}">
   @else
-   <form action="{{url('admin/createBlog')}}" method="POST">
+   <form action="{{url('admin/createBlog')}}" method="POST" id="submitForm">
     @endif
     {{ csrf_field() }}
-    <div class="form-group row  @if ($errors->has('title')) has-error @endif">
-      <label class="col-sm-2 col-form-label" for="title">Blog Title:</label>
-      <div class="col-sm-3">
-        <input type="text" class="form-control" id="title" name="title" value="{{ old('title',$blog->title) }}" required="true">
-        @if($errors->has('title')) <p class="help-block">{{ $errors->first('title') }}</p> @endif
-      </div>
-    </div>
-    <div class="form-group row @if ($errors->has('author')) has-error @endif">
-      <label class="col-sm-2 col-form-label" for="author">Author:</label>
-      <div class="col-sm-3">
-        <input type="text" class="form-control" id="author" name="author" value="{{ old('author',$blog->author) }}" required="true">
-        @if($errors->has('author')) <p class="has-error">{{ $errors->first('author') }}</p> @endif
-      </div>
-    </div>
-    <div class="form-group row @if ($errors->has('tags')) has-error @endif">
-      <label class="col-sm-2 col-form-label" for="tags">Tags:</label>
-      <div class="col-sm-3">
-        <input type="text" class="form-control" id="tags" name="tags" value="{{ old('tags',$tags) }}" required="true">
-        @if($errors->has('tags')) <p class="has-error">{{ $errors->first('tags') }}</p> @endif
-      </div>
-    </div>
     <div class="form-group row  @if ($errors->has('category_id')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="category_id">Category:</label>
       <div class="col-sm-3">
@@ -57,6 +36,28 @@
           @endif
         </select>
         @if($errors->has('category_id')) <p class="has-error">{{ $errors->first('category_id') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row  @if ($errors->has('title')) has-error @endif">
+      <label class="col-sm-2 col-form-label" for="title">Blog Title:</label>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" id="title" name="title" value="{{ old('title',$blog->title) }}" required="true">
+        @if($errors->has('title')) <p class="help-block">{{ $errors->first('title') }}</p> @endif
+        <span class="hide" id="blogError" style="color: white;">Given title is already exist with select category.Please enter another title.</span>
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('author')) has-error @endif">
+      <label class="col-sm-2 col-form-label" for="author">Author:</label>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" id="author" name="author" value="{{ old('author',$blog->author) }}" required="true">
+        @if($errors->has('author')) <p class="has-error">{{ $errors->first('author') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('tags')) has-error @endif">
+      <label class="col-sm-2 col-form-label" for="tags">Tags:</label>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" id="tags" name="tags" value="{{ old('tags',$tags) }}" required="true">
+        @if($errors->has('tags')) <p class="has-error">{{ $errors->first('tags') }}</p> @endif
       </div>
     </div>
     <div class="form-group row @if ($errors->has('content')) has-error @endif">
@@ -93,9 +94,40 @@
     </div>
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-primary" onclick="searchBlog();">Submit</button>
       </div>
     </div>
   </div>
 </form>
+<script type="text/javascript">
+  function searchBlog(){
+    var category = document.getElementById('category_id').value;
+    var blog = document.getElementById('title').value;
+    if(document.getElementById('blog_id')){
+      var blogId = document.getElementById('blog_id').value;
+    } else {
+      var blogId = 0;
+    }
+    if(category && blog){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isBlogExist')}}",
+        data:{category:category,blog:blog,blog_id:blogId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('blogError').classList.remove('hide');
+          document.getElementById('blogError').classList.add('has-error');
+        } else {
+          document.getElementById('blogError').classList.add('hide');
+          document.getElementById('blogError').classList.remove('has-error');
+          document.getElementById('submitForm').submit();
+        }
+      });
+    } else if(!category){
+      alert('please select category name.');
+    } else {
+      alert('please enter title.');
+    }
+  }
+</script>
 @stop

@@ -161,4 +161,8 @@ class CourseSubCategoryController extends Controller
     	}
     	return Redirect::to('admin/manageCourseSubCategory');
     }
+
+    protected function isCourseSubCategoryExist(Request $request){
+        return CourseSubCategory::isCourseSubCategoryExist($request);
+    }
 }

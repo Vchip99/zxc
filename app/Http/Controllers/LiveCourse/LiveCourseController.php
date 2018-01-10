@@ -159,4 +159,8 @@ class LiveCourseController extends Controller
         return Redirect::to('admin/manageLiveCourse');
     }
 
+    protected function isLiveCourseExist(Request $request){
+        return LiveCourse::isLiveCourseExist($request);
+    }
+
 }

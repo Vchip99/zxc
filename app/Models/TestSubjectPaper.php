@@ -310,4 +310,23 @@ class TestSubjectPaper extends Model
             }
         }
     }
+
+    protected static function isTestPaperExist(Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        $subjectId = InputSanitise::inputInt($request->get('subject'));
+        $paperName = InputSanitise::inputString($request->get('paper'));
+        $paperId = InputSanitise::inputInt($request->get('paper_id'));
+        $result = static::where('test_category_id', $categoryId)->where('test_sub_category_id', $subcategoryId)->where('test_subject_id', $subjectId)->where('name', $paperName);
+        if(!empty($paperId)){
+            $result->where('id', '!=', $paperId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+        return 'false';
+    }
 }

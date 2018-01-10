@@ -165,4 +165,8 @@ class CategoryController extends Controller
         }
 		return Redirect::to('admin/manageCategory');
     }
+
+    protected function isTestCategoryExist(Request $request){
+        return TestCategory::isTestCategoryExist($request);
+    }
 }

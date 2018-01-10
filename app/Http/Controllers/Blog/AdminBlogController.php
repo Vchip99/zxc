@@ -246,4 +246,8 @@ class AdminBlogController extends Controller
     	}
     	return Redirect::to('admin/manageBlog');
     }
+
+    protected function isBlogExist(Request $request){
+        return Blog::isBlogExist($request);
+    }
 }

@@ -15,11 +15,11 @@
   &nbsp;
   <div class="container admin_div">
   @if(isset($workshopVideo->id))
-    <form action="{{url('admin/updateWorkshopVideo')}}" method="POST">
+    <form action="{{url('admin/updateWorkshopVideo')}}" method="POST" id="submitForm">
     {{method_field('PUT')}}
-    <input type="hidden" name="video_id" value="{{$workshopVideo->id}}">
+    <input type="hidden" name="video_id" id="video_id" value="{{$workshopVideo->id}}">
   @else
-    <form action="{{url('admin/createWorkshopVideo')}}" method="POST">
+    <form action="{{url('admin/createWorkshopVideo')}}" method="POST" id="submitForm">
   @endif
     {{ csrf_field() }}
   <div class="form-group row @if ($errors->has('category')) has-error @endif">
@@ -66,11 +66,12 @@
     <label for="name" class="col-sm-2 col-form-label">Video Name:</label>
     <div class="col-sm-3">
       @if(isset($workshopVideo->id))
-        <input type="text" class="form-control" name="name" value="{{$workshopVideo->name}}" placeholder="Video name" required="true">
+        <input type="text" class="form-control" name="name" id="video" value="{{$workshopVideo->name}}" placeholder="Video name" required="true">
       @else
-        <input type="text" class="form-control" name="name" value="" placeholder="Video name" required="true">
+        <input type="text" class="form-control" name="name" id="video" value="" placeholder="Video name" required="true">
       @endif
       @if($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
+      <span class="hide" id="videoError" style="color: white;">Given video name is already exist with selected category and workshop.Please enter another name.</span>
     </div>
   </div>
   <div class="form-group row @if ($errors->has('description')) has-error @endif">
@@ -114,7 +115,7 @@
   </div>
   <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-primary" onclick="searchVideo();">Submit</button>
       </div>
     </div>
   </div>
@@ -145,6 +146,39 @@
           });
         }
       });
+    }
+  }
+
+  function searchVideo(){
+    var category = document.getElementById('category').value;
+    var workshop = document.getElementById('workshop').value;
+    var video = document.getElementById('video').value;
+    if(document.getElementById('video_id')){
+      var videoId = document.getElementById('video_id').value;
+    } else {
+      var videoId = 0;
+    }
+    if(category && workshop && video){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isOnlineWorkshopVideoExist')}}",
+        data:{category:category,workshop:workshop,video:video,video_id:videoId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('videoError').classList.remove('hide');
+          document.getElementById('videoError').classList.add('has-error');
+        } else {
+          document.getElementById('videoError').classList.add('hide');
+          document.getElementById('videoError').classList.remove('has-error');
+          document.getElementById('submitForm').submit();
+        }
+      });
+    } else if(!category){
+      alert('please select category.');
+    } else if(!workshop){
+      alert('please select workshop.');
+    } else {
+      alert('please enter name.');
     }
   }
 </script>

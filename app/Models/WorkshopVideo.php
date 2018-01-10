@@ -68,4 +68,21 @@ class WorkshopVideo extends Model
 		}
 		return 'false';
     }
+
+    protected static function isOnlineWorkshopVideoExist($request){
+        $workshop   = InputSanitise::inputInt($request->get('workshop'));
+        $category   = InputSanitise::inputInt($request->get('category'));
+        $video = InputSanitise::inputString($request->get('video'));
+        $videoId   = InputSanitise::inputInt($request->get('video_id'));
+        $result = static::where('workshop_category_id', $category)->where('workshop_details_id', $workshop)->where('name', '=',$video);
+        if(!empty($videoId)){
+            $result->where('id', '!=', $videoId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

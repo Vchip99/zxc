@@ -15,11 +15,11 @@
   &nbsp;
   <div class="container admin_div">
   @if(isset($hero->id))
-    <form action="{{url('admin/updateZeroToHero')}}" method="POST">
+    <form action="{{url('admin/updateZeroToHero')}}" method="POST" id="submitForm">
     {{ method_field('PUT') }}
-    <input type="hidden" name="hero_id" value="{{$hero->id}}">
+    <input type="hidden" name="hero_id" id="hero_id" value="{{$hero->id}}">
   @else
-   <form action="{{url('admin/createZeroToHero')}}" method="POST">
+    <form action="{{url('admin/createZeroToHero')}}" method="POST" id="submitForm">
   @endif
     {{ csrf_field() }}
     <div class="form-group row @if ($errors->has('designation')) has-error @endif">
@@ -63,6 +63,7 @@
       <div class="col-sm-3">
         <input type="text" class="form-control" id="hero" name="hero" value="{{($hero)?$hero->name:null}}" required="true">
         @if($errors->has('hero')) <p class="help-block">{{ $errors->first('hero') }}</p> @endif
+        <span class="hide" id="heroError" style="color: white;">Given name is already exist with selected designation and area.Please enter another name.</span>
       </div>
     </div>
     <div class="form-group row  @if ($errors->has('url')) has-error @endif">
@@ -85,7 +86,7 @@
     </div>
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-primary" onclick="searchHero();">Submit</button>
       </div>
     </div>
     </form>
@@ -115,6 +116,39 @@
           });
         }
       });
+    }
+  }
+
+  function searchHero(){
+    var designation = document.getElementById('designation').value;
+    var area = document.getElementById('area').value;
+    var hero = document.getElementById('hero').value;
+    if(document.getElementById('hero_id')){
+      var heroId = document.getElementById('hero_id').value;
+    } else {
+      var heroId = 0;
+    }
+    if(area && designation && hero){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isHeroExist')}}",
+        data:{area:area,designation:designation,hero:hero,hero_id:heroId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('heroError').classList.remove('hide');
+          document.getElementById('heroError').classList.add('has-error');
+        } else {
+          document.getElementById('heroError').classList.add('hide');
+          document.getElementById('heroError').classList.remove('has-error');
+          document.getElementById('submitForm').submit();
+        }
+      });
+    } else if(!designation){
+      alert('please select designation.');
+    } else if(!area){
+      alert('please select area.');
+    } else {
+      alert('please enter name.');
     }
   }
 </script>

@@ -163,4 +163,21 @@ class TestSubCategory extends Model
             InputSanitise::delFolder($subCategoryImageFolder);
         }
     }
+
+    protected static function isTestSubCategoryExist(Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subCategoryName = InputSanitise::inputString($request->get('subcategory'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory_id'));
+        $result = static::where('test_category_id', $categoryId)->where('name', $subCategoryName);
+        if(!empty($subcategoryId)){
+            $result->where('id', '!=', $subcategoryId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+        return 'false';
+    }
 }

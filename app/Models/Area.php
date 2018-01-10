@@ -51,4 +51,20 @@ class Area extends Model
     public function heros(){
         return $this->hasMany(ZeroToHero::class, 'area_id');
     }
+
+    protected static function isAreaExist(Request $request){
+        $area = InputSanitise::inputString($request->get('area'));
+        $areaId   = InputSanitise::inputInt($request->get('area_id'));
+        $designation   = InputSanitise::inputInt($request->get('designation'));
+        $result = static::where('designation_id', $designation)->where('name', '=',$area);
+        if(!empty($areaId)){
+            $result->where('id', '!=', $areaId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

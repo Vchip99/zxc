@@ -13,11 +13,11 @@
     <script src="{{asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
   <div class="container admin_div">
   @if(isset($workshopDetail->id))
-    <form action="{{url('admin/updateOfflineWorkshopDetails')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/updateOfflineWorkshopDetails')}}" method="POST" enctype="multipart/form-data" id="submitForm">
     {{method_field('PUT')}}
     <input type="hidden" id="workshop_id" name="workshop_id" value="{{$workshopDetail->id}}">
   @else
-    <form action="{{url('admin/createOfflineWorkshopDetails')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/createOfflineWorkshopDetails')}}" method="POST" enctype="multipart/form-data" id="submitForm">
   @endif
     {{ csrf_field() }}
     <div class="form-group row @if ($errors->has('category')) has-error @endif">
@@ -27,7 +27,7 @@
           @foreach($workshopCategories as $workshopCategory)
             @if( isset($workshopDetail->id) && $workshopDetail->offline_workshop_category_id == $workshopCategory->id)
               <input type="text" class="form-control" name="category_text" value="{{$workshopCategory->name}}" readonly="true">
-              <input type="hidden" name="category" value="{{$workshopCategory->id}}">
+              <input type="hidden" name="category" id="category" value="{{$workshopCategory->id}}">
             @endif
           @endforeach
         @else
@@ -48,12 +48,9 @@
      <div class="form-group row @if ($errors->has('course')) has-error @endif">
       <label for="course" class="col-sm-2 col-form-label">Workshop Name:</label>
       <div class="col-sm-3">
-        @if(isset($workshopDetail->id))
-          <input type="text" class="form-control" name="workshop" value="{{$workshopDetail->name}}" readonly="true">
-        @else
-          <input type="text" class="form-control" name="workshop" value="" placeholder="Workshop Name" required="true">
-        @endif
+          <input type="text" class="form-control" name="workshop" id="workshop" value="{{$workshopDetail->name}}" required="true">
         @if($errors->has('workshop')) <p class="help-block">{{ $errors->first('workshop') }}</p> @endif
+        <span class="hide" id="workshopError" style="color: white;">Given workshop name is already exist with selected category.Please enter another name.</span>
       </div>
     </div>
     <div class="form-group row @if ($errors->has('about')) has-error @endif">
@@ -322,7 +319,7 @@
     </div>
     <div class="form-group row">
         <div class="offset-sm-2 col-sm-3" title="Submit">
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn btn-primary" onclick="searchWorkshop();">Submit</button>
         </div>
       </div>
   </div>
@@ -395,7 +392,6 @@
 
     document.getElementById('component_count').value = count;
   }
-
   function removeElement(parent,childId){
     event.preventDefault();
       var childTr = document.getElementById('tr_'+childId);
@@ -407,6 +403,35 @@
       if(childBr){
         parent.removeChild(childBr);
       }
+  }
+  function searchWorkshop(){
+    var category = document.getElementById('category').value;
+    var workshop = document.getElementById('workshop').value;
+    if(document.getElementById('workshop_id')){
+      var workshopId = document.getElementById('workshop_id').value;
+    } else {
+      var workshopId = 0;
+    }
+    if(category && workshop){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isOfflineWorkshopExist')}}",
+        data:{category:category,workshop:workshop,workshop_id:workshopId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('workshopError').classList.remove('hide');
+          document.getElementById('workshopError').classList.add('has-error');
+        } else {
+          document.getElementById('workshopError').classList.add('hide');
+          document.getElementById('workshopError').classList.remove('has-error');
+          document.getElementById('submitForm').submit();
+        }
+      });
+    } else if(!category){
+      alert('please select category.');
+    } else {
+      alert('please enter name.');
+    }
   }
 </script>
 @stop

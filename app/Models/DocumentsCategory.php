@@ -50,4 +50,18 @@ class DocumentsCategory extends Model
         return $this->hasMany(DocumentsDoc::class, 'doc_category_id');
     }
 
+    protected static function isDocumentCategoryExist(Request $request){
+        $categoryName = InputSanitise::inputString($request->get('category'));
+        $categoryId = InputSanitise::inputInt($request->get('category_id'));
+        $result = static::where('name', $categoryName);
+        if(!empty($categoryId)){
+            $result->where('id', '!=', $categoryId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

@@ -98,7 +98,7 @@ margin-left: -13px;}
                     </div>
                     <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
                     <div class="user-block cmt-left-margin">
-                      @if(!empty($post->user->photo))
+                      @if(is_file($post->user->photo))
                         <img src="{{ asset($post->user->photo)}} " class="img-circle" alt="User Image">
                       @else
                         <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -168,10 +168,10 @@ margin-left: -13px;}
                       </div>
                       <div class="cmt-bg">
                         <div class="box-body chat" id="chat-box">
-                          @if(count( $post->comments) > 0)
-                            @foreach($post->comments as $comment)
+                          @if(count( $post->descComments) > 0)
+                            @foreach($post->descComments as $comment)
                               <div class="item cmt-left-margin-10" id="showComment_{{$comment->id}}">
-                                @if(!empty($comment->user->photo))
+                                @if(is_file($comment->user->photo))
                                   <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
                                 @else
                                   <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -674,10 +674,12 @@ margin-left: -13px;}
     showPostsDiv = document.getElementById('showAllPosts');
     showPostsDiv.innerHTML = '';
     arrayComments = [];
+
     $.each(msg['posts'], function(idx, obj) {
       arrayComments[idx] = obj;
     });
     var sortedArray = arrayComments.reverse();
+    // var sortedArray = arrayComments;
       $.each(sortedArray, function(idx, obj) {
         if(false == $.isEmptyObject(obj)){
         var divMedia = document.createElement('div');
@@ -707,7 +709,7 @@ margin-left: -13px;}
 
         var commentBlockDiv = document.createElement('div');
         commentBlockDiv.className = 'user-block cmt-left-margin';
-        if(obj.user_image){
+        if(obj.image_exist){
           var userImagePath = "{{ asset('') }}"+obj.user_image;
           var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
         } else {
@@ -791,7 +793,14 @@ margin-left: -13px;}
         commentchatDiv.className = 'box-body chat';
         commentchatDiv.id = 'chat-box';
         var postId = obj.id;
-        var comments = obj.comments;
+        // var comments = obj.comments;
+        var comments = [];
+        $.each(obj.comments, function(idx, obj) {
+          var arrayRevComments = [];
+          arrayRevComments[idx] = obj;
+          comments = arrayRevComments.reverse();
+        });
+
         var commentLikesCount = msg['commentLikesCount'];
         var subcommentLikesCount = msg['subcommentLikesCount'];
         var postUserId = obj.user_id;
@@ -804,7 +813,7 @@ margin-left: -13px;}
               mainCommentDiv.id = 'showComment_'+obj.id;
 
               var commentImage = document.createElement('img');
-              if(obj.user_image){
+              if(obj.image_exist){
                 var imageUrl =  "{{ asset('') }}"+obj.user_image;
               } else {
                 var imageUrl = "{{ asset('images/user1.png') }}";
@@ -930,7 +939,7 @@ margin-left: -13px;}
         mainSubCommentDiv.className = 'item replySubComment-1';
 
         var subcommentImage = document.createElement('img');
-        if(obj.user_image){
+        if(obj.image_exist){
           var subcommentImageUrl = "{{ asset('') }}"+obj.user_image;
         } else {
           var subcommentImageUrl = "{{ asset('images/user1.png') }}";
@@ -958,13 +967,13 @@ margin-left: -13px;}
         var pSubcommentBodyDiv = document.createElement('p');
         var ancUserNameDiv = document.createElement('a');
         ancUserNameDiv.className = 'SubCommentName';
-        ancUserNameDiv.innerHTML = obj.user_name;
+        ancUserNameDiv.innerHTML = '<i>'+obj.user_name+'</i>';
         pSubcommentBodyDiv.appendChild(ancUserNameDiv);
 
         var spanSubCommentBodyDiv = document.createElement('span');
         spanSubCommentBodyDiv.className = 'more';
         spanSubCommentBodyDiv.id = 'editSubCommentHide_'+obj.id;
-        spanSubCommentBodyDiv.innerHTML = obj.body; //'{!! '+obj.body+' !!}';
+        spanSubCommentBodyDiv.innerHTML = ' '+ obj.body; //'{!! '+obj.body+' !!}';
         pSubcommentBodyDiv.appendChild(spanSubCommentBodyDiv);
         subCommentMessageDiv.appendChild(pSubcommentBodyDiv);
 

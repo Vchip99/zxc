@@ -95,4 +95,20 @@ class MotivationalSpeechDetail extends Model
         }
         return $data;
     }
+
+    protected static function isMotivationalSpeechExist(Request $request){
+        $speech = InputSanitise::inputString($request->get('speech'));
+        $speechId   = InputSanitise::inputInt($request->get('motivational_speech_id'));
+        $category   = InputSanitise::inputInt($request->get('category'));
+        $result = static::where('motivational_speech_category_id', $category)->where('name', '=',$speech);
+        if(!empty($speechId)){
+            $result->where('id', '!=', $speechId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

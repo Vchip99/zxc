@@ -177,4 +177,7 @@ class ZeroToHeroController extends Controller
 		return Redirect::to('admin/manageZeroToHero');
     }
 
+    protected function isHeroExist(Request $request){
+        return ZeroToHero::isHeroExist($request);
+    }
 }

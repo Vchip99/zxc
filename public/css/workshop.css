@@ -1,4 +1,4 @@
-  
+
 .vchip_product_itm{
       background: #fff;
       margin-top: 30px;
@@ -29,9 +29,9 @@
     overflow: hidden;
     white-space: nowrap;
      }
-    h3.ellipsed{
-  cursor: pointer;
-}
+    span.ellipsed,a.ellipsed,h3.ellipsed{
+      cursor: pointer;
+    }
  /*h2 {
   border-bottom: 10px solid red;
   font-family: 'Raleway', sans-serif;
@@ -75,13 +75,13 @@
   margin: 18px auto 13px;
   /*text-align: center;*/
   width: 91%;
- 
+
 }
 #workshop .btn-default:focus, .btn-default:hover {
   background-color: red;
   background-position: 0 -15px;
 }
-  
+
 #workshop   .cuadro_intro_hover{
       padding: 0px;
     position: relative;
@@ -126,7 +126,7 @@
     width: 100%;
   }
 
-p.link:before{    
+p.link:before{
     height: 1px;
     width: 40px;
     background: #fff;
@@ -165,7 +165,7 @@ p.link:before{
 
 }
 h3{margin:0px;}
-.workshop_detail{    
+.workshop_detail{
   padding: 20px;
     display: inline-block;
     width: 100%;
@@ -294,13 +294,13 @@ padding: 10px 30px;   background-color: #000;}
 .MultiCarousel .leftLst { left:0; }
 .MultiCarousel .rightLst { right:0; }
 .MultiCarousel .leftLst.over, .MultiCarousel .rightLst.over { pointer-events: none; background:#ccc; }
-.hr{margin-top: 6px; 
+.hr{margin-top: 6px;
     margin-bottom: 6px;
     border: 0;
     border-top: 3px solid #0867b1;
     width: 50px;
 }
-.vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; margin-bottom: 25px;} 
+.vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; margin-bottom: 25px;}
 .vid iframe, .vid object,.vid embed {position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
 .video-mobile-headline{display: none; margin:0px;}
 @media only screen and (max-device-width: 800px), only screen and (device-width: 1024px) and (device-height: 600px), only screen and (width: 1280px) and (orientation: landscape), only screen and (device-width: 800px), only screen and (max-width: 767px) {

@@ -182,4 +182,8 @@ class SubCategoryController extends Controller
         }
     }
 
+    protected function isTestSubCategoryExist(Request $request){
+        return TestSubCategory::isTestSubCategoryExist($request);
+    }
+
 }

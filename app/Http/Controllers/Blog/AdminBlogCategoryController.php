@@ -150,4 +150,8 @@ class AdminBlogCategoryController extends Controller
     	}
     	return Redirect::to('admin/manageBlogCategory');
     }
+
+    protected function isBlogCategoryExist(Request $request){
+        return BlogCategory::isBlogCategoryExist($request);
+    }
 }

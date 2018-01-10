@@ -47,7 +47,7 @@
         <h4 class="v_h4_subtitle"> Sorted By</h4>
         <div class="mrgn_20_top_btm" >
           <select id="category" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectWorkshop(this);" required>
-            <option value="0">Select Category</option>
+            <option value="0">Select Speacker</option>
             @if(count($motivationalSpeechCategories) > 0)
               @foreach($motivationalSpeechCategories as $motivationalSpeechCategory)
                 <option value="{{$motivationalSpeechCategory->id}}">{{$motivationalSpeechCategory->name}}</option>
@@ -69,8 +69,8 @@
                   <div class="caption">
                     <div class="blur"></div>
                     <div class="caption-text">
-                      <h3 class="ellipsed" title="{{ $motivationalSpeech->name }}">{{ $motivationalSpeech->name }}</h3>
-                      <p class="block-with-text">{{ $motivationalSpeech->about }}</p>
+                      <h3 class="ellipsed" title="{{ $motivationalSpeech->name }}"><a href="{{ url('motivationalSpeechDetails')}}/{{$motivationalSpeech->id }}">{{ $motivationalSpeech->name }}</a></h3>
+                      <p class="block-with-text">{!!  substr($motivationalSpeech->about, 0, 60) !!} ...</p>
                     </div>
                   </div>
                 </div>
@@ -90,7 +90,7 @@
           <h4 class="v_h4_subtitle"> Sorted By</h4>
           <div class="mrgn_20_top_btm" >
             <select id="category" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectWorkshop(this);" required>
-              <option value="0">Select Category</option>
+              <option value="0">Select Speacker</option>
               @if(count($motivationalSpeechCategories) > 0)
                 @foreach($motivationalSpeechCategories as $motivationalSpeechCategory)
                   <option value="{{$motivationalSpeechCategory->id}}">{{$motivationalSpeechCategory->name}}</option>
@@ -199,9 +199,10 @@
             secondDiv.innerHTML = '';
             var imgUrl = "{{ asset('') }}" + obj['about_image'];
             secondDiv.innerHTML +='<p style="text-align:center;"><img src="'+imgUrl+'" alt="workshop" class="img-responsive"/></p>';
-            secondDiv.innerHTML +='<div class="caption"><div class="blur"></div><div class="caption-text"><h3 class="ellipsed" title="'+ obj['name'] +'">'+ obj['name'] +'</h3><p class="block-with-text">'+ obj['about'] +'</p></div></div>'
-            firstDiv.appendChild(secondDiv);
             var url = "{{ url('motivationalSpeechDetails')}}/"+  obj['id'];
+            var about = obj['about'];
+            secondDiv.innerHTML +='<div class="caption"><div class="blur"></div><div class="caption-text"><h3 class="ellipsed" title="'+ obj['name'] +'"><a href="'+ url +'">'+ obj['name'] +'</a></h3><p class="block-with-text">'+ about.substr(0, 60) +'...</p></div></div>'
+            firstDiv.appendChild(secondDiv);
             var pEle = document.createElement('p');
             pEle.className = "link";
             pEle.innerHTML ='<a href="'+ url +'"> Read More</a>';

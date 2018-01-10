@@ -12,34 +12,13 @@
   &nbsp;
   <div class="container admin_div">
   @if(isset($documentsDoc->id))
-    <form action="{{url('admin/updateDocumentsDoc')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('admin/updateDocumentsDoc')}}" method="POST" enctype="multipart/form-data" id="submitForm">
     {{ method_field('PUT') }}
-    <input type="hidden" name="document_id" value="{{$documentsDoc->id}}"/>
+    <input type="hidden" name="document_id" id="document_id" value="{{$documentsDoc->id}}"/>
   @else
-   <form action="{{url('admin/createDocumentsDoc')}}" method="POST" enctype="multipart/form-data">
+   <form action="{{url('admin/createDocumentsDoc')}}" method="POST" enctype="multipart/form-data" id="submitForm">
     @endif
     {{ csrf_field() }}
-    <div class="form-group row  @if ($errors->has('name')) has-error @endif">
-      <label class="col-sm-2 col-form-label" for="category">Document Name:</label>
-      <div class="col-sm-3">
-        <input type="text" class="form-control" id="name" name="name" value="{{($documentsDoc)?$documentsDoc->name:null}}" required="true">
-        @if($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-sm-2 col-form-label" for="author">Author:</label>
-      <div class="col-sm-3">
-        <input type="text" class="form-control" id="author" name="author" value="{{($documentsDoc->author)?$documentsDoc->author:NULL}}" required="true">
-        @if($errors->has('author')) <p class="help-block">{{ $errors->first('author') }}</p> @endif
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-sm-2 col-form-label" for="introduction">Introduction:</label>
-      <div class="col-sm-3">
-        <textarea class="form-control" id="introduction" name="introduction" required="true">{{($documentsDoc->introduction)?$documentsDoc->introduction:NULL}}</textarea>
-        @if($errors->has('introduction')) <p class="help-block">{{ $errors->first('introduction') }}</p> @endif
-      </div>
-    </div>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label" for="doc_category_id">Category:</label>
       <div class="col-sm-3">
@@ -58,17 +37,26 @@
         @if($errors->has('doc_category_id')) <p class="help-block">{{ $errors->first('doc_category_id') }}</p> @endif
       </div>
     </div>
-    <div class="form-group row @if ($errors->has('is_paid')) has-error @endif">
-      <label for="course" class="col-sm-2 col-form-label">Is Paid:</label>
+    <div class="form-group row  @if ($errors->has('name')) has-error @endif">
+      <label class="col-sm-2 col-form-label" for="category">Document Name:</label>
       <div class="col-sm-3">
-          @if(isset($documentsDoc->id))
-          <label class="radio-inline"><input type="radio" name="is_paid" value="1" @if(1 == $documentsDoc->is_paid) checked="true" @endif> Yes</label>
-          <label class="radio-inline"><input type="radio" name="is_paid" value="0" @if(0 == $documentsDoc->is_paid) checked="true" @endif> No</label>
-          @else
-            <label class="radio-inline"><input type="radio" name="is_paid" value="1"> Yes</label>
-            <label class="radio-inline"><input type="radio" name="is_paid" value="0" checked> No</label>
-          @endif
-        @if($errors->has('is_paid')) <p class="help-block">{{ $errors->first('is_paid') }}</p> @endif
+        <input type="text" class="form-control" id="name" name="name" value="{{($documentsDoc)?$documentsDoc->name:null}}" required="true">
+        @if($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
+        <span class="hide" id="documentError" style="color: white;">Given name is already exist with select category.Please enter another name.</span>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label" for="author">Author:</label>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" id="author" name="author" value="{{($documentsDoc->author)?$documentsDoc->author:NULL}}" required="true">
+        @if($errors->has('author')) <p class="help-block">{{ $errors->first('author') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label" for="introduction">Introduction:</label>
+      <div class="col-sm-3">
+        <textarea class="form-control" id="introduction" name="introduction" required="true">{{($documentsDoc->introduction)?$documentsDoc->introduction:NULL}}</textarea>
+        @if($errors->has('introduction')) <p class="help-block">{{ $errors->first('introduction') }}</p> @endif
       </div>
     </div>
     <div class="form-group row @if ($errors->has('price')) has-error @endif">
@@ -132,9 +120,40 @@
     </div>
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-primary" onclick="searchDocument();">Submit</button>
       </div>
     </div>
   </div>
 </form>
+<script type="text/javascript">
+  function searchDocument(){
+    var category = document.getElementById('doc_category_id').value;
+    var documentName = document.getElementById('name').value;
+    if(document.getElementById('document_id')){
+      var documentId = document.getElementById('document_id').value;
+    } else {
+      var documentId = 0;
+    }
+    if(category && documentName){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isDocumentDocExist')}}",
+        data:{category:category,document:documentName,document_id:documentId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('documentError').classList.remove('hide');
+          document.getElementById('documentError').classList.add('has-error');
+        } else {
+          document.getElementById('documentError').classList.add('hide');
+          document.getElementById('documentError').classList.remove('has-error');
+          document.getElementById('submitForm').submit();
+        }
+      });
+    } else if(!category){
+      alert('please select category name.');
+    } else {
+      alert('please enter name.');
+    }
+  }
+</script>
 @stop

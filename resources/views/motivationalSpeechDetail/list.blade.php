@@ -1,10 +1,10 @@
 @extends('admin.master')
 @section('module_title')
   <section class="content-header">
-    <h1> Manage Motivational Details </h1>
+    <h1> Manage Motivational Speech Details </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-microphone"></i> Motivational Speech </li>
-      <li class="active"> Manage Motivational Details </li>
+      <li class="active"> Manage Motivational Speech Details </li>
     </ol>
   </section>
 @stop

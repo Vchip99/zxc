@@ -82,4 +82,21 @@ class ZeroToHero extends Model
         }
         return $results->select('zero_to_heroes.*')->get();
     }
+
+    protected static function isHeroExist(Request $request){
+        $hero   = InputSanitise::inputString($request->get('hero'));
+        $heroId = InputSanitise::inputInt($request->get('hero_id'));
+        $area   = InputSanitise::inputInt($request->get('area'));
+        $designation   = InputSanitise::inputInt($request->get('designation'));
+        $result = static::where('designation_id', $designation)->where('area_id', $area)->where('name', '=',$hero);
+        if(!empty($heroId)){
+            $result->where('id', '!=', $heroId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

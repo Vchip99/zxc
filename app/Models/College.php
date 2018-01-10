@@ -38,4 +38,18 @@ class College extends Model
     	return $this->hasMany(CollegeDept::class, 'college_id');
     }
 
+    protected static function isCollegeExist(Request $request){
+      $college = InputSanitise::inputString($request->get('college'));
+      $collegeId   = InputSanitise::inputInt($request->get('college_id'));
+      $result = static::where('name', '=',$college);
+      if(!empty($collegeId)){
+          $result->where('id', '!=', $collegeId);
+      }
+      $result->first();
+      if(is_object($result) && 1 == $result->count()){
+          return 'true';
+      } else {
+          return 'false';
+      }
+    }
 }

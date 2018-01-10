@@ -35,6 +35,7 @@
         <input type="text" class="form-control" id="college" name="college" value="{{($college)?$college->name:null}}" required="true" placeholder="College Name">
       </div>
       @if($errors->has('college')) <p class="help-block">{{ $errors->first('college') }}</p> @endif
+      <span class="hide" id="collegeError" style="color: white;">Given college name is already exist.Please enter another name.</span>
     </div>
     @if(!empty($college->id) && count($college->departments) > 0)
     <div class="form-group row ">
@@ -68,7 +69,7 @@
 
     <div class="form-group row">
       <!-- <div class="offset-sm-2 col-sm-3"> -->
-        <button id="submitCollege" class="btn btn-primary">Submit</button>
+        <button id="submitCollege" class="btn btn-primary" onclick="searchCollege();">Submit</button>
         <button id="addDept" class="btn btn-primary">Add Department</button>
       <!-- </div> -->
     </div>
@@ -115,7 +116,6 @@
     eleSpan.appendChild(eleInput);
     eleSpan.appendChild(eleImg);
 
-
     eleDiv.appendChild(eleSpan);
     document.getElementById("departments").appendChild(eleDiv);
     var eleBr = document.createElement('Br');
@@ -131,8 +131,32 @@
       document.getElementById("delete_depts").value += childDiv + ',';
     }
   }
-  $('#submitCollege').click(function(){
-    document.getElementById("createCollege").submit();
-  });
+  function searchCollege(){
+    event.preventDefault();
+    var college = document.getElementById('college').value;
+    if(document.getElementById('college_id')){
+      var collegeId = document.getElementById('college_id').value;
+    } else {
+      var collegeId = 0;
+    }
+    if(college){
+      $.ajax({
+        method:'POST',
+        url: "{{url('admin/isCollegeExist')}}",
+        data:{college:college,college_id:collegeId}
+      }).done(function( msg ) {
+        if('true' == msg){
+          document.getElementById('collegeError').classList.remove('hide');
+          document.getElementById('collegeError').classList.add('has-error');
+        } else {
+          document.getElementById('collegeError').classList.add('hide');
+          document.getElementById('collegeError').classList.remove('has-error');
+          document.getElementById('createCollege').submit();
+        }
+      });
+    } else {
+      alert('please enter college name.');
+    }
+  }
 </script>
 @stop

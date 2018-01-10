@@ -147,4 +147,8 @@ class VkitCategoryController extends Controller
         }
         return Redirect::to('admin/manageVkitCategory');
     }
+
+    protected function isVkitCategoryExist(Request $request){
+        return VkitCategory::isVkitCategoryExist($request);
+    }
 }

@@ -100,4 +100,21 @@ class LiveVideo extends Model
             }
         }
     }
+
+    protected static function isLiveCourseVideoExist($request){
+        $courseId = InputSanitise::inputInt($request->get('course'));
+        $videoName = InputSanitise::inputString($request->get('video'));
+        $videoId = InputSanitise::inputInt($request->get('live_video_id'));
+        $result = static::where('live_course_id', $courseId)->where('name', $videoName);
+        if(!empty($videoId)){
+            $result->where('id', '!=', $videoId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+        return 'false';
+    }
 }

@@ -278,7 +278,7 @@ border-radius: 0px!important
                     @foreach($comments as $comment)
                     <div class="box-body chat" id="chat-box">
                       <div class="item" id="showComment_{{$comment->id}}">
-                        @if(!empty($comment->user->photo))
+                        @if(is_file($comment->user->photo))
                           <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
                         @else
                           <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -472,7 +472,7 @@ border-radius: 0px!important
         mainCommentDiv.id = 'showComment_'+obj.id;
 
         var commentImage = document.createElement('img');
-        if(obj.user_image){
+        if(obj.image_exist){
           var imageUrl =  "{{ asset('') }}"+obj.user_image;
         } else {
           var imageUrl = "{{ asset('images/user1.png') }}";
@@ -500,7 +500,7 @@ border-radius: 0px!important
 
         var ancUserNameDiv = document.createElement('a');
         ancUserNameDiv.className = 'SubCommentName';
-        ancUserNameDiv.innerHTML = obj.user_name;
+        ancUserNameDiv.innerHTML = obj.user_name + ' ';
         commentMessageDiv.appendChild(ancUserNameDiv);
 
         var pCommentBodyDiv = document.createElement('p');
@@ -589,7 +589,7 @@ border-radius: 0px!important
         mainSubCommentDiv.className = 'item replySubComment-1';
 
         var subcommentImage = document.createElement('img');
-        if(obj.user_image){
+        if(obj.image_exist){
           var subcommentImageUrl = "{{ asset('') }}"+obj.user_image;
         } else {
           var subcommentImageUrl = "{{ asset('images/user1.png') }}";
@@ -619,7 +619,7 @@ border-radius: 0px!important
         var pSubcommentBodyDiv = document.createElement('p');
         var ancUserNameDiv = document.createElement('a');
         ancUserNameDiv.className = 'SubCommentName';
-        ancUserNameDiv.innerHTML = obj.user_name;
+        ancUserNameDiv.innerHTML = obj.user_name + ' ';
         pSubcommentBodyDiv.appendChild(ancUserNameDiv);
 
         var spanSubCommentBodyDiv = document.createElement('span');

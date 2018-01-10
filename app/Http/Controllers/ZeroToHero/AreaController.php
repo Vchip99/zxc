@@ -157,4 +157,7 @@ class AreaController extends Controller
         return Area::getAreasByDesignation($designationId);
     }
 
+    protected function isAreaExist(Request $request){
+        return Area::isAreaExist($request);
+    }
 }

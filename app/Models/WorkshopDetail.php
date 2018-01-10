@@ -100,4 +100,20 @@ class WorkshopDetail extends Model
     protected function getWorkshopsByCategory($categoryId){
     	return static::where('workshop_category_id', $categoryId)->get();
     }
+
+    protected static function isOnlineWorkshopExist(Request $request){
+        $workshop = InputSanitise::inputString($request->get('workshop'));
+        $workshopId   = InputSanitise::inputInt($request->get('workshop_id'));
+        $category   = InputSanitise::inputInt($request->get('category'));
+        $result = static::where('workshop_category_id', $category)->where('name', '=',$workshop);
+        if(!empty($workshopId)){
+            $result->where('id', '!=', $workshopId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

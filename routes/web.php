@@ -11,6 +11,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/coursecategory/{id}/edit', 'Course\CourseCategoryController@edit');
 	Route::put('admin/updateCourseCategory', 'Course\CourseCategoryController@update');
 	Route::delete('admin/deleteCourseCategory', 'Course\CourseCategoryController@delete');
+	Route::post('admin/isCourseCategoryExist', 'Course\CourseCategoryController@isCourseCategoryExist');
 
 	// admin course sub category
 	Route::get('admin/manageCourseSubCategory', 'Course\CourseSubCategoryController@show');
@@ -19,6 +20,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/coursesubcategory/{id}/edit', 'Course\CourseSubCategoryController@edit');
 	Route::put('admin/updateCourseSubCategory', 'Course\CourseSubCategoryController@update');
 	Route::delete('admin/deleteCourseSubCategory', 'Course\CourseSubCategoryController@delete');
+	Route::post('admin/isCourseSubCategoryExist', 'Course\CourseSubCategoryController@isCourseSubCategoryExist');
 
 	// admin course course
 	Route::get('admin/manageCourseCourse', 'Course\CourseCourseController@show');
@@ -28,6 +30,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateCourseCourse', 'Course\CourseCourseController@update');
 	Route::delete('admin/deleteCourseCourse', 'Course\CourseCourseController@delete');
 	Route::post('admin/getCourseSubCategories', 'Course\CourseCourseController@getCourseSubCategories');
+	Route::post('admin/isCourseCourseExist', 'Course\CourseCourseController@isCourseCourseExist');
 
 	// admin course video
 	Route::get('admin/manageCourseVideo', 'Course\CourseVideoController@show');
@@ -36,6 +39,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/courseVideo/{id}/edit', 'Course\CourseVideoController@edit');
 	Route::put('admin/updateCourseVideo', 'Course\CourseVideoController@update');
 	Route::delete('admin/deleteCourseVideo', 'Course\CourseVideoController@delete');
+	Route::post('admin/isCourseVideoExist', 'Course\CourseVideoController@isCourseVideoExist');
+
 
 	//Admin Login
 	Route::get('admin/login', 'AdminAuth\LoginController@showLoginForm');
@@ -83,6 +88,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/college/{id}/edit', 'Test\CollegeInfoController@edit');
 	Route::put('admin/updateCollege', 'Test\CollegeInfoController@update');
 	Route::delete('admin/deleteCollege', 'Test\CollegeInfoController@delete');
+	Route::post('admin/isCollegeExist', 'Test\CollegeInfoController@isCollegeExist');
 
 	// user login
 	Route::get('login', 'UserAuth\LoginController@showLoginForm');
@@ -125,6 +131,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/category/{id}/edit', 'Test\CategoryController@edit');
 	Route::put('admin/updateCategory', 'Test\CategoryController@update');
 	Route::delete('admin/deleteCategory', 'Test\CategoryController@delete');
+	Route::post('admin/isTestCategoryExist', 'Test\CategoryController@isTestCategoryExist');
 
 	// admin test sub category
 	Route::get('admin/manageSubCategory', 'Test\SubCategoryController@show');
@@ -134,6 +141,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateSubCategory', 'Test\SubCategoryController@update');
 	Route::delete('admin/deleteSubCategory', 'Test\SubCategoryController@delete');
 	Route::post('admin/getSubCategories', [ 'as' => 'admin/getSubCategories', 'uses' => 'Test\SubCategoryController@getSubCategories' ]);
+	Route::post('admin/isTestSubCategoryExist', 'Test\SubCategoryController@isTestSubCategoryExist');
 
 	// admin test subject
 	Route::get('admin/manageSubject', 'Test\SubjectController@show');
@@ -142,6 +150,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/subject/{id}/edit', 'Test\SubjectController@edit');
 	Route::put('admin/updateSubject', 'Test\SubjectController@update');
 	Route::delete('admin/deleteSubject', 'Test\SubjectController@delete');
+	Route::post('admin/isTestSubjectExist', 'Test\SubjectController@isTestSubjectExist');
 
 	// admin  test paper
 	Route::get('admin/managePaper', 'Test\PaperController@show');
@@ -152,7 +161,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deletePaper', 'Test\PaperController@delete');
 	Route::post('admin/getSubjectsByCatIdBySubcatId', [ 'as' => 'admin/getSubjectsByCatIdBySubcatId','uses' => 'Test\PaperController@getSubjectsByCatIdBySubcatId' ]);
 	Route::post('admin/getPaperSectionsByPaperId', [ 'as' => 'admin/getPaperSectionsByPaperId','uses' => 'Test\PaperController@getPaperSectionsByPaperId' ]);
-
+	Route::post('admin/isTestPaperExist', 'Test\PaperController@isTestPaperExist');
 
 	// admin  test questions
 	Route::get('admin/manageQuestions', 'Test\QuestionController@index');
@@ -250,6 +259,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/discussionCategory/{id}/edit', 'Discussion\DiscussionCategoryController@edit');
 	Route::put('admin/updateDiscussionCategory', 'Discussion\DiscussionCategoryController@update');
 	Route::delete('admin/deleteDiscussionCategory', 'Discussion\DiscussionCategoryController@delete');
+	Route::post('admin/isDiscussionCategoryExist', 'Discussion\DiscussionCategoryController@isDiscussionCategoryExist');
 
 	// admin  vkit category
 	Route::get('admin/manageVkitCategory', 'Vkit\VkitCategoryController@show');
@@ -258,6 +268,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/vkitCategory/{id}/edit', 'Vkit\VkitCategoryController@edit');
 	Route::put('admin/updateVkitCategory', 'Vkit\VkitCategoryController@update');
 	Route::delete('admin/deleteVkitCategory', 'Vkit\VkitCategoryController@delete');
+	Route::post('admin/isVkitCategoryExist', 'Vkit\VkitCategoryController@isVkitCategoryExist');
 
 	// admin vkit project
 	Route::get('admin/manageVkitProject', 'Vkit\VkitProjectController@show');
@@ -266,6 +277,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/vkitProject/{id}/edit', 'Vkit\VkitProjectController@edit');
 	Route::put('admin/updateVkitProject', 'Vkit\VkitProjectController@update');
 	Route::delete('admin/deleteVkitProject','Vkit\VkitProjectController@delete');
+	Route::post('admin/isVkitProjectExist', 'Vkit\VkitProjectController@isVkitProjectExist');
 
 	// vkits user
 	Route::get('vkits', 'VkitController@show');
@@ -304,6 +316,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/blogCategory/{id}/edit', 'Blog\AdminBlogCategoryController@edit');
 	Route::put('admin/updateBlogCategory', 'Blog\AdminBlogCategoryController@update');
 	Route::delete('admin/deleteBlogCategory', 'Blog\AdminBlogCategoryController@delete');
+	Route::post('admin/isBlogCategoryExist', 'Blog\AdminBlogCategoryController@isBlogCategoryExist');
 
 	// admin blog
 	Route::get('admin/manageBlog', 'Blog\AdminBlogController@show');
@@ -312,6 +325,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/blog/{id}/edit', 'Blog\AdminBlogController@edit');
 	Route::put('admin/updateBlog', 'Blog\AdminBlogController@update');
 	Route::delete('admin/deleteBlog', 'Blog\AdminBlogController@delete');
+	Route::post('admin/isBlogExist', 'Blog\AdminBlogController@isBlogExist');
+
 
 	// admin live courses
 	Route::get('admin/manageLiveCourse', 'LiveCourse\LiveCourseController@show');
@@ -320,6 +335,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/liveCourse/{id}/edit', 'LiveCourse\LiveCourseController@edit');
 	Route::put('admin/updateLiveCourse', 'LiveCourse\LiveCourseController@update');
 	Route::delete('admin/deleteLiveCourses', 'LiveCourse\LiveCourseController@delete');
+	Route::post('admin/isLiveCourseExist', 'LiveCourse\LiveCourseController@isLiveCourseExist');
+
 
 	// admin live videos
 	Route::get('admin/manageLiveVideo', 'LiveCourse\LiveVideoController@show');
@@ -328,6 +345,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/liveVideo/{id}/edit', 'LiveCourse\LiveVideoController@edit');
 	Route::put('admin/updateLiveVideo', 'LiveCourse\LiveVideoController@update');
 	Route::delete('admin/deleteLiveVideo', 'LiveCourse\LiveVideoController@delete');
+	Route::post('admin/isLiveCourseVideoExist', 'LiveCourse\LiveVideoController@isLiveCourseVideoExist');
+
 
 	// admin Documents Category
 	Route::get('admin/manageDocumentsCategory', 'Documents\DocumentsCategoryController@show');
@@ -336,6 +355,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/documentCategory/{id}/edit', 'Documents\DocumentsCategoryController@edit');
 	Route::put('admin/updateDocumentsCategory', 'Documents\DocumentsCategoryController@update');
 	Route::delete('admin/deleteDocumentsCategory', 'Documents\DocumentsCategoryController@delete');
+	Route::post('admin/isDocumentCategoryExist', 'Documents\DocumentsCategoryController@isDocumentCategoryExist');
 
 	// admin Documents Docs
 	Route::get('admin/manageDocumentsDoc', 'Documents\DocumentsDocController@show');
@@ -344,6 +364,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/documentDoc/{id}/edit', 'Documents\DocumentsDocController@edit');
 	Route::put('admin/updateDocumentsDoc', 'Documents\DocumentsDocController@update');
 	Route::delete('admin/deleteDocumentsDoc', 'Documents\DocumentsDocController@delete');
+	Route::post('admin/isDocumentDocExist', 'Documents\DocumentsDocController@isDocumentDocExist');
 
 	// Documents Docs user front
 	Route::get('documents/{id?}', 'DocumentsController@show');
@@ -472,6 +493,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/designation/{id}/edit', 'ZeroToHero\DesignationController@edit');
 	Route::put('admin/updateDesignation', 'ZeroToHero\DesignationController@update');
 	Route::delete('admin/deleteDesignation', 'ZeroToHero\DesignationController@delete');
+	Route::post('admin/isDesignationExist', 'ZeroToHero\DesignationController@isDesignationExist');
 
 	//manage Area
 	Route::get('admin/manageArea', 'ZeroToHero\AreaController@show');
@@ -481,7 +503,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateArea', 'ZeroToHero\AreaController@update');
 	Route::delete('admin/deleteArea', 'ZeroToHero\AreaController@delete');
 	Route::post('admin/getAreasByDesignation', 'ZeroToHero\AreaController@getAreasByDesignation');
-
+	Route::post('admin/isAreaExist', 'ZeroToHero\AreaController@isAreaExist');
 
 	//manage ZeroToHero
 	Route::get('admin/manageZeroToHero', 'ZeroToHero\ZeroToHeroController@show');
@@ -490,6 +512,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/herotozero/{id}/edit', 'ZeroToHero\ZeroToHeroController@edit');
 	Route::put('admin/updateZeroToHero', 'ZeroToHero\ZeroToHeroController@update');
 	Route::delete('admin/deleteHero', 'ZeroToHero\ZeroToHeroController@delete');
+	Route::post('admin/isHeroExist', 'ZeroToHero\ZeroToHeroController@isHeroExist');
 
 	// Notifications
 	Route::get('myNotifications', 'AccountController@notifications');
@@ -534,6 +557,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/workshopCategory/{id}/edit', 'Workshop\WorkshopCategoryController@edit');
 	Route::put('admin/updateWorkshopCategory', 'Workshop\WorkshopCategoryController@update');
 	Route::delete('admin/deleteWorkshopCategory', 'Workshop\WorkshopCategoryController@delete');
+	Route::post('admin/isOnlineWorkshopCategoryExist', 'Workshop\WorkshopCategoryController@isOnlineWorkshopCategoryExist');
 
 	// workshop Details
 	Route::get('admin/manageWorkshopDetails', 'Workshop\WorkshopDetailsController@show');
@@ -542,6 +566,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/workshopDetails/{id}/edit', 'Workshop\WorkshopDetailsController@edit');
 	Route::put('admin/updateWorkshopDetails', 'Workshop\WorkshopDetailsController@update');
 	Route::delete('admin/deleteWorkshopDetails', 'Workshop\WorkshopDetailsController@delete');
+	Route::post('admin/isOnlineWorkshopExist', 'Workshop\WorkshopDetailsController@isOnlineWorkshopExist');
 
 	// workshop Videos
 	Route::get('admin/manageWorkshopVideos', 'Workshop\WorkshopVideosController@show');
@@ -551,6 +576,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateWorkshopVideo', 'Workshop\WorkshopVideosController@update');
 	Route::post('admin/getWorkshopsByCategory', 'Workshop\WorkshopVideosController@getWorkshopsByCategory');
 	Route::delete('admin/deleteWorkshopVideo', 'Workshop\WorkshopVideosController@delete');
+	Route::post('admin/isOnlineWorkshopVideoExist', 'Workshop\WorkshopVideosController@isOnlineWorkshopVideoExist');
 
 	// workshop front
 	Route::get('workshops', 'WorkshopController@show');
@@ -565,6 +591,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/placementArea/{id}/edit', 'Placement\PlacementAreaController@edit');
 	Route::put('admin/updatePlacementArea', 'Placement\PlacementAreaController@update');
 	Route::delete('admin/deletePlacementArea', 'Placement\PlacementAreaController@delete');
+	Route::post('admin/isPlacementAreaExist', 'Placement\PlacementAreaController@isPlacementAreaExist');
 
 	// placement company
 	Route::get('admin/managePlacementCompany', 'Placement\PlacementCompanyController@show');
@@ -573,6 +600,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/placementCompany/{id}/edit', 'Placement\PlacementCompanyController@edit');
 	Route::put('admin/updatePlacementCompany', 'Placement\PlacementCompanyController@update');
 	Route::delete('admin/deletePlacementCompany', 'Placement\PlacementCompanyController@delete');
+	Route::post('admin/isPlacementCompanyExist', 'Placement\PlacementCompanyController@isPlacementCompanyExist');
 
 	// placement Details
 	Route::get('admin/managePlacementCompanyDetails', 'Placement\PlacementCompanyDetailsController@show');
@@ -635,6 +663,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/offlineWorkshopCategory/{id}/edit', 'OfflineWorkshop\OfflineWorkshopCategoryController@edit');
 	Route::put('admin/updateOfflineWorkshopCategory', 'OfflineWorkshop\OfflineWorkshopCategoryController@update');
 	Route::delete('admin/deleteOfflineWorkshopCategory', 'OfflineWorkshop\OfflineWorkshopCategoryController@delete');
+	Route::post('admin/isOfflineWorkshopCategoryExist', 'OfflineWorkshop\OfflineWorkshopCategoryController@isOfflineWorkshopCategoryExist');
+
 
 	// offline workshop Details
 	Route::get('admin/manageOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@show');
@@ -643,6 +673,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/offlineWorkshopDetails/{id}/edit', 'OfflineWorkshop\OfflineWorkshopDetailsController@edit');
 	Route::put('admin/updateOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@update');
 	Route::delete('admin/deleteOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@delete');
+	Route::post('admin/isOfflineWorkshopExist', 'OfflineWorkshop\OfflineWorkshopDetailsController@isOfflineWorkshopExist');
+
 
 	// front offline workshop
 	Route::get('offlineworkshops', 'OfflineWorkshopController@show');
@@ -657,6 +689,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/motivationalSpeechCategory/{id}/edit', 'MotivationalSpeech\MotivationalSpeechCategoryController@edit');
 	Route::put('admin/updateMotivationalSpeechCategory', 'MotivationalSpeech\MotivationalSpeechCategoryController@update');
 	Route::delete('admin/deleteMotivationalSpeechCategory', 'MotivationalSpeech\MotivationalSpeechCategoryController@delete');
+	Route::post('admin/isMotivationalSpeechCategoryExist', 'MotivationalSpeech\MotivationalSpeechCategoryController@isMotivationalSpeechCategoryExist');
+
 
 	// Motivational Speech Details
 	Route::get('admin/manageMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@show');
@@ -665,6 +699,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/motivationalSpeechDetails/{id}/edit', 'MotivationalSpeech\MotivationalSpeechDetailsController@edit');
 	Route::put('admin/updateMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@update');
 	Route::delete('admin/deleteMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@delete');
+	Route::post('admin/isMotivationalSpeechExist', 'MotivationalSpeech\MotivationalSpeechDetailsController@isMotivationalSpeechExist');
 
 	// Motivational Speech Video
 	Route::get('admin/manageMotivationalSpeechVideos', 'MotivationalSpeech\MotivationalSpeechVideoController@show');

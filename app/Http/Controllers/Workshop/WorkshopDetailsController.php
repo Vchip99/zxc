@@ -147,4 +147,8 @@ class WorkshopDetailsController extends Controller
         }
         return Redirect::to('admin/manageWorkshopDetails');
     }
+
+    protected function isOnlineWorkshopExist(Request $request){
+        return WorkshopDetail::isOnlineWorkshopExist($request);
+    }
 }

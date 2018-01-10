@@ -37,7 +37,6 @@ class DocumentsDocController extends Controller
         'author' => 'required|string',
         'introduction' => 'required|string',
         'doc_category_id' => 'required',
-        'is_paid' => 'required|integer',
         'price' => 'required',
         'difficulty_level' => 'required|integer',
         'type_of_document' => 'required|integer',
@@ -51,7 +50,6 @@ class DocumentsDocController extends Controller
         'author' => 'required|string',
         'introduction' => 'required|string',
         'doc_category_id' => 'required',
-        'is_paid' => 'required|integer',
         'price' => 'required',
         'difficulty_level' => 'required|integer',
         'type_of_document' => 'required|integer',
@@ -191,5 +189,9 @@ class DocumentsDocController extends Controller
             }
         }
         return Redirect::to('admin/manageDocumentsDoc');
+    }
+
+    protected function isDocumentDocExist(Request $request){
+        return DocumentsDoc::isDocumentDocExist($request);
     }
 }

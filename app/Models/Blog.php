@@ -119,5 +119,21 @@ class Blog extends Model
             }
         }
     }
+
+    protected static function isBlogExist(Request $request){
+        $category = InputSanitise::inputInt($request->get('category'));
+        $blog = InputSanitise::inputString($request->get('blog'));
+        $blogId   = InputSanitise::inputInt($request->get('blog_id'));
+        $result = static::where('blog_category_id', $category)->where('title', '=',$blog);
+        if(!empty($blogId)){
+            $result->where('id', '!=', $blogId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }
 

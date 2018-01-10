@@ -154,4 +154,8 @@ class DesignationController extends Controller
         }
         return Redirect::to('admin/manageDesignation');
     }
+
+    protected function isDesignationExist(Request $request){
+        return Designation::isDesignationExist($request);
+    }
 }

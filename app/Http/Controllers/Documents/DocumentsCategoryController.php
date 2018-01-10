@@ -148,4 +148,8 @@ class DocumentsCategoryController extends Controller
         }
         return Redirect::to('admin/manageDocumentsCategory');
     }
+
+    protected function isDocumentCategoryExist(Request $request){
+        return DocumentsCategory::isDocumentCategoryExist($request);
+    }
 }
