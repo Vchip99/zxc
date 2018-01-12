@@ -483,11 +483,16 @@
 		    <div class="form-group row num_ans hide">
 		    	<label class="col-sm-2 col-form-label">Enter Answer:</label>
 			    <div class="col-sm-3 ">
-			    	FROM <input class="form-control" name="min" type="text" value="@if(isset($testQuestion->id)){!! $testQuestion->min !!}@endif"/>
-
+			    	FROM <input class="form-control" name="min" id="min" type="text" value="@if(isset($testQuestion->id)){!! $testQuestion->min !!}@endif"/>
+			    	<div class="hide" role="alert" id="empty_min_error">
+			    		<p>Please enter from value.</p>
+					</div>
 			    </div>
 			    <div class="col-sm-3">
-			      	To <input class="form-control" name="max" type="text" value="@if(isset($testQuestion->id)){!! $testQuestion->max !!}@endif"/>
+			      	To <input class="form-control" name="max" id="max" type="text" value="@if(isset($testQuestion->id)){!! $testQuestion->max !!}@endif"/>
+			      	<div class="hide" role="alert" id="empty_max_error">
+			    		<p>Please enter to value.</p>
+					</div>
 			    </div>
 		    </div>
 		    <div class="form-group row">
@@ -658,7 +663,7 @@
 
 	function checkCkeditor(){
 		var errorCount = 0;
-		var questionLength = CKEDITOR.instances.question.getData().length; //var question = document.getElementById('question').value;
+		var questionLength = CKEDITOR.instances.question.getData().length;
 
 		if(0 == questionLength){
 			$('#question_error').removeClass('hide');
@@ -669,7 +674,7 @@
 			$('#question_error').removeClass('alert alert-danger');
 		}
 
-		var solutionLength = CKEDITOR.instances.solution.getData().length; //var question = document.getElementById('question').value;
+		var solutionLength = CKEDITOR.instances.solution.getData().length;
 
 		if(0 == solutionLength){
 			$('#solution_error').removeClass('hide');
@@ -709,23 +714,43 @@
 			$('#pos_num_error').addClass('hide');
 			$('#pos_num_error').removeClass('alert alert-danger');
 		}
+		if($('#mcq_ques').hasClass('active')){
+			var answerNum= document.getElementById('answer').value;
+			if( "" == answerNum){
+				$('#empty_answer_error').removeClass('hide');
+				$('#empty_answer_error').addClass('alert alert-danger');
+				errorCount += 1;
+			}else if( answerNum >= 6){
+				$('#answer_error').removeClass('hide');
+				$('#answer_error').addClass('alert alert-danger');
+				errorCount += 1;
+			} else{
+				$('#answer_error').addClass('hide');
+				$('#answer_error').removeClass('alert alert-danger');
+				$('#empty_answer_error').addClass('hide');
+				$('#empty_answer_error').removeClass('alert alert-danger');
+			}
+		} else {
+			var min= document.getElementById('min').value;
+			if( "" == min){
+				$('#empty_min_error').removeClass('hide');
+				$('#empty_min_error').addClass('alert alert-danger');
+				errorCount += 1;
+			} else {
+				$('#empty_min_error').addClass('hide');
+				$('#empty_min_error').removeClass('alert alert-danger');
+			}
 
-		var answerNum= document.getElementById('answer').value;
-		if( "" == answerNum){
-			$('#empty_answer_error').removeClass('hide');
-			$('#empty_answer_error').addClass('alert alert-danger');
-			errorCount += 1;
-		}else if( answerNum >= 6){
-			$('#answer_error').removeClass('hide');
-			$('#answer_error').addClass('alert alert-danger');
-			errorCount += 1;
-		} else{
-			$('#answer_error').addClass('hide');
-			$('#answer_error').removeClass('alert alert-danger');
-			$('#empty_answer_error').addClass('hide');
-			$('#empty_answer_error').removeClass('alert alert-danger');
+			var max= document.getElementById('max').value;
+			if( "" == max){
+				$('#empty_max_error').removeClass('hide');
+				$('#empty_max_error').addClass('alert alert-danger');
+				errorCount += 1;
+			} else {
+				$('#empty_max_error').addClass('hide');
+				$('#empty_max_error').removeClass('alert alert-danger');
+			}
 		}
-
 
 		if( 0 == errorCount){
 			var form = document.getElementById('createForm');

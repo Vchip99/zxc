@@ -311,13 +311,13 @@ font-size: 20px;
     <div class="tab-content" style="background-color: #01bafd; padding : 6px 15px;">
       <div id="about1" class="tab-pane fade in active">
         <h3 class="v_h3_title ">About</h3>
-          <p class="more"> Vchip-edu is the part of Vchip Technology. Vchip Technology is IoT base young start-up company having head office in Pune. Vchip Technology is working in Education, Health and Agriculture sectores.
+          <p class="more"> Vchip-edu is the part of Vchip Technology. Vchip Technology is IoT based young start-up company having head office in Pune. Vchip Technology is working in Education, Health and Agriculture sectors.
           <br/>
-          We at <b>Vchip-edu</b> believes that better education is right of everyone. In our country (India), most of people live in villages. So Vchip-edu is working on Digital Education platform, so that we can provide a quality education equally in villages and remote areas along with urban area. In other word everyone can learn with fun from anywhere in the world at any time.
+          We at <b>Vchip-edu</b> believe that better education is right of everyone. In our country (India), most of people live in villages. So Vchip-edu is working on Digital Education platform, so that we can provide a quality education equally in villages and remote areas along with urban area. In other words everyone can learn with fun from anywhere in the world at any time.
           <br/><br/>
-          Currently, we are focusing on bridging a gap between industries and educational organizations along with digital villages. In that we are working on direct interaction of students with industries and our experts who belong to different industries. Also, interaction of students with Founder and CEO’s of successful start-ups. Also, our platform have all the require things which are needed for placement like online test (design according to pattern of the major companies), online course for aptitude preparation, discussion forum etc.
+          Currently, we are focusing on bridging a gap between industries and educational organizations along with digital villages. In that we are working on direct interaction of students with industries and our experts who belong to different industries. Also, interaction of students with Founder and CEO’s of successful start-ups. Also, our platform have all the required things which are needed for placement like online test (design according to pattern of the major companies), online course for aptitude preparation, discussion forum etc.
           <br/><br/>
-          We are providing access of Vchip-edu platform to colleges at totally free of cost, so more and more students can get benefit of it. Student access to our platform is also totally free of cost. Also, any private/coaching institutes can start their classes digitally with in 15 minute on our platform. For  private/coaching institutes also our platform is free to use upto 20 logins.
+          We are providing access of Vchip-edu platform to colleges at totally free of cost, so more and more students can get benefit of it. Student access to our platform is also totally free of cost. Also, any private/coaching institutes can start their classes digitally within 15 minute on our platform. For  private/coaching institutes also our platform is free to use upto 20 logins.
           <br/>
               <b>" We always believe that better society is a best place to live and educated society is better than best. "</b>
           </p>
@@ -328,7 +328,7 @@ font-size: 20px;
       </div>
       <div id="mission" class="tab-pane fade">
         <h3 class="v_h3_title">Mission</h3>
-        <p>We are working on digital education platform with the prior motive of bridging a gap between industry and educational organizations along with digital village. So that, we are collaborating with educational organization, institutes, colleges along with well establish industries and start-ups. </p>
+        <p>We are working on digital education platform with the prior motive of bridging a gap between industry and educational organizations along with digital village. So that, we are collaborating with educational organization, institutes, colleges along with well established industries and start-ups. </p>
       </div>
     </div>
   </div>
@@ -418,7 +418,7 @@ font-size: 20px;
       <h3 class="v_h3_title">Workshop</h3>
       <p>We provide online Workshop...</p>
       <p class="mrgn_20_top">
-        <a href="workshop.html" class="btn-link">Learn More
+        <a href="{{ url('offlineworkshops') }}" class="btn-link">Learn More
           <i class="fa fa-angle-right" aria-hidden="true"></i>
         </a>
       </p>
