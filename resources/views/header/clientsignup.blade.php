@@ -179,7 +179,6 @@
   }
 
   function confirmSubmit(){
-
     document.getElementById('registerClient').submit();
   }
 </script>

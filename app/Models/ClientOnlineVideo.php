@@ -160,4 +160,20 @@ class ClientOnlineVideo extends Model
         return static::where('client_id', Auth::guard('clientuser')->user()->client_id)->select('client_online_videos.*')->get();
     }
 
+    protected static function isClientCourseVideoExist(Request $request){
+        $clientId = Auth::guard('client')->user()->id;
+        $courseId = InputSanitise::inputInt($request->get('course'));
+        $videoId = InputSanitise::inputInt($request->get('video_id'));
+        $videoName = InputSanitise::inputString($request->get('video'));
+        $result = static::where('client_id', $clientId)->where('course_id', $courseId)->where('name', '=',$videoName);
+        if(!empty($videoId)){
+            $result->where('id', '!=', $videoId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

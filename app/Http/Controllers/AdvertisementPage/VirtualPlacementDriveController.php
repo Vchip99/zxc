@@ -66,7 +66,7 @@ class VirtualPlacementDriveController extends Controller
         }
         DB::beginTransaction();
         try
-        {	//dd($request->all());
+        {
             $virtualPlacementDrive = VirtualPlacementDrive::addOrUpdateVirtualPlacementDrive($request);
             if(is_object($virtualPlacementDrive)){
                 DB::commit();

@@ -138,8 +138,7 @@ class ClientBaseController extends BaseController
                 $total += $userTestSubCategory->price;
             }
         }
-        // return \DB::connection('mysql2')->getQueryLog();
-        // dd($userCourses);
+
         $results['total'] = $total;
         return $results;
     }

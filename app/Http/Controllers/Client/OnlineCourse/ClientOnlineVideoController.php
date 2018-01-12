@@ -146,4 +146,8 @@ class ClientOnlineVideoController extends ClientBaseController
     	return Redirect::to('manageOnlineVideo');
     }
 
+    protected function isClientCourseVideoExist(Request $request){
+        return ClientOnlineVideo::isClientCourseVideoExist($request);
+    }
+
 }

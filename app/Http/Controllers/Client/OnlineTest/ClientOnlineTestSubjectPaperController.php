@@ -179,4 +179,7 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
         return ClientOnlinePaperSection::paperSectionsByPaperId($request->paper_id, Auth::guard('client')->user()->id);
     }
 
+    protected function isClientTestPaperExist(Request $request){
+        return ClientOnlineTestSubjectPaper::isClientTestPaperExist($request);
+    }
 }

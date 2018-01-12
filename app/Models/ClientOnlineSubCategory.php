@@ -113,4 +113,21 @@ class ClientOnlineSubCategory extends Model
             }
         }
     }
+
+    protected static function isClientCourseSubCategoryExist(Request $request){
+        $clientId = Auth::guard('client')->user()->id;
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subCategoryId = InputSanitise::inputInt($request->get('subcategory_id'));
+        $subCategoryName = InputSanitise::inputString($request->get('subcategory'));
+        $result = static::where('client_id', $clientId)->where('category_id', $categoryId)->where('name', '=',$subCategoryName);
+        if(!empty($subCategoryId)){
+            $result->where('id', '!=', $subCategoryId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

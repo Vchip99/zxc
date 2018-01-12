@@ -157,4 +157,10 @@ class MotivationalSpeechDetailsController extends Controller
     protected function isMotivationalSpeechExist(Request $request){
         return MotivationalSpeechDetail::isMotivationalSpeechExist($request);
     }
+
+
+    protected function getMotivationalSpeechesByCategoryByAdmin(Request $request){
+        $category   = InputSanitise::inputInt($request->get('category'));
+        return MotivationalSpeechDetail::getMotivationalSpeechesByCategoryByAdmin($category);
+    }
 }

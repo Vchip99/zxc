@@ -170,4 +170,8 @@ class ClientOnlineTestSubCategoryController extends ClientBaseController
     protected function getOnlineTestCategories(Request $request){
         return ClientOnlineTestCategory::getCategoriesByInstituteCourseId($request->get('id'));
     }
+
+    protected function isClientTestSubCategoryExist(Request $request){
+        return ClientOnlineTestSubCategory::isClientTestSubCategoryExist($request);
+    }
 }

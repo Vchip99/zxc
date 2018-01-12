@@ -294,4 +294,22 @@ class ClientOnlineCourse extends Model
             }
         }
     }
+
+    protected static function isClientOnlineCourseExist(Request $request){
+        $clientId = Auth::guard('client')->user()->id;
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subCategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        $courseName = InputSanitise::inputString($request->get('course'));
+        $courseId = InputSanitise::inputInt($request->get('course_id'));
+        $result = static::where('client_id', $clientId)->where('category_id', $categoryId)->where('sub_category_id', $subCategoryId)->where('name', '=',$courseName);
+        if(!empty($courseId)){
+            $result->where('id', '!=', $courseId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
 }

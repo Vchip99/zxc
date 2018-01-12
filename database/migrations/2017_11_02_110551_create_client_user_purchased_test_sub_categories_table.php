@@ -19,7 +19,6 @@ class CreateClientUserPurchasedTestSubCategoriesTable extends Migration
             $table->integer('test_category_id');
             $table->integer('test_sub_category_id');
             $table->integer('client_id');
-            $table->string('payment_id');
         });
     }
 

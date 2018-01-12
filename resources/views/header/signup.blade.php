@@ -169,7 +169,7 @@
                           <br/>
                           <!-- <button type="submit" value="Register" name="submit" class="btn btn-info btn-block">Register
                           </button><br /> -->
-                          <button name="register" class="btn btn-info btn-block" onclick="event.preventDefault(); confirmSubmit();" data-toggle="tooltip" title="Register">Register</button></br>
+                          <button id="registerBtn" class="btn btn-info btn-block" onclick="event.preventDefault(); confirmSubmit();" data-toggle="tooltip" title="Register">Register</button></br>
                           <div><a class="mrgn_10_top" href="{{ url('/')}}">Alredy Member?</a></div>
                          </form>
                       </div>
@@ -268,7 +268,10 @@
         }
       }
       if( 0 == error){
+        document.getElementById('registerBtn').disabled = true;
         document.getElementById('registerUser').submit();
+      } else {
+        document.getElementById('registerBtn').disabled = false;
       }
     }
 
@@ -295,7 +298,10 @@
         document.getElementById('department_error').classList.add('hide');
       }
       if( 0 == error){
+        document.getElementById('registerBtn').disabled = true;
         document.getElementById('registerUser').submit();
+      } else {
+        document.getElementById('registerBtn').disabled = false;
       }
     }
 
@@ -315,7 +321,10 @@
         document.getElementById('college_error').classList.add('hide');
       }
       if( 0 == error){
+        document.getElementById('registerBtn').disabled = true;
         document.getElementById('registerUser').submit();
+      } else {
+        document.getElementById('registerBtn').disabled = false;
       }
     }
   }

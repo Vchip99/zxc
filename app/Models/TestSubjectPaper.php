@@ -190,7 +190,7 @@ class TestSubjectPaper extends Model
                     ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
                     ->where('test_subject_papers.test_category_id', $catId)
                     ->where('test_subject_papers.test_sub_category_id', $subcatId)
-                    ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d'))
+                    ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
                     ->select('test_subject_papers.id','test_subject_papers.*')
                     ->groupBy('test_subject_papers.id')
                     ->get();

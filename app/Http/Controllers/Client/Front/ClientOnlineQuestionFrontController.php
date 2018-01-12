@@ -60,7 +60,6 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                     $clientId = 0;
                 }
                 $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
-
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
                         if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -245,7 +244,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         return view('client.front.question.solutions', compact('results', 'userResults', 'score', 'sections'));
     }
 
-    protected function showUserTestSolution(Request $request){// dd($request->all());
+    protected function showUserTestSolution(Request $request){
         $paper = ClientOnlineTestSubjectPaper::find($request->paper_id);
         $sections = [];
         $userResults = [];

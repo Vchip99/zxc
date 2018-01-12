@@ -29,7 +29,6 @@ class ClientOnlineTestSubjectPaper extends Model
      *  add/update paper
      */
     protected static function addOrUpdateOnlineTestSubjectPaper( Request $request, $isUpdate=false){
-        // dd($request->all());
         $sessions = [];
         $addPaperSessions = [];
         $updatePaperSessions = [];
@@ -342,5 +341,25 @@ class ClientOnlineTestSubjectPaper extends Model
     protected static function getClientOnlineTestSubjectPapersByClient(){
         return static::where('client_online_test_subject_papers.client_id', Auth::guard('clientuser')->user()->client_id)
             ->select('client_online_test_subject_papers.*')->get();
+    }
+
+    protected static function isClientTestPaperExist(Request $request){
+        $clientId = Auth::guard('client')->user()->id;
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        $subjectId = InputSanitise::inputInt($request->get('subject'));
+        $paperName = InputSanitise::inputString($request->get('paper'));
+        $paperId = InputSanitise::inputInt($request->get('paper_id'));
+        $result = static::where('client_id', $clientId)->where('category_id', $categoryId)->where('sub_category_id', $subcategoryId)->where('subject_id', $subjectId)->where('name', $paperName);
+        if(!empty($paperId)){
+            $result->where('id', '!=', $paperId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+        return 'false';
     }
 }

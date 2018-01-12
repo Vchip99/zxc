@@ -77,7 +77,11 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $subdomain = '';
+        if('other' == $data['college']){
+            $data['department'] = '';
+            $data['year'] = '';
+            $data['roll_no'] = '';
+        }
         $emailToken= str_random(60);
         $user = User::create([
                 'name' => $data['name'],
@@ -173,23 +177,26 @@ class RegisterController extends Controller
             } else {
                 $data['degree'] = '';
             }
-            if($request->get('college') > 0){
+            if('other' != $request->get('college') && $request->get('college') > 0){
                 $data['college'] = $college->name?:'';
                 if($request->get('department') > 0 && is_object($collegeDept)){
                     $data['department'] = $collegeDept->name;
                 } else {
                     $data['department'] = '';
                 }
+                if($request->get('year') > 0){
+                    $data['year'] = $year[$request->get('year')];
+                } else {
+                    $data['year'] = '';
+                }
+                $data['roll_no'] = $request->get('roll_no')?:'';
             } else{
                 $data['college'] = $request->get('college');
                 $data['department'] = '';
-            }
-            if($request->get('year') > 0){
-                $data['year'] = $year[$request->get('year')];
-            } else {
                 $data['year'] = '';
+                $data['roll_no'] = '';
             }
-            $data['roll_no'] = $request->get('roll_no')?:'';
+
             $data['other_source'] = $request->get('other_source')?:'';
 
             // send mail to admin after new registration

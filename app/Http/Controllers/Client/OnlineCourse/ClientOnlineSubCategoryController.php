@@ -160,4 +160,8 @@ class ClientOnlineSubCategoryController extends ClientBaseController
     protected function getOnlineCategories(Request $request){
         return ClientOnlineCategory::getCategoriesByInstituteCourseId($request->get('id'));
     }
+
+    protected function isClientCourseSubCategoryExist(Request $request){
+        return ClientOnlineSubCategory::isClientCourseSubCategoryExist($request);
+    }
 }

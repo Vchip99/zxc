@@ -700,6 +700,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@update');
 	Route::delete('admin/deleteMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@delete');
 	Route::post('admin/isMotivationalSpeechExist', 'MotivationalSpeech\MotivationalSpeechDetailsController@isMotivationalSpeechExist');
+	Route::post('admin/getMotivationalSpeechesByCategoryByAdmin', 'MotivationalSpeech\MotivationalSpeechDetailsController@getMotivationalSpeechesByCategoryByAdmin');
 
 	// Motivational Speech Video
 	Route::get('admin/manageMotivationalSpeechVideos', 'MotivationalSpeech\MotivationalSpeechVideoController@show');
@@ -708,6 +709,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/motivationalSpeechVideo/{id}/edit', 'MotivationalSpeech\MotivationalSpeechVideoController@edit');
 	Route::put('admin/updateMotivationalSpeechVideo', 'MotivationalSpeech\MotivationalSpeechVideoController@update');
 	Route::delete('admin/deleteMotivationalSpeechVideo', 'MotivationalSpeech\MotivationalSpeechVideoController@delete');
+	Route::post('admin/isMotivationalSpeechVideoExist', 'MotivationalSpeech\MotivationalSpeechVideoController@isMotivationalSpeechVideoExist');
+
 
 	// Motional speech front
 	Route::get('motivationalspeech', 'MotivationalSpeechController@show');
@@ -806,6 +809,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('onlinecategory/{id}/edit', 'Client\OnlineCourse\ClientOnlineCategoryController@edit');
   	Route::put('updateOnlineCategory', 'Client\OnlineCourse\ClientOnlineCategoryController@update');
   	Route::delete('deleteOnlineCategory', 'Client\OnlineCourse\ClientOnlineCategoryController@delete');
+  	Route::post('isClientCourseCategoryExist', 'Client\OnlineCourse\ClientOnlineCategoryController@isClientCourseCategoryExist');
 
   	// sub category
   	Route::get('manageOnlineSubCategory', 'Client\OnlineCourse\ClientOnlineSubCategoryController@show');
@@ -815,6 +819,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::put('updateOnlineSubCategory', 'Client\OnlineCourse\ClientOnlineSubCategoryController@update');
   	Route::delete('deleteOnlineSubCategory', 'Client\OnlineCourse\ClientOnlineSubCategoryController@delete');
   	Route::post('getOnlineCategories', 'Client\OnlineCourse\ClientOnlineSubCategoryController@getOnlineCategories');
+  	Route::post('isClientCourseSubCategoryExist', 'Client\OnlineCourse\ClientOnlineSubCategoryController@isClientCourseSubCategoryExist');
 
 
   	// Online course
@@ -825,7 +830,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::put('updateOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@update');
   	Route::delete('deleteOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@delete');
 	Route::post('getOnlineCourseByInstituteCourseId', 'Client\OnlineCourse\ClientOnlineCourseController@getOnlineCourseByInstituteCourseId');
-
+	Route::post('isClientOnlineCourseExist', 'Client\OnlineCourse\ClientOnlineCourseController@isClientOnlineCourseExist');
 
   	// Online video
   	Route::get('manageOnlineVideo', 'Client\OnlineCourse\ClientOnlineVideoController@show');
@@ -834,7 +839,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('onlinevideo/{id}/edit', 'Client\OnlineCourse\ClientOnlineVideoController@edit');
   	Route::put('updateOnlineVideo', 'Client\OnlineCourse\ClientOnlineVideoController@update');
   	Route::delete('deleteOnlineVideo', 'Client\OnlineCourse\ClientOnlineVideoController@delete');
-
+  	Route::post('isClientCourseVideoExist', 'Client\OnlineCourse\ClientOnlineVideoController@isClientCourseVideoExist');
 
   	// test category
   	Route::get('manageOnlineTestCategory', 'Client\OnlineTest\ClientOnlineTestCategoryController@show');
@@ -843,6 +848,8 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('onlinetestcategory/{id}/edit', 'Client\OnlineTest\ClientOnlineTestCategoryController@edit');
   	Route::put('updateOnlineTestCategory', 'Client\OnlineTest\ClientOnlineTestCategoryController@update');
   	Route::delete('deleteOnlineTestCategory', 'Client\OnlineTest\ClientOnlineTestCategoryController@delete');
+  	Route::post('isClientTestCategoryExist', 'Client\OnlineTest\ClientOnlineTestCategoryController@isClientTestCategoryExist');
+
 
   	// test sub category
   	Route::get('manageOnlineTestSubCategory', 'Client\OnlineTest\ClientOnlineTestSubCategoryController@show');
@@ -852,6 +859,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::put('updateOnlineTestSubCategory', 'Client\OnlineTest\ClientOnlineTestSubCategoryController@update');
   	Route::delete('deleteOnlineTestSubCategory', 'Client\OnlineTest\ClientOnlineTestSubCategoryController@delete');
   	Route::post('getOnlineTestCategories', 'Client\OnlineTest\ClientOnlineTestSubCategoryController@getOnlineTestCategories');
+  	Route::post('isClientTestSubCategoryExist', 'Client\OnlineTest\ClientOnlineTestSubCategoryController@isClientTestSubCategoryExist');
 
   	// test subject
   	Route::get('manageOnlineTestSubject', 'Client\OnlineTest\ClientOnlineTestSubjectController@show');
@@ -861,6 +869,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::put('updateOnlineTestSubject', 'Client\OnlineTest\ClientOnlineTestSubjectController@update');
   	Route::delete('deleteOnlineTestSubject', 'Client\OnlineTest\ClientOnlineTestSubjectController@delete');
 	Route::post('getOnlineSubjectsByCatIdBySubcatId', 'Client\OnlineTest\ClientOnlineTestSubjectController@getOnlineSubjectsByCatIdBySubcatId');
+	Route::post('isClientTestSubjectExist', 'Client\OnlineTest\ClientOnlineTestSubjectController@isClientTestSubjectExist');
 
   	// test subject paper
   	Route::get('manageOnlineTestSubjectPaper', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@show');
@@ -871,6 +880,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::delete('deleteOnlineTestSubjectPaper', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@delete');
   	Route::post('getOnlinePapersBySubjectId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@getOnlinePapersBySubjectId');
   	Route::post('paperSectionsByPaperId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@paperSectionsByPaperId');
+  	Route::post('isClientTestPaperExist', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@isClientTestPaperExist');
 
   	// test question
   	Route::get('manageOnlineTestQuestion', 'Client\OnlineTest\ClientOnlineTestQuestionController@index');

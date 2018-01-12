@@ -160,4 +160,7 @@ class ClientOnlineTestCategoryController extends ClientBaseController
 		return Redirect::to('manageOnlineTestCategory');
     }
 
+    protected function isClientTestCategoryExist(Request $request){
+        return ClientOnlineTestCategory::isClientTestCategoryExist($request);
+    }
 }

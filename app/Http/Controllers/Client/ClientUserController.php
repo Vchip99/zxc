@@ -619,7 +619,6 @@ class ClientUserController extends BaseController
               Mail::to('vchipdesigng8@gmail.com')->send(new PaymentGatewayErrors((string)$err));
             } else {
                 $result = json_decode($response);
-                // dd($result);
                 if( 'true' == $result->status){
                     DB::connection('mysql2')->beginTransaction();
                     try

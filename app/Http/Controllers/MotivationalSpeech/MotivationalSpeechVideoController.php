@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Redirect;
 use App\Models\MotivationalSpeechVideo;
 use App\Models\MotivationalSpeechDetail;
+use App\Models\MotivationalSpeechCategory;
 use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\User;
@@ -33,6 +34,7 @@ class MotivationalSpeechVideoController extends Controller
      * the controller to reuse the rules.
      */
     protected $validateMotivationalSpeechVideo = [
+        'motivational_speech_category_id' => 'required',
         'motivational_speech_detail_id' => 'required',
         'name' => 'required',
         'video_path' => 'required',
@@ -46,8 +48,9 @@ class MotivationalSpeechVideoController extends Controller
 
     protected function create(){
         $motivationalSpeechVideo = new MotivationalSpeechVideo;
-        $motivationalSpeechDetails = MotivationalSpeechDetail::all();
-        return view('motivationalSpeechVideo.create', compact('motivationalSpeechVideo', 'motivationalSpeechDetails'));
+        $motivationalSpeechCategories = MotivationalSpeechCategory::all();
+        $motivationalSpeechDetails = [];//MotivationalSpeechDetail::all();
+        return view('motivationalSpeechVideo.create', compact('motivationalSpeechVideo', 'motivationalSpeechDetails', 'motivationalSpeechCategories'));
     }
 
     /**
@@ -84,8 +87,9 @@ class MotivationalSpeechVideoController extends Controller
         if(isset($id)){
             $motivationalSpeechVideo = MotivationalSpeechVideo::find($id);
             if(is_object($motivationalSpeechVideo)){
-            	$motivationalSpeechDetails = MotivationalSpeechDetail::all();
-                return view('motivationalSpeechVideo.create', compact('motivationalSpeechVideo', 'motivationalSpeechDetails'));
+                $motivationalSpeechCategories = MotivationalSpeechCategory::all();
+            	$motivationalSpeechDetails = MotivationalSpeechDetail::getMotivationalSpeechesByCategoryByAdmin($motivationalSpeechVideo->motivational_speech_category_id);
+                return view('motivationalSpeechVideo.create', compact('motivationalSpeechVideo', 'motivationalSpeechDetails', 'motivationalSpeechCategories'));
             }
         }
         return Redirect::to('admin/manageMotivationalSpeechVideos');
@@ -138,5 +142,9 @@ class MotivationalSpeechVideoController extends Controller
             }
         }
         return Redirect::to('admin/manageMotivationalSpeechVideos');
+    }
+
+    protected function isMotivationalSpeechVideoExist(Request $request){
+        return MotivationalSpeechVideo::isMotivationalSpeechVideoExist($request);
     }
 }

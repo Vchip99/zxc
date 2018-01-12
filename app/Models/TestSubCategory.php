@@ -89,7 +89,7 @@ class TestSubCategory extends Model
                     $join->on('test_categories.id', '=', 'questions.category_id');
                 })
                 ->join('test_subjects', 'test_subjects.id', '=', 'questions.subject_id')
-                ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d'))
+                ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
                 ->where('test_sub_categories.test_category_id', $categoryId)
                 ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path')
                 ->groupBy('test_sub_categories.id')->get();

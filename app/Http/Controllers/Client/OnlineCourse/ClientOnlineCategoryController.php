@@ -157,4 +157,7 @@ class ClientOnlineCategoryController extends ClientBaseController
     	return Redirect::to('manageOnlineCategory');
     }
 
+    protected function isClientCourseCategoryExist(Request $request){
+        return ClientOnlineCategory::isClientCourseCategoryExist($request);
+    }
 }

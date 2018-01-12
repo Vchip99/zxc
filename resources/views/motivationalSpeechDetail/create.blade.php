@@ -31,8 +31,8 @@
             @endif
           @endforeach
         @else
-          <select id="category" class="form-control" name="category" title="Category" required >
-          <option value="">Select Category</option>
+          <select id="category" class="form-control" name="category" title="Speaker" required >
+          <option value="">Select Speaker</option>
             @foreach($motivationalSpeechCategories as $motivationalSpeechCategory)
               @if( isset($motivationalSpeechDetail->id) && $motivationalSpeechDetail->motivational_speech_category_id == $motivationalSpeechCategory->id)
                 <option value="{{$motivationalSpeechCategory->id}}" selected="true">{{$motivationalSpeechCategory->name}}</option>

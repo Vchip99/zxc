@@ -176,4 +176,7 @@ class ClientOnlineCourseController extends ClientBaseController
         return ClientOnlineCourse::getCoursesByClientInstituteCourseId($request);
     }
 
+    protected function isClientOnlineCourseExist(Request $request){
+        return ClientOnlineCourse::isClientOnlineCourseExist($request);
+    }
 }

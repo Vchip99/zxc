@@ -166,4 +166,8 @@ class ClientOnlineTestSubjectController extends ClientBaseController
     	}
     	return Redirect::to('manageOnlineTestSubject');
 	}
+
+	protected function isClientTestSubjectExist(Request $request){
+		return ClientOnlineTestSubject::isClientTestSubjectExist($request);
+	}
 }

@@ -14,5 +14,6 @@
 /public/offlineWorkshopImages
 /public/virtualPlacementDriveImages
 /vendor
-.env
+!/vendor/laravel/*
+/.env
 /storage/logs

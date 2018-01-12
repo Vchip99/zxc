@@ -111,4 +111,8 @@ class MotivationalSpeechDetail extends Model
             return 'false';
         }
     }
+
+    protected static function getMotivationalSpeechesByCategoryByAdmin($category){
+        return static::where('motivational_speech_category_id', $category)->get();
+    }
 }

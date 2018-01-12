@@ -323,7 +323,6 @@ class ClientUsersInfoController extends BaseController
     }
 
     protected function profile(){
-        // dd(Auth::guard('client')->user());
         return view('client.clientLogin.profile');
     }
 

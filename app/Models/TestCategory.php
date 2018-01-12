@@ -62,7 +62,7 @@ class TestCategory extends Model
         return DB::table('test_categories')
                 ->join('test_subject_papers', 'test_subject_papers.test_category_id', 'test_categories.id')
                 ->join('questions', 'questions.category_id', 'test_categories.id')
-                ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d'))
+                ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
                 ->select('test_categories.id', 'test_categories.name')->groupBy('test_categories.id')->get();
     }
 

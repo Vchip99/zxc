@@ -109,9 +109,9 @@
       <input type="text"  class="form-control" name="date_to_active" id="date_to_active" @if(isset($paper->id)) value="{{$paper->date_to_active}}" @endif required="true" placeholder="date" required="true">
     </div>
     <script type="text/javascript">
-        var currentDate = "{{ date('Y-m-d')}}";
+        var currentDate = "{{ date('Y-m-d H:i:s')}}";
         $(function () {
-            $('#date_to_active').datetimepicker({defaultDate: currentDate,format: 'YYYY-MM-DD'});
+            $('#date_to_active').datetimepicker({defaultDate: currentDate,format: 'YYYY-MM-DD  HH:mm'});
         });
     </script>
   </div>
@@ -122,7 +122,7 @@
     </div>
     <script type="text/javascript">
         $(function () {
-            $('#date_to_inactive').datetimepicker({defaultDate: "2050-01-01",format: 'YYYY-MM-DD'});
+            $('#date_to_inactive').datetimepicker({defaultDate: "2050-01-01 12:00",format: 'YYYY-MM-DD  HH:mm'});
         });
     </script>
   </div>

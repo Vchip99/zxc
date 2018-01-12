@@ -149,7 +149,7 @@ class AccountController extends Controller
         }
         $testCategories = TestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($userId);
         $alreadyGivenPapers = Score::getTestUserScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $userId);
-        $currentDate = date('Y-m-d');
+        $currentDate = date('Y-m-d H:i:s');
         return view('dashboard.myTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate'));
     }
 

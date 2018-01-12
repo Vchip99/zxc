@@ -92,7 +92,7 @@ class TestController extends Controller
                         }
                     }
                 }
-				$currentDate = date('Y-m-d');
+				$currentDate = date('Y-m-d H:i:s');
 				return view('tests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'subject', 'paper'));
 			}
 		}
@@ -162,7 +162,7 @@ class TestController extends Controller
 		}
 
 		$result['alreadyGivenPapers'] = $this->getTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
-		$result['currentDate'] = date('Y-m-d');
+		$result['currentDate'] = date('Y-m-d H:i:s');
 		return $result;
 	}
 

@@ -28,6 +28,7 @@
         <tr>
           <th>#</th>
           <th>Video Name</th>
+          <th>Speaker Name</th>
           <th>Motivational Speech Name</th>
           <th>Edit Video</th>
           <th>Delete Motivational Video</th>
@@ -39,6 +40,7 @@
           <tr>
             <th scope="row">{{$index + 1}}</th>
             <td>{{$motivationalSpeechVideo->name}}</td>
+            <td>{{$motivationalSpeechVideo->motivationalspeaker->name}}</td>
             <td>{{$motivationalSpeechVideo->motivationalspeech->name}}</td>
             <td>
               <a href="{{url('admin/motivationalSpeechVideo')}}/{{$motivationalSpeechVideo->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$motivationalSpeechVideo->name}}" />
