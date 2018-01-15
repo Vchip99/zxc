@@ -45,7 +45,7 @@
 		<div class="">
 			<h2 class="v_h2_title">PERSONALIZED LIVE TEACHING</h2>
 		  <hr class="section-dash-dark "/>
-		   <p>This ensures a student gets the entire attention of a dedicated teacher and learns at his/her pace. The interaction between the teacher and students is strong and two-way, which is also monitored technologically for further improvement (if needed). The student is encouraged to ask doubts/questions unlike in a crowded classroom. And the student is much comfortable in asking his/her doubts on Vedantu than anywhere else, as teachers instill questioning skills along with imparting theoretical knowledge. Enhanced engagement between student and teacher on Vedantu guarantees better understanding and recall for the student; unlike in a classroom where teacher-student engagement is difficult to measure. And of course, the student is learning from the comfort of his/her own home – Learning happens best when the student's mind is relaxed! </p>
+		   <p>This ensures a student gets the entire attention of a dedicated teacher and learns at his/her pace. The interaction between the teacher and students is strong and two-way, which is also monitored technologically for further improvement (if needed). The student is encouraged to ask doubts/questions unlike in a crowded classroom. And the student is much comfortable in asking his/her doubts on Vchip edu platform than anywhere else, as teachers instill questioning skills along with imparting theoretical knowledge. Enhanced engagement between student and teacher gives guarantees of better understanding and recall for the student; unlike in a classroom where teacher-student engagement is difficult to measure. And of course, the student is learning from the comfort of his/her own home – Learning happens best when the student's mind is relaxed! </p>
 		</div>
 	</div>
 </section>
@@ -53,9 +53,9 @@
 	<div class="container text-center mrgn_60_btm">
 		<div class="fa_icon slideanim"><i class="fa fa-refresh benefits-icon" aria-hidden="true"></i></div>
 		<div>
-		  <h2 class="v_h2_title">BETTER THAN  RECORDED LECTURES</h2>
+		  <h2 class="v_h2_title">BETTER THAN RECORDED LECTURES</h2>
 		  <hr class="section-dash-dark"/>
-		  <p>The MOOCS revolution claimed to ensure that quality education is available to all and this will solve the maladies that the education system suffers from. However, the basic problem has not been solved- that of assembly line education production. The ensuing 'One Size Fits All solution' is still completely against the very ethos of personalized education. </p>
+		  <p>At Vchip we ensure that quality education is available to all and this will solve the maladies that the education system suffers from. However, the basic problem has not been solved- that of assembly line education production. The ensuing 'One Size Fits All solution' is still completely against the very ethos of personalized education. </p>
 		</div>
 	</div>
 </section>
@@ -75,7 +75,7 @@
 		<div>
 		  <h2 class="v_h2_title">ANYTIME ANYWHERE LEARNING</h2>
 		  <hr class="section-dash-dark"/>
-		  <p>The conventional classroom method mandates that learning has to be limited to a place and constrained by time. We believe, learning should not be time bound. Nor should teaching be. Vedantu breaks the shackles of time and place, liberating learning and teaching from the limits of time and location. Now even late at night, or early in the morning, a student has the liberty to reach out for guidance and help... and teachers at Vedantu will be all excited to lend their helping hands!</p>
+		  <p>The conventional classroom method mandates that learning has to be limited to a place and constrained by time. We believe, learning should not be time bound. Nor should teaching be. Vchip edu platform breaks the shackles of time and place, liberating learning and teaching from the limits of time and location. Now even late at night, or early in the morning, a student has the liberty to reach out for guidance and help... and teachers at Vchip edu platform will be all excited to lend their helping hands!</p>
 		</div>
 	</div>
 </section>
@@ -85,7 +85,7 @@
 		<div>
 		  <h2 class="v_h2_title">SAFETY</h2>
 		  <hr class="section-dash-dark"/>
-		  <p>We are sure, by now you'll agree with us on the technological advancement that our RDX is working on to bring democratization and personalization in education. We have raised the bar even a step higher for ourselves and introduced LIVE learning on Android mobile devices. Yes, the students can now take full-fledged LIVE sessions on their mobile/tablet devices. We have now broken the shackles of time, place, and devices for learning. </p>
+		  <p>We are sure, by now you'll agree with us on the technological advancement that our vchip-edu is working on to bring democratization and personalization in education. We have raised the bar even a step higher for ourselves and introduced LIVE learning on Android mobile devices. Yes, the students can now take full-fledged LIVE sessions on their mobile/tablet devices. We have now broken the shackles of time, place, and devices for learning. </p>
 		</div>
 	</div>
 </section>

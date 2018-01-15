@@ -29,7 +29,7 @@
   <div class="container ">
     <div class="row">
       <div class="col-sm-3 hidden-div">
-        <h4 class="v_h4_subtitle"> Sorted By</h4>
+        <h4 class="v_h4_subtitle"> Sort By</h4>
         <div class="mrgn_20_top_btm" >
           <select id="category" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectSubcategory(this);" required>
             <option value="0">Select Category ...</option>
@@ -68,7 +68,7 @@
             <label><input class="search" type="checkbox" value="1" data-filter="startingsoon" onclick="searchCourse();">Starting soon</label>
           </div>
           <div class="checkbox">
-            <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Letest</label>
+            <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Latest</label>
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@
       </div>
       <div class="col-sm-3 col-sm-pull-9">
         <div class="hidden-div1">
-           <h4 class="v_h4_subtitle"> Sorted By</h4>
+           <h4 class="v_h4_subtitle"> Sort By</h4>
           <div class="mrgn_20_top_btm" >
 
             <select id="categoryNew" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectSubcategoryNew(this);" required>
@@ -165,7 +165,7 @@
               <label><input class="search" type="checkbox" value="1" data-filter="startingsoon" onclick="searchCourse();">Starting soon</label>
             </div>
             <div class="checkbox">
-              <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Letest</label>
+              <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Latest</label>
             </div>
           </div>
         </div>
@@ -260,7 +260,7 @@
                 <ul class="vchip_categories list-inline">
                   <li>
                     University at Home</li></ul>
-                    <p class="">You can learn a you want at your home.</p>
+                    <p class="">You can learn as you want at your home.</p>
                   </div>
                 </div>
                 <div class="col-md-4 col-sm-12 mrgn_40_top ">
@@ -270,7 +270,7 @@
                     class="img-responsive center-block" alt="Professional Certificate"/>
                     <ul class="vchip_categories list-inline">
                       <li>Professional Certificate</li></ul>
-                      <p class="">After successfully completion of certificate course, you will get certificate that enhance level of your resumes and accelerate your career.</p>
+                      <p class="">After successful completion of certificate course, you will get certificate that will enhance level of your resumes and accelerate your career.</p>
                     </div>
                   </div>
                   <div class="col-md-4 col-sm-12 mrgn_40_top ">
@@ -280,7 +280,7 @@
                       class="img-responsive center-block" alt="Nano degree course"/>
                       <ul class="vchip_categories list-inline">
                         <li>Nano degree course</li></ul>
-                        <p class="">A graduate and master level courses use to get mastery in that field. </p>
+                        <p class="">Graduate and master level courses that helps to get mastery in that field. </p>
                       </div>
                     </div>
 

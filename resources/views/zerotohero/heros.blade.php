@@ -254,7 +254,7 @@ option:not(:checked) {
   <div class="container ">
     <div class="row">
       <div class="col-sm-3 hidden-div">
-        <h4 class="v_h4_subtitle"> Sorted By</h4>
+        <h4 class="v_h4_subtitle"> Sort By</h4>
         <div class="mrgn_20_top_btm" >
           <select class="form-control" id="designation" name="designation" required title="Designation"  onChange="selectArea();">
             <option value="">Select Designation</option>
@@ -275,7 +275,7 @@ option:not(:checked) {
         <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Others"> Others</p>
         <div class="panel">
           <div class="checkbox">
-            <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Letest</label>
+            <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Latest</label>
           </div>
         </div>
       </div>
@@ -303,7 +303,7 @@ option:not(:checked) {
       </div>
       <div class="col-sm-3 col-sm-pull-9">
         <div class="hidden-div1">
-          <h4 class="v_h4_subtitle"> Sorted By</h4>
+          <h4 class="v_h4_subtitle"> Sort By</h4>
           <div class="mrgn_20_top_btm" >
             <select class="form-control" id="designation1" name="designation" required title="Designation"  onChange="selectAreaNew();">
               <option value="">Select Designation</option>
@@ -324,7 +324,7 @@ option:not(:checked) {
           <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Others"> Others</p>
           <div class="panel">
             <div class="checkbox">
-              <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Letest</label>
+              <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Latest</label>
             </div>
           </div>
         </div>

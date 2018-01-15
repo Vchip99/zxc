@@ -21,6 +21,7 @@
         </figure>
       </div>
       <div class="vchip-background-content">
+        <h2 class="animated bounceInLeft">Digital Education</h2>
       </div>
     </div>
   </section>
@@ -31,7 +32,7 @@
         <p>Vchip-edu is working on digital education platform namely Vchip-edu 1.0. Its the digital education platform design for all who wish to learn. Our main motive is to deliver quality education in villages and remote areas along with urban area to fulfill the dream of Digital Village. At first we are focusing on Engineering and management colleges because we have lots of literature review on that.
           </p>
           <p>
-          We provide our all the service at free of cost  to college for non-commercial purpose only. We are mostly focusing on bridging a gap between industries and colleges/educational organizations.
+          We provide all our services at free of cost to college for non-commercial purpose only. We are mostly focusing on bridging a gap between industries and colleges/educational organizations.
           </p>
       </div>
   </section>
@@ -319,7 +320,7 @@
             <br/>
             <b>1. Objective:</b>
 
-            <p>The objective of this MoU is to bridging a gap between industries and educational organizations/ colleges. We believe that not only students having dream companies but also companies having their dream employees. So that, we are connecting with industries and colleges, so right person should reach to right place. </p>
+            <p>The objective of this MoU is to bridging a gap between industries and educational organizations/ colleges. We believes that not only students having dream companies but also companies having their dream employees. So that, we are connecting with industries and colleges, so right person should reach to right place. </p>
             <br/>
             <b>We Provide:</b>
             <ul>
@@ -393,14 +394,14 @@
 
             <p>We are working on digital education platform namely V-edu 1.0 <a target="_blank" href="https://vchipedu.com">(https://vchipedu.com).</a> Its the digital education platform design for all who wish to learn. Our main motive is to deliver quality education in villages and remote areas along with urban area to fulfill the dream of Digital Village. At first we are focusing on Engineering colleges because we have lots of literature review on that. </p>
 
-            <p>We will provide all the basic need at free of cost like in engineering colleges most of students (90%+) are prepare for placement. We will digitally provide all the required for placement at free of cost.</p>
+            <p>We will provide all the basic need at free of cost like in engineering colleges most of students (90%+) prepare for placement. We will digitally provide all the required things for placement at free of cost.</p>
             <br/>
             <br/>
             <b>Why Vchip Technology:</b>
             <ul>
-              <li>Vchip Technology has purpose of educated society. Its not only business but much more than it. Its all about betterness of society. </li>
-              <li> Vchip Technology has CEO, who is very dedicated about his dream and attitude of never give up always be helpful to Vchip.</li>
-              <li>Vchip has proper time-lime to work and never think about plan B.</li>
+              <li>Vchip Technology has vision of educated society. Its not only business but much more than it. Its all about betterness of society. </li>
+              <li> Vchip Technology has CEO, who is very dedicated about his dream and attitude of never giving up which is always helpful to Vchip.</li>
+              <li>Vchip has proper timeline to work and never think about plan B.</li>
             </ul>
             <br/>
             <br/>
@@ -408,10 +409,10 @@
             <b>About Vchip Technology:</b>
             <ul>
               <li>Vchip Technology is newly born IoT base company.</li>
-              <li>Vchip Technology is working in Education and Agriculture field. Because childhood of our CEO went in villages and He faced lost of problem in his primary education. In villages quality of education is very poor so, at that time only he decided that I would contribute in education field to improve the quality of education in villages and remote areas along with urban area. Also, He is son of farmer, so obviously he wanna work for farmer. He believe that, India is country of villages so development of India is directly proportional to development of villages.</li>
-              <li>Vchip Technology believe that <b>Better society is best place to live and Educated society is better than best</b>.</li>
+              <li>Vchip Technology is working in Education and Agriculture field. Because childhood of our CEO went in villages and He faced lots of problem in his primary education. In villages quality of education is very poor so, at that time only he decided that I would contribute in education field to improve the quality of education in villages and remote areas along with urban area. Also, He is son of farmer, so obviously he wants to work for farmer. He believes that, India is country of villages so development of India is directly proportional to development of villages.</li>
+              <li>Vchip Technology believes that <b>Better society is best place to live and Educated society is better than best</b>.</li>
               <li>We will provide IoT base solution in Education and Agriculture field. Currently we are working on Software part. In next year, we will start working in Hardware field and Networking.</li>
-              <li>Currently we have team of 4 guys at our Pune office.</li>
+              <li>Currently we have team of 4 members at our Pune office.</li>
               <li>Has lots of IITian connected with us for courses/test series/project/research paper generation.</li>
               <li>Discussion going on with IIT Kharagpur to become partner with Vchip Technology.</li>
             </ul>

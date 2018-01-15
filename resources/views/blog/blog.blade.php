@@ -75,7 +75,7 @@ color: #b6b6b6;
         <div class="row">
 
           <div class="col-sm-3 col-sm-push-9 ">
-            <h4 class="v_h4_subtitle "> Sorted By</h4>
+            <h4 class="v_h4_subtitle "> Sort By</h4>
             <div class="dropdown mrgn_20_top_btm" id="cat">
               <select class="form-control" id="category_id" name="category_id" title="Category" onChange="showBlogs(this);">
                 <option value="">Select Category ...</option>

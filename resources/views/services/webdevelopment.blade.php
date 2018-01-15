@@ -149,6 +149,7 @@ box-shadow: 0 13px 40px 0 rgba(62,68,93,.3), 0 2px 4px 0 rgba(62,68,93,.06);
         </figure>
       </div>
       <div class="vchip-background-content">
+        <h2 class="animated bounceInLeft">Digital Education</h2>
       </div>
     </div>
   </section>
@@ -171,7 +172,7 @@ box-shadow: 0 13px 40px 0 rgba(62,68,93,.3), 0 2px 4px 0 rgba(62,68,93,.06);
    <h2 class="v_h2_title text-center"> Custom web & App Development</h2>
    <hr class="section-dash-dark mrgn_60_btm"/>
     <div class="container">
-    <p>We develop custom website and app (Android and iOS) from scratch for educational institute/organizations. Our expert at first do study about your business and suggest you appropriate design. Once you finalize the design and submit the initial required information, our team will design and developed website within 15 days. Also, at the same time our team will design, developed and store your app at Google play store and app store. We have specialty in designing and developing website and app from scratch in education sector.   </p>
+    <p>We develop custom website and app (Android and iOS) from scratch for educational institute/organizations. Our expert at first do study about your business and suggest you appropriate design. Once you finalize the design and submit the initial required information, our team will design and develop website within 15 days. Also, at the same time our team will design, develop and store your app at Google play store and app store. We have specialty in designing and developing website and app from scratch in education sector.   </p>
 
     </div>
 </section>

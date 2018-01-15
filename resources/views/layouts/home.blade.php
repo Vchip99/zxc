@@ -488,7 +488,7 @@ font-size: 20px;
           </span>
           <span class="counter">
             <h3 class="v_h3_title">ELECTROfreaks</h3>
-            <p>Technical event conducted by Vchip Technology in Amravati (India) in the month of February of every years.</p>
+            <p>Technical event conducted by Vchip Technology in Amravati (India) in the month of February of every year.</p>
           </span>
         </div>
       </div>
@@ -499,7 +499,7 @@ font-size: 20px;
           </span>
           <span class="counter">
            <h3 class="v_h3_title">Vchip-Tech</h3>
-            <p>Technical event conducted by Vchip Technology in Pune (India) in the month of August of every years.</p>
+            <p>Technical event conducted by Vchip Technology in Pune (India) in the month of August of every year.</p>
           </span>
         </div>
       </div>
@@ -509,8 +509,8 @@ font-size: 20px;
            <i class="fa fa-trophy" aria-hidden="true"></i>
           </span>
           <span class="counter">
-           <h3 class="v_h3_title">Vchip-Debu</h3>
-            <p>Its the competition for debut in new technology. Winner get internship, funding and work space from Vchip Technology.</p>
+           <h3 class="v_h3_title">Vchip-Debut</h3>
+            <p>Its the competition for debut in new technology. Winners will get internship, funding and work space from Vchip Technology.</p>
           </span>
         </div>
       </div>

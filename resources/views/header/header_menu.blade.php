@@ -70,7 +70,7 @@
               <ul class="dropdown-menu" role="menu">
                 <div class="navbar-content">
                  <li><a href="{{ url('courses')}}" title="Online Courses">Online Courses</a></li>
-                 <li><a href="{{ url('liveCourse')}}" title="Live course">Live course</a></li>
+                 <!-- <li><a href="{{ url('liveCourse')}}" title="Live Courses">Live Courses</a></li> -->
                  <li class="divider"></li>
                  <li><a href="{{ url('workshops') }}" title="Workshop">Workshop</a></li>
                  <li class="divider"></li>
@@ -123,7 +123,7 @@
             <ul class="dropdown-menu" role="menu">
               <div class="navbar-content">
                 <li><a href="{{url('discussion')}}" title="Discussion forum">Discussion forum</a></li>
-                <li><a href="{{url('liveVideo')}}" title="Live video discussion">Live video discussion</a></li>
+                <!-- <li><a href="{{url('liveVideo')}}" title="Live video discussion">Live video discussion</a></li> -->
                 <li><a href="{{url('blog')}}" title="Blog">Blog</a></li>
               </div>
             </ul>

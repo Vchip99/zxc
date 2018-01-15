@@ -200,6 +200,10 @@ ul.ul_custom li {
   margin-left: 3em;
 }
 
+ul.ul_custom ul {
+  padding: 0px;
+}
+
 ul.ul_custom li:before {
   content: '\f006';
   font-family: 'FontAwesome';

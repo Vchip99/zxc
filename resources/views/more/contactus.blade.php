@@ -18,6 +18,7 @@
             </figure>
         </div>
         <div class="vchip-background-content">
+            <h2 class="animated bounceInLeft">Digital Education</h2>
         </div>
     </div>
 </section>

@@ -138,7 +138,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
     <div class="row text-center">
       <h2 class="v_h2_title">Our Partners</h2>
       <hr class="section-dash-dark"/>
-      <h3 class="v_h3_title ">We belive that work together always increase productivity...</h3>
+      <h3 class="v_h3_title ">We Believe that working together always increases productivity...</h3>
       <p>An integral part of Vchip-edu’s partners includes our mentors, funders and franchise holders. Vchip-edu works with companies of same interest, governments, nonprofits and other organizations, institutes, mentors, funders and franchise holders to make an educated world and digital villages. We are partners not only for business, but also for better educated society. By supporting to each others we have made stronger community.</p>
     </div>
 </section>
@@ -225,11 +225,11 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
            <ul class="vchip_list">
              <li> Education is one of the most growing business in the world.</li>
              <li> Vchip-edu is working on IoT base both software and hardware solution for education sector. </li>
-             <li> We have done lots of research on what’s beneficial to our student's for their long term future.</li>
+             <li> We have done lots of research on what’s beneficial to our students for their long term future.</li>
              <li> Optimize solution.</li>
              <li> First time digital villages concept in India.</li>
              <li> Concept of learn with fun. </li>
-             <li> Its also helpful for bridging between educational organizations/institutes and industries.</li>
+             <li> It is also helpful for bridging between educational organizations/institutes and industries.</li>
              <li> Our education platform provides industrial touch along with quality education. </li>
            </ul>
          </ul>

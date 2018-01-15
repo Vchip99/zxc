@@ -34,7 +34,7 @@
             <li><a href="{{ url('placements')}}">Placement</a></li>
             <li><a href="{{ url('/showTest') }}/1">Placement Mock Test</a></li>
             <li><a href="{{url('discussion')}}">Discussion Forum</a></li>
-            <li><a href="{{url('blog')}}">Blog</a></li>
+            <li><a href="{{url('blog')}}">Blogs</a></li>
             <li><a href="{{url('ourpartner')}}">Our Partners</a></li>
             <li><a href="{{url('career')}}">Career</a></li>
             <li><a href="{{url('admin/login')}}">Admin Dashboard</a></li>

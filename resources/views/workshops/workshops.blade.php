@@ -64,7 +64,7 @@
   <div class="container ">
     <div class="row">
       <div class="col-sm-3 ">
-        <h4 class="v_h4_subtitle"> Sorted By</h4>
+        <h4 class="v_h4_subtitle"> Sort By</h4>
         <div class="mrgn_20_top_btm" >
           <select id="category" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectWorkshop(this);" required>
             <option value="0">Select Category</option>

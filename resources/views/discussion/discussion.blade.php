@@ -43,7 +43,7 @@ margin-left: -13px;}
     <div class="container ">
       <div class="row">
         <div class="col-sm-3 hidden-div" id="sidemenuindex">
-          <h4 class="v_h4_subtitle"> Sorted By</h4>
+          <h4 class="v_h4_subtitle"> Sort By</h4>
           <div class="dropdown mrgn_20_top_btm" id="cat">
             <select id="category" class="form-control" name="category" title="Category" onChange="showPosts(this);" required>
               <option value = "0"> Select Category ...</option>
@@ -300,7 +300,7 @@ margin-left: -13px;}
         </div>
         <div class="col-sm-3 col-sm-pull-9">
           <div class="hidden-div1" id="sidemenuindex">
-            <h4 class="v_h4_subtitle"> Sorted By</h4>
+            <h4 class="v_h4_subtitle"> Sort By</h4>
             <div class="dropdown mrgn_20_top_btm" id="cat">
               <select id="category" class="form-control" name="category" title="Category" onChange="showPosts(this);" required>
                 <option value = "0"> Select Category ...</option>

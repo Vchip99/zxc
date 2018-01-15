@@ -633,9 +633,8 @@ ul.table_list{ margin-left: -30px; }
                     @if(count($placementFaqs) > 0)
                       @foreach($placementFaqs as $placementFaq)
                         <div class="panel panel-default">
-                          <div class="panel-heading clickable">
+                          <div class="panel-heading clickable collapsed" data-toggle="collapse" data-target="#post{{$placementFaq->id}}" >
                             <h4 class="panel-title">{{$placementFaq->question}}
-                            <button type="button" data-toggle="collapse" data-target="#post{{$placementFaq->id}}" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn pull-right collapseed" ><i class="fa fa-chevron-up"></i></button>
                             </h4>
                           </div>
                           <div class="cmt-parent panel-collapse collapse" id="post{{$placementFaq->id}}">{!! $placementFaq->answer !!}</div>
@@ -648,9 +647,6 @@ ul.table_list{ margin-left: -30px; }
                   <!-- end FAQ -->
                   <div id="tab_4" class="tab-pane fade ">
                      <div class="panel panel-default">
-                      <!--   <div class="panel-heading">
-                          <h4 class="panel-title">Apply Job</h4>
-                        </div> -->
                         <div class="panel-body" style="padding: 0px;">
                           <table  class="" id="student-record">
                             <thead>

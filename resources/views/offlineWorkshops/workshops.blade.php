@@ -35,8 +35,8 @@
         </figure>
       </div>
       <div class="vchip-background-content">
-          <h2 class="animated bounceInLeft">Digital Education</h2>
-        </div>
+        <h2 class="animated bounceInLeft">Digital Education</h2>
+      </div>
     </div>
   </section>
 <!-- Start course section -->
@@ -44,7 +44,7 @@
   <div class="container ">
     <div class="row">
       <div class="col-sm-3 hidden-div">
-        <h4 class="v_h4_subtitle"> Sorted By</h4>
+        <h4 class="v_h4_subtitle"> Sort By</h4>
         <div class="mrgn_20_top_btm" >
           <select id="category" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectWorkshop(this);" required>
             <option value="0">Select Category</option>
@@ -87,7 +87,7 @@
       </div>
       <div class="col-sm-3 col-sm-pull-9">
         <div class="hidden-div1">
-          <h4 class="v_h4_subtitle"> Sorted By</h4>
+          <h4 class="v_h4_subtitle"> Sort By</h4>
           <div class="mrgn_20_top_btm" >
             <select id="category" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectWorkshop(this);" required>
               <option value="0">Select Category</option>

@@ -383,6 +383,7 @@ margin-right: 10px;
             </figure>
         </div>
         <div class="vchip-background-content">
+          <h2 class="animated bounceInLeft">Digital Education</h2>
         </div>
     </div>
 </section>
@@ -435,7 +436,7 @@ margin-right: 10px;
                         <img class="img-circle" src="{{ asset('images/testimonial/testimonial-1.jpg') }}" style="width: 100px;height:100px;" alt="Testimonial" />
                       </div>
                       <div class="col-sm-9">
-                        <p>Thanks to Vchip-edu, i have able to start my online classes on Vchip-edu platform within a day and now growth  of my institute is nearly double.</p>
+                        <p>Thanks to Vchip-edu, i was able to start my online classes on Vchip-edu platform within a day and now growth  of my institute is nearly double.</p>
                         <h6>Ajay Joshi</h6>
                       </div>
                     </div>
@@ -463,7 +464,7 @@ margin-right: 10px;
                         <img class="img-circle" src="{{ asset('images/testimonial/testimonial-3.jpg') }}" style="width: 100px;height:100px;">
                       </div>
                       <div class="col-sm-9">
-                        <p>One of the great digital education platform. It is help me for preparation of placement.</p>
+                        <p>One of the great digital education platform. It helped me for preparation of placement.</p>
                         <h6>Rashmi Raut</h6>
                       </div>
                     </div>

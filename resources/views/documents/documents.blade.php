@@ -56,7 +56,7 @@
   <div class="container ">
     <div class="row">
       <div class="col-sm-3 hidden-div">
-        <h4 class="v_h4_subtitle"> Sorted By</h4>
+        <h4 class="v_h4_subtitle"> Sort By</h4>
         <div class="dropdown mrgn_20_top_btm" id="cat">
           <select class="form-control" id="category" name="category" onchange="showDocuments(this);">
              <option>Select Category ...</option>
@@ -84,10 +84,10 @@
         <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Type of Document"> Type of Document </p>
         <div class="panel">
            <div class="checkbox">
-            <label><input class="search" type="checkbox" value="1" data-filter="typeOfDoc" onclick="searchDocuments();">Reasearch Paper</label>
+            <label><input class="search" type="checkbox" value="1" data-filter="typeOfDoc" onclick="searchDocuments();">Research Paper</label>
           </div>
           <div class="checkbox">
-            <label><input class="search" type="checkbox" value="2" data-filter="typeOfDoc" onclick="searchDocuments();">Documentry</label>
+            <label><input class="search" type="checkbox" value="2" data-filter="typeOfDoc" onclick="searchDocuments();">Documentary</label>
           </div>
         </div>
 
@@ -170,7 +170,7 @@
       </div>
       <div class="col-sm-3 col-sm-pull-9">
         <div class="hidden-div1">
-          <h4 class="v_h4_subtitle"> Sorted By</h4>
+          <h4 class="v_h4_subtitle"> Sort By</h4>
           <div class="dropdown mrgn_20_top_btm" id="cat">
             <select class="form-control" id="category" name="category" onchange="showDocuments(this);">
                <option>Select Category ...</option>

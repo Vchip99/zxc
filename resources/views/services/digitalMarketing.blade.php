@@ -21,6 +21,7 @@
         </figure>
       </div>
       <div class="vchip-background-content">
+        <h2 class="animated bounceInLeft">Digital Education</h2>
       </div>
     </div>
   </section>
@@ -75,7 +76,7 @@
             </span>
             <span class="counter">
               <h3 class="v_h3_title">Social Media Marketing</h3>
-              <p>first step toward success is the understanding of your audience. Social medias are very helpful for gathering data about your audience and it give instance reach to to your audience. Social media is one of the key factor to increase traffic on your website and so improve the search engine ranking. </p>
+              <p>first step toward success is the understanding of your audience. Social medias are very helpful for gathering data about your audience and it give instance reach to your audience. Social media is one of the key factor to increase traffic on your website and so improve the search engine ranking. </p>
             </span>
           </div>
         </div>

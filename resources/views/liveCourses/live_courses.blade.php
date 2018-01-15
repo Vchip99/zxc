@@ -92,7 +92,7 @@
   <div class="container ">
     <div class="row">
       <div class="col-sm-3 hidden-div">
-        <h4 class="v_h4_subtitle"> Sorted By</h4>
+        <h4 class="v_h4_subtitle"> Sort By</h4>
         <div class="dropdown mrgn_20_top_btm" id="cat">
           <select id="category" class="form-control" name="category" title="Category" onChange="showLiveCourses(this);"  required>
             <option value="">Select Category ...</option>
@@ -185,7 +185,7 @@
       </div>
       <div class="col-sm-3 col-sm-pull-9">
         <div class="hidden-div1">
-          <h4 class="v_h4_subtitle"> Sorted By</h4>
+          <h4 class="v_h4_subtitle"> Sort By</h4>
           <div class="dropdown mrgn_20_top_btm" id="cat">
             <select id="category" class="form-control" name="category" title="Category" onChange="showLiveCourses(this);"  required>
               <option value="">Select Category ...</option>

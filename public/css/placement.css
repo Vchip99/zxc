@@ -187,9 +187,9 @@ ul.custom-list-style li:before{
 }
 /**/
  .clickable{
-      cursor: pointer;
-    }
-    .panel-heading span {
-      margin-top: -20px;
-      font-size: 15px;
-    }
+    cursor: pointer;
+  }
+  .panel-heading span {
+    margin-top: -20px;
+    font-size: 15px;
+  }

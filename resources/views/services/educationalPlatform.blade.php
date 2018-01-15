@@ -114,6 +114,7 @@ color: #747474; }
         </figure>
       </div>
       <div class="vchip-background-content">
+        <h2 class="animated bounceInLeft">Digital Education</h2>
       </div>
     </div>
   </section>
@@ -131,7 +132,7 @@ color: #747474; }
                   </div>
                   <div class="media-body">
                       <h4 class="media-heading">Responsive web-page </h4>
-                      <p>Build your responsive website on our sub-domain with in 5 minute</p>
+                      <p>Build your responsive website on our sub-domain within 5 minute</p>
                   </div>
               </div>
           </div>
@@ -144,7 +145,7 @@ color: #747474; }
                   </div>
                   <div class="media-body">
                       <h4 class="media-heading">Online test series</h4>
-                      <p>Generate your own online tests/test-series. It support to both MCQs and Numerical type questions. You can generate any numbers of test series</p>
+                      <p>Generate your own online tests/test-series. It supports both MCQs and Numerical type questions. You can generate any numbers of test series</p>
                   </div>
               </div>
           </div>
@@ -170,7 +171,7 @@ color: #747474; }
                   </div>
                   <div class="media-body">
                       <h4 class="media-heading">Notification</h4>
-                      <p>Notify the students, if any one reply to their query/comments.</p>
+                      <p>Notify the students, whenever someone replies to their query/comments.</p>
                   </div>
               </div>
           </div>
@@ -222,7 +223,7 @@ color: #747474; }
                   </div>
                   <div class="media-body">
                       <h4 class="media-heading">Dashboard for students</h4>
-                      <p>All detail about students, their result and performance detail about online test-series, all the online courses that added in faviorate and if course is certified then certificate of course like that all the things are available in dashboard</p>
+                      <p>All detail about students, their result and performance detail about online test-series, all the online courses that added in favorite and if course is certified then certificate of course like that all the things are available in dashboard</p>
                   </div>
               </div>
           </div>
@@ -235,7 +236,7 @@ color: #747474; }
                   </div>
                   <div class="media-body">
                       <h4 class="media-heading">Admin panel (ERP)</h4>
-                      <p>Admin can access all the detail and performance of his/her students just by click. </p><p>Also Admin can manage all detail about the students. Give permission to access the the courses etc. </p>
+                      <p>Admin can access all the detail and performance of his/her students just by click. </p><p>Also Admin can manage all detail about the students. Give permission to access the courses etc. </p>
                   </div>
               </div>
           </div>

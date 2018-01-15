@@ -265,14 +265,14 @@
             <div class="item">
               <div class="testimonial4_slide">
                 <img src="{{ asset('images/user/vinay.jpg')}}" class="img-circle img-responsive" />
-                <p>Team form Vchip was very supportive. At the last they given suggestions, which were help me to overcome the weakness of mine. Also, the session about current trends and demands of industries was help me to finalize the technology for my career.</p>
+                <p>Team from Vchip was very supportive. At the last they given suggestions, which helped me to overcome the weakness of mine. Also, the session about current trends and demands of industries helped me to finalize the technology for my career.</p>
                 <h4>Vinay Motghare (Student of G. H. Raisoni)</h4>
               </div>
             </div>
             <div class="item">
               <div class="testimonial4_slide">
                 <img src="{{ asset('images/user/user.png')}}" class="img-circle img-responsive" />
-                <p>Great work by Vchip. It’s help our students to perform well at the time of actual placement drive.</p>
+                <p>Great work by Vchip. it helped our students to perform well at the time of actual placement drive.</p>
                 <h4>Pournima Kawalkar (Lecturer at MGM COET)</h4>
               </div>
             </div>
