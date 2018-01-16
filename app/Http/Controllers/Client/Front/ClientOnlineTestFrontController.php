@@ -224,6 +224,9 @@ class ClientOnlineTestFrontController extends ClientHomeController
         $subcategoryId = Session::get('client_subcategory');
         $subjectId = Session::get('client_subject');
         $paperId = Session::get('client_paper');
+        if(!is_object(Auth::guard('clientuser')->user())){
+        	return Redirect::to('/');
+        }
         return view('client.front.instructions', compact('categoryId', 'subcategoryId', 'subjectId', 'paperId'));
     }
 

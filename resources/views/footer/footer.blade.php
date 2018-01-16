@@ -100,13 +100,19 @@
             <button type="submit" value="login" name="submit" class="btn btn-info btn-block" onClick="loginUser();">Login</button>
             <br />
             <div class="form-group">
+              <a href="{{ url('/auth/facebook') }}" class="btn btn-facebook btn-info" style="width: 209px; background-color: #3B5998; border-color: #3B5998;"><i class="fa fa-facebook"></i> Login </a>
+            </div>
+            <div class="form-group">
+              <a href="{{ url('/auth/google') }}" class="btn btn-google btn-info" style="width: 209px; background-color: #DD4B39; border-color: #DD4B39;"><i class="fa fa-google"></i> Login </a>
+            </div>
+            <div class="form-group">
               <div class="col-md-12 control">
                   <div style="margin-top: 10px; margin-bottom: 20px;  color:#fff;" >
                       Need an account?
                   <a href="{{ url('signup')}}" ">Sign Up</a>
                   </div>
               </div>
-          </div>
+            </div>
         </div>
       </div>
     </div>
@@ -136,4 +142,12 @@
     document.getElementById(ele).setAttribute('type', ele);
     document.getElementById('loginErrorMsg').classList.add('hide');
   }
+
+  $(window).on('load', function(e){
+    if (window.location.hash == '#_=_') {
+      window.location.hash = ''; // for older browsers, leaves a # behind
+      history.pushState('', document.title, window.location.pathname); // nice and clean
+      e.preventDefault(); // no page reload
+    }
+  });
 </script>

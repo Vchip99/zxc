@@ -67,7 +67,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'user_type', 'verified', 'admin_approve', 'degree', 'college_id', 'college_dept_id', 'year', 'roll_no', 'other_source', 'photo','resume','recorded_video','email_token', 'remember_token'
+        'name', 'email', 'password','phone', 'user_type', 'verified', 'admin_approve', 'degree', 'college_id', 'college_dept_id', 'year', 'roll_no', 'other_source', 'photo','resume','recorded_video','email_token', 'remember_token', 'google_provider_id', 'facebook_provider_id'
     ];
 
     /**

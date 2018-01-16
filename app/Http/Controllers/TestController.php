@@ -194,6 +194,9 @@ class TestController extends Controller
         $subcategoryId = Session::get('subcategory');
         $subjectId = Session::get('subject');
         $paperId = Session::get('paper');
+        if(!is_object(Auth::user())){
+        	return Redirect::to('/');
+        }
         return view('layouts.instructions', compact('categoryId', 'subcategoryId', 'subjectId', 'paperId'));
     }
 

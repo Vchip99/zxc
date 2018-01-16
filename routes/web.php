@@ -4,6 +4,12 @@
 Route::group(['domain' => 'localvchip.com'], function () {
 
 	Route::get('/', 'HomeController@home');
+	Route::get('/home', 'HomeController@home');
+
+	// OAuth Routes
+	Route::get('/auth/{provider}', 'SocialiteController@redirectToProvider');
+	Route::get('/auth/{provider}/callback', 'SocialiteController@handleProviderCallback');
+
 	// admin course category
 	Route::get('admin/manageCourseCategory', 'Course\CourseCategoryController@show');
 	Route::get('admin/createCourseCategory', 'Course\CourseCategoryController@create');
