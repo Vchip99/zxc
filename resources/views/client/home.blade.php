@@ -439,7 +439,7 @@
   </div>
   <div class="row">
     @if(is_object($defaultCourse))
-      <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+      <div class="col-lg-4 col-md-4 col-sm-6">
           <div class="vchip_product_itm text-left">
             <figure title="{{ $defaultCourse->name }}">
               <img src="{{asset('images/index/online-course.jpg')}}" alt="onlne course" class="img-responsive">
@@ -459,7 +459,7 @@
     @endif
     @if(count($onlineCourses) > 0)
       @foreach($onlineCourses as $courses)
-        <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+        <div class="col-lg-4 col-md-4 col-sm-6">
           <div class="vchip_product_itm text-left">
             <figure title="{{ $courses->name }}">
               <img src="{{asset('images/index/online-course.jpg')}}" alt="onlne course" class="img-responsive">
@@ -513,7 +513,7 @@
   </div>
   <div class="row">
      @if(is_object($defaultTest))
-      <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+      <div class="col-lg-4 col-md-4 col-sm-6">
           <div class="vchip_product_itm text-left">
             <figure title="{{ $defaultTest->name }}">
               <img src="{{asset('images/index/online-course.jpg')}}" alt="onlne course" class="img-responsive">
@@ -533,7 +533,7 @@
     @endif
     @if(count($onlineTestSubcategories)>0)
       @foreach($onlineTestSubcategories as $subcategory)
-        <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+        <div class="col-lg-4 col-md-4 col-sm-6">
           <div class="vchip_product_itm text-left">
             <figure title="{{ $subcategory->name }}">
               <img src="{{asset('images/index/online-course.jpg')}}" alt="onlne course" class="img-responsive">
@@ -588,7 +588,7 @@
       <div class="row our_customer">
         @if(count($clientCustomers) > 0)
           @foreach($clientCustomers as $customer)
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
               <div  data-toggle="modal" data-target="#customer_{{ $customer->id }}" title="{{ $customer->name }}">
                 <div class="hovereffect">
                   <img class="" id="client-customer-img_{{ $customer->id }}"  src="{{asset($customer->image)}}" alt="SSGMCE" >

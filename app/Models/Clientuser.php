@@ -29,7 +29,7 @@ class Clientuser extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video'
+        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id'
     ];
 
     /**
@@ -162,9 +162,8 @@ class Clientuser extends Authenticatable
         }
         if($request->exists('photo')){
             $userImage = $request->file('photo')->getClientOriginalName();
-            $userImagePath = $userStoragePath."/".$user->photo;
-            if(!empty($user->photo) && file_exists($userImagePath)){
-                unlink($userImagePath);
+            if(!empty($user->photo) && file_exists($user->photo)){
+                unlink($user->photo);
             }
             $request->file('photo')->move($userStoragePath, $userImage);
             $dbUserImagePath = $userStoragePath."/".$userImage;

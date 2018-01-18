@@ -278,7 +278,7 @@ border-radius: 0px!important
                     @foreach($comments as $comment)
                     <div class="box-body chat" id="chat-box">
                       <div class="item" id="showComment_{{$comment->id}}">
-                        @if(is_file($comment->user->photo))
+                        @if(!empty($comment->user->photo) && is_file($comment->user->photo) || (!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)))
                           <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
                         @else
                           <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -387,6 +387,12 @@ border-radius: 0px!important
                 <button type="submit" value="login" name="submit" class="btn btn-info btn-block" onClick="loginUser();">Login</button>
                 <br />
                 <div class="form-group">
+                  <a href="{{ url('/auth/facebook') }}" class="btn btn-facebook btn-info" style="width: 209px; background-color: #3B5998; border-color: #3B5998;"><i class="fa fa-facebook"></i> Login </a>
+                </div>
+                <div class="form-group">
+                  <a href="{{ url('/auth/google') }}" class="btn btn-google btn-info" style="width: 209px; background-color: #DD4B39; border-color: #DD4B39;"><i class="fa fa-google"></i> Login </a>
+                </div>
+                <div class="form-group">
                   <div class="col-md-12 control">
                       <div style="margin-top: 10px; margin-bottom: 20px;  color:#fff;" >
                           Need an account?
@@ -472,8 +478,10 @@ border-radius: 0px!important
         mainCommentDiv.id = 'showComment_'+obj.id;
 
         var commentImage = document.createElement('img');
-        if(obj.image_exist){
+        if('system' == obj.image_exist){
           var imageUrl =  "{{ asset('') }}"+obj.user_image;
+        } else if('other' == obj.image_exist){
+          var imageUrl =  obj.user_image;
         } else {
           var imageUrl = "{{ asset('images/user1.png') }}";
         }
@@ -589,8 +597,10 @@ border-radius: 0px!important
         mainSubCommentDiv.className = 'item replySubComment-1';
 
         var subcommentImage = document.createElement('img');
-        if(obj.image_exist){
-          var subcommentImageUrl = "{{ asset('') }}"+obj.user_image;
+        if('system' == obj.image_exist){
+          var subcommentImageUrl =  "{{ asset('') }}"+obj.user_image;
+        } else if('other' == obj.image_exist){
+          var subcommentImageUrl =  obj.user_image;
         } else {
           var subcommentImageUrl = "{{ asset('images/user1.png') }}";
         }
@@ -967,6 +977,13 @@ border-radius: 0px!important
     document.getElementById(ele).setAttribute('type', ele);
     document.getElementById('loginErrorMsg').classList.add('hide');
   }
+  $(window).on('load', function(e){
+    if (window.location.hash == '#_=_') {
+      window.location.hash = ''; // for older browsers, leaves a # behind
+      history.pushState('', document.title, window.location.pathname); // nice and clean
+      e.preventDefault(); // no page reload
+    }
+  });
   </script>
 </body>
 </html>

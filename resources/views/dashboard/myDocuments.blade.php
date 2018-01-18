@@ -60,7 +60,7 @@
   <div class="row" id="render_documents">
   	@if(count($documents)>0)
       @foreach($documents as $document)
-        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 slideanim">
+        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
           <div class="course-box">
             <a class="img-course-box">
               @if(!empty($document->doc_image_path))

@@ -61,7 +61,7 @@
         <div class="row info" id="workshop">
           @if(count($motivationalSpeechDetails) > 0)
             @foreach($motivationalSpeechDetails as $motivationalSpeech)
-              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6  slideanim">
+              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 ">
                 <div class="cuadro_intro_hover " style="background-color:#cccccc;">
                   <p style="text-align:center;">
                     <img src="{{ asset($motivationalSpeech->about_image) }}" class="img-responsive" alt="workshop" />

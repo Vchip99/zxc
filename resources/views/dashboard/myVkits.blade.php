@@ -46,7 +46,7 @@
   <div class="row" id="vkitprojects">
 	@if(count($projects) > 0)
     @foreach($projects as $project)
-      <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 slideanim">
+      <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
         <div class="course-box">
           <a class="img-course-box" href="{{ url('vkitproject')}}/{{$project->id}}">
             @if(!empty($project->front_image_path))

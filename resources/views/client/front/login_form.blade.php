@@ -74,6 +74,12 @@
                           </br>
                         </form>
                         <div>
+                        <div class="form-group">
+                            <a href="{{ url('/auth/facebook') }}" class="btn btn-info btn-block" style="color: white; background-color: #3B5998; border-color: #3B5998;"><i class="fa fa-facebook"></i> Login</a>
+                        </div>
+                        <div class="form-group">
+                            <a href="{{ url('/auth/google') }}" class="btn btn-info btn-block" style="color: white;background-color: #DD4B39; border-color: #DD4B39;"><i class="fa fa-google"></i> Login</a>
+                        </div>
                         <a href="{{ url('forgotPassword')}}" title="Forgot Password">Forgot Password?</a></div>
                       </div>
                       <div id="menu1" class="tab-pane fade">

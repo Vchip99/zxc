@@ -171,23 +171,31 @@ class PlacementController extends Controller
      */
     protected function getComments($companyId){
         $comments = PlacementProcessComment::where('company_id', $companyId)->orderBy('id','desc')->get();
-        $videoComments = [];
+        $placementComments = [];
         foreach($comments as $comment){
-            $videoComments['comments'][$comment->id]['body'] = $comment->body;
-            $videoComments['comments'][$comment->id]['id'] = $comment->id;
-            $videoComments['comments'][$comment->id]['company_id'] = $comment->company_id;
-            $videoComments['comments'][$comment->id]['user_id'] = $comment->user_id;
-            $videoComments['comments'][$comment->id]['user_name'] = $comment->user->name;
-            $videoComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
-            $videoComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
+            $placementComments['comments'][$comment->id]['body'] = $comment->body;
+            $placementComments['comments'][$comment->id]['id'] = $comment->id;
+            $placementComments['comments'][$comment->id]['company_id'] = $comment->company_id;
+            $placementComments['comments'][$comment->id]['user_id'] = $comment->user_id;
+            $placementComments['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $placementComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
+            if(is_file($comment->user->photo) && true == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $placementComments['comments'][$comment->id]['image_exist'] = $isImageExist;
+            $placementComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
             if(is_object($comment->children) && false == $comment->children->isEmpty()){
-                $videoComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
+                $placementComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
             }
         }
-        $videoComments['commentLikesCount'] = PlacementProcessCommentLike::getLikesByCompanyId($companyId);
-        $videoComments['subcommentLikesCount'] = PlacementProcessSubCommentLike::getLikesByCompanyId($companyId);
+        $placementComments['commentLikesCount'] = PlacementProcessCommentLike::getLikesByCompanyId($companyId);
+        $placementComments['subcommentLikesCount'] = PlacementProcessSubCommentLike::getLikesByCompanyId($companyId);
 
-        return $videoComments;
+        return $placementComments;
     }
 
     /**
@@ -195,22 +203,30 @@ class PlacementController extends Controller
      */
     protected function getSubComments($subComments){
 
-        $videoChildComments = [];
+        $placementChildComments = [];
         foreach($subComments as $subComment){
-            $videoChildComments[$subComment->id]['body'] = $subComment->body;
-            $videoChildComments[$subComment->id]['id'] = $subComment->id;
-            $videoChildComments[$subComment->id]['company_id'] = $subComment->company_id;
-            $videoChildComments[$subComment->id]['placement_process_comment_id'] = $subComment->placement_process_comment_id;
-            $videoChildComments[$subComment->id]['user_name'] = $subComment->user->name;
-            $videoChildComments[$subComment->id]['user_id'] = $subComment->user_id;
-            $videoChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
-            $videoChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
+            $placementChildComments[$subComment->id]['body'] = $subComment->body;
+            $placementChildComments[$subComment->id]['id'] = $subComment->id;
+            $placementChildComments[$subComment->id]['company_id'] = $subComment->company_id;
+            $placementChildComments[$subComment->id]['placement_process_comment_id'] = $subComment->placement_process_comment_id;
+            $placementChildComments[$subComment->id]['user_name'] = $subComment->user->name;
+            $placementChildComments[$subComment->id]['user_id'] = $subComment->user_id;
+            $placementChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
+            $placementChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
+            if(is_file($subComment->user->photo) && true == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($subComment->user->photo) && false == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $placementChildComments[$subComment->id]['image_exist'] = $isImageExist;
             if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
-                $videoChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
+                $placementChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
             }
         }
 
-        return $videoChildComments;
+        return $placementChildComments;
     }
 
     protected function createPlacementProcessComment(Request $request){

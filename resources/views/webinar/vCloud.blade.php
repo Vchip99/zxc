@@ -60,7 +60,7 @@
 				<div class="col-md-7 text-center">
 				<div>
 						<div id="" class="pd_img img-container">
-							<img class="img-responsive slideanim img-hover" src="{{ asset('images/solution/cloud/cloud.png')}}" alt="vchip cloud"  />
+							<img class="img-responsive img-hover" src="{{ asset('images/solution/cloud/cloud.png')}}" alt="vchip cloud"  />
 						</div>
 					</div>
 				</div>
@@ -69,7 +69,7 @@
 				<div class="col-md-7 text-center">
 				<div>
 						<div id="" class="pd_img img-container">
-							<img class="img-responsive slideanim img-hover " src="{{ asset('images/solution/cloud/cloud-1.png')}}" alt="vchip cloud"  />
+							<img class="img-responsive img-hover " src="{{ asset('images/solution/cloud/cloud-1.png')}}" alt="vchip cloud"  />
 						</div>
 					</div>
 				</div>

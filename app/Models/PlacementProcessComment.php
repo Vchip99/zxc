@@ -46,7 +46,7 @@ class PlacementProcessComment extends Model
     }
 
     public function children(){
-    	return $this->hasMany(PlacementProcessSubComment::class)->orderby('id', 'desc');
+    	return $this->hasMany(PlacementProcessSubComment::class);
     }
 
     public function deleteLikes(){

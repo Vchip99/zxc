@@ -64,7 +64,7 @@
    <div class="col-md-7 text-center">
    <a href="#">
       <div id="" class="pd_img img-container">
-        <img class="img-responsive pd-img slideanim img-hover" src="{{ asset('images/solution/pen/pen-drive.png')}}" alt="pendrive"  />
+        <img class="img-responsive pd-img img-hover" src="{{ asset('images/solution/pen/pen-drive.png')}}" alt="pendrive"  />
       </div>
     </a>
    </div>
@@ -73,7 +73,7 @@
     <div class="col-md-7">
       <a href="#">
         <div id="" class="pd_img img-container">
-          <img class="img-responsive slideanim img-hover" src="{{ asset('images/solution/pen/pen-drive-1.png')}}" alt="pendrive"  />
+          <img class="img-responsive img-hover" src="{{ asset('images/solution/pen/pen-drive-1.png')}}" alt="pendrive"  />
         </div>
       </a>
     </div>

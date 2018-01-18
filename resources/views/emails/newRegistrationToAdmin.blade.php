@@ -5,7 +5,7 @@
 </head>
 <body>
 	<p>Hi Admin,</p>
-		<p>we have a new registration from <b>{{ $name }}</b>. please verify to <b>{{ $name }}</b> to access our digital platform.</p>
+		<p>we have a new registration from <b>{{ $name }}</b>.</p>
 		<p>Follwoing are the details:</p>
 		<div>
 			@if(!empty($name))

@@ -98,7 +98,7 @@ margin-left: -13px;}
                     </div>
                     <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
                     <div class="user-block cmt-left-margin">
-                      @if(is_file($post->user->photo))
+                      @if(is_file($post->user->photo) || (!empty($post->user->photo) && false == preg_match('/userStorage/',$post->user->photo)))
                         <img src="{{ asset($post->user->photo)}} " class="img-circle" alt="User Image">
                       @else
                         <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -171,7 +171,7 @@ margin-left: -13px;}
                           @if(count( $post->descComments) > 0)
                             @foreach($post->descComments as $comment)
                               <div class="item cmt-left-margin-10" id="showComment_{{$comment->id}}">
-                                @if(is_file($comment->user->photo))
+                                @if(is_file($comment->user->photo) || (!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)))
                                   <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
                                 @else
                                   <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -673,14 +673,13 @@ margin-left: -13px;}
     }
     showPostsDiv = document.getElementById('showAllPosts');
     showPostsDiv.innerHTML = '';
-    arrayComments = [];
+    var arrayPosts = [];
 
     $.each(msg['posts'], function(idx, obj) {
-      arrayComments[idx] = obj;
+      arrayPosts[idx] = obj;
     });
-    var sortedArray = arrayComments.reverse();
-    // var sortedArray = arrayComments;
-      $.each(sortedArray, function(idx, obj) {
+    var sortedPostArray = arrayPosts.reverse();
+      $.each(sortedPostArray, function(idx, obj) {
         if(false == $.isEmptyObject(obj)){
         var divMedia = document.createElement('div');
         divMedia.className = 'media';
@@ -709,13 +708,18 @@ margin-left: -13px;}
 
         var commentBlockDiv = document.createElement('div');
         commentBlockDiv.className = 'user-block cmt-left-margin';
-        if(obj.image_exist){
+
+        if('system' == obj.image_exist){
           var userImagePath = "{{ asset('') }}"+obj.user_image;
+          var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
+        } else if('other' == obj.image_exist){
+          var userImagePath = obj.user_image;
           var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
         } else {
           var userImagePath = "{{ asset('images/user1.png') }}";
           var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
         }
+
         commentBlockDiv.innerHTML = ''+userImage+'<span class="username">'+ obj.user_name +'</span><span class="description">Shared publicly - '+ obj.updated_at+'</span>';
         divPanel.appendChild(commentBlockDiv);
 
@@ -794,27 +798,29 @@ margin-left: -13px;}
         commentchatDiv.id = 'chat-box';
         var postId = obj.id;
         // var comments = obj.comments;
-        var comments = [];
+        var commentsArr = [];
+        var arrayRevComments = [];
         $.each(obj.comments, function(idx, obj) {
-          var arrayRevComments = [];
           arrayRevComments[idx] = obj;
-          comments = arrayRevComments.reverse();
         });
+        commentsArr = arrayRevComments.reverse();
 
         var commentLikesCount = msg['commentLikesCount'];
         var subcommentLikesCount = msg['subcommentLikesCount'];
         var postUserId = obj.user_id;
-        if(Object.keys(comments).length > 0){
-          if(false == $.isEmptyObject(comments)){
-            $.each(comments, function(idx, obj) {
+        if(Object.keys(commentsArr).length > 0){
+          if(false == $.isEmptyObject(commentsArr)){
+            $.each(commentsArr, function(idx, obj) {
               if(false == $.isEmptyObject(obj)){
               var mainCommentDiv = document.createElement('div');
               mainCommentDiv.className = 'item cmt-left-margin-10';
               mainCommentDiv.id = 'showComment_'+obj.id;
 
               var commentImage = document.createElement('img');
-              if(obj.image_exist){
+              if('system' == obj.image_exist){
                 var imageUrl =  "{{ asset('') }}"+obj.user_image;
+              } else if('other' == obj.image_exist){
+                var imageUrl =  obj.user_image;
               } else {
                 var imageUrl = "{{ asset('images/user1.png') }}";
               }
@@ -939,8 +945,10 @@ margin-left: -13px;}
         mainSubCommentDiv.className = 'item replySubComment-1';
 
         var subcommentImage = document.createElement('img');
-        if(obj.image_exist){
-          var subcommentImageUrl = "{{ asset('') }}"+obj.user_image;
+        if('system' == obj.image_exist){
+          var subcommentImageUrl =  "{{ asset('') }}"+obj.user_image;
+        } else if('other' == obj.image_exist){
+          var subcommentImageUrl =  obj.user_image;
         } else {
           var subcommentImageUrl = "{{ asset('images/user1.png') }}";
         }

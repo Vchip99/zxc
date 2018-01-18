@@ -80,7 +80,7 @@
         <div class="row info" id="addWorkshop">
           @if(count($workshops) > 0)
             @foreach($workshops as $workshop)
-              <div class="col-lg-6 col-md-6 col-sm-6 slideanim small-img">
+              <div class="col-lg-6 col-md-6 col-sm-6 small-img">
                 <div class="vchip_product_itm text-left">
                   <figure>
                     <img src="{{ asset($workshop->workshop_image) }}" alt="workshop" class="img-responsive " />

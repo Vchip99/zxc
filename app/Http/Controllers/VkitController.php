@@ -319,7 +319,14 @@ class VkitController extends Controller
             $videoComments['comments'][$comment->id]['user_name'] = $comment->user->name;
             $videoComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
             $videoComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
-            $videoComments['comments'][$comment->id]['image_exist'] = is_file($comment->user->photo);
+            if(is_file($comment->user->photo) && true == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $videoComments['comments'][$comment->id]['image_exist'] = $isImageExist;
             if(is_object($comment->children) && false == $comment->children->isEmpty()){
                 $videoComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
             }
@@ -345,7 +352,14 @@ class VkitController extends Controller
             $videoChildComments[$subComment->id]['user_id'] = $subComment->user_id;
             $videoChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
             $videoChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
-            $videoChildComments[$subComment->id]['image_exist'] = is_file($subComment->user->photo);
+            if(is_file($subComment->user->photo) && true == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($subComment->user->photo) && false == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $videoChildComments[$subComment->id]['image_exist'] = $isImageExist;
             if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
                 $videoChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
             }

@@ -204,9 +204,26 @@ class User extends Authenticatable
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
-        if(self::Student == $user->user_type){
+        $user->user_type = $request->user_type;
+        if(self::Student == $request->user_type){
             $user->year = $request->year;
             $user->roll_no = $request->roll_no;
+        } else {
+            $user->year = 0;
+            $user->roll_no = 0;
+        }
+
+        $user->college_id = $request->college;
+        if('other' == $request->college){
+            $user->college_dept_id = 0;
+            $user->other_source = $request->other_source;
+        } elseif($request->college > 0){
+            if(self::Directore == $request->user_type || self::TNP == $request->user_type){
+                $user->college_dept_id = 0;
+            } else {
+                $user->college_dept_id = $request->department;
+            }
+            $user->other_source = '';
         }
 
         $userStoragePath = "userStorage/".$user->id;
@@ -215,18 +232,16 @@ class User extends Authenticatable
         }
         if($request->exists('photo')){
             $userImage = $request->file('photo')->getClientOriginalName();
-            $userImagePath = $userStoragePath."/".$user->photo;
-            if(!empty($user->photo) && file_exists($userImagePath)){
-                unlink($userImagePath);
+            if(!empty($user->photo) && file_exists($user->photo)){
+                unlink($user->photo);
             }
             $request->file('photo')->move($userStoragePath, $userImage);
             $dbUserImagePath = $userStoragePath."/".$userImage;
         }
         if($request->exists('resume')){
             $userResume = $request->file('resume')->getClientOriginalName();
-            $userResumePath = $userStoragePath."/".$user->resume;
-            if(!empty($user->resume) && file_exists($userResumePath)){
-                unlink($userResumePath);
+            if(!empty($user->resume) && file_exists($user->resume)){
+                unlink($user->resume);
             }
             $request->file('resume')->move($userStoragePath, $userResume);
             $dbUserResumePath = $userStoragePath."/".$userResume;

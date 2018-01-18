@@ -135,7 +135,7 @@
         <div class="row info" id="all_live_courses">
           @if(count($liveCourses) > 0)
             @foreach($liveCourses as $liveCourse)
-              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim">
+              <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
                 <div class="course-box">
                   <a class="img-course-box" href="{{ url('liveCourse')}}/{{$liveCourse->id}}">
                     @if(!empty($liveCourse->image_path))
@@ -306,7 +306,7 @@
   <div class="container text-center v_container">
     <div class="row text-center ">
       <div class="col-md-4 col-sm-6 text-center">
-        <div class="box slideanim">
+        <div class="box">
         <a href="{{ asset('saveTimeSecurity')}}" target="_blank">
           <div class="icon" title="PERSONALIZED LIVE TEACHING"><i class="fa fa-user " aria-hidden="true"></i></div>
           <h3>PERSONALIZED LIVE TEACHING</h3>
@@ -317,7 +317,7 @@
         </div>
       </div>
       <div class="col-md-4 col-sm-6">
-        <div class="box slideanim">
+        <div class="box">
         <a href="{{ asset('saveTimeSecurity')}}" target="_blank">
           <div class="icon " title="BETTER THAN  RECORDED LECTURES"><i class="fa fa-refresh" aria-hidden="true"></i></div>
           <h3>BETTER THAN  RECORDED LECTURES</h3>
@@ -328,7 +328,7 @@
         </div>
       </div>
       <div class="col-md-4 col-sm-6">
-        <div class="box slideanim">
+        <div class="box">
         <a href="{{ asset('saveTimeSecurity')}}" target="_blank">
           <div class="icon " title="SAVE ON TIME"><i class="fa fa-clock-o" aria-hidden="true"></i></div>
           <h3>SAVE ON TIME</h3>
@@ -339,7 +339,7 @@
         </div>
       </div>
       <div class="col-md-4 col-md-offset-2 col-sm-6" >
-        <div class="box slideanim">
+        <div class="box">
           <a href="{{ asset('saveTimeSecurity')}}" target="_blank">
             <div class="icon " title="ANYTIME ANYWHERE LEARNING"><i class="fa fa-sun-o" aria-hidden="true"></i></div>
             <h3>ANYTIME ANYWHERE LEARNING</h3>
@@ -350,7 +350,7 @@
         </div>
       </div>
       <div class="col-md-4 col-sm-12 ">
-        <div class="box slideanim" >
+        <div class="box" >
           <a href="{{ asset('saveTimeSecurity')}}" target="_blank">
             <div class="icon " title="SAFETY"><i class="fa fa-expeditedssl" aria-hidden="true"></i></div>
             <h3>SAFETY</h3>

@@ -49,7 +49,7 @@
         <div class="row" id="testSubCategories">
           @if(count($testSubCategories) > 0)
             @foreach($testSubCategories as $testSubCategory)
-              <div class="col-lg-6 col-md-6 col-sm-6 slideanim small-img">
+              <div class="col-lg-6 col-md-6 col-sm-6 small-img">
                   <div class="vchip_product_itm text-left">
                     <figure title="{{$testSubCategory->name}}">
                       <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />

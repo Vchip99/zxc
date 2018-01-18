@@ -489,7 +489,7 @@ margin-right: 10px;
               <h3 class="v_h3_title mrgn_30_btm">Happy customers...Successful adventure.</h3>
             </div>
             <div class="row our_customer">
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                   <div class="tile">
                         <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="SSGMCE"/>
                         <div class="text">
@@ -502,7 +502,7 @@ margin-right: 10px;
                         </div>
                   </div>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                   <div class="tile">
                         <img src="{{ asset('images/logo/pote.jpg') }}" alt="P.R. Pote College of Engineering & Management"/>
                         <div class="text">
@@ -515,7 +515,7 @@ margin-right: 10px;
                         </div>
                   </div>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                   <div class="tile">
                         <img src="{{ asset('images/logo/hvpm.jpg') }}" alt="HVPM College of Engineer And Technology" />
                         <div class="text">
@@ -528,7 +528,7 @@ margin-right: 10px;
                         </div>
                   </div>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                   <div class="tile">
                         <img src="{{ asset('images/logo/ghrcema_logo.png') }}" alt="G H RISONI" />
                         <div class="text">
@@ -559,7 +559,7 @@ margin-right: 10px;
       <div class="person">
         <img class="img-responsive" src="{{ asset('images/team/vishesh.jpg') }}" alt="member-1" />
       </div>
-      <div class="person-detail  slideanim">
+      <div class="person-detail ">
         <div class="arrow-bottom "></div>
         <p><strong>Mr. Vishesh Agrawal</strong></p>
         <p>CEO</p>
@@ -575,7 +575,7 @@ margin-right: 10px;
         <p>Adjunct Professor</p>
         <p>M-Tech: IIT Kharagpur </p>
       </div>
-      <div class="person slideanim">
+      <div class="person">
         <img class="img-responsive" src="{{ asset('images/team/ajay.jpg') }}" alt="member-2" />
       </div>
     </div>
@@ -584,7 +584,7 @@ margin-right: 10px;
       <div class="person">
         <img class="img-responsive" src="{{ asset('images/team/vishal_kumar.jpg') }}" alt="member-3" />
       </div>
-      <div class="person-detail slideanim">
+      <div class="person-detail">
         <div class="arrow-bottom"></div>
         <p><strong>Mr. Vishal Kumar</strong></p>
         <p>Adjunct Professor</p>
@@ -599,7 +599,7 @@ margin-right: 10px;
         <p>Adjunct Professor</p>
         <p>M-Tech: Bits Pilani </p>
       </div>
-      <div class="person slideanim">
+      <div class="person">
         <img class="img-responsive" src="{{ asset('images/team/vishal_parvani.jpg') }}" alt="member-4" />
       </div>
     </div>
@@ -608,7 +608,7 @@ margin-right: 10px;
       <div class="person">
         <img class="img-responsive" src="{{ asset('images/team/vartul.jpg') }}" alt="member-5" />
       </div>
-      <div class="person-detail slideanim">
+      <div class="person-detail">
         <div class="arrow-bottom"></div>
         <p><strong>Mr. Vartul Sharma</strong></p>
         <p>Adjunct Professor</p>
@@ -622,7 +622,7 @@ margin-right: 10px;
         <p>Adjunct Professor</p>
         <p>M-Tech: VIT Vellore </p>
       </div>
-      <div class="person slideanim">
+      <div class="person">
         <img class="img-responsive" src="{{ asset('images/team/aditya.jpg') }}" alt="member-6" />
       </div>
     </div>

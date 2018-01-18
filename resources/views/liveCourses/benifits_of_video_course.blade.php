@@ -41,7 +41,7 @@
 </section>
 <section id="live-technology" class="v_container v_bg_grey ">
 	<div class="container text-center mrgn_60_btm ">
-		<div class="fa_icon slideanim"><i class="fa fa-user" aria-hidden="true"></i></div>
+		<div class="fa_icon"><i class="fa fa-user" aria-hidden="true"></i></div>
 		<div class="">
 			<h2 class="v_h2_title">PERSONALIZED LIVE TEACHING</h2>
 		  <hr class="section-dash-dark "/>
@@ -51,7 +51,7 @@
 </section>
 <section id="betterThanRecCourse" class="v_container ">
 	<div class="container text-center mrgn_60_btm">
-		<div class="fa_icon slideanim"><i class="fa fa-refresh benefits-icon" aria-hidden="true"></i></div>
+		<div class="fa_icon"><i class="fa fa-refresh benefits-icon" aria-hidden="true"></i></div>
 		<div>
 		  <h2 class="v_h2_title">BETTER THAN RECORDED LECTURES</h2>
 		  <hr class="section-dash-dark"/>
@@ -61,7 +61,7 @@
 </section>
 <section id="saveOnTime" class="v_container v_bg_grey">
 	<div class="container text-center mrgn_60_btm">
-	 	<div class="fa_icon slideanim"><i class="fa fa-clock-o benefits-icon" aria-hidden="true"></i></div>
+	 	<div class="fa_icon"><i class="fa fa-clock-o benefits-icon" aria-hidden="true"></i></div>
 		<div>
 		  <h2 class="v_h2_title">SAVE ON TIME</h2>
 		  <hr class="section-dash-dark"/>
@@ -71,7 +71,7 @@
 </section>
 <section id="anytimeAnywhereLern" class="v_container ">
 	<div class="container text-center mrgn_60_btm">
-		<div class="fa_icon slideanim"><i class="fa fa-sun-o benefits-icon" aria-hidden="true"></i></div>
+		<div class="fa_icon"><i class="fa fa-sun-o benefits-icon" aria-hidden="true"></i></div>
 		<div>
 		  <h2 class="v_h2_title">ANYTIME ANYWHERE LEARNING</h2>
 		  <hr class="section-dash-dark"/>
@@ -81,7 +81,7 @@
 </section>
 <section id="safe" class="v_container v_bg_grey">
 	<div class="container text-center mrgn_60_btm">
-		<div class="fa_icon slideanim"><i class="fa fa-expeditedssl benefits-icon" aria-hidden="true"></i></div>
+		<div class="fa_icon"><i class="fa fa-expeditedssl benefits-icon" aria-hidden="true"></i></div>
 		<div>
 		  <h2 class="v_h2_title">SAFETY</h2>
 		  <hr class="section-dash-dark"/>

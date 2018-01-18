@@ -261,7 +261,7 @@
   </div>
   <div class="row">
     @if(is_object($defaultCourse))
-      <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+      <div class="col-lg-4 col-md-4 col-sm-6">
           <div class="vchip_product_itm text-left">
             <figure>
               <img src="{{asset($defaultCourse->image_path)}}" alt="onlne course" class="img-responsive"  title="{{ $defaultCourse->name }}">
@@ -282,7 +282,7 @@
     @if(count($onlineCourses) > 0)
       @if(Auth::guard('clientuser')->user())
         @foreach($onlineCourses as $course)
-          <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+          <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="vchip_product_itm text-left">
               <figure>
                 <img src="{{asset($course->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $course->name }}">
@@ -302,7 +302,7 @@
         @endforeach
       @else
         @foreach($onlineCourses as $course)
-          <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+          <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="vchip_product_itm text-left">
               <figure>
                 <img src="{{asset($course->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $course->name }}">
@@ -338,7 +338,7 @@
   </div>
   <div class="row">
     @if(is_object($defaultTest))
-      <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+      <div class="col-lg-4 col-md-4 col-sm-6">
           <div class="vchip_product_itm text-left">
             <figure>
               <img src="{{asset($defaultTest->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $defaultTest->name }}">
@@ -359,7 +359,7 @@
     @if(count($onlineTestSubcategories)>0)
       @if(Auth::guard('clientuser')->user())
         @foreach($onlineTestSubcategories as $subcategory)
-          <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+          <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="vchip_product_itm text-left">
               <figure>
                 <img src="{{asset($subcategory->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $subcategory->name }}">
@@ -379,7 +379,7 @@
         @endforeach
       @else
         @foreach($onlineTestSubcategories as $subcategory)
-          <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+          <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="vchip_product_itm text-left">
               <figure>
                 <img src="{{asset($subcategory->image_path)}}" alt="onlne course" class="img-responsive" title="{{ $subcategory->name }}">
@@ -415,7 +415,7 @@
       <div class="row our_customer">
         @if(count($clientCustomers) > 0)
           @foreach($clientCustomers as $customer)
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
               <div class="hovereffect" data-toggle="{{ $customer->name }}" title="{{ $customer->name }}">
                 <img class="" id="client-customer-img_1"  src="{{asset($customer->image)}}" alt="SSGMCE" >
                 <div class="overlay">

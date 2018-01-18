@@ -217,7 +217,7 @@ hr{
                     @if(count( $comments) > 0)
                       @foreach($comments as $comment)
                         <div class="item" id="showComment_{{$comment->id}}">
-                          @if(is_file($comment->user->photo))
+                          @if(is_file($comment->user->photo) || (!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)))
                             <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
                           @else
                             <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -467,8 +467,10 @@ hr{
         mainCommentDiv.id = 'showComment_'+obj.id;
 
         var commentImage = document.createElement('img');
-        if(obj.image_exist){
+        if('system' == obj.image_exist){
           var imageUrl =  "{{ asset('') }}"+obj.user_image;
+        } else if('other' == obj.image_exist){
+          var imageUrl =  obj.user_image;
         } else {
           var imageUrl = "{{ asset('images/user1.png') }}";
         }
@@ -583,11 +585,14 @@ hr{
         mainSubCommentDiv.className = 'item replySubComment-1';
 
         var subcommentImage = document.createElement('img');
-        if(obj.image_exist){
-          var subcommentImageUrl = "{{ asset('') }}"+obj.user_image;
+        if('system' == obj.image_exist){
+          var subcommentImageUrl =  "{{ asset('') }}"+obj.user_image;
+        } else if('other' == obj.image_exist){
+          var subcommentImageUrl =  obj.user_image;
         } else {
           var subcommentImageUrl = "{{ asset('images/user1.png') }}";
         }
+
         subcommentImage.setAttribute('src',subcommentImageUrl);
         mainSubCommentDiv.appendChild(subcommentImage);
 

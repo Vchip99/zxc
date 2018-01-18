@@ -401,23 +401,31 @@ class ClientOnlineCourseFrontController extends ClientHomeController
      */
     protected function getComments($videoId, Request $request){
         $comments = ClientCourseComment::getCommentsByVideoId($videoId, $request);
-        $videoComments = [];
+        $courseComment = [];
         foreach($comments as $comment){
-            $videoComments['comments'][$comment->id]['body'] = $comment->body;
-            $videoComments['comments'][$comment->id]['id'] = $comment->id;
-            $videoComments['comments'][$comment->id]['client_online_video_id'] = $comment->client_online_video_id;
-            $videoComments['comments'][$comment->id]['user_id'] = $comment->user_id;
-            $videoComments['comments'][$comment->id]['user_name'] = $comment->user->name;
-            $videoComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
-            $videoComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
+            $courseComment['comments'][$comment->id]['body'] = $comment->body;
+            $courseComment['comments'][$comment->id]['id'] = $comment->id;
+            $courseComment['comments'][$comment->id]['client_online_video_id'] = $comment->client_online_video_id;
+            $courseComment['comments'][$comment->id]['user_id'] = $comment->user_id;
+            $courseComment['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $courseComment['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
+            $courseComment['comments'][$comment->id]['user_image'] = $comment->user->photo;
+            if(is_file($comment->user->photo) && true == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $courseComment['comments'][$comment->id]['image_exist'] = $isImageExist;
             if(is_object($comment->children) && false == $comment->children->isEmpty()){
-                $videoComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
+                $courseComment['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
             }
         }
-        $videoComments['commentLikesCount'] = ClientCourseCommentLike::getLikesByVideoId($videoId, $request);
-        $videoComments['subcommentLikesCount'] = ClientCourseSubCommentLike::getLikesByVideoId($videoId, $request);
+        $courseComment['commentLikesCount'] = ClientCourseCommentLike::getLikesByVideoId($videoId, $request);
+        $courseComment['subcommentLikesCount'] = ClientCourseSubCommentLike::getLikesByVideoId($videoId, $request);
 
-        return $videoComments;
+        return $courseComment;
     }
 
     /**
@@ -435,6 +443,14 @@ class ClientOnlineCourseFrontController extends ClientHomeController
             $videoChildComments[$subComment->id]['user_id'] = $subComment->user_id;
             $videoChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
             $videoChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
+            if(is_file($subComment->user->photo) && true == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($subComment->user->photo) && false == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $videoChildComments[$subComment->id]['image_exist'] = $isImageExist;
             if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
                 $videoChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
             }

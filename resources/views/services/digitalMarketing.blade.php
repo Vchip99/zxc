@@ -36,7 +36,7 @@
   <section id="feature" class="v_container ">
     <div class="container">
         <div class="row">
-        <div class="col-md-6 animate-box slideanim" >
+        <div class="col-md-6 animate-box" >
           <div class="feature-center" >
             <span class="icon">
               <i class="ti-image"></i>
@@ -47,7 +47,7 @@
             </span>
           </div>
         </div>
-        <div class="col-md-6 animate-box slideanim" >
+        <div class="col-md-6 animate-box" >
           <div class="feature-center" >
             <span class="icon">
               <i class="ti-email "></i>
@@ -58,7 +58,7 @@
             </span>
           </div>
         </div>
-         <div class="col-md-6 animate-box slideanim" >
+         <div class="col-md-6 animate-box" >
           <div class="feature-center" >
             <span class="icon">
               <i class="ti-search"></i>
@@ -69,7 +69,7 @@
             </span>
           </div>
         </div>
-         <div class="col-md-6 animate-box slideanim" >
+         <div class="col-md-6 animate-box" >
           <div class="feature-center" >
             <span class="icon">
               <i class="ti-sharethis"></i>

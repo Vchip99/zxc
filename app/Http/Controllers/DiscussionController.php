@@ -186,7 +186,14 @@ class DiscussionController extends Controller
             $postChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
             $postChildComments[$subComment->id]['title'] = $title;
             $postChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
-            $postChildComments[$subComment->id]['image_exist'] = is_file($subComment->user->photo);
+            if(is_file($subComment->user->photo) && true == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($subComment->user->photo) && false == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $postChildComments[$subComment->id]['image_exist'] = $isImageExist;
             if($subComment->children){
                 $postChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children,$title);
             }
@@ -211,7 +218,15 @@ class DiscussionController extends Controller
             $postComments[$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
             $postComments[$comment->id]['title'] = $title;
             $postComments[$comment->id]['user_image'] = $comment->user->photo;
-            $postComments[$comment->id]['image_exist'] = is_file($comment->user->photo);
+            if(is_file($comment->user->photo) && true == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $postComments[$comment->id]['image_exist'] = $isImageExist;
+
             if($comment->children){
                 $postComments[$comment->id]['subcomments'] = $this->getSubComments($comment->children,$title);
             }
@@ -234,8 +249,14 @@ class DiscussionController extends Controller
             $allPosts['posts'][$post->id]['user_name'] = $post->user->name;
             $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
             $allPosts['posts'][$post->id]['user_image'] = $post->user->photo;
-            $allPosts['posts'][$post->id]['image_exist'] = is_file($post->user->photo);
-
+            if(is_file($post->user->photo) && true == preg_match('/userStorage/',$post->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($post->user->photo) && false == preg_match('/userStorage/',$post->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $allPosts['posts'][$post->id]['image_exist'] = $isImageExist;
             if($post->descComments){
                 $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
             }
@@ -260,6 +281,14 @@ class DiscussionController extends Controller
             $allPosts['posts'][$post->id]['user_name'] = $post->user->name;
             $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
             $allPosts['posts'][$post->id]['user_image'] = $post->user->photo;
+            if(is_file($post->user->photo) && true == preg_match('/userStorage/',$post->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($post->user->photo) && false == preg_match('/userStorage/',$post->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $allPosts['posts'][$post->id]['image_exist'] = $isImageExist;
 
             if($post->descComments){
                 $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
@@ -285,7 +314,14 @@ class DiscussionController extends Controller
             $allPosts['posts'][$post->id]['user_name'] = $user->find($post->user_id)->name;
             $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
             $allPosts['posts'][$post->id]['user_image'] = $post->user->photo;
-
+            if(is_file($post->user->photo) && true == preg_match('/userStorage/',$post->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($post->user->photo) && false == preg_match('/userStorage/',$post->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $allPosts['posts'][$post->id]['image_exist'] = $isImageExist;
             if($post->descComments){
                 $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
             }

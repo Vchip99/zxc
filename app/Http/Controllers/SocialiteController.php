@@ -5,16 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
+use App\Models\Client;
+use App\Models\Clientuser;
 use Auth,Hash,DB, Redirect,Session,Validator,Input, Url;
 use App\Libraries\InputSanitise;
 use App\Mail\SocialiteUser;
 use App\Mail\NewRegisteration;
+use App\Mail\NewClientUserRegistration;
 use Socialite;
 
 class SocialiteController extends Controller
 {
-
-
 	/**
      * Redirect the user to the OAuth Provider.
      *
@@ -22,7 +23,21 @@ class SocialiteController extends Controller
      */
     public function redirectToProvider(Request $request, $provider)
     {
-    	Session::flash('previousUrl',$request->server('HTTP_REFERER'));
+    	Session::flash('domainUrl',$request->server('HTTP_REFERER'));
+
+        return Socialite::driver($provider)->redirect();
+    }
+
+    /**
+     * Redirect the user to the OAuth Provider.
+     *
+     * @return Response
+     */
+    public function subdomainRedirectToProvider(Request $request, $subdomain=NULL,$provider)
+    {
+        Session::put('subdomainReferer', $request->server('HTTP_REFERER'));
+        Session::put('subdomainUrl', $request->server('HTTP_HOST'));
+        Session::save();
         return Socialite::driver($provider)->redirect();
     }
 
@@ -34,31 +49,111 @@ class SocialiteController extends Controller
      *
      * @return Response
      */
-    public function handleProviderCallback($provider)
+    public function handleProviderCallback(Request $request, $provider)
     {
+
+        $state = $request->get('state');
+        $request->session()->put('state',$state);
+        if(true == Session::has('domainUrl')){
+            $domainUrl = Session::get('domainUrl');
+        } else {
+            $domainUrl = '';
+        }
+        if(true == Session::has('subdomainUrl')){
+            $subdomainUrl = Session::get('subdomainUrl');
+        } else {
+            $subdomainUrl = '';
+        }
+        if(true == Session::has('subdomainReferer')){
+            $subdomainReferer = Session::get('subdomainReferer');
+        } else {
+            $subdomainReferer = '';
+        }
 
     	try
         {
         	$user = Socialite::driver($provider)->user();
         }
         catch (Exception $e) {
-            return Redirect::to('/');
+            if(!empty($domainUrl) && empty($subdomainUrl) && empty($subdomainReferer)){
+                Session::remove('domainUrl');
+                if(true == Session::has('subdomainUrl')){
+                    Session::remove('subdomainUrl');
+                }
+                if(true == Session::has('subdomainReferer')){
+                    Session::remove('subdomainReferer');
+                }
+                return Redirect::to($domainUrl);
+            } else if(!empty($subdomainUrl) && !empty($subdomainReferer) && empty($domainUrl)){
+                Session::remove('subdomainUrl');
+                Session::remove('subdomainReferer');
+                if(true == Session::has('domainUrl')){
+                    Session::remove('domainUrl');
+                }
+
+                return Redirect::to($subdomainReferer);
+            } else {
+                return Redirect::to('/');
+            }
         }
 
         try
         {
-        	$authUser = $this->findOrCreateUser($user, $provider);
+            if(is_object($user)){
+        	   $authUser = $this->findOrCreateUser($user, $provider);
+            } else {
+                $authUser = '';
+            }
         }
         catch (Exception $e) {
-        	DB::rollback();
-            return Redirect::to('/');
+            if(!empty($domainUrl) && empty($subdomainUrl) && empty($subdomainReferer)){
+                Session::remove('domainUrl');
+                if(true == Session::has('subdomainUrl')){
+                    Session::remove('subdomainUrl');
+                }
+                if(true == Session::has('subdomainReferer')){
+                    Session::remove('subdomainReferer');
+                }
+                return Redirect::to($domainUrl);
+            } else if(!empty($subdomainUrl) && !empty($subdomainReferer) && empty($domainUrl)){
+                Session::remove('subdomainUrl');
+                Session::remove('subdomainReferer');
+                if(true == Session::has('domainUrl')){
+                    Session::remove('domainUrl');
+                }
+
+                return Redirect::to($subdomainReferer);
+            } else {
+                return Redirect::to('/');
+            }
         }
 
-        Auth::login($authUser);
-        if(Session::has('previousUrl')){
-        	return Redirect::to(Session::get('previousUrl'))->with('message', 'Welcome '. $authUser->name);
+        if(!empty($domainUrl) && empty($subdomainUrl) && empty($subdomainReferer)){
+            if(is_object($authUser)){
+                Auth::login($authUser);
+                Session::remove('domainUrl');
+                if(true == Session::has('subdomainUrl')){
+                    Session::remove('subdomainUrl');
+                }
+                if(true == Session::has('subdomainReferer')){
+                    Session::remove('subdomainReferer');
+                }
+                return Redirect::to($domainUrl)->with('message', 'Welcome '. $authUser->name);
+            } else {
+                return Redirect::to('/');
+            }
         } else {
-        	return back()->with('message', 'Welcome '. $authUser->name);
+            if(is_object($authUser)){
+                Auth::guard('clientuser')->login($authUser);
+                Session::remove('subdomainUrl');
+                Session::remove('subdomainReferer');
+                if(true == Session::has('domainUrl')){
+                    Session::remove('domainUrl');
+                }
+                return Redirect::to($subdomainReferer)->with('message', 'Welcome '. $authUser->name);
+            } else {
+                return Redirect::to('/');
+            }
         }
     }
 
@@ -71,64 +166,154 @@ class SocialiteController extends Controller
      */
     public function findOrCreateUser($user, $provider)
     {
-    	$authUser = User::where('email', $user->email)->first();
-    	if(is_object($authUser)){
-    		if( 'facebook' == $provider && empty($authUser->facebook_provider_id)){
-    			$authUser->facebook_provider_id = $user->id;
-    			$authUser->save();
-    			DB::commit();
-    		} else if( 'google' == $provider && empty($authUser->google_provider_id)){
-    			$authUser->google_provider_id = $user->id;
-    			$authUser->save();
-    			DB::commit();
-    		}
-    		return $authUser;
-    	} else {
-    		if( 'facebook' == $provider){
-    			$facebookProviderId = $user->id;
-    			$googleProviderId = '';
-    		} else {
-    			$facebookProviderId = '';
-    			$googleProviderId = $user->id;
-    		}
-    		$data = [];
-	        $passwordStr= str_random(10);
-        	$authUser = User::create([
-                'name'     => $user->name,
-	            'email'    => $user->email,
-	            'phone'	   => '1234567890',
-                'password' => bcrypt($passwordStr),
-                'user_type' => 2,
-                'admin_approve' => 1,
-                'verified' => 1,
-                'degree' => 1,
-                'college_id' => 'other',
-                'college_dept_id' => '',
-                'year' => '',
-                'roll_no' => '',
-                'other_source' => $provider,
-                'email_token' => '',
-                'google_provider_id' => $googleProviderId,
-                'facebook_provider_id' => $facebookProviderId
-            ]);
-            DB::commit();
-            $data['name'] = $user->name;
-            $data['email'] = $user->email;
-            $data['password'] = $passwordStr;
-            $data['url'] = url('/');
-            $data['other_source'] = $provider;
-            $data['degree'] = 'Engineering';
-            $data['college'] = '';
-            $data['department'] = '';
-            $data['year'] = '';
-            $data['roll_no'] = '';
-            $data['user_type'] = 'Student';
-
-            // send mail to user after new registration
-            Mail::to($user->email)->send(new SocialiteUser($data));
-            // send mail to admin after new registration
-            Mail::to('vchipdesigng8@gmail.com')->send(new NewRegisteration($data));
-            return $authUser;
-    	}
+        if(true == Session::has('domainUrl') && false == Session::has('subdomainUrl') && false == Session::has('subdomainReferer')){
+        	$authUser = User::where('email', $user->email)->first();
+            DB::beginTransaction();
+            try
+            {
+            	if(is_object($authUser)){
+            		if( 'facebook' == $provider && empty($authUser->facebook_provider_id)){
+            			$authUser->facebook_provider_id = $user->id;
+            			$authUser->save();
+            			DB::commit();
+            		} else if( 'google' == $provider && empty($authUser->google_provider_id)){
+            			$authUser->google_provider_id = $user->id;
+            			$authUser->save();
+            			DB::commit();
+            		}
+                    if(empty($authUser->photo)){
+                        $authUser->photo = $user->avatar_original;
+                        $authUser->save();
+                        DB::commit();
+                    }
+            	} else {
+            		if( 'facebook' == $provider){
+            			$facebookProviderId = $user->id;
+            			$googleProviderId = '';
+            		} else {
+            			$facebookProviderId = '';
+            			$googleProviderId = $user->id;
+            		}
+            		$data = [];
+        	        $passwordStr= str_random(10);
+                	$authUser = User::create([
+                        'name'     => $user->name,
+        	            'email'    => $user->email,
+        	            'phone'	   => '1234567890',
+                        'password' => bcrypt($passwordStr),
+                        'user_type' => 2,
+                        'admin_approve' => 1,
+                        'verified' => 1,
+                        'degree' => 1,
+                        'college_id' => 'other',
+                        'college_dept_id' => '',
+                        'year' => '',
+                        'roll_no' => '',
+                        'other_source' => $provider,
+                        'photo'    => $user->avatar_original,
+                        'email_token' => '',
+                        'google_provider_id' => $googleProviderId,
+                        'facebook_provider_id' => $facebookProviderId
+                    ]);
+                    DB::commit();
+                    $data['name'] = $user->name;
+                    $data['email'] = $user->email;
+                    $data['password'] = $passwordStr;
+                    $data['url'] = url('/');
+                    $data['other_source'] = $provider;
+                    $data['degree'] = 'Engineering';
+                    $data['college'] = '';
+                    $data['department'] = '';
+                    $data['year'] = '';
+                    $data['roll_no'] = '';
+                    $data['user_type'] = 'Student';
+                    $data['domain'] = 'Vchipedu';
+                    // send mail to user after new registration
+                    Mail::to($user->email)->send(new SocialiteUser($data));
+                    // send mail to admin after new registration
+                    Mail::to('vchipdesigng8@gmail.com')->send(new NewRegisteration($data));
+                }
+                return $authUser;
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'false';
+            }
+        } else if(true == Session::has('subdomainUrl') && true == Session::has('subdomainReferer') && false == Session::has('domainUrl')){
+            $subdomain = Session::get('subdomainUrl');
+            if($subdomain){
+                DB::connection('mysql2')->beginTransaction();
+                try
+                {
+                    $client = Client::where('subdomain', $subdomain)->first();
+                    if(is_object($client)){
+                        $authUser = Clientuser::where('email', $user->email)->where('client_id', $client->id)->first();
+                        if(is_object($authUser)){
+                            if( 'facebook' == $provider && empty($authUser->facebook_provider_id)){
+                                $authUser->facebook_provider_id = $user->id;
+                                $authUser->save();
+                                DB::connection('mysql2')->commit();
+                            } else if( 'google' == $provider && empty($authUser->google_provider_id)){
+                                $authUser->google_provider_id = $user->id;
+                                $authUser->save();
+                                DB::connection('mysql2')->commit();
+                            }
+                            if(empty($authUser->photo)){
+                                $authUser->photo = $user->avatar_original;
+                                $authUser->save();
+                                DB::connection('mysql2')->commit();
+                            }
+                        } else {
+                            if( 'facebook' == $provider){
+                                $facebookProviderId = $user->id;
+                                $googleProviderId = '';
+                            } else {
+                                $facebookProviderId = '';
+                                $googleProviderId = $user->id;
+                            }
+                            $data = [];
+                            $passwordStr= str_random(10);
+                            $authUser = Clientuser::create([
+                                'name'     => $user->name,
+                                'email'    => $user->email,
+                                'phone'    => '1234567890',
+                                'password' => bcrypt($passwordStr),
+                                'client_id' => $client->id,
+                                'verified' => 1,
+                                'client_approve' => 1,
+                                'photo'    => $user->avatar_original,
+                                'google_provider_id' => $googleProviderId,
+                                'facebook_provider_id' => $facebookProviderId
+                            ]);
+                            DB::connection('mysql2')->commit();
+                            $data['name'] = $user->name;
+                            $data['email'] = $user->email;
+                            $data['password'] = $passwordStr;
+                            $data['url'] = Session::get('subdomainUrl');
+                            $data['domain'] = explode('.', $subdomain)[0];
+                            // send mail to user after new registration
+                            Mail::to($user->email)->send(new SocialiteUser($data));
+                            // send mail to client after new registration
+                            $data = [
+                                'name' => $user->name,
+                                'email' => $user->email,
+                            ];
+                            Mail::to($client->email)->send(new NewClientUserRegistration($data));
+                            // return $authUser;
+                        }
+                        return $authUser;
+                    }
+                    return 'false';
+                }
+                catch(\Exception $e)
+                {
+                    DB::connection('mysql2')->rollback();
+                    return 'false';
+                }
+            }
+            return 'false';
+        }
+        return 'false';
     }
 }

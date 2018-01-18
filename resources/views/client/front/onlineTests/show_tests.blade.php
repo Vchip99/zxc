@@ -336,6 +336,7 @@ font-weight: bold;
 	}
 
 	function startTest(ele){
+		var popup_window =window.open("", 'My Window', 'height=900px !important,width=1500px !important');
 		var paper = parseInt($(ele).data('paper'));
 		var subject = parseInt($(ele).data('subject'));
 		var category = parseInt($(ele).data('category'));
@@ -349,7 +350,7 @@ font-weight: bold;
 	        })
 	        .done(function( msg ) {
 	        	if( msg ){
-					window.open("{{ url('instructions')}}", 'My Window', 'height=900px !important,width=1500px !important');
+					popup_window.location = "{{ url('instructions')}}";
 	        	}
 	        });
 		}

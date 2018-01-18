@@ -45,7 +45,7 @@ class BlogController extends Controller
      *  show all blog
      */
     protected function show(Request $request){
-        $blogs = Blog::orderBy('id', 'desc')->paginate(5);
+        $blogs = Blog::orderBy('id', 'desc')->paginate();
         $blogCategories = BlogCategory::all();
         $date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
@@ -331,7 +331,14 @@ class BlogController extends Controller
             $blogComments['comments'][$comment->id]['user_name'] = $comment->user->name;
             $blogComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
             $blogComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
-            $blogComments['comments'][$comment->id]['image_exist'] = is_file($comment->user->photo);
+            if(is_file($comment->user->photo) && true == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $blogComments['comments'][$comment->id]['image_exist'] = $isImageExist;
             if(is_object($comment->children) && false == $comment->children->isEmpty()){
                 $blogComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
             }
@@ -357,7 +364,14 @@ class BlogController extends Controller
             $blogChildComments[$subComment->id]['user_id'] = $subComment->user_id;
             $blogChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
             $blogChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
-            $blogChildComments[$subComment->id]['image_exist'] = is_file($subComment->user->photo);
+            if(is_file($subComment->user->photo) && true == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($subComment->user->photo) && false == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $blogChildComments[$subComment->id]['image_exist'] = $isImageExist;
             if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
                 $blogChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
             }

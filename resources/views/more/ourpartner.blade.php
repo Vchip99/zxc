@@ -151,7 +151,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
 	          <h3 class="v_h3_title ">Happy partners...Successful adventure.</h3>
 	        </div>
 	        <div class="row our_customer">
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
               <div class="tile">
                     <img src="{{ asset('images/our-partner/vchip-tech-logo.jpg')}}" alt="SSGMCE"/>
                     <div class="text">
@@ -164,7 +164,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
                     </div>
               </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
               <div class="tile">
                     <img src="{{ asset('images/our-partner/lasthour_logo.jpg')}}" alt="Last Hours Tech"/>
                     <div class="text">
@@ -177,7 +177,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
                     </div>
               </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
               <div class="tile">
                     <img src="" alt="Pinnaculum Infotech Pvt. Ltd"/>
                     <div class="text">
@@ -190,7 +190,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
                     </div>
               </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
               <div class="tile">
                     <img class="" src="{{ asset('images/our-partner/axis-bank.jpg')}}" alt="Axis Bank">
                     <div class="text">
@@ -216,7 +216,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
        <h3 class="v_h3_title text-muted "><em>Happy partners...Successful adventure.</em></h3>
      </div>
      <div class="col-md-12 mrgn_30_top">
-      <button class="accordion slideanim" title="ANGEL INVESTOR">ANGEL INVESTOR</button>
+      <button class="accordion" title="ANGEL INVESTOR">ANGEL INVESTOR</button>
       <div class="panel">
         <div class="panel-content ">
           <ul>
@@ -240,7 +240,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
 
      </div>
 
-     <button class="accordion slideanim" title="FRANCHISE HOLDER">FRANCHISE HOLDER</button>
+     <button class="accordion" title="FRANCHISE HOLDER">FRANCHISE HOLDER</button>
      <div class="panel">
       <div class="panel-content ">
         <h2 class="v_h2_title text-center">Vchip-edu, leaders in on-line education platform.</h2>
@@ -269,7 +269,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
         </div>
 
       </div>
-      <button class="accordion slideanim" title="MENTORS">MENTORS</button>
+      <button class="accordion" title="MENTORS">MENTORS</button>
       <div class="panel">
         <div class="panel-content">
           <p>We believes that if you want to win the race then only your speed in not enough but also you should have proper direction. So before starting any adventure we at first discuss our plan with our mentors, industry leaders who are working in same fields.

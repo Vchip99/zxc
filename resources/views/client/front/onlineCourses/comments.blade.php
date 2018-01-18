@@ -1,6 +1,6 @@
 @foreach($comments as $subcomment)
 	<div class="item replySubComment-1">
-	  	@if(!empty($subcomment->user->photo))
+	  	@if(is_file($subcomment->user->photo) || (!empty($subcomment->user->photo) && false == preg_match('/clientUserStorage/',$subcomment->user->photo)))
 	        <img src="{{ asset($subcomment->user->photo) }}" alt="User Image" />
 	      @else
 	        <img src="{{ asset('images/user1.png') }}" alt="User Image" />

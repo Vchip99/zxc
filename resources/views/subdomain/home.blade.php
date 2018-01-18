@@ -55,7 +55,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+    <div class="col-lg-4 col-md-4 col-sm-6">
       <div class="vchip_product_itm text-left">
         <figure>
           <img src="{{asset('images/index/online-course.jpg')}}" alt="onlne course" class="img-responsive">
@@ -89,7 +89,7 @@
         </div>
       </div>
     </div>
-    <!-- <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+    <!-- <div class="col-lg-4 col-md-4 col-sm-6">
       <div class="vchip_product_itm">
         <figure>
           <img src="{{asset('images/index/webinar.jpg')}}" alt="webinar" class="img-responsive">
@@ -120,7 +120,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-lg-4 col-md-4 col-sm-6 slideanim">
+    <div class="col-lg-4 col-md-4 col-sm-6">
       <div class="vchip_product_itm text-left">
         <figure>
           <img src="{{asset('images/index/online-course.jpg')}}" alt="onlne course" class="img-responsive">
@@ -167,7 +167,7 @@
         <h3 class="v_h3_title">Happy customers...Successful adventure.</h3>
       </div>
       <div class="row our_customer">
-        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim">
+        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
           <div class="hovereffect">
             <img class="" src="{{ asset('images/logo/ssgmce-logo.jpg')}}" alt="SSGMCE" />
             <div class="overlay">
@@ -176,7 +176,7 @@
            </div>
          </div>
        </div>
-       <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim mrgn_10_top">
+       <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 mrgn_10_top">
         <div class="hovereffect">
           <img class="" src="{{ asset('images/logo/gate-the-Direction.png')}}" alt="GATE THE Direction" style="padding: 20px 0px;">
           <div class="overlay">
@@ -185,7 +185,7 @@
          </div>
        </div>
      </div>
-     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim mrgn_10_top">
+     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 mrgn_10_top">
       <div class="hovereffect">
         <img class="" src="{{ asset('images/logo/kaizen.jpg')}}" alt="Kaizen Technology"/>
         <div class="overlay">
@@ -194,7 +194,7 @@
        </div>
      </div>
    </div>
-   <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 slideanim mrgn_10_top">
+   <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 mrgn_10_top">
     <div class="hovereffect">
       <img class="" src="{{ asset('images/logo/lasthour-logo.jpg')}}" alt="Last Hours Technology"/>
       <div class="overlay">
@@ -219,7 +219,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-4 col-sm-4 animate-box slideanim" >
+    <div class="col-md-4 col-sm-4 animate-box" >
       <div class="feature-center" style="text-align: center">
         <span class="icon">
           <i class="ti-download"></i>
@@ -245,7 +245,7 @@
       </span>
     </div>
   </div>
-  <div class="col-md-4 col-sm-4 animate-box slideanim" >
+  <div class="col-md-4 col-sm-4 animate-box" >
     <div class="feature-center" style="text-align: center">
       <span class="icon">
         <i class="ti-face-smile"></i>
@@ -275,7 +275,7 @@
       <div class="person">
         <img class="img-responsive" src="{{asset('images/team/team-member-1.jpg')}}" alt="member-1">
       </div>
-      <div class="person-detail slideanim">
+      <div class="person-detail">
         <div class="arrow-bottom"></div>
         <p><strong>Mr. Vishesh Agrawal</strong></p>
         <p>CEO</p>
@@ -289,7 +289,7 @@
         <p>Professor</p>
         <p>M-Tech: IIT Kharagpur </p>
       </div>
-      <div class="person slideanim">
+      <div class="person">
         <img class="img-responsive" src="{{asset('images/team/team-member-2.jpg')}}" alt="member-2">
       </div>
     </div>
@@ -297,7 +297,7 @@
       <div class="person">
         <img class="img-responsive" src="{{asset('images/team/team-member-3.jpg')}}" alt="member-3">
       </div>
-      <div class="person-detail slideanim">
+      <div class="person-detail">
         <div class="arrow-bottom"></div>
         <p><strong>Mr. Vishal Kumar</strong></p>
         <p>Adjoint Professor</p>
@@ -311,7 +311,7 @@
         <p>Adjoint Professor</p>
         <p>M-Tech: Bits Pilani </p>
       </div>
-      <div class="person slideanim">
+      <div class="person">
         <img class="img-responsive" src="{{asset('images/team/team-member-4.jpg')}}" alt="member-5">
       </div>
     </div>
@@ -319,7 +319,7 @@
       <div class="person">
         <img class="img-responsive" src="{{asset('images/team/team-member-5.jpg')}}" alt="member-6">
       </div>
-      <div class="person-detail slideanim">
+      <div class="person-detail">
         <div class="arrow-bottom"></div>
         <p><strong>Mr. Vartul Sharma</strong></p>
         <p>Adjoint Professor</p>
@@ -333,7 +333,7 @@
         <p>Adjoint Professor</p>
         <p>M-Tech: VIT Vellore </p>
       </div>
-      <div class="person slideanim">
+      <div class="person">
         <img class="img-responsive" src="{{asset('images/team/team-member-6.jpg')}}" alt="member-5">
       </div>
     </div>

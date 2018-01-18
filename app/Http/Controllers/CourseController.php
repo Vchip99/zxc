@@ -232,24 +232,31 @@ class CourseController extends Controller
      */
     protected function getComments($videoId){
         $comments = CourseComment::where('course_video_id', $videoId)->orderBy('id', 'desc')->get();
-        $videoComments = [];
+        $courseComment = [];
         foreach($comments as $comment){
-            $videoComments['comments'][$comment->id]['body'] = $comment->body;
-            $videoComments['comments'][$comment->id]['id'] = $comment->id;
-            $videoComments['comments'][$comment->id]['course_video_id'] = $comment->course_video_id;
-            $videoComments['comments'][$comment->id]['user_id'] = $comment->user_id;
-            $videoComments['comments'][$comment->id]['user_name'] = $comment->user->name;
-            $videoComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
-            $videoComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
-            $videoComments['comments'][$comment->id]['image_exist'] = is_file($comment->user->photo);
+            $courseComment['comments'][$comment->id]['body'] = $comment->body;
+            $courseComment['comments'][$comment->id]['id'] = $comment->id;
+            $courseComment['comments'][$comment->id]['course_video_id'] = $comment->course_video_id;
+            $courseComment['comments'][$comment->id]['user_id'] = $comment->user_id;
+            $courseComment['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $courseComment['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
+            $courseComment['comments'][$comment->id]['user_image'] = $comment->user->photo;
+            if(is_file($comment->user->photo) && true == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $courseComment['comments'][$comment->id]['image_exist'] = $isImageExist;
             if(is_object($comment->children) && false == $comment->children->isEmpty()){
-                $videoComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
+                $courseComment['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
             }
         }
-        $videoComments['commentLikesCount'] = CourseCommentLike::getLikesByVideoId($videoId);
-        $videoComments['subcommentLikesCount'] = CourseSubCommentLike::getLikesByVideoId($videoId);
+        $courseComment['commentLikesCount'] = CourseCommentLike::getLikesByVideoId($videoId);
+        $courseComment['subcommentLikesCount'] = CourseSubCommentLike::getLikesByVideoId($videoId);
 
-        return $videoComments;
+        return $courseComment;
     }
 
     /**
@@ -257,23 +264,30 @@ class CourseController extends Controller
      */
     protected function getSubComments($subComments){
 
-        $videoChildComments = [];
+        $courseChildComments = [];
         foreach($subComments as $subComment){
-            $videoChildComments[$subComment->id]['body'] = $subComment->body;
-            $videoChildComments[$subComment->id]['id'] = $subComment->id;
-            $videoChildComments[$subComment->id]['course_video_id'] = $subComment->course_video_id;
-            $videoChildComments[$subComment->id]['course_comment_id'] = $subComment->course_comment_id;
-            $videoChildComments[$subComment->id]['user_name'] = $subComment->user->name;
-            $videoChildComments[$subComment->id]['user_id'] = $subComment->user_id;
-            $videoChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
-            $videoChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
-            $videoChildComments[$subComment->id]['image_exist'] = is_file($subComment->user->photo);
+            $courseChildComments[$subComment->id]['body'] = $subComment->body;
+            $courseChildComments[$subComment->id]['id'] = $subComment->id;
+            $courseChildComments[$subComment->id]['course_video_id'] = $subComment->course_video_id;
+            $courseChildComments[$subComment->id]['course_comment_id'] = $subComment->course_comment_id;
+            $courseChildComments[$subComment->id]['user_name'] = $subComment->user->name;
+            $courseChildComments[$subComment->id]['user_id'] = $subComment->user_id;
+            $courseChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
+            $courseChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
+            if(is_file($subComment->user->photo) && true == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($subComment->user->photo) && false == preg_match('/userStorage/',$subComment->user->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $courseChildComments[$subComment->id]['image_exist'] = $isImageExist;
             if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
-                $videoChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
+                $courseChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
             }
         }
 
-        return $videoChildComments;
+        return $courseChildComments;
     }
 
     protected function updateCourseComment(Request $request){

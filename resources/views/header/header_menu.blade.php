@@ -15,7 +15,7 @@
         <div class="pull-right dropdown " >
           @if(Auth::user())
           <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User">
-            @if(is_file(Auth::user()->photo))
+            @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
               <img src="{{asset(Auth::user()->photo)}}" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
             @else
               <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
@@ -27,7 +27,7 @@
             <ul class="dropdown-menu user-dropdown ">
                 <li>
                   <a href="{{ url('profile')}}" data-toggle="tooltip" title="Dashbord">
-                  @if(is_file(Auth::user()->photo))
+                  @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
                     <img src="{{asset(Auth::user()->photo)}}" class="img-circle user-profile1" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
                   @else
                     <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;

@@ -35,7 +35,7 @@
     <div class="row " id="addCourses">
     	@if(count($courses) > 0)
         @foreach($courses as $course)
-          <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 slideanim">
+          <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
             <div class="course-box">
               <a class="img-course-box" href="{{ url('courseDetails')}}/{{$course->id}}" title="{{$course->name}}">
                 @if(!empty($course->image_path))

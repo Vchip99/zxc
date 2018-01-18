@@ -748,6 +748,9 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('client/login', 'ClientAuth\LoginController@login');
   	Route::post('client/logout', 'ClientAuth\LoginController@logout');
 
+	Route::get('/auth/{provider}', 'SocialiteController@subdomainRedirectToProvider');
+	Route::get('/auth/{provider}/callback', 'SocialiteController@handleProviderCallback');
+
   	// verify account
   	Route::get('verifyAccount', 'Client\ClientHomeController@verifyAccount');
   	Route::post('verifyClientEmail', 'Client\ClientHomeController@verifyClientEmail');

@@ -56,7 +56,7 @@
       <h3 class="v_h3_title text-center">Products</h3>
       <div class="right-sidebar">
         <div class="media" title="Online courses">
-          <div class=" media-left slideanim">
+          <div class=" media-left ">
             <a href="{{ url('courses') }}"><img class="media-object" src="{{ asset('images/solution/online-course.png')}}" alt="online course"/></a>
           </div>
           <div class="media-body">
@@ -64,7 +64,7 @@
          </div>
        </div>
        <div class="media" title="Live courses">
-        <div class="media-left slideanim">
+        <div class="media-left ">
           <a href="{{ url('livecourses') }}"><img class="media-object" src="{{ asset('images/solution/live-course.png')}}" alt="live course"/></a>
         </div>
         <div class="media-body">
@@ -72,7 +72,7 @@
        </div>
      </div>
      <div class="media" title="Test series">
-      <div class="media-left slideanim">
+      <div class="media-left ">
         <a href="{{ url('online-tests') }}"><img class="media-object" src="{{ asset('images/solution/test-series.png')}}" alt="test series"/></a>
       </div>
       <div class="media-body">
@@ -80,7 +80,7 @@
      </div>
    </div>
    <div class="media" title="V-kit">
-    <div class="media-left slideanim">
+    <div class="media-left ">
       <a href="{{ url('vkits') }}"><img class="media-object" src="{{ asset('images/solution/v-kit.png')}}" alt="hobby project"/> </a>
     </div>
     <div class="media-body">
@@ -88,7 +88,7 @@
     </div>
   </div>
   <div class="media" title="V-doc">
-    <div class="media-left slideanim">
+    <div class="media-left ">
       <a href="{{ url('documents') }}"><img class="media-object" src="{{ asset('images/solution/v-doc.png')}}" alt="document"/></a>
     </div>
     <div class="media-body">

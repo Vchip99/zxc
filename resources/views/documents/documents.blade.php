@@ -97,9 +97,9 @@
           @if(count($documents)>0)
             @foreach($documents as $document)
               @if($id == $document->id)
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim" style="border-style: dotted;border-color: red;">
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6" style="border-style: dotted;border-color: red;">
               @else
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 slideanim">
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
               @endif
                 <div class="course-box">
                   <a class="img-course-box">

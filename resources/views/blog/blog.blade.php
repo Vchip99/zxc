@@ -173,13 +173,13 @@ color: #b6b6b6;
               <div id="blogs">
                 @if(count($blogs) > 0)
                   @foreach($blogs as $blog)
-                    <div class="panel panel-default container-fluid slideanim">
+                    <div class="panel panel-default container-fluid">
                       <div class="panel-heading row">
                         <p class="ellipsed"> <a class="uppercase v_p_heding " href="{{url('blogComment')}}/{{$blog->id}}" target="_blank"> {{$blog->title}}</a>
                         </p>
                         <figcaption class="blog-by">
                           <span>
-                            @if(!empty($blog->user->photo) && is_file($blog->user->photo))
+                            @if(!empty($blog->user->photo) && is_file($blog->user->photo) || (!empty($blog->user->photo) && false == preg_match('/userStorage/',$blog->user->photo)))
                               <img src="{{ asset($blog->user->photo)}} " class="img-circle" alt="User Image">
                             @else
                               <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">

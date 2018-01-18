@@ -48,7 +48,7 @@
 
      <div>
        <h2 class="v_h2_title ">Key Features</h2>
-       <figure class="slideanim mrgn_30_top">
+       <figure class=" mrgn_30_top">
         <div class="row key-feature">
           <div class="thumbnail col-md-3 col-sm-4">
             <img src="{{ asset('images/solution/connect/Lecture-screen-shairing.jpg')}}"
@@ -111,7 +111,7 @@
       <h3 class="v_h3_title text-center">Products</h3>
       <div class="right-sidebar">
         <div class="media" title="Online courses">
-          <div class=" media-left slideanim">
+          <div class=" media-left ">
             <a href="{{ url('courses') }}"><img class="media-object" src="{{ asset('images/solution/online-course.png')}}" alt="online course"/></a>
           </div>
           <div class="media-body">
@@ -119,7 +119,7 @@
          </div>
        </div>
        <div class="media" title="Live courses">
-        <div class="media-left slideanim">
+        <div class="media-left ">
           <a href="{{ url('livecourses') }}"><img class="media-object" src="{{ asset('images/solution/live-course.png')}}" alt="live course"/></a>
         </div>
         <div class="media-body">
@@ -127,7 +127,7 @@
        </div>
      </div>
      <div class="media" title="Test series">
-      <div class="media-left slideanim">
+      <div class="media-left ">
         <a href="{{ url('online-tests') }}"><img class="media-object" src="{{ asset('images/solution/test-series.png')}}" alt="test series"/></a>
       </div>
       <div class="media-body">
@@ -135,7 +135,7 @@
      </div>
    </div>
  <div class="media">
-  <div class="media-left slideanim">
+  <div class="media-left ">
     <a href="{{ url('vkits') }}"><img class="media-object" src="{{ asset('images/solution/v-kit.png')}}" alt="hobby project"/> </a>
   </div>
   <div class="media-body">
@@ -143,7 +143,7 @@
   </div>
 </div>
 <div class="media">
-  <div class="media-left slideanim">
+  <div class="media-left ">
     <a href="{{ url('documents') }}"><img class="media-object" src="{{ asset('images/solution/v-doc.png')}}" alt="document"/></a>
   </div>
   <div class="media-body">
@@ -161,7 +161,7 @@
     <div>
       <h2 class="v_h2_title ">FEATURES</h2>
       <hr class="section-dash-dark"/>
-      <article class="row slideanim">
+      <article class="row ">
         <div class="col-md-2 col-sm-2 hidden-xs ">
           <figure class="thumb   ">
             <img class="img-responsive" src="{{ asset('images/solution/feature/feature-1.jpg')}}"/>
@@ -177,7 +177,7 @@
          </div>
        </div>
      </article>
-     <article class="row slideanim mrgn_30_top">
+     <article class="row  mrgn_30_top">
       <div class="col-md-2 col-sm-2 hidden-xs">
         <figure class="thumb ">
           <img class="img-responsive" src="{{ asset('images/solution/feature/feature-1.jpg')}}" />
@@ -194,7 +194,7 @@
        </div>
      </div>
    </article>
-   <article class="row slideanim mrgn_30_top">
+   <article class="row  mrgn_30_top">
     <div class="col-md-2 col-sm-2 hidden-xs">
       <figure class="thumb ">
         <img class="img-responsive" src="{{ asset('images/solution/feature/feature-1.jpg')}}" />
@@ -210,7 +210,7 @@
      </div>
    </div>
  </article>
- <article class="row slideanim mrgn_30_top">
+ <article class="row  mrgn_30_top">
   <div class="col-md-2 col-sm-2 hidden-xs">
     <figure class="thumb ">
       <img class="img-responsive" src="{{ asset('images/solution/feature/feature-1.jpg')}}" />
@@ -226,7 +226,7 @@
    </div>
  </div>
 </article>
-<article class="row slideanim mrgn_30_top">
+<article class="row  mrgn_30_top">
   <div class="col-md-2 col-sm-2 hidden-xs">
     <figure class="thumb ">
       <img class="img-responsive" src="{{ asset('images/solution/feature/feature-1.jpg')}}" />
@@ -242,7 +242,7 @@
    </div>
  </div>
 </article>
-<article class="row slideanim  mrgn_30_top">
+<article class="row   mrgn_30_top">
   <div class="col-md-2 col-sm-2 hidden-xs">
     <figure class="thumb">
       <img class="img-responsive" src="{{ asset('images/solution/feature/feature-1.jpg')}}" />

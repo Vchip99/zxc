@@ -34,7 +34,8 @@ class SocialiteUser extends Mailable
             ->with([
                     'email' => $this->data['email'],
                     'password' => $this->data['password'],
-                    'url' => $this->data['url']
+                    'url' => $this->data['url'],
+                    'domain' => $this->data['domain'],
                 ]);
     }
 }

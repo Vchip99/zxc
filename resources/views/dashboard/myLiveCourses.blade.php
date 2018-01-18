@@ -33,7 +33,7 @@
   <div class="row" id="all_live_courses">
 	@if(count($liveCourses) > 0)
     @foreach($liveCourses as $liveCourse)
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 slideanim">
+    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
       <div class="course-box">
         <a class="img-course-box" href="{{ url('liveCourse')}}/{{$liveCourse->id}}">
           @if(!empty($liveCourse->image_path))

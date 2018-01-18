@@ -382,7 +382,7 @@ font-size: 20px;
      </div>
     </div>
     <div class="row">
-    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+    <div class="col-lg-4 col-md-4 col-sm-6 ">
       <div class="v-icon text-center mb-1 left-reveal">
          <i class="fa fa-list-alt" aria-hidden="true"></i>
       </div>
@@ -396,7 +396,7 @@ font-size: 20px;
       </p>
       </div>
     </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+    <div class="col-lg-4 col-md-4 col-sm-6 ">
       <div class="v-icon text-center mb-1 left-reveal">
          <i class="fa fa-laptop" aria-hidden="true"></i>
       </div>
@@ -410,7 +410,7 @@ font-size: 20px;
       </p>
       </div>
     </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+    <div class="col-lg-4 col-md-4 col-sm-6 ">
       <div class="v-icon text-center mb-1 left-reveal">
          <i class="fa fa-wrench" aria-hidden="true"></i>
       </div>
@@ -424,7 +424,7 @@ font-size: 20px;
       </p>
       </div>
     </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+    <div class="col-lg-4 col-md-4 col-sm-6 ">
       <div class="v-icon text-center mb-1 left-reveal">
          <i class="fa fa-joomla" aria-hidden="true"></i>
 
@@ -439,7 +439,7 @@ font-size: 20px;
       </p>
       </div>
     </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+    <div class="col-lg-4 col-md-4 col-sm-6 ">
       <div class="v-icon text-center mb-1 left-reveal">
          <i class="fa fa-folder-open" aria-hidden="true"></i>
       </div>
@@ -453,7 +453,7 @@ font-size: 20px;
       </p>
       </div>
     </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 slideanim ">
+    <div class="col-lg-4 col-md-4 col-sm-6 ">
       <div class="v-icon text-center mb-1 left-reveal">
          <i class="fa fa-file-video-o" aria-hidden="true"></i>
       </div>
@@ -481,7 +481,7 @@ font-size: 20px;
     </div>
 
     <div class="row">
-      <div class="col-md-4 col-sm-4 animate-box slideanim" >
+      <div class="col-md-4 col-sm-4 animate-box" >
         <div class="feature-center" >
           <span class="icon">
             <i class="ti-ruler-alt-2 icon-sm"></i>
@@ -503,7 +503,7 @@ font-size: 20px;
           </span>
         </div>
       </div>
-      <div class="col-md-4 col-sm-4 animate-box slideanim" >
+      <div class="col-md-4 col-sm-4 animate-box" >
         <div class="feature-center">
           <span class="icon">
            <i class="fa fa-trophy" aria-hidden="true"></i>

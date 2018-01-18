@@ -101,7 +101,7 @@
 <div class="row " id="v_car">
 <!-- col-8 aboutus -->
 <div class="col-md-12">
-<button class="accordion slideanim" title="DATA SCIENCE">DATA SCIENCE</button>
+<button class="accordion" title="DATA SCIENCE">DATA SCIENCE</button>
 <div class="panel">
     <div class="panel-content">
         <p class="qualification">
@@ -123,7 +123,7 @@
 
 </div>
 
-<button class="accordion slideanim" title="QUANTITATIVE APTITUDE">QUANTITATIVE APTITUDE</button>
+<button class="accordion" title="QUANTITATIVE APTITUDE">QUANTITATIVE APTITUDE</button>
 <div class="panel">
     <div class="panel-content">
         <p class="qualification">
@@ -143,7 +143,7 @@
      </div>
 
 </div>
-<button class="accordion slideanim" title="REASONING">REASONING</button>
+<button class="accordion" title="REASONING">REASONING</button>
 <div class="panel">
     <div class="panel-content">
         <p class="qualification">
@@ -163,7 +163,7 @@
      </div>
 
 </div>
-<button class="accordion slideanim" title="ANDROID APP DEVELOPMENT">ANDROID APP DEVELOPMENT</button>
+<button class="accordion" title="ANDROID APP DEVELOPMENT">ANDROID APP DEVELOPMENT</button>
 <div class="panel">
     <div class="panel-content">
         <p class="qualification">

@@ -112,7 +112,6 @@
                           <div class="form-group @if ($errors->has('user_type')) has-error @endif">
                             <select class="form-control slt mrgn_20_top" id="user" name="user_type" onChange="toggleOptions(this);" required="true">
                               <option value="0">Select User</option>
-                              <!-- <option value="1">Admin/Owner of Institute </option> -->
                               <option value="2">Student</option>
                               <option value="3">Lecturer</option>
                               <option value="4">HOD</option>
@@ -124,7 +123,7 @@
                           <div class="form-group @if ($errors->has('college')) has-error @endif">
                             <select class="hide form-control  slt mrgn_20_top" id="clg" name="college" onChange="getDepartment(this);">
                               <option value="0">Select College Name</option>
-                              <option value="other" id="other" class="hide">Other</option>
+                              <option value="other" id="other">Other</option>
                               @if(count($colleges) > 0)
                                 @foreach($colleges as $college)
                                   <option value="{{$college->id}}">{{$college->name}}</option>
@@ -192,40 +191,8 @@
     } else {
       document.getElementById('user_error').classList.add('hide');
     }
-    // if(1 == userType){
-    //   subdomain = document.getElementById('subdomain').value;
-    //   if(subdomain && true == isNaN(subdomain)){
-    //     //Build your expression
-    //     var regex = new RegExp("^[a-zA-Z]+[a-zA-Z0-9\\-]*$");
-    //     //Test your current value
-    //     if(false == regex.test(subdomain )){
-    //       alert('Please enter subdomain correctly. check given example.');
-    //       // $.alert({
-    //       //     title: 'Alert!',
-    //       //     content: 'Please enter subdomain correctly. check given example.',
-    //       // });
-    //       error++;
-    //     }else {
-    //       document.getElementById('subdomain_error').classList.add('hide');
-    //     }
-    //   } else if(1 == userType){
-    //     document.getElementById('subdomain_error').classList.remove('hide');
-    //     error++;
-    //   } else {
-    //     document.getElementById('subdomain_error').classList.add('hide');
-    //   }
-    //   if( 0 == error){
-    //     document.getElementById('registerUser').submit();
-    //   }
-    // }
+
     if(2 == userType){
-      // degree = document.getElementById('degree').value;
-      // if(0 == degree){
-      //   document.getElementById('degree_error').classList.remove('hide');
-      //   error++;
-      // } else {
-      //   document.getElementById('degree_error').classList.add('hide');
-      // }
       clg = document.getElementById('clg').value;
       if(0 == clg){
         document.getElementById('college_error').classList.remove('hide');
@@ -276,13 +243,6 @@
     }
 
     if(3 == userType || 4 == userType){
-      // degree = document.getElementById('degree').value;
-      // if(0 == degree){
-      //   document.getElementById('degree_error').classList.remove('hide');
-      //   error++;
-      // } else {
-      //   document.getElementById('degree_error').classList.add('hide');
-      // }
       clg = document.getElementById('clg').value;
       if(0 == clg){
         document.getElementById('college_error').classList.remove('hide');
@@ -306,13 +266,6 @@
     }
 
     if(5 == userType || 6 == userType){
-      // degree = document.getElementById('degree').value;
-      // if(0 == degree){
-      //   document.getElementById('degree_error').classList.remove('hide');
-      //   error++;
-      // } else {
-      //   document.getElementById('degree_error').classList.add('hide');
-      // }
       clg = document.getElementById('clg').value;
       if(0 == clg){
         document.getElementById('college_error').classList.remove('hide');
@@ -384,9 +337,11 @@
     if(3 == userType || 4 == userType){
       document.getElementById('year').classList.remove("show");
       document.getElementById('rollNo').classList.remove("show");
+      document.getElementById('dept').classList.add("show");
 
       document.getElementById('year').classList.add("hide");
       document.getElementById('rollNo').classList.add("hide");
+      document.getElementById('dept').classList.remove("hide");
     } else {
       document.getElementById('dept').classList.add("show");
       document.getElementById('year').classList.add("show");
@@ -405,84 +360,34 @@
       document.getElementById('year').classList.add("hide");
       document.getElementById('rollNo').classList.add("hide");
       document.getElementById('dept').classList.add("show");
-      // document.getElementById('degree').classList.remove("hide");
       document.getElementById('clg').classList.remove("hide");
 
       document.getElementById('dept').classList.remove("hide");
       document.getElementById('year').classList.remove("show");
       document.getElementById('rollNo').classList.remove("show");
-      // document.getElementById('degree').classList.add("show");
       document.getElementById('clg').classList.add("show");
-      document.getElementById('other').classList.add("hide");
-
-
-      // hideSubdomain();
     } else if(2 == selectedVal){
       document.getElementById('year').classList.add("show");
       document.getElementById('rollNo').classList.add("show");
       document.getElementById('dept').classList.add("show");
-      // document.getElementById('degree').classList.remove("hide");
       document.getElementById('clg').classList.remove("hide");
 
       document.getElementById('year').classList.remove("hide");
       document.getElementById('rollNo').classList.remove("hide");
       document.getElementById('dept').classList.remove("hide");
-      // document.getElementById('degree').classList.add("show");
       document.getElementById('clg').classList.add("show");
-      document.getElementById('other').classList.remove("hide");
-
-      // hideSubdomain();
     } else if(5 == selectedVal || 6 == selectedVal){
       document.getElementById('year').classList.remove("show");
       document.getElementById('rollNo').classList.remove("show");
       document.getElementById('dept').classList.remove("show");
-
-      // document.getElementById('degree').classList.remove("hide");
       document.getElementById('clg').classList.remove("hide");
 
       document.getElementById('year').classList.add("hide");
       document.getElementById('rollNo').classList.add("hide");
       document.getElementById('dept').classList.add("hide");
-
-      // document.getElementById('degree').classList.add("show");
       document.getElementById('clg').classList.add("show");
-      document.getElementById('other').classList.add("hide");
-
-      // hideSubdomain();
     }
-    // else if(1 == selectedVal){
-    //   showSubdomain();
-
-    //   document.getElementById('year').classList.add("hide");
-    //   document.getElementById('rollNo').classList.add("hide");
-    //   document.getElementById('dept').classList.add("hide");
-    //   // document.getElementById('degree').classList.add("hide");
-    //   document.getElementById('clg').classList.add("hide");
-
-    //   document.getElementById('year').classList.remove("show");
-    //   document.getElementById('rollNo').classList.remove("show");
-    //   document.getElementById('dept').classList.remove("show");
-    //   // document.getElementById('degree').classList.remove("show");
-    //   document.getElementById('clg').classList.remove("show");
-    // }
   }
-
-  // function hideSubdomain(){
-  //     document.getElementById('subdomainDiv').classList.add("hide");
-  //     document.getElementById('subdomainEx').classList.add("hide");
-
-  //     document.getElementById('subdomainDiv').classList.remove("show");
-  //     document.getElementById('subdomainEx').classList.remove("show");
-  // }
-
-  // function showSubdomain(){
-  //     document.getElementById('subdomainDiv').classList.add("show");
-  //     document.getElementById('subdomainEx').classList.add("show");
-
-  //     document.getElementById('subdomainDiv').classList.remove("hide");
-  //     document.getElementById('subdomainEx').classList.remove("hide");
-  // }
-
 </script>
 </body>
 </html>

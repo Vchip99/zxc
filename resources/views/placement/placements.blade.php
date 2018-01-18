@@ -444,7 +444,7 @@ ul.table_list{ margin-left: -30px; }
                                       @if(count( $comments) > 0)
                                         @foreach($comments as $comment)
                                           <div class="item" id="showComment_{{$comment->id}}">
-                                            @if(!empty($comment->user->photo))
+                                            @if(is_file($comment->user->photo) || (!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)))
                                               <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
                                             @else
                                               <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -522,7 +522,7 @@ ul.table_list{ margin-left: -30px; }
                       <div class="panel panel-default clickable">
                         @if(count($placementExperiances) > 0)
                           @foreach($placementExperiances as $placementExperiance)
-                            <div class="panel panel-default container-fluid slideanim">
+                            <div class="panel panel-default container-fluid ">
                               <div class="panel-heading row">
                                 <p class="ellipsed"> <a class="uppercase v_p_heding " href="{{url('placementExperiance')}}/{{$placementExperiance->id}}" target="_blank"> {{$placementExperiance->title}}</a>
                                 </p>
@@ -1063,8 +1063,10 @@ ul.table_list{ margin-left: -30px; }
         mainCommentDiv.id = 'showComment_'+obj.id;
 
         var commentImage = document.createElement('img');
-        if(obj.user_image){
+        if('system' == obj.image_exist){
           var imageUrl =  "{{ asset('') }}"+obj.user_image;
+        } else if('other' == obj.image_exist){
+          var imageUrl =  obj.user_image;
         } else {
           var imageUrl = "{{ asset('images/user1.png') }}";
         }
@@ -1097,7 +1099,7 @@ ul.table_list{ margin-left: -30px; }
         var pCommentBodyDiv = document.createElement('p');
         pCommentBodyDiv.className = 'more';
         pCommentBodyDiv.id = 'editCommentHide_'+obj.id;
-        pCommentBodyDiv.innerHTML = obj.body; //'{!! '+obj.body+' !!}';
+        pCommentBodyDiv.innerHTML = ' ' + obj.body; //'{!! '+obj.body+' !!}';
         commentMessageDiv.appendChild(pCommentBodyDiv);
 
         var divUpdateComment = document.createElement('div');
@@ -1155,19 +1157,21 @@ ul.table_list{ margin-left: -30px; }
 
   function showSubComments(subcomments, commentchatDiv, subcommentLikesCount, userId, commentUserId){
     if(false == $.isEmptyObject(subcomments)){
-      arraySubComments = [];
+      // arraySubComments = [];
+      // $.each(subcomments, function(idx, obj) {
+      //   arraySubComments[idx] = obj;
+      // });
+      // var sortedArray = arraySubComments.reverse();
       $.each(subcomments, function(idx, obj) {
-        arraySubComments[idx] = obj;
-      });
-      var sortedArray = arraySubComments.reverse();
-      $.each(sortedArray, function(idx, obj) {
         if(false == $.isEmptyObject(obj)){
           var mainSubCommentDiv = document.createElement('div');
           mainSubCommentDiv.className = 'item replySubComment-1';
 
           var subcommentImage = document.createElement('img');
-          if(obj.user_image){
-            var subcommentImageUrl = "{{ asset('') }}"+obj.user_image;
+          if('system' == obj.image_exist){
+            var subcommentImageUrl =  "{{ asset('') }}"+obj.user_image;
+          } else if('other' == obj.image_exist){
+            var subcommentImageUrl =  obj.user_image;
           } else {
             var subcommentImageUrl = "{{ asset('images/user1.png') }}";
           }
@@ -1202,7 +1206,7 @@ ul.table_list{ margin-left: -30px; }
           var spanSubCommentBodyDiv = document.createElement('span');
           spanSubCommentBodyDiv.className = 'more';
           spanSubCommentBodyDiv.id = 'editSubCommentHide_'+obj.id;
-          spanSubCommentBodyDiv.innerHTML = obj.body; //'{!! '+obj.body+' !!}';
+          spanSubCommentBodyDiv.innerHTML = ' ' + obj.body; //'{!! '+obj.body+' !!}';
           pSubcommentBodyDiv.appendChild(spanSubCommentBodyDiv);
           subCommentMessageDiv.appendChild(pSubcommentBodyDiv);
 

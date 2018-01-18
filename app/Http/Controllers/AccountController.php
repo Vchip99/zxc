@@ -118,8 +118,14 @@ class AccountController extends Controller
     }
 
     protected function showProfile(){
+        $collegeDepts = [];
         $users = self::Users;
-        return view('dashboard.profile', compact('users'));
+        $colleges = College::all();
+        if(Auth::user()->college_id > 0){
+            $collegeDepts = CollegeDept::where('college_id', Auth::user()->college_id)->get();
+        }
+
+        return view('dashboard.profile', compact('users', 'colleges', 'collegeDepts'));
     }
 
     protected function myCourses(){
