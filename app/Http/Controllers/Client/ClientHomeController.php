@@ -26,6 +26,7 @@ class ClientHomeController extends Controller
      */
     public function __construct(Request $request)
     {
+
         $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
         if(is_object($subdomain)){
             view::share('subdomain', $subdomain);
@@ -48,6 +49,13 @@ class ClientHomeController extends Controller
         $courseIds = [];
         $userCoursePermissionIds = [];
         if(is_object($subdomain)){
+            if( is_object(Auth::guard('clientuser')->user()) && $subdomain->client_id != Auth::guard('clientuser')->user()->client_id){
+                if('local' == \Config::get('app.env')){
+                    return Redirect::away('http://'.Auth::guard('clientuser')->user()->client->subdomain);
+                } else {
+                    return Redirect::away('https://'.Auth::guard('clientuser')->user()->client->subdomain);
+                }
+            }
             $onlineCourses = ClientOnlineCourse::getCurrentCoursesByClient($subdomain->subdomain);
             $defaultCourse = ClientOnlineCourse::where('name', 'How to use course')->first();
             $defaultTest = ClientOnlineCourse::where('name', 'How to use test')->first();

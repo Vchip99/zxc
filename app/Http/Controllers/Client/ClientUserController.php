@@ -56,10 +56,14 @@ class ClientUserController extends BaseController
         return view('clientuser.dashboard.dashboard');
     }
 
-    protected function myCourses(){
+    protected function myCourses(Request $request){
         $categoryIds = [];
         $categories = [];
         $courseVideoCount = 0;
+        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
         $userId = Auth::guard('clientuser')->user()->id;
         $courses = ClientOnlineCourse::getRegisteredOnlineCourses($userId);
         if(is_object($courses) && false == $courses->isEmpty()){
@@ -78,12 +82,16 @@ class ClientUserController extends BaseController
         return view('clientuser.dashboard.myCertificate');
     }
 
-    protected function myTest(){
+    protected function myTest(Request $request){
         $results = [];
         $testSubjectPapers   = [];
         $testSubjects        = [];
         $testSubjectPaperIds = [];
         $testSubjectIds      = [];
+        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
         $userId = Auth::guard('clientuser')->user()->id;
         $results = ClientOnlineTestSubjectPaper::getRegisteredSubjectPapersByUserId($userId);
         if(count($results)>0){
@@ -109,9 +117,13 @@ class ClientUserController extends BaseController
         return ClientOnlineVideo::getCoursevideoCount($courseIds);
     }
 
-    protected function myCourseResults(){
+    protected function myCourseResults(Request $request){
         $categoryIds = [];
         $categories = [];
+        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
         $user = Auth::guard('clientuser')->user();
 
         $courses = ClientOnlineCourse::getRegisteredOnlineCourses($user->id);
@@ -133,10 +145,14 @@ class ClientUserController extends BaseController
         return $result;
     }
 
-    protected function myTestResults(){
+    protected function myTestResults(Request $request){
+        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
         $user = Auth::guard('clientuser')->user();
         $categories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($user->id);
-        // $results = ClientScore::where('client_user_id', $user->id)->get();
+
         $results = ClientScore::getClientScoreByUserId($user->id);
         $barchartLimits = range(100, 0, 10);
         return view('clientuser.dashboard.myTestResults', compact('categories','results','barchartLimits'));
@@ -147,7 +163,11 @@ class ClientUserController extends BaseController
         return ClientScore::getUserTestResultsByCategoryBySubcategoryByUserId($request);
     }
 
-    protected function profile(){
+    protected function profile(Request $request){
+        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
         return view('clientuser.dashboard.profile');
     }
 
@@ -169,6 +189,8 @@ class ClientUserController extends BaseController
         return Redirect::to('profile');
     }
 
+
+
     protected function clientMessages(Request $request){
         $sortIds = [];
         $allIds = [];
@@ -178,6 +200,10 @@ class ClientUserController extends BaseController
         $idsImploded = '';
         $selectedYear = !empty($request->get('year'))?$request->get('year'): date('Y');
         $selectedMonth = !empty($request->get('month'))?$request->get('month'): date('m');
+        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
 
         $readNotificationIds = ClientReadNotification::getReadNotificationIdsByUser($selectedYear,$selectedMonth);
 
@@ -216,7 +242,11 @@ class ClientUserController extends BaseController
     }
 
 
-    protected function myNotifications(){
+    protected function myNotifications(Request $request){
+        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -232,7 +262,11 @@ class ClientUserController extends BaseController
         return view('clientuser.dashboard.notifications', compact('notifications'));
     }
 
-    protected function myAssignments(){
+    protected function myAssignments(Request $request){
+        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
         $assignments = ClientAssignmentQuestion::where('client_id', Auth::guard('clientuser')->user()->client_id)
                 ->select('client_assignment_questions.*')->paginate();
         $subjects = ClientOnlineTestSubject::where('client_id', Auth::guard('clientuser')->user()->client_id)->get();

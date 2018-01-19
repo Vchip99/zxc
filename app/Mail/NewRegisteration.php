@@ -43,6 +43,7 @@ class NewRegisteration extends Mailable
                     'year' => $this->data['year'],
                     'rollNo' => $this->data['roll_no'],
                     'otherSource' => $this->data['other_source'],
+                    'domain' => $this->data['domain']
                 ]);
         } else {
             return $this->subject('New Client Registration ')

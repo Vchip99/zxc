@@ -32,6 +32,9 @@
 			@if(!empty($otherSource))
 				<p>Other Source : {{ $otherSource }} </p>
 			@endif
+			@if(!empty($domain))
+				<p>Domain : {{ $domain }} </p>
+			@endif
 			@if(!empty($subdomain))
 				<p>Subdomain : {{ $subdomain }} </p>
 			@endif

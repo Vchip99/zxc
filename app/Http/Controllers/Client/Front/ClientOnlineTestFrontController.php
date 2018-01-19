@@ -32,6 +32,12 @@ class ClientOnlineTestFrontController extends ClientHomeController
                 return Redirect::away('https://vchipedu.com/');
             }
 		}
+		if(is_object(Auth::guard('clientuser')->user())){
+            $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+            if( !is_object($clientResult)){
+                return Redirect::away($clientResult);
+            }
+        }
 		view::share('subdomain', $subdomain);
 
         $testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
@@ -70,6 +76,12 @@ class ClientOnlineTestFrontController extends ClientHomeController
 		$subcatId = json_decode($id);
 		$testSubjectPaperIds = [];
 		$isTestSubCategoryPurchased = 'false';
+		if(is_object(Auth::guard('clientuser')->user())){
+            $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+            if( !is_object($clientResult)){
+                return Redirect::away($clientResult);
+            }
+        }
 		if(isset($subcatId)){
 			$subcategory = ClientOnlineTestSubCategory::find($subcatId);
 			if(is_object($subcategory)){

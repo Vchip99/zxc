@@ -366,23 +366,23 @@
           <div class="carousel-inner" role="listbox">
             <div class="item active">
               <div class="testimonial4_slide">
-                <img src="http://via.placeholder.com/100x100" class="img-circle img-responsive" />
-                <p>Lorem ipsum dolor sit amet adipiscing elit am nibh unc varius facilisis eros ed erat in in velit quis arcu ornare laoreet urabitur.</p>
-                <h4>Ben Hanna</h4>
+                <img src="{{ asset('images/user/shashi.jpg') }}" class="img-circle img-responsive" />
+                <p>ElectroFreak2k15 create my interest in electronics field and provide me a direction for future. After that workshop, I come to know that there is lots to do in our own core field. Special thanks to Vishesh sir, for giving personal attention to all the students.</p>
+                <h4>Shashikant Agrawal</h4>
               </div>
             </div>
             <div class="item">
               <div class="testimonial4_slide">
-                <img src="http://via.placeholder.com/100x100" class="img-circle img-responsive" />
-                <p>Lorem ipsum dolor sit amet adipiscing elit am nibh unc varius facilisis eros ed erat in in velit quis arcu ornare laoreet urabitur.</p>
-                <h4>Ben Hanna</h4>
+                <img src="{{ asset('images/user/rishabh.jpg') }}" class="img-circle img-responsive" />
+                <p>I like the way of execution of ElectroFreak2k16. In that, I appreciate Vchip for the way, they start and end. They started from very basic concepts & concentrate on basics at every step and end with competition.</p>
+                <h4>Rishabh Lavhale</h4>
               </div>
             </div>
             <div class="item">
               <div class="testimonial4_slide">
-                <img src="http://via.placeholder.com/100x100" class="img-circle img-responsive" />
-                <p>Lorem ipsum dolor sit amet adipiscing elit am nibh unc varius facilisis eros ed erat in in velit quis arcu ornare laoreet urabitur.</p>
-                <h4>Ben Hanna</h4>
+                <img src="{{ asset('images/user/aishwarya.jpg') }}" class="img-circle img-responsive" />
+                <p>Great work done by Vchip Technology. ElectroFreak2k15 is much beneficial to me to understands the requirement of industries and deciding my future goal. Very thanks to Vchip & Team.</p>
+                <h4>Aishwarya Sharma</h4>
               </div>
             </div>
           </div>

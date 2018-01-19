@@ -49,6 +49,12 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                 return Redirect::away('https://vchipedu.com/');
             }
         }
+        if(is_object(Auth::guard('clientuser')->user())){
+            $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+            if( !is_object($clientResult)){
+                return Redirect::away($clientResult);
+            }
+        }
         view::share('subdomain', $subdomain);
     	$subdomainName = InputSanitise::getCurrentClient($request);
         $courseCategories = ClientOnlineCategory::getCategoriesAssocaitedWithVideos($subdomainName);
@@ -97,6 +103,12 @@ class ClientOnlineCourseFrontController extends ClientHomeController
 	 	$onlineVideoIds = [];
         $isCoursePurchased = 'false';
         $courseId = json_decode(trim($id));
+        if(is_object(Auth::guard('clientuser')->user())){
+            $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+            if( !is_object($clientResult)){
+                return Redirect::away($clientResult);
+            }
+        }
         $course = ClientOnlineCourse::find($courseId);
         if(is_object($course)){
             $videos = ClientOnlineVideo::getClientCourseVideosByCourseId($courseId, $request);
@@ -116,6 +128,12 @@ class ClientOnlineCourseFrontController extends ClientHomeController
      */
     protected function episode($subdomain, $id,Request $request,$subcomment=NULL){
         $videoId = json_decode(trim($id));
+        if(is_object(Auth::guard('clientuser')->user())){
+            $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+            if( !is_object($clientResult)){
+                return Redirect::away($clientResult);
+            }
+        }
         if(isset($videoId)){
             $video = ClientOnlineVideo::find($videoId);
             if(is_object($video)){
