@@ -113,7 +113,11 @@
 					        <div class="panel-heading" role="tab" id="headingOne">
 					          <h4 class="panel-title">
 					            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#subject{{$testSubject->id}}" aria-expanded="true" aria-controls="collapseOne" title="{{ $testSubject->name }}">
-					              <i class="more-less glyphicon glyphicon-plus"></i>
+					            	@if(0 == $index)
+					              		<i class="more-less glyphicon glyphicon-minus"></i>
+					              	@else
+							        	<i class="more-less glyphicon glyphicon-plus"></i>
+							        @endif
 					              {{ $testSubject->name }}
 					            </a>
 					          </h4>

@@ -15,7 +15,7 @@ body{font-family:  Century Gothic, serif}
 	#instr .panel{border-radius: 0px;}
 	#instr .panel-heading{font-weight: bolder;}
 	#instr .instruction-panel{overflow:auto;}
-	#instr .panel-body{height: 680px;}
+	/*#instr .panel-body{height: 680px;}*/
 	#iner-instr .panel{overflow: hidden;}
 	#iner-instr .panel-body{height: 620px; overflow: auto;}
 	.user-pic{text-align: left; padding: 10px;}
@@ -180,12 +180,16 @@ body{font-family:  Century Gothic, serif}
 											I have read and understood all the above mentioned instructions. Also, I confirm that at the start of the examination all the computer hardware and internet connection are in proper working condition.
 									</ul>
 	                			</div>
+	                			<div class="panel-footer">
+									<label class="checkbox-inline"><input type="checkbox" name="checkMe" value="" class="mrgn" id="checkMe">I agree all terms and conditions.</label>
+									<button type="button"  class=" next-btn" onClick="return checkCondition();" >Next</button>
+							  	</div>
 	        				</div>
 	    				</div>
 					</div>
 				</div>
 
-			  	<div class="panel-footer">
+			  	<!-- <div class="panel-footer">
 			  		<div class="row">
 					  	<div class="col-md-6 col-sm-6 col-xs-12">
 							<label class="checkbox-inline"><input type="checkbox" name="checkMe" value="" class="mrgn" id="checkMe">I agree all terms and conditions.</label>
@@ -193,7 +197,7 @@ body{font-family:  Century Gothic, serif}
 					  	</div>
 			  			<div class="col-md-6 col-sm-6 col-xs-12 "></div>
 			  		</div>
-			  	</div>
+			  	</div> -->
 			</div>
 			<input type="hidden" id="category_id" name="category_id" value="{{$categoryId}}">
 		    <input type="hidden" id="sub_category_id" name="sub_category_id" value="{{$subcategoryId}}">
