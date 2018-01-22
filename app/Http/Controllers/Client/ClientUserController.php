@@ -602,7 +602,11 @@ class ClientUserController extends BaseController
                 header("Location: $result->longurl");
                 exit();
             } else {
-                return Redirect::to('online-tests')->withErrors(['some thing went wrong. please try after some time.']);
+                if(is_object($result) && false == $result->success){
+                    return Redirect::to('online-tests')->withErrors([$result->message]);
+                } else {
+                    return Redirect::to('online-tests')->withErrors(['some thing went wrong. please try after some time.']);
+                }
             }
         }
         if(!empty($instamojoErrors)){

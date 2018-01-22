@@ -133,7 +133,7 @@ font-weight: bold;
   	<section>
 	  	<div class="container exam-panel" id="subjects">
 		    @if(count($testSubjects)>0)
-	    		@foreach($testSubjects as $testSubject)
+	    		@foreach($testSubjects as $index => $testSubject)
 	    			@if($subject == $testSubject->id)
 				    	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="border-style: dotted;border-color: red;">
 				    @else
@@ -148,7 +148,11 @@ font-weight: bold;
 					            </a>
 					          </h4>
 					        </div>
-					        <div id="subject{{$testSubject->id}}" class="panel-collapse collapse panel-lg" role="tabpanel" aria-labelledby="headingOne">
+					        @if(0 == $index)
+					        	<div id="subject{{$testSubject->id}}" class="panel-collapse panel-lg collapse in" role="tabpanel" aria-labelledby="headingOne">
+					        @else
+					        	<div id="subject{{$testSubject->id}}" class="panel-collapse panel-lg collapse " role="tabpanel" aria-labelledby="headingOne">
+					        @endif
 					          	<div class="panel-body">
 					            <table class="table data-lg">
 					              	<thead>
@@ -336,7 +340,9 @@ font-weight: bold;
 	}
 
 	function startTest(ele){
-		var popup_window =window.open("", 'My Window', 'height=900px !important,width=1500px !important');
+		var windowHeight = screen.height;
+		var windowWidth = screen.width;
+		var popup_window =window.open("", 'My Window', 'height='+windowHeight+'px !important,width='+windowWidth+'px !important');
 		var paper = parseInt($(ele).data('paper'));
 		var subject = parseInt($(ele).data('subject'));
 		var category = parseInt($(ele).data('category'));
@@ -351,6 +357,7 @@ font-weight: bold;
 	        .done(function( msg ) {
 	        	if( msg ){
 					popup_window.location = "{{ url('instructions')}}";
+					popup_window.focus();
 	        	}
 	        });
 		}
@@ -887,7 +894,6 @@ font-weight: bold;
 	$('.panel-group').on('shown.bs.collapse', toggleIcon);
 
   	$(document).ready(function() {
-  		console.log(location.host);
 	    $('[id^=paper]').hide();
 	    $('.toggle').click(function() {
 	      $input = $( this );

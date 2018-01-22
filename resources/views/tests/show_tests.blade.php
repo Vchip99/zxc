@@ -103,7 +103,7 @@
   	<section>
 	  	<div class="container exam-panel" id="subjects">
 			@if(count($testSubjects)>0)
-	    		@foreach($testSubjects as $testSubject)
+	    		@foreach($testSubjects as $index => $testSubject)
 	    			@if($subject == $testSubject->id)
 				    	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="border-style: dotted;border-color: red;">
 				    @else
@@ -118,7 +118,11 @@
 					            </a>
 					          </h4>
 					        </div>
-					        <div id="subject{{$testSubject->id}}" class="panel-collapse collapse panel-lg" role="tabpanel" aria-labelledby="headingOne">
+					        @if(0 == $index)
+					        	<div id="subject{{$testSubject->id}}" class="panel-collapse panel-lg collapse in" role="tabpanel" aria-labelledby="headingOne">
+					        @else
+					        	<div id="subject{{$testSubject->id}}" class="panel-collapse panel-lg collapse " role="tabpanel" aria-labelledby="headingOne">
+					        @endif
 					          	<div class="panel-body">
 					            <table class="table data-lg">
 					              	<thead>
@@ -285,7 +289,9 @@
 	}
 
 	function startTest(ele){
-		var popup_window =window.open("", 'My Window', 'height=900px !important,width=1500px !important');
+		var windowHeight = screen.height;
+		var windowWidth = screen.width;
+		var popup_window =window.open("", 'My Window', 'height='+windowHeight+'px !important,width='+windowWidth+'px !important');
 		var paper = parseInt($(ele).data('paper'));
 		var subject = parseInt($(ele).data('subject'));
 		var category = parseInt($(ele).data('category'));
@@ -300,6 +306,7 @@
 	        .done(function( msg ) {
 	        	if( msg ){
 	        		popup_window.location = "{{ url('instructions')}}";
+	        		popup_window.focus();
 	        	}
 	        });
 		} else {
@@ -406,7 +413,11 @@
 
 			        		var secondMainDiv = document.createElement('div');
 			        		secondMainDiv.id = 'subject'+ subId;
-			        		secondMainDiv.className = "panel-collapse collapse panel-lg";
+			        		if(0 == ind){
+			        			secondMainDiv.className = "panel-collapse panel-lg collapse in";
+			        		} else {
+			        			secondMainDiv.className = "panel-collapse panel-lg collapse ";
+			        		}
 			        		secondMainDiv.setAttribute('role','tabpanel');
 			        		secondMainDiv.setAttribute('aria-labelledby','headingOne');
 

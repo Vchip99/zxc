@@ -409,6 +409,7 @@ class HomeController extends Controller
                     $data['name'] = $client->name;
                     $data['email'] = $client->email;
                     $data['subdomain'] = $client->subdomain;
+                    $data['domain'] = '';
 
                     // send mail to admin after new registration
                     Mail::to('vchipdesigng8@gmail.com')->send(new NewRegisteration($data));
@@ -723,6 +724,7 @@ class HomeController extends Controller
             $data['name'] = $client->name;
             $data['email'] = $client->email;
             $data['subdomain'] = $client->subdomain;
+            $data['domain'] = '';
 
             // send mail to admin after new registration
             Mail::to('vchipdesigng8@gmail.com')->send(new NewRegisteration($data));

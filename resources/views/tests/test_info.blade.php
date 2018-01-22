@@ -50,21 +50,21 @@
           @if(count($testSubCategories) > 0)
             @foreach($testSubCategories as $testSubCategory)
               <div class="col-lg-6 col-md-6 col-sm-6 small-img">
+                <a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">
                   <div class="vchip_product_itm text-left">
                     <figure title="{{$testSubCategory->name}}">
-                      <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
+                        <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
                     </figure>
                     <ul class="vchip_categories list-inline">
                       <li>{{$testSubCategory->name}}</li>
                     </ul>
                     <div class="vchip_product_content">
-                      <p class="mrgn_20_top"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">Start Test <i
-                        class="fa fa-angle-right"
-                        aria-hidden="true"></i></a>
+                      <p class="mrgn_20_top">Start Test <i class="fa fa-angle-right" aria-hidden="true"></i>
                       </p>
                     </div>
                   </div>
-                </div>
+                </a>
+              </div>
               @endforeach
           @else
             No tests are available.
@@ -182,6 +182,11 @@
                 var mainDiv = document.createElement('div');
                 mainDiv.className = 'col-lg-6 col-md-6 col-sm-6 small-img';
 
+                var ancDiv = document.createElement('a');
+                contentUrl = "{{url('getTest')}}/"+obj.id;
+                ancDiv.className = 'btn-link';
+                ancDiv.setAttribute('href', contentUrl);
+
                 var productDiv = document.createElement('div');
                 productDiv.className = "vchip_product_itm text-left";
 
@@ -200,10 +205,11 @@
 
                 var contentDiv = document.createElement('div');
                 contentDiv.className ='vchip_product_content';
-                contentUrl = "{{url('getTest')}}/"+obj.id;
-                contentDiv.innerHTML = '<p class=""><a href="'+ contentUrl +'" class="btn-link">Start Test <iclass="fa fa-angle-right"aria-hidden="true"></i></a></p>';
+                // contentUrl = "{{url('getTest')}}/"+obj.id;
+                contentDiv.innerHTML = '<p class="mrgn_20_top">Start Test <i class="fa fa-angle-right"aria-hidden="true"></i></p>';
                 productDiv.appendChild(contentDiv);
-                mainDiv.appendChild(productDiv);
+                ancDiv.appendChild(productDiv);
+                mainDiv.appendChild(ancDiv);
                 subcatDiv.appendChild(mainDiv);
                 });
             }

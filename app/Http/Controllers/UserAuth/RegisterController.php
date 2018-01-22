@@ -196,7 +196,7 @@ class RegisterController extends Controller
                 $data['year'] = '';
                 $data['roll_no'] = '';
             }
-
+            $data['domain'] = '';
             $data['other_source'] = $request->get('other_source')?:'';
 
             // send mail to admin after new registration

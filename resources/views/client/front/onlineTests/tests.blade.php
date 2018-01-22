@@ -43,6 +43,15 @@
   <section id="sidemenuindex"  class="v_container">
   <div class="container ">
     <div class="row">
+      @if (count($errors) > 0)
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+      @endif
       <div class="col-sm-3 ">
         <h4 class="v_h4_subtitle"> Filter By</h4>
         <div class="dropdown mrgn_20_top_btm" id="cat">
@@ -61,39 +70,40 @@
           @if(count($testSubCategories) > 0)
             @foreach($testSubCategories as $testSubCategory)
               <div class="col-lg-6 col-md-6 col-sm-6 small-img">
-                <div class="vchip_product_itm text-left">
-                  <figure title="{{$testSubCategory->name}}">
-                    <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
-                  </figure>
-                  <ul class="vchip_categories list-inline">
-                    <li>{{$testSubCategory->name}}</li>
-                  </ul>
-                  <div class="categoery" style="padding-left: 18px;">
-                  <span style="color: #e91e63;">Price: {{$testSubCategory->price}} Rs.</span>
-                    @if(is_object(Auth::guard('clientuser')->user()))
-                      @if( true == in_array($testSubCategory->id, $purchasedSubCategories))
-                        <a class="btn btn-primary" title="Paid" style="min-width: 100px;">Paid</a>
+                  <div class="vchip_product_itm text-left">
+                    <a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link">
+                      <figure title="{{$testSubCategory->name}}">
+                        <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
+                      </figure>
+                      <ul class="vchip_categories list-inline">
+                        <li>{{$testSubCategory->name}}</li>
+                      </ul>
+                    </a>
+                    <div class="categoery" style="padding-left: 18px;">
+                      <span style="color: #e91e63;">Price: {{$testSubCategory->price}} Rs.</span>
+                      @if(is_object(Auth::guard('clientuser')->user()))
+                        @if( true == in_array($testSubCategory->id, $purchasedSubCategories))
+                          <a class="btn btn-primary" title="Paid" style="min-width: 100px;">Paid</a>
+                        @else
+                          @if($testSubCategory->price > 0)
+                            <a href="{{ url('purchaseTestSubCategory')}}/{{$testSubCategory->id}}" class="btn btn-primary" title="Pay Now" style="min-width: 100px;">Pay Now</a>
+                          @else
+                            <a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>
+                          @endif
+                        @endif
                       @else
                         @if($testSubCategory->price > 0)
-                          <a href="{{ url('purchaseTestSubCategory')}}/{{$testSubCategory->id}}" class="btn btn-primary" title="Pay Now" style="min-width: 100px;">Pay Now</a>
+                          <a class="btn btn-primary" title="Pay Now" style="min-width: 100px;"  onClick="checkLogin();">Pay Now</a>
                         @else
                           <a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>
                         @endif
                       @endif
-                    @else
-                      @if($testSubCategory->price > 0)
-                        <a class="btn btn-primary" title="Pay Now" style="min-width: 100px;"  onClick="checkLogin();">Pay Now</a>
-                      @else
-                        <a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>
-                      @endif
-                    @endif
+                    </div>
+                    <div class="vchip_product_content">
+                      <p class="mrgn_20_top"><a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link">Start Test <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                      </p>
+                    </div>
                   </div>
-                  <div class="vchip_product_content">
-                    <p class="mrgn_20_top">
-                      <a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">Start Test <i class="fa fa-angle-right" aria-hidden="true"></i></a>
-                    </p>
-                  </div>
-                </div>
               </div>
             @endforeach
           @else
@@ -101,7 +111,7 @@
           @endif
         </div>
       </div>
-      </div>
+    </div>
   </div>
 </section>
 @stop
@@ -131,15 +141,22 @@
 
                   var productDiv = document.createElement('div');
                   productDiv.className = "vchip_product_itm text-left";
+
+                  var ancDiv = document.createElement('a');
+                  contentUrl = "{{url('getTest')}}/"+obj.id;
+                  ancDiv.className = 'btn-link';
+                  ancDiv.setAttribute('href', contentUrl);
+
                   var imageDiv = document.createElement('figure');
                   imageUrl = "{{ asset('')}}"+ obj.image_path;
                   imageDiv.innerHTML = '<img src="'+ imageUrl +'"class="img-responsive" alt="test "/>';
-                  productDiv.appendChild(imageDiv);
+                  ancDiv.appendChild(imageDiv);
 
                   var eleUl = document.createElement('ul');
                   eleUl.className="mrgn_5_top vchip_categories list-inline";
                   eleUl.innerHTML='<li>'+ obj.name +'</li>';
-                  productDiv.appendChild(eleUl);
+                  ancDiv.appendChild(eleUl);
+                  productDiv.appendChild(ancDiv);
 
                   var priceDiv = document.createElement('div');
                   priceDiv.className = 'categoery';
@@ -167,8 +184,7 @@
 
                   var contentDiv = document.createElement('div');
                   contentDiv.className ='vchip_product_content';
-                  contentUrl = "{{url('getTest')}}/"+obj.id;
-                  contentDiv.innerHTML = '<p class=""><a href="'+ contentUrl +'" class="btn-link">Start Test <i class="fa fa-angle-right"aria-hidden="true"></i></a></p>';
+                  contentDiv.innerHTML = '<p class="mrgn_20_top"><a href="'+contentUrl+'" class="btn-link">Start Test <i class="fa fa-angle-right"aria-hidden="true"></i></a></p>';
                   productDiv.appendChild(contentDiv);
                   mainDiv.appendChild(productDiv);
                   subcatDiv.appendChild(mainDiv);
