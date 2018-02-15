@@ -700,7 +700,8 @@
                       <strong style="color: red;" id="unreadCount_{{$chatuser['id']}}"></strong>
                     @endif
                   </p>
-                  <p class="preview">Vchip Tech</p>
+                  <!-- <p class="preview">Vchip Tech</p> -->
+                  <p class="preview"></p>
                 </div>
                 <input type="hidden" id="message_limit_{{$chatuser['id']}}" value="0">
                 <input type="hidden" id="is_scroll_{{$chatuser['id']}}" value="0">
@@ -732,7 +733,7 @@
     </div>
   </div>
 <script type="text/javascript">
-  var socket = io.connect('http://'+window.location.host+':8890');
+  var socket = io.connect(window.location.protocol+'//'+window.location.host+':8080', { secure: true, reconnect: true, rejectUnauthorized : false });
 
   $(document).ready(function () {
     $('#contact_list li:first')[0].click()
@@ -1081,7 +1082,7 @@
                         if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
                           divmeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+obj.id+'">'+users['unreadCount'][obj.id]+'</strong>';
                         }
-                        divmeta.innerHTML +='<p class="preview">Vchip Tech</p><input type="hidden" id="message_limit_'+obj.id+'" value="0"><input type="hidden" id="is_scroll_'+obj.id+'" value="0">';
+                        divmeta.innerHTML +='<p class="preview"></p><input type="hidden" id="message_limit_'+obj.id+'" value="0"><input type="hidden" id="is_scroll_'+obj.id+'" value="0">';
                         divWrap.appendChild(divmeta);
                         liEle.appendChild(divWrap);
                         chatUsers.appendChild(liEle);

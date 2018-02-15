@@ -274,7 +274,7 @@
     window.addEventListener("load", calculate_popups);
 </script>
 <script type="text/javascript">
-    var socket = io.connect('http://'+window.location.host+':8890');
+    var socket = io.connect(window.location.protocol+'//'+window.location.host+':8080', { secure: true, reconnect: true, rejectUnauthorized : false });
 
     // show user chat messages
     function showChat(ele){
@@ -306,7 +306,7 @@
 
         var popupMessageFooterDiv = document.createElement('div');
         popupMessageFooterDiv.className = 'popup-messages-footer';
-        popupMessageFooterDiv.innerHTML = '<textarea id="message_'+receiverId+'"  data-receiver_id="'+receiverId+'" placeholder="Type a message..." rows="10" cols="40" name="message" onfocus="readmessagecount(this);"></textarea><div class="btn-footer"><button class="pull-right send-msg" id="send_'+receiverId+'" data-send_id="'+receiverId+'" data-chatroom_id=""  onclick="sendMessage(this);"><span class="fa fa-share"></span> Share</button><input type="hidden" id="message_limit_'+receiverId+'" value="0"><input type="hidden" id="is_scroll_'+receiverId+'" value="1"></div>';
+        popupMessageFooterDiv.innerHTML = '<textarea id="message_'+receiverId+'"  data-receiver_id="'+receiverId+'" placeholder="Type a message..." rows="10" cols="40" name="message" onfocus="readmessagecount(this);"></textarea><div class="btn-footer"><button class="pull-right send-msg" id="send_'+receiverId+'" data-send_id="'+receiverId+'" data-chatroom_id=""  onclick="sendMessage(this);">Send</button><input type="hidden" id="message_limit_'+receiverId+'" value="0"><input type="hidden" id="is_scroll_'+receiverId+'" value="1"></div>';
         popupBoxDiv.appendChild(popupMessageFooterDiv);
         divChatWindows.appendChild(popupBoxDiv);
         $('.popup-messages').scroll(function() {
@@ -342,6 +342,7 @@
                 if(messages['chatroom_id']){
                     document.getElementById('send_'+receiverId).setAttribute('data-chatroom_id',messages['chatroom_id']);
                 }
+                document.getElementById('message_'+receiverId).focus();
             }
         });
     }
@@ -458,7 +459,7 @@
                         divChatBody.appendChild(divHeader);
 
                         var pEle = document.createElement('p');
-                        pEle.innerHTML = 'Vchip Technology';
+                        // pEle.innerHTML = 'Vchip Technology';
                         divChatBody.appendChild(pEle);
                         liEle.appendChild(divChatBody);
                         chatUsers.appendChild(liEle);
@@ -546,7 +547,7 @@
                     divChatBody.appendChild(divHeader);
 
                     var pEle = document.createElement('p');
-                    pEle.innerHTML = 'Vchip Technology';
+                    // pEle.innerHTML = 'Vchip Technology';
                     divChatBody.appendChild(pEle);
                     liEle.appendChild(divChatBody);
                     chatUsers.appendChild(liEle);
@@ -795,4 +796,12 @@
             alert("Please Add Message.");
         }
     }
+
+    $(window).on('keydown', function(e) {
+      var receiverId = $(e.target).attr('data-receiver_id');
+      if (e.which == 13 && receiverId > 0) {
+        $('#send_'+receiverId).click();
+        return false;
+      }
+    });
 </script>
