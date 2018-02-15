@@ -16,12 +16,14 @@
           @if(Auth::user())
           <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User">
             @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
-              <img src="{{asset(Auth::user()->photo)}}" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
+              <img src="{{asset(Auth::user()->photo)}}" id="currentUserImage" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
             @else
-              <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
+              <img src="{{ asset('images/user1.png') }}" id="currentUserImage" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
             @endif
             @if(Auth::user()->userNotificationCount() > 0)
-              <b style="color: red;">{{Auth::user()->userNotificationCount()}}</b>
+              <b style="color: red;" id="userCnt_{{Auth::user()->id}}">{{Auth::user()->userNotificationCount()}}</b>
+            @else
+              <b style="color: red;" id="userCnt_{{Auth::user()->id}}"></b>
             @endif
           </a>
             <ul class="dropdown-menu user-dropdown ">
@@ -36,6 +38,9 @@
                   </a>
                 </li>
                 <li role="separator" class="divider"></li>
+                <li>
+                  <a href="{{ url('allChatMessages')}}" data-toggle="tooltip" title="Chat Messages"><i class="fa fa-star" aria-hidden="true"></i> Chat Messages : <b style="color: red;" id="all_chat_messages"><span id="msg_count_2_{{Auth::user()->id}}">0</span></b></a>
+                </li>
                 <li>
                   <a href="{{ url('myNotifications')}}" data-toggle="tooltip" title="My Notifications"><i class="fa fa-star" aria-hidden="true"></i> My Notifications : <b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></a>
                 </li>

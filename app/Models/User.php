@@ -45,7 +45,8 @@ use App\Models\PlacementProcessCommentLike;
 use App\Models\PlacementProcessSubCommentLike;
 use App\Models\PlacementProcessComment;
 use App\Models\PlacementProcessSubComment;
-use Auth, DB;
+use App\Models\ChatMessage;
+use Auth, DB, Cache;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class User extends Authenticatable
@@ -176,6 +177,19 @@ class User extends Authenticatable
 
     public function department(){
         return $this->belongsTo(CollegeDept::class, 'college_dept_id');
+    }
+
+    public function chatroomid(){
+        $senderUserId = Auth::user()->id;
+        $receiverId = $this->id;
+        $roomMembers = [$receiverId, $senderUserId];
+        sort($roomMembers);
+        return 'chatmessages_'.$roomMembers[0].'_'.$roomMembers[1];
+    }
+
+    public function isOnline()
+    {
+        return Cache::has('vchip:online_user-' . $this->id);
     }
 
     protected static function searchStudent(Request $request){
@@ -425,5 +439,10 @@ class User extends Authenticatable
                 ->where('users.college_dept_id', $collegeDept)
                 ->select('users.id', 'users.*')->groupBy('users.id')->get();
         }
+    }
+
+
+    public function unreadChatMessagesCount(){
+        return ChatMessage::where('receiver_id', Auth::user()->id)->where('is_read', 0)->count();
     }
 }

@@ -160,7 +160,7 @@ hr{
          <h2 class="v_h2_title">Placement Experiance</h2>
          <h3 class="v_h3_title ">{{$placementExperiance->title}}</h3>
          <p>
-            {{ date('F d, Y', strtotime($placementExperiance->created_at))}} by <a>{{$placementExperiance->user->name}}</a>
+            {{ date('F d, Y', strtotime($placementExperiance->created_at))}} by <a>{{$placementExperiance->getUser($placementExperiance->user_id)->name}}</a>
          </p>
          <p >{!! $placementExperiance->question !!}</p>
       </div>
@@ -181,7 +181,7 @@ hr{
 </section>
   <footer class="blog-footer ">
     <!-- <p>Blog  by <a href="http://vchiptech.com/">Vishes Agrawal</a>.</p> -->
-    <p>Shared by {{$placementExperiance->user->name}}</p>
+    <p>Shared by {{$placementExperiance->getUser($placementExperiance->user_id)->name}}</p>
     <p>
       <a href="#">Back to top</a>
     </p>

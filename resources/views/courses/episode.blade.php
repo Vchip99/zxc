@@ -80,25 +80,24 @@
       @media  (max-width: 349px) {
           .hidden-sm { display: none; }
         }
-.fa-comment-o, .first-like i, .your-cmt{
-  font-weight: bold;
-  font-size: 18px;
-  color: #555;
-}
-.first-like i{
-  margin-right: 5px;
-}
-hr{
-  margin-top: 5px;
-  margin-bottom: 2px;
-  border-bottom: 1px solid ;
-}
-.comment-meta{
-  margin-left: 30px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
+    .fa-comment-o, .first-like i, .your-cmt{
+      font-weight: bold;
+      font-size: 18px;
+      color: #555;
+    }
+    .first-like i{
+      margin-right: 5px;
+    }
+    hr{
+      margin-top: 5px;
+      margin-bottom: 2px;
+      border-bottom: 1px solid ;
+    }
+    .comment-meta{
+      margin-left: 30px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
   </style>
 @stop
 @section('header-js')
@@ -160,8 +159,7 @@ hr{
         </div>
       </div>
     </div>
-  </section>
-
+</section>
 <!-- <span>&nbsp;</span> -->
   <section class="">
     <div class="container">
@@ -169,7 +167,7 @@ hr{
         <div class="">
           <div class="comment-meta">
             <span id="like_{{$video->id}}" class="first-like">
-              @if( isset($likesCount[$video->id]) && isset($likesCount[$video->id]['user_id'][$currentUser]))
+              @if( isset($likesCount[$video->id]) && is_object($currentUser) && isset($likesCount[$video->id]['user_id'][$currentUser->id]))
                    <i id="video_like_{{$video->id}}" data-video_id="{{$video->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>
                    <span id="like1-bs3">{{count($likesCount[$video->id]['like_id'])}}</span>
               @else
@@ -180,7 +178,7 @@ hr{
 
             <span class="mrgn_5_left">
               <i class="fa fa-comment-o" aria-hidden="true"></i>
-              @if(is_object(Auth::user()))
+              @if(is_object($currentUser))
                 <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
               @else
                 <a class="your-cmt" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">Comment</a>
@@ -233,28 +231,28 @@ hr{
                       @if(count( $comments) > 0)
                         @foreach($comments as $comment)
                           <div class="item" id="showComment_{{$comment->id}}">
-                            @if(is_file($comment->user->photo) || (!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)))
-                              <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
+                            @if(is_file($comment->getUser($comment->user_id)->photo) || (!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)))
+                              <img src="{{ asset($comment->getUser($comment->user_id)->photo)}} " class="img-circle" alt="User Image">
                             @else
                               <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
                             @endif
                             <div class="message">
-                              @if(is_object(Auth::user()) && (Auth::user()->id == $comment->user_id))
+                              @if(is_object($currentUser) && ($currentUser->id == $comment->user_id))
                               <div class="dropdown pull-right">
                                 <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                   <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                  @if(Auth::user()->id == $comment->user_id)
+                                  @if($currentUser->id == $comment->user_id)
                                     <li><a id="{{$comment->id}}" data-comment_id="{{$comment->id}}" data-video_id="{{$video->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
                                   @endif
-                                  @if(Auth::user()->id == $comment->user_id)
+                                  @if($currentUser->id == $comment->user_id)
                                     <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
                                   @endif
                                 </ul>
                               </div>
                               @endif
-                                <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
+                                <a class="SubCommentName">{{ $comment->getUser($comment->user_id)->name }}</a>
                                 <div class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
                                   <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
                                     <textarea class="form-control" name="comment{{$comment->id}}" id="comment{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
@@ -283,7 +281,7 @@ hr{
                               </div>
                               <div class="comment-meta reply-1">
                                 <span id="cmt_like_{{$comment->id}}" >
-                                  @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
+                                  @if( isset($commentLikesCount[$comment->id]) &&  is_object($currentUser) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser->id]))
                                        <i id="comment_like_{{$comment->id}}" data-video_id="{{$video->id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
                                        <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
                                   @else
@@ -292,7 +290,7 @@ hr{
                                   @endif
                                 </span>
                                <span class="mrgn_5_left">
-                                @if(is_object(Auth::user()))
+                                @if(is_object($currentUser))
                                   <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
                                 @else
                                   <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
@@ -310,7 +308,7 @@ hr{
                             </div>
                           </div>
                           @if(count( $comment->children ) > 0)
-                            @include('courses.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'user' => $user, 'videoId' => $video->id])
+                            @include('courses.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'videoId' => $video->id,'currentUser' => $currentUser])
                           @endif
                         @endforeach
                       @endif
@@ -634,6 +632,7 @@ hr{
     document.getElementById('editCommentHide_'+id).classList.remove("hide");
     document.getElementById('editCommentShow_'+id).classList.add("hide");
   }
+
   function confirmCommentDelete(ele){
       $.confirm({
         title: 'Confirmation',

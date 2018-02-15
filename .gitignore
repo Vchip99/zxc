@@ -13,6 +13,7 @@
 /public/motivationalSpeechDetailsImages
 /public/offlineWorkshopImages
 /public/virtualPlacementDriveImages
+/public/templateEditor/
 /vendor
 !/vendor/laravel/*
 /.env

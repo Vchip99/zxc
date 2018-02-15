@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
-use DB;
+use DB,Cache;
 use App\Models\TestSubjectPaper;
 
 class Question extends Model
@@ -109,8 +109,7 @@ class Question extends Model
      */
     protected static function getQuestionsByCategoryIdBySubcatId($categoryId, $subcatId){
 
-    	$questions = DB::table('questions')->select('id')->where('category_id', 1)->where('subcat_id', 0)->get();
-    	return $questions;
+    	return DB::table('questions')->select('id')->where('category_id', 1)->where('subcat_id', 0)->get();
     }
 
     /**
@@ -118,7 +117,7 @@ class Question extends Model
      */
     protected function getQuestionsByIds($ids){
 
-        return $questions = DB::table('questions')->select('id','answer', 'question_type', 'positive_marks', 'negative_marks', 'min', 'max')->whereIn('id', $ids)->orderBy('id')->get();
+        return DB::table('questions')->select('id','answer', 'question_type', 'positive_marks', 'negative_marks', 'min', 'max')->whereIn('id', $ids)->orderBy('id')->get();
     }
 
     /**
@@ -206,13 +205,19 @@ class Question extends Model
     }
 
     protected static function getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId){
-        return DB::table('questions')
-            ->where('category_id', $categoryId)
-            ->where('subcat_id', $subcategoryId)
-            ->where('subject_id', $subjectId)
-            ->where('paper_id', $paperId)
-            ->select('questions.*')
-            ->get();
+        // return DB::table('questions')
+        //     ->where('category_id', $categoryId)
+        //     ->where('subcat_id', $subcategoryId)
+        //     ->where('subject_id', $subjectId)
+        //     ->where('paper_id', $paperId)
+        //     ->select('questions.*')
+        //     ->get();
+        return Cache::remember('vchip:Questions:cat-'.$categoryId.':subcat-'.$subcategoryId.':subj-'.$subjectId.':paper-'.$paperId,30, function() use ($categoryId, $subcategoryId,$subjectId,$paperId) {
+                return  static::where('category_id', $categoryId)
+                ->where('subcat_id', $subcategoryId)
+                ->where('subject_id', $subjectId)
+                ->where('paper_id', $paperId)->get();
+            });
     }
 
     /**

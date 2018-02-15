@@ -4,7 +4,7 @@ namespace App\Libraries;
 use Illuminate\Http\Request;
 use App\Models\ClientHomePage;
 use App\Models\Client;
-use DB;
+use DB, Cache;
 
 class InputSanitise{
 

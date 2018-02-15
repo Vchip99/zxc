@@ -251,7 +251,7 @@
 		        </div>
 	          	<div class="modal-body text-center">
 					<input type="hidden" name="mode"  id="mode" value=""/>
-					<img src="{{ asset('images/user/user.png') }}" style="width: 100px; height: 100px;" />
+					<img src="{{ asset('images/user/user1.png') }}" style="width: 100px; height: 100px;" />
 					<br/>
 					@if(is_object(Auth::guard('clientuser')->user()))
 						<span><b>Name :</b> </span>{{Auth::guard('clientuser')->user()->name}}

@@ -30,6 +30,7 @@ use App\Models\AssignmentAnswer;
 use App\Models\AssignmentSubject;
 use App\Models\AssignmentTopic;
 use App\Models\DiscussionCategory;
+use App\Models\ChatMessage;
 use Excel;
 use Auth,Hash,DB, Redirect,Session,Validator,Input;
 use App\Libraries\InputSanitise;
@@ -726,5 +727,26 @@ class AccountController extends Controller
             return Redirect::to('studentVideo')->with('message', 'User video url updated successfully.');
         }
         return Redirect::to('studentVideo');
+    }
+
+    protected function allChatMessages(){
+        $unreadCount = [];
+        $users = ChatMessage::showchatusers();
+        $results = ChatMessage::where('receiver_id',  Auth()->user()->id)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                $unreadCount[$result->sender_id] = $result->unread;
+            }
+        }
+
+        return view('dashboard.chatMessages', compact('users', 'unreadCount'));
+    }
+
+    protected function dashboardPrivateChat(Request $request){
+        return ChatMessage::privatechat($request);
+    }
+
+    protected function dashboardSendMessage(Request $request){
+        return ChatMessage::sendMessage($request);
     }
 }

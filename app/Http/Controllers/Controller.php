@@ -10,7 +10,8 @@ use App\Models\TestCategory;
 use App\Models\TestSubCategory;
 use App\Models\TestSubject;
 use App\Models\TestSubjectPaper;
-use View;
+use App\Libraries\InputSanitise;
+use View,Cache;
 
 class Controller extends BaseController
 {
@@ -23,19 +24,26 @@ class Controller extends BaseController
      */
     public function __construct()
     {
-        // $testCategories = TestCategory::getAllTestCategories();
-        // view::share('testCategories', $testCategories);
 
-        $testCategoriesWithQuestions = TestCategory::getTestCategoriesAssociatedWithQuestion();
+        $testCategoriesWithQuestions = Cache::remember('vchip:testCategoriesWithQuestions',60, function() {
+            return TestCategory::getTestCategoriesAssociatedWithQuestion();
+        });
         view::share('testCategoriesWithQuestions', $testCategoriesWithQuestions);
 
-        $testSubCategories = TestSubCategory::getAllTestSubCategories();
-        view::share('testSubCategories', $testSubCategories);
+        // $testSubCategories = Cache::remember('testSubCategories',60, function() {
+        //     return TestSubCategory::getAllTestSubCategories();
+        // });
+        // view::share('testSubCategories', $testSubCategories);
 
-        $testSubjects = TestSubject::getAllSubjects();
-        view::share('testSubjects', $testSubjects);
+        // $testSubjects = Cache::remember('testSubjects',60, function() {
+        //     return TestSubject::getAllSubjects();
+        // });
+        // view::share('testSubjects', $testSubjects);
 
-        $testSubjectPapers = TestSubjectPaper::getAllSubjectPapers();
-        view::share('testSubjectPapers', $testSubjectPapers);
+        // $testSubjectPapers = Cache::remember('testSubjectPapers',60, function() {
+        //     return TestSubjectPaper::getAllSubjectPapers();
+        // });
+        // view::share('testSubjectPapers', $testSubjectPapers);
+
     }
 }

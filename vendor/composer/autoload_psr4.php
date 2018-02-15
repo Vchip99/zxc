@@ -33,6 +33,7 @@ return array(
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
     'Proengsoft\\JsValidation\\Tests\\' => array($vendorDir . '/proengsoft/laravel-jsvalidation/tests'),
     'Proengsoft\\JsValidation\\' => array($vendorDir . '/proengsoft/laravel-jsvalidation/src'),
+    'Predis\\' => array($vendorDir . '/predis/predis/src'),
     'PhpParser\\' => array($vendorDir . '/nikic/php-parser/lib/PhpParser'),
     'Mpdf\\' => array($vendorDir . '/mpdf/mpdf/src'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),

@@ -11,7 +11,7 @@ use App\Models\UserSolution;
 use App\Models\TestSubjectPaper;
 use App\Models\PaperSection;
 use App\Models\RegisterPaper;
-use Session, Redirect, DB;
+use Session, Redirect, DB, Cache;
 
 class QuizController extends Controller
 {
@@ -48,14 +48,17 @@ class QuizController extends Controller
         $paperId = $request->get('paper_id');
 
         if(!empty($categoryId) && !empty($subcategoryId) && !empty($subjectId) && !empty($paperId)){
-            $questions = $this->getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
+            $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
 
             foreach($questions as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
 
             if(count(array_keys($results['questions'])) > 0){
-                $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
+                $paperSections = Cache::remember('vchip:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
+                    return PaperSection::where('test_subject_paper_id', $paperId)->get();
+                });
+
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
                         if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -83,13 +86,15 @@ class QuizController extends Controller
         $subcategoryId = $request->get('subcategory');
         $subjectId = $request->get('subject');
         $paperId = $request->get('paper');
-        $allQuestions = $this->getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
+        $allQuestions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
 
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
         if(count(array_keys($questions)) > 0){
-            $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
+            $paperSections = Cache::remember('vchip:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
+                return PaperSection::where('test_subject_paper_id', $paperId)->get();
+            });
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
                     if(in_array($paperSection->id, array_keys($questions))){
@@ -102,15 +107,17 @@ class QuizController extends Controller
         return view('quiz.show_questions', compact('questions', 'sections'));
     }
 
-    /**
-     *  return question by categoryId by sub categoryId by subjectId by paperId
-     */
-    protected function getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId){
-        return  Question::where('category_id', $categoryId)
-                ->where('subcat_id', $subcategoryId)
-                ->where('subject_id', $subjectId)
-                ->where('paper_id', $paperId)->get();
-    }
+    // /**
+    //  *  return question by categoryId by sub categoryId by subjectId by paperId
+    //  */
+    // protected function getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId){
+    //     return Cache::remember('vchip:Questions:cat-'.$catId.':subcat-'.$subcatId.':subj-'.$subjectId.':paper-'.$paperId,30, function() use ($catId, $subcatId,$subjectId,$paperId) {
+    //             return  Question::where('category_id', $categoryId)
+    //             ->where('subcat_id', $subcategoryId)
+    //             ->where('subject_id', $subjectId)
+    //             ->where('paper_id', $paperId)->get();
+    //         });
+    // }
 
     /**
      *  return sub categories by categoryId
@@ -119,7 +126,9 @@ class QuizController extends Controller
         $subcategories = [];
         $id = json_decode($id);
         if(isset($id)){
-            $subcategories = DB::table('test_sub_categories')->select('id','name', 'test_category_id')->where('test_category_id', $id)->get();
+            $subcategories = Cache::remember('vchip:subcategories:cat-'.$id,30, function() use ($id) {
+                return DB::table('test_sub_categories')->select('id','name', 'test_category_id')->where('test_category_id', $id)->get();
+            });
         }
         return $subcategories;
     }
@@ -128,7 +137,9 @@ class QuizController extends Controller
      *  return paper by Id
      */
     protected function getPaperById($id){
-        return DB::table('test_subject_papers')->where('id', $id)->first();
+        return Cache::remember('vchip:paper:id-'.$id,30, function() use ($id) {
+            return DB::table('test_subject_papers')->where('id', $id)->first();
+        });
     }
 
     /**
@@ -255,7 +266,7 @@ class QuizController extends Controller
         $paperId = $request->get('paper_id');
         $score = score::getUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId);
 
-        $questions = $this->getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
+        $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
 
         foreach($questions as $question){
             $results['questions'][$question->section_type][] = $question;
@@ -285,13 +296,16 @@ class QuizController extends Controller
         $userId = $request->user_id;
         $scoreId = $request->score_id;
         if(is_object($paper)){
-            $questions = $this->getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($paper->test_category_id, $paper->test_sub_category_id, $paper->test_subject_id, $paper->id);
+            $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($paper->test_category_id, $paper->test_sub_category_id, $paper->test_subject_id, $paper->id);
 
             foreach($questions as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
             if(count(array_keys($results['questions'])) > 0){
-                $paperSections = PaperSection::where('test_subject_paper_id', $paper->id)->get();
+                $paperId = $paper->id;
+                $paperSections = Cache::remember('vchip:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
+                    return PaperSection::where('test_subject_paper_id', $paperId)->get();
+                });
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
                         if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -319,13 +333,15 @@ class QuizController extends Controller
         $subcategoryId = $subcategory;
         $subjectId = $subject;
         $paperId = $paper;
-        $allQuestions = $this->getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
+        $allQuestions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
 
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
         if(count(array_keys($questions)) > 0){
-            $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
+            $paperSections = Cache::remember('vchip:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
+                return PaperSection::where('test_subject_paper_id', $paperId)->get();
+            });
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
                     if(in_array($paperSection->id, array_keys($questions))){
@@ -360,63 +376,6 @@ class QuizController extends Controller
         $mpdf->WriteHTML($stylesheet2,1);
         $mpdf->WriteHTML($html, 2);
         return  $mpdf->Output("download_questions.pdf", "D");
-    }
-
-    /**
-     *  show result grid
-     */
-    protected function getAllResults(){
-        $this->getUserResults();
-        return view('quiz.results-grid');
-    }
-
-    /**
-     *  show user result grid
-     */
-    protected function getUserResults(){
-        $page = 0;
-        $limit = 10;
-        // $sidx = 10;
-        // $sord = 'asc';
-
-        if(count($_GET)>0){
-            $page = $_GET['page']; // get the requested page
-            $limit = $_GET['rows']; // get how many rows we want to have into the grid
-            $sidx = $_GET['sidx']; // get index row - i.e. user click to sort
-            $sord = $_GET['sord']; // get the direction
-        }
-        $userId = Auth::user()->id;
-        $count = \DB::table('scores')->where('user_id', $userId)->count();
-
-        if( $count >0 )
-        {
-            $total_pages = ceil($count/$limit);
-        } else {
-            $total_pages = 0;
-        }
-        if($page > $total_pages){
-            $page=$total_pages;
-        }
-        $start = $limit*$page - $limit; // do not put $limit*($page - 1)
-
-        $results = \DB::table('scores')
-                        ->join('subcategory', function($join){
-                            $join->on('scores.category_id', '=', 'subcategory.cat_id');
-                            $join->on('scores.subcat_id', '=', 'subcategory.id');
-                        })
-                        ->where('scores.user_id', $userId)
-                        ->select('scores.*', 'subcategory.name')
-                        ->orderBy('scores.id')
-                        ->skip($start)->take($limit)->get();
-        $responce = new \stdClass();
-        $responce->page = $page;
-        $responce->total = $total_pages;
-        $responce->records = $count;
-        foreach ($results as $index => $row) {
-            $responce->rows[$index]['id']=$row->id;
-            $responce->rows[$index]['cell']=array($row->id,$row->name,$row->right_answered,$row->wrong_answered,$row->unanswered);
-        }
-        return json_encode($responce);
     }
 
 }

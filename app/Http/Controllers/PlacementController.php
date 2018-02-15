@@ -17,7 +17,7 @@ use App\Models\PlacementProcessCommentLike;
 use App\Models\PlacementProcessSubCommentLike;
 use App\Models\PlacementProcessLike;
 use App\Models\ApplyJob;
-use DB, Auth, Session;
+use DB, Auth, Session, Cache;
 use Validator, Redirect,Hash;
 use App\Libraries\InputSanitise;
 use App\Models\Add;
@@ -37,17 +37,32 @@ class PlacementController extends Controller
     protected function show(Request $request){
         $companyId = Session::get('front_selected_company_id');
         if($companyId > 0){
-            $companyDetails = CompanyDetails::where('placement_company_id', $companyId)->first();
+            $companyDetails = Cache::remember('vchip:companyDetails:company-'.$companyId,60, function() use ($companyId){
+                return CompanyDetails::where('placement_company_id', $companyId)->first();
+            });
         } else {
-            $companyDetails = CompanyDetails::first();
+            $companyDetails = Cache::remember('vchip:companyDetails:company-first',60, function() use ($companyId){
+                return CompanyDetails::first();
+            });
         }
-        $placementAreas = PlacementArea::getPlacementAreas();
+        $placementAreas= Cache::remember('vchip:placementAreas',60, function() {
+            return PlacementArea::getPlacementAreas();
+        });
         if(is_object($companyDetails)){
-    	   $placementProcess = PlacementProcess::where('placement_company_id', $companyDetails->placement_company_id)->first();
+            $companyId = $companyDetails->placement_company_id;
+            $placementProcess = Cache::remember('vchip:placementProcess:company-'.$companyId,60, function() use ($companyId){
+                return PlacementProcess::where('placement_company_id', $companyId)->first();
+            });
             if(is_object($placementProcess)){
-                $placementFaqs = PlacementFaq::where('placement_company_id', $placementProcess->placement_company_id)->get();
-                $examPatterns = ExamPattern::where('placement_company_id', $placementProcess->placement_company_id)->get();
-                $placementExperiances= PlacementExperiance::where('placement_company_id', $placementProcess->placement_company_id)->get();
+                $placementFaqs = Cache::remember('vchip:placementFaqs:company-'.$companyId,60, function() use ($companyId){
+                    return PlacementFaq::where('placement_company_id', $companyId)->orderBy('id', 'desc')->get();
+                });
+                $examPatterns = Cache::remember('vchip:examPatterns:company-'.$companyId,60, function() use ($companyId){
+                    return ExamPattern::where('placement_company_id', $companyId)->get();
+                });
+                $placementExperiances = Cache::remember('vchip:placementExperiances:company-'.$companyId,60, function() use ($companyId){
+                    return PlacementExperiance::where('placement_company_id', $companyId)->orderBy('id', 'desc')->get();
+                });
             } else {
                 $placementFaqs = [];
                 $examPatterns = [];
@@ -60,12 +75,13 @@ class PlacementController extends Controller
             $subcommentLikesCount = PlacementProcessSubCommentLike::getLikesByCompanyId($companyDetails->placement_company_id);
             $likesCount = PlacementProcessLike::getLikesByCompanyId($companyDetails->placement_company_id);
             $comments = PlacementProcessComment::where('company_id', $companyDetails->placement_company_id)->orderBy('id','desc')->get();
-            if(is_object(Auth::user())){
-                $currentUser = Auth::user()->id;
-            } else {
-                $currentUser = 0;
+            $currentUser = Auth::user();
+            if(!is_object($currentUser)){
+                $currentUser = NULL;
             }
-            $applyJobs = ApplyJob::all();
+            $applyJobs = Cache::remember('vchip:applyJobs',60, function() {
+                return ApplyJob::orderBy('id', 'desc')->get();
+            });
             $date = date('Y-m-d');
             $ads = Add::getAdds($request->url(),$date);
 	        return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount', 'applyJobs', 'ads'));
@@ -82,12 +98,13 @@ class PlacementController extends Controller
             $commentLikesCount = [];
             $subcommentLikesCount = [];
             $likesCount = [];
-            if(is_object(Auth::user())){
-                $currentUser = Auth::user()->id;
-            } else {
-                $currentUser = 0;
+            $currentUser = Auth::user();
+            if(!is_object($currentUser)){
+                $currentUser = new user;
             }
-            $applyJobs = ApplyJob::all();
+            $applyJobs = Cache::remember('vchip:applyJobs',60, function() {
+                return ApplyJob::orderBy('id', 'desc')->get();
+            });
             $date = date('Y-m-d');
             $ads = Add::getAdds($request->url(),$date);
             return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount', 'applyJobs', 'ads'));
@@ -96,26 +113,42 @@ class PlacementController extends Controller
     }
 
     protected function showPlacements(Request $request){
-        $companyDetails = CompanyDetails::where('placement_company_id',$request->get('company_id'))->first();
-        $placementProcess = PlacementProcess::where('placement_company_id',$request->get('company_id'))->first();
-        $placementAreas = PlacementArea::getPlacementAreas();
+        $selectedCompany = $request->get('company_id');
+        $companyDetails = Cache::remember('vchip:companyDetails:company-'.$selectedCompany,60, function() use ($selectedCompany){
+            return CompanyDetails::where('placement_company_id', $selectedCompany)->first();
+        });
+        $placementProcess = Cache::remember('vchip:placementProcess:company-'.$selectedCompany,60, function() use ($selectedCompany){
+            return PlacementProcess::where('placement_company_id', $selectedCompany)->first();
+        });
+        $placementAreas= Cache::remember('vchip:placementAreas',60, function() {
+            return PlacementArea::getPlacementAreas();
+        });
         if(is_object($companyDetails) && is_object($placementProcess)){
-            $placementCompanies = PlacementCompany::where('placement_area_id',$companyDetails->placement_area_id)->get();
-            $selectedCompany = $request->get('company_id');
             $selectedArea = $companyDetails->placement_area_id;
-            $placementFaqs = PlacementFaq::where('placement_company_id', $companyDetails->placement_company_id)->get();
-            $examPatterns = ExamPattern::where('placement_company_id', $companyDetails->placement_company_id)->get();
-            $placementExperiances= PlacementExperiance::where('placement_company_id', $companyDetails->placement_company_id)->get();
-            $commentLikesCount = PlacementProcessCommentLike::getLikesByCompanyId($companyDetails->placement_company_id);
-            $subcommentLikesCount = PlacementProcessSubCommentLike::getLikesByCompanyId($companyDetails->placement_company_id);
-            $likesCount = PlacementProcessLike::getLikesByCompanyId($companyDetails->placement_company_id);
-            $comments = PlacementProcessComment::where('company_id', $companyDetails->placement_company_id)->orderBy('id','desc')->get();
-            if(is_object(Auth::user())){
-                $currentUser = Auth::user()->id;
-            } else {
-                $currentUser = 0;
+            $placementCompanies = Cache::remember('vchip:placementCompanies:areaId-'.$selectedArea,60, function() use ($selectedArea){
+                return PlacementCompany::where('placement_area_id',$selectedArea)->get();
+            });
+            $placementFaqs = Cache::remember('vchip:placementFaqs:company-'.$selectedCompany,60, function() use ($selectedCompany){
+                return PlacementFaq::where('placement_company_id', $selectedCompany)->orderBy('id', 'desc')->get();
+            });
+            $examPatterns = Cache::remember('vchip:examPatterns:company-'.$selectedCompany,60, function() use ($selectedCompany){
+                return ExamPattern::where('placement_company_id', $selectedCompany)->get();
+            });
+            $placementExperiances = Cache::remember('vchip:placementExperiances:company-'.$selectedCompany,60, function() use ($selectedCompany){
+                return PlacementExperiance::where('placement_company_id', $selectedCompany)->orderBy('id', 'desc')->get();
+            });
+
+            $commentLikesCount = PlacementProcessCommentLike::getLikesByCompanyId($selectedCompany);
+            $subcommentLikesCount = PlacementProcessSubCommentLike::getLikesByCompanyId($selectedCompany);
+            $likesCount = PlacementProcessLike::getLikesByCompanyId($selectedCompany);
+            $comments = PlacementProcessComment::where('company_id', $selectedCompany)->orderBy('id','desc')->get();
+            $currentUser = Auth::user();
+            if(!is_object($currentUser)){
+                $currentUser = new user;
             }
-            $applyJobs = ApplyJob::all();
+            $applyJobs = Cache::remember('vchip:applyJobs',60, function() {
+                return ApplyJob::orderBy('id', 'desc')->get();
+            });
             $date = date('Y-m-d');
             $ads = DB::table('adds')
                 ->where('show_page_id', 8)
@@ -131,7 +164,10 @@ class PlacementController extends Controller
     }
 
     protected function getPlacementCompaniesByAreaForFront(Request $request){
-        return PlacementCompany::getPlacementCompaniesByAreaForFront($request->id);
+        $areaId = $request->id;
+        return Cache::remember('vchip:placementCompanies:areaId-'.$areaId,60, function() use ($areaId){
+            return PlacementCompany::getPlacementCompaniesByAreaForFront($areaId);
+        });
     }
 
     protected function createPlacementExperiance(Request $request){
@@ -157,9 +193,13 @@ class PlacementController extends Controller
     protected function placementExperiance($id){
         $id = json_decode($id);
         if(isset($id)){
-            $placementExperiance = PlacementExperiance::find($id);
+            $placementExperiance = Cache::remember('vchip:placementExperiance-'.$id,60, function() use ($id){
+                return PlacementExperiance::find($id);
+            });
             if(is_object($placementExperiance)){
-                $placementExperiances = placementExperiance::all();
+                $placementExperiances = Cache::remember('vchip:placementExperiances',60, function() {
+                    return placementExperiance::all();
+                });
                 return view('placement.placementExperiance', compact('placementExperiance', 'placementExperiances'));
             }
         }
@@ -177,17 +217,17 @@ class PlacementController extends Controller
             $placementComments['comments'][$comment->id]['id'] = $comment->id;
             $placementComments['comments'][$comment->id]['company_id'] = $comment->company_id;
             $placementComments['comments'][$comment->id]['user_id'] = $comment->user_id;
-            $placementComments['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $placementComments['comments'][$comment->id]['user_name'] = $comment->getUser($comment->user_id)->name;
             $placementComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
-            if(is_file($comment->user->photo) && true == preg_match('/userStorage/',$comment->user->photo)){
+            if(is_file($comment->getUser($comment->user_id)->photo) && true == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)){
                 $isImageExist = 'system';
-            } else if(!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)){
+            } else if(!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)){
                 $isImageExist = 'other';
             } else {
                 $isImageExist = 'false';
             }
             $placementComments['comments'][$comment->id]['image_exist'] = $isImageExist;
-            $placementComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
+            $placementComments['comments'][$comment->id]['user_image'] = $comment->getUser($comment->user_id)->photo;
             if(is_object($comment->children) && false == $comment->children->isEmpty()){
                 $placementComments['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
             }
@@ -209,13 +249,13 @@ class PlacementController extends Controller
             $placementChildComments[$subComment->id]['id'] = $subComment->id;
             $placementChildComments[$subComment->id]['company_id'] = $subComment->company_id;
             $placementChildComments[$subComment->id]['placement_process_comment_id'] = $subComment->placement_process_comment_id;
-            $placementChildComments[$subComment->id]['user_name'] = $subComment->user->name;
+            $placementChildComments[$subComment->id]['user_name'] = $subComment->getUser($subComment->user_id)->name;
             $placementChildComments[$subComment->id]['user_id'] = $subComment->user_id;
             $placementChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
-            $placementChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
-            if(is_file($subComment->user->photo) && true == preg_match('/userStorage/',$subComment->user->photo)){
+            $placementChildComments[$subComment->id]['user_image'] = $subComment->getUser($subComment->user_id)->photo;
+            if(is_file($subComment->getUser($subComment->user_id)->photo) && true == preg_match('/userStorage/',$subComment->getUser($subComment->user_id)->photo)){
                 $isImageExist = 'system';
-            } else if(!empty($subComment->user->photo) && false == preg_match('/userStorage/',$subComment->user->photo)){
+            } else if(!empty($subComment->getUser($subComment->user_id)->photo) && false == preg_match('/userStorage/',$subComment->getUser($subComment->user_id)->photo)){
                 $isImageExist = 'other';
             } else {
                 $isImageExist = 'false';

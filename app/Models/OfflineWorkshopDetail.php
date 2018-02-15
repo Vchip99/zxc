@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Redirect, DB;
+use Redirect, DB,Cache;
 use App\Libraries\InputSanitise;
 use App\Models\OfflineWorkshopCategory;
 use App\Models\OfflineWorkshopComponent;
@@ -175,7 +175,10 @@ class OfflineWorkshopDetail extends Model
 
     protected static function getOfflineWorkshopsByCategory(Request $request){
         $data = [];
-        $results = static::where('offline_workshop_category_id', $request->id)->get();
+        $categoryId = $request->id;
+        $results = Cache::remember('vchip:workshops:cat-'.$categoryId,30, function() use ($categoryId){
+            return static::where('offline_workshop_category_id', $categoryId)->get();
+        });
         if(is_object($results) && false == $results->isEmpty()){
             foreach($results as $result){
                 $data[] = [

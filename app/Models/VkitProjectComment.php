@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\VkitProjectSubComment;
 use App\Libraries\InputSanitise;
 use App\Models\VkitProjectCommentLike;
+use Cache;
 
 class VkitProjectComment extends Model
 {
@@ -43,6 +44,12 @@ class VkitProjectComment extends Model
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getUser($userId){
+        return Cache::remember('vchip:user-'.$userId,30, function() use($userId){
+            return User::find($userId);
+        });
     }
 
     protected static function deleteVkitProjectCommentsByUserId($userId){

@@ -8,3 +8,4 @@
 <link rel="stylesheet" href="{{asset('css/bootstrap-multiselect.css?ver=1.0')}}">
 <link href="{{asset('css/jquery-confirm.min.css?ver=1.0')}}" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css?family=Hind" rel="stylesheet">
+<link href="{{asset('css/chat.css?ver=1.0')}}" rel="stylesheet">

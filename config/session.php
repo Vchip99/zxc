@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'connection' => null,
+    'connection' => 'session',
 
     /*
     |--------------------------------------------------------------------------
@@ -148,7 +148,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN', '.vchipedu.com'),
+    'domain' => env('SESSION_DOMAIN', '.localvchip.com'),
 
     /*
     |--------------------------------------------------------------------------

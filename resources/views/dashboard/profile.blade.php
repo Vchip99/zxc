@@ -135,7 +135,7 @@
                     @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
                       <img alt="User Pic" style="max-height: 200px !important;" src="{{Auth::user()->photo}}" id="profile-image1" class="user-prof img-responsive">
                     @else
-                      <img alt="User Pic" src="{{ url('images/user/user.png')}}" id="profile-image1" class="img-circle img-responsive">
+                      <img alt="User Pic" src="{{ url('images/user/user1.png')}}" id="profile-image1" class="img-circle img-responsive">
                     @endif
                   </div>
               </div>

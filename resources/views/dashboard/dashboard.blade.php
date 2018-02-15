@@ -19,6 +19,7 @@
   <link href="{{ asset('css/jquery-confirm.min.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/nav_footer.css?ver=1.0')}}" rel="stylesheet"/>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
   <script src="{{asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
   <script src="{{ asset('js/jquery.min.js?ver=1.0')}}"></script>
   <script src="{{ asset('js/bootstrap.min.js?ver=1.0')}}"></script>
@@ -73,9 +74,9 @@
         <div class="pull-left image">
           <a href="{{ url('profile')}}">
           @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
-            <img src="{{ asset(Auth::user()->photo)}} " class="img-circle" alt="User Image">
+            <img src="{{ asset(Auth::user()->photo)}}" id="dashboardUserImage" class="img-circle" alt="User Image">
           @else
-            <img src="{{ url('images/user/user.png')}}" class="img-circle" alt="User Image">
+            <img src="{{ url('images/user/user1.png')}}" id="dashboardUserImage" class="img-circle" alt="User Image">
           @endif
           </a>
           @php
@@ -90,6 +91,17 @@
       </div>
       <ul class="sidebar-menu">
         <li class="header">Vchip Technology</li>
+        <li class="treeview ">
+          <a href="#">
+            <i class="fa fa-comments"><b style="color: red;" id="unreadCountDash_1_{{Auth::user()->id}}">{{Auth::user()->unreadChatMessagesCount()}}</b></i> <span>Chat Messages </span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{{ url('allChatMessages')}}"><i class="fa fa-circle-o"></i> Chat Messages : <b style="color: red;" id="unreadCountDash_2_{{Auth::user()->id}}">{{Auth::user()->unreadChatMessagesCount()}}</b></a></li>
+          </ul>
+        </li>
         <li class="treeview ">
           <a href="#">
             <i class="fa fa-star"><b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></i> <span>Notifications </span>

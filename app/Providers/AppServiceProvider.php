@@ -13,11 +13,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // \DB::listen(function ($query) {
-        //     print_r($query->sql);
-        //     print_r($query->bindings);
-        //     print_r($query->time);
-        // });
+        \DB::listen(function ($query) {
+            // print_r($query->sql);
+            // print_r($query->bindings);
+            // print_r($query->time);
+            // \Log::debug($query->sql . ' - ' . serialize($query->bindings).'-'.$query->time );
+        });
     }
 
     /**

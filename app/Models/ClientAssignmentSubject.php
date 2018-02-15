@@ -10,7 +10,7 @@ use App\Libraries\InputSanitise;
 class ClientAssignmentSubject extends Model
 {
     protected $connection = 'mysql2';
-
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

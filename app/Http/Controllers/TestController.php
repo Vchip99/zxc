@@ -13,7 +13,7 @@ use App\Models\Question;
 use App\Models\Notification;
 use App\Models\ReadNotification;
 use App\Models\UserSolution;
-use Session, Redirect, Auth, DB;
+use Session, Redirect, Auth, DB,Cache;
 use App\Models\Add;
 
 class TestController extends Controller
@@ -22,8 +22,12 @@ class TestController extends Controller
 	 *	show test sub categories by categoryId
 	 */
 	public function index(Request $request){
-		$testCategories = TestCategory::getTestCategoriesAssociatedWithQuestion();
-		$testSubCategories = TestSubCategory::getTestSubCategoriesAssociatedWithQuestion();
+		$testCategories = Cache::remember('vchip:testCategoriesWithQuestions',60, function() {
+            return TestCategory::getTestCategoriesAssociatedWithQuestion();
+        });
+		$testSubCategories = Cache::remember('vchip:testSubCategories',60, function() {
+            return TestSubCategory::getTestSubCategoriesAssociatedWithQuestion();
+        });
 		$catId = 0;
 		$date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
@@ -36,10 +40,16 @@ class TestController extends Controller
 	protected function showTest(Request $request,$id){
 		$catId = json_decode($id);
 		if(isset($catId)){
-			$category = TestCategory::find($catId);
+			$category = Cache::remember('vchip:testCategory-'.$catId,30, function() use ($catId) {
+	            return TestCategory::find($catId);
+	        });
 			if(is_object($category)){
-				$testCategories = TestCategory::getTestCategoriesAssociatedWithQuestion();
-				$testSubCategories = TestSubCategory::getSubcategoriesByCategoryId($catId);
+				$testCategories = Cache::remember('vchip:testCategoriesWithQuestions',60, function() {
+		            return TestCategory::getTestCategoriesAssociatedWithQuestion();
+		        });
+				$testSubCategories = Cache::remember('vchip:testSubCategories:cat-'.$catId,30, function() use ($catId) {
+		            return TestSubCategory::getSubcategoriesByCategoryId($catId);
+		        });
 				$date = date('Y-m-d');
         		$ads = Add::getAdds($request->url(),$date);
 				return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads'));
@@ -55,13 +65,23 @@ class TestController extends Controller
 		$subcatId = json_decode($id);
 		$testSubjectPaperIds = [];
 		if(isset($subcatId)){
-			$subcategory = TestSubCategory::find($subcatId);
+			$subcategory = Cache::remember('vchip:testSubCategory-'.$subcatId,30, function() use ($subcatId) {
+	            return TestSubCategory::find($subcatId);
+	        });
 			if(is_object($subcategory)){
 				$catId = $subcategory->test_category_id;
-				$testCategories = TestCategory::getTestCategoriesAssociatedWithQuestion();
-				$testSubCategories = TestSubCategory::getSubcategoriesByCategoryId($catId);
-				$testSubjects = TestSubject::getSubjectsByCatIdBySubcatid($catId, $subcatId);
-				$testSubjectPapers = TestSubjectPaper::getSubjectPapersByCatIdBySubCatId($catId, $subcatId);
+				$testCategories = Cache::remember('vchip:testCategoriesWithQuestions',60, function() {
+		            return TestCategory::getTestCategoriesAssociatedWithQuestion();
+		        });
+				$testSubCategories = Cache::remember('vchip:testSubCategories:cat-'.$catId,30, function() use ($catId) {
+		            return TestSubCategory::getSubcategoriesByCategoryId($catId);
+		        });
+				$testSubjects = Cache::remember('vchip:testSubjects:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
+		            return TestSubject::getSubjectsByCatIdBySubcatid($catId, $subcatId);
+		        });
+		        $testSubjectPapers = Cache::remember('vchip:testSubjectPapers:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
+		            return TestSubjectPaper::getSubjectPapersByCatIdBySubCatId($catId, $subcatId);
+		        });
 
 				if(is_array($testSubjectPapers)){
 					foreach($testSubjectPapers as $testPapers){
@@ -111,9 +131,15 @@ class TestController extends Controller
 		$subcatId = $request->get('subcategory_id');
 		if(isset($catId) && isset($subcatId)){
 			$testCategories = TestCategory::all();
-			$testSubCategories = TestSubCategory::getSubcategoriesByCategoryId($catId);
-			$testSubjects = TestSubject::getSubjectsByCatIdBySubcatid($catId, $subcatId);
-			$testSubjectPapers = TestSubjectPaper::getSubjectPapersByCatIdBySubCatId($catId, $subcatId);
+			$testSubCategories = Cache::remember('vchip:testSubCategories:cat-'.$catId,30, function() use ($catId) {
+	            return TestSubCategory::getSubcategoriesByCategoryId($catId);
+	        });
+			$testSubjects = Cache::remember('vchip:testSubjects:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
+	            return TestSubject::getSubjectsByCatIdBySubcatid($catId, $subcatId);
+	        });
+			$testSubjectPapers = Cache::remember('vchip:testSubjectPapers:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
+		            return TestSubjectPaper::getSubjectPapersByCatIdBySubCatId($catId, $subcatId);
+		        });
 			return view('tests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers'));
 		} else {
 			return Redirect::to('/');
@@ -128,7 +154,9 @@ class TestController extends Controller
 			$categoryId = $request->get('id');
 			$userId = $request->get('userId');
 			if(isset($categoryId) && empty($userId)){
-				return $subCategories = TestSubCategory::getSubcategoriesByCategoryId($categoryId);
+				return Cache::remember('vchip:testSubCategories:cat-'.$categoryId,30, function() use ($categoryId) {
+		            return TestSubCategory::getSubcategoriesByCategoryId($categoryId);
+		        });
 			} else {
 				return $subCategories = TestSubCategory::getTestSubCategoriesByRegisteredSubjectPapersByCategoryIdByUserId($categoryId,$userId);
 			}
@@ -145,8 +173,12 @@ class TestController extends Controller
 		$subcatId = $request->get('subcat');
 		$userId = $request->get('userId');
 		if(empty($userId)){
-			$result['subjects'] = TestSubject::getSubjectsByCatIdBySubcatid($catId, $subcatId);
-			$result['papers'] = TestSubjectPaper::getSubjectPapersByCatIdBySubCatId($catId, $subcatId);
+			$result['subjects'] = Cache::remember('vchip:testSubjects:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
+	            return TestSubject::getSubjectsByCatIdBySubcatid($catId, $subcatId);
+	        });
+			$result['papers'] = Cache::remember('vchip:testSubjectPapers:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
+	            return TestSubjectPaper::getSubjectPapersByCatIdBySubCatId($catId, $subcatId);
+	        });
 			$result['registeredPaperIds'] = $this->getRegisteredPaperIds();
 		} else {
 			$result['subjects'] = TestSubject::getRegisteredSubjectsByCatIdBySubcatIdByUserId($catId, $subcatId,$userId);

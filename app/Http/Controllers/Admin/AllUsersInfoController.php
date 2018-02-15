@@ -357,8 +357,8 @@ class AllUsersInfoController extends Controller
             $paperName = $request->get('paper');
         }
 
-        $collegeResult = $collegeName.'_'.$paperName.'_result';
-        $sheetName = $paperName.' Test Result';
+        $collegeResult = substr($collegeName.'_'.$paperName.'_result', 0, 25);
+        $sheetName = substr($paperName.' Test Result', 0, 25);
         return \Excel::create($collegeResult, function($excel) use ($sheetName,$resultArray) {
             $excel->sheet($sheetName , function($sheet) use ($resultArray)
             {

@@ -68,12 +68,12 @@ margin-left: -13px;}
         </div>
         <div class="col-sm-9 col-sm-push-3">
           <div class="ask-qst">
-              @if(is_object(Auth::user()))
+              @if(is_object($currentUser))
                 <a class="btn btn-primary" data-toggle="modal" data-target="#askQuestion">Ask Question</a>
               @else
                 <a class="btn btn-primary" data-toggle="modal" data-target="#loginUserModel">Ask Question</a>
               @endif
-              <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::user()))?Auth::user()->id:NULL}}">
+              <input type="hidden" name="user_id" id="user_id" value="{{ (is_object($currentUser))?$currentUser->id:NULL}}">
           </div>
           <div class="post-comments ">
             <div class="row" id="showAllPosts">
@@ -87,7 +87,7 @@ margin-left: -13px;}
                     <div class="box-tools ">
                       <button type="button" data-toggle="collapse" data-target="#post{{$post->id}}" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i>
                       </button>
-                      @if(is_object(Auth::user()) && Auth::user()->id == $post->user_id)
+                      @if(is_object($currentUser) && $currentUser->id == $post->user_id)
                       <button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button>
                       <ul role="menu" class="dropdown-menu dropdown-menu-right">
                         <li><a id="{{$post->id}}" onclick="confirmPostDelete(this);">Delete</a></li>
@@ -98,12 +98,12 @@ margin-left: -13px;}
                     </div>
                     <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
                     <div class="user-block cmt-left-margin">
-                      @if(is_file($post->user->photo) || (!empty($post->user->photo) && false == preg_match('/userStorage/',$post->user->photo)))
-                        <img src="{{ asset($post->user->photo)}} " class="img-circle" alt="User Image">
+                      @if(is_file($post->getUser($post->user_id)->photo) || (!empty($post->getUser($post->user_id)->photo) && false == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)))
+                        <img src="{{ asset($post->getUser($post->user_id)->photo)}} " class="img-circle" alt="User Image">
                       @else
                         <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
                       @endif
-                      <span class="username">{{ $user->find($post->user_id)->name }} </span>
+                      <span class="username">{{ $post->getUser($post->user_id)->name }} </span>
                       <span class="description">Shared publicly - {{$post->updated_at->diffForHumans()}}</span>
                     </div>
                     <div  class="media-body" data-toggle="lightbox">
@@ -142,7 +142,7 @@ margin-left: -13px;}
                       <div class="border-bottom"></div>
                       <div class="comment-meta main-reply-box cmt-left-margin">
                           <span id="like_{{$post->id}}" >
-                            @if( isset($likesCount[$post->id]) && isset($likesCount[$post->id]['user_id'][$currentUser]))
+                            @if( isset($likesCount[$post->id]) && is_object($currentUser) && isset($likesCount[$post->id]['user_id'][$currentUser->id]))
                                  <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
                                  <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
                             @else
@@ -151,7 +151,7 @@ margin-left: -13px;}
                             @endif
                           </span>
                          <span class="mrgn_5_left">
-                          @if(is_object(Auth::user()))
+                          @if(is_object($currentUser))
                             <a class="" role="button" data-toggle="collapse" href="#replyToPost{{$post->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
                           @else
                             <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
@@ -171,28 +171,28 @@ margin-left: -13px;}
                           @if(count( $post->descComments) > 0)
                             @foreach($post->descComments as $comment)
                               <div class="item cmt-left-margin-10" id="showComment_{{$comment->id}}">
-                                @if(is_file($comment->user->photo) || (!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)))
-                                  <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
+                                @if(is_file($comment->getUser($comment->user_id)->photo) || (!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)))
+                                  <img src="{{ asset($comment->getUser($comment->user_id)->photo)}} " class="img-circle" alt="User Image">
                                 @else
                                   <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
                                 @endif
                                 <div class="message">
-                                  @if(is_object(Auth::user()) && (Auth::user()->id == $comment->user_id || Auth::user()->id == $post->user_id))
+                                  @if(is_object($currentUser) && ($currentUser->id == $comment->user_id || $currentUser->id == $post->user_id))
                                   <div class="dropdown pull-right">
                                     <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                       <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                      @if(Auth::user()->id == $comment->user_id || Auth::user()->id == $post->user_id)
+                                      @if($currentUser->id == $comment->user_id || $currentUser->id == $post->user_id)
                                         <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
                                       @endif
-                                      @if(Auth::user()->id == $comment->user_id)
+                                      @if($currentUser->id == $comment->user_id)
                                         <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
                                       @endif
                                     </ul>
                                   </div>
                                   @endif
-                                    <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
+                                    <a class="SubCommentName">{{ $comment->getUser($comment->user_id)->name }}</a>
                                     <p class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</p>
                                       <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
                                         <textarea class="form-control" name="comment" id="comment_{{$post->id}}_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
@@ -202,7 +202,7 @@ margin-left: -13px;}
                                   </div>
                                   <div class="comment-meta reply-1 cmt-left-margin">
                                     <span id="cmt_like_{{$comment->id}}" >
-                                      @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
+                                      @if( isset($commentLikesCount[$comment->id]) &&  is_object($currentUser) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser->id]))
                                            <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
                                            <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
                                       @else
@@ -211,7 +211,7 @@ margin-left: -13px;}
                                       @endif
                                     </span>
                                    <span class="mrgn_5_left">
-                                    @if(is_object(Auth::user()))
+                                    @if(is_object($currentUser))
                                       <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$post->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
                                     @else
                                       <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
@@ -229,7 +229,7 @@ margin-left: -13px;}
                                 </div>
                               </div>
                               @if(count( $comment->children ) > 0)
-                                @include('discussion.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'user' => $user])
+                                @include('discussion.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'currentUser' => $currentUser])
                               @endif
                             @endforeach
                           @endif

@@ -7,7 +7,7 @@
   <link href="{{asset('css/index_new.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{asset('css/hover.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{asset('css/themify-icons/themify-icons.css?ver=1.0')}}" rel="stylesheet"/>
-  <!-- <link href="{{asset('css/animate.min.css?ver=1.0')}}" rel="stylesheet"/> -->
+
   <style>
 .divide-nav{
   background-color:#151B54;
@@ -522,6 +522,7 @@ font-size: 20px;
   @include('footer.footer')
 <script>
   $(document).ready(function() {
+
     var showChar = 500;
     var ellipsestext = "...";
     var moretext = "<br /> Read More";
@@ -554,7 +555,6 @@ font-size: 20px;
     return false;
   });
   });
-
 
 </script>
 

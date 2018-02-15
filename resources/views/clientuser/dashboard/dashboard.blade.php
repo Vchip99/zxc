@@ -70,7 +70,7 @@
           @if(!empty(Auth::guard('clientuser')->user()->photo))
             <img src="{{ asset(Auth::guard('clientuser')->user()->photo)}}" class="img-circle" alt="User Image" >
           @else
-            <img src="{{ asset('images/user.png')}}" class="img-circle" alt="User Image">
+            <img src="{{ asset('images/user1.png')}}" class="img-circle" alt="User Image">
           @endif
           </a>
         </div>

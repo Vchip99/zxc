@@ -179,11 +179,7 @@ color: #b6b6b6;
                         </p>
                         <figcaption class="blog-by">
                           <span>
-                            @if(!empty($blog->user->photo) && is_file($blog->user->photo) || (!empty($blog->user->photo) && false == preg_match('/userStorage/',$blog->user->photo)))
-                              <img src="{{ asset($blog->user->photo)}} " class="img-circle" alt="User Image">
-                            @else
-                              <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
-                            @endif
+                            <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
                           </span>
                           <span class="username">{{$blog->author}}</span>
                           <span class="date"><i class="fa fa-calendar-o"></i><span> {{ $blog->created_at->format('M d , Y') }}</span></span>

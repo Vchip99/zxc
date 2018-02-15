@@ -6,6 +6,15 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('/', 'HomeController@home');
 	Route::get('/home', 'HomeController@home');
 
+	// chat
+	Route::post('sendMessage', 'ChatController@sendMessage');
+	Route::post('privateChat', 'ChatController@privateChat');
+	Route::post('showChatUsers', 'ChatController@showChatUsers');
+	Route::post('loadChatUsers', 'ChatController@loadChatUsers');
+	Route::post('checkOnlineUsers', 'ChatController@checkOnlineUsers');
+	Route::post('readChatMessages', 'ChatController@readChatMessages');
+	Route::post('checkDashboardOnlineUsers', 'ChatController@checkOnlineUsers');
+
 	// OAuth Routes
 	Route::get('/auth/{provider}', 'SocialiteController@redirectToProvider');
 	Route::get('/auth/{provider}/callback', 'SocialiteController@handleProviderCallback');
@@ -524,6 +533,10 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('myNotifications', 'AccountController@notifications');
 	Route::get('adminMessages/{year?}/{month?}', 'AccountController@adminMessages');
 	Route::get('downloadExcelResult', 'AccountController@downloadExcelResult');
+	Route::get('allChatMessages', 'AccountController@allChatMessages');
+	Route::post('dashboardPrivateChat', 'AccountController@dashboardPrivateChat');
+	Route::post('dashboardSendMessage', 'AccountController@dashboardSendMessage');
+
 
 	// AssignmentSubject
 	Route::get('manageAssignmentSubject', 'AssignmentSubjectController@show');

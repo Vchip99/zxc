@@ -12,7 +12,7 @@ use App\Models\RegisterProject;
 use App\Models\VkitProjectSubCommentLike;
 use App\Models\VkitProjectCommentLike;
 use App\Models\AllSubCommentLike;
-use DB, Auth, Session;
+use DB, Auth, Session, Cache;
 use Validator, Redirect,Hash;
 use App\Libraries\InputSanitise;
 use App\Models\VkitProjectLike;
@@ -47,8 +47,18 @@ class VkitController extends Controller
      *  show vkits projects
      */
     protected function show(Request $request){
-        $projects = VkitProject::paginate(12);
-        $vkitCategories = VkitCategory::getProjectCategoriesAssociatedWithProject();
+        if(empty($request->getQueryString())){
+            $page = 'page=1';
+        } else {
+            $page = $request->getQueryString();
+        }
+        $projects = Cache::remember('vchip:projects-'.$page,60, function() {
+            return VkitProject::paginate(12);
+        });
+
+        $vkitCategories= Cache::remember('vchip:vkitCategories',60, function() {
+            return VkitCategory::getProjectCategoriesAssociatedWithProject();
+        });
         $date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
         return view('vkits.vkits', compact('projects', 'vkitCategories', 'ads'));
@@ -58,24 +68,27 @@ class VkitController extends Controller
      *  show vkits project by Id
      */
     protected function vkitproject($id,$subcommentId=NULL){
-        $project = VkitProject::find(json_decode($id));
+        $project = Cache::remember('vchip:project-'.$id,60, function() use ($id){
+            return VkitProject::find(json_decode($id));
+        });
         if(is_object($project)){
-            $projects = VkitProject::all();
-            $user = new User;
+            $projects = Cache::remember('vchip:projects',60, function() {
+                return VkitProject::all();
+            });
             $comments = VkitProjectComment::where('vkit_project_id', $id)->orderBy('id', 'desc')->get();
 
             $registeredProjectIds = $this->getRegisteredProjectIds();
             $likesCount = VkitProjectLike::getLikesByVkitProjectId($id);
             $commentLikesCount = VkitProjectCommentLike::getLikesByVkitProjectId($id);
             $subcommentLikesCount = VkitProjectSubCommentLike::getLikesByVkitProjectId($id);
-            if(is_object(Auth::user())){
-                $currentUser = Auth::user()->id;
+            $currentUser = Auth::user();
+            if(is_object($currentUser)){
                 if($id > 0 || $subcommentId > 0){
                     DB::beginTransaction();
                     try
                     {
                         if($id > 0 && $subcommentId == NULL){
-                            $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINVKITPROJECT,$id,$currentUser);
+                            $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINVKITPROJECT,$id,$currentUser->id);
                             if(is_object($readNotification)){
                                 DB::commit();
                             }
@@ -93,9 +106,9 @@ class VkitController extends Controller
                     Session::set('show_subcomment_area', 0);
                 }
             } else {
-                $currentUser = 0;
+                $currentUser = NULL;
             }
-            return view('vkits.vkitproject', compact('project', 'projects', 'comments', 'user', 'registeredProjectIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
+            return view('vkits.vkitproject', compact('project', 'projects', 'comments', 'registeredProjectIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
         }
         return Redirect::to('vkits');
     }
@@ -107,7 +120,9 @@ class VkitController extends Controller
         $categoryId = $request->get('id');
         $userId = $request->get('userId');
         if(isset($categoryId) && empty($userId)){
-            return VkitProject::getVkitProjectsByCategoryId($categoryId);
+            return Cache::remember('vchip:projects:cat-'.$categoryId, 60, function() use ($categoryId){
+                return VkitProject::getVkitProjectsByCategoryId($categoryId);
+            });
         } else {
             return VkitProject::getRegisteredVkitProjectsByUserIdByCategoryId($userId, $categoryId);
         }
@@ -316,12 +331,12 @@ class VkitController extends Controller
             $videoComments['comments'][$comment->id]['id'] = $comment->id;
             $videoComments['comments'][$comment->id]['vkit_project_id'] = $comment->vkit_project_id;
             $videoComments['comments'][$comment->id]['user_id'] = $comment->user_id;
-            $videoComments['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $videoComments['comments'][$comment->id]['user_name'] = $comment->getUser($comment->user_id)->name;
             $videoComments['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
-            $videoComments['comments'][$comment->id]['user_image'] = $comment->user->photo;
-            if(is_file($comment->user->photo) && true == preg_match('/userStorage/',$comment->user->photo)){
+            $videoComments['comments'][$comment->id]['user_image'] = $comment->getUser($comment->user_id)->photo;
+            if(is_file($comment->getUser($comment->user_id)->photo) && true == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)){
                 $isImageExist = 'system';
-            } else if(!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)){
+            } else if(!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)){
                 $isImageExist = 'other';
             } else {
                 $isImageExist = 'false';
@@ -348,13 +363,13 @@ class VkitController extends Controller
             $videoChildComments[$subComment->id]['id'] = $subComment->id;
             $videoChildComments[$subComment->id]['vkit_project_id'] = $subComment->vkit_project_id;
             $videoChildComments[$subComment->id]['vkit_project_comment_id'] = $subComment->vkit_project_comment_id;
-            $videoChildComments[$subComment->id]['user_name'] = $subComment->user->name;
+            $videoChildComments[$subComment->id]['user_name'] = $subComment->getUser($subComment->user_id)->name;
             $videoChildComments[$subComment->id]['user_id'] = $subComment->user_id;
             $videoChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
-            $videoChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
-            if(is_file($subComment->user->photo) && true == preg_match('/userStorage/',$subComment->user->photo)){
+            $videoChildComments[$subComment->id]['user_image'] = $subComment->getUser($subComment->user_id)->photo;
+            if(is_file($subComment->getUser($subComment->user_id)->photo) && true == preg_match('/userStorage/',$subComment->getUser($subComment->user_id)->photo)){
                 $isImageExist = 'system';
-            } else if(!empty($subComment->user->photo) && false == preg_match('/userStorage/',$subComment->user->photo)){
+            } else if(!empty($subComment->getUser($subComment->user_id)->photo) && false == preg_match('/userStorage/',$subComment->getUser($subComment->user_id)->photo)){
                 $isImageExist = 'other';
             } else {
                 $isImageExist = 'false';

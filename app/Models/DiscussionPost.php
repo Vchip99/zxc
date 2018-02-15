@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Models\DiscussionComment;
-use DB;
+use DB, Cache;
 use App\Models\DiscussionCommentLike;
 use App\Models\DiscussionPostLike;
 use App\Models\User;
@@ -91,6 +91,12 @@ class DiscussionPost extends Model
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getUser($userId){
+        return Cache::remember('vchip:user-'.$userId,30, function() use($userId){
+            return User::find($userId);
+        });
     }
 
     public function deleteCommantsAndSubComments(){

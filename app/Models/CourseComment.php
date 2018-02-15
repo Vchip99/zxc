@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\CourseSubComment;
 use App\Libraries\InputSanitise;
 use App\Models\CourseCommentLike;
-use Auth;
+use Auth,Cache;
 
 class CourseComment extends Model
 {
@@ -43,6 +43,12 @@ class CourseComment extends Model
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getUser($userId){
+        return Cache::remember('vchip:user-'.$userId,30, function() use($userId){
+            return User::find($userId);
+        });
     }
 
     protected static function deleteCourseCommentsByUserId($userId){

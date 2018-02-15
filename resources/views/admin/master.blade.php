@@ -63,7 +63,7 @@
       <div class="user-panel">
         <div class="pull-left image">
         <a href="">
-          <img src="{{ asset('images/user.png')}}" class="img-circle" alt="User Image">
+          <img src="{{ asset('images/user1.png')}}" class="img-circle" alt="User Image">
         </a>
         </div>
         <div class="pull-left info">

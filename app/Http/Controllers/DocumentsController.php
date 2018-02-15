@@ -9,7 +9,7 @@ use App\Models\RegisterDocuments;
 use App\Models\RegisterFavouriteDocuments;
 use App\Models\ReadNotification;
 use App\Models\Notification;
-use Auth,Hash,DB;
+use Auth,Hash,DB,Cache;
 use App\Models\Add;
 
 class DocumentsController extends Controller
@@ -31,8 +31,18 @@ class DocumentsController extends Controller
     protected function show(Request $request, $id=NULL){
         $registeredDocIds = [];
         $favouriteDocIds = [];
-        $documents = DocumentsDoc::getDocumentsAssociatedWithCategory();
-        $documentsCategories = DocumentsCategory::getDocumentsCategoriesAssociatedWithDocs();
+        if(empty($request->getQueryString())){
+            $page = 'page=1';
+        } else {
+            $page = $request->getQueryString();
+        }
+        $documents = Cache::remember('vchip:documents-'.$page,60, function() {
+            return DocumentsDoc::getDocumentsAssociatedWithCategory();
+        });
+
+        $documentsCategories = Cache::remember('vchip:documentsCategories',60, function() {
+            return DocumentsCategory::getDocumentsCategoriesAssociatedWithDocs();
+        });
         $registeredDocuments = $this->getRegisteredDocumentIds();
         $favouriteDocIds = $this->getFavouritedDocumentIds();
         if(is_object(Auth::user()) && $id > 0){
@@ -64,7 +74,9 @@ class DocumentsController extends Controller
         $categoryId = $request->get('id');
         $userId = $request->get('user_id');
         if(isset($categoryId) && empty($userId)){
-            $result['documents'] = DocumentsDoc::getDocumentsByCategoryId($categoryId);
+            $result['documents'] = Cache::remember('vchip:documents:cat-'.$categoryId,60, function() use ($categoryId){
+                return DocumentsDoc::getDocumentsByCategoryId($categoryId);
+            });
             $result['registeredDocuments'] = [];
             $result['favouriteDocIds'] = [];
         } else {

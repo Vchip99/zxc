@@ -100,7 +100,7 @@
 	        </div>
 			<div class="user-pic ">
 				<input type="hidden" name="mode"  id="mode" value=""/>
-				<img src="{{ asset('images/user/user.png') }}" class="img-responsive" alt="user" />
+				<img src="{{ asset('images/user/user1.png') }}" class="img-responsive" alt="user" />
 				<br/>
 				<div class="form-group">
 				<span><b>Name :</b>{{Auth::user()->name}}</span><br/>

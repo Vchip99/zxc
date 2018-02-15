@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Models\Blog;
 use App\Models\User;
-use Auth;
+use Auth, Cache;
 use App\Models\PlacementProcessSubCommentLike;
 
 class PlacementProcessSubComment extends Model
@@ -53,6 +53,12 @@ class PlacementProcessSubComment extends Model
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getUser($userId){
+        return Cache::remember('vchip:user-'.$userId,30, function() use($userId){
+            return User::find($userId);
+        });
     }
 
     public function deleteLikes(){

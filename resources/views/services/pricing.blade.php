@@ -157,7 +157,7 @@
                       <li class="list-group-item" style="margin-top: 13px;">Online test series</li>
                       <li class="list-group-item">Online Courses</li>
                       <li class="list-group-item">Notification</li>
-                      <li class="list-group-item">Admin massage</li>
+                      <li class="list-group-item">Admin message</li>
                       <li class="list-group-item">Assignment</li>
                       <li class="list-group-item">Payment Gateway</li>
                       <li class="list-group-item">Dashboard for students</li>
@@ -181,7 +181,7 @@
                       <li class="list-group-item">Online test series</li>
                       <li class="list-group-item">Online Courses</li>
                       <li class="list-group-item">Notification</li>
-                      <li class="list-group-item">Admin massage</li>
+                      <li class="list-group-item">Admin message</li>
                       <li class="list-group-item">Assignment</li>
                       <li class="list-group-item">Payment Gateway</li>
                       <li class="list-group-item">Dashboard for students</li>
@@ -207,7 +207,7 @@
                       <li class="list-group-item">Online test series</li>
                       <li class="list-group-item">Online Courses</li>
                       <li class="list-group-item">Notification</li>
-                      <li class="list-group-item">Admin massage</li>
+                      <li class="list-group-item">Admin message</li>
                       <li class="list-group-item">Assignment</li>
                       <li class="list-group-item">Payment Gateway</li>
                       <li class="list-group-item">Dashboard for students</li>
@@ -235,7 +235,7 @@
                           <li class="list-group-item">Online test series</li>
                           <li class="list-group-item">Online Courses</li>
                           <li class="list-group-item">Notification</li>
-                          <li class="list-group-item">Admin massage</li>
+                          <li class="list-group-item">Admin message</li>
                           <li class="list-group-item">Assignment</li>
                           <li class="list-group-item">Payment Gateway</li>
                           <li class="list-group-item">Dashboard for students</li>

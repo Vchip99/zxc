@@ -8,6 +8,7 @@ use App\Models\Blog;
 use App\Models\User;
 use App\Models\BlogSubComment;
 use App\Models\BlogCommentLike;
+use Cache;
 
 class BlogComment extends Model
 {
@@ -55,6 +56,12 @@ class BlogComment extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getUser($userId){
+        return Cache::remember('vchip:user-'.$userId,30, function() use($userId){
+            return User::find($userId);
+        });
     }
 
     public function deleteLikes(){

@@ -400,7 +400,7 @@ ul.table_list{ margin-left: -30px; }
                           <div class="comment-meta">
                             @if(is_object($companyDetails))
                             <span id="like_{{$companyDetails->placement_company_id}}" class="first-like">
-                              @if( isset($likesCount[$companyDetails->placement_company_id]) && isset($likesCount[$companyDetails->placement_company_id]['user_id'][$currentUser]))
+                              @if( isset($likesCount[$companyDetails->placement_company_id]) && is_object($currentUser) && isset($likesCount[$companyDetails->placement_company_id]['user_id'][$currentUser->id]))
                                    <i id="company_like_{{$companyDetails->placement_company_id}}" data-company_id="{{$companyDetails->placement_company_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>
                                    <span id="like1-bs3">{{count($likesCount[$companyDetails->placement_company_id]['like_id'])}}</span>
                               @else
@@ -411,7 +411,7 @@ ul.table_list{ margin-left: -30px; }
                             @endif
                             <span class="mrgn_5_left">
                             <i class="fa fa-comment-o" aria-hidden="true"></i>
-                              @if(is_object(Auth::user()))
+                              @if(is_object($currentUser))
                                 <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{(is_object($companyDetails))?$companyDetails->id:NULL}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
                               @else
                                 <a class="your-cmt" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">Comment</a>
@@ -444,28 +444,28 @@ ul.table_list{ margin-left: -30px; }
                                       @if(count( $comments) > 0)
                                         @foreach($comments as $comment)
                                           <div class="item" id="showComment_{{$comment->id}}">
-                                            @if(is_file($comment->user->photo) || (!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)))
-                                              <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
+                                            @if(is_file($comment->getUser($comment->user_id)->photo) || (!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)))
+                                              <img src="{{ asset($comment->getUser($comment->user_id)->photo)}} " class="img-circle" alt="User Image">
                                             @else
                                               <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
                                             @endif
                                             <div class="message">
-                                              @if(is_object(Auth::user()) && (Auth::user()->id == $comment->user_id))
+                                              @if(is_object($currentUser) && ($currentUser->id == $comment->user_id))
                                               <div class="dropdown pull-right">
                                                 <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                                   <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                                 </button>
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                                  @if(Auth::user()->id == $comment->user_id)
+                                                  @if($currentUser->id == $comment->user_id)
                                                     <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);" data-comment_id="{{$comment->id}}" data-company_id="{{$companyDetails->placement_company_id}}">Delete</a></li>
                                                   @endif
-                                                  @if(Auth::user()->id == $comment->user_id)
+                                                  @if($currentUser->id == $comment->user_id)
                                                     <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
                                                   @endif
                                                 </ul>
                                               </div>
                                               @endif
-                                                <a class="SubCommentName">{{ $comment->user->name }}</a>
+                                                <a class="SubCommentName">{{ $comment->getUser($comment->user_id)->name }}</a>
                                                 <div class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
                                                   <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
                                                     <textarea class="form-control" name="comment" id="comment_{{$comment->id}}" rows="3" >{!! $comment->body !!}</textarea>
@@ -475,7 +475,7 @@ ul.table_list{ margin-left: -30px; }
                                               </div>
                                               <div class="comment-meta reply-1">
                                                 <span id="cmt_like_{{$comment->id}}" >
-                                                  @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
+                                                  @if( isset($commentLikesCount[$comment->id]) &&  is_object($currentUser) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser->id]))
                                                        <i id="comment_like_{{$comment->id}}" data-company_id="{{$companyDetails->placement_company_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
                                                        <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
                                                   @else
@@ -484,7 +484,7 @@ ul.table_list{ margin-left: -30px; }
                                                   @endif
                                                 </span>
                                                <span class="mrgn_5_left">
-                                                @if(is_object(Auth::user()))
+                                                @if(is_object($currentUser))
                                                   <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
                                                 @else
                                                   <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
@@ -502,7 +502,7 @@ ul.table_list{ margin-left: -30px; }
                                             </div>
                                           </div>
                                           @if(count( $comment->children ) > 0)
-                                            @include('placement.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'companyId' => $companyDetails->placement_company_id])
+                                            @include('placement.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'companyId' => $companyDetails->placement_company_id, 'currentUser' => $currentUser])
                                           @endif
                                         @endforeach
                                       @endif
@@ -516,7 +516,7 @@ ul.table_list{ margin-left: -30px; }
                       </div>
                     </div>
                   </div>
-                  <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::user()))?Auth::user()->id:NULL}}">
+                  <input type="hidden" name="user_id" id="user_id" value="{{ (is_object($currentUser))?$currentUser->id:NULL}}">
                   <!-- end pp -->
                   <div id="dropdown1-tab" class="tab-pane fade ">
                       <div class="panel panel-default clickable">
@@ -528,13 +528,13 @@ ul.table_list{ margin-left: -30px; }
                                 </p>
                                 <figcaption class="blog-by">
                                   <span>
-                                    @if(!empty($placementExperiance->user->photo))
-                                      <img src="{{ asset($placementExperiance->user->photo)}} " class="img-circle" alt="User Image">
+                                    @if(!empty($placementExperiance->getUser($placementExperiance->user_id)->photo))
+                                      <img src="{{ asset($placementExperiance->getUser($placementExperiance->user_id)->photo)}} " class="img-circle" alt="User Image">
                                     @else
                                       <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
                                     @endif
                                   </span>
-                                  <span class="username">{{$placementExperiance->user->name}}</span>
+                                  <span class="username">{{$placementExperiance->getUser($placementExperiance->user_id)->name}}</span>
                                   <span class="date"><i class="fa fa-calendar-o"></i><span> {{ $placementExperiance->created_at->format('M d , Y') }}</span></span>
                                 </figcaption>
                               </div>
@@ -728,46 +728,6 @@ ul.table_list{ margin-left: -30px; }
             @endif
           </select>
         </div>
-        <!-- <div class="advertisement-area">
-            <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
-        </div>
-        <br/>
-        <div class="add-1">
-          <div class="course-box advertisement">
-           <a href="http://www.gatethedirection.com/" target="_blank"  title="Gate The Direction">
-           <div class="caption">
-                <p class=" btn btn-default">View Details</p>
-            </div>
-            </a>
-            <a class="img-course-box" href="v-kit-project.html">
-              <img src="{{ asset('images/logo/gatetheDirection.png') }}" alt="Gate The Direction"  class="img-responsive" />
-            </a>
-            <div class="course-box-content">
-              <h4 class="course-box-title" title="GATE THE DIRECTION" data-toggle="tooltip" data-placement="bottom">
-                <a href="http://localhost/EDUCATION/final-website(php)/gate/index.php"  class="add-tital ellipsed">GATE THE DIRECTION</a>
-              </h4>
-              <p class="ellipsed"> "Started by IITain so you become IITain"</p>
-            </div>
-          </div>
-         </div>
-        <div class="add-2">
-          <div class="course-box advertisement">
-            <a href="http://kaizenn.org/" target="_blank"  title="kaizen coaching classes">
-            <div class="caption">
-                <p class=" btn btn-default">View Details</p>
-            </div>
-            </a>
-            <a class="img-course-box" href="http://kaizenn.org/">
-              <img src="{{ asset('images/logo/kaizen.jpg') }}" alt="Kaizen classes"  class="img-responsive" />
-            </a>
-            <div class="course-box-content">
-              <h4 class="course-box-title" title="kaizen coaching classes" data-toggle="tooltip" data-placement="bottom">
-                <a href="http://kaizenn.org/" class="add-tital ellipsed">KAIZEN COACHING CLASSES</a>
-              </h4>
-              <p class="ellipsed"> "Leading the success in "Banking Exams""</p>
-            </div>
-          </div>
-        </div> -->
         <div class="advertisement-area">
             <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
         </div>
@@ -853,7 +813,19 @@ ul.table_list{ margin-left: -30px; }
   <script type="text/javascript">
     $( document ).ready(function() {
       $("[rel='tooltip']").tooltip();
-
+      if(window.location.hash){
+        $.each($('ul.nav-tabs-lg > li > a'), function(idx, obj){
+          if(window.location.hash == $(obj).attr('href')){
+            $(obj).attr('aria-expanded', true);
+            $(obj).parent().addClass('active');
+            $(obj).addClass('active in')
+          } else {
+            $(obj).attr('aria-expanded', false);
+            $(obj).parent().removeClass('active');
+            $(obj).removeClass('active in')
+          }
+        });
+      }
       $('.advertisement').hover(
           function(){
               $(this).find('.caption').slideDown(250); //.fadeIn(250)
@@ -1157,11 +1129,6 @@ ul.table_list{ margin-left: -30px; }
 
   function showSubComments(subcomments, commentchatDiv, subcommentLikesCount, userId, commentUserId){
     if(false == $.isEmptyObject(subcomments)){
-      // arraySubComments = [];
-      // $.each(subcomments, function(idx, obj) {
-      //   arraySubComments[idx] = obj;
-      // });
-      // var sortedArray = arraySubComments.reverse();
       $.each(subcomments, function(idx, obj) {
         if(false == $.isEmptyObject(obj)){
           var mainSubCommentDiv = document.createElement('div');

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
-use DB;
+use DB,Cache;
 use App\Models\BlogComment;
 use App\Models\BlogCommentLike;
 use App\Models\BlogCategory;
@@ -81,6 +81,12 @@ class Blog extends Model
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getUser($userId){
+        return Cache::remember('vchip:user-'.$userId,30, function() use($userId){
+            return User::find($userId);
+        });
     }
 
     public function deleteCommantsAndSubComments(){

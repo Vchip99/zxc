@@ -18,7 +18,7 @@ use App\Models\ZeroToHero;
 use App\Models\Area;
 use App\Models\Notification;
 use App\Models\ReadNotification;
-use View,DB,Session,Redirect, Auth,Validator;
+use View,DB,Session,Redirect, Auth,Validator,Cache;
 use App\Mail\EmailVerification;
 use App\Mail\NewRegisteration;
 use App\Mail\SubscribedUserVerification;
@@ -745,7 +745,9 @@ class HomeController extends Controller
     }
 
     public function virtualplacementdrive(){
-        $virtualplacementdrive = VirtualPlacementDrive::first();
+        $virtualplacementdrive = Cache::remember('vchip:virtualplacementdrive',60, function() {
+            return VirtualPlacementDrive::first();
+        });
         return view('virtualPlacementDrive.virtualplacementdrive', compact('virtualplacementdrive'));
     }
 
@@ -1039,9 +1041,13 @@ class HomeController extends Controller
      *  show career
      */
     protected function heros(Request $request,$id=NULL){
-        $designations = Designation::all();
         $courses = [];
-        $heros = ZeroToHero::all();
+        $designations = Cache::remember('vchip:designations',60, function() {
+            return Designation::all();
+        });
+        $heros = Cache::remember('vchip:heros',60, function() {
+            return ZeroToHero::all();
+        });
         if(is_object(Auth::user())){
             $currentUser = Auth::user()->id;
             if($id > 0 ){
@@ -1162,7 +1168,9 @@ class HomeController extends Controller
 
     protected function getAreasByDesignation(Request $request){
         $designationId   = InputSanitise::inputInt($request->get('designation_id'));
-        return Area::getAreasByDesignation($designationId);
+        return Cache::remember('vchip:areas:designationId-'.$designationId,60, function() use ($designationId){
+            return Area::getAreasByDesignation($designationId);
+        });
     }
 
     protected function getHerosBySearchArray(Request $request){

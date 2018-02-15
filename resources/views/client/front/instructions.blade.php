@@ -96,7 +96,7 @@ body{font-family:  Century Gothic, serif}
 			                    <h3 class="panel-title text-center">USER</h3>
 			                </div>
 							<div class="user-pic ">
-								<img src="{{ asset('images/user/user.png') }}" class="img-responsive" alt="user" />
+								<img src="{{ asset('images/user/user1.png') }}" class="img-responsive" alt="user" />
 								<br/>
 								<div class="form-group">
 									@if(is_object(Auth::guard('clientuser')->user()))

@@ -8,7 +8,7 @@ use App\Models\DiscussionPost;
 use App\Models\DiscussionSubComment;
 use App\Models\User;
 use App\Models\DiscussionCommentLike;
-use Auth;
+use Auth,Cache;
 
 class DiscussionComment extends Model
 {
@@ -67,6 +67,11 @@ class DiscussionComment extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getUser($userId){
+        return Cache::remember('vchip:user-'.$userId,30, function() use($userId){
+            return User::find($userId);
+        });
+    }
 
     public function commentLikes(){
         return $this->hasMany(DiscussionCommentLike::class, 'discussion_comment_id');

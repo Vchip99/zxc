@@ -9,7 +9,7 @@ use App\Models\MotivationalSpeechCategory;
 use App\Models\MotivationalSpeechVideo;
 use App\Models\MotivationalSpeechDetail;
 use App\Mail\MotivationalSpeechQuery;
-use DB, Auth, Session;
+use DB, Auth, Session, Cache;
 use Validator, Redirect,Hash;
 use App\Libraries\InputSanitise;
 use App\Models\Add;
@@ -27,8 +27,17 @@ class MotivationalSpeechController extends Controller
     }
 
     protected function show(Request $request){
-    	$motivationalSpeechDetails = MotivationalSpeechDetail::paginate();
-    	$motivationalSpeechCategories = MotivationalSpeechCategory::all();
+        if(empty($request->getQueryString())){
+            $page = 'page=1';
+        } else {
+            $page = $request->getQueryString();
+        }
+        $motivationalSpeechDetails = Cache::remember('vchip:motivationalSpeech-'.$page,60, function() {
+            return MotivationalSpeechDetail::paginate();
+        });
+        $motivationalSpeechCategories = Cache::remember('vchip:motivationalSpeechCategories',60, function() {
+            return MotivationalSpeechCategory::all();
+        });
         $date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
     	return view('motivationalSpeech.motivationalSpeeches', compact('motivationalSpeechDetails', 'motivationalSpeechCategories', 'ads'));
@@ -36,10 +45,16 @@ class MotivationalSpeechController extends Controller
 
     protected function motivationalSpeechDetails($id){
     	$id = json_decode($id);
-    	$motivationalSpeechDetail = MotivationalSpeechDetail::find($id);
+        $motivationalSpeechDetail = Cache::remember('vchip:motivationalSpeech-'.$id,60, function() use ($id){
+            return MotivationalSpeechDetail::find($id);
+        });
     	if(is_object($motivationalSpeechDetail)){
-            $motivationalSpeechDetails = MotivationalSpeechDetail::all();
-            $videos = MotivationalSpeechVideo::where('motivational_speech_detail_id', $motivationalSpeechDetail->id)->get();
+            $motivationalSpeechDetails = Cache::remember('vchip:motivationalSpeechs',60, function(){
+                return MotivationalSpeechDetail::all();
+            });
+            $videos = Cache::remember('vchip:videos:speechId-'.$id,60, function() use ($id){
+                return MotivationalSpeechVideo::where('motivational_speech_detail_id', $id)->get();
+            });
     		return view('motivationalSpeech.motivationalSpeechDetails', compact('motivationalSpeechDetail', 'motivationalSpeechDetails', 'videos'));
     	}
     	return Redirect::to('motivationalspeech');

@@ -48,10 +48,10 @@
   @yield('footer')
 <script type="text/javascript">
   $(document).ready(function(){
-        setTimeout(function() {
-          $('.alert-success').fadeOut('fast');
-        }, 10000);
-    });
+    setTimeout(function() {
+      $('.alert-success').fadeOut('fast');
+    }, 10000);
+  });
 
 </script>
 </body>

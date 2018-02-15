@@ -175,8 +175,8 @@ border-radius: 0px!important
   </div>
 </nav>
 <input type="hidden" name="user_id" id="user_id"
-  @if(is_object(Auth::user()))
-    value="{{Auth::user()->id}}"
+  @if(is_object($currentUser))
+    value="{{$currentUser->id}}"
   @endif
 >
 <section id="" class="v_container v_bg_grey mrgn_50_top">
@@ -223,7 +223,7 @@ border-radius: 0px!important
         <div class="">
           <div class="comment-meta">
             <span id="like_{{$blog->id}}"  class="first-like">
-              @if( isset($likesCount[$blog->id]) && isset($likesCount[$blog->id]['user_id'][$currentUser]))
+              @if( isset($likesCount[$blog->id]) && is_object($currentUser) && isset($likesCount[$blog->id]['user_id'][$currentUser->id]))
                    <i id="blog_like_{{$blog->id}}" data-blog_id="{{$blog->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>
                    <span id="like1-bs3">{{count($likesCount[$blog->id]['like_id'])}}</span>
               @else
@@ -233,7 +233,7 @@ border-radius: 0px!important
             </span>
             <span class="mrgn_5_left">
               <i class="fa fa-comment-o" aria-hidden="true"></i>
-              @if(is_object(Auth::user()))
+              @if(is_object($currentUser))
                 <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToBlog{{$blog->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
               @else
                 <a class="your-cmt" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">Comment</a>
@@ -278,28 +278,28 @@ border-radius: 0px!important
                     @foreach($comments as $comment)
                     <div class="box-body chat" id="chat-box">
                       <div class="item" id="showComment_{{$comment->id}}">
-                        @if(!empty($comment->user->photo) && is_file($comment->user->photo) || (!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)))
-                          <img src="{{ asset($comment->user->photo)}} " class="img-circle" alt="User Image">
+                        @if(!empty($comment->getUser($comment->user_id)->photo) && is_file($comment->getUser($comment->user_id)->photo) || (!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)))
+                          <img src="{{ asset($comment->getUser($comment->user_id)->photo)}} " class="img-circle" alt="User Image">
                         @else
                           <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
                         @endif
                         <div class="message">
-                          @if(is_object(Auth::user()) && (Auth::user()->id == $comment->user_id))
+                          @if(is_object($currentUser) && ($currentUser->id == $comment->user_id))
                           <div class="dropdown pull-right">
                             <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                               <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                              @if(Auth::user()->id == $comment->user_id)
+                              @if($currentUser->id == $comment->user_id)
                                 <li><a id="{{$comment->id}}" data-blog_id="{{$blog->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
                               @endif
-                              @if(Auth::user()->id == $comment->user_id)
+                              @if($currentUser->id == $comment->user_id)
                                 <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
                               @endif
                             </ul>
                           </div>
                           @endif
-                            <a class="SubCommentName">{{ $user->find($comment->user_id)->name }}</a>
+                            <a class="SubCommentName">{{ $comment->getUser($comment->user_id)->name }}</a>
                             <div class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</div>
                               <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
                                 <textarea class="form-control" name="comment" id="comment_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
@@ -328,7 +328,7 @@ border-radius: 0px!important
                           </div>
                           <div class="comment-meta reply-1">
                             <span id="cmt_like_{{$comment->id}}" >
-                              @if( isset($commentLikesCount[$comment->id]) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser]))
+                              @if( isset($commentLikesCount[$comment->id]) && is_object($currentUser) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser->id]))
                                    <i id="comment_like_{{$comment->id}}" data-blog_id="{{$comment->blog_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
                                    <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
                               @else
@@ -337,7 +337,7 @@ border-radius: 0px!important
                               @endif
                             </span>
                            <span class="mrgn_5_left">
-                            @if(is_object(Auth::user()))
+                            @if(is_object($currentUser))
                               <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$blog->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
                             @else
                               <a class="" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
@@ -355,7 +355,7 @@ border-radius: 0px!important
                         </div>
                       </div>
                       @if(count( $comment->children ) > 0)
-                        @include('blog.child_comments', ['comments' => $comment->children, 'parent' => $comment->id, 'user' => $user])
+                        @include('blog.child_comments', ['comments' => $comment->children, 'parent' => $comment->id, 'currentUser' => $currentUser])
                       @endif
                     </div>
                     @endforeach

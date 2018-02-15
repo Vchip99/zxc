@@ -11,7 +11,7 @@ use App\Libraries\InputSanitise;
 use App\Models\CourseComment;
 use App\Models\User;
 use App\Models\RegisterOnlineCourse;
-use DB, Session;
+use DB, Session, Cache;
 use Validator, Redirect, Auth;
 use App\Models\CourseSubComment;
 use App\Models\CourseVideoLike;
@@ -49,9 +49,20 @@ class CourseController extends Controller
      */
     protected function courses(Request $request){
         $courseIds = [];
-        $courseCategories = CourseCategory::getCategoriesAssocaitedWithVideos();
-        $courses = CourseCourse::getCourseAssocaitedWithVideos();
-        $courseVideoCount = $this->getVideoCount($courses);
+        $courseCategories = Cache::remember('vchip:courseCats',60, function() {
+            return CourseCategory::getCategoriesAssocaitedWithVideos();
+        });
+        if(empty($request->getQueryString())){
+            $page = 'page=1';
+        } else {
+            $page = $request->getQueryString();
+        }
+        $courses = Cache::remember('vchip:courses-'.$page,60, function() {
+            return CourseCourse::getCourseAssocaitedWithVideos();
+        });
+        $courseVideoCount = Cache::remember('vchip:courseVideoCnt-'.$page,60, function() use ($courses){
+            return $this->getVideoCount($courses);
+        });
         $date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
         return view('courses.courses', compact('courseCategories', 'courses', 'courseVideoCount', 'ads'));
@@ -66,7 +77,9 @@ class CourseController extends Controller
         $subcategoryId = $request->get('subcatId');
         $userId = $request->get('userId');
         if(isset($categoryId) && isset($subcategoryId) && empty($userId)){
-            $result['courses'] = CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId);
+            $result['courses'] = Cache::remember('vchip:courses:cat-'.$categoryId.':subcat-'.$subcategoryId,30, function() use ($categoryId,$subcategoryId){
+                return CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId);
+            });
             $result['courseVideoCount'] = $this->getVideoCount($result['courses']);
         } else {
             $result['courses'] = CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId,$userId);
@@ -80,9 +93,13 @@ class CourseController extends Controller
      */
     protected function courseDetails($id){
         $courseId = json_decode(trim($id));
-        $course = CourseCourse::find($courseId);
+        $course = Cache::remember('vchip:Course-'.$courseId,30, function() use ($courseId){
+            return CourseCourse::find($courseId);
+        });
         if(is_object($course)){
-            $videos = CourseVideo::getCourseVideosByCourseId($courseId);
+            $videos = Cache::remember('vchip:videos:coursId-'.$courseId,30, function() use ($courseId){
+                return CourseVideo::getCourseVideosByCourseId($courseId);
+            });
             $isCourseRegistered = RegisterOnlineCourse::isCourseRegistered($courseId);
             return view('courses.course_details', compact('videos', 'isCourseRegistered', 'courseId', 'course'));
         }
@@ -95,22 +112,26 @@ class CourseController extends Controller
     protected function episode($id,$subcomment=NULL){
         $videoId = json_decode(trim($id));
         if(isset($videoId)){
-            $video = CourseVideo::find($videoId);
+            $video = Cache::remember('vchip:video-'.$videoId,30, function() use ($videoId){
+                return CourseVideo::find($videoId);
+            });
             if(is_object($video)){
-                $user = new User;
-                $courseVideos = CourseVideo::getCourseVideosByCourseId($video->course_id);
+                $courseId = $video->course_id;
+                $courseVideos = Cache::remember('vchip:videos:coursId-'.$courseId,30, function() use ($courseId){
+                    return CourseVideo::getCourseVideosByCourseId($courseId);
+                });
                 $comments = CourseComment::where('course_video_id', $id)->orderBy('id', 'desc')->get();
                 $likesCount = CourseVideoLike::getLikesByVideoId($videoId);
                 $commentLikesCount = CourseCommentLike::getLikesByVideoId($videoId);
                 $subcommentLikesCount = CourseSubCommentLike::getLikesByVideoId($videoId);
-                if(is_object(Auth::user())){
-                    $currentUser = Auth::user()->id;
+                $currentUser = Auth::user();
+                if(is_object($currentUser)){
                     if($videoId > 0 || $subcomment > 0){
                         DB::beginTransaction();
                         try
                         {
                             if($videoId > 0 && $subcomment == NULL){
-                                $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINCOURSEVIDEO,$videoId,$currentUser);
+                                $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINCOURSEVIDEO,$videoId,$currentUser->id);
                                 if(is_object($readNotification)){
                                     DB::commit();
                                 }
@@ -128,9 +149,9 @@ class CourseController extends Controller
                         Session::set('show_subcomment_area', 0);
                     }
                 } else {
-                    $currentUser = 0;
+                    $currentUser = NULL;
                 }
-                return view('courses.episode', compact('video', 'courseVideos', 'comments', 'user', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
+                return view('courses.episode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
             }
         }
         return Redirect::to('courses');
@@ -143,7 +164,9 @@ class CourseController extends Controller
         $id = $request->get('id');
         $userid = $request->get('userId');
         if(isset($id) && empty($userid)){
-            return CourseSubCategory::getCourseSubCategoriesByCategoryId($id);
+            return Cache::remember('vchip:coursesubcat:cat-'.$id,30, function() use ($id){
+                return CourseSubCategory::getCourseSubCategoriesByCategoryId($id);
+            });
         } else {
             return CourseSubCategory::getCourseSubCategoriesByCategoryId($id, $userid);
         }
@@ -222,7 +245,6 @@ class CourseController extends Controller
             // return back()->withErrors('something went wrong.');
         }
         // return Redirect::to('courses');
-
         return $this->getComments($videoId);
 
     }
@@ -238,12 +260,12 @@ class CourseController extends Controller
             $courseComment['comments'][$comment->id]['id'] = $comment->id;
             $courseComment['comments'][$comment->id]['course_video_id'] = $comment->course_video_id;
             $courseComment['comments'][$comment->id]['user_id'] = $comment->user_id;
-            $courseComment['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $courseComment['comments'][$comment->id]['user_name'] = $comment->getUser($comment->user_id)->name;
             $courseComment['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
-            $courseComment['comments'][$comment->id]['user_image'] = $comment->user->photo;
-            if(is_file($comment->user->photo) && true == preg_match('/userStorage/',$comment->user->photo)){
+            $courseComment['comments'][$comment->id]['user_image'] = $comment->getUser($comment->user_id)->photo;
+            if(is_file($comment->getUser($comment->user_id)->photo) && true == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)){
                 $isImageExist = 'system';
-            } else if(!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)){
+            } else if(!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)){
                 $isImageExist = 'other';
             } else {
                 $isImageExist = 'false';
@@ -270,13 +292,13 @@ class CourseController extends Controller
             $courseChildComments[$subComment->id]['id'] = $subComment->id;
             $courseChildComments[$subComment->id]['course_video_id'] = $subComment->course_video_id;
             $courseChildComments[$subComment->id]['course_comment_id'] = $subComment->course_comment_id;
-            $courseChildComments[$subComment->id]['user_name'] = $subComment->user->name;
+            $courseChildComments[$subComment->id]['user_name'] = $subComment->getUser($subComment->user_id)->name;
             $courseChildComments[$subComment->id]['user_id'] = $subComment->user_id;
             $courseChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
-            $courseChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
-            if(is_file($subComment->user->photo) && true == preg_match('/userStorage/',$subComment->user->photo)){
+            $courseChildComments[$subComment->id]['user_image'] = $subComment->getUser($subComment->user_id)->photo;
+            if(is_file($subComment->getUser($subComment->user_id)->photo) && true == preg_match('/userStorage/',$subComment->getUser($subComment->user_id)->photo)){
                 $isImageExist = 'system';
-            } else if(!empty($subComment->user->photo) && false == preg_match('/userStorage/',$subComment->user->photo)){
+            } else if(!empty($subComment->getUser($subComment->user_id)->photo) && false == preg_match('/userStorage/',$subComment->getUser($subComment->user_id)->photo)){
                 $isImageExist = 'other';
             } else {
                 $isImageExist = 'false';

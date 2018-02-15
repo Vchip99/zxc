@@ -5,7 +5,7 @@ namespace App\Http\Controllers\UserAuth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
-use Session,Redirect;
+use Session,Redirect,Cache;
 use Illuminate\Http\Request;
 
 class LoginController extends Controller
@@ -70,6 +70,7 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
+        Cache::forget('online_user-' . $this->guard()->user()->id);
         $this->guard()->logout();
 
         Session::flush();

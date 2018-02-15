@@ -132,7 +132,7 @@
                       @if(!empty($answer->student->photo))
                         <img class="direct-chat-img" src="{{ asset($answer->student->photo) }}" alt="User Image" />
                       @else
-                        <img class="direct-chat-img" src="{{ url('images/user/user.png')}}" alt="User Image" />
+                        <img class="direct-chat-img" src="{{ url('images/user/user1.png')}}" alt="User Image" />
                       @endif
                       @if(!empty($answer->answer))
                       <div class="direct-chat-text-left ">
@@ -157,7 +157,7 @@
                       @if(!empty($answer->teacher->photo))
                         <img class="direct-chat-img" src="{{ asset($answer->teacher->photo) }}" alt="User Image" />
                       @else
-                        <img class="direct-chat-img" src="{{ url('images/user/user.png')}}" alt="User Image" />
+                        <img class="direct-chat-img" src="{{ url('images/user/user1.png')}}" alt="User Image" />
                       @endif
                       @if(!empty($answer->answer))
                       <div class="direct-chat-text ">{!! $answer->answer !!}</div>

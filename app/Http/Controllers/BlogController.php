@@ -14,7 +14,7 @@ use App\Models\BlogCategory;
 use App\Models\BlogLikes;
 use App\Models\Notification;
 use App\Models\ReadNotification;
-use DB, Auth, Session;
+use DB, Auth, Session, Cache;
 use Validator, Redirect;
 use App\Models\Add;
 
@@ -45,8 +45,17 @@ class BlogController extends Controller
      *  show all blog
      */
     protected function show(Request $request){
-        $blogs = Blog::orderBy('id', 'desc')->paginate();
-        $blogCategories = BlogCategory::all();
+        if(empty($request->getQueryString())){
+            $page = 'page=1';
+        } else {
+            $page = $request->getQueryString();
+        }
+        $blogs = Cache::remember('vchip:blogs-'.$page,60, function() {
+            return Blog::orderBy('id', 'desc')->paginate();
+        });
+        $blogCategories= Cache::remember('vchip:blogCategories',60, function() {
+            return BlogCategory::all();
+        });
         $date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
         return view('blog.blog', compact('blogs', 'blogCategories', 'ads'));
@@ -61,19 +70,22 @@ class BlogController extends Controller
             $blog = Blog::find($id);
             if(is_object($blog)){
                 $comments = BlogComment::where('blog_id', $id)->orderBy('id', 'desc')->get();
-                $user = new User;
                 $commentLikesCount = BlogCommentLike::getLikesByBlogId($blog->id);
                 $subcommentLikesCount = BlogSubCommentLike::getLikesByBlogId($blog->id);
-                $blogs = Blog::orderBy('id', 'desc')->get();
-                $blogTags = BlogTag::where('blog_id', $blog->id)->get();
-                if(is_object(Auth::user())){
-                    $currentUser = Auth::user()->id;
+                $blogs = Cache::remember('vchip:blogs',60, function() {
+                    return Blog::orderBy('id', 'desc')->get();
+                });
+                $blogTags = Cache::remember('vchip:blogTags:blogId-'.$id,60, function() use ($id){
+                    BlogTag::where('blog_id', $id)->get();
+                });
+                $currentUser = Auth::user();
+                if(is_object($currentUser)){
                     if($id > 0 || $subcomment > 0){
                         DB::beginTransaction();
                         try
                         {
                             if($id > 0 && $subcomment == NULL){
-                                $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINBLOG,$id,$currentUser);
+                                $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINBLOG,$id,$currentUser->id);
                                 if(is_object($readNotification)){
                                     DB::commit();
                                 }
@@ -91,11 +103,12 @@ class BlogController extends Controller
                         Session::set('show_subcomment_area', 0);
                     }
                 } else {
-                    $currentUser = 0;
+                    $currentUser = NULL;
                 }
+
                 $likesCount = BlogLikes::getLikesByBlogId($blog->id);
 
-                return view('blog.blog_comment', compact('blog', 'blogs', 'comments', 'user', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'blogTags', 'likesCount'));
+                return view('blog.blog_comment', compact('blog', 'blogs', 'comments', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'blogTags', 'likesCount'));
             }
         }
         return Redirect::to('blog');
@@ -160,12 +173,18 @@ class BlogController extends Controller
 
         $categoryId = $request->get('id');
         if(isset($categoryId)){
-            return Blog::getBlogsByCategory($categoryId);
+            return Cache::remember('vchip:blogs:cat-'.$categoryId,60, function() use ($categoryId){
+                return Blog::getBlogsByCategory($categoryId);
+            });
         } else {
             $categoryId = $request->get('category_id');
             $page = $request->get('page');
-            $blogs = Blog::getBlogsByCategory($categoryId, $page);
-            $blogCategories = BlogCategory::all();
+            $blogs = Cache::remember('vchip:blogs:cat-'.$categoryId.':page-'.$page,60, function() use ($categoryId, $page){
+                return Blog::getBlogsByCategory($categoryId, $page);
+            });
+            $blogCategories= Cache::remember('vchip:blogCategories',60, function() {
+                return BlogCategory::all();
+            });
             return view('blog.category_blog', compact('blogs', 'blogCategories', 'categoryId'));
         }
         return [];

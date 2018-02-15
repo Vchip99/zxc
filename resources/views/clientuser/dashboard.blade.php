@@ -50,7 +50,7 @@
     <section class="sidebar">
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="{{ asset('images/user.png')}}" class="img-circle" alt="User Image">
+          <img src="{{ asset('images/user1.png')}}" class="img-circle" alt="User Image">
         </div>
         <div class="pull-left info">
           <p>{{ ucfirst(Auth::guard('clientuser')->user()->name)}}</p>
