@@ -3,6 +3,29 @@
   <section class="content-header">
     <h1> Profile </h1>
   </section>
+  <style type="text/css">
+    @media screen and (max-width: 320px) {
+      .v-container .container, .list-group .list-group-item, .col-xs-12, .col-xs-7{
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+      }
+      .col-md-offset-2, .col-xs-10{
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+      }
+    }
+
+    @media screen and (max-width: 375px) {
+      .v-container .container, .list-group .list-group-item, .col-xs-12, .col-xs-7{
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+      }
+      .col-md-offset-2, .col-xs-10{
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+      }
+    }
+  </style>
 @stop
 @section('dashboard_content')
 	<div class="content-wrapper v-container tab-content" >
@@ -142,7 +165,7 @@
               <ul class="list-group">
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                         <div class="col-xs-5 "><b>Name</b></div>
                         <div class="col-xs-7 pull-left">{{Auth::user()->name}}</div>
@@ -152,7 +175,7 @@
                 </li>
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-2" data-toggle="detail-2">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                         <div class="col-xs-5 "><b>Email</b></div>
                         <div class="col-xs-7 pull-left">{{Auth::user()->email}}</div>
@@ -162,7 +185,7 @@
                 </li>
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b>Phone</b></div>
                          <div class="col-xs-7 pull-left">{{Auth::user()->phone}}</div>
@@ -172,7 +195,7 @@
                 </li>
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b> Designation</b></div>
                          <div class="col-xs-7 ">{{$users[Auth::user()->user_type]}}</div>
@@ -183,7 +206,7 @@
                 @if(Auth::user()->college_id > 0)
                   <li class="list-group-item">
                     <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
-                      <div class="col-xs-10">
+                      <div class="col-xs-12">
                         <div class="row">
                            <div class="col-xs-5 "><b> College</b></div>
                            <div class="col-xs-7 ">{{Auth::user()->college->name}}</div>
@@ -194,7 +217,7 @@
                   @if(Auth::user()->college_dept_id > 0)
                     <li class="list-group-item">
                       <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
-                        <div class="col-xs-10">
+                        <div class="col-xs-12">
                           <div class="row">
                              <div class="col-xs-5 "><b> Department</b></div>
                              <div class="col-xs-7 ">{{Auth::user()->department->name}}</div>
@@ -206,7 +229,7 @@
                 @elseif('other' == Auth::user()->college_id)
                   <li class="list-group-item">
                     <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
-                      <div class="col-xs-10">
+                      <div class="col-xs-12">
                         <div class="row">
                            <div class="col-xs-5 "><b> Other</b></div>
                            <div class="col-xs-7 ">{{Auth::user()->other_source}}</div>
@@ -218,7 +241,7 @@
                 @if(2 == Auth::user()->user_type)
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b>Year</b></div>
                          <div class="col-xs-7 pull-left">{{Auth::user()->year}}</div>
@@ -228,7 +251,7 @@
                 </li>
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b>Roll No</b></div>
                          <div class="col-xs-7 pull-left">{{Auth::user()->roll_no}}</div>

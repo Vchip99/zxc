@@ -109,9 +109,7 @@ class UpdateClientAccessToken extends Command
                           $results = json_decode($response, true);
                           if(count($results) > 0){
                               $this->info('--------user_auth_error--------</br>');
-                              foreach($results as $key => $result){
-                                  $this->info($key.'->'.$result[0].'</br>');
-                              }
+                              $this->info(serialize($results).'</br>');
                           }
                         }
                     }

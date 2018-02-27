@@ -208,7 +208,7 @@
 					              			<div class=" panel panel-info" >
 					                			<div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">{{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
 					                			</div>
-							                  	<div id="paper{{$testSubjectPaper->id}}" class="panel-body">
+							                  	<div id="paper{{$testSubjectPaper->id}}" class="panel-body" style="padding:2px 0px;">
 								                    <div class="container">
 								                      	<div class="fluid-row">
 									                       	<ul class="">

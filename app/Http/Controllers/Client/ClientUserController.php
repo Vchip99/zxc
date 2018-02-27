@@ -189,8 +189,6 @@ class ClientUserController extends BaseController
         return Redirect::to('profile');
     }
 
-
-
     protected function clientMessages(Request $request){
         $sortIds = [];
         $allIds = [];
@@ -240,7 +238,6 @@ class ClientUserController extends BaseController
                 );
         return view('clientuser.dashboard.adminNotifications', compact('notifications', 'readNotificationIds', 'years', 'months','selectedYear', 'selectedMonth'));
     }
-
 
     protected function myNotifications(Request $request){
         $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());

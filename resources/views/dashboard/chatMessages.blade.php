@@ -5,23 +5,131 @@
 
 #frame {
   width: 100%;
-  min-width: 360px;
+  /* min-width: 360px;*/
   height: 80vh;
   min-height: 300px;
   max-height: 720px;
   background: #E6EAEA;
 }
-@media screen and (max-width: 360px) {
+@media screen and (max-width: 325px) {
+    .v-container .container {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+  /*.row .col-sm-9{
+    padding-right: 0px !important;
+  }
+  .v-container .container .container {
+    padding-right: 5px !important;
+    padding-left: 5px !important;
+  }
   #frame {
-    width: 100%;
+    max-width: 280px !important;
     height: 100vh;
   }
+  #frame #sidepanel {
+    width: 58px;
+    min-width: 58px;
+  }
+
+  #frame .content {
+    max-width: 206px !important;
+  }
+  #frame .content .contact-profile {
+    max-width: 200px !important;
+  }
+
+  #frame .content .messages {
+    width: 202px !important;
+    padding: 0px !important;
+  }
+
+  #frame .content .message-input .wrap {
+    position: relative;
+    width: 250px !important;
+  }*/
+  ul#contact_list {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-left: 6px !important;
+  }
+
+  ul#chat_messages {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-left: 6px !important;
+  }
+  #frame .content .message-input .wrap input{
+    width: 90% !important;
+  }
+  #frame .content .message-input .wrap button {
+    padding: 16px 0;
+    float: left;
+    width: 10% !important;
+  }
 }
+
+@media screen and (max-width: 380px) {
+    .v-container .container {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+  ul#contact_list {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-left: 20px !important;
+  }
+
+  ul#chat_messages {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-left: 6px !important;
+  }
+  #frame .content .message-input .wrap input{
+    width: 90% !important;
+  }
+  #frame .content .message-input .wrap button {
+    padding: 16px 0;
+    float: left;
+    width: 10% !important;
+  }
+}
+
+@media screen and (max-width: 735px) {
+    .v-container .container {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+  ul#contact_list {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-left: 20px !important;
+  }
+
+  ul#chat_messages {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-left: 6px !important;
+  }
+  #frame .content .message-input .wrap input{
+    width: 90% !important;
+  }
+  #frame .content .message-input .wrap button {
+    padding: 16px 0;
+    float: left;
+    width: 10% !important;
+  }
+}
+
+ul#chat_messages div{
+  padding-right: 15px !important;
+}
+
 #frame #sidepanel {
   float: left;
-  min-width: 280px;
-  max-width: 340px;
-  width: 40%;
+ /* min-width: 280px;
+  max-width: 340px;*/
+  width: 30%;
   height: 100%;
   background: #2c3e50;
   color: #f5f5f5;
@@ -29,24 +137,9 @@
   position: relative;
 }
 
-@media screen and (max-width: 735px) {
-  #frame #sidepanel {
-    width: 58px;
-    min-width: 58px;
-  }
-}
-
 #frame #sidepanel #profile {
   width: 80%;
   margin: 25px auto;
-}
-@media screen and (max-width: 735px) {
-  #frame #sidepanel #profile {
-    width: 100%;
-    margin: 0 auto;
-    padding: 5px 0 0 0;
-    background: #32465a;
-  }
 }
 
 #frame #sidepanel #profile.expanded .wrap {
@@ -84,10 +177,10 @@
 
 #frame #sidepanel #profile .wrap img {
   width: 50px;
+  height: 50px;
   border-radius: 50%;
   padding: 3px;
   border: 2px solid #e74c3c;
-  height: auto;
   float: left;
   cursor: pointer;
   -moz-transition: 0.3s border ease;
@@ -98,6 +191,7 @@
 @media screen and (max-width: 735px) {
   #frame #sidepanel #profile .wrap img {
     width: 40px;
+    height: 40px;
     margin-left: 4px;
   }
 }
@@ -289,7 +383,7 @@
   outline: none;
   background: #435f7a;
 }
-#frame #sidepanel #search {
+#frame #sidepanel #search,#frame .content #search_mobile {
   border-top: 1px solid #32465a;
   border-bottom: 1px solid #32465a;
   font-weight: 300;
@@ -299,7 +393,12 @@
     display: none;
   }
 }
-#frame #sidepanel #search label {
+@media screen and (min-width: 735px) {
+  .container #search_mobile {
+    display: none;
+  }
+}
+#frame #sidepanel #search label, .container #search_mobile label {
   position: absolute;
   margin: 10px 0 0 20px;
 }
@@ -311,6 +410,12 @@
   background: #32465a;
   color: #f5f5f5;
 }
+/*.container #search_mobile label {
+  font-family: "proxima-nova",  "Source Sans Pro", sans-serif;
+  border: none;
+  color: #000000;
+  background: #f5f5f5;
+}*/
 #frame #sidepanel #search input:focus {
   outline: none;
   background: #435f7a;
@@ -355,14 +460,14 @@
 }
 #frame #sidepanel #contacts ul li.contact {
   position: relative;
-  padding: 10px 0 15px 0;
+  padding: 10px 0 0px 0;
   font-size: 0.9em;
   cursor: pointer;
 }
 @media screen and (max-width: 735px) {
-  #frame #sidepanel #contacts ul li.contact {
-    padding: 6px 0 46px 8px;
-  }
+  /*#frame #sidepanel #contacts ul li.contact {
+    padding: 6px 0 15px 0px;
+  }*/
 }
 #frame #sidepanel #contacts ul li.contact:hover {
   background: #32465a;
@@ -378,10 +483,12 @@
   width: 88%;
   margin: 0 auto;
   position: relative;
+  padding: 10px 0 15px 0px;
 }
 @media screen and (max-width: 735px) {
   #frame #sidepanel #contacts ul li.contact .wrap {
     width: 100%;
+    padding: 10px 0 15px 0px !important;
   }
 }
 #frame #sidepanel #contacts ul li.contact .wrap span {
@@ -405,6 +512,7 @@
 }
 #frame #sidepanel #contacts ul li.contact .wrap img {
   width: 40px;
+  height: 40px;
   border-radius: 50%;
   float: left;
   margin-right: 10px;
@@ -418,9 +526,9 @@
   padding: 5px 0 0 0;
 }
 @media screen and (max-width: 735px) {
-  #frame #sidepanel #contacts ul li.contact .wrap .meta {
+  /*#frame #sidepanel #contacts ul li.contact .wrap .meta {
     display: none;
-  }
+  }*/
 }
 #frame #sidepanel #contacts ul li.contact .wrap .meta .name {
   font-weight: 600;
@@ -502,22 +610,14 @@
 
 #frame .content {
   float: right;
-  width: 60%;
+  width: 70%;
   height: 100%;
   overflow: hidden;
   position: relative;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
 }
-@media screen and (max-width: 735px) {
-  #frame .content {
-    width: calc(100% - 58px);
-    min-width: 300px !important;
-  }
-}
-@media screen and (min-width: 900px) {
-  #frame .content {
-    width: calc(100% - 340px);
-  }
-}
+
 #frame .content .contact-profile {
   width: 100%;
   height: 60px;
@@ -526,13 +626,14 @@
 }
 #frame .content .contact-profile img {
   width: 40px;
+  height: 40px;
   border-radius: 50%;
   float: left;
   margin: 9px 12px 0 9px;
 }
 
 #frame .content .messages {
-  height: 500px;
+  min-height: 500px;
   overflow: auto;
   width: 100%;
   z-index: 0;
@@ -540,7 +641,15 @@
 }
 @media screen and (max-width: 735px) {
   #frame .content .messages {
-    max-height: calc(100% - 105px);
+    max-height: calc(100% - 82px);
+    min-height: 0px !important;
+  }
+}
+
+@media screen and (min-width: 736px) {
+  #frame .content .messages {
+    max-height: calc(100% - 82px);
+    min-height: 0px !important;
   }
 }
 
@@ -571,7 +680,7 @@
 }
 #frame .content .messages ul li.replies img {
   float: right;
-  margin: 6px 0 0 8px;
+  margin: 6px 6px 0 8px;
 }
 #frame .content .messages ul li.replies p {
   background: #f5f5f5;
@@ -579,6 +688,7 @@
 }
 #frame .content .messages ul li img {
   width: 22px;
+  height: 22px;
   border-radius: 50%;
   float: left;
 }
@@ -613,11 +723,7 @@
   font-size: 0.8em;
   color: #32465a;
 }
-@media screen and (max-width: 735px) {
-  #frame .content .message-input .wrap input {
-    padding: 15px 32px 16px 8px;
-  }
-}
+
 #frame .content .message-input .wrap input:focus {
   outline: none;
 }
@@ -625,16 +731,13 @@
   float: right;
   border: none;
   width: 80px;
+  height: 36px;
   padding: 12px 0;
   cursor: pointer;
   background: #32465a;
   color: #f5f5f5;
 }
-@media screen and (max-width: 735px) {
-  #frame .content .message-input .wrap button {
-    padding: 16px 0;
-  }
-}
+
 #frame .content .message-input .wrap button:hover {
   background: #435f7a;
 }
@@ -660,11 +763,14 @@
 @stop
 @section('dashboard_content')
   <div class="container ">
+    <div id="search_mobile" class="row">
+      <!-- <label for=""><i class="fa fa-search" aria-hidden="true"></i></label> -->
+      <input type="text" id="search_contact" name="student" class="form-control" placeholder="Search contacts..." onkeyup="searchContact(this.value);">
+    </div>
     <div id="frame">
       <div id="sidepanel">
         <div id="profile">
           <div class="wrap">
-            <!-- <img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="online" alt="" /> -->
             @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
               <img src="{{ asset(Auth::user()->photo)}} " class="online" alt="User Image">
             @else
@@ -674,12 +780,12 @@
           </div>
         </div>
         <div id="search">
-          <!-- <label for=""><i class="fa fa-search" aria-hidden="true"></i></label>
-          <input type="text" placeholder="Search contacts..." /> -->
+          <label for=""><i class="fa fa-search" aria-hidden="true"></i></label>
+          <input type="text" id="search_contact" name="student" class="form-control" placeholder="Search contacts..." onkeyup="searchContact(this.value);">
         </div>
         <div id="contacts">
           <ul id="contact_list">
-            @foreach($users['chatusers']['users'] as $chatuser)
+            @foreach($users['users'] as $chatuser)
             <li class="contact" id="{{$chatuser['id']}}" data-user_name="{{$chatuser['name']}}" onclick="showChat(this);">
               <div class="wrap">
                 @if($chatuser['is_online'])
@@ -700,8 +806,7 @@
                       <strong style="color: red;" id="unreadCount_{{$chatuser['id']}}"></strong>
                     @endif
                   </p>
-                  <!-- <p class="preview">Vchip Tech</p> -->
-                  <p class="preview"></p>
+                  <p class="preview">{{$chatuser['college']}}</p>
                 </div>
                 <input type="hidden" id="message_limit_{{$chatuser['id']}}" value="0">
                 <input type="hidden" id="is_scroll_{{$chatuser['id']}}" value="0">
@@ -710,12 +815,12 @@
             @endforeach
           </ul>
           <input type="hidden" id="isUserScroll" value="0">
-          <input type="hidden" id="previuos_chat_users" value="">
+          <input type="hidden" id="previuos_chat_users" value="{{$users['chat_users']}}">
         </div>
       </div>
       <div class="content">
         <div class="contact-profile">
-          <img id="profile_image" src="" alt="" />
+          <img class="img-circle" id="profile_image" src="" alt="" />
           <p id="profile_name"></p>
         </div>
         <div class="messages chat_messages">
@@ -746,52 +851,146 @@
     setInterval(checkOnlineUsers, 180000);
   });
 
-  function checkOnlineUsers(){
-        var token = "{{ csrf_token() }}";
-        var current_user = document.getElementById('user_id').value;
-        $.ajax({
-            type: "POST",
-            url: '{!! URL::to("checkDashboardOnlineUsers") !!}',
-            dataType: "json",
-            data: {'_token':token},
-            success:function(onlineusers){
-                if(onlineusers.length > 0){
-                    var messageUsers = $('span[id^=status_]');
-                    $.each(messageUsers, function(idx, obj){
-                      var userId = $(obj).data('user_id');
-                      if(current_user != userId){
-                          if(onlineusers.indexOf(userId) > -1){
-                              document.getElementById('status_'+userId).classList.add('online');
-                          } else {
-                              document.getElementById('status_'+userId).classList.remove('online');
-                          }
-                      }
-                    });
-                }
-            }
-        });
+  function searchContact(contact){
+    if(contact.length > 2){
+      $.ajax({
+        method: "POST",
+        url: "{{url('searchContact')}}",
+        data:{contact:contact}
+      })
+      .done(function( results ) {
+        if(results['users'].length > 0){
+          renderContacts(results['users'],results['unreadCount']);
+        } else {
+          document.getElementById('contact_list').innerHTML = 'No Result';
+        }
+      });
+    } else if('' == contact){
+      $.ajax({
+        method: "POST",
+        url: "{{url('getContacts')}}",
+      })
+      .done(function( allresults ) {
+        if(allresults['chatusers']['users'].length > 0){
+          renderContacts(allresults['chatusers']['users'],allresults['chatusers']['unreadCount']);
+        } else {
+          document.getElementById('contact_list').innerHTML = 'No Result';
+        }
+      });
     }
+  }
+
+  function renderContacts(contacts,unreadCount){
+    var contactList = document.getElementById('contact_list');
+    contactList.innerHTML = '';
+    $.each(contacts, function(idx, obj){
+        var liEle = document.createElement('li');
+        liEle.className = 'contact';
+        liEle.id = obj['id'];
+        liEle.setAttribute('data-user_name', obj['name']);
+        liEle.setAttribute('onclick', 'showChat(this);');
+
+        var divEle = document.createElement('div');
+        divEle.className = 'wrap';
+
+        var spanStatus = document.createElement('span');
+        spanStatus.id = 'status_'+obj['id'];
+        spanStatus.setAttribute('data-user_id', obj['id']);
+        if(obj['is_online']){
+          spanStatus.className = 'contact-status online';
+        } else {
+          spanStatus.className = 'contact-status';
+        }
+        divEle.appendChild(spanStatus);
+
+        var imgUser = document.createElement('img');
+        imgUser.id = 'image_'+obj['id'];
+        var webUrl = window.location.protocol+'//'+window.location.host;
+        if('other' == obj['image_exist']){
+          imgUser.setAttribute('src', obj['photo']);
+        } else if('system' == obj['image_exist']){
+          imgUser.setAttribute('src', webUrl+"/"+obj['photo']);
+        } else {
+          imgUser.setAttribute('src', webUrl+'/images/user/user1.png');
+        }
+        imgUser.setAttribute('style', 'width: 40px;height: 40px;border-radius: 50%;float: left;margin-right: 10px;');
+
+        imgUser.className = 'online';
+        imgUser.setAttribute('alt', 'User Image');
+        divEle.appendChild(imgUser);
+
+        var divMeta = document.createElement('div');
+        divMeta.innerHTML = '<p class="name">'+obj['name'];
+        if( unreadCount && unreadCount[obj['id']] > 0){
+          divMeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+obj['id']+'">'+unreadCount[obj['id']]+'</strong>';
+        } else {
+          divMeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+obj['id']+'"></strong>';
+        }
+        divMeta.innerHTML +='<p><p class="preview">'+obj['college']+'</p>';
+        divEle.appendChild(divMeta);
+
+        var inputMsgLimit = document.createElement('input');
+        inputMsgLimit.id = 'message_limit_'+obj['id'];
+        inputMsgLimit.setAttribute('type', 'hidden');
+        inputMsgLimit.setAttribute('value', 0);
+        divEle.appendChild(inputMsgLimit);
+
+        var inputIsScroll = document.createElement('input');
+        inputIsScroll.id = 'is_scroll_'+obj['id'];
+        inputIsScroll.setAttribute('type', 'hidden');
+        inputIsScroll.setAttribute('value', 0);
+        divEle.appendChild(inputIsScroll);
+        liEle.appendChild(divEle);
+        contactList.appendChild(liEle);
+    });
+  }
+
+  function checkOnlineUsers(){
+    var token = "{{ csrf_token() }}";
+    var current_user = document.getElementById('user_id').value;
+    $.ajax({
+        type: "POST",
+        url: '{!! URL::to("checkDashboardOnlineUsers") !!}',
+        dataType: "json",
+        data: {'_token':token},
+        success:function(onlineusers){
+            if(onlineusers.length > 0){
+                var messageUsers = $('span[id^=status_]');
+                $.each(messageUsers, function(idx, obj){
+                  var userId = $(obj).data('user_id');
+                  if(current_user != userId){
+                      if(onlineusers.indexOf(userId) > -1){
+                          document.getElementById('status_'+userId).classList.add('online');
+                      } else {
+                          document.getElementById('status_'+userId).classList.remove('online');
+                      }
+                  }
+                });
+            }
+        }
+    });
+  }
 
   // make count zero
-    function readmessagecount(ele){
-      var receiver = $(ele).attr('data-receiver_id');
-      var current_user = document.getElementById('user_id').value;
-      var token = "{{ csrf_token() }}";
-      if(receiver > 0 && document.getElementById('unreadCount_'+receiver) && parseInt(document.getElementById('unreadCount_'+receiver).innerHTML) > 0){
-        if(parseInt(document.getElementById('unreadCountDash_1_'+current_user).innerHTML) > 0){
-          document.getElementById('unreadCountDash_1_'+current_user).innerHTML -= parseInt(document.getElementById('unreadCount_'+receiver).innerHTML);
-          document.getElementById('unreadCountDash_2_'+current_user).innerHTML -= parseInt(document.getElementById('unreadCount_'+receiver).innerHTML);
-        }
-        $.ajax({
-          type: "POST",
-          url: '{!! URL::to("readChatMessages") !!}',
-          dataType: "json",
-          data: {'_token':token, 'sender_id':receiver},
-          success:function(msg){}
-        });
-        document.getElementById('unreadCount_'+receiver).innerHTML = '';
+  function readmessagecount(ele){
+    var receiver = $(ele).attr('data-receiver_id');
+    var current_user = document.getElementById('user_id').value;
+    var token = "{{ csrf_token() }}";
+    if(receiver > 0 && document.getElementById('unreadCount_'+receiver) && parseInt(document.getElementById('unreadCount_'+receiver).innerHTML) > 0){
+      if(parseInt(document.getElementById('unreadCountDash_1_'+current_user).innerHTML) > 0){
+        document.getElementById('unreadCountDash_1_'+current_user).innerHTML -= parseInt(document.getElementById('unreadCount_'+receiver).innerHTML);
+        document.getElementById('unreadCountDash_2_'+current_user).innerHTML -= parseInt(document.getElementById('unreadCount_'+receiver).innerHTML);
       }
+      $.ajax({
+        type: "POST",
+        url: '{!! URL::to("readChatMessages") !!}',
+        dataType: "json",
+        data: {'_token':token, 'sender_id':receiver},
+        success:function(msg){}
+      });
+      document.getElementById('unreadCount_'+receiver).innerHTML = '';
     }
+  }
 
   // show next 10 messages
   function getNextchatMessages(receiverId){
@@ -909,8 +1108,8 @@
             }
         }
     });
-
   }
+
   function messagteTime(date){
       var currentTime = new Date(date),
       day = currentTime.getDate(),
@@ -994,9 +1193,8 @@
             var liEle = document.createElement('li');
             liEle.className = 'replies';
             liEle.innerHTML = '<img src="'+senderImgPath+'"><p>'+data.message+'</p>';
-            '<span class="pull-right">'+messagteTime(data.created_at)+'</span>';
             userchat[0].appendChild(liEle);
-            var spanEle = document.createElement('span');
+            var spanEle = document.createElement('div');
             spanEle.className = 'pull-right';
             spanEle.innerHTML = messagteTime(data.created_at);
             userchat[0].appendChild(spanEle);
@@ -1004,9 +1202,8 @@
             var liEle = document.createElement('li');
             liEle.className = 'sent';
             liEle.innerHTML = '<img src="'+receiverImgPath+'"><p>'+data.message+'</p>';
-            '<span class="pull-right">'+messagteTime(data.created_at)+'</span>';
             userchat[0].appendChild(liEle);
-            var spanEle = document.createElement('span');
+            var spanEle = document.createElement('div');
             spanEle.className = 'pull-left';
             spanEle.innerHTML = messagteTime(data.created_at);
             userchat[0].appendChild(spanEle);
@@ -1029,71 +1226,71 @@
   });
 
   // show chat users
-    function loadChatUsers(limitStart){
-        var previuosChatUsers = document.getElementById('previuos_chat_users').value;
-        var token = "{{ csrf_token() }}";
-        $.ajax({
-            type: "POST",
-            url: '{!! URL::to("loadChatUsers") !!}',
-            dataType: "json",
-            data: {'_token':token, 'limit_start':limitStart, 'previuos_chat_users':previuosChatUsers},
-            success:function(users){
-                if(users['chatusers'].length > 0){
-                    var chatUsers = document.getElementById('contact_list');
-                    $.each(users['chatusers'],function(idx,obj){
-                        var liEle = document.createElement('li');
-                        if(document.getElementById('user_id').value == obj['id']){
-                            liEle.className = 'hide contact';
-                        } else {
-                            liEle.className = 'contact';
-                        }
-                        liEle.id = obj['id'];
-                        liEle.setAttribute('data-user_name', obj['name']);
-                        liEle.setAttribute('onclick', 'showChat(this);');
+  function loadChatUsers(limitStart){
+      var previuosChatUsers = document.getElementById('previuos_chat_users').value;
+      var token = "{{ csrf_token() }}";
+      $.ajax({
+          type: "POST",
+          url: '{!! URL::to("loadChatUsers") !!}',
+          dataType: "json",
+          data: {'_token':token, 'limit_start':limitStart, 'previuos_chat_users':previuosChatUsers},
+          success:function(users){
+              if(users['chatusers'].length > 0){
+                  var chatUsers = document.getElementById('contact_list');
+                  $.each(users['chatusers'],function(idx,obj){
+                      var liEle = document.createElement('li');
+                      if(document.getElementById('user_id').value == obj['id']){
+                          liEle.className = 'hide contact';
+                      } else {
+                          liEle.className = 'contact';
+                      }
+                      liEle.id = obj['id'];
+                      liEle.setAttribute('data-user_name', obj['name']);
+                      liEle.setAttribute('onclick', 'showChat(this);');
 
-                        var divWrap = document.createElement('div');
-                        divWrap.className = 'wrap';
+                      var divWrap = document.createElement('div');
+                      divWrap.className = 'wrap';
 
-                        var spanStatus = document.createElement('span');
-                        spanStatus.id = 'status_'+obj['id'];
-                        spanStatus.setAttribute('data-user_id', obj['id']);
-                        if(obj['is_online']){
-                          spanStatus.className = 'contact-status online';
-                        } else {
-                          spanStatus.className = 'contact-status';
-                        }
-                        divWrap.appendChild(spanStatus);
+                      var spanStatus = document.createElement('span');
+                      spanStatus.id = 'status_'+obj['id'];
+                      spanStatus.setAttribute('data-user_id', obj['id']);
+                      if(obj['is_online']){
+                        spanStatus.className = 'contact-status online';
+                      } else {
+                        spanStatus.className = 'contact-status';
+                      }
+                      divWrap.appendChild(spanStatus);
 
-                        var eleImage = document.createElement('img');
-                        eleImage.id = 'image_'+obj.id;
-                        eleImage.className = 'online';
-                        var spanImage = document.createElement('img');
-                        if(obj.photo){
-                          var userImagePath = obj.photo;
-                        } else {
-                          var userImagePath = "/images/user1.png";
-                        }
-                        eleImage.setAttribute('src', userImagePath);
-                        divWrap.appendChild(eleImage);
+                      var eleImage = document.createElement('img');
+                      eleImage.id = 'image_'+obj['id'];
+                      eleImage.className = 'online';
+                      var spanImage = document.createElement('img');
+                      if(obj['photo']){
+                        var userImagePath = obj['photo'];
+                      } else {
+                        var userImagePath = "/images/user1.png";
+                      }
+                      eleImage.setAttribute('src', userImagePath);
+                      divWrap.appendChild(eleImage);
 
-                        var divmeta = document.createElement('div');
-                        divmeta.className = 'meta';
-                        divmeta.innerHTML = '<p class="name">'+obj.name+'</p>';
-                        if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
-                          divmeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+obj.id+'">'+users['unreadCount'][obj.id]+'</strong>';
-                        }
-                        divmeta.innerHTML +='<p class="preview"></p><input type="hidden" id="message_limit_'+obj.id+'" value="0"><input type="hidden" id="is_scroll_'+obj.id+'" value="0">';
-                        divWrap.appendChild(divmeta);
-                        liEle.appendChild(divWrap);
-                        chatUsers.appendChild(liEle);
-                    });
-                    $('#isUserScroll').val(0);
-                } else {
-                    $('#isUserScroll').val(1);
-                }
-            }
-        });
-    }
+                      var divmeta = document.createElement('div');
+                      divmeta.className = 'meta';
+                      divmeta.innerHTML = '<p class="name">'+obj['name']+'</p>';
+                      if(users['unreadCount'] && users['unreadCount'][obj['id']] > 0){
+                        divmeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+obj['id']+'">'+users['unreadCount'][obj['id']]+'</strong>';
+                      }
+                      divmeta.innerHTML +='<p class="preview">'+obj['college']+'</p><input type="hidden" id="message_limit_'+obj['id']+'" value="0"><input type="hidden" id="is_scroll_'+obj['id']+'" value="0">';
+                      divWrap.appendChild(divmeta);
+                      liEle.appendChild(divWrap);
+                      chatUsers.appendChild(liEle);
+                  });
+                  $('#isUserScroll').val(0);
+              } else {
+                  $('#isUserScroll').val(1);
+              }
+          }
+      });
+  }
 
 </script>
 @stop

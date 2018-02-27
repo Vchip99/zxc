@@ -30,7 +30,7 @@
   .chat-window{
     bottom:0;
     position:fixed;
-    right: 20px;
+    right: 5px;
     width: 300px;
     z-index: 10;
     overflow: hidden;
@@ -65,12 +65,16 @@
 }
   /*chat*/
 
+#userchatwindow .panel-body{
+  padding-bottom: 1px !important;
+}
+
 .popup-box {
    background-color: #ffffff;
     border: 1px solid #b0b0b0;
     bottom: 0;
     display: none;
-    height: 350px;
+    /*height: 350px;*/
     position: fixed;
     right: 300px;
     width: 300px;
@@ -159,7 +163,7 @@
 
 .popup-box .popup-messages {
     background: #fff none repeat scroll 0 0;
-    height: 205px;
+    height: 238px;
     overflow: auto;
     border-bottom:  1px dotted #e91e63;
     padding: 10px 5px;

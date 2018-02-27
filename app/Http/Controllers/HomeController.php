@@ -92,6 +92,9 @@ class HomeController extends Controller
         ]);
     }
 
+    /**
+     * client payment redirect
+     */
     protected function doPayment(Request $request){
         // Laravel validation
         $validator = $this->validateClient($request->all());
@@ -483,7 +486,9 @@ class HomeController extends Controller
             mail($to, $subject, $message, $headers);
         }
     }
-
+    /**
+     * client free registration
+     */
     protected function freeRegister(Request $request){
         // Laravel validation
         $validator = $this->validateClient($request->all());

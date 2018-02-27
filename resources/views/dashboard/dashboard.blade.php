@@ -84,7 +84,7 @@
           @endphp
         </div>
         <div class="pull-left info">
-          <p>{{ ucfirst(Auth::user()->name)}}</p>
+          <p><a href="{{ url('profile')}}">{{ ucfirst(Auth::user()->name)}}</a></p>
           <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
           <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::user()))?Auth::user()->id: NULL }}"/>
         </div>
@@ -93,7 +93,7 @@
         <li class="header">Vchip Technology</li>
         <li class="treeview ">
           <a href="#">
-            <i class="fa fa-comments"><b style="color: red;" id="unreadCountDash_1_{{Auth::user()->id}}">{{Auth::user()->unreadChatMessagesCount()}}</b></i> <span>Chat Messages </span>
+            <i class="fa fa-comments"></i><span> Chat Messages </span><b style="color: red;" id="unreadCountDash_1_{{Auth::user()->id}}">{{Auth::user()->unreadChatMessagesCount()}}</b>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -104,7 +104,7 @@
         </li>
         <li class="treeview ">
           <a href="#">
-            <i class="fa fa-star"><b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></i> <span>Notifications </span>
+            <i class="fa fa-star"></i><span>Notifications </span><b style="color: red;">{{Auth::user()->userNotificationCount()}}</b>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>

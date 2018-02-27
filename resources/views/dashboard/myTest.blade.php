@@ -12,11 +12,19 @@
           margin-left: 20px;
      }
    }
+   @media screen and (max-width: 320px) {
+    .data-sm .container, .data-sm .container .fluid-row{
+      padding-left: 0px !important;
+    }
+    .data-sm .btn3d{
+      min-width: 150px !important;
+    }
+   }
    @media screen and (max-width: 527px) {
-   .col-md-6{
+    .col-md-6{
           width: 100%;
           float: left;
-           margin-left: 0px;
+          margin-left: 20px;
      }
    }
    .label-primary{margin-right: 2px;margin-left: 2px;}
@@ -139,7 +147,7 @@
                             <div class=" panel panel-info" >
                               <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">{{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
                               </div>
-                                <div id="paper{{$testSubjectPaper->id}}" class="panel-body">
+                                <div id="paper{{$testSubjectPaper->id}}" class="panel-body" style="padding:2px 0px;">
                                   <div class="container">
                                       <div class="fluid-row">
                                         <ul class="">

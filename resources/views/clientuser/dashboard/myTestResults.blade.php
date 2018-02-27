@@ -72,7 +72,7 @@
                </div>
             </div>
           </div>
-          <div class="col-lg-12" id="bar-chart">
+          <!-- <div class="col-lg-12" id="bar-chart">
             <div class="panel panel-info">
               <div class="panel-heading text-center">
                  RESULT
@@ -101,7 +101,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>

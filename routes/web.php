@@ -56,7 +56,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteCourseVideo', 'Course\CourseVideoController@delete');
 	Route::post('admin/isCourseVideoExist', 'Course\CourseVideoController@isCourseVideoExist');
 
-
 	//Admin Login
 	Route::get('admin/login', 'AdminAuth\LoginController@showLoginForm');
 	Route::get('admin', 'AdminAuth\LoginController@redirectToLoginForm');
@@ -489,6 +488,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getDepartmentLecturers', 'AccountController@getDepartmentLecturers');
 	Route::get('studentVideo/{id?}', 'AccountController@studentVideo');
 	Route::put('updateStudentVideo', 'AccountController@updateStudentVideo');
+	Route::post('searchContact', 'AccountController@searchContact');
+	Route::post('getContacts', 'AccountController@getContacts');
 
 	// like- dis-like count front
 	Route::post('likePost', 'CourseController@likePost');

@@ -95,9 +95,7 @@ class UpdateApplicationAccessToken extends Command
                       $results = json_decode($response, true);
                       if(count($results) > 0){
                           $this->info('--------update_application_access_token_error--------</br>');
-                          foreach($results as $key => $result){
-                              $this->info($key.'->'.$result[0].'</br>');
-                          }
+                          $this->info(serialize($results).'</br>');
                       }
                     }
                 }

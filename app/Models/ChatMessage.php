@@ -22,59 +22,86 @@ class ChatMessage extends Model
     }
 
     protected static function showchatusers(){
-    	$chatusers = [];
+        $chatusers = [];
         $chatmessageusers = [];
         if(Cache::has('vchip:user-'.Auth()->user()->id.':chatusers')){
             $userResult['chatusers'] = Cache::get('vchip:user-'.Auth()->user()->id.':chatusers');
         } else {
-            $result = static::where('sender_id', Auth()->user()->id)->Orwhere('receiver_id',  Auth()->user()->id)->take(10)->get();
+            $result = static::where('sender_id', Auth()->user()->id)->Orwhere('receiver_id',  Auth()->user()->id)->orderBy('id', 'desc')->get();
             if(is_object($result) && false == $result->isEmpty()){
                 foreach($result as $message){
                     if(Auth()->user()->id != $message->sender_id){
-                        $chatmessageusers[] = $message->sender_id;
+                        if(!in_array($message->sender_id, $chatmessageusers)){
+                            $chatmessageusers[] = $message->sender_id;
+                        }
                     } else {
-                        $chatmessageusers[] = $message->receiver_id;
+                        if(!in_array($message->receiver_id, $chatmessageusers)){
+                            $chatmessageusers[] = $message->receiver_id;
+                        }
                     }
                 }
             }
-            $skipUsers =  array_unique($chatmessageusers);
 
-            $chatusers['chat_users'][] = array_values($skipUsers);
-            $messageusers = User::whereIn('id', $skipUsers)->get();
+            // $chatusers['chat_users'][] = array_values($chatmessageusers);
+            $chatusers['chat_users'] = $orderById = implode(',', $chatmessageusers);
+            $messageusers = User::whereIn('id', $chatmessageusers)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
             if(is_object($messageusers) && false == $messageusers->isEmpty()){
                 foreach($messageusers as $user){
+                    if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
+                        $isImageExist = 'system';
+                    } else if(!empty($user->photo) && false == preg_match('/userStorage/',$user->photo)){
+                        $isImageExist = 'other';
+                    } else {
+                        $isImageExist = 'false';
+                    }
                     $chatusers['users'][] = [
                         'id' => $user->id,
                         'name' => $user->name,
                         'photo' => $user->photo,
+                        'image_exist' => $isImageExist,
                         'chat_room_id' => $user->chatroomid(),
                         'is_online' => $user->isOnline(),
+                        'college' => $user->getCollegeName(),
                     ];
                 }
             }
-            array_push($skipUsers, Auth()->user()->id);
-            $users = User::whereNotIn('id', $skipUsers)->skip(0)->take(10)->get();
 
-        	if(is_object($users) && false == $users->isEmpty()){
-        		foreach($users as $user){
-        			$chatusers['users'][] = [
-        				'id' => $user->id,
-        				'name' => $user->name,
-        				'photo' => $user->photo,
-        				'chat_room_id' => $user->chatroomid(),
-        				'is_online' => $user->isOnline(),
-        			];
-        		}
-        	}
+            array_push($chatmessageusers, Auth()->user()->id);
+            $users = User::whereNotIn('id', $chatmessageusers)->skip(0)->take(10)->get();
+
+            if(is_object($users) && false == $users->isEmpty()){
+                foreach($users as $user){
+                    if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
+                        $isImageExist = 'system';
+                    } else if(!empty($user->photo) && false == preg_match('/userStorage/',$user->photo)){
+                        $isImageExist = 'other';
+                    } else {
+                        $isImageExist = 'false';
+                    }
+                    $chatusers['users'][] = [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'photo' => $user->photo,
+                        'image_exist' => $isImageExist,
+                        'chat_room_id' => $user->chatroomid(),
+                        'is_online' => $user->isOnline(),
+                        'college' => $user->getCollegeName(),
+                    ];
+                }
+            }
+
             Cache::put('vchip:user-'.Auth()->user()->id.':chatusers', $chatusers, 60);
-    	    $userResult['chatusers'] = $chatusers;
+            $userResult['chatusers'] = $chatusers;
         }
         $messageResult = static::where('receiver_id',  Auth()->user()->id)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
         if(is_object($messageResult) && false == $messageResult->isEmpty()){
             foreach($messageResult as $message){
                 $userResult['unreadCount'][$message->sender_id] = $message->unread;
             }
+        } else {
+            $userResult['unreadCount'] = [];
         }
+
         return $userResult;
     }
 

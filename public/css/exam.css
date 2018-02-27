@@ -86,7 +86,7 @@ button .fa{
   list-style-type: none;
   text-align: center;
 }
-@media only screen and (max-width : 335px){
+@media only screen and (max-width : 320px){
   .data-sm  ul{ text-align: left;  }
 }
 .data-sm .btn3d {

@@ -183,8 +183,8 @@ color: #747474; }
                       </div>
                   </div>
                   <div class="media-body">
-                      <h4 class="media-heading">Admin massage</h4>
-                      <p>Massage trigger to all the users if Admin add any new test Series or course</p>
+                      <h4 class="media-heading">Admin message</h4>
+                      <p>Message trigger to all the users if Admin add any new test Series or course</p>
                   </div>
               </div>
           </div>

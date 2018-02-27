@@ -253,6 +253,10 @@ class AccountController extends Controller
         return User::searchStudent($request);
     }
 
+    protected function searchContact(Request $request){
+        return User::searchContact($request);
+    }
+
     protected function studentTestResults($id=Null){
         $results = [];
         $students = [];
@@ -730,15 +734,11 @@ class AccountController extends Controller
     }
 
     protected function allChatMessages(){
-        $unreadCount = [];
-        $users = ChatMessage::showchatusers();
-        $results = ChatMessage::where('receiver_id',  Auth()->user()->id)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
-        if(is_object($results) && false == $results->isEmpty()){
-            foreach($results as $result){
-                $unreadCount[$result->sender_id] = $result->unread;
-            }
+        $result = ChatMessage::showchatusers();
+        $users = $result['chatusers'];
+        if(isset($result['unreadCount'])){
+            $unreadCount = $result['unreadCount'];
         }
-
         return view('dashboard.chatMessages', compact('users', 'unreadCount'));
     }
 
@@ -748,5 +748,9 @@ class AccountController extends Controller
 
     protected function dashboardSendMessage(Request $request){
         return ChatMessage::sendMessage($request);
+    }
+
+    protected function getContacts(){
+        return ChatMessage::showchatusers();
     }
 }

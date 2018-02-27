@@ -30,3 +30,23 @@ sudo ln -s /etc/supervisor/supervisord.conf /etc/supervisord.conf
 
 sudo systemctl enable supervisor
 sudo systemctl start supervisor
+
+
+--------------------------------------------------------------------
+supervisor for nodejs server
+
+cd /etc/supervisor/conf.d
+sudo nano nodejs-server.conf
+save below in this file
+
+[program:nodejs-server]
+directory=/var/www/html/vchip
+command=node nodejs/server.js
+autostart=true
+autorestart=true
+stderr_logfile=/var/www/html/vchip/storage/logs/nodejs-server.log
+
+
+
+sudo supervisorctl reread
+

@@ -4,6 +4,21 @@
     <h1> Profile </h1>
   </section>
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
+  <style type="text/css">
+    @media screen and (max-width: 320px) {
+      .content,.col-sm-12,.v-container, .container, .col-md-7, .list-group .list-group-item,.col-xs-7{
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+      }
+    }
+
+    @media screen and (min-width: 350px) and (max-width: 415px){
+      .content,.col-sm-12,.v-container, .container, .col-md-7, .list-group .list-group-item,.col-xs-7{
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+      }
+    }
+  </style>
 @stop
 @section('dashboard_content')
 	<div class="content-wrapper v-container tab-content" >
@@ -67,7 +82,7 @@
               <ul class="list-group">
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                         <div class="col-xs-5 "><b>Name</b></div>
                         <div class="col-xs-7 pull-left">{{Auth::guard('client')->user()->name}}</div>
@@ -77,7 +92,7 @@
                 </li>
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-2" data-toggle="detail-2">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                         <div class="col-xs-5 "><b>EMAIL</b></div>
                         <div class="col-xs-7 pull-left">{{Auth::guard('client')->user()->email}}</div>
@@ -87,7 +102,7 @@
                 </li>
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b>PHONE</b></div>
                          <div class="col-xs-7 pull-left">{{Auth::guard('client')->user()->phone}}</div>

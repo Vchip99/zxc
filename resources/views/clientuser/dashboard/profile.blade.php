@@ -3,6 +3,29 @@
   <section class="content-header">
     <h1> Profile </h1>
   </section>
+  <style type="text/css">
+    @media screen and (max-width: 320px) {
+      .container, .list-group .list-group-item, .col-xs-12, .col-xs-7, .col-sm-12{
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+      }
+      .col-md-offset-2, .col-xs-10, .content{
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+      }
+    }
+
+    @media screen and (min-width: 350px) and (max-width: 375px) {
+      .container, .list-group .list-group-item, .col-xs-12, .col-xs-7, .col-sm-12{
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+      }
+      .col-md-offset-2, .col-xs-10, .content{
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+      }
+    }
+  </style>
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
 @stop
 @section('dashboard_content')
@@ -78,7 +101,7 @@
               <ul class="list-group">
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                         <div class="col-xs-5 "><b>Name</b></div>
                         <div class="col-xs-7 pull-left">{{Auth::guard('clientuser')->user()->name}}</div>
@@ -88,7 +111,7 @@
                 </li>
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-2" data-toggle="detail-2">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                         <div class="col-xs-5 "><b>EMAIL</b></div>
                         <div class="col-xs-7 pull-left">{{Auth::guard('clientuser')->user()->email}}</div>
@@ -98,7 +121,7 @@
                 </li>
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b>PHONE</b></div>
                          <div class="col-xs-7 pull-left">{{Auth::guard('clientuser')->user()->phone}}</div>
@@ -108,7 +131,7 @@
                 </li>
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
-                    <div class="col-xs-10">
+                    <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b> DESIGNATION</b></div>
                          <div class="col-xs-7 ">Student</div>
@@ -166,7 +189,7 @@
                   <div class="row toggle" id="dropdown-detail-2" data-toggle="detail-5">
                       <div class="col-xs-10">
                         <div class="row">
-                            <div class="col-xs-12 ">
+                            <div class="col-xs-6 ">
                               <b><a href="#student_resume" data-toggle="modal" >Show Resume</a></b>
                             </div>
                         </div>

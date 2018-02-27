@@ -4,13 +4,14 @@ var express = require('express');
 var app = express();
 
 var options = {
-    // key: fs.readFileSync('/var/www/html/vchip/file.pem'),
-    // cert: fs.readFileSync('/var/www/html/vchip/file.crt')
+    key: fs.readFileSync('/var/www/html/vchip/file.pem'),
+    cert: fs.readFileSync('/var/www/html/vchip/file.crt')
 };
 var serverPort = 8080;
 
 var server = https.createServer(options, app);
 var io = require('socket.io')(server);
+io.set('transports', ['websocket', 'polling']);
 server.listen(serverPort);
 
 // var fs = require( 'fs' );

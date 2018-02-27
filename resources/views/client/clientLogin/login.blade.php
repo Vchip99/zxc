@@ -101,7 +101,7 @@
               <input id="password" name="password" type="text" class="form-control" placeholder="password" data-type="password" autocomplete="off" onfocus="this.type='password'" required >
             </div>
             <div class="form-group">
-              <button id="signupSubmit" type="submit" class="btn btn-info btn-block">Sign Up</button>
+              <button id="signupSubmit" type="submit" class="btn btn-info btn-block">Login</button>
                <div class="form-group">
                   <div class="col-md-12 control">
                       <a href="{{ url('clientforgotPassword')}}" data-toggle="tooltip" title="Forgot Password">Forgot Password?</a>

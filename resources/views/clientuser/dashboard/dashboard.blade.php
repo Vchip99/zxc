@@ -75,7 +75,7 @@
           </a>
         </div>
         <div class="pull-left info">
-          <p>{{ ucfirst(Auth::guard('clientuser')->user()->name)}}</p>
+          <p><a href="{{ url('profile')}}">{{ ucfirst(Auth::guard('clientuser')->user()->name)}}</a></p>
           <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
           <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::guard('clientuser')->user()))?Auth::guard('clientuser')->user()->id: NULL }}"/>
         </div>
@@ -84,7 +84,7 @@
         <li class="header">Vchip Technology</li>
         <li class="treeview ">
           <a href="#">
-            <i class="fa fa-star"><b style="color: red;">{{Auth::guard('clientuser')->user()->userNotificationCount()}}</b></i> <span>Notifications </span>
+            <i class="fa fa-star"></i><span>Notifications </span><b style="color: red;">{{Auth::guard('clientuser')->user()->userNotificationCount()}}</b>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>

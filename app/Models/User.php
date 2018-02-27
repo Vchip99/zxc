@@ -192,6 +192,14 @@ class User extends Authenticatable
         return Cache::has('vchip:online_user-' . $this->id);
     }
 
+    public function getCollegeName(){
+        if($this->college_id > 0){
+            return $this->college->name;
+        } else {
+            return $this->other_source;
+        }
+    }
+
     protected static function searchStudent(Request $request){
         $user = Auth::user();
         $student = static::join('college_depts', 'college_depts.id', '=', 'users.college_dept_id')
@@ -444,5 +452,44 @@ class User extends Authenticatable
 
     public function unreadChatMessagesCount(){
         return ChatMessage::where('receiver_id', Auth::user()->id)->where('is_read', 0)->count();
+    }
+
+    protected static function searchContact(Request $request){
+        $chatusers = [];
+        $unreadCount = [];
+        $contact = InputSanitise::inputString($request->contact);
+        $users = static::where('users.name', 'LIKE', '%'.$contact.'%')->get();
+        if(is_object($users) && false == $users->isEmpty()){
+            foreach($users as $user){
+                if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
+                    $isImageExist = 'system';
+                } else if(!empty($user->photo) && false == preg_match('/userStorage/',$user->photo)){
+                    $isImageExist = 'other';
+                } else {
+                    $isImageExist = 'false';
+                }
+                $chatusers[] = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'photo' => $user->photo,
+                    'image_exist' => $isImageExist,
+                    'chat_room_id' => $user->chatroomid(),
+                    'is_online' => $user->isOnline(),
+                    'college' => $user->getCollegeName(),
+                ];
+            }
+        }
+        if(count($chatusers) > 0){
+            $searchIds = array_column($chatusers, 'id');
+            $chatMessages = ChatMessage::where('receiver_id',  Auth()->user()->id)->whereIn('sender_id', $searchIds)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
+            if(is_object($chatMessages) && false == $chatMessages->isEmpty()){
+                foreach($chatMessages as $chatMessage){
+                    $unreadCount[$chatMessage->sender_id] = $chatMessage->unread;
+                }
+            }
+        }
+        $result['users'] =  $chatusers;
+        $result['unreadCount'] =  $unreadCount;
+        return $result;
     }
 }
