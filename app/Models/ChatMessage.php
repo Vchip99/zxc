@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use App\Models\User;
 use App\Models\ChatRoom;
-use DB,Auth,Cache;
+use DB,Auth,Cache,LRedis;
 
 class ChatMessage extends Model
 {
@@ -60,7 +60,6 @@ class ChatMessage extends Model
                         'photo' => $user->photo,
                         'image_exist' => $isImageExist,
                         'chat_room_id' => $user->chatroomid(),
-                        'is_online' => $user->isOnline(),
                         'college' => $user->getCollegeName(),
                     ];
                 }
@@ -84,7 +83,6 @@ class ChatMessage extends Model
                         'photo' => $user->photo,
                         'image_exist' => $isImageExist,
                         'chat_room_id' => $user->chatroomid(),
-                        'is_online' => $user->isOnline(),
                         'college' => $user->getCollegeName(),
                     ];
                 }
@@ -101,6 +99,8 @@ class ChatMessage extends Model
         } else {
             $userResult['unreadCount'] = [];
         }
+
+        $userResult['onlineUsers'] = static::checkOnlineUsers();
 
         return $userResult;
     }
@@ -156,4 +156,16 @@ class ChatMessage extends Model
             return;
         }
 	}
+
+    protected static function checkOnlineUsers(){
+        $onlineUsers = LRedis::scan(0, 'match', "vchip:online_user-*")[1];
+        $onlineUserIds = [];
+        if(count($onlineUsers) > 0){
+            foreach($onlineUsers as $onlineUser){
+                $userId = (int) explode('-', $onlineUser)[1];
+                $onlineUserIds[$userId] = $userId;
+            }
+        }
+        return $onlineUserIds;
+    }
 }

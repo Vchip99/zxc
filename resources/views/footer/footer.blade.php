@@ -463,7 +463,8 @@
 
             var spanStatus = document.createElement('span');
             spanStatus.className = 'chat-img pull-right';
-            if(obj['is_online']){
+            if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
+            // if(users['onlineUsers'].indexOf(obj['id']) !== -1){
                 spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
 
             } else {
@@ -583,7 +584,8 @@
 
                   var spanStatus = document.createElement('span');
                   spanStatus.className = 'chat-img pull-right';
-                  if(obj['is_online']){
+                  // if(users['onlineUsers'].indexOf(obj['id']) !== -1){
+                  if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
                       spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
 
                   } else {
@@ -683,7 +685,8 @@
 
         var spanStatus = document.createElement('span');
         spanStatus.className = 'chat-img pull-right';
-        if(obj['is_online']){
+        // if(users['onlineUsers'].indexOf(obj['id']) !== -1){
+        if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
             spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
 
         } else {

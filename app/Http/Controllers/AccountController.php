@@ -739,7 +739,8 @@ class AccountController extends Controller
         if(isset($result['unreadCount'])){
             $unreadCount = $result['unreadCount'];
         }
-        return view('dashboard.chatMessages', compact('users', 'unreadCount'));
+        $onlineUsers = $result['onlineUsers'];
+        return view('dashboard.chatMessages', compact('users', 'unreadCount', 'onlineUsers'));
     }
 
     protected function dashboardPrivateChat(Request $request){

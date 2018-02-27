@@ -54,7 +54,6 @@ class chatController extends Controller
                         'photo' => $user->photo,
                         'image_exist' => $isImageExist,
                         'chat_room_id' => $user->chatroomid(),
-                        'is_online' => $user->isOnline(),
                         'college' => $user->getCollegeName(),
                     ];
                 }
@@ -63,18 +62,12 @@ class chatController extends Controller
             $result['chatusers'] = $chatusers;
         }
         $result['unreadCount'] = ChatMessage::where('receiver_id',  Auth()->user()->id)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
+        $result['onlineUsers'] = ChatMessage::checkOnlineUsers();
         return $result;
     }
 
     protected function checkOnlineUsers(){
-        $onlineUsers = LRedis::scan(0, 'match', "vchip:online_user-*")[1];
-        $onlineUserIds = [];
-        if(count($onlineUsers) > 0){
-            foreach($onlineUsers as $onlineUser){
-                $onlineUserIds[] = (int) explode('-', $onlineUser)[1];
-            }
-        }
-        return $onlineUserIds;
+        return ChatMessage::checkOnlineUsers();
     }
 
     protected function readChatMessages(Request $request){

@@ -457,31 +457,33 @@ class User extends Authenticatable
     protected static function searchContact(Request $request){
         $chatusers = [];
         $unreadCount = [];
+        $currentUserId = Auth()->user()->id;
         $contact = InputSanitise::inputString($request->contact);
         $users = static::where('users.name', 'LIKE', '%'.$contact.'%')->get();
         if(is_object($users) && false == $users->isEmpty()){
             foreach($users as $user){
-                if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
-                    $isImageExist = 'system';
-                } else if(!empty($user->photo) && false == preg_match('/userStorage/',$user->photo)){
-                    $isImageExist = 'other';
-                } else {
-                    $isImageExist = 'false';
+                if($currentUserId != $user->id){
+                    if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
+                        $isImageExist = 'system';
+                    } else if(!empty($user->photo) && false == preg_match('/userStorage/',$user->photo)){
+                        $isImageExist = 'other';
+                    } else {
+                        $isImageExist = 'false';
+                    }
+                    $chatusers[] = [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'photo' => $user->photo,
+                        'image_exist' => $isImageExist,
+                        'chat_room_id' => $user->chatroomid(),
+                        'college' => $user->getCollegeName(),
+                    ];
                 }
-                $chatusers[] = [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'photo' => $user->photo,
-                    'image_exist' => $isImageExist,
-                    'chat_room_id' => $user->chatroomid(),
-                    'is_online' => $user->isOnline(),
-                    'college' => $user->getCollegeName(),
-                ];
             }
         }
         if(count($chatusers) > 0){
             $searchIds = array_column($chatusers, 'id');
-            $chatMessages = ChatMessage::where('receiver_id',  Auth()->user()->id)->whereIn('sender_id', $searchIds)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
+            $chatMessages = ChatMessage::where('receiver_id',  $currentUserId)->whereIn('sender_id', $searchIds)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
             if(is_object($chatMessages) && false == $chatMessages->isEmpty()){
                 foreach($chatMessages as $chatMessage){
                     $unreadCount[$chatMessage->sender_id] = $chatMessage->unread;
@@ -490,6 +492,7 @@ class User extends Authenticatable
         }
         $result['users'] =  $chatusers;
         $result['unreadCount'] =  $unreadCount;
+        $result['onlineUsers'] = ChatMessage::checkOnlineUsers();
         return $result;
     }
 }

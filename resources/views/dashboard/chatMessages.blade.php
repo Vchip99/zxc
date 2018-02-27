@@ -788,7 +788,7 @@ ul#chat_messages div{
             @foreach($users['users'] as $chatuser)
             <li class="contact" id="{{$chatuser['id']}}" data-user_name="{{$chatuser['name']}}" onclick="showChat(this);">
               <div class="wrap">
-                @if($chatuser['is_online'])
+                @if(isset($onlineUsers[$chatuser['id']]))
                   <span id="status_{{$chatuser['id']}}" data-user_id="{{$chatuser['id']}}" class="contact-status online"></span>
                 @else
                   <span id="status_{{$chatuser['id']}}" data-user_id="{{$chatuser['id']}}" class="contact-status"></span>
@@ -860,7 +860,7 @@ ul#chat_messages div{
       })
       .done(function( results ) {
         if(results['users'].length > 0){
-          renderContacts(results['users'],results['unreadCount']);
+          renderContacts(results['users'],results['unreadCount'],results['onlineUsers']);
         } else {
           document.getElementById('contact_list').innerHTML = 'No Result';
         }
@@ -872,7 +872,7 @@ ul#chat_messages div{
       })
       .done(function( allresults ) {
         if(allresults['chatusers']['users'].length > 0){
-          renderContacts(allresults['chatusers']['users'],allresults['chatusers']['unreadCount']);
+          renderContacts(allresults['chatusers']['users'],allresults['chatusers']['unreadCount'],allresults['onlineUsers']);
         } else {
           document.getElementById('contact_list').innerHTML = 'No Result';
         }
@@ -880,7 +880,7 @@ ul#chat_messages div{
     }
   }
 
-  function renderContacts(contacts,unreadCount){
+  function renderContacts(contacts,unreadCount,onlineUsers){
     var contactList = document.getElementById('contact_list');
     contactList.innerHTML = '';
     $.each(contacts, function(idx, obj){
@@ -896,7 +896,7 @@ ul#chat_messages div{
         var spanStatus = document.createElement('span');
         spanStatus.id = 'status_'+obj['id'];
         spanStatus.setAttribute('data-user_id', obj['id']);
-        if(obj['is_online']){
+        if(onlineUsers && onlineUsers[obj['id']]){
           spanStatus.className = 'contact-status online';
         } else {
           spanStatus.className = 'contact-status';
