@@ -1,4 +1,13 @@
 <footer>
+  @php
+    if('local' == \Config::get('app.env')){
+      $homeUrl = 'https://localvchip.com/';
+      $onlineUrl = 'https://online.localvchip.com/';
+    } else {
+      $homeUrl = 'https://vchipedu.com/';
+      $onlineUrl = 'https://online.vchipedu.com/';
+    }
+  @endphp
  <div class="footer" >
     <div class="container">
       <div class="row">
@@ -6,9 +15,13 @@
           <h3> Services</h3>
           <ul>
             <li class=""><a href="{{ url('erp') }}">Digital Edu & ERP</a></li>
-            <li class=""><a href="{{ url('educationalPlatform') }}">Education Platform</a></li>
-            <li class=""><a href="{{ url('digitalMarketing') }}">Digital Marketing</a></li>
-            <li class=""><a href="{{ url('pricing') }}">Pricing</a></li>
+            <li class=""><a href="{{ url('offlineworkshops') }}">Workshops</a></li>
+            <li class=""><a href="{{ url('motivationalspeech') }}">Motivational Speech</a></li>
+            <li class=""><a href="{{ url('virtualplacementdrive') }}">Virtual Placement Drive</a></li>
+            <li class=""><a href="{{$onlineUrl}}digitaleducation" target="_blank">Digital-Edu Platform</a></li>
+            <li class=""><a href="{{$onlineUrl}}digitalmarketing" target="_blank">Digital Marketing</a></li>
+            <li class=""><a href="{{$onlineUrl}}webdevelopment" target="_blank">Web & App Development</a></li>
+            <li class=""><a href="{{$onlineUrl}}pricing" target="_blank">Pricing</a></li>
           </ul>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3">
@@ -16,7 +29,7 @@
           <h3 class="hidden-1">Education</h3>
           <ul >
              <li><a href="{{ url('courses')}}">Online Courses</a></li>
-             <li><a href="{{ url('liveCourse') }}">Live Course</a></li>
+             <!-- <li><a href="{{ url('liveCourse') }}">Live Course</a></li> -->
              <li class=""></li>
              <li><a href="{{ url('online-tests') }}">Online Test Series</a></li>
              <li class=""></li>

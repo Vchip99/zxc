@@ -105,7 +105,7 @@ color: #747474; }
   @include('layouts.home-js')
 @stop
 @section('content')
-  @include('header.header_menu')
+  @include('client.online.header_menu')
   <section id="vchip-background" class="mrgn_60_btm">
     <div class="vchip-background-single" >
       <div class="vchip-background-img">
@@ -269,7 +269,7 @@ color: #747474; }
         <div class="row">
             <div class="col-md-12">
                 <div class="block">
-                    <h2 class="title wow fadeInDown" data-wow-delay=".3s" data-wow-duration="500ms">Prize </h2>
+                    <h2 class="title wow fadeInDown" data-wow-delay=".3s" data-wow-duration="500ms">Price </h2>
                     <p class="wow fadeInDown" data-wow-delay=".5s" data-wow-duration="500ms">All the above mention facilities are at free of cost up-to 20 login.<br/>@ Rs. 2999 /year for unlimited logins.</p>
                     <a href="{{ url('pricing') }}" class="btn btn-default btn-contact wow fadeInDown" data-wow-delay=".7s" data-wow-duration="500ms">Buy Now</a>
                 </div>
@@ -280,5 +280,5 @@ color: #747474; }
 </section>
 @stop
 @section('footer')
-  @include('footer.footer')
+  @include('client.online.footer')
 @stop

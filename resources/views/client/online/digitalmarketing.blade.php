@@ -12,7 +12,7 @@
   @include('layouts.home-js')
 @stop
 @section('content')
-  @include('header.header_menu')
+  @include('client.online.header_menu')
   <section id="vchip-background" class="mrgn_60_btm">
     <div class="vchip-background-single" >
       <div class="vchip-background-img">
@@ -21,11 +21,26 @@
         </figure>
       </div>
       <div class="vchip-background-content">
-        <h2 class="animated bounceInLeft">Digital Education</h2>
+        <h2 class="animated bounceInLeft">Digital Marketing</h2>
       </div>
     </div>
   </section>
   <section id="" class="v_container ">
+    @if(Session::has('message'))
+      <div class="alert alert-success" id="message">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+          {{ Session::get('message') }}
+      </div>
+    @endif
+    @if(count($errors) > 0)
+      <div class="alert alert-danger">
+        <ul>
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
      <h2 class="v_h2_title text-center"> Digital Education</h2>
      <hr class="section-dash-dark "/>
       <div class="container">
@@ -88,25 +103,6 @@
     <hr class="section-dash-dark "/>
     <h3 class="v_h3_title text-center">For More Detail Contact Us</h3>
     <div class="container">
-      @if(Session::has('message'))
-      <div class="alert alert-success" id="message">
-        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-          {{ Session::get('message') }}
-      </div>
-    @endif
-    @if(count($errors) > 0)
-      <div class="alert alert-danger">
-          <ul>
-              @foreach ($errors->all() as $error)
-                @if('verify_email' == $error)
-                  <li><a href="{{ url('verifyAccount')}}">Click here to resend verification email</a></li>
-                @else
-                  <li>{{ $error }}</li>
-                @endif
-              @endforeach
-          </ul>
-      </div>
-    @endif
       <div class="row">
         <form class="form-horizontal" method="post" action="{{ url('sendContactUsMail')}}" enctype="multipart/form-data">
             <div class="v_contactus-area">
@@ -156,5 +152,5 @@
   </section>
 @stop
 @section('footer')
-  @include('footer.footer')
+  @include('client.online.footer')
 @stop

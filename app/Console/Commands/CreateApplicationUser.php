@@ -159,10 +159,8 @@ class CreateApplicationUser extends Command
                           $errorCount++;
                           $results = json_decode($response, true);
                           if(count($results) > 0){
-                              $this->info('--------user_auth_error--------</br>');
-                              foreach($results as $key => $result){
-                                $this->info('user -'.$client->email.'->'.$key.'->'.$result[0].'</br>');
-                              }
+                            $this->info('--------user_auth_error--------</br>');
+                            $this->info(serialize($results).'</br>');
                           }
                         }
                     }
@@ -170,10 +168,8 @@ class CreateApplicationUser extends Command
                     $errorCount++;
                     $results = json_decode($response, true);
                     if(count($results) > 0){
-                        $this->info('--------signup_error--------</br>');
-                        foreach($results as $key => $result){
-                            $this->info('user -'.$client->email.'->'.$key.'->'.$result[0].'</br>');
-                        }
+                      $this->info('--------signup_error--------</br>');
+                      $this->info(serialize($results).'</br>');
                     }
                   }
                 }

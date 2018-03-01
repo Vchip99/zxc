@@ -143,7 +143,6 @@
     </div>
 </div>
 <script type="text/javascript">
-  // $('#subdomain').blur(function(ele){
   function checkSubdomain(){
     var error = 0;
     var subdomain = document.getElementById('subdomain').value;
@@ -159,19 +158,24 @@
         }
       document.getElementById('subdomain_exist').classList.add('hide');
       if( 0 == error){
-        $.ajax({
-            method: "POST",
-            url: "{{url('isCLientExists')}}",
-            data: {subdomain:subdomain}
-        })
-        .done(function( msg ) {
-          if('true' == msg){
-            document.getElementById('subdomain_exist').classList.remove('hide');
-            document.getElementById('registerBtn').disabled = true;
-          } else {
-            document.getElementById('registerBtn').disabled = false;
-          }
-        });
+        if('online' == subdomain){
+          document.getElementById('subdomain_exist').classList.remove('hide');
+          document.getElementById('registerBtn').disabled = true;
+        } else {
+          $.ajax({
+              method: "POST",
+              url: "{{url('isCLientExists')}}",
+              data: {subdomain:subdomain}
+          })
+          .done(function( msg ) {
+            if('true' == msg){
+              document.getElementById('subdomain_exist').classList.remove('hide');
+              document.getElementById('registerBtn').disabled = true;
+            } else {
+              document.getElementById('registerBtn').disabled = false;
+            }
+          });
+        }
       } else {
         document.getElementById('registerBtn').disabled = true;
       }
@@ -179,6 +183,7 @@
   }
 
   function confirmSubmit(){
+    document.getElementById('registerBtn').disabled = true;
     document.getElementById('registerClient').submit();
   }
 </script>

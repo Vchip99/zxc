@@ -120,6 +120,7 @@ class ClientOnlineTestSubCategory extends Model
                 ->where('client_online_test_sub_categories.client_id', $clientId)
                 ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))
                 ->select('client_online_test_sub_categories.*')
+                ->groupBy('client_online_test_sub_categories.id')
                 ->get();
         }
         return;

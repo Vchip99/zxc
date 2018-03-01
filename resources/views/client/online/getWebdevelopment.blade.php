@@ -108,7 +108,7 @@
                           <div>
                             <label>Price: Rs. 2999 </label>
                           </div>
-                          <button id="registerBtn" name="register" type="submit" class="btn btn-info btn-block" >Make Payment</button></br>
+                          <button id="registerBtn" name="register" type="submit" class="btn btn-info btn-block" onclick="this.form.submit(); this.disabled=true;">Make Payment</button></br>
                          </form>
                       </div>
                     </div>
@@ -119,6 +119,6 @@
         </div>
       </div>
     </div>
-</div>
+  </div>
 </body>
 </html>

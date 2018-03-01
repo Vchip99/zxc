@@ -119,13 +119,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('password/reset', 'UserAuth\ResetPasswordController@reset');
 	Route::get('register/verify/{token}', 'UserAuth\RegisterController@verify');
 	Route::get('signup', 'HomeController@signup');
-	Route::get('clientsignup/{planId}', 'HomeController@clientsignup');
-	Route::post('isCLientExists', 'HomeController@isCLientExists');
 	Route::post('getDepartments', 'HomeController@getDepartments');
-	Route::post('doPayment', 'HomeController@doPayment');
-	Route::get('thankyou', 'HomeController@thankyou');
-	Route::any('webhook', 'HomeController@webhook');
-	Route::post('freeRegister', 'HomeController@freeRegister');
 	Route::post('doAdvertisementPayment', 'HomeController@doAdvertisementPayment');
 	Route::get('thankyouadvertisement', 'HomeController@thankyouadvertisement');
 	Route::any('webhookAdvertisement', 'HomeController@webhookAdvertisement');
@@ -219,10 +213,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getAreasByDesignation', 'HomeController@getAreasByDesignation');
 	Route::post('getHeroByDesignationByArea', 'HomeController@getHeroByDesignationByArea');
 	Route::get('erp', 'HomeController@erp');
-	Route::get('educationalPlatform', 'HomeController@educationalPlatform');
-	Route::get('digitalMarketing', 'HomeController@digitalMarketing');
-	Route::get('pricing', 'HomeController@pricing');
-	Route::get('webdevelopment', 'HomeController@webdevelopment');
 	Route::get('us', 'HomeController@us');
 	Route::get('virtualplacementdrive', 'HomeController@virtualplacementdrive');
 	Route::post('virtualplacementquery', 'HomeController@virtualplacementquery');
@@ -231,10 +221,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('checkDateSlot', 'HomeController@checkDateSlot');
 	Route::post('showCalendar', 'HomeController@showCalendar');
 	Route::get('getAllEvents', 'HomeController@getAllEvents');
-	Route::get('getWebdevelopment', 'HomeController@getWebdevelopment');
-	Route::post('doWebdevelopmentPayment', 'HomeController@doWebdevelopmentPayment');
-	Route::get('thankyouwebdevelopment', 'HomeController@thankyouwebdevelopment');
-	Route::post('webhookwebdevelopment', 'HomeController@webhookwebdevelopment');
 
 	// online courses front
 	Route::get('courses', 'CourseController@courses');
@@ -774,6 +760,23 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('clientpassword/email', 'ClientAuth\ForgotPasswordController@sendPasswordResetLink');
   	Route::get('clientpassword/reset/{token}', 'ClientAuth\ResetPasswordController@showResetForm');
   	Route::post('client/password/reset', 'ClientAuth\ResetPasswordController@reset');
+
+  	// online client
+  	Route::get('digitaleducation', 'Client\OnlineClientController@digitaleducation');
+  	Route::get('webdevelopment', 'Client\OnlineClientController@webdevelopment');
+  	Route::get('digitalmarketing', 'Client\OnlineClientController@digitalmarketing');
+  	Route::get('pricing', 'Client\OnlineClientController@pricing');
+  	Route::get('getWebdevelopment', 'Client\OnlineClientController@getWebdevelopment');
+  	Route::post('doWebdevelopmentPayment', 'Client\OnlineClientController@doWebdevelopmentPayment');
+  	Route::get('thankyouwebdevelopment', 'Client\OnlineClientController@thankyouwebdevelopment');
+	Route::post('webhookwebdevelopment', 'Client\OnlineClientController@webhookwebdevelopment');
+	Route::post('sendContactUsMail', 'Client\OnlineClientController@sendContactUsMail');
+	Route::get('clientsignup/{planId}', 'Client\OnlineClientController@clientsignup');
+	Route::post('isCLientExists', 'Client\OnlineClientController@isCLientExists');
+	Route::post('doPayment', 'Client\OnlineClientController@doPayment');
+	Route::get('thankyouclient', 'Client\OnlineClientController@thankyouclient');
+	Route::any('webhookclient', 'Client\OnlineClientController@webhookclient');
+	Route::post('freeRegister', 'Client\OnlineClientController@freeRegister');
 
   	// client users info
   	Route::get('allUsers', 'Client\ClientUsersInfoController@allUsers');

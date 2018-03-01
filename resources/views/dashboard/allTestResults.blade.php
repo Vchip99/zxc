@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> All Test Results </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> All Test Results </li>
+      <li><i class="fa fa-trophy"></i> All Test Results </li>
       <li class="active"> All Test Results </li>
     </ol>
   </section>

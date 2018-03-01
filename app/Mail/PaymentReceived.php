@@ -23,9 +23,10 @@ class PaymentReceived extends Mailable
      *
      * @return void
      */
-    public function __construct($content)
+    public function __construct($content, $subject = NULL)
     {
         $this->content = $content;
+        $this->subject = $subject;
     }
 
     /**
@@ -35,7 +36,12 @@ class PaymentReceived extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.paymentReveived')
+        if(!empty($this->subject)){
+            return $this->subject($this->subject)->view('emails.paymentReveived')
                     ->with('content', $this->content);
+        } else {
+            return $this->view('emails.paymentReveived')
+                    ->with('content', $this->content);
+        }
     }
 }

@@ -170,7 +170,7 @@
                           </button><br /> -->
                           <button id="registerBtn" class="btn btn-info btn-block" onclick="event.preventDefault(); confirmSubmit();" data-toggle="tooltip" title="Register">Register</button></br>
                           <div><a class="mrgn_10_top" href="{{ url('/')}}">Alredy Member?</a></div>
-                         </form>
+                        </form>
                       </div>
                     </div>
                   </div>

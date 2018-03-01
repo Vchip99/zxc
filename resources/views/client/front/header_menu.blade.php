@@ -27,7 +27,7 @@
             </a>
             <ul class="dropdown-menu user-dropdown ">
               <li>
-                <a href="{{ url('profile')}}" title="Dashbord">
+                <a href="{{ url('profile')}}" title="Dashbord" target="_blank">
                   @if(!empty(Auth::guard('clientuser')->user()->photo))
                     <img src="{{ asset(Auth::guard('clientuser')->user()->photo) }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
                   @else
@@ -38,10 +38,10 @@
               </li>
               <li role="separator" class="divider"></li>
               <li>
-                <a href="{{ url('myNotifications')}}" data-toggle="tooltip" title="My Notifications"><i class="fa fa-star" aria-hidden="true"></i> My Notifications : <b style="color: red;">{{Auth::guard('clientuser')->user()->userNotificationCount()}}</b></a>
+                <a href="{{ url('myNotifications')}}" data-toggle="tooltip" title="My Notifications" target="_blank"><i class="fa fa-star" aria-hidden="true"></i> My Notifications : <b style="color: red;">{{Auth::guard('clientuser')->user()->userNotificationCount()}}</b></a>
               </li>
               <li>
-                <a href="{{ url('clientMessages')}}" data-toggle="tooltip" title="Admin Messages"><i class="fa fa-star" aria-hidden="true"></i> Admin Messages : <b style="color: red;">{{Auth::guard('clientuser')->user()->adminNotificationCount()}}</b></a>
+                <a href="{{ url('clientMessages')}}" data-toggle="tooltip" title="Admin Messages" target="_blank"><i class="fa fa-star" aria-hidden="true"></i> Admin Messages : <b style="color: red;">{{Auth::guard('clientuser')->user()->adminNotificationCount()}}</b></a>
               </li>
               <li role="separator" class="divider"></li>
               <li><a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" title="Logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>

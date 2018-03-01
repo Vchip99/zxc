@@ -125,7 +125,7 @@
             <li><a href="{{ url('myCourses')}}"><i class="fa fa-circle-o"></i> My Online Courses</a></li>
             <li><a href="{{ url('myCourseResults')}}"><i class="fa fa-circle-o"></i> My Course Results</a></li>
             <li><a href="{{ url('myCertificate')}}"><i class="fa fa-circle-o"></i> My Certificate</a></li>
-            <li><a href="{{ url('courses')}}"><i class="fa fa-circle-o"></i> More Courses</a></li>
+            <li><a href="{{ url('courses')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Courses</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -139,10 +139,10 @@
           <ul class="treeview-menu">
             <li><a href="{{ url('myTest')}}"><i class="fa fa-circle-o"></i> My Test</a></li>
             <li><a href="{{ url('myTestResults')}}"><i class="fa fa-circle-o"></i> My Test Results</a></li>
-            <li><a href="{{ url('online-tests')}}"><i class="fa fa-circle-o"></i> More Test</a></li>
+            <li><a href="{{ url('online-tests')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Test</a></li>
           </ul>
         </li>
-        <li class="treeview">
+        <!-- <li class="treeview">
           <a href="#">
             <i class="fa fa-pie-chart"></i>
             <span>Live Courses</span>
@@ -152,7 +152,7 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="{{ url('myLiveCourses')}}"><i class="fa fa-circle-o"></i>My Live Courses</a></li>
-            <li><a href="{{ url('liveCourse')}}"><i class="fa fa-circle-o"></i> More Courses</a></li>
+            <li><a href="{{ url('liveCourse')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Courses</a></li>
           </ul>
         </li>
         <li class="treeview ">
@@ -167,7 +167,7 @@
             <li><a href="#"><i class="fa fa-circle-o"></i> My Webinar</a></li>
             <li class="active"><a href="{{ url('webinar') }}"><i class="fa fa-circle-o"></i> more Webinar</a></li>
           </ul>
-        </li>
+        </li> -->
         <li class="treeview">
           <a href="#">
             <i class="fa fa-book"></i> <span>Documents</span>
@@ -178,7 +178,7 @@
           <ul class="treeview-menu">
             <li><a href="{{ url('myDocuments') }}"><i class="fa fa-circle-o"></i> Read Articles</a></li>
             <li><a href="{{ url('myFavouriteArticles') }}"><i class="fa fa-circle-o"></i> Favourite Articles</a></li>
-            <li><a href="{{ url('documents') }}"><i class="fa fa-circle-o"></i> More Articles</a></li>
+            <li><a href="{{ url('documents') }}" target="_blank" ><i class="fa fa-circle-o"></i> More Articles</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -190,7 +190,7 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="{{ url('myVkits')}}"><i class="fa fa-circle-o"></i>  Favourite Projects</a></li>
-            <li><a href="{{ url('vkits')}}"><i class="fa fa-circle-o"></i> More Projects</a></li>
+            <li><a href="{{ url('vkits')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Projects</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -203,7 +203,7 @@
           <ul class="treeview-menu">
             <li><a href="{{ url('myQuestions')}}"><i class="fa fa-circle-o"></i> My Questions</a></li>
             <li><a href="{{ url('myReplies')}}"><i class="fa fa-circle-o"></i> My Replies</a></li>
-            <li><a href="{{ url('discussion')}}"><i class="fa fa-circle-o"></i> More Discussion</a></li>
+            <li><a href="{{ url('discussion')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Discussion</a></li>
           </ul>
         </li>
         @if(2 == Auth::user()->user_type || 3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type)

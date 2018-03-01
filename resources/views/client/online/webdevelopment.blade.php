@@ -140,7 +140,7 @@ box-shadow: 0 13px 40px 0 rgba(62,68,93,.3), 0 2px 4px 0 rgba(62,68,93,.06);
   @include('layouts.home-js')
 @stop
 @section('content')
-  @include('header.header_menu')
+  @include('client.online.header_menu')
   <section id="vchip-background" class="mrgn_60_btm">
     <div class="vchip-background-single" >
       <div class="vchip-background-img">
@@ -313,16 +313,15 @@ box-shadow: 0 13px 40px 0 rgba(62,68,93,.3), 0 2px 4px 0 rgba(62,68,93,.06);
         <div class="row">
             <div class="col-md-12">
                 <div class="block">
-                    <h2 class="title wow fadeInDown" data-wow-delay=".3s" data-wow-duration="500ms">Prize </h2>
+                    <h2 class="title wow fadeInDown" data-wow-delay=".3s" data-wow-duration="500ms">Price </h2>
                     <p class="wow fadeInDown" data-wow-delay=".5s" data-wow-duration="500ms">Rs. 2999</p>
                     <a href="{{ url('getWebdevelopment')}}" data-toggle="modal" class="btn btn-default btn-contact wow fadeInDown" data-wow-delay=".7s" data-wow-duration="500ms">Buy Now</a>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
 @stop
 @section('footer')
-  @include('footer.footer')
+  @include('client.online.footer')
 @stop

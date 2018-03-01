@@ -5,6 +5,13 @@
          <span>Vchip-edu</span>
         </a>
       </div>
+      @php
+        if('local' == \Config::get('app.env')){
+          $onlineUrl = 'https://online.localvchip.com/';
+        } else {
+          $onlineUrl = 'https://online.vchipedu.com/';
+        }
+      @endphp
       <div class="navbar-header pull-right">
         <button type="button" class="navbar-toggle pull-left" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
           <span class="sr-only">Toggle navigation</span>
@@ -28,7 +35,7 @@
           </a>
             <ul class="dropdown-menu user-dropdown ">
                 <li>
-                  <a href="{{ url('profile')}}" data-toggle="tooltip" title="Dashbord">
+                  <a href="{{ url('profile')}}" target="_blank" data-toggle="tooltip" title="Dashbord">
                   @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
                     <img src="{{asset(Auth::user()->photo)}}" class="img-circle user-profile1" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
                   @else
@@ -39,13 +46,13 @@
                 </li>
                 <li role="separator" class="divider"></li>
                 <li>
-                  <a href="{{ url('allChatMessages')}}" data-toggle="tooltip" title="Chat Messages"><i class="fa fa-star" aria-hidden="true"></i> Chat Messages : <b style="color: red;" id="all_chat_messages"><span id="msg_count_2_{{Auth::user()->id}}">0</span></b></a>
+                  <a href="{{ url('allChatMessages')}}" target="_blank" data-toggle="tooltip" title="Chat Messages"><i class="fa fa-star" aria-hidden="true"></i> Chat Messages : <b style="color: red;" id="all_chat_messages"><span id="msg_count_2_{{Auth::user()->id}}">0</span></b></a>
                 </li>
                 <li>
-                  <a href="{{ url('myNotifications')}}" data-toggle="tooltip" title="My Notifications"><i class="fa fa-star" aria-hidden="true"></i> My Notifications : <b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></a>
+                  <a href="{{ url('myNotifications')}}" target="_blank" data-toggle="tooltip" title="My Notifications"><i class="fa fa-star" aria-hidden="true"></i> My Notifications : <b style="color: red;">{{Auth::user()->userNotificationCount()}}</b></a>
                 </li>
                 <li>
-                  <a href="{{ url('adminMessages')}}" data-toggle="tooltip" title="Admin Notifications"><i class="fa fa-star" aria-hidden="true"></i> Admin Messages : <b style="color: red;">{{Auth::user()->adminNotificationCount()}}</b></a>
+                  <a href="{{ url('adminMessages')}}" target="_blank" data-toggle="tooltip" title="Admin Notifications"><i class="fa fa-star" aria-hidden="true"></i> Admin Messages : <b style="color: red;">{{Auth::user()->adminNotificationCount()}}</b></a>
                 </li>
                 <li role="separator" class="divider"></li>
                 <li><a href="{{ url('logout') }}" data-toggle="tooltip" title="Logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
@@ -113,10 +120,10 @@
                 <li class="mrgn_10_left"><a href="{{ url('virtualplacementdrive') }}" title="virtual placement drive">virtual placement drive</a></li>
                 <li class="divider"></li>
                 <li> <b style="color: #01bafd;">Coaching Institute</b></li>
-                 <li class="mrgn_10_left"><a href="{{ url('educationalPlatform') }}" title="Education Platform">Education Platform</a></li>
-                 <li class="mrgn_10_left"><a href="{{ url('digitalMarketing') }}" title="Digital Marketing">Digital Marketing</a></li>
-                 <li class="mrgn_10_left"><a href="{{ url('webdevelopment') }}" title="web & app development">web & app development</a></li>
-                 <li class="mrgn_10_left"><a href="{{ url('pricing') }}" title="pricing">pricing</a></li>
+                 <li class="mrgn_10_left"><a href="{{$onlineUrl}}digitaleducation" title="Digital-Edu Platform" target="_blank">Digital-Edu Platform</a></li>
+                 <li class="mrgn_10_left"><a href="{{$onlineUrl}}digitalmarketing" title="Digital Marketing" target="_blank">Digital Marketing</a></li>
+                 <li class="mrgn_10_left"><a href="{{$onlineUrl}}webdevelopment" title="web & app development" target="_blank">web & app development</a></li>
+                 <li class="mrgn_10_left"><a href="{{$onlineUrl}}pricing" title="pricing" target="_blank">pricing</a></li>
              </div>
             </ul>
           </li>

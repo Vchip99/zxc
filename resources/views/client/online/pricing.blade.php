@@ -91,8 +91,6 @@
     transition: all 0.3s;
      height: 350px;
      padding-top: 10px;
-
-
 }
 .read-more{
     height: auto;
@@ -111,7 +109,7 @@
   @include('layouts.home-js')
 @stop
 @section('content')
-  @include('header.header_menu')
+  @include('client.online.header_menu')
   <section id="vchip-background" class="mrgn_60_btm">
     <div class="vchip-background-single" >
       <div class="vchip-background-img">
@@ -283,5 +281,5 @@ $('#readMore-2').click(function(){
 </script>
 @stop
 @section('footer')
-  @include('footer.footer')
+  @include('client.online.footer')
 @stop

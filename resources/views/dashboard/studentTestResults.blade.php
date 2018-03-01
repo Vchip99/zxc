@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Test Results </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Users Info</li>
+      <li><i class="fa fa-group"></i> Users Info</li>
       <li class="active">Test Results </li>
     </ol>
   </section>

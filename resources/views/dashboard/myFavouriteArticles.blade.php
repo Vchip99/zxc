@@ -72,7 +72,7 @@
               @endif
             </a>
             <div class="topleft">@if( 1 == $document->type_of_document )Research Paper @else Documentary @endif</div>
-            <div class="topright">@if($document->is_paid) Paid @else Free @endif</div>
+            <div class="topright">@if($document->price > 0) Paid @else Free @endif</div>
             <div class="course-box-content" >
                <h4 class="course-box-title " title="{{$document->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a >{{$document->name}}</a></p></h4>
                <br/>

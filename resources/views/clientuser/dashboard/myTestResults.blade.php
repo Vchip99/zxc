@@ -8,7 +8,7 @@
   <section class="content-header">
     <h1> My Test Results </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Online Test</li>
+      <li><i class="fa fa-files-o"></i> Online Test</li>
       <li class="active"> My Test Results </li>
     </ol>
   </section>
@@ -120,8 +120,8 @@
         .done(function( msg ) {
           body = document.getElementById('test-result');
           body.innerHTML = '';
-          barchart = document.getElementById('barchart');
-          barchart.innerHTML = '';
+          // barchart = document.getElementById('barchart');
+          // barchart.innerHTML = '';
           if( 0 < msg['scores'].length){
             $.each(msg['scores'], function(idx, obj) {
                 var eleTr = document.createElement('tr');
@@ -146,12 +146,12 @@
                 eleTr.appendChild(eleRank);
                 body.appendChild(eleTr);
 
-                var eleMainDiv = document.createElement('div');
-                eleMainDiv.className = 'barchart-Col';
-                eleInnerHtml = '<div class="barchart-Bar" style="height:'+ msg['marks'][obj.id]['percentage']+ '%;" title="'+obj.subject+'-'+obj.paper+'" attr-height="'+ msg['marks'][obj.id]['percentage']+ '%"></div>';
-                eleInnerHtml += '<div class="barchart-BarFooter " title="'+obj.paper+'">'+obj.paper+'</div>';
-                eleMainDiv.innerHTML = eleInnerHtml;
-                barchart.appendChild(eleMainDiv);
+                // var eleMainDiv = document.createElement('div');
+                // eleMainDiv.className = 'barchart-Col';
+                // eleInnerHtml = '<div class="barchart-Bar" style="height:'+ msg['marks'][obj.id]['percentage']+ '%;" title="'+obj.subject+'-'+obj.paper+'" attr-height="'+ msg['marks'][obj.id]['percentage']+ '%"></div>';
+                // eleInnerHtml += '<div class="barchart-BarFooter " title="'+obj.paper+'">'+obj.paper+'</div>';
+                // eleMainDiv.innerHTML = eleInnerHtml;
+                // barchart.appendChild(eleMainDiv);
             });
           } else {
             var eleTr = document.createElement('tr');
@@ -168,7 +168,7 @@
     id = parseInt($(ele).val());
     var userId = parseInt(document.getElementById('user_id').value);
     document.getElementById('test-result').innerHTML = '';
-    document.getElementById('barchart').innerHTML = '';
+    // document.getElementById('barchart').innerHTML = '';
     if( 0 < id && 0 < userId ){
       $.ajax({
               method: "POST",

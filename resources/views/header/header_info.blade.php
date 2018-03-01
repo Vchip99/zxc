@@ -4,7 +4,7 @@
   -webkit-background-size:cover;
   -moz-background-size:cover;
   -o-background-size:cover;" data-stellar-background-ratio="0.5">
-  <div class="overlay"></div>
+  <!-- <div class="overlay"></div> -->
   <div class="vchip-container ">
     <div class="row">
       <div class="col-md-12 col-md-offset-0 text-left">

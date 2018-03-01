@@ -42,33 +42,42 @@ class ClientHomeController extends Controller
     }
 
     protected function clientHome(Request $request){
-        $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
-
-        $userSubCategoryPermissionIds = [];
-        $subCategoryCourseIds = [];
-        $courseIds = [];
-        $userCoursePermissionIds = [];
-        if(is_object($subdomain)){
-            if( is_object(Auth::guard('clientuser')->user()) && $subdomain->client_id != Auth::guard('clientuser')->user()->client_id){
-                if('local' == \Config::get('app.env')){
-                    return Redirect::away('http://'.Auth::guard('clientuser')->user()->client->subdomain);
-                } else {
-                    return Redirect::away('https://'.Auth::guard('clientuser')->user()->client->subdomain);
-                }
-            }
-            $onlineCourses = ClientOnlineCourse::getCurrentCoursesByClient($subdomain->subdomain);
-            $defaultCourse = ClientOnlineCourse::where('name', 'How to use course')->first();
-            $defaultTest = ClientOnlineCourse::where('name', 'How to use test')->first();
-            $onlineTestSubcategories = ClientOnlineTestSubCategory::getCurrentSubCategoriesAssociatedWithQuestion($subdomain->subdomain);
-            $testimonials = ClientTestimonial::getClientTestimonials($subdomain->subdomain);
-            $clientTeam = ClientTeam::getClientTeam($subdomain->subdomain);
-            $clientCustomers = ClientCustomer::getClientCustomer($subdomain->subdomain);
-            return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers'));
+        if('local' == \Config::get('app.env')){
+            $onlineClientUrl = 'online.localvchip.com';
         } else {
-            if('local' == \Config::get('app.env')){
-                return Redirect::away('http://localvchip.com');
+            $onlineClientUrl = 'online.vchipedu.com';
+        }
+        if( $onlineClientUrl == $request->getHost()){
+            return view('client.online.home');
+        } else {
+            $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
+
+            $userSubCategoryPermissionIds = [];
+            $subCategoryCourseIds = [];
+            $courseIds = [];
+            $userCoursePermissionIds = [];
+            if(is_object($subdomain)){
+                if( is_object(Auth::guard('clientuser')->user()) && $subdomain->client_id != Auth::guard('clientuser')->user()->client_id){
+                    if('local' == \Config::get('app.env')){
+                        return Redirect::away('http://'.Auth::guard('clientuser')->user()->client->subdomain);
+                    } else {
+                        return Redirect::away('https://'.Auth::guard('clientuser')->user()->client->subdomain);
+                    }
+                }
+                $onlineCourses = ClientOnlineCourse::getCurrentCoursesByClient($subdomain->subdomain);
+                $defaultCourse = ClientOnlineCourse::where('name', 'How to use course')->first();
+                $defaultTest = ClientOnlineCourse::where('name', 'How to use test')->first();
+                $onlineTestSubcategories = ClientOnlineTestSubCategory::getCurrentSubCategoriesAssociatedWithQuestion($subdomain->subdomain);
+                $testimonials = ClientTestimonial::getClientTestimonials($subdomain->subdomain);
+                $clientTeam = ClientTeam::getClientTeam($subdomain->subdomain);
+                $clientCustomers = ClientCustomer::getClientCustomer($subdomain->subdomain);
+                return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers'));
             } else {
-                return Redirect::away('https://vchipedu.com/');
+                if('local' == \Config::get('app.env')){
+                    return Redirect::away('https://localvchip.com');
+                } else {
+                    return Redirect::away('https://vchipedu.com/');
+                }
             }
         }
     }
