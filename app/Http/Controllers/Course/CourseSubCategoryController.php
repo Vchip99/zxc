@@ -49,7 +49,7 @@ class CourseSubCategoryController extends Controller
      *  show create category UI
      */
     protected function create(){
-    	$courseCategories = CourseCategory::paginate();
+    	$courseCategories = CourseCategory::all();
     	$courseSubcategory = new CourseSubCategory;
     	return view('courseSubcategory.create', compact('courseSubcategory', 'courseCategories'));
     }

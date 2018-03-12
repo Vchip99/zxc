@@ -31,7 +31,7 @@ class CourseSubCategory extends Model
         if( $isUpdate && isset($subCategoryId)){
             $courseSubcategory = static::find($subCategoryId);
             if(!is_object($courseSubcategory)){
-            	return Redirect::to('admin/manageCategory');
+            	return Redirect::to('admin/manageCourseSubCategory');
             }
         } else{
             $courseSubcategory = new static;

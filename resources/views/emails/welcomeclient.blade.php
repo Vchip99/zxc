@@ -6,7 +6,7 @@
 <body>
 	<p>Hello from Vchipedu,</p>
 		<p>Congratulations! You have successfully signup for vchipedu.</p>
-		<p>Follwoing are the details:</p>
+		<p>Following are the details:</p>
 		<div>
 			@if(!empty($name))
 				<p>Name : {{ $name }} </p>

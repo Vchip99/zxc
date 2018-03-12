@@ -6,7 +6,7 @@
 <body>
 	<p>Hello from {{$domain }} ,</p>
 		<p>Congratulations! You have successfully signup for {{$domain }}.</p>
-		<p>Follwoing are the details:</p>
+		<p>Following are the details:</p>
 		<div>
 			@if(!empty($email))
 				<p>Email/User Id : {{ $email }} </p>

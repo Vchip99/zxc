@@ -70,7 +70,7 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-        Cache::forget('online_user-' . $this->guard()->user()->id);
+        Cache::forget('vchip:online_user-' . $this->guard('user')->user()->id);
         $this->guard()->logout();
 
         Session::flush();

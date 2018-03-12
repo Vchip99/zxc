@@ -1,9 +1,11 @@
 /*header*/
-#vchip-header {  background: #4d4d4d;
-top:-80px !important;}
+#vchip-header {
+  background: #4d4d4d;
+  top:-80px !important;
+}
 @media screen and (max-width: 992px) {
  #vchip-header.vchip-cover {
-    height: inherit !important;
+    /*height: inherit !important;*/
     padding: 48px 0 !important;
   }
 }

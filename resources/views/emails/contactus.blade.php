@@ -10,7 +10,7 @@
 		@else
 			<p>The person {{ $name }} of email id {{ $email }} send a mail.</p>
 		@endif
-		<p>Follwoing are the details:</p>
+		<p>Following are the details:</p>
 		<div>
 			<p>Name : {{ $name }}</p>
 			<p>Email : {{ $email }} </p>

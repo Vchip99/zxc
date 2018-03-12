@@ -6,7 +6,7 @@
 <body>
 	<p>Hi Admin,</p>
 		<p>we got an application from {{ $email }} for '<b>{{ $subject }}</b>'.</p>
-		<p>Follwoing are the details:</p>
+		<p>Following are the details:</p>
 		<div>
 			<p>Name : {{ $firstName }} {{ $lastName }}</p>
 			<p>Company : {{ $company }} </p>

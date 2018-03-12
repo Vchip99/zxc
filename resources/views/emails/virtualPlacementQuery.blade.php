@@ -6,7 +6,7 @@
 <body>
 	<p>Hi Admin,</p>
 		<p>we have a mail about virtual placement drive.</p>
-		<p>Follwoing are the details:</p>
+		<p>Following are the details:</p>
 		<div>
 			@if(!empty($name))
 				<p>Name : {{ $name }} </p>
