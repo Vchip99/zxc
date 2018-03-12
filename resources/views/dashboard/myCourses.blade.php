@@ -36,7 +36,7 @@
         @foreach($courses as $course)
           <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
             <div class="course-box">
-              <a class="img-course-box" href="{{ url('courseDetails')}}/{{$course->id}}">
+              <a class="img-course-box" href="{{ url('courseDetails')}}/{{$course->id}}" target="_blank">
                 @if(!empty($course->image_path))
                   <img class="img-responsive " src="{{ asset($course->image_path) }}" alt="course">
                 @else
@@ -46,9 +46,9 @@
               <div class="topleft">@if( 1 == $course->certified )Certified @else Non Certified @endif</div>
               <div class="topright">{{($course->price > 0)? 'Paid' : 'Free' }}</div>
               <div class="course-box-content" >
-                 <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
+                 <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}" target="_blank">{{$course->name}}</a></p></h4>
                  <div class="categoery">
-                   <a  href="{{ url('courseDetails')}}/{{$course->id}}"> {{$course->category}}</a>
+                   <a  href="{{ url('courseDetails')}}/{{$course->id}}" target="_blank"> {{$course->category}}</a>
                  </div>
                  <br/>
                 <p class="block-with-text">
@@ -61,12 +61,12 @@
                     </div><br/>
                       <p>{{$course->description}}</p>
                       <div class="text-center corse-detail-footer" >
-                        <a href="{{ url('courseDetails')}}/{{$course->id}}" class="btn btn-primary btn-default" > Start Course</a>
+                        <a href="{{ url('courseDetails')}}/{{$course->id}}" class="btn btn-primary btn-default" target="_blank"> Start Course</a>
                       </div>
                   </div>
                 </div>
                 <div class="course-auther">
-                  <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
+                  <a href="{{ url('courseDetails')}}/{{$course->id}}" target="_blank"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
                   </a>
                 </div>
               </div>
@@ -128,6 +128,7 @@
         var anc = document.createElement('a');
         anc.className = 'img-course-box';
         anc.href = url;
+        anc.setAttribute("target","_blank");
         var img = document.createElement('img');
         img.className = "img-responsive";
         if(obj.image_path){
@@ -151,17 +152,17 @@
         var thirdDiv = document.createElement('div');
         thirdDiv.className = "course-box-content";
 
-        var courseContent = '<h4 class="course-box-title" title="'+ obj.name +'" data-toggle="tooltip" data-placement="bottom"><p class="block-with-text"><a href="'+ url +'">'+ obj.name +'</a></p></h4>';
-         courseContent += '<div class="categoery"><a  href="'+ url +'">'+ obj.category +'</a></div><br/><p class="block-with-text">'+ obj.description+'<a type="button" class="show " data-show="'+ obj.id +'">Read More</a></p>';
+        var courseContent = '<h4 class="course-box-title" title="'+ obj.name +'" data-toggle="tooltip" data-placement="bottom"><p class="block-with-text"><a href="'+ url +'" target="_blank">'+ obj.name +'</a></p></h4>';
+         courseContent += '<div class="categoery"><a href="'+ url +'" target="_blank">'+ obj.category +'</a></div><br/><p class="block-with-text">'+ obj.description+'<a type="button" class="show " data-show="'+ obj.id +'">Read More</a></p>';
 
-        courseContent += '<div class="corse-detail" id="corse-detail-'+ obj.id +'"><div class="corse-detail-heder"><span class="card-title"><b>'+ obj.name +'</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="'+ obj.id +'"><span aria-hidden="true">×</span></button></div></br/><p>'+ obj.description +'</p><div class="text-center corse-detail-footer" ><a href="'+ url +'" class="btn btn-primary btn-default" > Start Course</a></div></div>';
+        courseContent += '<div class="corse-detail" id="corse-detail-'+ obj.id +'"><div class="corse-detail-heder"><span class="card-title"><b>'+ obj.name +'</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="'+ obj.id +'"><span aria-hidden="true">×</span></button></div></br/><p>'+ obj.description +'</p><div class="text-center corse-detail-footer" ><a href="'+ url +'" class="btn btn-primary btn-default" target="_blank"> Start Course</a></div></div>';
 
         thirdDiv.innerHTML = courseContent;
         secondDiv.appendChild(thirdDiv);
 
         var authorDiv = document.createElement('div');
         authorDiv.className = "course-auther";
-        authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
+        authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'" target="_blank">'+ obj.author +'</i></a>';
         secondDiv.appendChild(authorDiv);
         firstDiv.appendChild(secondDiv);
         divCourses.appendChild(firstDiv);

@@ -76,7 +76,7 @@ class ZeroToHeroController extends Controller
             $hero = ZeroToHero::addOrUpdateZeroToHero($request);
             if(is_object($hero)){
                 $messageBody = '';
-                $notificationMessage = 'A new zero to hero video: <a href="'.$request->root().'/heros/'.$hero->id.'">'.$hero->name.'</a> has been added.';
+                $notificationMessage = 'A new zero to hero video: <a href="'.$request->root().'/heros/'.$hero->id.'" target="_blank">'.$hero->name.'</a> has been added.';
                 Notification::addNotification($notificationMessage, Notification::ADMINZEROTOHERO, $hero->id);
                 DB::commit();
                 $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();

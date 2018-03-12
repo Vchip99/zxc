@@ -48,7 +48,7 @@
     @foreach($projects as $project)
       <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
         <div class="course-box">
-          <a class="img-course-box" href="{{ url('vkitproject')}}/{{$project->id}}">
+          <a class="img-course-box" href="{{ url('vkitproject')}}/{{$project->id}}" target="_blank">
             @if(!empty($project->front_image_path))
               <img class="img-responsive " src="{{ asset($project->front_image_path) }}" alt="vckits">
             @else
@@ -56,7 +56,7 @@
             @endif
           </a>
           <div class="course-box-content" >
-             <h4 class="course-box-title " title="{{$project->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('vkitproject')}}/{{$project->id}}">{{$project->name}}</a></p></h4>
+             <h4 class="course-box-title " title="{{$project->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('vkitproject')}}/{{$project->id}}" target="_blank">{{$project->name}}</a></p></h4>
              <br/>
             <p class="block-with-text">
               {{$project->introduction}}
@@ -68,12 +68,12 @@
                 </div><br/>
                   <p>{{$project->introduction}}</p>
                   <div class="text-center corse-detail-footer" >
-                    <a href="{{ url('vkitproject')}}/{{$project->id}}" class="btn btn-primary btn-default" > Start Project</a>
+                    <a href="{{ url('vkitproject')}}/{{$project->id}}" class="btn btn-primary btn-default" target="_blank"> Start Project</a>
                   </div>
               </div>
             </div>
             <div class="course-auther">
-              <a href="{{ url('vkitproject')}}/{{$project->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$project->author}}"> {{$project->author}}</i>
+              <a href="{{ url('vkitproject')}}/{{$project->id}}" target="_blank"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$project->author}}"> {{$project->author}}</i>
               </a>
             </div>
           </div>
@@ -101,6 +101,8 @@
           var anc = document.createElement('a');
           anc.className = 'img-course-box';
           anc.href = url;
+          anc.setAttribute('target', '_blank');
+
           var img = document.createElement('img');
           img.className = "img-responsive";
           if(obj.front_image_path){
@@ -114,17 +116,17 @@
           var thirdDiv = document.createElement('div');
           thirdDiv.className = "course-box-content";
 
-          var courseContent = '<h4 class="course-box-title" title="'+ obj.name +'" data-toggle="tooltip" data-placement="bottom"><p class="block-with-text"><a href="'+ url +'">'+ obj.name +'</a></p></h4>';
+          var courseContent = '<h4 class="course-box-title" title="'+ obj.name +'" data-toggle="tooltip" data-placement="bottom"><p class="block-with-text"><a href="'+ url +'" target="_blank">'+ obj.name +'</a></p></h4>';
            courseContent += '<br/><p class="block-with-text">'+ obj.introduction+'<a type="button" class="show " data-show="'+ obj.id +'">Read More</a></p>';
 
-          courseContent += '<div class="corse-detail" id="corse-detail-'+ obj.id +'"><div class="corse-detail-heder"><span class="card-title"><b>'+ obj.name +'</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="'+ obj.id +'"><span aria-hidden="true">×</span></button></div></br/><p>'+ obj.introduction +'</p><div class="text-center corse-detail-footer" ><a href="'+ url +'" class="btn btn-primary btn-default" > Start Project</a></div></div>';
+          courseContent += '<div class="corse-detail" id="corse-detail-'+ obj.id +'"><div class="corse-detail-heder"><span class="card-title"><b>'+ obj.name +'</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="'+ obj.id +'"><span aria-hidden="true">×</span></button></div></br/><p>'+ obj.introduction +'</p><div class="text-center corse-detail-footer" ><a href="'+ url +'" class="btn btn-primary btn-default"  target="_blank"> Start Project</a></div></div>';
 
           thirdDiv.innerHTML = courseContent;
           secondDiv.appendChild(thirdDiv);
 
           var authorDiv = document.createElement('div');
           authorDiv.className = "course-auther";
-          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
+          authorDiv.innerHTML = '<a href="'+ url +'" target="_blank"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           projects.appendChild(firstDiv);

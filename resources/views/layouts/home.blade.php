@@ -245,7 +245,10 @@
     .col-xs-12 {
         width: 100%;
         margin-left: 0%;
+      }
     }
+    .footer{
+      border-top: 0px !important;
     }
   </style>
 @stop
@@ -258,7 +261,7 @@
   @include('header.header_info')
 @stop
 @section('footer')
-  @include('footer.livechat')
+  @include('footer.footer')
 <script>
   $(document).ready(function() {
     var showChar = 500;

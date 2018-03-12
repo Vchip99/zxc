@@ -88,7 +88,7 @@ class DocumentsDocController extends Controller
             $documentsDoc = DocumentsDoc::addOrUpdateDocument($request);
             if(is_object($documentsDoc)){
                 $messageBody = '';
-                $notificationMessage = 'A new document: <a href="'.$request->root().'/documents/'.$documentsDoc->id.'">'.$documentsDoc->name.'</a> has been added.';
+                $notificationMessage = 'A new document: <a href="'.$request->root().'/documents/'.$documentsDoc->id.'" target="_blank">'.$documentsDoc->name.'</a> has been added.';
                 Notification::addNotification($notificationMessage, Notification::ADMINDOCUMENT, $documentsDoc->id);
                 DB::commit();
                 $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get()->toArray();

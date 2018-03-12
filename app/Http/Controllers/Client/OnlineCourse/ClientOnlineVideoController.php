@@ -65,7 +65,7 @@ class ClientOnlineVideoController extends ClientBaseController
         {
         	$video = ClientOnlineVideo::addOrUpdateVideo($request);
             if(is_object($video)){
-                $notificationMessage = 'A new course video: <a href="'.$request->root().'/episode/'.$video->id.'">'.$video->name.'</a> has been added.';
+                $notificationMessage = 'A new course video: <a href="'.$request->root().'/episode/'.$video->id.'" target="_blank">'.$video->name.'</a> has been added.';
                 ClientNotification::addNotification($notificationMessage, ClientNotification::CLIENTCOURSEVIDEO, $video->id);
                 DB::connection('mysql2')->commit();
             	return Redirect::to('manageOnlineVideo')->with('message', 'Video created successfully!');

@@ -212,7 +212,7 @@ class QuestionController extends Controller
                     $paper = TestSubjectPaper::find($paperId);
                     if(is_object($paper)){
                         $messageBody = '';
-                        $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'">'.$paper->name.'</a> has been added.';
+                        $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'" target="_blank">'.$paper->name.'</a> has been added.';
                         Notification::addNotification($notificationMessage, Notification::ADMINPAPER, $paper->id);
 
                         $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();

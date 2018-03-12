@@ -145,7 +145,7 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-12" id="bar-chart">
+          <!-- <div class="col-lg-12" id="bar-chart">
             <div class="panel panel-info">
               <div class="panel-heading text-center">
                  RESULT
@@ -174,7 +174,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -184,7 +184,7 @@
     document.getElementById('selected_year').value = 0;
     document.getElementById('selected_student').value = 0;
     document.getElementById('test-result').innerHTML = '';
-    document.getElementById('barchart').innerHTML = '';
+    // document.getElementById('barchart').innerHTML = '';
     document.getElementById('category').value = 0;
     unsetSubCategory();
     unsetStudent();
@@ -205,8 +205,8 @@
         .done(function( msg ) {
           body = document.getElementById('test-result');
           body.innerHTML = '';
-          barchart = document.getElementById('barchart');
-          barchart.innerHTML = '';
+          // barchart = document.getElementById('barchart');
+          // barchart.innerHTML = '';
           if( 0 < msg['scores'].length){
             $.each(msg['scores'], function(idx, obj) {
                 var eleTr = document.createElement('tr');
@@ -231,12 +231,12 @@
                 eleTr.appendChild(eleRank);
                 body.appendChild(eleTr);
 
-                var eleMainDiv = document.createElement('div');
-                eleMainDiv.className = 'barchart-Col';
-                eleInnerHtml = '<div class="barchart-Bar" style="height:'+ msg['marks'][obj.id]['percentage']+ '%;" title="'+obj.subject+'-'+obj.paper+'" attr-height="'+ msg['marks'][obj.id]['percentage']+ '%"></div>';
-                eleInnerHtml += '<div class="barchart-BarFooter " title="'+obj.paper+'">'+obj.paper+'</div>';
-                eleMainDiv.innerHTML = eleInnerHtml;
-                barchart.appendChild(eleMainDiv);
+                // var eleMainDiv = document.createElement('div');
+                // eleMainDiv.className = 'barchart-Col';
+                // eleInnerHtml = '<div class="barchart-Bar" style="height:'+ msg['marks'][obj.id]['percentage']+ '%;" title="'+obj.subject+'-'+obj.paper+'" attr-height="'+ msg['marks'][obj.id]['percentage']+ '%"></div>';
+                // eleInnerHtml += '<div class="barchart-BarFooter " title="'+obj.paper+'">'+obj.paper+'</div>';
+                // eleMainDiv.innerHTML = eleInnerHtml;
+                // barchart.appendChild(eleMainDiv);
             });
           } else {
             var eleTr = document.createElement('tr');
@@ -255,7 +255,7 @@
     var selected_year = document.getElementById('selected_year').value;
     document.getElementById('selected_student').value = 0;
     document.getElementById('test-result').innerHTML = '';
-    document.getElementById('barchart').innerHTML = '';
+    // document.getElementById('barchart').innerHTML = '';
     document.getElementById('category').value = 0;
     unsetSubCategory();
 
@@ -292,7 +292,7 @@
     document.getElementById('selected_dept').value = 0;
     document.getElementById('selected_year').value = 0;
     document.getElementById('test-result').innerHTML = '';
-    document.getElementById('barchart').innerHTML = '';
+    // document.getElementById('barchart').innerHTML = '';
 
     document.getElementById('category').value = 0;
     unsetSubCategory();

@@ -71,7 +71,7 @@ class PlacementApplyJobController extends Controller
             $applyJob = ApplyJob::addOrUpdateApplyJob($request);
             if(is_object($applyJob)){
                 $messageBody = '';
-                $notificationMessage = 'A new job vacancy of company: <a href="'.$request->root().'/placements/">'.$applyJob->company.'</a> has been added.';
+                $notificationMessage = 'A new job vacancy of company: <a href="'.$request->root().'/placements/" target="_blank">'.$applyJob->company.'</a> has been added.';
                 Notification::addNotification($notificationMessage, Notification::ADMINCOMPANYJOB, $applyJob->id);
                 DB::commit();
                 $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();

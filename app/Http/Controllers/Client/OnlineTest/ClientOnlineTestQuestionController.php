@@ -196,7 +196,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                 if(1 == $questionCount){
                     $paper = ClientOnlineTestSubjectPaper::find($paperId);
                     if(is_object($paper)){
-                        $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'">'.$paper->name.'</a> has been added.';
+                        $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'" target="_blank">'.$paper->name.'</a> has been added.';
                         ClientNotification::addNotification($notificationMessage, ClientNotification::CLIENTPAPER, $paperId,$testQuestion->client_institute_course_id);
                     }
                 }

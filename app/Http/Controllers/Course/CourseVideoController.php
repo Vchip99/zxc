@@ -76,7 +76,7 @@ class CourseVideoController extends Controller
         	$video = CourseVideo::addOrUpdateVideo($request);
             if(is_object($video)){
                 $messageBody = '';
-                $notificationMessage = 'A new course video: <a href="'.$request->root().'/episode/'.$video->id.'">'.$video->name.'</a> has been added.';
+                $notificationMessage = 'A new course video: <a href="'.$request->root().'/episode/'.$video->id.'" target="_blank">'.$video->name.'</a> has been added.';
                 Notification::addNotification($notificationMessage, Notification::ADMINCOURSEVIDEO, $video->id);
                 DB::commit();
                 $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();

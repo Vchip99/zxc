@@ -84,7 +84,7 @@ class AdminBlogController extends Controller
             $blog = Blog::addOrUpdateBlog($request);
             if(is_object($blog)){
                 $messageBody = '';
-                $notificationMessage = 'A new blog: <a href="'.$request->root().'/blogComment/'.$blog->id.'">'.$blog->title.'</a> has been added.';
+                $notificationMessage = 'A new blog: <a href="'.$request->root().'/blogComment/'.$blog->id.'" target="_blank">'.$blog->title.'</a> has been added.';
                 Notification::addNotification($notificationMessage, Notification::ADMINBLOG, $blog->id);
 
                 $tags = explode(',',$request->get('tags'));

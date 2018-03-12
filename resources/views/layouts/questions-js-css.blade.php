@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="{{ asset('css/ui.jqgrid.css?ver=1.0') }}"/>
 <link href="{{asset('css/jquery-confirm.min.css?ver=1.0')}}" rel="stylesheet"/>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 <script src="{{ asset('js/jquery.min.js?ver=1.0')}}"></script>
 <script src="{{ asset('js/bootstrap.min.js?ver=1.0')}}" type="text/javascript"></script>
 <script src="{{ asset('js/jquery.jqGrid.min.js?ver=1.0') }}"></script>

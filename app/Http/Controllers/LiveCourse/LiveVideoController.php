@@ -73,7 +73,7 @@ class LiveVideoController extends Controller
             $video = LiveVideo::addOrUpdateLiveVideo($request);
             if(is_object($video)){
                 $messageBody = '';
-                $notificationMessage = 'A new live course video: <a href="'.$request->root().'/liveEpisode/'.$video->id.'">'.$video->name.'</a> has been added.';
+                $notificationMessage = 'A new live course video: <a href="'.$request->root().'/liveEpisode/'.$video->id.'" target="_blank">'.$video->name.'</a> has been added.';
                 Notification::addNotification($notificationMessage, Notification::ADMINLIVECOURSEVIDEO, $video->id);
                 DB::commit();
                 $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();

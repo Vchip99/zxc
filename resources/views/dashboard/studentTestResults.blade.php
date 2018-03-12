@@ -144,7 +144,7 @@
                </div>
             </div>
           </div>
-          <div class="col-lg-12" id="bar-chart">
+          <!-- <div class="col-lg-12" id="bar-chart">
             <div class="panel panel-info">
               <div class="panel-heading text-center">
                  RESULT
@@ -173,7 +173,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -191,7 +191,7 @@
     document.getElementById('category').value = 0;
     document.getElementById('subcategory').value = 0;
     document.getElementById('test-result').innerHTML = '';
-    document.getElementById('barchart').innerHTML = '';
+    // document.getElementById('barchart').innerHTML = '';
   }
 
   function resetDepartments(){
@@ -205,7 +205,7 @@
     document.getElementById('category').value = 0;
     document.getElementById('subcategory').value = 0;
     document.getElementById('test-result').innerHTML = '';
-    document.getElementById('barchart').innerHTML = '';
+    // document.getElementById('barchart').innerHTML = '';
     if(2 == user_type){
       document.getElementById('div_year').classList.remove('hide');
       document.getElementById('selected_year').value = 0;
@@ -244,7 +244,7 @@
     document.getElementById('category').value = 0;
     document.getElementById('subcategory').value = 0;
     document.getElementById('test-result').innerHTML = '';
-    document.getElementById('barchart').innerHTML = '';
+    // document.getElementById('barchart').innerHTML = '';
 
     $.ajax({
           method: "POST",
@@ -336,8 +336,8 @@
           .done(function( msg ) {
             body = document.getElementById('test-result');
             body.innerHTML = '';
-            barchart = document.getElementById('barchart');
-            barchart.innerHTML = '';
+            // barchart = document.getElementById('barchart');
+            // barchart.innerHTML = '';
             if( 0 < msg['scores'].length){
               $.each(msg['scores'], function(idx, obj) {
                   var eleTr = document.createElement('tr');
@@ -362,12 +362,12 @@
                   eleTr.appendChild(eleRank);
                   body.appendChild(eleTr);
 
-                  var eleMainDiv = document.createElement('div');
-                  eleMainDiv.className = 'barchart-Col';
-                  eleInnerHtml = '<div class="barchart-Bar" style="height:'+ msg['marks'][obj.id]['percentage']+ '%;" title="'+ msg['marks'][obj.id]['percentage']+ '%" attr-height="'+ msg['marks'][obj.id]['percentage']+ '%"></div>';
-                  eleInnerHtml += '<div class="barchart-BarFooter " title="'+obj.subject+'-'+obj.paper+'">'+obj.subject+'-'+obj.paper+'</div>';
-                  eleMainDiv.innerHTML = eleInnerHtml;
-                  barchart.appendChild(eleMainDiv);
+                  // var eleMainDiv = document.createElement('div');
+                  // eleMainDiv.className = 'barchart-Col';
+                  // eleInnerHtml = '<div class="barchart-Bar" style="height:'+ msg['marks'][obj.id]['percentage']+ '%;" title="'+ msg['marks'][obj.id]['percentage']+ '%" attr-height="'+ msg['marks'][obj.id]['percentage']+ '%"></div>';
+                  // eleInnerHtml += '<div class="barchart-BarFooter " title="'+obj.subject+'-'+obj.paper+'">'+obj.subject+'-'+obj.paper+'</div>';
+                  // eleMainDiv.innerHTML = eleInnerHtml;
+                  // barchart.appendChild(eleMainDiv);
               });
             } else {
               var eleTr = document.createElement('tr');

@@ -10,7 +10,7 @@
 	    	<span class="more" id="editSubCommentHide_{{$subcomment->id}}">
 	    	{!! $subcomment->body !!}
 	    	</span></p>
-	    	<form id="goToComment_{{$comment->id}}" action="{{ url('goToComment')}}" method="POST" style="display: none;">
+	    	<form id="goToComment_{{$comment->id}}" action="{{ url('goToComment')}}" method="POST" style="display: none;" target="_blank">
               {{ csrf_field() }}
               <input type="hidden" name="comment_id" value="{{$comment->id}}">
             </form>

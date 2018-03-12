@@ -90,7 +90,7 @@ class VkitProjectController extends Controller
             $project = VkitProject::addOrUpdateProject($request);
             if(is_object($project)){
                 $messageBody = '';
-                $notificationMessage = 'A new project: <a href="'.$request->root().'/vkitproject/'.$project->id.'">'.$project->name.'</a> has been added.';
+                $notificationMessage = 'A new project: <a href="'.$request->root().'/vkitproject/'.$project->id.'" target="_blank">'.$project->name.'</a> has been added.';
                 Notification::addNotification($notificationMessage, Notification::ADMINVKITPROJECT, $project->id);
                 DB::commit();
                 $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();

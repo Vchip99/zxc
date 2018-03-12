@@ -136,7 +136,7 @@
           var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
           if(document.getElementById('qnimate_'+receiverId)){
             document.getElementById('qnimate_'+receiverId).classList.add('popup-box-on');
-            console.log(document.getElementById('qnimate_'+receiverId).children[1].style.display = "block");
+            document.getElementById('qnimate_'+receiverId).children[1].style.display = "block";
             // set popup position
             register_popup('qnimate_'+receiverId);
             return false;

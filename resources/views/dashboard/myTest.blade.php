@@ -123,7 +123,7 @@
                               @if($currentDate < $testSubjectPaper->date_to_active)
                                   <button disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
                               @elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-                                <form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}">
+                                <form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}" target="_blank">
                                   {{ csrf_field() }}
                                   <input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
                                   <input type="hidden" name="category_id" value="{{$testSubjectPaper->test_category_id}}">
@@ -164,7 +164,7 @@
                                             @if($currentDate < $testSubjectPaper->date_to_active)
                                               <button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
                                             @elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-                                              <form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}">
+                                              <form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}" target="_blank">
                                                 {{ csrf_field() }}
                                                 <input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
                                                 <input type="hidden" name="category_id" value="{{$testSubjectPaper->test_category_id}}">
@@ -369,7 +369,7 @@
                       var testUrl = "{{ url('showUserTestResult') }}";
                       var csrf_token = '{{ csrf_field() }}';
                       divInnerHtml += '<td class=" ">';
-                      divInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
+                      divInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'" target="_blank">';
                       divInnerHtml += csrf_token;
                       divInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.test_category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.test_sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.test_subject_id +'"></form>';
                       divInnerHtml += '<button onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
@@ -440,7 +440,7 @@
                         var testUrl = "{{ url('showUserTestResult') }}";
                         var csrf_token = '{{ csrf_field() }}';
                         ulDivInnerHtml += '<li class=" ">';
-                        ulDivInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
+                        ulDivInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'" target="_blank">';
                         ulDivInnerHtml += csrf_token;
                         ulDivInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.test_category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.test_sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.test_subject_id +'"></form>';
                         ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';

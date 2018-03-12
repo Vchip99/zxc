@@ -26,7 +26,7 @@
                           <div class="media-heading" >
                             <div class="user-block ">
                               <a id="{{$post->id}}" class="tital" onClick="goToPost(this);" style="cursor: pointer;">{{$post->title}} </a>
-                                <form id="goToPost_{{$post->id}}" action="{{ url('goToPost')}}" method="POST" style="display: none;">
+                                <form id="goToPost_{{$post->id}}" action="{{ url('goToPost')}}" method="POST" style="display: none;" target="_blank">
                                   {{ csrf_field() }}
                                   <input type="hidden" name="post_id" value="{{$post->id}}">
                                 </form>
