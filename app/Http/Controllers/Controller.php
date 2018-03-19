@@ -29,21 +29,5 @@ class Controller extends BaseController
             return TestCategory::getTestCategoriesAssociatedWithQuestion();
         });
         view::share('testCategoriesWithQuestions', $testCategoriesWithQuestions);
-
-        // $testSubCategories = Cache::remember('testSubCategories',60, function() {
-        //     return TestSubCategory::getAllTestSubCategories();
-        // });
-        // view::share('testSubCategories', $testSubCategories);
-
-        // $testSubjects = Cache::remember('testSubjects',60, function() {
-        //     return TestSubject::getAllSubjects();
-        // });
-        // view::share('testSubjects', $testSubjects);
-
-        // $testSubjectPapers = Cache::remember('testSubjectPapers',60, function() {
-        //     return TestSubjectPaper::getAllSubjectPapers();
-        // });
-        // view::share('testSubjectPapers', $testSubjectPapers);
-
     }
 }

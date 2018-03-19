@@ -136,7 +136,7 @@
 						                  	<th>Result</th>
 						                  	<th>Date to Active</th>
 						                  	<th>Price</th>
-						                  	<th>Add to cart</th>
+						                  	<th>Add to Favourite</th>
 					                	</tr>
 					              	</thead>
 					              	<tbody>
@@ -162,7 +162,7 @@
 										                @elseif($testSubjectPaper->price < 1 )
 										                	<td id="startTest_{{$testSubjectPaper->id}}" onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->test_category_id}}" data-subcategory="{{$testSubjectPaper->test_sub_category_id}}"><button data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button></td>
 										                @else
-										                	<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Add to cart to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
+										                	<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Add to favourite to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
 									                    @endif
 							                    	@endif
 
@@ -187,12 +187,12 @@
 								                    <td class=" ">{{ $testSubjectPaper->date_to_active }}</td>
 								                    <td class=""><i class="fa fa-inr"></i>{{ $testSubjectPaper->price }}</td>
 								                    @if($currentDate < $testSubjectPaper->date_to_active)
-								                    	<td><button disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled on date to active"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
+								                    	<td><button disabled="true" data-toggle="tooltip" title="Add to Favourite will be enabled on date to active"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
 								                    @else
 								                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
-									                    	<td><button disabled="true" data-toggle="tooltip" title="Already Added to Cart!"><i class="fa fa-cart-plus" aria-hidden="true"></i></button></td>
+									                    	<td><button disabled="true" data-toggle="tooltip" title="Already Added to Favourite!" ><i class="fa fa-star" aria-hidden="true" style="color: rgb(233, 30, 99);"></i></button></td>
 									                    @else
-									                    	<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->test_category_id}}" data-subcategory="{{$testSubjectPaper->test_sub_category_id}}" onClick="registerPaper(this);"><button  data-toggle="tooltip" title="Add to Cart!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>
+									                    	<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->test_category_id}}" data-subcategory="{{$testSubjectPaper->test_sub_category_id}}" onClick="registerPaper(this);"><button  data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
 									                    @endif
 								                    @endif
 								                </tr>
@@ -226,7 +226,7 @@
 													                @elseif($testSubjectPaper->price < 1 )
 													                	<li id="startTest_mobile_{{$testSubjectPaper->id}}" onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->test_category_id}}" data-subcategory="{{$testSubjectPaper->test_sub_category_id}}" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true"></span>Start</button></li>
 													                @else
-													                	<li id="startTest_mobile_{{$testSubjectPaper->id}}" ><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to cart to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
+													                	<li id="startTest_mobile_{{$testSubjectPaper->id}}" ><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to favourite to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
 												                    @endif
 										                    	@endif
 									                           	<li id="showUserResultMobileBtn_{{$testSubjectPaper->id}}">
@@ -254,12 +254,12 @@
 									                           		<button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span> {{ $testSubjectPaper->price }} </button>
 									                           	</li>
 								                           		@if($currentDate < $testSubjectPaper->date_to_active)
-											                    	<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled on date to active"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
+											                    	<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to Favourite will be enabled on date to active"><span class="fa fa-star" aria-hidden="true" ></span> Add</button></li>
 											                    @else
 											                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
-												                    	<li><button  disabled="true" class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Already Added to Cart!"><span class="fa fa-cart-plus" aria-hidden="true"></span> Add</button></li>
+												                    	<li><button  disabled="true" class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Already Added to Favourite!"><span class="fa fa-star" aria-hidden="true" style="color: rgb(233, 30, 99);"></span> Add</button></li>
 												                    @else
-												                    	<li id="registerPaper_mobile_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->test_category_id}}" data-subcategory="{{$testSubjectPaper->test_sub_category_id}}" onClick="registerPaper(this);"><button class="btn-magick btn-sm btn3d"  data-toggle="tooltip" title="Add to Cart!"><span class="fa fa-cart-plus" aria-hidden="true" ></span> Add</button></li>
+												                    	<li id="registerPaper_mobile_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->test_category_id}}" data-subcategory="{{$testSubjectPaper->test_sub_category_id}}" onClick="registerPaper(this);"><button class="btn-magick btn-sm btn3d"  data-toggle="tooltip" title="Add to Favourite!"><span class="fa fa-star" aria-hidden="true" ></span> Add</button></li>
 												                    @endif
 											                    @endif
 								                         	</ul>
@@ -439,7 +439,7 @@
 				                trInnerhtml += '<th>Result</th>';
 				                trInnerhtml += '<th>Date to Active</th>';
 				                trInnerhtml += '<th>Price</th>';
-				                trInnerhtml += '<th>Add to Cart</th>';
+				                trInnerhtml += '<th>Add to Favourite</th>';
 				                tableTr.innerHTML = trInnerhtml;
 				                tableHead.appendChild(tableTr);
 				                tableEle.appendChild(tableHead);
@@ -465,7 +465,7 @@
 		                				} else if(obj.price < 1){
 		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'" data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 		                				} else {
-		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true" data-toggle="tooltip" title="Add to cart to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true" data-toggle="tooltip" title="Add to favourite to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 		                				}
 								    }
 								    if(msg['currentDate'] < obj.date_to_active){
@@ -495,12 +495,12 @@
 								    divInnerHtml += '<td class=""><i class="fa fa-inr"></i>'+ obj.price +'</td>';
 
 								    if(msg['currentDate'] < obj.date_to_active){
-								    	divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled on date to active"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+								    	divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Add to Favourite will be enabled on date to active"><i class="fa fa-star" aria-hidden="true" ></i></button></td>';
 								    } else {
 									    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
-									    	divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Already Added to Cart."><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+									    	divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Already Added to Favourite."><i class="fa fa-star" aria-hidden="true" ></i></button></td>';
 									    } else {
-									    	divInnerHtml += '<td id="registerPaper_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'" onClick="registerPaper(this);" ><button data-toggle="tooltip" title="Add to Cart!"><i class="fa fa-cart-plus" aria-hidden="true" ></i></button></td>';
+									    	divInnerHtml += '<td id="registerPaper_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'" onClick="registerPaper(this);" ><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-star" aria-hidden="true" ></i></button></td>';
 									    }
 									}
 								    tbodyTr.innerHTML = divInnerHtml;
@@ -560,7 +560,7 @@
 		                				} else if(obj.price < 1){
 		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 		                				} else {
-		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to cart to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to favourite to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 		                				}
 								    }
 								    if(msg['currentDate'] < obj.date_to_active){
@@ -590,12 +590,12 @@
 								    ulDivInnerHtml += '<li class=""><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.price +'</button></li>';
 
 								    if(msg['currentDate'] < obj.date_to_active){
-								    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to Cart will be enabled on date to active"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+								    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to Favourite will be enabled on date to active"><span class="fa fa-star" aria-hidden="true" ></span>Add</button></li>';
 								    } else {
 									    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
-									    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already Added to Cart."><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+									    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already Added to Favourite."><span class="fa fa-star" aria-hidden="true" ></span>Add</button></li>';
 									    } else {
-									    	ulDivInnerHtml += '<li id="registerPaper_mobile_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'" onClick="registerPaper(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Cart!"><span class="fa fa-cart-plus" aria-hidden="true" ></span>Add</button></li>';
+									    	ulDivInnerHtml += '<li id="registerPaper_mobile_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'" onClick="registerPaper(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Favourite!"><span class="fa fa-star" aria-hidden="true" ></span>Add</button></li>';
 									    }
 									}
 									ulDiv.innerHTML = ulDivInnerHtml;
@@ -721,7 +721,7 @@
 								registerEle.setAttribute('data-subcategory', 0);
 								registerEle.removeAttribute('onclick');
 						        registerEle.innerHTML ='';
-						        registerEle.innerHTML = '<button data-toggle="tooltip" title="Already Added to Cart!"><i class="fa fa-cart-plus" aria-hidden="true"></i></button>';
+						        registerEle.innerHTML = '<button data-toggle="tooltip" title="Already Added to Favourite!"><i class="fa fa-star" aria-hidden="true" style="color: rgb(233, 30, 99);"></i></button>';
 
 
 						        var registerMobileEle = document.getElementById('registerPaper_mobile_'+paper);
@@ -731,7 +731,7 @@
 								registerMobileEle.setAttribute('data-subcategory', 0);
 								registerMobileEle.removeAttribute('onclick');
 						        registerMobileEle.innerHTML ='';
-						        registerMobileEle.innerHTML = '<button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Already Added to Cart!"><span class="fa fa-cart-plus" aria-hidden="true"></span>Add</button>';
+						        registerMobileEle.innerHTML = '<button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Already Added to Favourite!"><span class="fa fa-star" aria-hidden="true"></span>Add</button>';
 
 						        var startTestEle = document.getElementById('startTest_'+paper);
 						        startTestEle.setAttribute('data-paper', paper);

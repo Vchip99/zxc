@@ -250,6 +250,29 @@
     .footer{
       border-top: 0px !important;
     }
+       /*tree*/
+  .tree-tital{
+    font-weight: 800;
+    color: #448eda;
+    font-size: 23px;
+  }
+  .tree-menu {
+    margin: 13% 0 25%;
+    float: left;
+    font-weight: bolder;
+    width: 100%;
+  }
+  @media screen and (max-width: 991px){
+    .tree-menu{
+        margin: 2% 0;
+        line-height: 1;
+    }
+  }
+  @media screen and (max-width: 991px){
+    .tree-menu ,.tree-tital{
+        text-align: center;
+    }
+  }
   </style>
 @stop
 @section('header-js')
@@ -259,6 +282,49 @@
 @section('content')
   @include('header.header_menu')
   @include('header.header_info')
+  <section id="vchip_solution" class="v_container" >
+  <div class="container ">
+    <div class="row mrgn_60_btm">
+      <div class="col-md-8 col-md-offset-2 text-center ">
+        <h2 class="v_h2_title">OUR SERVICES</h2>
+        <hr class="section-dash-dark"/>
+        <h3 class="v_h3_title">Learn with fun...</h3>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-push-2" style="padding: 1% 0;">
+        <figure >
+          <img src="{{asset('images/solution/tree-digram.png')}}" class="img-responsive" alt="Tree Digram" style="width: 100%;"/>
+        </figure>
+      </div>
+      <div class="col-md-2 col-md-pull-8 " style="padding: 4% 0;">
+          <p class="tree-tital"><a href="{{ url('erp')}}">COLLEGE/STUDENTS</a></p>
+            <div class="tree-menu"><a>Bridging a gap between industries & Students</a></div>
+            <div class="tree-menu"><a>Placement, Internship, Sponsor projects</a></div>
+            <div class="tree-menu"><a>Workshops on emerging Technology </a></div>
+            <div class="tree-menu"><a>Digital Education & ERP Management </a></div>
+            <div class="tree-menu"><a>Start-ups</a></div>
+      </div>
+      @php
+        if('local' == \Config::get('app.env')){
+          $onlineUrl = 'https://online.localvchip.com/';
+        } else {
+          $onlineUrl = 'https://online.vchipedu.com/';
+        }
+      @endphp
+      <div class="col-md-2 " style="padding: 4% 0;">
+           <p class="tree-tital" ><a href="{{$onlineUrl}}digitaleducation">COACHING INSTITUTE</a></p>
+            <div class="tree-menu"><a>Digital Education Platform</a></div>
+            <div class="tree-menu"><a>ERP Management</a></div>
+            <div class="tree-menu"><a>Web and Mobile App Development</a></div>
+            <div class="tree-menu"><a>Digital Marketing</a></div>
+            <div class="tree-menu"><a>SEO</a></div>
+      </div>
+    </div>
+  </div>
+</section>
 @stop
 @section('footer')
   @include('footer.footer')

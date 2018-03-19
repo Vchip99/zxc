@@ -102,7 +102,7 @@
 <!-- col-8 aboutus -->
 <div class="col-md-12">
 <button class="accordion" title="DATA SCIENCE">DATA SCIENCE</button>
-<div class="panel">
+<div class="panel_body">
     <div class="panel-content">
         <p class="qualification">
               <strong>Qualification:</strong>Qualification BE/B.Tech(CS,IT,EXTC)
@@ -124,7 +124,7 @@
 </div>
 
 <button class="accordion" title="QUANTITATIVE APTITUDE">QUANTITATIVE APTITUDE</button>
-<div class="panel">
+<div class="panel_body">
     <div class="panel-content">
         <p class="qualification">
               <strong>Qualification:</strong>Qualification MBA(From IIM)
@@ -144,7 +144,7 @@
 
 </div>
 <button class="accordion" title="REASONING">REASONING</button>
-<div class="panel">
+<div class="panel_body">
     <div class="panel-content">
         <p class="qualification">
               <strong>Qualification:</strong>Qualification MBA(From IIM)
@@ -164,7 +164,7 @@
 
 </div>
 <button class="accordion" title="ANDROID APP DEVELOPMENT">ANDROID APP DEVELOPMENT</button>
-<div class="panel">
+<div class="panel_body">
     <div class="panel-content">
         <p class="qualification">
               <strong>Qualification:</strong>Qualification BE/B.Tech(CS,IT,EXTC)

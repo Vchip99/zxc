@@ -99,6 +99,12 @@ color: #747474; }
 .prizing .block .btn-contact i {
   margin-right: 10px;
 }
+.vchip-background-content {
+  width: 100% !important;
+  bottom: 30px !important;
+  position: static !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+}
   </style>
 @stop
 @section('header-js')
@@ -114,7 +120,7 @@ color: #747474; }
         </figure>
       </div>
       <div class="vchip-background-content">
-        <h2 class="animated bounceInLeft">Digital Education</h2>
+        <h2 class="animated bounceInLeft">Start your own online education with in 15 mins</h2>
       </div>
     </div>
   </section>

@@ -459,29 +459,7 @@ margin-right: 10px;
     color: #fff;
   }
 
-   /*tree*/
-  .tree-tital{
-    font-weight: 800;
-    color: #448eda;
-    font-size: 23px;
-  }
-  .tree-menu {
-    margin: 13% 0 25%;
-    float: left;
-    font-weight: bolder;
-    width: 100%;
-  }
-  @media screen and (max-width: 991px){
-    .tree-menu{
-        margin: 2% 0;
-        line-height: 1;
-    }
-  }
-  @media screen and (max-width: 991px){
-    .tree-menu ,.tree-tital{
-        text-align: center;
-    }
-  }
+
   </style>
 @stop
 @section('header-js')
@@ -501,25 +479,6 @@ margin-right: 10px;
         </div>
     </div>
 </section>
-<!-- <section id="" class="v_container v_bg_grey">
-   <h2 class="v_h2_title text-center"> About us</h2>
-   <hr class="section-dash-dark"/>
-    <div class="container">
-
-          <div class="v_contactus-area">
-             <p class="more"> Vchip-edu is the part of Vchip Technology. Vchip Technology is IoT base young start-up company having head office in Pune. Vchip Technology is working in Education, Health and Agriculture sectores.
-          <br/>
-          Vchip-edu believes that better education is right of everyone. In our country (India), most of people live in villages. So Vchip-edu is working on Digital Education platform, so that we can provide a quality education equally in villages and remote areas along with urban area. In other word everyone can learn with fun from anywhere in the world at any time.
-          <br/><br/>
-          Currently, we are focusing on bridging a gap between industries and educational organizations along with digital villages. In that we are working on direct interaction of students with industries and our experts who belong to different industries. Also, interaction of students with Founder and CEO’s of successful start-ups. Also, our platform have all the require things which are needed for placement like online test (design according to pattern of the major companies), online course for aptitude preparation, discussion forum etc.
-          <br/><br/>
-          We are providing access of Vchip-edu platform to colleges at totally free of cost, so more and more students can get benefit of it. Student access to our platform is also totally free of cost. Also, any private/coaching institutes can start their classes digitally with in 15 minute on our platform. For  private/coaching institutes also our platform is free to use upto 20 logins.
-          <br/>
-           <p class="text-center">   <b >" We always believe that better society is a best place to live and educated society is better than best. "</b></p>
-          </p>
-      </div>
-    </div>
-</section> -->
 <section class="v_bg_grey v_container " >
   <div class="container">
     <div class="row">
@@ -558,44 +517,6 @@ margin-right: 10px;
     </div>
   </div>
   <br />
-</section>
-<section id="vchip_solution" class="v_container" >
-  <div class="container ">
-    <div class="row mrgn_60_btm">
-      <div class="col-md-8 col-md-offset-2 text-center ">
-        <h2 class="v_h2_title">OUR SERVICES</h2>
-        <hr class="section-dash-dark"/>
-        <h3 class="v_h3_title">Learn with fun...</h3>
-      </div>
-    </div>
-  </div>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-8 col-md-push-2" style="padding: 1% 0;">
-        <figure >
-          <img src="{{asset('images/solution/tree-digram.png')}}" class="img-responsive" alt="Tree Digram" style="width: 100%;"/>
-        </figure>
-      </div>
-      <div class="col-md-2 col-md-pull-8 " style="padding: 4% 0;">
-          <p class="tree-tital">COLLEGE/STUDENTS</p>
-            <div class="tree-menu"><a href="#">Bridging a gap between industries & Students</a></div>
-            <div class="tree-menu"><a href="#">Placement, Internship, Sponsor projects</a></div>
-            <div class="tree-menu"><a href="#">Workshops on emerging Technology </a></div>
-            <div class="tree-menu"><a href="#">Digital Education & ERP Management </a></div>
-            <div class="tree-menu"><a href="#">Start-ups</a></div>
-
-
-    </div>
-      <div class="col-md-2 " style="padding: 4% 0;">
-           <p class="tree-tital" >COACHING INSTITUTE</p>
-            <div class="tree-menu"><a href="#">Digital Education Platform</a></div>
-            <div class="tree-menu"><a href="#">ERP Management</a></div>
-            <div class="tree-menu"><a href="#">Web and Mobile App Development</a></div>
-            <div class="tree-menu"><a href="#">Digital Marketing</a></div>
-            <div class="tree-menu"><a href="#">SEO</a></div>
-      </div>
-    </div>
-  </div>
 </section>
 <section class="v_bg_grey" id="feature">
   <div class="container v_container">

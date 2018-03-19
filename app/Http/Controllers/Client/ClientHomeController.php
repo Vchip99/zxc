@@ -48,7 +48,8 @@ class ClientHomeController extends Controller
             $onlineClientUrl = 'online.vchipedu.com';
         }
         if( $onlineClientUrl == $request->getHost()){
-            return view('client.online.home');
+            return view('client.online.digitaleducation');
+
         } else {
             $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
 

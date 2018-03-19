@@ -217,7 +217,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
      </div>
      <div class="col-md-12 mrgn_30_top">
       <button class="accordion" title="ANGEL INVESTOR">ANGEL INVESTOR</button>
-      <div class="panel">
+      <div class="panel_body">
         <div class="panel-content ">
           <ul>
            <li>We are looking for Angel Investor so we can concentrate more and more toward quality rather that currency flow at the initial stage and also we can pay well to our team so they will be always with us. </li>
@@ -241,7 +241,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
      </div>
 
      <button class="accordion" title="FRANCHISE HOLDER">FRANCHISE HOLDER</button>
-     <div class="panel">
+     <div class="panel_body">
       <div class="panel-content ">
         <h2 class="v_h2_title text-center">Vchip-edu, leaders in on-line education platform.</h2>
         <p>Vchip-edu offers the customize on-line education platform to the students, industrial personal by the quality teaching, optimistic materials. Vchip-edu has introduced the innovative products live learn with fun, Vchip-education, Vchip-connect, Vchip-pendrive, Vchip-cloud. </p>
@@ -270,7 +270,7 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
 
       </div>
       <button class="accordion" title="MENTORS">MENTORS</button>
-      <div class="panel">
+      <div class="panel_body">
         <div class="panel-content">
           <p>We believes that if you want to win the race then only your speed in not enough but also you should have proper direction. So before starting any adventure we at first discuss our plan with our mentors, industry leaders who are working in same fields.
             All the industry leaders in the field of education, professors are most welcome to become mentor of Vchip-edu. </p>
