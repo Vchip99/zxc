@@ -301,11 +301,11 @@
       </div>
       <div class="col-md-2 col-md-pull-8 " style="padding: 4% 0;">
           <p class="tree-tital"><a href="{{ url('erp')}}">COLLEGE/STUDENTS</a></p>
-            <div class="tree-menu"><a>Bridging a gap between industries & Students</a></div>
-            <div class="tree-menu"><a>Placement, Internship, Sponsor projects</a></div>
-            <div class="tree-menu"><a>Workshops on emerging Technology </a></div>
-            <div class="tree-menu"><a>Digital Education & ERP Management </a></div>
-            <div class="tree-menu"><a>Start-ups</a></div>
+            <div class="tree-menu">Bridging a gap between industries & Students</div>
+            <div class="tree-menu">Placement, Internship, Sponsor projects</div>
+            <div class="tree-menu">Workshops on emerging Technology </div>
+            <div class="tree-menu">Digital Education & ERP Management </div>
+            <div class="tree-menu">Start-ups</div>
       </div>
       @php
         if('local' == \Config::get('app.env')){
@@ -315,12 +315,12 @@
         }
       @endphp
       <div class="col-md-2 " style="padding: 4% 0;">
-           <p class="tree-tital" ><a href="{{$onlineUrl}}digitaleducation">COACHING INSTITUTE</a></p>
-            <div class="tree-menu"><a>Digital Education Platform</a></div>
-            <div class="tree-menu"><a>ERP Management</a></div>
-            <div class="tree-menu"><a>Web and Mobile App Development</a></div>
-            <div class="tree-menu"><a>Digital Marketing</a></div>
-            <div class="tree-menu"><a>SEO</a></div>
+           <p class="tree-tital" ><a href="{{$onlineUrl}}">COACHING INSTITUTE</a></p>
+            <div class="tree-menu">Digital Education Platform</div>
+            <div class="tree-menu">ERP Management</div>
+            <div class="tree-menu">Web and Mobile App Development</div>
+            <div class="tree-menu">Digital Marketing</div>
+            <div class="tree-menu">SEO</div>
       </div>
     </div>
   </div>

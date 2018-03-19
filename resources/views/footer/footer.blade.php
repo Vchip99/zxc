@@ -18,7 +18,7 @@
             <li class=""><a href="{{ url('offlineworkshops') }}">Workshops</a></li>
             <li class=""><a href="{{ url('motivationalspeech') }}">Motivational Speech</a></li>
             <li class=""><a href="{{ url('virtualplacementdrive') }}">Virtual Placement Drive</a></li>
-            <li class=""><a href="{{$onlineUrl}}digitaleducation" target="_blank">Digital-Edu Platform</a></li>
+            <li class=""><a href="{{$onlineUrl}}" target="_blank">Digital-Edu Platform</a></li>
             <li class=""><a href="{{$onlineUrl}}digitalmarketing" target="_blank">Digital Marketing</a></li>
             <li class=""><a href="{{$onlineUrl}}webdevelopment" target="_blank">Web & App Development</a></li>
             <li class=""><a href="{{$onlineUrl}}pricing" target="_blank">Pricing</a></li>

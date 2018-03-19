@@ -120,7 +120,7 @@
                 <li class="mrgn_10_left"><a href="{{ url('virtualplacementdrive') }}" title="virtual placement drive">virtual placement drive</a></li>
                 <li class="divider"></li>
                 <li> <b style="color: #01bafd;">Coaching Institute</b></li>
-                 <li class="mrgn_10_left"><a href="{{$onlineUrl}}digitaleducation" title="Digital-Edu Platform" target="_blank">Digital-Edu Platform</a></li>
+                 <li class="mrgn_10_left"><a href="{{$onlineUrl}}" title="Digital-Edu Platform" target="_blank">Digital-Edu Platform</a></li>
                  <li class="mrgn_10_left"><a href="{{$onlineUrl}}digitalmarketing" title="Digital Marketing" target="_blank">Digital Marketing</a></li>
                  <li class="mrgn_10_left"><a href="{{$onlineUrl}}webdevelopment" title="web & app development" target="_blank">web & app development</a></li>
                  <li class="mrgn_10_left"><a href="{{$onlineUrl}}pricing" title="pricing" target="_blank">pricing</a></li>

@@ -95,6 +95,9 @@
 .read-more{
     height: auto;
 }
+.free_first{
+  height: 369px;
+}
 #readMore, #readMore-1, #readMore-2{
   font-weight: bolder;
   cursor: pointer;
@@ -151,7 +154,7 @@
                     <div class="panel-body text-center">
                       <p class="lead" style="font-size:20px"><strong>Rs. 0000 / year</strong></p>
                     </div>
-                    <ul class="list-group list-group-flush text-center">
+                    <ul class="list-group list-group-flush text-center free_first">
                       <li class="list-group-item" style="margin-top: 13px;">Online test series</li>
                       <li class="list-group-item">Online Courses</li>
                       <li class="list-group-item">Notification</li>

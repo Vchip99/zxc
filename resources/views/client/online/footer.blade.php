@@ -17,7 +17,7 @@
             <li class=""><a href="{{$homeUrl}}motivationalspeech" target="_blank">Motivational Speech</a></li>
             <li class=""><a href="{{$homeUrl}}virtualplacementdrive" target="_blank">Virtual Placement Drive</a></li>
 
-            <li class=""><a href="{{ url('digitaleducation') }}">Digital-Edu </a></li>
+            <li class=""><a href="{{ url('/') }}">Digital-Edu </a></li>
             <li class=""><a href="{{ url('digitalmarketing') }}">Digital Marketing</a></li>
             <li class=""><a href="{{ url('webdevelopment') }}">Web & App </a></li>
             <li class=""><a href="{{ url('pricing') }}">Pricing</a></li>
