@@ -57,6 +57,7 @@ class MotivationalSpeechCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:motivationalSpeechs*');
         DB::beginTransaction();
         try
         {
@@ -92,6 +93,7 @@ class MotivationalSpeechCategoryController extends Controller
      *  update  category
      */
     protected function update(Request $request){
+        InputSanitise::deleteCacheByString('vchip:motivationalSpeechs*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             DB::beginTransaction();
@@ -116,6 +118,7 @@ class MotivationalSpeechCategoryController extends Controller
      *  delete  category
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:motivationalSpeechs*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             $motivationalSpeechCategory = MotivationalSpeechCategory::find($categoryId);

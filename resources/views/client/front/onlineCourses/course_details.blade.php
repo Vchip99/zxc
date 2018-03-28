@@ -78,7 +78,7 @@
           @if('true' == $isCoursePurchased)
             <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" title="Paid">Paid</a>
           @else
-            @if(is_object(Auth::guard('clientuser')->user()))
+            @if(is_object($loginUser))
               <a href="{{ url('purchaseCourse')}}/{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" >Pay Now</a>
             @else
               <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" title="Pay Now" onClick="checkLogin();">Pay Now</a>
@@ -106,7 +106,7 @@
           </button>
       </div>
       <div class="btn-group" role="group" title="Favourite">
-        @if(is_object(Auth::guard('clientuser')->user()))
+        @if(is_object($loginUser))
             @if('true' == $isCourseRegistered)
               <a class="btn btn-default voted-btn" id="favourite" data-favourite="true" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Favourite" style="color: rgb(233, 30, 99);"> <i class="fa fa-star " aria-hidden="true"></i> </a>
             @else
@@ -123,7 +123,7 @@
           @foreach($videos as $index => $video)
           <div class="row mrgn_30_top border_box padding_10">
             <div class="col-md-3 ">
-              @if(is_object(Auth::guard('clientuser')->user()))
+              @if(is_object($loginUser))
                 @if('true' == $isCoursePurchased || 1 == $video->is_free || $course->price <= 0)
                   <a href="{{ url('episode')}}/{{$video->id}}"><h1 class="video_id">{{ $index + 1}}</h1></a>
                 @else
@@ -145,7 +145,7 @@
                 <span style="color: #e91e63;">Free</span>
               @endif
               <h4 class="v_h4_subtitle">
-                @if(is_object(Auth::guard('clientuser')->user()))
+                @if(is_object($loginUser))
                   @if('true' == $isCoursePurchased || 1 == $video->is_free || $course->price <= 0)
                     <a href="{{ url('episode')}}/{{$video->id}}">{{$video->name}}</a>
                   @else

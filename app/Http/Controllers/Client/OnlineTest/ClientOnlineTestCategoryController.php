@@ -46,12 +46,13 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     /**
      *  store category
      */
-    protected function store(Request $request){
+    protected function store($subdomain,Request $request){
         $v = Validator::make($request->all(), $this->validateCreateCategory);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString($subdomain.':tests*');
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -86,13 +87,13 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     /**
      * update category
      */
-    protected function update(Request $request){
+    protected function update($subdomain,Request $request){
         $v = Validator::make($request->all(), $this->validateCreateCategory);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString($subdomain.':tests*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             DB::connection('mysql2')->beginTransaction();
@@ -116,7 +117,8 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     /**
      * delete category
      */
-    protected function delete(Request $request){
+    protected function delete($subdomain,Request $request){
+        InputSanitise::deleteCacheByString($subdomain.':tests*');
     	$catId = InputSanitise::inputInt($request->get('category_id'));
     	if(isset($catId)){
     		$category = ClientOnlineTestCategory::find($catId);

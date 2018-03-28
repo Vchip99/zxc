@@ -58,6 +58,7 @@ class PlacementAreaController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:placements*');
         DB::beginTransaction();
         try
         {
@@ -93,6 +94,7 @@ class PlacementAreaController extends Controller
      *  update PlacementArea
      */
     protected function update(Request $request){
+        InputSanitise::deleteCacheByString('vchip:placements*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             DB::beginTransaction();
@@ -117,6 +119,7 @@ class PlacementAreaController extends Controller
      *  delete placement area
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:placements*');
         $areaId = InputSanitise::inputInt($request->get('area_id'));
         if(isset($areaId)){
             $placementArea = PlacementArea::find($areaId);

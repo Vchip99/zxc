@@ -33,10 +33,10 @@ class RegisterClientOnlineCourses extends Model
     }
 
     protected static function isCourseRegistered($courseId){
-        if(is_object(Auth::guard('clientuser')->user())){
-            $userId = Auth::guard('clientuser')->user()->id;
-            $registeredCourses = static::where('client_user_id', $userId)
-                                ->where('client_id', Auth::guard('clientuser')->user()->client_id)
+        $loginUser = Auth::guard('clientuser')->user();
+        if(is_object($loginUser)){
+            $registeredCourses = static::where('client_user_id', $loginUser->id)
+                                ->where('client_id', $loginUser->client_id)
                                 ->where('client_online_course_id', $courseId)
                                 ->get();
             if(false == $registeredCourses->isEmpty()){

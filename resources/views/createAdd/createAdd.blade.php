@@ -200,7 +200,11 @@
 	  	var selectedPage =  document.getElementById('selected_page').value;
         var spdate = new Date();
 		var sdd = spdate.getDate();
-		var smm = spdate.getMonth() + 1;
+		if(spdate.getMonth() > 9){
+			var smm = spdate.getMonth() + 1;
+		} else {
+			var smm = '0'+(spdate.getMonth() + 1);
+		}
 		var syyyy = spdate.getFullYear();
 		var today = syyyy+'-'+smm+'-'+sdd;
 

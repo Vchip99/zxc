@@ -53,13 +53,14 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 	/**
 	 *	store subject
 	 */
-	protected function store(Request $request){
+	protected function store($subdomain,Request $request){
 		$v = Validator::make($request->all(), $this->validateCreateSubject);
 
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString($subdomain.':tests*');
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -96,12 +97,13 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 	/**
 	 *	update subject
 	 */
-	protected function update(Request $request){
+	protected function update($subdomain,Request $request){
 		$v = Validator::make($request->all(), $this->validateCreateSubject);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString($subdomain.':tests*');
 		$subjectId = InputSanitise::inputInt($request->get('subject_id'));
 		if(isset($subjectId)){
 			DB::connection('mysql2')->beginTransaction();
@@ -125,7 +127,8 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 	/**
 	 *	delete subject
 	 */
-	protected function delete(Request $request){
+	protected function delete($subdomain,Request $request){
+		InputSanitise::deleteCacheByString($subdomain.':tests*');
 		$subjectId = InputSanitise::inputInt($request->get('subject_id'));
 		if(isset($subjectId)){
 			$testSubject = ClientOnlineTestSubject::find($subjectId);

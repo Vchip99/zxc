@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Clientuser;
 use App\Libraries\InputSanitise;
 use App\Models\ClientCourseSubCommentLike;
-use Auth;
+use Auth,Cache;
 
 class ClientCourseSubComment extends Model
 {
@@ -56,6 +56,12 @@ class ClientCourseSubComment extends Model
 
     public function user(){
         return $this->belongsTo(Clientuser::class, 'user_id');
+    }
+
+    public function getClientUser($subdomainName,$userId){
+        return Cache::remember($subdomainName.':user-'.$userId,30, function() use($userId){
+            return Clientuser::find($userId);
+        });
     }
 
     protected static function deleteClientCourseSubCommentsByUserId($clientId){

@@ -118,8 +118,8 @@ class RegisterController extends Controller
         if(!is_object($client)){
             return Redirect::to('/');
         }
-        // if free plan & user count greter than 20 then dont allow to signup.
-        if(1 == $client->plan_id && 20 <= $client->userCountByClientId($client->id)){
+        // if free plan & user count greter than 10 then dont allow to signup.
+        if(1 == $client->plan_id && 10 <= $client->userCountByClientId($client->id)){
             $data['name'] = $request->name;
             $data['email'] = $request->email;
             $data['client'] = $client->name;

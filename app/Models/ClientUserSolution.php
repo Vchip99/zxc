@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use DB;
+use DB, Cache;
 
 class ClientUserSolution extends Model
 {
@@ -26,12 +26,12 @@ class ClientUserSolution extends Model
     /**
      *  return solution by userId by scoreId by subjectId by paperId
      */
-    protected static function getClientUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $scoreId, $subjectId, $paperId){
-    	return DB::connection('mysql2')->table('client_user_solutions')->where('client_user_id', $userId)
-    								->where('client_score_id', $scoreId)
-    								->where('subject_id', $subjectId)
-    								->where('paper_id', $paperId)
-    								->get();
+    protected static function getClientUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($subdomainName,$userId, $scoreId, $subjectId, $paperId){
+            return DB::connection('mysql2')->table('client_user_solutions')->where('client_user_id', $userId)
+				->where('client_score_id', $scoreId)
+				->where('subject_id', $subjectId)
+				->where('paper_id', $paperId)
+				->get();
     }
 
     protected static function deleteClientUserSolutions($userId){

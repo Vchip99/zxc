@@ -23,6 +23,36 @@
 		    <label class="col-sm-2 col-form-label">Download Excel File:</label>
 		    <div class="col-sm-3"><a class="btn btn-primary" href="{{asset('Download Excel Questions File.xlsx')}}" download data-toggle="tooltip" data-placement="bottom">Download Excel Questions File</a>
 		    </div>
+		    <div class="col-sm-3">
+		    	<button id="submitButton" type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modelUploadImages">Upload Images</button>
+		    </div>
+		    <div class="modal fade" id="modelUploadImages" >
+	          	<div class="modal-dialog" role="document" >
+		            <div class="modal-content" >
+		              	<div class="modal-header">
+			                <h5 class="modal-title model-title">Upload Multiple Images</h5>
+			                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			                  <span aria-hidden="true">&times;</span>
+			                </button>
+		              	</div>
+		              	<form id="uploadImagesForm" action="{{url('uploadClientTestImages')}}" method="POST" enctype="multipart/form-data">
+						{{csrf_field()}}
+			              	<div class="modal-body">
+				                <div class="form-group row">
+				                  <label class="col-sm-3 col-form-label">Upload Images:</label>
+				                  <div class="col-sm-3">
+				                    <input type="file" class="model-input" id="upload_images" name="images[]" multiple="multiple" required="true">
+				                  </div>
+				                </div>
+			              	</div>
+			              	<div class="modal-footer">
+			                	<button class="btn btn-primary" data-dismiss="modal" onclick="uploadImages();">Save/Upload</button>
+			                	<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			              	</div>
+			            </form>
+		            </div>
+	          	</div>
+        	</div>
 	  	</div>
 		<form id="questionForm" action="{{url('uploadQuestions')}}" method="POST" enctype="multipart/form-data">
 			{{csrf_field()}}
@@ -227,6 +257,15 @@
 	            }
           	});
     	}
+	}
+
+	function uploadImages(){
+		if(document.getElementById('upload_images').value.length > 0){
+			document.getElementById('uploadImagesForm').submit();
+		} else {
+			alert('please select an image.');
+        	return false;
+		}
 	}
 
 </script>

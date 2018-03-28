@@ -70,6 +70,7 @@ class AdminBlogController extends Controller
         {   $request->flash();
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:blogs*');
         $blogTitle = InputSanitise::inputString($request->get('title'));
         $blogCategoryId = InputSanitise::inputInt($request->get('category_id'));
         $duplicateBlogName = Blog::where('title', $blogTitle)->where('blog_category_id', $blogCategoryId)->first();
@@ -155,7 +156,7 @@ class AdminBlogController extends Controller
         {   $request->flash();
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString('vchip:blogs*');
         $blogId = InputSanitise::inputInt($request->get('blog_id'));
         $blogTitle = InputSanitise::inputString($request->get('title'));
         $blogCategoryId = InputSanitise::inputInt($request->get('category_id'));
@@ -214,6 +215,7 @@ class AdminBlogController extends Controller
      *  delete blog
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:blogs*');
     	$blogId = InputSanitise::inputInt($request->get('blog_id'));
     	if(isset($blogId)){
     		$blog = Blog::find($blogId);

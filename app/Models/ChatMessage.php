@@ -28,6 +28,7 @@ class ChatMessage extends Model
             $userResult['chatusers'] = Cache::get('vchip:user-'.Auth()->user()->id.':chatusers');
         } else {
             $result = static::where('sender_id', Auth()->user()->id)->Orwhere('receiver_id',  Auth()->user()->id)->orderBy('id', 'desc')->get();
+
             if(is_object($result) && false == $result->isEmpty()){
                 foreach($result as $message){
                     if(Auth()->user()->id != $message->sender_id){
@@ -42,26 +43,27 @@ class ChatMessage extends Model
                 }
             }
 
-            // $chatusers['chat_users'][] = array_values($chatmessageusers);
             $chatusers['chat_users'] = $orderById = implode(',', $chatmessageusers);
-            $messageusers = User::whereIn('id', $chatmessageusers)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
-            if(is_object($messageusers) && false == $messageusers->isEmpty()){
-                foreach($messageusers as $user){
-                    if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
-                        $isImageExist = 'system';
-                    } else if(!empty($user->photo) && false == preg_match('/userStorage/',$user->photo)){
-                        $isImageExist = 'other';
-                    } else {
-                        $isImageExist = 'false';
+            if(count($chatmessageusers) > 0){
+                $messageusers = User::whereIn('id', $chatmessageusers)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
+                if(is_object($messageusers) && false == $messageusers->isEmpty()){
+                    foreach($messageusers as $user){
+                        if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
+                            $isImageExist = 'system';
+                        } else if(!empty($user->photo) && false == preg_match('/userStorage/',$user->photo)){
+                            $isImageExist = 'other';
+                        } else {
+                            $isImageExist = 'false';
+                        }
+                        $chatusers['users'][] = [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'photo' => $user->photo,
+                            'image_exist' => $isImageExist,
+                            'chat_room_id' => $user->chatroomid(),
+                            'college' => $user->getCollegeName(),
+                        ];
                     }
-                    $chatusers['users'][] = [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'photo' => $user->photo,
-                        'image_exist' => $isImageExist,
-                        'chat_room_id' => $user->chatroomid(),
-                        'college' => $user->getCollegeName(),
-                    ];
                 }
             }
 

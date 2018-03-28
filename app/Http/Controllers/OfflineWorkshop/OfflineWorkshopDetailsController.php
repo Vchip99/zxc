@@ -69,7 +69,7 @@ class OfflineWorkshopDetailsController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString('vchip:workshops*');
         DB::beginTransaction();
         try
         {
@@ -107,6 +107,7 @@ class OfflineWorkshopDetailsController extends Controller
      *  update workshop Details
      */
     protected function update(Request $request){
+        InputSanitise::deleteCacheByString('vchip:workshops*');
         $workshopId = InputSanitise::inputInt($request->get('workshop_id'));
         if(isset($workshopId)){
             DB::beginTransaction();
@@ -131,6 +132,7 @@ class OfflineWorkshopDetailsController extends Controller
      *  delete workshop
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:workshops*');
         $workshopId = InputSanitise::inputInt($request->get('workshop_id'));
         if(isset($workshopId)){
             $workshopDetail = OfflineWorkshopDetail::find($workshopId);

@@ -59,6 +59,7 @@ class DiscussionCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:discussions*');
         DB::beginTransaction();
         try
         {
@@ -99,6 +100,7 @@ class DiscussionCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:discussions*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             DB::beginTransaction();
@@ -123,6 +125,7 @@ class DiscussionCategoryController extends Controller
      *  delete Discussion
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:discussions*');
     	$categoryId = InputSanitise::inputInt($request->get('category_id'));
     	if(isset($categoryId)){
     		$discussionCategory = DiscussionCategory::find($categoryId);

@@ -59,6 +59,7 @@ class DesignationController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:heros*');
         DB::beginTransaction();
         try
         {
@@ -99,6 +100,7 @@ class DesignationController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:heros*');
         $designationId = InputSanitise::inputInt($request->get('designation_id'));
         if(isset($designationId)){
             DB::beginTransaction();
@@ -123,6 +125,7 @@ class DesignationController extends Controller
      *  delete designation
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:heros*');
         $designationId = InputSanitise::inputInt($request->get('designation_id'));
         if(isset($designationId)){
             $designation = Designation::find($designationId);

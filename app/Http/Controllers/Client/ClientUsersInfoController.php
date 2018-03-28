@@ -22,7 +22,7 @@ use App\Models\ClientUserPurchasedTestSubCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
-use Auth, Redirect, View, DB, Session, Validator, Hash;
+use Auth, Redirect, View, DB, Session, Validator, Hash,Cache;
 use Excel;
 
 class ClientUsersInfoController extends BaseController
@@ -57,7 +57,7 @@ class ClientUsersInfoController extends BaseController
         'password_confirmation' => 'required|same:password',
     ];
 
-    protected function allUsers(Request $request){
+    protected function allUsers($subdomainName,Request $request){
         $clientId = Auth::guard('client')->user()->id;
         $clientusers = Clientuser::where('client_id', $clientId)->get();
         $courses = ClientOnlineCourse::getCourseAssocaitedWithVideos();
@@ -67,11 +67,11 @@ class ClientUsersInfoController extends BaseController
         return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories'));
     }
 
-    protected function searchUsers(Request $request){
-        return Clientuser::searchUsers($request);
+    protected function searchUsers($subdomainName,Request $request){
+        return Clientuser::searchUsers($subdomainName,$request);
     }
 
-    protected function deleteStudent(Request $request){
+    protected function deleteStudent($subdomainName,Request $request){
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -86,7 +86,7 @@ class ClientUsersInfoController extends BaseController
         {
             DB::connection('mysql2')->rollback();
         }
-        return Clientuser::searchUsers($request);
+        return Clientuser::searchUsers($subdomainName,$request);
     }
 
     protected function changeClientUserApproveStatus(Request $request){

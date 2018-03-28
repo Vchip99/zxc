@@ -59,6 +59,7 @@ class VkitCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:projects*');
         DB::beginTransaction();
         try
         {
@@ -94,6 +95,7 @@ class VkitCategoryController extends Controller
      *  update vkit category
      */
     protected function update(Request $request){
+        InputSanitise::deleteCacheByString('vchip:projects*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             DB::beginTransaction();
@@ -118,6 +120,7 @@ class VkitCategoryController extends Controller
      *  delete vkit category
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:projects*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             $vkitCategory = VkitCategory::find($categoryId);

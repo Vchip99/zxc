@@ -73,6 +73,7 @@ class PlacementProcessController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:placements*');
         DB::beginTransaction();
         try
         {
@@ -117,7 +118,7 @@ class PlacementProcessController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString('vchip:placements*');
     	$placementProcessId = InputSanitise::inputInt($request->get('placement_process_id'));
     	if(isset($placementProcessId)){
             DB::beginTransaction();
@@ -146,6 +147,7 @@ class PlacementProcessController extends Controller
      *  delete placement process
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:placements*');
         $processId = InputSanitise::inputInt($request->get('process_id'));
         if(isset($processId)){
             $placementProcess = PlacementProcess::find($processId);

@@ -37,30 +37,30 @@ class PlacementController extends Controller
     protected function show(Request $request){
         $companyId = Session::get('front_selected_company_id');
         if($companyId > 0){
-            $companyDetails = Cache::remember('vchip:companyDetails:company-'.$companyId,60, function() use ($companyId){
+            $companyDetails = Cache::remember('vchip:placements:companyDetails:company-'.$companyId,60, function() use ($companyId){
                 return CompanyDetails::where('placement_company_id', $companyId)->first();
             });
         } else {
-            $companyDetails = Cache::remember('vchip:companyDetails:company-first',60, function() use ($companyId){
+            $companyDetails = Cache::remember('vchip:placements:companyDetails:company-first',60, function() use ($companyId){
                 return CompanyDetails::first();
             });
         }
-        $placementAreas= Cache::remember('vchip:placementAreas',60, function() {
+        $placementAreas= Cache::remember('vchip:placements:placementAreas',60, function() {
             return PlacementArea::getPlacementAreas();
         });
         if(is_object($companyDetails)){
             $companyId = $companyDetails->placement_company_id;
-            $placementProcess = Cache::remember('vchip:placementProcess:company-'.$companyId,60, function() use ($companyId){
+            $placementProcess = Cache::remember('vchip:placements:placementProcess:company-'.$companyId,60, function() use ($companyId){
                 return PlacementProcess::where('placement_company_id', $companyId)->first();
             });
             if(is_object($placementProcess)){
-                $placementFaqs = Cache::remember('vchip:placementFaqs:company-'.$companyId,60, function() use ($companyId){
+                $placementFaqs = Cache::remember('vchip:placements:placementFaqs:company-'.$companyId,60, function() use ($companyId){
                     return PlacementFaq::where('placement_company_id', $companyId)->orderBy('id', 'desc')->get();
                 });
-                $examPatterns = Cache::remember('vchip:examPatterns:company-'.$companyId,60, function() use ($companyId){
+                $examPatterns = Cache::remember('vchip:placements:examPatterns:company-'.$companyId,60, function() use ($companyId){
                     return ExamPattern::where('placement_company_id', $companyId)->get();
                 });
-                $placementExperiances = Cache::remember('vchip:placementExperiances:company-'.$companyId,60, function() use ($companyId){
+                $placementExperiances = Cache::remember('vchip:placements:placementExperiances:company-'.$companyId,60, function() use ($companyId){
                     return PlacementExperiance::where('placement_company_id', $companyId)->orderBy('id', 'desc')->get();
                 });
             } else {
@@ -79,7 +79,7 @@ class PlacementController extends Controller
             if(!is_object($currentUser)){
                 $currentUser = NULL;
             }
-            $applyJobs = Cache::remember('vchip:applyJobs',60, function() {
+            $applyJobs = Cache::remember('vchip:placements:applyJobs',60, function() {
                 return ApplyJob::orderBy('id', 'desc')->get();
             });
             $date = date('Y-m-d');
@@ -102,7 +102,7 @@ class PlacementController extends Controller
             if(!is_object($currentUser)){
                 $currentUser = new user;
             }
-            $applyJobs = Cache::remember('vchip:applyJobs',60, function() {
+            $applyJobs = Cache::remember('vchip:placements:applyJobs',60, function() {
                 return ApplyJob::orderBy('id', 'desc')->get();
             });
             $date = date('Y-m-d');
@@ -114,27 +114,27 @@ class PlacementController extends Controller
 
     protected function showPlacements(Request $request){
         $selectedCompany = $request->get('company_id');
-        $companyDetails = Cache::remember('vchip:companyDetails:company-'.$selectedCompany,60, function() use ($selectedCompany){
+        $companyDetails = Cache::remember('vchip:placements:companyDetails:company-'.$selectedCompany,60, function() use ($selectedCompany){
             return CompanyDetails::where('placement_company_id', $selectedCompany)->first();
         });
-        $placementProcess = Cache::remember('vchip:placementProcess:company-'.$selectedCompany,60, function() use ($selectedCompany){
+        $placementProcess = Cache::remember('vchip:placements:placementProcess:company-'.$selectedCompany,60, function() use ($selectedCompany){
             return PlacementProcess::where('placement_company_id', $selectedCompany)->first();
         });
-        $placementAreas= Cache::remember('vchip:placementAreas',60, function() {
+        $placementAreas= Cache::remember('vchip:placements:placementAreas',60, function() {
             return PlacementArea::getPlacementAreas();
         });
         if(is_object($companyDetails) && is_object($placementProcess)){
             $selectedArea = $companyDetails->placement_area_id;
-            $placementCompanies = Cache::remember('vchip:placementCompanies:areaId-'.$selectedArea,60, function() use ($selectedArea){
+            $placementCompanies = Cache::remember('vchip:placements:placementCompanies:areaId-'.$selectedArea,60, function() use ($selectedArea){
                 return PlacementCompany::where('placement_area_id',$selectedArea)->get();
             });
-            $placementFaqs = Cache::remember('vchip:placementFaqs:company-'.$selectedCompany,60, function() use ($selectedCompany){
+            $placementFaqs = Cache::remember('vchip:placements:placementFaqs:company-'.$selectedCompany,60, function() use ($selectedCompany){
                 return PlacementFaq::where('placement_company_id', $selectedCompany)->orderBy('id', 'desc')->get();
             });
-            $examPatterns = Cache::remember('vchip:examPatterns:company-'.$selectedCompany,60, function() use ($selectedCompany){
+            $examPatterns = Cache::remember('vchip:placements:examPatterns:company-'.$selectedCompany,60, function() use ($selectedCompany){
                 return ExamPattern::where('placement_company_id', $selectedCompany)->get();
             });
-            $placementExperiances = Cache::remember('vchip:placementExperiances:company-'.$selectedCompany,60, function() use ($selectedCompany){
+            $placementExperiances = Cache::remember('vchip:placements:placementExperiances:company-'.$selectedCompany,60, function() use ($selectedCompany){
                 return PlacementExperiance::where('placement_company_id', $selectedCompany)->orderBy('id', 'desc')->get();
             });
 
@@ -146,7 +146,7 @@ class PlacementController extends Controller
             if(!is_object($currentUser)){
                 $currentUser = new user;
             }
-            $applyJobs = Cache::remember('vchip:applyJobs',60, function() {
+            $applyJobs = Cache::remember('vchip:placements:applyJobs',60, function() {
                 return ApplyJob::orderBy('id', 'desc')->get();
             });
             $date = date('Y-m-d');
@@ -165,7 +165,7 @@ class PlacementController extends Controller
 
     protected function getPlacementCompaniesByAreaForFront(Request $request){
         $areaId = $request->id;
-        return Cache::remember('vchip:placementCompanies:areaId-'.$areaId,60, function() use ($areaId){
+        return Cache::remember('vchip:placements:placementCompanies:areaId-'.$areaId,60, function() use ($areaId){
             return PlacementCompany::getPlacementCompaniesByAreaForFront($areaId);
         });
     }
@@ -193,11 +193,11 @@ class PlacementController extends Controller
     protected function placementExperiance($id){
         $id = json_decode($id);
         if(isset($id)){
-            $placementExperiance = Cache::remember('vchip:placementExperiance-'.$id,60, function() use ($id){
+            $placementExperiance = Cache::remember('vchip:placements:placementExperiance-'.$id,60, function() use ($id){
                 return PlacementExperiance::find($id);
             });
             if(is_object($placementExperiance)){
-                $placementExperiances = Cache::remember('vchip:placementExperiances',60, function() {
+                $placementExperiances = Cache::remember('vchip:placements:placementExperiances',60, function() {
                     return placementExperiance::all();
                 });
                 return view('placement.placementExperiance', compact('placementExperiance', 'placementExperiances'));

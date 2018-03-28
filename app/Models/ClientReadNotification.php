@@ -41,8 +41,9 @@ class ClientReadNotification extends Model
 
     protected static function getReadNotificationIdsByUser($selectedYear=NULL,$selectedMonth=NULL){
     	$ids = [];
-    	$resultQuery = static::where('client_id', Auth::guard('clientuser')->user()->client_id)
-    				->where('client_user_id', Auth::guard('clientuser')->user()->id);
+        $clientUser = Auth::guard('clientuser')->user();
+    	$resultQuery = static::where('client_id', $clientUser->client_id)
+    				->where('client_user_id', $clientUser->id);
         if($selectedYear > 0){
             $resultQuery->whereYear('created_at', $selectedYear);
         }

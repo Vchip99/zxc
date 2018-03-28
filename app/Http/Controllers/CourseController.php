@@ -49,7 +49,7 @@ class CourseController extends Controller
      */
     protected function courses(Request $request){
         $courseIds = [];
-        $courseCategories = Cache::remember('vchip:courseCats',60, function() {
+        $courseCategories = Cache::remember('vchip:courses:courseCats',60, function() {
             return CourseCategory::getCategoriesAssocaitedWithVideos();
         });
         if(empty($request->getQueryString())){
@@ -57,10 +57,10 @@ class CourseController extends Controller
         } else {
             $page = $request->getQueryString();
         }
-        $courses = Cache::remember('vchip:courses-'.$page,60, function() {
+        $courses = Cache::remember('vchip:courses:courses-'.$page,60, function() {
             return CourseCourse::getCourseAssocaitedWithVideos();
         });
-        $courseVideoCount = Cache::remember('vchip:courseVideoCnt-'.$page,60, function() use ($courses){
+        $courseVideoCount = Cache::remember('vchip:courses:courseVideoCnt-'.$page,60, function() use ($courses){
             return $this->getVideoCount($courses);
         });
         $date = date('Y-m-d');
@@ -77,7 +77,7 @@ class CourseController extends Controller
         $subcategoryId = $request->get('subcatId');
         $userId = $request->get('userId');
         if(isset($categoryId) && isset($subcategoryId) && empty($userId)){
-            $result['courses'] = Cache::remember('vchip:courses:cat-'.$categoryId.':subcat-'.$subcategoryId,30, function() use ($categoryId,$subcategoryId){
+            $result['courses'] = Cache::remember('vchip:courses:courses:cat-'.$categoryId.':subcat-'.$subcategoryId,30, function() use ($categoryId,$subcategoryId){
                 return CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId);
             });
             $result['courseVideoCount'] = $this->getVideoCount($result['courses']);
@@ -93,11 +93,11 @@ class CourseController extends Controller
      */
     protected function courseDetails($id){
         $courseId = json_decode(trim($id));
-        $course = Cache::remember('vchip:Course-'.$courseId,30, function() use ($courseId){
+        $course = Cache::remember('vchip:courses:Course-'.$courseId,30, function() use ($courseId){
             return CourseCourse::find($courseId);
         });
         if(is_object($course)){
-            $videos = Cache::remember('vchip:videos:coursId-'.$courseId,30, function() use ($courseId){
+            $videos = Cache::remember('vchip:courses:videos:coursId-'.$courseId,30, function() use ($courseId){
                 return CourseVideo::getCourseVideosByCourseId($courseId);
             });
             $isCourseRegistered = RegisterOnlineCourse::isCourseRegistered($courseId);
@@ -112,12 +112,12 @@ class CourseController extends Controller
     protected function episode($id,$subcomment=NULL){
         $videoId = json_decode(trim($id));
         if(isset($videoId)){
-            $video = Cache::remember('vchip:video-'.$videoId,30, function() use ($videoId){
+            $video = Cache::remember('vchip:courses:video-'.$videoId,30, function() use ($videoId){
                 return CourseVideo::find($videoId);
             });
             if(is_object($video)){
                 $courseId = $video->course_id;
-                $courseVideos = Cache::remember('vchip:videos:coursId-'.$courseId,30, function() use ($courseId){
+                $courseVideos = Cache::remember('vchip:courses:videos:coursId-'.$courseId,30, function() use ($courseId){
                     return CourseVideo::getCourseVideosByCourseId($courseId);
                 });
                 $comments = CourseComment::where('course_video_id', $id)->orderBy('id', 'desc')->get();
@@ -164,7 +164,7 @@ class CourseController extends Controller
         $id = $request->get('id');
         $userid = $request->get('userId');
         if(isset($id) && empty($userid)){
-            return Cache::remember('vchip:coursesubcat:cat-'.$id,30, function() use ($id){
+            return Cache::remember('vchip:courses:coursesubcat:cat-'.$id,30, function() use ($id){
                 return CourseSubCategory::getCourseSubCategoriesByCategoryId($id);
             });
         } else {

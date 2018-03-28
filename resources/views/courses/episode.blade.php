@@ -483,7 +483,7 @@
 
         var subcommentImage = document.createElement('img');
         if('system' == obj.image_exist){
-          var subcommentImageUrl =  "{{ asset('') }}"+obj.user_image;
+          var subcommentImageUrl =  "{{ asset('') }}/"+obj.user_image;
         } else if('other' == obj.image_exist){
           var subcommentImageUrl =  obj.user_image;
         } else {

@@ -5,7 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Instamojo;
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use Auth,Redirect,View,DB,Mail,Session,Validator,Cache;
+use Auth,Redirect,View,DB,Mail,Session,Validator,Cache,File;
 use Illuminate\Http\RedirectResponse;
 use App\Mail\PaymentReceived;
 use App\Mail\ContactUs;
@@ -13,7 +13,6 @@ use App\Mail\EmailVerification;
 use App\Mail\NewRegisteration;
 use App\Mail\WelcomeClient;
 use App\Mail\PaymentGatewayErrors;
-
 use App\Libraries\InputSanitise;
 use App\Models\WebdevelopmentPayment;
 use App\Models\Plan;
@@ -80,7 +79,7 @@ class OnlineClientController extends Controller
         $email = $request->get('email');
         $domains = $request->get('domains');
         $phone = $request->get('phone');
-        $price = 2999;
+        $price = 4999;
 
         Session::put('web_name', $name);
         Session::put('web_email', $email);
@@ -389,6 +388,13 @@ class OnlineClientController extends Controller
                     ClientTeam::addTeam($client);
                     ClientCustomer::addCustomer($client);
 
+                    $hostArr = explode('.', $client->subdomain);
+                    // create client/subdomain dir in kcfinder upload dir
+                    $path = public_path().'/templateEditor/kcfinder/upload/images/'. $hostArr[0];
+                    if(!is_dir($path)){
+                        File::makeDirectory($path, $mode = 0777, true, true);
+                    }
+
                     DB::connection('mysql')->beginTransaction();
                     try
                     {
@@ -667,6 +673,7 @@ class OnlineClientController extends Controller
             Mail::to($to)->send(new PaymentReceived($message,$subject));
         }
     }
+
     /**
      * client free registration
      */
@@ -723,6 +730,13 @@ class OnlineClientController extends Controller
             ClientTestimonial::addTestimonials($client);
             ClientTeam::addTeam($client);
             ClientCustomer::addCustomer($client);
+
+            $hostArr = explode('.', $client->subdomain);
+            // create client/subdomain dir in kcfinder upload dir
+            $path = public_path().'/templateEditor/kcfinder/upload/images/'. $hostArr[0];
+            if(!is_dir($path)){
+                File::makeDirectory($path, $mode = 0777, true, true);
+            }
 
             DB::connection('mysql')->beginTransaction();
             try

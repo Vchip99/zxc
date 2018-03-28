@@ -4,7 +4,7 @@ namespace App\Libraries;
 use Illuminate\Http\Request;
 use App\Models\ClientHomePage;
 use App\Models\Client;
-use DB, Cache;
+use DB, Cache, File,LRedis;
 
 class InputSanitise{
 
@@ -55,6 +55,25 @@ class InputSanitise{
             }
         }
         return $subdomainObj;
+    }
+
+    public static function checkClientImagesDirForCkeditor($subdomain){
+        // create client/subdomain dir in kcfinder upload dir
+        $path = public_path().'/templateEditor/kcfinder/upload/images/'. $subdomain;
+        if(!is_dir($path)){
+            File::makeDirectory($path, $mode = 0777, true, true);
+        }
+        return;
+    }
+
+    public static function deleteCacheByString($searchString){
+        $keys = LRedis::keys($searchString.'*');
+        if(count($keys) > 0){
+            foreach($keys as $key){
+                LRedis::del($key);
+            }
+        }
+        return ;
     }
 
 }

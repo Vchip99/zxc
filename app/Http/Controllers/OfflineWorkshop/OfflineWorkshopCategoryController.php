@@ -57,6 +57,7 @@ class OfflineWorkshopCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:workshops*');
         DB::beginTransaction();
         try
         {
@@ -92,6 +93,7 @@ class OfflineWorkshopCategoryController extends Controller
      *  update workshop category
      */
     protected function update(Request $request){
+        InputSanitise::deleteCacheByString('vchip:workshops*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             DB::beginTransaction();
@@ -116,6 +118,7 @@ class OfflineWorkshopCategoryController extends Controller
      *  delete workshop category
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:workshops*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             $workshopCategory = OfflineWorkshopCategory::find($categoryId);

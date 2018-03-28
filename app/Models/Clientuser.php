@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
-use DB, Auth;
+use DB, Auth, Cache;
 use App\Models\RegisterClientOnlinePaper;
 use App\Models\RegisterClientOnlineCourses;
 use App\Models\ClientScore;
@@ -79,7 +79,7 @@ class Clientuser extends Authenticatable
                 ->first();
     }
 
-    protected static function searchUsers($request){
+    protected static function searchUsers($subdomainName,$request){
         $results = [];
         $courseId = InputSanitise::inputInt($request->get('course_id'));
         $clientId = Auth::guard('client')->user()->id;
@@ -214,8 +214,12 @@ class Clientuser extends Authenticatable
     function adminNotificationCount($year=NULL,$month=NULL){
         $ids = [];
         $notificationCount = [];
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+
         $ids = ClientReadNotification::getReadNotificationIdsByUser($year,$month);
-        $resultQuery = ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id)
+        $resultQuery = ClientNotification::where('client_id', $clientId)
                     ->where('is_seen', 0)->whereNotIn('id', $ids)->where('created_by',0)->where('created_to',0);
         if($year > 0){
             $resultQuery->whereYear('created_at', $year);
@@ -232,13 +236,15 @@ class Clientuser extends Authenticatable
                 }
             }
         }
-
         return count($notificationCount);
+
     }
 
     function userNotificationCount(){
-        return ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('created_to', Auth::guard('clientuser')->user()->id)->where('is_seen', 0)->count();
-
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        return ClientNotification::where('client_id', $clientId)->where('created_to', $clientUserId)->where('is_seen', 0)->count();
     }
 
     protected static function searchStudentForAssignment(){

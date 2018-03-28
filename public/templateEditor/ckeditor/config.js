@@ -8,12 +8,21 @@ CKEDITOR.editorConfig = function( config ) {
 	// For complete reference see:
 	// http://docs.ckeditor.com/#!/api/CKEDITOR.config
 	var base_url = window.location.origin;
-	config.filebrowserBrowseUrl = base_url +'/templateEditor/kcfinder/browse.php?opener=ckeditor&type=files';
-    config.filebrowserImageBrowseUrl = base_url +'/templateEditor/kcfinder/browse.php?opener=ckeditor&type=images';
-    config.filebrowserFlashBrowseUrl = base_url +'/templateEditor/kcfinder/browse.php?opener=ckeditor&type=flash';
-    config.filebrowserUploadUrl = base_url +'/templateEditor/kcfinder/upload.php?opener=ckeditor&type=files';
-    config.filebrowserImageUploadUrl = base_url +'/templateEditor/kcfinder/upload.php?opener=ckeditor&type=images';
-    config.filebrowserFlashUploadUrl = base_url +'/templateEditor/kcfinder/upload.php?opener=ckeditor&type=flash';
+	var fullUrl = window.location.host;
+	var parts = fullUrl.split('.');
+	if('localvchip' == parts[0] || 'vchipedu' == parts[0]){
+		var type = 'images';
+		var dir  = 'images';
+	} else {
+		var type = 'images';
+		var dir  = 'images/'+parts[0];
+	}
+	config.filebrowserBrowseUrl = base_url +'/templateEditor/kcfinder/browse.php?opener=ckeditor&type=files&dir='+dir+'';
+    config.filebrowserImageBrowseUrl = base_url +'/templateEditor/kcfinder/browse.php?opener=ckeditor&type='+type+'&dir='+dir+'';
+    config.filebrowserFlashBrowseUrl = base_url +'/templateEditor/kcfinder/browse.php?opener=ckeditor&type=flash&dir='+dir+'';
+    config.filebrowserUploadUrl = base_url +'/templateEditor/kcfinder/upload.php?opener=ckeditor&type=files&dir='+dir+'';
+    config.filebrowserImageUploadUrl = base_url +'/templateEditor/kcfinder/upload.php?opener=ckeditor&type='+type+'&dir='+dir+'';
+    config.filebrowserFlashUploadUrl = base_url +'/templateEditor/kcfinder/upload.php?opener=ckeditor&type=flash&dir='+dir+'';
 
 	config.baseHref = base_url;
 	 // Toolbar configuration generated automatically by the editor based on config.toolbarGroups.

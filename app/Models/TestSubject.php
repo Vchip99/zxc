@@ -53,9 +53,15 @@ class TestSubject extends Model
     	$subjects = DB::table('test_subjects')
     					->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subjects.test_sub_category_id')
     					->join('test_categories', 'test_categories.id', '=', 'test_sub_categories.test_category_id')
+                        ->join('test_subject_papers', function($join){
+                            $join->on('test_subject_papers.test_subject_id', '=', 'test_subjects.id');
+                            $join->on('test_subject_papers.test_sub_category_id', '=', 'test_sub_categories.id');
+                            $join->on('test_subject_papers.test_category_id', '=', 'test_categories.id');
+                        })
     					->join('questions', 'questions.subject_id', 'test_subjects.id')
                         ->where('test_sub_categories.test_category_id', $catId)
     					->where('test_subjects.test_sub_category_id', $subcatId)
+                        ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
     					->select('test_subjects.id','test_subjects.*')
                         ->groupBy('test_subjects.id')
     					->get();

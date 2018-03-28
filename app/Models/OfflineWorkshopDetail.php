@@ -176,7 +176,7 @@ class OfflineWorkshopDetail extends Model
     protected static function getOfflineWorkshopsByCategory(Request $request){
         $data = [];
         $categoryId = $request->id;
-        $results = Cache::remember('vchip:workshops:cat-'.$categoryId,30, function() use ($categoryId){
+        $results = Cache::remember('vchip:workshops:workshops:cat-'.$categoryId,30, function() use ($categoryId){
             return static::where('offline_workshop_category_id', $categoryId)->get();
         });
         if(is_object($results) && false == $results->isEmpty()){

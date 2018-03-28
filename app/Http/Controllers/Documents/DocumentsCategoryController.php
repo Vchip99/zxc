@@ -56,6 +56,7 @@ class DocumentsCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:documents*');
         DB::beginTransaction();
         try
         {
@@ -96,7 +97,7 @@ class DocumentsCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString('vchip:documents*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             DB::beginTransaction();
@@ -121,6 +122,7 @@ class DocumentsCategoryController extends Controller
      *  delete document category
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:documents*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             $documentsCategory = DocumentsCategory::find($categoryId);

@@ -83,7 +83,7 @@ class MotivationalSpeechDetail extends Model
     protected static function getMotivationalSpeechesByCategory(Request $request){
         $data = [];
         $id = $request->id;
-        $results = Cache::remember('vchip:motivationalSpeechs:cat-'.$id,60, function() use ($id){
+        $results = Cache::remember('vchip:motivationalSpeechs:motivationalSpeechs:cat-'.$id,60, function() use ($id){
             return static::where('motivational_speech_category_id', $id)->get();
         });
         if(is_object($results) && false == $results->isEmpty()){

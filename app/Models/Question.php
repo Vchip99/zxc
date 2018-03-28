@@ -212,7 +212,7 @@ class Question extends Model
         //     ->where('paper_id', $paperId)
         //     ->select('questions.*')
         //     ->get();
-        return Cache::remember('vchip:Questions:cat-'.$categoryId.':subcat-'.$subcategoryId.':subj-'.$subjectId.':paper-'.$paperId,30, function() use ($categoryId, $subcategoryId,$subjectId,$paperId) {
+        return Cache::remember('vchip:tests:Questions:cat-'.$categoryId.':subcat-'.$subcategoryId.':subj-'.$subjectId.':paper-'.$paperId,30, function() use ($categoryId, $subcategoryId,$subjectId,$paperId) {
                 return  static::where('category_id', $categoryId)
                 ->where('subcat_id', $subcategoryId)
                 ->where('subject_id', $subjectId)

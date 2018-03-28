@@ -54,12 +54,13 @@ class ClientOnlineVideoController extends ClientBaseController
     /**
      *  store course video
      */
-    protected function store(Request $request){
+    protected function store($subdomain,Request $request){
     	$v = Validator::make($request->all(), $this->validateVideo);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString($subdomain.':courses*');
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -97,12 +98,13 @@ class ClientOnlineVideoController extends ClientBaseController
     /**
      *  update course video
      */
-    protected function update(Request $request){
+    protected function update($subdomain,Request $request){
     	$v = Validator::make($request->all(), $this->validateVideo);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString($subdomain.':courses*');
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -123,7 +125,8 @@ class ClientOnlineVideoController extends ClientBaseController
     /**
      *  delete course video
      */
-    protected function delete(Request $request){
+    protected function delete($subdomain,Request $request){
+        InputSanitise::deleteCacheByString($subdomain.':courses*');
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
     	if(isset($videoId)){
     		$video = ClientOnlineVideo::find($videoId);

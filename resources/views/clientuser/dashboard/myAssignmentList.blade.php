@@ -133,6 +133,7 @@
     var id = parseInt($(ele).val());
     document.getElementById('studentAssignment').innerHTML = '';
     document.getElementById('paginate').innerHTML = '';
+    var topic = document.getElementById('topic').value;
     if( 0 < id ){
       $.ajax({
           method: "POST",
@@ -160,7 +161,7 @@
       $.ajax({
         method: "POST",
         url: "{{url('getAssignments')}}",
-        data: {subject:id}
+        data: {subject:id,topic:topic}
       })
       .done(function( msgs ) {
         body = document.getElementById('studentAssignment');
@@ -181,11 +182,12 @@
 
   function getAssignments(ele){
     id = parseInt($(ele).val());
+    var subject = document.getElementById('subject').value;
     if( 0 < id ){
       $.ajax({
         method: "POST",
         url: "{{url('getAssignments')}}",
-        data: {topic:id}
+        data: {topic:id,subject:subject}
       })
       .done(function( msgs ) {
         body = document.getElementById('studentAssignment');

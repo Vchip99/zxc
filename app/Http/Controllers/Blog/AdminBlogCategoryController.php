@@ -59,6 +59,7 @@ class AdminBlogCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:blogs*');
         DB::beginTransaction();
         try
         {
@@ -99,6 +100,7 @@ class AdminBlogCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:blogs*');
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
         if(isset($categoryId)){
             DB::beginTransaction();
@@ -123,6 +125,7 @@ class AdminBlogCategoryController extends Controller
      *  delete blog
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:blogs*');
     	$categoryId = InputSanitise::inputInt($request->get('category_id'));
     	if(isset($categoryId)){
     		$blogCategory = BlogCategory::find($categoryId);

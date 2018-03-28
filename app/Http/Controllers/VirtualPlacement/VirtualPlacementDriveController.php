@@ -63,6 +63,7 @@ class VirtualPlacementDriveController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:virtualplacementdrive*');
         DB::beginTransaction();
         try
         {
@@ -98,6 +99,7 @@ class VirtualPlacementDriveController extends Controller
      *  update
      */
     protected function update(Request $request){
+        InputSanitise::deleteCacheByString('vchip:virtualplacementdrive*');
         $placementId = InputSanitise::inputInt($request->get('placement_id'));
         if(isset($placementId)){
             DB::beginTransaction();
@@ -122,6 +124,7 @@ class VirtualPlacementDriveController extends Controller
      *  delete
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:virtualplacementdrive*');
         $placementId = InputSanitise::inputInt($request->get('placement_id'));
         if(isset($placementId)){
             $virtualPlacementDrive = VirtualPlacementDrive::find($placementId);

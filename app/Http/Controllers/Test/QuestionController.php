@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Models\UserSolution;
 use App\Models\PaperSection;
+use Intervention\Image\ImageManagerStatic as Image;
 use Excel;
 
 class QuestionController extends Controller
@@ -32,6 +33,7 @@ class QuestionController extends Controller
                     return $next($request);
                 }
             }
+
             return Redirect::to('admin/home');
         });
     }
@@ -137,7 +139,8 @@ class QuestionController extends Controller
     /**
      *  show UI for create question
      */
-    protected function create(){
+    protected function create(Request $request){
+
         $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
         if(Session::has('selected_category')){
             $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin(Session::get('selected_category'));
@@ -209,6 +212,7 @@ class QuestionController extends Controller
 
                 $questionCount = Question::where('category_id', $categoryId)->where('subcat_id', $subcategoryId)->where('subject_id', $subjectId)->where('paper_id', $paperId)->count();
                 if(1 == $questionCount){
+                    InputSanitise::deleteCacheByString('vchip:tests*');
                     $paper = TestSubjectPaper::find($paperId);
                     if(is_object($paper)){
                         $messageBody = '';
@@ -430,31 +434,98 @@ class QuestionController extends Controller
     protected function importQuestions(Request $request){
         if($request->hasFile('questions')){
             $path = $request->file('questions')->getRealPath();
-            $questions = \Excel::selectSheetsByIndex(0)->load($path)->get();
+            $questions = \Excel::selectSheetsByIndex(0)->load($path, function($reader) {
+                            $reader->formatDates(false);
+                        })->get();
 
             if($questions->count()){
                 foreach ($questions as $key => $question) {
+                    preg_match_all('/image\[(.*)\]/', $question->question, $questionMatches);
+                    if($questionMatches[1] && $questionMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->question);
+                        $questionStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $questionStr = $question->question;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->option_a, $optionAMatches);
+                    if($optionAMatches[1] && $optionAMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->option_a);
+                        $optionAStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $optionAStr = $question->option_a;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->option_b, $optionBMatches);
+                    if($optionBMatches[1] && $optionBMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->option_b);
+                        $optionBStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $optionBStr = $question->option_b;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->option_c, $optionCMatches);
+                    if($optionCMatches[1] && $optionCMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->option_c);
+                        $optionCStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $optionCStr = $question->option_c;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->option_d, $optionDMatches);
+                    if($optionDMatches[1] && $optionDMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->option_d);
+                        $optionDStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $optionDStr = $question->option_d;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->option_e, $optionEMatches);
+                    if($optionEMatches[1] && $optionEMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->option_e);
+                        $optionEStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $optionEStr = $question->option_e;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->solution, $solutionMatches);
+                    if($solutionMatches[1] && $solutionMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->solution);
+                        $solutionStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $solutionStr = $question->solution;
+                    }
+
                     $allQuestions[] = [
-                        'name' => $question->question,
-                        'answer1' => ($question->option_a)?:'',
-                        'answer2' => ($question->option_b)?:'',
-                        'answer3' => ($question->option_c)?:'',
-                        'answer4' => ($question->option_d)?:'',
-                        'answer5' => ($question->option_e)?:'',
+                        'name' => $questionStr,
+                        'answer1' => $optionAStr,
+                        'answer2' => $optionBStr,
+                        'answer3' => $optionCStr,
+                        'answer4' => $optionDStr,
+                        'answer5' => $optionEStr,
                         'answer6' => 0,
                         'answer' => $question->right_answer,
                         'min' => ($question->min)?:0,
                         'max' => ($question->max)?:0,
                         'question_type' => (int) $question->question_type,
-                        'solution' => $question->solution,
+                        'solution' => $solutionStr,
                         'positive_marks' => $question->positive_mark,
                         'negative_marks' => $question->negative_mark,
-                        'common_data' => $question->common_data,
+                        'common_data' => ($question->common_data)?:'',
                         'category_id' => $request->get('category'),
                         'subcat_id' =>  $request->get('subcategory'),
                         'subject_id' => $request->get('subject'),
                         'paper_id' => $request->get('paper'),
-                        'section_type' => $request->get('section_type')
+                        'section_type' => $request->get('section_type'),
+                        'created_at' => date('Y-m-d h:i:s'),
+                        'updated_at' => date('Y-m-d h:i:s')
                     ];
                 }
 
@@ -477,7 +548,7 @@ class QuestionController extends Controller
         return Redirect::to('admin/uploadQuestions');
     }
 
-        /**
+    /**
      *  show questions associated with subject and paper
      */
     protected function showSession(){
@@ -506,7 +577,7 @@ class QuestionController extends Controller
         return view('question.associateQuestion', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers', 'paperSections'));
     }
 
-        /**
+    /**
      *  show all question associated with subject and paper
      */
     protected function associateSession(Request $request){
@@ -556,5 +627,26 @@ class QuestionController extends Controller
             return 'false';
         }
         return 'false';
+    }
+
+    protected function uploadTestImages(Request $request){
+        $allowedImageTypes = ['image/png','image/jpeg'];
+        if($request->exists('images')){
+            foreach($request->file('images') as $file){
+                if(in_array($file->getClientMimeType(), $allowedImageTypes)){
+                    $imageName = $file->getClientOriginalName();
+                    $clientImagesFolder = public_path().'/templateEditor/kcfinder/upload/images';
+                    $file->move($clientImagesFolder, $imageName);
+                    // open image
+                    $img = Image::make($clientImagesFolder."/".$imageName);
+                    // enable interlacing
+                    $img->interlace(true);
+                    // save image interlaced
+                    $img->save();
+                }
+            }
+            return Redirect::to('admin/uploadQuestions')->with('message', 'Images uploaded successfully!');
+        }
+        return Redirect::to('admin/uploadQuestions');
     }
 }

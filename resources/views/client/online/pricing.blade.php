@@ -98,6 +98,9 @@
 .free_first{
   height: 369px;
 }
+.paid_secind_third{
+  height: 381px;
+}
 #readMore, #readMore-1, #readMore-2{
   font-weight: bolder;
   cursor: pointer;
@@ -163,7 +166,7 @@
                       <li class="list-group-item">Payment Gateway</li>
                       <li class="list-group-item">Dashboard for students</li>
                       <li class="list-group-item">Admin panel (ERP)</li>
-                      <li class="list-group-item">Up-to 20 login</li>
+                      <li class="list-group-item">Up-to 10 login</li>
                     </ul>
                     <div class="panel-footer">
                       <a class="btn btn-lg btn-block btn-info" href="{{ url('clientsignup')}}/1">Register!</a>
@@ -176,7 +179,7 @@
                     <h2>Gold</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong> Rs. 2999 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong> Rs. 4999 / year</strong></p>
                     </div>
                     <ul class="list-group list-group-flush text-center read">
                       <li class="list-group-item">Online test series</li>
@@ -202,57 +205,35 @@
                     <h2>Platinum</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong>Rs. 4999 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong>Rs. 9999 / year</strong></p>
                     </div>
-                    <ul class="list-group list-group-flush text-center read-1">
-                      <li class="list-group-item">Online test series</li>
-                      <li class="list-group-item">Online Courses</li>
-                      <li class="list-group-item">Notification</li>
-                      <li class="list-group-item">Admin message</li>
-                      <li class="list-group-item">Assignment</li>
-                      <li class="list-group-item">Payment Gateway</li>
-                      <li class="list-group-item">Dashboard for students</li>
-                      <li class="list-group-item">Admin panel (ERP)</li>
-                      <li class="list-group-item">Unlimited users</li>
-                      <li class="list-group-item">Digital Advertisement (1 year)</li>
-                      <li class="list-group-item">SEO</li>
-                      <li class="list-group-item">Email marketing</li>
+                    <ul class="list-group list-group-flush text-center read-1  paid_secind_third">
+                      <li class="list-group-item">All in Gold plan</li>
+                      <li class="list-group-item">Custom web-site design</li>
+                      <li class="list-group-item">Developed website</li>
+                      <li class="list-group-item">Hosting for a year</li>
+                      <li class="list-group-item">Maintenance for a year</li>
+                      <li class="list-group-item">Solving any technical issues</li>
+                      <li class="list-group-item">Add/Remove pages</li>
+                      <li class="list-group-item">SEO (Basic)</li>
                     </ul>
-                   <p id="readMore-1" class="text-center"> Show More</p>
                     <div class="panel-footer">
-                    <a class="btn btn-lg btn-block btn-info" href="{{ url('clientsignup')}}/3">BUY NOW!</a>
+                      <a class="btn btn-lg btn-block btn-info" href="{{ url('clientsignup')}}/3">BUY NOW!</a>
                     </div>
                   </div>
             </div>
             <div class="col-md-3 col-sm-6">
                   <div class="panel price panel-blue">
-                    <div class="panel-heading arrow_box text-center">
+                    <div class="panel-heading arrow_box text-center ">
                     <h2>Diamond</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong> Rs. 9999 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong> Rs. 19,999 / year</strong></p>
                     </div>
-                    <ul class="list-group list-group-flush text-center read-2">
-                          <li class="list-group-item">Online test series</li>
-                          <li class="list-group-item">Online Courses</li>
-                          <li class="list-group-item">Notification</li>
-                          <li class="list-group-item">Admin message</li>
-                          <li class="list-group-item">Assignment</li>
-                          <li class="list-group-item">Payment Gateway</li>
-                          <li class="list-group-item">Dashboard for students</li>
-                          <li class="list-group-item">Admin panel (ERP)</li>
-                          <li class="list-group-item">Unlimited users</li>
-                          <li class="list-group-item">Hosting for one year</li>
-                          <li class="list-group-item">Domain name</li>
-                          <li class="list-group-item">Design websites</li>
-                          <li class="list-group-item">Developed website</li>
-                          <li class="list-group-item">Editing in any page</li>
-                          <li class="list-group-item">Add/remove the page</li>
-                          <li class="list-group-item">Solving any technical issues</li>
-                          <li class="list-group-item">Digital Marketing (one Month)</li>
-                          <li class="list-group-item">SEO     </li>
+                    <ul class="list-group list-group-flush text-center read-2 paid_secind_third">
+                          <li class="list-group-item">All in Platinum plan</li>
+                          <li class="list-group-item">SEO (Advance)</li>
                     </ul>
-                   <p id="readMore-2">Show More</p>
                     <div class="panel-footer">
                       <a class="btn btn-lg btn-block btn-info" href="{{ url('clientsignup')}}/4">BUY NOW!</a>
                     </div>

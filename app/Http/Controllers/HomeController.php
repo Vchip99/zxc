@@ -228,10 +228,10 @@ class HomeController extends Controller
      */
     protected function heros(Request $request,$id=NULL){
         $courses = [];
-        $designations = Cache::remember('vchip:designations',60, function() {
+        $designations = Cache::remember('vchip:heros:designations',60, function() {
             return Designation::all();
         });
-        $heros = Cache::remember('vchip:heros',60, function() {
+        $heros = Cache::remember('vchip:heros:heros',60, function() {
             return ZeroToHero::all();
         });
         if(is_object(Auth::user())){
@@ -354,7 +354,7 @@ class HomeController extends Controller
 
     protected function getAreasByDesignation(Request $request){
         $designationId   = InputSanitise::inputInt($request->get('designation_id'));
-        return Cache::remember('vchip:areas:designationId-'.$designationId,60, function() use ($designationId){
+        return Cache::remember('vchip:heros:areas:designationId-'.$designationId,60, function() use ($designationId){
             return Area::getAreasByDesignation($designationId);
         });
     }

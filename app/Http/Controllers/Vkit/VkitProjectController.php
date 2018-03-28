@@ -84,6 +84,7 @@ class VkitProjectController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:projects*');
         DB::beginTransaction();
         try
         {
@@ -141,6 +142,7 @@ class VkitProjectController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:projects*');
         $projectId = InputSanitise::inputInt($request->get('project_id'));
         if(isset($projectId)){
             DB::beginTransaction();
@@ -166,6 +168,7 @@ class VkitProjectController extends Controller
      */
     protected function delete(Request $request){
         $arrPostIds = [];
+        InputSanitise::deleteCacheByString('vchip:projects*');
         $projectId = InputSanitise::inputInt($request->get('project_id'));
         if(isset($projectId)){
             $project = VkitProject::find($projectId);

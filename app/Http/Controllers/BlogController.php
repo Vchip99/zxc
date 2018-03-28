@@ -50,10 +50,10 @@ class BlogController extends Controller
         } else {
             $page = $request->getQueryString();
         }
-        $blogs = Cache::remember('vchip:blogs-'.$page,60, function() {
+        $blogs = Cache::remember('vchip:blogs:blogs-'.$page,60, function() {
             return Blog::orderBy('id', 'desc')->paginate();
         });
-        $blogCategories= Cache::remember('vchip:blogCategories',60, function() {
+        $blogCategories= Cache::remember('vchip:blogs:blogCategories',60, function() {
             return BlogCategory::all();
         });
         $date = date('Y-m-d');
@@ -72,10 +72,10 @@ class BlogController extends Controller
                 $comments = BlogComment::where('blog_id', $id)->orderBy('id', 'desc')->get();
                 $commentLikesCount = BlogCommentLike::getLikesByBlogId($blog->id);
                 $subcommentLikesCount = BlogSubCommentLike::getLikesByBlogId($blog->id);
-                $blogs = Cache::remember('vchip:blogs',60, function() {
+                $blogs = Cache::remember('vchip:blogs:blogs',60, function() {
                     return Blog::orderBy('id', 'desc')->get();
                 });
-                $blogTags = Cache::remember('vchip:blogTags:blogId-'.$id,60, function() use ($id){
+                $blogTags = Cache::remember('vchip:blogs:blogTags:blogId-'.$id,60, function() use ($id){
                     BlogTag::where('blog_id', $id)->get();
                 });
                 $currentUser = Auth::user();
@@ -173,16 +173,16 @@ class BlogController extends Controller
 
         $categoryId = $request->get('id');
         if(isset($categoryId)){
-            return Cache::remember('vchip:blogs:cat-'.$categoryId,60, function() use ($categoryId){
+            return Cache::remember('vchip:blogs:blogs:cat-'.$categoryId,60, function() use ($categoryId){
                 return Blog::getBlogsByCategory($categoryId);
             });
         } else {
             $categoryId = $request->get('category_id');
             $page = $request->get('page');
-            $blogs = Cache::remember('vchip:blogs:cat-'.$categoryId.':page-'.$page,60, function() use ($categoryId, $page){
+            $blogs = Cache::remember('vchip:blogs:blogs:cat-'.$categoryId.':page-'.$page,60, function() use ($categoryId, $page){
                 return Blog::getBlogsByCategory($categoryId, $page);
             });
-            $blogCategories= Cache::remember('vchip:blogCategories',60, function() {
+            $blogCategories= Cache::remember('vchip:blogs:blogCategories',60, function() {
                 return BlogCategory::all();
             });
             return view('blog.category_blog', compact('blogs', 'blogCategories', 'categoryId'));

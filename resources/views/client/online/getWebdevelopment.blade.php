@@ -106,7 +106,7 @@
                             @if($errors->has('domains')) <p class="help-block">{{ $errors->first('domains') }}</p> @endif
                           </div>
                           <div>
-                            <label>Price: Rs. 2999 </label>
+                            <label>Price: Rs. 4999 </label>
                           </div>
                           <button id="registerBtn" name="register" type="submit" class="btn btn-info btn-block" onclick="this.form.submit(); this.disabled=true;">Make Payment</button></br>
                          </form>

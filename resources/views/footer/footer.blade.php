@@ -163,5 +163,13 @@
       history.pushState('', document.title, window.location.pathname); // nice and clean
       e.preventDefault(); // no page reload
     }
+    if (window.location.hash == '#tab_4') {
+      $('#menu > li').removeClass('active');
+      $('#menu > li > a').attr('aria-expanded', false);
+      $('#menu > li:last').addClass('active');
+      $('#menu > li:last > a').attr('aria-expanded', true);
+      $('.tab-content > div#tab_1').removeClass('active in');
+      $('.tab-content > div#tab_4').addClass('active in');
+    }
   });
 </script>

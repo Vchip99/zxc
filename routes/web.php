@@ -188,6 +188,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/associateSession', 'Test\QuestionController@showSession');
 	Route::post('admin/associateSession', 'Test\QuestionController@associateSession');
 	Route::post('admin/updateQuestionSession', 'Test\QuestionController@updateQuestionSession');
+	Route::post('admin/uploadTestImages', 'Test\QuestionController@uploadTestImages');
 
 	// verify account
 	Route::get('verifyAccount', 'HomeController@verifyAccount');
@@ -921,7 +922,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('getClientPrevQuestion', 'Client\OnlineTest\ClientOnlineTestQuestionController@getClientPrevQuestion');
   	Route::get('manageUploadQuestions', 'Client\OnlineTest\ClientOnlineTestQuestionController@uploadQuestions');
   	Route::post('uploadQuestions', 'Client\OnlineTest\ClientOnlineTestQuestionController@importQuestions');
-
+  	Route::post('uploadClientTestImages', 'Client\OnlineTest\ClientOnlineTestQuestionController@uploadClientTestImages');
 
   	// online courses front
 	Route::get('online-courses', 'Client\Front\ClientOnlineCourseFrontController@courses');

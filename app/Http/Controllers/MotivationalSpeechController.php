@@ -32,10 +32,10 @@ class MotivationalSpeechController extends Controller
         } else {
             $page = $request->getQueryString();
         }
-        $motivationalSpeechDetails = Cache::remember('vchip:motivationalSpeech-'.$page,60, function() {
+        $motivationalSpeechDetails = Cache::remember('vchip:motivationalSpeechs:motivationalSpeech-'.$page,60, function() {
             return MotivationalSpeechDetail::paginate();
         });
-        $motivationalSpeechCategories = Cache::remember('vchip:motivationalSpeechCategories',60, function() {
+        $motivationalSpeechCategories = Cache::remember('vchip:motivationalSpeechs:motivationalSpeechCategories',60, function() {
             return MotivationalSpeechCategory::all();
         });
         $date = date('Y-m-d');
@@ -45,14 +45,14 @@ class MotivationalSpeechController extends Controller
 
     protected function motivationalSpeechDetails($id){
     	$id = json_decode($id);
-        $motivationalSpeechDetail = Cache::remember('vchip:motivationalSpeech-'.$id,60, function() use ($id){
+        $motivationalSpeechDetail = Cache::remember('vchip:motivationalSpeechs:motivationalSpeech-'.$id,60, function() use ($id){
             return MotivationalSpeechDetail::find($id);
         });
     	if(is_object($motivationalSpeechDetail)){
-            $motivationalSpeechDetails = Cache::remember('vchip:motivationalSpeechs',60, function(){
+            $motivationalSpeechDetails = Cache::remember('vchip:motivationalSpeechs:motivationalSpeechs',60, function(){
                 return MotivationalSpeechDetail::all();
             });
-            $videos = Cache::remember('vchip:videos:speechId-'.$id,60, function() use ($id){
+            $videos = Cache::remember('vchip:motivationalSpeechs:videos:speechId-'.$id,60, function() use ($id){
                 return MotivationalSpeechVideo::where('motivational_speech_detail_id', $id)->get();
             });
     		return view('motivationalSpeech.motivationalSpeechDetails', compact('motivationalSpeechDetail', 'motivationalSpeechDetails', 'videos'));

@@ -55,7 +55,7 @@ class QuizController extends Controller
             }
 
             if(count(array_keys($results['questions'])) > 0){
-                $paperSections = Cache::remember('vchip:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
+                $paperSections = Cache::remember('vchip:tests:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
                     return PaperSection::where('test_subject_paper_id', $paperId)->get();
                 });
 
@@ -92,7 +92,7 @@ class QuizController extends Controller
             $questions[$question->section_type][] = $question;
         }
         if(count(array_keys($questions)) > 0){
-            $paperSections = Cache::remember('vchip:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
+            $paperSections = Cache::remember('vchip:tests:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
                 return PaperSection::where('test_subject_paper_id', $paperId)->get();
             });
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
@@ -126,7 +126,7 @@ class QuizController extends Controller
         $subcategories = [];
         $id = json_decode($id);
         if(isset($id)){
-            $subcategories = Cache::remember('vchip:subcategories:cat-'.$id,30, function() use ($id) {
+            $subcategories = Cache::remember('vchip:tests:subcategories:cat-'.$id,30, function() use ($id) {
                 return DB::table('test_sub_categories')->select('id','name', 'test_category_id')->where('test_category_id', $id)->get();
             });
         }
@@ -137,7 +137,7 @@ class QuizController extends Controller
      *  return paper by Id
      */
     protected function getPaperById($id){
-        return Cache::remember('vchip:paper:id-'.$id,30, function() use ($id) {
+        return Cache::remember('vchip:tests:paper:id-'.$id,30, function() use ($id) {
             return DB::table('test_subject_papers')->where('id', $id)->first();
         });
     }
@@ -303,7 +303,7 @@ class QuizController extends Controller
             }
             if(count(array_keys($results['questions'])) > 0){
                 $paperId = $paper->id;
-                $paperSections = Cache::remember('vchip:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
+                $paperSections = Cache::remember('vchip:tests:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
                     return PaperSection::where('test_subject_paper_id', $paperId)->get();
                 });
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
@@ -339,7 +339,7 @@ class QuizController extends Controller
             $questions[$question->section_type][] = $question;
         }
         if(count(array_keys($questions)) > 0){
-            $paperSections = Cache::remember('vchip:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
+            $paperSections = Cache::remember('vchip:tests:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
                 return PaperSection::where('test_subject_paper_id', $paperId)->get();
             });
             if(is_object($paperSections) && false == $paperSections->isEmpty()){

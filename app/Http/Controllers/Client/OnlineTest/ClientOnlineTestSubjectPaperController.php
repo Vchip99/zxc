@@ -62,12 +62,13 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     /**
      *  store paper
      */
-    protected function store(Request $request){
+    protected function store($subdomain,Request $request){
         $v = Validator::make($request->all(), $this->validatePaper);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString($subdomain.':tests*');
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -108,13 +109,13 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     /**
      *  update paper
      */
-    protected function update(Request $request){
+    protected function update($subdomain,Request $request){
         $v = Validator::make($request->all(), $this->validatePaper);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString($subdomain.':tests*');
         $paperId = InputSanitise::inputInt($request->get('paper_id'));
         if(isset($paperId)){
             DB::connection('mysql2')->beginTransaction();
@@ -138,7 +139,8 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     /**
      *  delete paper
      */
-    protected function delete(Request $request){
+    protected function delete($subdomain,Request $request){
+        InputSanitise::deleteCacheByString($subdomain.':tests*');
     	$paperId = InputSanitise::inputInt($request->get('paper_id'));
     	if(isset($paperId)){
     		$paper = ClientOnlineTestSubjectPaper::find($paperId);

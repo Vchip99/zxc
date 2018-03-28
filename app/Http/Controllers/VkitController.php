@@ -52,11 +52,11 @@ class VkitController extends Controller
         } else {
             $page = $request->getQueryString();
         }
-        $projects = Cache::remember('vchip:projects-'.$page,60, function() {
+        $projects = Cache::remember('vchip:projects:projects-'.$page,60, function() {
             return VkitProject::paginate(12);
         });
 
-        $vkitCategories= Cache::remember('vchip:vkitCategories',60, function() {
+        $vkitCategories= Cache::remember('vchip:projects:vkitCategories',60, function() {
             return VkitCategory::getProjectCategoriesAssociatedWithProject();
         });
         $date = date('Y-m-d');
@@ -68,11 +68,11 @@ class VkitController extends Controller
      *  show vkits project by Id
      */
     protected function vkitproject($id,$subcommentId=NULL){
-        $project = Cache::remember('vchip:project-'.$id,60, function() use ($id){
+        $project = Cache::remember('vchip:projects:project-'.$id,60, function() use ($id){
             return VkitProject::find(json_decode($id));
         });
         if(is_object($project)){
-            $projects = Cache::remember('vchip:projects',60, function() {
+            $projects = Cache::remember('vchip:projects:projects',60, function() {
                 return VkitProject::all();
             });
             $comments = VkitProjectComment::where('vkit_project_id', $id)->orderBy('id', 'desc')->get();
@@ -120,7 +120,7 @@ class VkitController extends Controller
         $categoryId = $request->get('id');
         $userId = $request->get('userId');
         if(isset($categoryId) && empty($userId)){
-            return Cache::remember('vchip:projects:cat-'.$categoryId, 60, function() use ($categoryId){
+            return Cache::remember('vchip:projects:projects:cat-'.$categoryId, 60, function() use ($categoryId){
                 return VkitProject::getVkitProjectsByCategoryId($categoryId);
             });
         } else {

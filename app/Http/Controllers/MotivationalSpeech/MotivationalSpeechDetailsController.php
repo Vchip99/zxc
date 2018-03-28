@@ -62,7 +62,7 @@ class MotivationalSpeechDetailsController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString('vchip:motivationalSpeechs*');
         DB::beginTransaction();
         try
         {
@@ -99,6 +99,7 @@ class MotivationalSpeechDetailsController extends Controller
      *  update workshop Details
      */
     protected function update(Request $request){
+        InputSanitise::deleteCacheByString('vchip:motivationalSpeechs*');
         $motivationalSpeechId = InputSanitise::inputInt($request->get('motivational_speech_id'));
         if(isset($motivationalSpeechId)){
             DB::beginTransaction();
@@ -123,6 +124,7 @@ class MotivationalSpeechDetailsController extends Controller
      *  delete workshop
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:motivationalSpeechs*');
         $speechId = InputSanitise::inputInt($request->get('motivational_speech_details_id'));
         if(isset($speechId)){
             $motivationalSpeechDetail = MotivationalSpeechDetail::find($speechId);

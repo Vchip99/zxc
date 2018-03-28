@@ -14,7 +14,7 @@
   @if(isset($testCategory->id))
     <form action="{{url('admin/updateCategory')}}" method="POST" id="submitForm">
     {{ method_field('PUT') }}
-    <input type="hidden" name="category_id" value="{{$testCategory->id}}">
+    <input type="hidden" name="category_id" id="category_id" value="{{$testCategory->id}}">
   @else
    <form action="{{url('admin/createCategory')}}" method="POST" id="submitForm">
   @endif

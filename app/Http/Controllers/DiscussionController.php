@@ -48,7 +48,7 @@ class DiscussionController extends Controller
      */
     protected function discussion(Request $request,$commentId=NULL, $subcommentId=NULL ){
         $postCategoryIds = [];
-        $discussionCategories = Cache::remember('vchip:discussionCategories',60, function() {
+        $discussionCategories = Cache::remember('vchip:discussions:discussionCategories',60, function() {
             return DiscussionCategory::all();
         });
         $posts = DiscussionPost::orderBy('id', 'desc')->get();

@@ -70,6 +70,7 @@ class ZeroToHeroController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:heros*');
         DB::beginTransaction();
         try
         {
@@ -132,6 +133,7 @@ class ZeroToHeroController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:heros*');
         $heroId = InputSanitise::inputInt($request->get('hero_id'));
         if(isset($heroId)){
             DB::beginTransaction();
@@ -156,6 +158,7 @@ class ZeroToHeroController extends Controller
      *  delete hero
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:heros*');
     	$heroId = InputSanitise::inputInt($request->get('hero_id'));
     	if(isset($heroId)){
     		$hero = ZeroToHero::find($heroId);

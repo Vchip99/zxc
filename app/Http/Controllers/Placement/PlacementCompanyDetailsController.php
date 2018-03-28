@@ -75,6 +75,7 @@ class PlacementCompanyDetailsController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:placements*');
         DB::beginTransaction();
         try
         {
@@ -117,7 +118,7 @@ class PlacementCompanyDetailsController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString('vchip:placements*');
     	$companyDetailsId = InputSanitise::inputInt($request->get('company_details_id'));
     	if(isset($companyDetailsId)){
             DB::beginTransaction();
@@ -150,6 +151,7 @@ class PlacementCompanyDetailsController extends Controller
      *  delete placement Company Details
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:placements*');
         $detailsId = InputSanitise::inputInt($request->get('details_id'));
         if(isset($detailsId)){
             $companyDetail = CompanyDetails::find($detailsId);

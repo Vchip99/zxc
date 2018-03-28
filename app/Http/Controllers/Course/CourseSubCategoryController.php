@@ -63,6 +63,7 @@ class CourseSubCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:courses*');
         DB::beginTransaction();
         try
         {
@@ -104,6 +105,7 @@ class CourseSubCategoryController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:courses*');
         $subCategoryId = InputSanitise::inputInt($request->get('subCategory_id'));
     	if(isset($subCategoryId)){
             DB::beginTransaction();
@@ -128,6 +130,7 @@ class CourseSubCategoryController extends Controller
      *  delete sub category
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:courses*');
     	$subCategoryId = InputSanitise::inputInt($request->get('subCategory_id'));
     	if(isset($subCategoryId)){
     		$courseSubcategory = CourseSubCategory::find($subCategoryId);

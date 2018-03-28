@@ -75,12 +75,13 @@ class ClientOnlineCourseController extends ClientBaseController
     /**
      *  store course
      */
-    protected function store(Request $request){
-    	$v = Validator::make($request->all(), $this->validateCourse);
+    protected function store($subdomain, Request $request){
+        $v = Validator::make($request->all(), $this->validateCourse);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString($subdomain.':courses*');
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -116,12 +117,13 @@ class ClientOnlineCourseController extends ClientBaseController
     /**
      *  update course
      */
-    protected function update(Request $request){
-    	$v = Validator::make($request->all(), $this->validateUpdateCourse);
+    protected function update($subdomain,Request $request){
+        $v = Validator::make($request->all(), $this->validateUpdateCourse);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString($subdomain.':courses*');
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -142,7 +144,8 @@ class ClientOnlineCourseController extends ClientBaseController
     /**
      *  delete course
      */
-    protected function delete(Request $request){
+    protected function delete($subdomain,Request $request){
+        InputSanitise::deleteCacheByString($subdomain.':courses*');
     	$courseId = InputSanitise::inputInt($request->get('course_id'));
     	if(isset($courseId)){
     		$course = ClientOnlineCourse::find($courseId);

@@ -93,6 +93,8 @@ class AssignmentQuestion extends Model
         }
         if(!empty($request->year)){
             $resultQuery->where('year', $request->year);
+        }else{
+            $resultQuery->where('year', Auth::user()->id);
         }
 
         if(User::Lecturer == Auth::user()->user_type){
@@ -111,7 +113,7 @@ class AssignmentQuestion extends Model
     }
 
     protected static function getAssignmentByTopic($topic){
-        return static::where('assignment_topic_id',$topic)->first();
+        return static::where('assignment_topic_id',$topic)->where('year', Auth::user()->id)->first();
     }
 
     protected static function checkAssignmentIsExist(Request $request){

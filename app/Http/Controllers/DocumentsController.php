@@ -36,11 +36,11 @@ class DocumentsController extends Controller
         } else {
             $page = $request->getQueryString();
         }
-        $documents = Cache::remember('vchip:documents-'.$page,60, function() {
+        $documents = Cache::remember('vchip:documents:documents-'.$page,60, function() {
             return DocumentsDoc::getDocumentsAssociatedWithCategory();
         });
 
-        $documentsCategories = Cache::remember('vchip:documentsCategories',60, function() {
+        $documentsCategories = Cache::remember('vchip:documents:documentsCategories',60, function() {
             return DocumentsCategory::getDocumentsCategoriesAssociatedWithDocs();
         });
         $registeredDocuments = $this->getRegisteredDocumentIds();
@@ -74,7 +74,7 @@ class DocumentsController extends Controller
         $categoryId = $request->get('id');
         $userId = $request->get('user_id');
         if(isset($categoryId) && empty($userId)){
-            $result['documents'] = Cache::remember('vchip:documents:cat-'.$categoryId,60, function() use ($categoryId){
+            $result['documents'] = Cache::remember('vchip:documents:documents:cat-'.$categoryId,60, function() use ($categoryId){
                 return DocumentsDoc::getDocumentsByCategoryId($categoryId);
             });
             $result['registeredDocuments'] = [];

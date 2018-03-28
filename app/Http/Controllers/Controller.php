@@ -11,7 +11,7 @@ use App\Models\TestSubCategory;
 use App\Models\TestSubject;
 use App\Models\TestSubjectPaper;
 use App\Libraries\InputSanitise;
-use View,Cache;
+use View,Cache,Session;
 
 class Controller extends BaseController
 {
@@ -25,9 +25,10 @@ class Controller extends BaseController
     public function __construct()
     {
 
-        $testCategoriesWithQuestions = Cache::remember('vchip:testCategoriesWithQuestions',60, function() {
+        $testCategoriesWithQuestions = Cache::remember('vchip:tests:testCategoriesWithQuestions',60, function() {
             return TestCategory::getTestCategoriesAssociatedWithQuestion();
         });
         view::share('testCategoriesWithQuestions', $testCategoriesWithQuestions);
+
     }
 }

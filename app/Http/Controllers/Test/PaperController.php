@@ -77,6 +77,7 @@ class PaperController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:tests*');
         DB::beginTransaction();
         try
         {
@@ -121,6 +122,7 @@ class PaperController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:tests*');
         $paperId = InputSanitise::inputInt($request->get('paper_id'));
         if(isset($paperId)){
             DB::beginTransaction();
@@ -145,6 +147,7 @@ class PaperController extends Controller
      *  delete paper
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:tests*');
     	$paperId = InputSanitise::inputInt($request->get('paper_id'));
     	if(isset($paperId)){
     		$paper = TestSubjectPaper::find($paperId);

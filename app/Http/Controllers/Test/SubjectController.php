@@ -66,6 +66,7 @@ class SubjectController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:tests*');
         DB::beginTransaction();
         try
         {
@@ -108,7 +109,7 @@ class SubjectController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString('vchip:tests*');
 		$subjectId = InputSanitise::inputInt($request->get('subject_id'));
 		if(isset($subjectId)){
 			DB::beginTransaction();
@@ -133,6 +134,7 @@ class SubjectController extends Controller
 	 *	delete subject
 	 */
 	protected function delete(Request $request){
+		InputSanitise::deleteCacheByString('vchip:tests*');
 		$subjectId = InputSanitise::inputInt($request->get('subject_id'));
 		if(isset($subjectId)){
 			$testSubject = TestSubject::find($subjectId);

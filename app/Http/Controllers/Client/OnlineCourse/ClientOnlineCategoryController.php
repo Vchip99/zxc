@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Client\OnlineCourse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Client\ClientBaseController;
 use Redirect;
-use Validator, Session, Auth, DB;
+use Validator, Session, Auth, DB,LRedis;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCategory;
 use App\Models\Client;
@@ -47,12 +47,13 @@ class ClientOnlineCategoryController extends ClientBaseController
     /**
      *  store course category
      */
-    protected function store(Request $request){
-    	$v = Validator::make($request->all(), $this->validateCategory);
+    protected function store($subdomain,Request $request){
+        $v = Validator::make($request->all(), $this->validateCategory);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString($subdomain.':courses*');
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -87,13 +88,13 @@ class ClientOnlineCategoryController extends ClientBaseController
     /**
      *  update course category
      */
-    protected function update(Request $request){
+    protected function update($subdomain,Request $request){
         $v = Validator::make($request->all(), $this->validateCategory);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString($subdomain.':courses*');
     	$categoryId = InputSanitise::inputInt($request->get('category_id'));
     	if(isset($categoryId)){
             DB::connection('mysql2')->beginTransaction();
@@ -117,7 +118,8 @@ class ClientOnlineCategoryController extends ClientBaseController
     /**
      *  delete course category
      */
-    protected function delete(Request $request){
+    protected function delete($subdomain,Request $request){
+        InputSanitise::deleteCacheByString($subdomain.':courses*');
     	$categoryId = InputSanitise::inputInt($request->get('category_id'));
     	if(isset($categoryId)){
     		$courseCategory = ClientOnlineCategory::find($categoryId);

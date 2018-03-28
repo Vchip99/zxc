@@ -250,7 +250,7 @@ ul.table_list{ margin-left: -30px; }
       <div class="col-sm-9 col-sm-push-3 data" id="placement-box">
          <div class="portlet box grey-cascade">
             <div class="portlet-title">
-              <ul class="nav nav-tabs nav-tabs-lg pull-left">
+              <ul class="nav nav-tabs nav-tabs-lg pull-left" id="menu">
                 <li class="active" title="About">
                   <a data-toggle="tab" href="#tab_1"
                     aria-expanded="true">

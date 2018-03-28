@@ -8,7 +8,7 @@ use App\Models\Clientuser;
 use App\Models\ClientCourseSubComment;
 use App\Libraries\InputSanitise;
 use App\Models\ClientCourseCommentLike;
-use Auth;
+use Auth,Cache;
 
 class ClientCourseComment extends Model
 {
@@ -46,6 +46,12 @@ class ClientCourseComment extends Model
 
     public function user(){
         return $this->belongsTo(Clientuser::class, 'user_id');
+    }
+
+    public function getClientUser($subdomainName,$userId){
+        return Cache::remember($subdomainName.':user-'.$userId,30, function() use($userId){
+            return Clientuser::find($userId);
+        });
     }
 
     public static function getCommentsByVideoId($id, Request $request){

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Client\Front;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Client\ClientHomeController;
-use View,DB,Session,Redirect, Auth,Validator;
+use View,DB,Session,Redirect, Auth,Validator,Cache;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientOnlineCategory;
@@ -38,7 +38,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
 	/**
      *  show all courses associated with videos
      */
-    protected function courses(Request $request){
+    protected function courses($subdomainName,Request $request){
 
         $userPurchasedCourses = [];
         $subdomain = InputSanitise::checkDomain($request);
@@ -49,21 +49,28 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                 return Redirect::away('https://vchipedu.com/');
             }
         }
-        if(is_object(Auth::guard('clientuser')->user())){
-            $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        $loginUser = Auth::guard('clientuser')->user();
+        if(is_object($loginUser)){
+            $clientResult = InputSanitise::checkUserClient($request, $loginUser);
             if( !is_object($clientResult)){
                 return Redirect::away($clientResult);
             }
         }
         view::share('subdomain', $subdomain);
-    	$subdomainName = InputSanitise::getCurrentClient($request);
-        $courseCategories = ClientOnlineCategory::getCategoriesAssocaitedWithVideos($subdomainName);
-        $courses = ClientOnlineCourse::getCourseAssocaitedWithVideos($subdomainName);
+    	$hostName = InputSanitise::getCurrentClient($request);
 
-        if(is_object(Auth::guard('clientuser')->user())){
-            $clientId = Auth::guard('clientuser')->user()->client_id;
-            $userId = Auth::guard('clientuser')->user()->id;
-            $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $userId);
+        $courseCategories = Cache::remember($subdomainName.':courses:categories:all',60, function() use ($hostName) {
+            return ClientOnlineCategory::getCategoriesAssocaitedWithVideos($hostName);
+        });
+
+        $courses = Cache::remember($subdomainName.':courses:courses:all',60, function() use ($hostName) {
+            return ClientOnlineCourse::getCourseAssocaitedWithVideos($hostName);
+        });
+
+        if(is_object($loginUser)){
+            $clientId = $loginUser->client_id;
+            $userId = $loginUser->id;
+            $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($subdomainName,$clientId, $userId);
         }
         return view('client.front.onlineCourses.courses', compact('courseCategories', 'courses', 'userPurchasedCourses'));
     }
@@ -71,15 +78,18 @@ class ClientOnlineCourseFrontController extends ClientHomeController
     /**
      *  return courses by categoryId by sub CategoryId or by userId
      */
-    protected function getOnlineCourseByCatIdBySubCatId(Request $request){
+    protected function getOnlineCourseByCatIdBySubCatId($subdomainName,Request $request){
         $result = [];
         $categoryId = $request->get('catId');
         $subcategoryId = $request->get('subcatId');
-        $result['courses'] = ClientOnlineCourse::getOnlineCourseByCatIdBySubCatId($categoryId,$subcategoryId, $request);
-        if(is_object(Auth::guard('clientuser')->user())){
-            $clientId = Auth::guard('clientuser')->user()->client_id;
-            $userId = Auth::guard('clientuser')->user()->id;
-            $result['userPurchasedCourses'] = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $userId);
+        $result['courses'] = Cache::remember($subdomainName.':courses:courses:cat-'.$categoryId.'-subcat-'.$subcategoryId,30, function() use ($categoryId,$subcategoryId, $request) {
+                return ClientOnlineCourse::getOnlineCourseByCatIdBySubCatId($categoryId,$subcategoryId, $request);
+            });
+        $loginUser = Auth::guard('clientuser')->user();
+        if(is_object($loginUser)){
+            $clientId = $loginUser->client_id;
+            $userId = $loginUser->id;
+            $result['userPurchasedCourses'] = ClientUserPurchasedCourse::getUserPurchasedCourses($subdomainName,$clientId, $userId);
         }
 
         return $result;
@@ -88,37 +98,42 @@ class ClientOnlineCourseFrontController extends ClientHomeController
     /**
      *  return courses by categoryId by sub CategoryId by userId
      */
-    protected function getRegisteredOnlineCourseByCatIdBySubCatId(Request $request){
+    protected function getRegisteredOnlineCourseByCatIdBySubCatId($subdomainName,Request $request){
         $result = [];
         $categoryId = $request->get('catId');
         $subcategoryId = $request->get('subcatId');
         $userId = $request->get('userId');
         $result['courses'] = ClientOnlineCourse::getRegisteredOnlineCourseByCatIdBySubCatId($categoryId,$subcategoryId, $userId);
         $clientId = Auth::guard('clientuser')->user()->client_id;
-        $result['userPurchasedCourses'] = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $userId);
+        $result['userPurchasedCourses'] = ClientUserPurchasedCourse::getUserPurchasedCourses($subdomainName,$clientId, $userId);
         return $result;
     }
 
-    protected function courseDetails($subdomain, $id,Request $request){
+    protected function courseDetails($subdomainName, $id,Request $request){
 	 	$onlineVideoIds = [];
         $isCoursePurchased = 'false';
         $courseId = json_decode(trim($id));
-        if(is_object(Auth::guard('clientuser')->user())){
-            $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        $loginUser = Auth::guard('clientuser')->user();
+        if(is_object($loginUser)){
+            $clientResult = InputSanitise::checkUserClient($request, $loginUser);
             if( !is_object($clientResult)){
                 return Redirect::away($clientResult);
             }
         }
-        $course = ClientOnlineCourse::find($courseId);
+        $course = Cache::remember($subdomainName.':courses:course:id-'.$courseId,30, function() use ($courseId) {
+            return ClientOnlineCourse::find($courseId);
+        });
         if(is_object($course)){
-            $videos = ClientOnlineVideo::getClientCourseVideosByCourseId($courseId, $request);
+            $videos = Cache::remember($subdomainName.':courses:videos:courseId-'.$courseId,30, function() use ($courseId, $request) {
+                return ClientOnlineVideo::getClientCourseVideosByCourseId($courseId, $request);
+            });
             $isCourseRegistered = RegisterClientOnlineCourses::isCourseRegistered($courseId);
-            if(is_object(Auth::guard('clientuser')->user())){
-                $clientId = Auth::guard('clientuser')->user()->client_id;
-                $userId = Auth::guard('clientuser')->user()->id;
+            if(is_object($loginUser)){
+                $clientId = $loginUser->client_id;
+                $userId = $loginUser->id;
                 $isCoursePurchased = ClientUserPurchasedCourse::isCoursePurchased($clientId, $userId, $courseId);
             }
-            return view('client.front.onlineCourses.course_details', compact('videos', 'courseId', 'isCourseRegistered', 'course', 'isCoursePurchased'));
+            return view('client.front.onlineCourses.course_details', compact('videos', 'courseId', 'isCourseRegistered', 'course', 'isCoursePurchased', 'loginUser'));
         }
         return redirect()->back();
     }
@@ -126,25 +141,31 @@ class ClientOnlineCourseFrontController extends ClientHomeController
     /**
      *  show episode and its details by id
      */
-    protected function episode($subdomain, $id,Request $request,$subcomment=NULL){
+    protected function episode($subdomainName, $id,Request $request,$subcomment=NULL){
         $videoId = json_decode(trim($id));
-        if(is_object(Auth::guard('clientuser')->user())){
-            $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        $loginUser = Auth::guard('clientuser')->user();
+        if(is_object($loginUser)){
+            $clientResult = InputSanitise::checkUserClient($request, $loginUser);
             if( !is_object($clientResult)){
                 return Redirect::away($clientResult);
             }
         }
         if(isset($videoId)){
-            $video = ClientOnlineVideo::find($videoId);
+            $video = Cache::remember($subdomainName.':courses:video:id-'.$videoId,30, function() use ($videoId) {
+                return ClientOnlineVideo::find($videoId);
+            });
             if(is_object($video)){
                 if( false == $video->course->release_date <= date('Y-m-d H:i')){
                     return Redirect::to('online-courses');
                 }
-                if( 0 == $video->is_free && $video->course->price > 0 ){
-                    if(is_object(Auth::guard('clientuser')->user())){
-                        $clientId = Auth::guard('clientuser')->user()->client_id;
-                        $userId = Auth::guard('clientuser')->user()->id;
-                        $courseId = $video->course->id;
+                $videoCourse = $video->course;
+                $courseId = $videoCourse->id;
+                $videoCoursePrice = $videoCourse->price;
+
+                if( 0 == $video->is_free && $videoCourse->price > 0 ){
+                    if(is_object($loginUser)){
+                        $clientId = $loginUser->client_id;
+                        $userId = $loginUser->id;
                         $isCoursePurchased = ClientUserPurchasedCourse::isCoursePurchased($clientId, $userId, $courseId);
                         if( 'false' ==  $isCoursePurchased){
                             return Redirect::to('online-courses');
@@ -153,20 +174,22 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                         return Redirect::to('online-courses');
                     }
                 }
-                $user = new Clientuser;
-                $courseVideos = ClientOnlineVideo::getClientCourseVideosByCourseId($video->course_id, $request);
+
+                $courseVideos = Cache::remember($subdomainName.':courses:videos:courseId-'.$courseId,30, function() use ($courseId, $request) {
+                    return ClientOnlineVideo::getClientCourseVideosByCourseId($courseId, $request);
+                });
                 $comments = ClientCourseComment::getCommentsByVideoId($video->id, $request);
                 $likesCount = ClientOnlineVideoLike::getLikesByVideoId($id, $request);
                 $commentLikesCount = ClientCourseCommentLike::getLikesByVideoId($id, $request);
                 $subcommentLikesCount = ClientCourseSubCommentLike::getLikesByVideoId($id, $request);
-                if(is_object(Auth::guard('clientuser')->user())){
-                    $currentUser = Auth::guard('clientuser')->user()->id;
+                if(is_object($loginUser)){
+                    $currentUser = $loginUser;
                     if($videoId > 0 || $subcomment > 0){
                         DB::beginTransaction();
                         try
                         {
                             if($videoId > 0 && $subcomment == NULL){
-                                $readNotification = ClientReadNotification::readNotificationByModuleByModuleIdByUser(ClientNotification::CLIENTCOURSEVIDEO,$videoId,$currentUser);
+                                $readNotification = ClientReadNotification::readNotificationByModuleByModuleIdByUser(ClientNotification::CLIENTCOURSEVIDEO,$videoId,$currentUser->id);
                                 if(is_object($readNotification)){
                                     DB::connection('mysql2')->commit();
                                 }
@@ -184,16 +207,15 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                     } else {
                         Session::set('client_subcomment_area', 0);
                     }
-                    $clientId = Auth::guard('clientuser')->user()->client_id;
-                    $isCoursePurchased = ClientUserPurchasedCourse::isCoursePurchased($clientId, $currentUser, $video->course_id);
+                    $isCoursePurchased = ClientUserPurchasedCourse::isCoursePurchased($loginUser->client_id, $currentUser->id, $courseId);
                 } else {
-                    $currentUser = 0;
+                    $currentUser = NULL;
                     $isCoursePurchased = 'false';
-                    if(0 == $video->is_free && $video->course->price > 0){
+                    if(0 == $video->is_free && $videoCoursePrice > 0){
                         return Redirect::to('online-courses');
                     }
                 }
-                return view('client.front.onlineCourses.episode', compact('video', 'courseVideos', 'comments', 'user', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'isCoursePurchased'));
+                return view('client.front.onlineCourses.episode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'isCoursePurchased', 'subdomainName', 'videoCoursePrice'));
             }
         }
         return Redirect::to('online-courses');
@@ -212,10 +234,12 @@ class ClientOnlineCourseFrontController extends ClientHomeController
     /**
      * return course sub categories by categoryId with courses
      */
-    protected function getOnlineSubCategoriesWithCourses(Request $request){
+    protected function getOnlineSubCategoriesWithCourses($subdomainName, Request $request){
         $id = InputSanitise::inputInt($request->get('id'));
         if(isset($id)){
-            return ClientOnlineSubCategory::getOnlineSubCategoriesWithCourses($id, $request);
+            return Cache::remember($subdomainName.':courses:subcats:cat-'.$id,30, function() use ($id, $request) {
+                return ClientOnlineSubCategory::getOnlineSubCategoriesWithCourses($id, $request);
+            });
         }
     }
 
@@ -246,7 +270,8 @@ class ClientOnlineCourseFrontController extends ClientHomeController
         return ClientCourseSubCommentLike::getLikeVideoSubComment($request);
     }
 
-    protected function createClientCourseComment(Request $request){
+    protected function createClientCourseComment($subdomainName, Request $request){
+
         $videoId = strip_tags(trim($request->get('video_id')));
         DB::connection('mysql2')->beginTransaction();
         try
@@ -259,13 +284,14 @@ class ClientOnlineCourseFrontController extends ClientHomeController
         {
             DB::connection('mysql2')->rollback();
         }
-        return $this->getComments($videoId,$request);
+        return $this->getComments($subdomainName, $videoId,$request);
     }
 
-    protected function updateClientCourseComment(Request $request){
+    protected function updateClientCourseComment($subdomainName, Request $request){
         $videoId = InputSanitise::inputInt($request->get('video_id'));
         $commentId = InputSanitise::inputInt($request->get('comment_id'));
         $commentBody = $request->get('comment');
+
         if(!empty($videoId) && !empty($commentId) && !empty($commentBody)){
             $comment = ClientCourseComment::where('client_online_video_id', $videoId)->where('client_id', Auth::guard('clientuser')->user()->client_id)->where('id', $commentId)->first();
             if(is_object($comment)){
@@ -285,10 +311,10 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                 }
             }
         }
-        return $this->getComments($videoId,$request);
+        return $this->getComments($subdomainName, $videoId,$request);
     }
 
-    protected function deleteClientCourseComment(Request $request){
+    protected function deleteClientCourseComment($subdomainName, Request $request){
         $videoId = InputSanitise::inputInt($request->get('video_id'));
         $commentId = InputSanitise::inputInt($request->get('comment_id'));
         if(!empty($videoId) && !empty($commentId)){
@@ -323,10 +349,10 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                 }
             }
         }
-        return $this->getComments($videoId,$request);
+        return $this->getComments($subdomainName, $videoId,$request);
     }
 
-    protected function createClientCourseSubComment(Request $request){
+    protected function createClientCourseSubComment($subdomainName, Request $request){
         $videoId = strip_tags(trim($request->get('video_id')));
         DB::connection('mysql2')->beginTransaction();
         try
@@ -337,11 +363,11 @@ class ClientOnlineCourseFrontController extends ClientHomeController
             $subdomain = explode('.',$request->getHost());
             $commentId = $request->get('comment_id');
             $subcommentId = $request->get('subcomment_id');
-
+            $loginUser = Auth::guard('clientuser')->user();
             if($commentId > 0 && $subcommentId > 0){
-                $parentComment = ClientCourseSubComment::where('id',$subcommentId)->where('client_id', Auth::guard('clientuser')->user()->client_id)->where('user_id', '!=', Auth::guard('clientuser')->user()->id)->first();
+                $parentComment = ClientCourseSubComment::where('id',$subcommentId)->where('client_id', $loginUser->client_id)->where('user_id', '!=', $loginUser->id)->first();
             } else {
-                $parentComment = ClientCourseComment::where('id',$subComment->client_course_comment_id)->where('client_id', Auth::guard('clientuser')->user()->client_id)->where('user_id', '!=', Auth::guard('clientuser')->user()->id)->first();
+                $parentComment = ClientCourseComment::where('id',$subComment->client_course_comment_id)->where('client_id', $loginUser->client_id)->where('user_id', '!=', $loginUser->id)->first();
             }
             if(is_object($parentComment)){
                 $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
@@ -357,10 +383,10 @@ class ClientOnlineCourseFrontController extends ClientHomeController
         {
             DB::connection('mysql2')->rollback();
         }
-        return $this->getComments($videoId,$request);
+        return $this->getComments($subdomainName, $videoId,$request);
     }
 
-    protected function updateClientCourseSubComment(Request $request){
+    protected function updateClientCourseSubComment($subdomainName, Request $request){
         $videoId = InputSanitise::inputInt($request->get('video_id'));
         $commentId = InputSanitise::inputInt($request->get('comment_id'));
         $subcommentId = InputSanitise::inputInt($request->get('subcomment_id'));
@@ -383,10 +409,10 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                 }
             }
         }
-        return $this->getComments($videoId,$request);
+        return $this->getComments($subdomainName, $videoId,$request);
     }
 
-    protected function deleteClientCourseSubComment(Request $request){
+    protected function deleteClientCourseSubComment($subdomainName, Request $request){
         $videoId = InputSanitise::inputInt($request->get('video_id'));
         $commentId = InputSanitise::inputInt($request->get('comment_id'));
         $subcommentId = InputSanitise::inputInt($request->get('subcomment_id'));
@@ -411,13 +437,13 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                 }
             }
         }
-        return $this->getComments($videoId,$request);
+        return $this->getComments($subdomainName, $videoId,$request);
     }
 
         /**
      *  return comments
      */
-    protected function getComments($videoId, Request $request){
+    protected function getComments($subdomainName, $videoId, Request $request){
         $comments = ClientCourseComment::getCommentsByVideoId($videoId, $request);
         $courseComment = [];
         foreach($comments as $comment){
@@ -425,19 +451,19 @@ class ClientOnlineCourseFrontController extends ClientHomeController
             $courseComment['comments'][$comment->id]['id'] = $comment->id;
             $courseComment['comments'][$comment->id]['client_online_video_id'] = $comment->client_online_video_id;
             $courseComment['comments'][$comment->id]['user_id'] = $comment->user_id;
-            $courseComment['comments'][$comment->id]['user_name'] = $comment->user->name;
+            $courseComment['comments'][$comment->id]['user_name'] = $comment->getClientUser($subdomainName, $comment->user_id)->name;
             $courseComment['comments'][$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
-            $courseComment['comments'][$comment->id]['user_image'] = $comment->user->photo;
-            if(is_file($comment->user->photo) && true == preg_match('/userStorage/',$comment->user->photo)){
+            $courseComment['comments'][$comment->id]['user_image'] = $comment->getClientUser($subdomainName, $comment->user_id)->photo;
+            if(is_file($comment->getClientUser($subdomainName, $comment->user_id)->photo) && true == preg_match('/clientUserStorage/',$comment->getClientUser($subdomainName, $comment->user_id)->photo)){
                 $isImageExist = 'system';
-            } else if(!empty($comment->user->photo) && false == preg_match('/userStorage/',$comment->user->photo)){
+            } else if(!empty($comment->getClientUser($subdomainName, $comment->user_id)->photo) && false == preg_match('/clientUserStorage/',$comment->getClientUser($subdomainName, $comment->user_id)->photo)){
                 $isImageExist = 'other';
             } else {
                 $isImageExist = 'false';
             }
             $courseComment['comments'][$comment->id]['image_exist'] = $isImageExist;
             if(is_object($comment->children) && false == $comment->children->isEmpty()){
-                $courseComment['comments'][$comment->id]['subcomments'] = $this->getSubComments($comment->children);
+                $courseComment['comments'][$comment->id]['subcomments'] = $this->getSubComments($subdomainName,$comment->children);
             }
         }
         $courseComment['commentLikesCount'] = ClientCourseCommentLike::getLikesByVideoId($videoId, $request);
@@ -449,7 +475,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
     /**
      *  return child comments
      */
-    protected function getSubComments($subComments){
+    protected function getSubComments($subdomainName,$subComments){
 
         $videoChildComments = [];
         foreach($subComments as $subComment){
@@ -457,20 +483,20 @@ class ClientOnlineCourseFrontController extends ClientHomeController
             $videoChildComments[$subComment->id]['id'] = $subComment->id;
             $videoChildComments[$subComment->id]['client_online_video_id'] = $subComment->client_online_video_id;
             $videoChildComments[$subComment->id]['client_course_comment_id'] = $subComment->client_course_comment_id;
-            $videoChildComments[$subComment->id]['user_name'] = $subComment->user->name;
+            $videoChildComments[$subComment->id]['user_name'] = $subComment->getClientUser($subdomainName, $subComment->user_id)->name;
             $videoChildComments[$subComment->id]['user_id'] = $subComment->user_id;
             $videoChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
-            $videoChildComments[$subComment->id]['user_image'] = $subComment->user->photo;
-            if(is_file($subComment->user->photo) && true == preg_match('/userStorage/',$subComment->user->photo)){
+            $videoChildComments[$subComment->id]['user_image'] = $subComment->getClientUser($subdomainName, $subComment->user_id)->photo;
+            if(is_file($subComment->getClientUser($subdomainName, $subComment->user_id)->photo) && true == preg_match('/clientUserStorage/',$subComment->getClientUser($subdomainName, $subComment->user_id)->photo)){
                 $isImageExist = 'system';
-            } else if(!empty($subComment->user->photo) && false == preg_match('/userStorage/',$subComment->user->photo)){
+            } else if(!empty($subComment->getClientUser($subdomainName, $subComment->user_id)->photo) && false == preg_match('/clientUserStorage/',$subComment->getClientUser($subdomainName, $subComment->user_id)->photo)){
                 $isImageExist = 'other';
             } else {
                 $isImageExist = 'false';
             }
             $videoChildComments[$subComment->id]['image_exist'] = $isImageExist;
             if(is_object($subComment->children) && false == $subComment->children->isEmpty()){
-                $videoChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
+                $videoChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subdomainName,$subComment->children);
             }
         }
 

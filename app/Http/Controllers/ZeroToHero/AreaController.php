@@ -61,6 +61,7 @@ class AreaController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:heros*');
         DB::beginTransaction();
         try
         {
@@ -101,6 +102,7 @@ class AreaController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:heros*');
         $areaId = InputSanitise::inputInt($request->get('area_id'));
         if(isset($areaId)){
             DB::beginTransaction();
@@ -125,6 +127,7 @@ class AreaController extends Controller
      *  delete area
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:heros*');
         $areaId = InputSanitise::inputInt($request->get('area_id'));
         if(isset($areaId)){
             $area = Area::find($areaId);

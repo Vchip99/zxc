@@ -12,7 +12,7 @@ use App\Mail\PaymentReceived;
 use App\Models\ClientHomePage;
 use App\Models\Client;
 use Illuminate\Http\Request;
-use View,DB,Session,Redirect, Auth,Validator;
+use View,DB,Session,Redirect, Auth,Validator,Cache,LRedis;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientOnlineTestSubjectPaper;
@@ -56,23 +56,24 @@ class ClientUserController extends BaseController
         return view('clientuser.dashboard.dashboard');
     }
 
-    protected function myCourses(Request $request){
+    protected function myCourses($subdomainName,Request $request){
         $categoryIds = [];
         $categories = [];
         $courseVideoCount = 0;
-        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
-        $userId = Auth::guard('clientuser')->user()->id;
-        $courses = ClientOnlineCourse::getRegisteredOnlineCourses($userId);
+        $courses = ClientOnlineCourse::getRegisteredOnlineCourses($clientUserId);
         if(is_object($courses) && false == $courses->isEmpty()){
             foreach($courses as $course){
                 $categoryIds[] = $course->category_id;
             }
             $categories = ClientOnlineCategory::find($categoryIds);
-            $clientId = Auth::guard('clientuser')->user()->client_id;
-            $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $userId);
+            $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($subdomainName,$clientId, $clientUserId);
         }
 
         return view('clientuser.dashboard.myCourses', compact('courses', 'categories', 'userPurchasedCourses'));
@@ -82,26 +83,28 @@ class ClientUserController extends BaseController
         return view('clientuser.dashboard.myCertificate');
     }
 
-    protected function myTest(Request $request){
+    protected function myTest($subdomainName,Request $request){
         $results = [];
         $testSubjectPapers   = [];
         $testSubjects        = [];
         $testSubjectPaperIds = [];
         $testSubjectIds      = [];
-        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
-        $userId = Auth::guard('clientuser')->user()->id;
-        $results = ClientOnlineTestSubjectPaper::getRegisteredSubjectPapersByUserId($userId);
+        $results = ClientOnlineTestSubjectPaper::getRegisteredSubjectPapersByUserId($clientUserId);
         if(count($results)>0){
             $testSubjectPapers = $results['papers'];
             $testSubjectPaperIds = $results['paperIds'];
             $testSubjectIds = $results['subjectIds'];
-            $testSubjects = ClientOnlineTestSubject::getSubjectsByIds($results['subjectIds']);
+            $testSubjects = ClientOnlineTestSubject::getSubjectsByIds($testSubjectIds);
         }
-        $testCategories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($userId);
-        $alreadyGivenPapers = ClientScore::getClientUserTestScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $userId);
+        $testCategories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($clientUserId);
+        $alreadyGivenPapers = ClientScore::getClientUserTestScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $clientUserId);
         $currentDate = date('Y-m-d H:i:s');
         return view('clientuser.dashboard.myTest', compact('testSubjects', 'testSubjectPapers', 'testCategories','currentDate', 'alreadyGivenPapers'));
     }
@@ -117,16 +120,17 @@ class ClientUserController extends BaseController
         return ClientOnlineVideo::getCoursevideoCount($courseIds);
     }
 
-    protected function myCourseResults(Request $request){
+    protected function myCourseResults($subdomainName,Request $request){
         $categoryIds = [];
         $categories = [];
-        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
-        $user = Auth::guard('clientuser')->user();
-
-        $courses = ClientOnlineCourse::getRegisteredOnlineCourses($user->id);
+        $courses = ClientOnlineCourse::getRegisteredOnlineCourses($clientUserId);
         if(is_object($courses) && false == $courses->isEmpty()){
             foreach($courses as $course){
                 $categoryIds[] = $course->category_id;
@@ -136,7 +140,7 @@ class ClientUserController extends BaseController
         return view('clientuser.dashboard.myCourseResult', compact('courses', 'categories'));
     }
 
-    protected function getCourseByCatIdBySubCatIdByUserId(Request $request){
+    protected function getCourseByCatIdBySubCatIdByUserId($subdomainName,Request $request){
         $result = [];
         $categoryId = $request->get('catId');
         $subcategoryId = $request->get('subcatId');
@@ -145,21 +149,23 @@ class ClientUserController extends BaseController
         return $result;
     }
 
-    protected function myTestResults(Request $request){
-        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+    protected function myTestResults($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
-        $user = Auth::guard('clientuser')->user();
-        $categories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($user->id);
+        $categories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($clientUserId);
 
-        $results = ClientScore::getClientScoreByUserId($user->id);
+        $results = ClientScore::getClientScoreByUserId($clientUserId);
+
         $barchartLimits = range(100, 0, 10);
         return view('clientuser.dashboard.myTestResults', compact('categories','results','barchartLimits'));
     }
 
-    protected function showUserTestResultsByCategoryBySubcategoryByUserId(Request $request){
-
+    protected function showUserTestResultsByCategoryBySubcategoryByUserId($subdomainName,Request $request){
         return ClientScore::getUserTestResultsByCategoryBySubcategoryByUserId($request);
     }
 
@@ -189,28 +195,31 @@ class ClientUserController extends BaseController
         return Redirect::to('profile');
     }
 
-    protected function clientMessages(Request $request){
+    protected function clientMessages($subdomainName,Request $request){
         $sortIds = [];
         $allIds = [];
         $testCourseIds = [];
         $onlineVideoIds = [];
         $testSubjectPapersIds = [];
         $idsImploded = '';
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
         $selectedYear = !empty($request->get('year'))?$request->get('year'): date('Y');
         $selectedMonth = !empty($request->get('month'))?$request->get('month'): date('m');
-        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
 
         $readNotificationIds = ClientReadNotification::getReadNotificationIdsByUser($selectedYear,$selectedMonth);
 
-        $queryForTestPapers = ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id)
+        $queryForTestPapers = ClientNotification::where('client_id', $clientId)
                         ->where('notification_module', 2)
                         ->where('created_by',0)->where('created_to',0)
                         ->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth);
 
-        $allAdminNotifications = ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id)
+        $allAdminNotifications = ClientNotification::where('client_id', $clientId)
                         ->where('notification_module', 1)
                         ->where('created_by',0)->where('created_to',0)
                         ->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)
@@ -225,11 +234,12 @@ class ClientUserController extends BaseController
             $allIds = array_merge($sortIds, $readNotificationIds);
             $idsImploded = "'" . implode("','", $allIds) . "'";
         }
-        $result =  ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id);
+        $result =  ClientNotification::where('client_id', $clientId);
         if( count($allIds) > 0 && !empty($idsImploded)){
             $result->whereIn('id', $allIds)->orderByRaw("FIELD(`id`,$idsImploded)");
         }
         $notifications = $result->where('created_by',0)->where('created_to',0)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->orderBy('id', 'desc')->paginate();
+
         $years = range(2017, 2030);
         $months = array(
                     "1" => "January", "2" => "February", "3" => "March", "4" => "April",
@@ -239,15 +249,18 @@ class ClientUserController extends BaseController
         return view('clientuser.dashboard.adminNotifications', compact('notifications', 'readNotificationIds', 'years', 'months','selectedYear', 'selectedMonth'));
     }
 
-    protected function myNotifications(Request $request){
-        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+    protected function myNotifications($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
         DB::connection('mysql2')->beginTransaction();
         try
         {
-            ClientNotification::readUserNotifications(Auth::guard('clientuser')->user()->id);
+            ClientNotification::readUserNotifications($clientUserId);
             DB::connection('mysql2')->commit();
         }
         catch(\Exception $e)
@@ -255,18 +268,26 @@ class ClientUserController extends BaseController
             DB::connection('mysql2')->rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }
-        $notifications =  ClientNotification::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('created_to', Auth::guard('clientuser')->user()->id)->orderBy('id', 'desc')->paginate();
+        if(empty($request->getQueryString())){
+            $page = 'page=1';
+        } else {
+            $page = $request->getQueryString();
+        }
+
+        $notifications = ClientNotification::where('client_id', $clientId)->where('created_to', $clientUserId)->orderBy('id', 'desc')->paginate();
         return view('clientuser.dashboard.notifications', compact('notifications'));
     }
 
-    protected function myAssignments(Request $request){
-        $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
+    protected function myAssignments($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
-        $assignments = ClientAssignmentQuestion::where('client_id', Auth::guard('clientuser')->user()->client_id)
-                ->select('client_assignment_questions.*')->paginate();
-        $subjects = ClientOnlineTestSubject::where('client_id', Auth::guard('clientuser')->user()->client_id)->get();
+        $assignments = ClientAssignmentQuestion::where('client_id', $clientId)->select('client_assignment_questions.*')->paginate();
+        $subjects = ClientOnlineTestSubject::where('client_id', $clientId)->get();
         return view('clientuser.dashboard.myAssignmentList', compact('assignments', 'subjects'));
     }
 
@@ -274,18 +295,25 @@ class ClientUserController extends BaseController
         return ClientAssignmentSubject::getAssignmentSubjectsByCourse($request->institute_course_id);
     }
 
-    protected function getAssignmentTopicsBySubject(Request $request){
-        return ClientAssignmentTopic::getAssignmentTopicsBySubject($request->subject_id);
+    protected function getAssignmentTopicsBySubject($subdomainName, Request $request){
+        $subjectId = $request->subject_id;
+        return ClientAssignmentTopic::getAssignmentTopicsBySubject($subjectId);
     }
 
-    protected function getAssignments(Request $request){
+    protected function getAssignments($subdomainName, Request $request){
         $results = [];
-        $query = ClientAssignmentQuestion::where('client_id', Auth::guard('clientuser')->user()->client_id);
-        if($request->subject > 0){
-            $query->where('client_assignment_subject_id', $request->subject);
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $subject = $request->subject;
+        $topic = $request->topic;
+
+        $query = ClientAssignmentQuestion::where('client_id', $clientId);
+        if($subject > 0){
+            $query->where('client_assignment_subject_id', $subject);
         }
-        if($request->topic > 0){
-            $query->where('client_assignment_topic_id', $request->topic);
+        if($topic > 0){
+            $query->where('client_assignment_topic_id', $topic);
         }
         $assignments = $query->get();
         if(is_object($assignments) and false == $assignments->isEmpty()){

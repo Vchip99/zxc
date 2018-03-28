@@ -44,7 +44,10 @@ class ClientAssignmentController extends ClientBaseController
     /**
      *  create assignment
      */
-    protected function create(){
+    protected function create($subdomain){
+        if($subdomain){
+            InputSanitise::checkClientImagesDirForCkeditor($subdomain);
+        }
         $topics = [];
         $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
         $assignment = new ClientAssignmentQuestion;
@@ -85,6 +88,9 @@ class ClientAssignmentController extends ClientBaseController
      * edit assignment
      */
     protected function edit($subdomain, $id){
+        if($subdomain){
+            InputSanitise::checkClientImagesDirForCkeditor($subdomain);
+        }
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $assignment = ClientAssignmentQuestion::find($id);

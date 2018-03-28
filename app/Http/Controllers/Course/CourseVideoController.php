@@ -70,6 +70,7 @@ class CourseVideoController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:courses*');
         DB::beginTransaction();
         try
         {
@@ -130,6 +131,7 @@ class CourseVideoController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:courses*');
         DB::beginTransaction();
         try
         {
@@ -151,6 +153,7 @@ class CourseVideoController extends Controller
      *  delete course video
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:courses*');
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
     	if(isset($videoId)){
     		$video = CourseVideo::find($videoId);

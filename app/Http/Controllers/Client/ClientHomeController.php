@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use Auth, Redirect, View, DB,Mail;
+use Auth, Redirect, View, DB,Mail,Cache;
 use Illuminate\Http\RedirectResponse;
 use App\Models\ClientHomePage;
 use App\Models\ClientOnlineCourse;
@@ -41,7 +41,7 @@ class ClientHomeController extends Controller
         return view('client.home');
     }
 
-    protected function clientHome(Request $request){
+    protected function clientHome($subdomainName,Request $request){
         if('local' == \Config::get('app.env')){
             $onlineClientUrl = 'online.localvchip.com';
         } else {
@@ -53,25 +53,43 @@ class ClientHomeController extends Controller
         } else {
             $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
 
-            $userSubCategoryPermissionIds = [];
-            $subCategoryCourseIds = [];
-            $courseIds = [];
-            $userCoursePermissionIds = [];
             if(is_object($subdomain)){
-                if( is_object(Auth::guard('clientuser')->user()) && $subdomain->client_id != Auth::guard('clientuser')->user()->client_id){
+                $loginUser = Auth::guard('clientuser')->user();
+                if( is_object($loginUser) && $subdomain->client_id != $loginUser->client_id){
                     if('local' == \Config::get('app.env')){
-                        return Redirect::away('http://'.Auth::guard('clientuser')->user()->client->subdomain);
+                        return Redirect::away('http://'.$loginUser->client->subdomain);
                     } else {
-                        return Redirect::away('https://'.Auth::guard('clientuser')->user()->client->subdomain);
+                        return Redirect::away('https://'.$loginUser->client->subdomain);
                     }
                 }
-                $onlineCourses = ClientOnlineCourse::getCurrentCoursesByClient($subdomain->subdomain);
-                $defaultCourse = ClientOnlineCourse::where('name', 'How to use course')->first();
-                $defaultTest = ClientOnlineCourse::where('name', 'How to use test')->first();
-                $onlineTestSubcategories = ClientOnlineTestSubCategory::getCurrentSubCategoriesAssociatedWithQuestion($subdomain->subdomain);
-                $testimonials = ClientTestimonial::getClientTestimonials($subdomain->subdomain);
-                $clientTeam = ClientTeam::getClientTeam($subdomain->subdomain);
-                $clientCustomers = ClientCustomer::getClientCustomer($subdomain->subdomain);
+                $hostName = $subdomain->subdomain;
+                $onlineCourses = Cache::remember($subdomainName.':home:courses:all',60, function() use ($hostName) {
+                    return ClientOnlineCourse::getCurrentCoursesByClient($hostName);
+                });
+
+                $defaultCourse = Cache::remember($subdomainName.':home:courses:defaultCourse',60, function() {
+                    return ClientOnlineCourse::where('name', 'How to use course')->first();
+                });
+
+                $defaultTest = Cache::remember($subdomainName.':home:tests:defaultTest',60, function() {
+                    return ClientOnlineCourse::where('name', 'How to use test')->first();
+                });
+
+                $onlineTestSubcategories = Cache::remember($subdomainName.':home:tests:all',60, function() use ($hostName) {
+                    return ClientOnlineTestSubCategory::getCurrentSubCategoriesAssociatedWithQuestion($hostName);
+                });
+
+                $testimonials = Cache::remember($subdomainName.':home:testimonials:all',60, function() use ($hostName) {
+                    return ClientTestimonial::getClientTestimonials($hostName);
+                });
+
+                $clientTeam = Cache::remember($subdomainName.':home:clientTeam:all',60, function() use ($hostName) {
+                    return ClientTeam::getClientTeam($hostName);
+                });
+
+                $clientCustomers = Cache::remember($subdomainName.':home:clientCustomers:all',60, function() use ($hostName) {
+                    return ClientCustomer::getClientCustomer($hostName);
+                });
                 return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers'));
             } else {
                 if('local' == \Config::get('app.env')){

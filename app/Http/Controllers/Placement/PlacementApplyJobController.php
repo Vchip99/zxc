@@ -65,6 +65,7 @@ class PlacementApplyJobController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:placements*');
         DB::beginTransaction();
         try
         {
@@ -125,7 +126,7 @@ class PlacementApplyJobController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
-
+        InputSanitise::deleteCacheByString('vchip:placements*');
         $applyJobId = InputSanitise::inputInt($request->get('apply_job_id'));
         if(isset($applyJobId)){
             DB::beginTransaction();
@@ -150,6 +151,7 @@ class PlacementApplyJobController extends Controller
      *  delete ApplyJob
      */
     protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:placements*');
         $applyJobId = InputSanitise::inputInt($request->get('apply_job_id'));
         if(isset($applyJobId)){
             $applyJob = ApplyJob::find($applyJobId);

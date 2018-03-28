@@ -15,6 +15,7 @@ use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientNotification;
 use App\Models\ClientUserSolution;
 use App\Models\ClientOnlinePaperSection;
+use Intervention\Image\ImageManagerStatic as Image;
 use Excel;
 
 class ClientOnlineTestQuestionController extends ClientBaseController
@@ -120,7 +121,11 @@ class ClientOnlineTestQuestionController extends ClientBaseController
     /**
      *  show UI for create question
      */
-    protected function create(Request $request){
+    protected function create($subdomain,Request $request){
+        if($subdomain){
+            InputSanitise::checkClientImagesDirForCkeditor($subdomain);
+        }
+
         $clientId = Auth::guard('client')->user()->id;
         $testCategories = ClientOnlineTestCategory::showCategories($request);
 
@@ -157,7 +162,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
     /**
      *  store question
      */
-    protected function store(Request $request){
+    protected function store($subdomain,Request $request){
         $v = Validator::make($request->all(), $this->validateCreateQuestion);
         if ($v->fails())
         {
@@ -194,6 +199,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
 
                 $questionCount = ClientOnlineTestQuestion::where('category_id', $categoryId)->where('subcat_id', $subcategoryId)->where('subject_id', $subjectId)->where('paper_id', $paperId)->where('client_id', Auth::guard('client')->user()->id)->count();
                 if(1 == $questionCount){
+                    InputSanitise::deleteCacheByString($subdomain.':tests*');
                     $paper = ClientOnlineTestSubjectPaper::find($paperId);
                     if(is_object($paper)){
                         $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'" target="_blank">'.$paper->name.'</a> has been added.';
@@ -217,6 +223,9 @@ class ClientOnlineTestQuestionController extends ClientBaseController
      *  edit question
      */
     protected function edit( $subdomain, $id, Request $request){
+        if($subdomain){
+            InputSanitise::checkClientImagesDirForCkeditor($subdomain);
+        }
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$testQuestion = ClientOnlineTestQuestion::find($id);
@@ -399,25 +408,90 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         return view('client.onlineTest.question.uploadQuestions', compact('testCategories', 'testSubCategories', 'testSubjects', 'papers'));
     }
 
-    protected function importQuestions(Request $request){
+    protected function importQuestions($subdomain, Request $request){
         if($request->hasFile('questions')){
             $path = $request->file('questions')->getRealPath();
-            $questions = \Excel::selectSheetsByIndex(0)->load($path)->get();
+            $questions = \Excel::selectSheetsByIndex(0)->load($path, function($reader) {
+                            $reader->formatDates(false);
+                        })->get();
             if($questions->count()){
                 foreach ($questions as $key => $question) {
+                    preg_match_all('/image\[(.*)\]/', $question->question, $questionMatches);
+                    if($questionMatches[1] && $questionMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/'.$subdomain.'/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->question);
+                        $questionStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $questionStr = $question->question;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->option_a, $optionAMatches);
+                    if($optionAMatches[1] && $optionAMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/'.$subdomain.'/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->option_a);
+                        $optionAStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $optionAStr = $question->option_a;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->option_b, $optionBMatches);
+                    if($optionBMatches[1] && $optionBMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/'.$subdomain.'/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->option_b);
+                        $optionBStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $optionBStr = $question->option_b;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->option_c, $optionCMatches);
+                    if($optionCMatches[1] && $optionCMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/'.$subdomain.'/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->option_c);
+                        $optionCStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $optionCStr = $question->option_c;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->option_d, $optionDMatches);
+                    if($optionDMatches[1] && $optionDMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/'.$subdomain.'/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->option_d);
+                        $optionDStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $optionDStr = $question->option_d;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->option_e, $optionEMatches);
+                    if($optionEMatches[1] && $optionEMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/'.$subdomain.'/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->option_e);
+                        $optionEStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $optionEStr = $question->option_e;
+                    }
+
+                    preg_match_all('/image\[(.*)\]/', $question->solution, $solutionMatches);
+                    if($solutionMatches[1] && $solutionMatches[1][0]){
+                        $ImgTag = '<img src="/templateEditor/kcfinder/upload/images/'.$subdomain.'/';
+                        $bodytag = str_replace("image[", $ImgTag, $question->solution);
+                        $solutionStr = str_replace("]", '" style="max-width: 100%;max-height: 400px;" />', $bodytag);
+                    } else {
+                        $solutionStr = $question->solution;
+                    }
+
                     $allQuestions[] = [
-                        'name' => $question->question,
-                        'answer1' => ($question->option_a)?:'',
-                        'answer2' => ($question->option_b)?:'',
-                        'answer3' => ($question->option_c)?:'',
-                        'answer4' => ($question->option_d)?:'',
-                        'answer5' => ($question->option_e)?:'',
+                        'name' => $questionStr,
+                        'answer1' => $optionAStr,
+                        'answer2' => $optionBStr,
+                        'answer3' => $optionCStr,
+                        'answer4' => $optionDStr,
+                        'answer5' => $optionEStr,
                         'answer6' => 0,
                         'answer' => $question->right_answer,
                         'min' => ($question->min)?:0,
                         'max' => ($question->max)?:0,
                         'question_type' => (int) $question->question_type,
-                        'solution' => $question->solution,
+                        'solution' => $solutionStr,
                         'positive_marks' => $question->positive_mark,
                         'negative_marks' => $question->negative_mark,
                         'common_data' => ($question->common_data)?:'',
@@ -435,6 +509,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                     {
                         DB::connection('mysql2')->table('client_online_test_questions')->insert($allQuestions);
                         DB::connection('mysql2')->commit();
+                        InputSanitise::deleteCacheByString($subdomain.':tests*');
                         return Redirect::to('manageUploadQuestions')->with('message', 'Questions added successfully!');
                     }
                     catch(\Exception $e)
@@ -444,6 +519,27 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                     }
                 }
             }
+        }
+        return Redirect::to('manageUploadQuestions');
+    }
+
+    protected function uploadClientTestImages($subdomain, Request $request){
+        $allowedImageTypes = ['image/png','image/jpeg'];
+        if($request->exists('images')){
+            foreach($request->file('images') as $file){
+                if(in_array($file->getClientMimeType(), $allowedImageTypes)){
+                    $imageName = $file->getClientOriginalName();
+                    $clientImagesFolder = public_path().'/templateEditor/kcfinder/upload/images/'. $subdomain;
+                    $file->move($clientImagesFolder, $imageName);
+                    // open image
+                    $img = Image::make($clientImagesFolder."/".$imageName);
+                    // enable interlacing
+                    $img->interlace(true);
+                    // save image interlaced
+                    $img->save();
+                }
+            }
+            return Redirect::to('manageUploadQuestions')->with('message', 'Images uploaded successfully!');
         }
         return Redirect::to('manageUploadQuestions');
     }

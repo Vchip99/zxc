@@ -40,7 +40,7 @@
     @endif
       <label for="paper" class="col-sm-2 col-form-label">Main Page:</label>
       <div class="col-sm-3">
-        <select id="subject" class="form-control" name="parent_page" required title="Parent Page">
+        <select id="mainPage" class="form-control" name="parent_page" title="Parent Page">
         <option value="">Select Page</option>
           @if(count($mainPages) > 0  && isset($advertisementPage->id))
             @foreach($mainPages as $mainPage)
@@ -91,7 +91,8 @@
 <script type="text/javascript">
   function showMainPages(ele){
       if(0 == $(ele).val()){
-        $('#main_page').removeClass('hide');;
+        $('#main_page').removeClass('hide');
+        $('#mainPage').attr('required', true);
       } else {
         $('#main_page').addClass('hide');
       }
