@@ -68,7 +68,6 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
         {
             return redirect()->back()->withErrors($v->errors());
         }
-        InputSanitise::deleteCacheByString($subdomain.':tests*');
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -115,7 +114,6 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
         {
             return redirect()->back()->withErrors($v->errors());
         }
-        InputSanitise::deleteCacheByString($subdomain.':tests*');
         $paperId = InputSanitise::inputInt($request->get('paper_id'));
         if(isset($paperId)){
             DB::connection('mysql2')->beginTransaction();
@@ -140,7 +138,6 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
      *  delete paper
      */
     protected function delete($subdomain,Request $request){
-        InputSanitise::deleteCacheByString($subdomain.':tests*');
     	$paperId = InputSanitise::inputInt($request->get('paper_id'));
     	if(isset($paperId)){
     		$paper = ClientOnlineTestSubjectPaper::find($paperId);

@@ -139,8 +139,7 @@ class ClientOnlineTestQuestion extends Model
 
 
     protected static function getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$categoryId, $subcategoryId, $subjectId, $paperId, $request){
-        return Cache::remember($subdomainName.':questions:subjectId-'.$subjectId.'-paperId-'.$paperId,30, function() use ($categoryId, $subcategoryId, $subjectId, $paperId, $request) {
-            return DB::connection('mysql2')->table('client_online_test_questions')
+        return DB::connection('mysql2')->table('client_online_test_questions')
                 ->join('clients', 'clients.id', '=', 'client_online_test_questions.client_id')
                 ->where('client_online_test_questions.category_id', $categoryId)
                 ->where('client_online_test_questions.subcat_id', $subcategoryId)
@@ -148,9 +147,7 @@ class ClientOnlineTestQuestion extends Model
                 ->where('client_online_test_questions.paper_id', $paperId)
                 ->where('clients.subdomain', InputSanitise::getCurrentClient($request))
                 ->select('client_online_test_questions.*')->get();
-        });
     }
-
 
     /**
      *  return questions by questions Ids

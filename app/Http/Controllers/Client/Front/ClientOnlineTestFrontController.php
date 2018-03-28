@@ -41,13 +41,9 @@ class ClientOnlineTestFrontController extends ClientHomeController
         }
 		view::share('subdomain', $subdomain);
 
-        $testCategories = Cache::remember($subdomainName.':tests:categories:all',60, function() use ($request) {
-            return ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
-        });
+        $testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
 
-        $testSubCategories = Cache::remember($subdomainName.':tests:subCategories:all',60, function() use ($request) {
-            return ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
-        });
+        $testSubCategories = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
 
         if(is_object($loginUser)){
         	$clientId = $loginUser->client_id;
@@ -63,9 +59,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
     public function getOnlineTestSubCategories($subdomainName,Request $request){
         if($request->ajax()){
             $id = InputSanitise::inputInt($request->get('id'));
-            return Cache::remember($subdomainName.':tests:subCategories:catId-'.$id,60, function() use ($id, $request) {
-	            return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($id, $request);
-	        });
+            return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($id, $request);
         }
     }
 
@@ -75,9 +69,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
     public function getOnlineTestSubcategoriesWithPapers($subdomainName,Request $request){
         if($request->ajax()){
             $id = InputSanitise::inputInt($request->get('id'));
-            return Cache::remember($subdomainName.':tests:subCategoriesWithPapers:catId-'.$id,60, function() use ($id, $request) {
-            	return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdWithPapers($id, $request);
-            });
+            return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdWithPapers($id, $request);
         }
     }
 
@@ -96,27 +88,17 @@ class ClientOnlineTestFrontController extends ClientHomeController
             }
         }
 		if(isset($subcatId)){
-			$subcategory = Cache::remember($subdomainName.':tests:subcategory:id-'.$subcatId,60, function() use ($subcatId) {
-	            return ClientOnlineTestSubCategory::find($subcatId);
-	        });
+			$subcategory = ClientOnlineTestSubCategory::find($subcatId);
 			if(is_object($subcategory)){
 				$catId = $subcategory->category_id;
 				$selectedSubCategory = $subcategory;
-				$testCategories = Cache::remember($subdomainName.':tests:categories:all',60, function() use ($request) {
-		            return ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
-		        });
+				$testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
 
-				$testSubCategories = Cache::remember($subdomainName.':tests:subCategories:catId-'.$catId,60, function() use ($catId, $request) {
-		            return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($catId, $request);
-		        });
+				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($catId, $request);
 
-				$testSubjects = Cache::remember($subdomainName.':tests:subjects:catId-'.$catId.'-subcatId-'.$subcatId,60, function() use ($catId, $subcatId, $request) {
-		            return ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
-		        });
+				$testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
 
-				$testSubjectPapers = Cache::remember($subdomainName.':tests:papers:catId-'.$catId.'-subcatId-'.$subcatId,60, function() use ($catId, $subcatId, $request) {
-		            return ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
-		        });
+				$testSubjectPapers = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
 
 				if(is_array($testSubjectPapers)){
 					foreach($testSubjectPapers as $testPapers){
@@ -166,9 +148,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 		if($request->ajax()){
 			$result = [];
             $id = InputSanitise::inputInt($request->get('id'));
-            $result['sub_categories'] = Cache::remember($subdomainName.':tests:subcategories:catId-'.$id,60, function() use ($id, $request) {
-	            return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($id, $request);
-	        });
+            $result['sub_categories'] = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($id, $request);
             $loginUser = Auth::guard('clientuser')->user();
             if(is_object($loginUser)){
             	$clientId = $loginUser->client_id;
@@ -191,13 +171,9 @@ class ClientOnlineTestFrontController extends ClientHomeController
 			$subcatId = InputSanitise::inputInt($request->get('subcat'));
 			$loginUser = Auth::guard('clientuser')->user();
 
-			$result['subjects']  = Cache::remember($subdomainName.':tests:subjects:catId-'.$catId.'-subcatId-'.$subcatId,60, function() use ($catId, $subcatId, $request) {
-	            return ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
-	        });
+			$result['subjects']  = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
 
-			$result['papers'] = Cache::remember($subdomainName.':tests:papers:catId-'.$catId.'-subcatId-'.$subcatId,60, function() use ($catId, $subcatId, $request) {
-	            return ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
-	        });
+			$result['papers'] = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
 
 			$result['registeredPaperIds'] = $this->getRegisteredPaperIds($subdomainName);
 			if(is_object($loginUser)){
@@ -229,9 +205,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 			$catId = InputSanitise::inputInt($request->get('cat'));
 			$subcatId = InputSanitise::inputInt($request->get('subcat'));
 			$userId = InputSanitise::inputInt($request->get('userId'));
-			$result['subjects']  = Cache::remember($subdomainName.':tests:subjects:catId-'.$catId.'-subcatId-'.$subcatId,60, function() use ($catId, $subcatId, $request) {
-	            return ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
-	        });
+			$result['subjects']  = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
 
 			$result['papers'] = ClientOnlineTestSubjectPaper::getRegisteredPapersByCatIdBySubCatId($catId, $subcatId, $userId);
 			if(is_array($result['papers'])){

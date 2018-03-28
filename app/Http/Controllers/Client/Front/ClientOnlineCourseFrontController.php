@@ -59,13 +59,9 @@ class ClientOnlineCourseFrontController extends ClientHomeController
         view::share('subdomain', $subdomain);
     	$hostName = InputSanitise::getCurrentClient($request);
 
-        $courseCategories = Cache::remember($subdomainName.':courses:categories:all',60, function() use ($hostName) {
-            return ClientOnlineCategory::getCategoriesAssocaitedWithVideos($hostName);
-        });
+        $courseCategories = ClientOnlineCategory::getCategoriesAssocaitedWithVideos($hostName);
 
-        $courses = Cache::remember($subdomainName.':courses:courses:all',60, function() use ($hostName) {
-            return ClientOnlineCourse::getCourseAssocaitedWithVideos($hostName);
-        });
+        $courses = ClientOnlineCourse::getCourseAssocaitedWithVideos($hostName);
 
         if(is_object($loginUser)){
             $clientId = $loginUser->client_id;
@@ -82,9 +78,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
         $result = [];
         $categoryId = $request->get('catId');
         $subcategoryId = $request->get('subcatId');
-        $result['courses'] = Cache::remember($subdomainName.':courses:courses:cat-'.$categoryId.'-subcat-'.$subcategoryId,30, function() use ($categoryId,$subcategoryId, $request) {
-                return ClientOnlineCourse::getOnlineCourseByCatIdBySubCatId($categoryId,$subcategoryId, $request);
-            });
+        $result['courses'] = ClientOnlineCourse::getOnlineCourseByCatIdBySubCatId($categoryId,$subcategoryId, $request);
         $loginUser = Auth::guard('clientuser')->user();
         if(is_object($loginUser)){
             $clientId = $loginUser->client_id;
@@ -120,13 +114,9 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                 return Redirect::away($clientResult);
             }
         }
-        $course = Cache::remember($subdomainName.':courses:course:id-'.$courseId,30, function() use ($courseId) {
-            return ClientOnlineCourse::find($courseId);
-        });
+        $course = ClientOnlineCourse::find($courseId);
         if(is_object($course)){
-            $videos = Cache::remember($subdomainName.':courses:videos:courseId-'.$courseId,30, function() use ($courseId, $request) {
-                return ClientOnlineVideo::getClientCourseVideosByCourseId($courseId, $request);
-            });
+            $videos = ClientOnlineVideo::getClientCourseVideosByCourseId($courseId, $request);
             $isCourseRegistered = RegisterClientOnlineCourses::isCourseRegistered($courseId);
             if(is_object($loginUser)){
                 $clientId = $loginUser->client_id;
@@ -151,9 +141,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
             }
         }
         if(isset($videoId)){
-            $video = Cache::remember($subdomainName.':courses:video:id-'.$videoId,30, function() use ($videoId) {
-                return ClientOnlineVideo::find($videoId);
-            });
+            $video = ClientOnlineVideo::find($videoId);
             if(is_object($video)){
                 if( false == $video->course->release_date <= date('Y-m-d H:i')){
                     return Redirect::to('online-courses');
@@ -175,9 +163,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                     }
                 }
 
-                $courseVideos = Cache::remember($subdomainName.':courses:videos:courseId-'.$courseId,30, function() use ($courseId, $request) {
-                    return ClientOnlineVideo::getClientCourseVideosByCourseId($courseId, $request);
-                });
+                $courseVideos = ClientOnlineVideo::getClientCourseVideosByCourseId($courseId, $request);
                 $comments = ClientCourseComment::getCommentsByVideoId($video->id, $request);
                 $likesCount = ClientOnlineVideoLike::getLikesByVideoId($id, $request);
                 $commentLikesCount = ClientCourseCommentLike::getLikesByVideoId($id, $request);
@@ -237,9 +223,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
     protected function getOnlineSubCategoriesWithCourses($subdomainName, Request $request){
         $id = InputSanitise::inputInt($request->get('id'));
         if(isset($id)){
-            return Cache::remember($subdomainName.':courses:subcats:cat-'.$id,30, function() use ($id, $request) {
-                return ClientOnlineSubCategory::getOnlineSubCategoriesWithCourses($id, $request);
-            });
+            return ClientOnlineSubCategory::getOnlineSubCategoriesWithCourses($id, $request);
         }
     }
 

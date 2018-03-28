@@ -59,9 +59,7 @@ class ClientCourseSubComment extends Model
     }
 
     public function getClientUser($subdomainName,$userId){
-        return Cache::remember($subdomainName.':user-'.$userId,30, function() use($userId){
-            return Clientuser::find($userId);
-        });
+        return Clientuser::find($userId);
     }
 
     protected static function deleteClientCourseSubCommentsByUserId($clientId){

@@ -165,11 +165,11 @@
     </div>
   </div>
   <div class="form-group row">
-    <label for="" class="col-sm-2 col-form-label">Session And Its Time:</label>
+    <label for="" class="col-sm-2 col-form-label">Section And Its Time:</label>
     <table class="">
       <thead class="">
         <tr>
-          <th class="col-sm-4">Session Name</th>
+          <th class="col-sm-4">Section Name</th>
           <th class="col-sm-4 duration">Duration(In Sec.)</th>
           <th class="col-sm">Add</th>
           <th class="col-sm">Delete</th>
@@ -189,7 +189,7 @@
           @endforeach
         @else
           <tr id="tr_1">
-            <td class="col-sm-3"><input type="text" class="form-control" name="session_1" value="" required="true"></td>
+            <td class="col-sm-3"><input type="text" class="form-control" name="session_1" value="Section 1" required="true"></td>
             <td class="col-sm-3 duration"><input type="text" class="form-control " name="duration_1" value=""></td>
             <td class=""><button type="button" onClick="addSessions();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
             @if(isset($paper))

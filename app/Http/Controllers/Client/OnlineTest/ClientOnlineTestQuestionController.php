@@ -199,7 +199,6 @@ class ClientOnlineTestQuestionController extends ClientBaseController
 
                 $questionCount = ClientOnlineTestQuestion::where('category_id', $categoryId)->where('subcat_id', $subcategoryId)->where('subject_id', $subjectId)->where('paper_id', $paperId)->where('client_id', Auth::guard('client')->user()->id)->count();
                 if(1 == $questionCount){
-                    InputSanitise::deleteCacheByString($subdomain.':tests*');
                     $paper = ClientOnlineTestSubjectPaper::find($paperId);
                     if(is_object($paper)){
                         $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'" target="_blank">'.$paper->name.'</a> has been added.';
@@ -509,7 +508,6 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                     {
                         DB::connection('mysql2')->table('client_online_test_questions')->insert($allQuestions);
                         DB::connection('mysql2')->commit();
-                        InputSanitise::deleteCacheByString($subdomain.':tests*');
                         return Redirect::to('manageUploadQuestions')->with('message', 'Questions added successfully!');
                     }
                     catch(\Exception $e)

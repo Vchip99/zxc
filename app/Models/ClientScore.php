@@ -86,24 +86,20 @@ class ClientScore extends Model
     }
 
    protected static function getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($subdomainName,$categoryId,$subcategoryId,$subjectId, $paperId,$testScore){
-        return Cache::remember($subdomainName.':rank:subjectId-'.$subjectId.'-paperId-'.$paperId.'-score-'.$testScore,30, function() use ($categoryId,$subcategoryId,$subjectId, $paperId,$testScore) {
-            return static::where('category_id', $categoryId)
-                    ->where('subcat_id', $subcategoryId)
-                    ->where('paper_id', $paperId)
-                    ->where('subject_id', $subjectId)
-                    ->where('test_score', '>', DB::raw($testScore))
-                    ->count();
-        });
-    }
-
-    protected static function getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$categoryId,$subcategoryId,$subjectId, $paperId){
-        return Cache::remember($subdomainName.':totalRank:subjectId-'.$subjectId.'-paperId-'.$paperId,30, function() use ($categoryId,$subcategoryId,$subjectId, $paperId) {
-            return static::where('category_id', $categoryId)
+        return static::where('category_id', $categoryId)
                 ->where('subcat_id', $subcategoryId)
                 ->where('paper_id', $paperId)
                 ->where('subject_id', $subjectId)
+                ->where('test_score', '>', DB::raw($testScore))
                 ->count();
-        });
+    }
+
+    protected static function getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$categoryId,$subcategoryId,$subjectId, $paperId){
+        return static::where('category_id', $categoryId)
+            ->where('subcat_id', $subcategoryId)
+            ->where('paper_id', $paperId)
+            ->where('subject_id', $subjectId)
+            ->count();
     }
 
     protected static function deleteClientUserScores($userId){

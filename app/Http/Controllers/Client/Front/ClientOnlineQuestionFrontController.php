@@ -60,9 +60,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 } else {
                     $clientId = 0;
                 }
-                $paperSections = Cache::remember($subdomainName.':paperSections:paperId-'.$paperId,30, function() use ($paperId, $clientId,$request) {
-                    return ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
-                });
+                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
                         if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -71,9 +69,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                     }
                 }
             }
-            $paper = Cache::remember($subdomainName.':paper:paperId-'.$paperId,30, function() use ($paperId,$request) {
-                return ClientOnlineTestSubjectPaper::getOnlineTestSubjectPaperById($paperId, $request);
-            });
+            $paper = ClientOnlineTestSubjectPaper::getOnlineTestSubjectPaperById($paperId, $request);
 
         	return view('client.front.question.questions', compact('results','paper', 'sections'));
         } else {
@@ -234,9 +230,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         }
         if(count(array_keys($results['questions'])) > 0){
             $clientId = Auth::guard('clientuser')->user()->client_id;
-            $paperSections = Cache::remember($subdomainName.':paperSections:paperId-'.$paperId,30, function() use ($paperId, $clientId,$request) {
-                return ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
-            });
+            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
                     if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -267,9 +261,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             if(count(array_keys($results['questions'])) > 0){
                 $clientId = Auth::guard('clientuser')->user()->client_id;
                 $paperId = $paper->id;
-                $paperSections = Cache::remember($subdomainName.':paperSections:paperId-'.$paperId,30, function() use ($paperId, $clientId,$request) {
-                    return ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
-                });
+                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
                         if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -310,9 +302,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             } else {
                 $clientId = 0;
             }
-            $paperSections = Cache::remember($subdomainName.':paperSections:paperId-'.$paperId,30, function() use ($paperId, $clientId,$request) {
-                return ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
-            });
+            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
                     if(in_array($paperSection->id, array_keys($questions))){
@@ -342,9 +332,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         }
         if(count(array_keys($questions)) > 0){
             $clientId = Auth::guard('clientuser')->user()->client_id;
-            $paperSections = Cache::remember($subdomainName.':paperSections:paperId-'.$paperId,30, function() use ($paperId, $clientId,$request) {
-                return ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
-            });
+            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
                     if(in_array($paperSection->id, array_keys($questions))){

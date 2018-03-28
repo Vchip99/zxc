@@ -42,6 +42,7 @@ class ClientHomeController extends Controller
     }
 
     protected function clientHome($subdomainName,Request $request){
+
         if('local' == \Config::get('app.env')){
             $onlineClientUrl = 'online.localvchip.com';
         } else {
@@ -63,33 +64,19 @@ class ClientHomeController extends Controller
                     }
                 }
                 $hostName = $subdomain->subdomain;
-                $onlineCourses = Cache::remember($subdomainName.':home:courses:all',60, function() use ($hostName) {
-                    return ClientOnlineCourse::getCurrentCoursesByClient($hostName);
-                });
+                $onlineCourses = ClientOnlineCourse::getCurrentCoursesByClient($hostName);
 
-                $defaultCourse = Cache::remember($subdomainName.':home:courses:defaultCourse',60, function() {
-                    return ClientOnlineCourse::where('name', 'How to use course')->first();
-                });
+                $defaultCourse = ClientOnlineCourse::where('name', 'How to use course')->first();
 
-                $defaultTest = Cache::remember($subdomainName.':home:tests:defaultTest',60, function() {
-                    return ClientOnlineCourse::where('name', 'How to use test')->first();
-                });
+                $defaultTest = ClientOnlineCourse::where('name', 'How to use test')->first();
 
-                $onlineTestSubcategories = Cache::remember($subdomainName.':home:tests:all',60, function() use ($hostName) {
-                    return ClientOnlineTestSubCategory::getCurrentSubCategoriesAssociatedWithQuestion($hostName);
-                });
+                $onlineTestSubcategories = ClientOnlineTestSubCategory::getCurrentSubCategoriesAssociatedWithQuestion($hostName);
 
-                $testimonials = Cache::remember($subdomainName.':home:testimonials:all',60, function() use ($hostName) {
-                    return ClientTestimonial::getClientTestimonials($hostName);
-                });
+                $testimonials = ClientTestimonial::getClientTestimonials($hostName);
 
-                $clientTeam = Cache::remember($subdomainName.':home:clientTeam:all',60, function() use ($hostName) {
-                    return ClientTeam::getClientTeam($hostName);
-                });
+                $clientTeam = ClientTeam::getClientTeam($hostName);
 
-                $clientCustomers = Cache::remember($subdomainName.':home:clientCustomers:all',60, function() use ($hostName) {
-                    return ClientCustomer::getClientCustomer($hostName);
-                });
+                $clientCustomers = ClientCustomer::getClientCustomer($hostName);
                 return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers'));
             } else {
                 if('local' == \Config::get('app.env')){

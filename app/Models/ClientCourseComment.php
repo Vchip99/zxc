@@ -49,9 +49,7 @@ class ClientCourseComment extends Model
     }
 
     public function getClientUser($subdomainName,$userId){
-        return Cache::remember($subdomainName.':user-'.$userId,30, function() use($userId){
-            return Clientuser::find($userId);
-        });
+        return Clientuser::find($userId);
     }
 
     public static function getCommentsByVideoId($id, Request $request){

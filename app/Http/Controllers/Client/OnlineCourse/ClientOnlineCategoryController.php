@@ -53,7 +53,6 @@ class ClientOnlineCategoryController extends ClientBaseController
         {
             return redirect()->back()->withErrors($v->errors());
         }
-        InputSanitise::deleteCacheByString($subdomain.':courses*');
         DB::connection('mysql2')->beginTransaction();
         try
         {
@@ -94,7 +93,6 @@ class ClientOnlineCategoryController extends ClientBaseController
         {
             return redirect()->back()->withErrors($v->errors());
         }
-        InputSanitise::deleteCacheByString($subdomain.':courses*');
     	$categoryId = InputSanitise::inputInt($request->get('category_id'));
     	if(isset($categoryId)){
             DB::connection('mysql2')->beginTransaction();
@@ -119,7 +117,6 @@ class ClientOnlineCategoryController extends ClientBaseController
      *  delete course category
      */
     protected function delete($subdomain,Request $request){
-        InputSanitise::deleteCacheByString($subdomain.':courses*');
     	$categoryId = InputSanitise::inputInt($request->get('category_id'));
     	if(isset($categoryId)){
     		$courseCategory = ClientOnlineCategory::find($categoryId);
