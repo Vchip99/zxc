@@ -28,6 +28,12 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteCourseCategory', 'Course\CourseCategoryController@delete');
 	Route::post('admin/isCourseCategoryExist', 'Course\CourseCategoryController@isCourseCategoryExist');
 
+	// manage course all
+	Route::get('admin/manageCourseAll', 'Course\CourseAllController@showAll');
+	Route::post('admin/createAllCourseCategory', 'Course\CourseAllController@storeCategory');
+	Route::post('admin/createAllCourseSubCategory', 'Course\CourseAllController@storeSubCategory');
+	Route::post('admin/createAllCourseCourse', 'Course\CourseAllController@storeCourse');
+
 	// admin course sub category
 	Route::get('admin/manageCourseSubCategory', 'Course\CourseSubCategoryController@show');
 	Route::get('admin/createCourseSubCategory', 'Course\CourseSubCategoryController@create');
@@ -124,7 +130,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('thankyouadvertisement', 'HomeController@thankyouadvertisement');
 	Route::any('webhookAdvertisement', 'HomeController@webhookAdvertisement');
 
-
 	// manage sub admin
 	Route::get('admin/manageSubadminUser', 'Admin\SubadminController@show');
 	Route::get('admin/createSubAdmin', 'Admin\SubadminController@create');
@@ -140,6 +145,13 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateCategory', 'Test\CategoryController@update');
 	Route::delete('admin/deleteCategory', 'Test\CategoryController@delete');
 	Route::post('admin/isTestCategoryExist', 'Test\CategoryController@isTestCategoryExist');
+
+	// admin test All
+	Route::get('admin/manageTestAll', 'Test\TestAllController@showAll');
+	Route::post('admin/createAllTestCategory', 'Test\TestAllController@storeCategory');
+	Route::post('admin/createAllTestSubCategory', 'Test\TestAllController@storeSubCategory');
+	Route::post('admin/createAllTestSubject', 'Test\TestAllController@storeSubject');
+	Route::post('admin/createAllTestPaper', 'Test\TestAllController@storePaper');
 
 	// admin test sub category
 	Route::get('admin/manageSubCategory', 'Test\SubCategoryController@show');
@@ -868,6 +880,19 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::delete('deleteOnlineVideo', 'Client\OnlineCourse\ClientOnlineVideoController@delete');
   	Route::post('isClientCourseVideoExist', 'Client\OnlineCourse\ClientOnlineVideoController@isClientCourseVideoExist');
 
+  	//manageAllCourse
+  	Route::get('manageAllCourse', 'Client\OnlineCourse\ClientAllCourseController@showAll');
+  	Route::post('createAllCourseCategory', 'Client\OnlineCourse\ClientAllCourseController@storeCategory');
+  	Route::post('createAllCourseSubCategory', 'Client\OnlineCourse\ClientAllCourseController@storeSubCategory');
+  	Route::post('createAllCourseCourse', 'Client\OnlineCourse\ClientAllCourseController@storeCourse');
+
+  	// manage All test
+  	Route::get('manageAllTest', 'Client\OnlineTest\ClientAllTestController@showAll');
+  	Route::post('createAllTestCategory', 'Client\OnlineTest\ClientAllTestController@storeCategory');
+  	Route::post('createAllTestSubCategory', 'Client\OnlineTest\ClientAllTestController@storeSubCategory');
+  	Route::post('createAllTestSubject', 'Client\OnlineTest\ClientAllTestController@storeSubject');
+  	Route::post('createAllTestPaper', 'Client\OnlineTest\ClientAllTestController@storePaper');
+
   	// test category
   	Route::get('manageOnlineTestCategory', 'Client\OnlineTest\ClientOnlineTestCategoryController@show');
   	Route::get('createOnlineTestCategory', 'Client\OnlineTest\ClientOnlineTestCategoryController@create');
@@ -942,7 +967,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('likeClientCourseVideo', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideo');
 	Route::post('likeClientCourseVideoComment', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideoComment');
 	Route::post('likeClientCourseVideoSubComment', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideoSubComment');
-
 
 
   	// online tests front

@@ -31,7 +31,7 @@ class ClientUserPurchasedCourse extends Model
     	return $userCourses;
     }
 
-    protected static function getUserPurchasedCourses($subdomainName,$clientId, $userId){
+    protected static function getUserPurchasedCourses($clientId, $userId){
         $userCourses = [];
         $results = static::where('client_id', $clientId)->where('user_id', $userId)->get();
         if(is_object($results) && false == $results->isEmpty()){

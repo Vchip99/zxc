@@ -160,8 +160,9 @@ class QuizController extends Controller
                 $negativeMarks = 0;
                 $userAnswers = [];
                 $questionIds = [];
-                $userId = Auth::user()->id;
-                $collegeId = Auth::user()->college_id;
+                $loginUser = Auth::user();
+                $userId = $loginUser->id;
+                $collegeId = $loginUser->college_id;
 
                 $categoryId = $request->get('category_id');
                 $subcategoryId = $request->get('sub_category_id');

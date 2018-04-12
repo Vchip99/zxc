@@ -66,8 +66,9 @@ class ClientOnlineTestSubject extends Model
     }
 
     protected static function getOnlineSubjectsByCatIdBySubcatId($categoryId, $subcategoryId, $request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }
@@ -84,8 +85,9 @@ class ClientOnlineTestSubject extends Model
     }
 
     protected static function getOnlineSubjectsByCatIdBySubcatIdWithQuestion($categoryId, $subcategoryId, $request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }
@@ -115,8 +117,9 @@ class ClientOnlineTestSubject extends Model
     }
 
     protected static function showSubjects($request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }

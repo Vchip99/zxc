@@ -73,7 +73,7 @@ class ClientUserController extends BaseController
                 $categoryIds[] = $course->category_id;
             }
             $categories = ClientOnlineCategory::find($categoryIds);
-            $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($subdomainName,$clientId, $clientUserId);
+            $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $clientUserId);
         }
 
         return view('clientuser.dashboard.myCourses', compact('courses', 'categories', 'userPurchasedCourses'));
@@ -287,7 +287,7 @@ class ClientUserController extends BaseController
             return Redirect::away($clientResult);
         }
         $assignments = ClientAssignmentQuestion::where('client_id', $clientId)->select('client_assignment_questions.*')->paginate();
-        $subjects = ClientOnlineTestSubject::where('client_id', $clientId)->get();
+        $subjects = ClientAssignmentSubject::where('client_id', $clientId)->get();
         return view('clientuser.dashboard.myAssignmentList', compact('assignments', 'subjects'));
     }
 
@@ -367,12 +367,13 @@ class ClientUserController extends BaseController
         }
         Session::put('client_course_id', $clientCourse->id);
         Session::save();
+        $loginUser = Auth::guard('clientuser')->user();
         $purchasePostFields = [
                                 'purpose' => 'purchase '. $clientCourse->name,
                                 'amount'  =>   $clientCourse->price,
-                                'buyer_name' => Auth::guard('clientuser')->user()->name,
-                                'email'  => Auth::guard('clientuser')->user()->email,
-                                'phone'  => Auth::guard('clientuser')->user()->phone,
+                                'buyer_name' => $loginUser->name,
+                                'email'  => $loginUser->email,
+                                'phone'  => $loginUser->phone,
                                 'send_email' => 'True',
                                 'send_sms' => 'False',
                                 'redirect_url' => url('redirectCoursePayment'),
@@ -380,7 +381,7 @@ class ClientUserController extends BaseController
                                 'allow_repeated_payments' => 'False'
                             ];
 
-        $clientUserAuth = UserBasedAuthentication::where('vchip_client_id', Auth::guard('clientuser')->user()->client_id)->first();
+        $clientUserAuth = UserBasedAuthentication::where('vchip_client_id', $loginUser->client_id)->first();
 
         if(!is_object($clientUserAuth)){
             return redirect()->back()->withErrors('something went wrong.');
@@ -430,8 +431,9 @@ class ClientUserController extends BaseController
         $paymentRequestId = $request->get('payment_request_id');
         $paymentId = $request->get('payment_id');
         if(!empty($paymentRequestId) && !empty($paymentId)){
-            $userId = Auth::guard('clientuser')->user()->id;
-            $clientId = Auth::guard('clientuser')->user()->client_id;
+            $loginUser = Auth::guard('clientuser')->user();
+            $userId = $loginUser->id;
+            $clientId = $loginUser->client_id;
             $clientUserAuth = UserBasedAuthentication::where('vchip_client_id', $clientId)->first();
 
             if(!is_object($clientUserAuth)){
@@ -492,7 +494,7 @@ class ClientUserController extends BaseController
                         Session::remove('client_course_id');
 
                         // mail to client
-                        $to = Auth::guard('clientuser')->user()->client->email;
+                        $to = $loginUser->client->email;
                         $subject = 'Payment on your website:'. $result->title.' by '.$result->name.'';
                         $message = "<h1>Payment Details</h1>";
                         $message .= "<hr>";
@@ -573,12 +575,13 @@ class ClientUserController extends BaseController
         Session::put('client_sub_category_id', $subCategory->id);
         Session::put('client_category_id', $subCategory->category_id);
         Session::save();
+        $loginUser = Auth::guard('clientuser')->user();
         $purchasePostFields = [
                                 'purpose' => 'purchase '. $subCategory->name,
                                 'amount'  =>   $subCategory->price,
-                                'buyer_name' => Auth::guard('clientuser')->user()->name,
-                                'email'  => Auth::guard('clientuser')->user()->email,
-                                'phone'  => Auth::guard('clientuser')->user()->phone,
+                                'buyer_name' => $loginUser->name,
+                                'email'  => $loginUser->email,
+                                'phone'  => $loginUser->phone,
                                 'send_email' => 'True',
                                 'send_sms' => 'False',
                                 'redirect_url' => url('redirectTestSubCategoryPayment'),
@@ -586,7 +589,7 @@ class ClientUserController extends BaseController
                                 'allow_repeated_payments' => 'False'
                             ];
 
-        $clientUserAuth = UserBasedAuthentication::where('vchip_client_id', Auth::guard('clientuser')->user()->client_id)->first();
+        $clientUserAuth = UserBasedAuthentication::where('vchip_client_id', $loginUser->client_id)->first();
 
         if(!is_object($clientUserAuth)){
             return redirect()->back()->withErrors('something went wrong.');
@@ -645,8 +648,9 @@ class ClientUserController extends BaseController
         $paymentRequestId = $request->get('payment_request_id');
         $paymentId = $request->get('payment_id');
         if(!empty($paymentRequestId) && !empty($paymentId)){
-            $userId = Auth::guard('clientuser')->user()->id;
-            $clientId = Auth::guard('clientuser')->user()->client_id;
+            $loginUser = Auth::guard('clientuser')->user();
+            $userId = $loginUser->id;
+            $clientId = $loginUser->client_id;
             $clientUserAuth = UserBasedAuthentication::where('vchip_client_id', $clientId)->first();
 
             if(!is_object($clientUserAuth)){
@@ -708,7 +712,7 @@ class ClientUserController extends BaseController
                         Session::remove('client_category_id');
 
                         // mail to client
-                        $to = Auth::guard('clientuser')->user()->client->email;
+                        $to = $loginUser->client->email;
                         $subject = 'Payment on your website:'. $result->title.' by '.$result->name.'';
                         $message = "<h1>Payment Details</h1>";
                         $message .= "<hr>";

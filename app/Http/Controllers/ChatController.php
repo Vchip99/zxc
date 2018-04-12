@@ -32,11 +32,12 @@ class chatController extends Controller
         $chatusers = [];
         $skipUsers = [];
         $limitStart = $request->get('limit_start');
-        if(Cache::has('vchip:user-'.Auth()->user()->id.':chatusers:limitStart-'.$limitStart)){
-            $result['chatusers'] = Cache::get('vchip:user-'.Auth()->user()->id.':chatusers:limitStart-'.$limitStart);
+        $loginUser = Auth()->user();
+        if(Cache::has('vchip:user-'.$loginUser->id.':chatusers:limitStart-'.$limitStart)){
+            $result['chatusers'] = Cache::get('vchip:user-'.$loginUser->id.':chatusers:limitStart-'.$limitStart);
         } else {
             $skipUsers = explode(',', $request->get('previuos_chat_users'));
-            array_push($skipUsers, Auth()->user()->id);
+            array_push($skipUsers, $loginUser->id);
             $users = User::whereNotIn('id', $skipUsers)->skip($limitStart)->take(10)->get();
 
             if(is_object($users) && false == $users->isEmpty()){
@@ -58,10 +59,10 @@ class chatController extends Controller
                     ];
                 }
             }
-            Cache::put('vchip:user-'.Auth()->user()->id.':chatusers:limitStart-'.$limitStart, $chatusers, 60);
+            Cache::put('vchip:user-'.$loginUser->id.':chatusers:limitStart-'.$limitStart, $chatusers, 60);
             $result['chatusers'] = $chatusers;
         }
-        $result['unreadCount'] = ChatMessage::where('receiver_id',  Auth()->user()->id)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
+        $result['unreadCount'] = ChatMessage::where('receiver_id',  $loginUser->id)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
         $result['onlineUsers'] = ChatMessage::checkOnlineUsers();
         return $result;
     }

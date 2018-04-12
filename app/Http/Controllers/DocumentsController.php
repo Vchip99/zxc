@@ -45,8 +45,9 @@ class DocumentsController extends Controller
         });
         $registeredDocuments = $this->getRegisteredDocumentIds();
         $favouriteDocIds = $this->getFavouritedDocumentIds();
-        if(is_object(Auth::user()) && $id > 0){
-            $currentUser = Auth::user()->id;
+        $loginUser = Auth::user();
+        if(is_object($loginUser) && $id > 0){
+            $currentUser = $loginUser->id;
             DB::beginTransaction();
             try
             {
@@ -118,8 +119,9 @@ class DocumentsController extends Controller
 
     protected function getRegisteredDocumentIds(){
         $registeredDocumentIds = [];
-        if(is_object(Auth::user())){
-            $userId = Auth::user()->id;
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
+            $userId = $loginUser->id;
             $registeredDocuments = RegisterDocuments::getRegisteredDocumentsByUserId($userId);
             if(false == $registeredDocuments->isEmpty()){
                 foreach($registeredDocuments as $registeredDocument){
@@ -132,8 +134,9 @@ class DocumentsController extends Controller
 
     protected function getFavouritedDocumentIds(){
         $favouriteDocIds = [];
-        if(is_object(Auth::user())){
-            $userId = Auth::user()->id;
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
+            $userId = $loginUser->id;
             $favouriteDocuments = RegisterFavouriteDocuments::getRegisteredFavouriteDocumentsByUserId($userId);
             if(false == $favouriteDocuments->isEmpty()){
                 foreach($favouriteDocuments as $favouriteDocument){

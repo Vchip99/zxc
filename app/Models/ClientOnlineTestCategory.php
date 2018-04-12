@@ -42,8 +42,9 @@ class ClientOnlineTestCategory extends Model
     }
 
     protected static function showCategories($request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginUser = Auth::guard('client')->user();
+        if(is_object($loginUser)){
+            $clientId = $loginUser->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }
@@ -61,8 +62,9 @@ class ClientOnlineTestCategory extends Model
     }
 
     protected static function getOnlineTestCategoriesAssociatedWithQuestion($request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginUser = Auth::guard('client')->user();
+        if(is_object($loginUser)){
+            $clientId = $loginUser->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }

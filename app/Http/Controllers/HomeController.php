@@ -234,8 +234,9 @@ class HomeController extends Controller
         $heros = Cache::remember('vchip:heros:heros',60, function() {
             return ZeroToHero::all();
         });
-        if(is_object(Auth::user())){
-            $currentUser = Auth::user()->id;
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
+            $currentUser = $loginUser->id;
             if($id > 0 ){
                 DB::beginTransaction();
                 try

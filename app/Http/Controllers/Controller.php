@@ -10,6 +10,7 @@ use App\Models\TestCategory;
 use App\Models\TestSubCategory;
 use App\Models\TestSubject;
 use App\Models\TestSubjectPaper;
+use App\Models\User;
 use App\Libraries\InputSanitise;
 use View,Cache,Session;
 
@@ -30,5 +31,20 @@ class Controller extends BaseController
         });
         view::share('testCategoriesWithQuestions', $testCategoriesWithQuestions);
 
+        $chatAdminId = Cache::remember('vchip:chatAdminId',60, function() {
+            $adminChatUser = User::where('email', 'ceo@vchiptech.com')->first();
+            if(is_object($adminChatUser)){
+                return $adminChatUser->id;
+            } else {
+                return 0;
+            }
+        });
+        view::share('chatAdminId', $chatAdminId);
+        if(Cache::has('vchip:chatAdminLive')){
+            $chatAdminLive = Cache::get('vchip:chatAdminLive');
+        } else {
+            $chatAdminLive = false;
+        }
+        view::share('chatAdminLive', $chatAdminLive);
     }
 }

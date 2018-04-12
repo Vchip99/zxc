@@ -417,31 +417,33 @@ class User extends Authenticatable
     }
 
     protected static function getAssignmentUsers($selectedAssignmentYear){
-        return static::where('user_type', self::Student)->where('college_id', Auth::user()->college_id)->where('college_dept_id', Auth::user()->college_dept_id)->where('year', $selectedAssignmentYear)->get();
+        $loginUser = Auth::user();
+        return static::where('user_type', self::Student)->where('college_id', $loginUser->college_id)->where('college_dept_id', $loginUser->college_dept_id)->where('year', $selectedAssignmentYear)->get();
     }
 
     protected static function getTeachers($collegeDept=NULL){
-        if( self::Student == Auth::user()->user_type){
+        $loginUser = Auth::user();
+        if( self::Student == $loginUser->user_type){
             return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
                 ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
-                ->where('users.college_id', Auth::user()->college_id)
-                ->where('users.college_dept_id', Auth::user()->college_dept_id)
-                ->where('assignment_questions.year', Auth::user()->year)
+                ->where('users.college_id', $loginUser->college_id)
+                ->where('users.college_dept_id', $loginUser->college_dept_id)
+                ->where('assignment_questions.year', $loginUser->year)
                 ->select('users.id', 'users.*')->groupBy('users.id')->get();
-        } else if( self::Lecturer == Auth::user()->user_type){
+        } else if( self::Lecturer == $loginUser->user_type){
             return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
                 ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
-                ->where('users.college_id', Auth::user()->college_id)
-                ->where('users.college_dept_id', Auth::user()->college_dept_id)
-                // ->where('assignment_questions.year', Auth::user()->year)
+                ->where('users.college_id', $loginUser->college_id)
+                ->where('users.college_dept_id', $loginUser->college_dept_id)
+                // ->where('assignment_questions.year', $loginUser->year)
                 ->select('users.id', 'users.*')->groupBy('users.id')->get();
-        } else if( self::Hod == Auth::user()->user_type){
+        } else if( self::Hod == $loginUser->user_type){
             return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
                 ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
-                ->where('users.college_id', Auth::user()->college_id)
-                ->where('users.college_dept_id', Auth::user()->college_dept_id)
+                ->where('users.college_id', $loginUser->college_id)
+                ->where('users.college_dept_id', $loginUser->college_dept_id)
                 ->select('users.id', 'users.*')->groupBy('users.id')->get();
-        } else if( self::Directore == Auth::user()->user_type){
+        } else if( self::Directore == $loginUser->user_type){
             return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
                 ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
                 ->where('users.college_dept_id', $collegeDept)

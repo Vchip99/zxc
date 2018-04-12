@@ -22,8 +22,9 @@ class ClientTeam extends Model
 
     protected static function updateTeam($request){
         $ArrVal = array_keys($request->all());
-        $clientTeams = static::where('client_id', Auth::guard('client')->user()->id)->get();
-        $subdomainArr = explode('.', Auth::guard('client')->user()->subdomain);
+        $loginClient = Auth::guard('client')->user();
+        $clientTeams = static::where('client_id', $loginClient->id)->get();
+        $subdomainArr = explode('.', $loginClient->subdomain);
         $clientName = $subdomainArr[0];
 
         if(count($clientTeams)>0){

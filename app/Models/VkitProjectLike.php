@@ -17,15 +17,16 @@ class VkitProjectLike extends Model
     protected $fillable = ['vkit_project_id', 'user_id'];
 
     protected static function getLikeVkitProject(Request $request){
-        if(is_object(Auth::user())){
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
             if( 1 == $request->get('dis_like')){
-                $likePost = static::where('vkit_project_id',$request->get('project_id'))->where('user_id' ,Auth::user()->id)->first();
+                $likePost = static::where('vkit_project_id',$request->get('project_id'))->where('user_id' ,$loginUser->id)->first();
                 if(is_object($likePost)){
                     $likePost->delete();
                     return self::getLikeStatus($request);
                 }
             } else {
-                static::create(['vkit_project_id' => $request->get('project_id'), 'user_id' => Auth::user()->id]);
+                static::create(['vkit_project_id' => $request->get('project_id'), 'user_id' => $loginUser->id]);
                 return self::getLikeStatus($request);
             }
         }

@@ -64,8 +64,9 @@ class ClientOnlineVideo extends Model
 
     public static function getClientCourseVideosByCourseId($courseId, Request $request){
         $courseId = InputSanitise::inputString($courseId);
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }
@@ -84,8 +85,9 @@ class ClientOnlineVideo extends Model
     }
 
     protected static function showVideos(Request $request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }

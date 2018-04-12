@@ -66,7 +66,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
         if(is_object($loginUser)){
             $clientId = $loginUser->client_id;
             $userId = $loginUser->id;
-            $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($subdomainName,$clientId, $userId);
+            $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $userId);
         }
         return view('client.front.onlineCourses.courses', compact('courseCategories', 'courses', 'userPurchasedCourses'));
     }
@@ -83,7 +83,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
         if(is_object($loginUser)){
             $clientId = $loginUser->client_id;
             $userId = $loginUser->id;
-            $result['userPurchasedCourses'] = ClientUserPurchasedCourse::getUserPurchasedCourses($subdomainName,$clientId, $userId);
+            $result['userPurchasedCourses'] = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $userId);
         }
 
         return $result;
@@ -99,7 +99,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
         $userId = $request->get('userId');
         $result['courses'] = ClientOnlineCourse::getRegisteredOnlineCourseByCatIdBySubCatId($categoryId,$subcategoryId, $userId);
         $clientId = Auth::guard('clientuser')->user()->client_id;
-        $result['userPurchasedCourses'] = ClientUserPurchasedCourse::getUserPurchasedCourses($subdomainName,$clientId, $userId);
+        $result['userPurchasedCourses'] = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $userId);
         return $result;
     }
 

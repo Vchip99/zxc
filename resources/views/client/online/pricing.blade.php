@@ -155,7 +155,7 @@
                      <h2>Free</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong>Rs. 0000 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong>Rs. {{ $allPlan[1]->amount}} / year</strong></p>
                     </div>
                     <ul class="list-group list-group-flush text-center free_first">
                       <li class="list-group-item" style="margin-top: 13px;">Online test series</li>
@@ -179,7 +179,7 @@
                     <h2>Gold</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong> Rs. 4999 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong> Rs. {{ $allPlan[2]->amount}} / year</strong></p>
                     </div>
                     <ul class="list-group list-group-flush text-center read">
                       <li class="list-group-item">Online test series</li>
@@ -205,7 +205,7 @@
                     <h2>Platinum</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong>Rs. 9999 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong>Rs. {{ $allPlan[3]->amount}} / year</strong></p>
                     </div>
                     <ul class="list-group list-group-flush text-center read-1  paid_secind_third">
                       <li class="list-group-item">All in Gold plan</li>
@@ -228,7 +228,7 @@
                     <h2>Diamond</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong> Rs. 19,999 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong> Rs. {{ $allPlan[4]->amount}} / year</strong></p>
                     </div>
                     <ul class="list-group list-group-flush text-center read-2 paid_secind_third">
                           <li class="list-group-item">All in Platinum plan</li>

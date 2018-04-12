@@ -17,15 +17,16 @@ class LiveCourseVideoLike extends Model
     protected $fillable = ['live_course_video_id', 'user_id'];
 
     protected static function getLikeVideo(Request $request){
-        if(is_object(Auth::user())){
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
             if( 1 == $request->get('dis_like')){
-                $likePost = static::where('live_course_video_id',$request->get('video_id'))->where('user_id' ,Auth::user()->id)->first();
+                $likePost = static::where('live_course_video_id',$request->get('video_id'))->where('user_id' ,$loginUser->id)->first();
                 if(is_object($likePost)){
                     $likePost->delete();
                     return self::getLikeStatus($request);
                 }
             } else {
-                static::create(['live_course_video_id' => $request->get('video_id'), 'user_id' => Auth::user()->id]);
+                static::create(['live_course_video_id' => $request->get('video_id'), 'user_id' => $loginUser->id]);
                 return self::getLikeStatus($request);
             }
         }

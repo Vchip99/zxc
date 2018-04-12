@@ -31,20 +31,21 @@ class VkitProjectSubCommentLike extends Model
     }
 
     protected static function getLikeVkitProject(Request $request){
-    	if(is_object(Auth::user())){
+    	$loginUser = Auth::user();
+    	if(is_object($loginUser)){
 	    	if( 0 == $request->get('dis_like')){
 	    		static::create([
 	    			'vkit_project_id' => $request->get('project_id'),
 	    			'vkit_project_comment_id' => $request->get('comment_id'),
 	    			'vkit_project_sub_comment_id' => $request->get('sub_comment_id'),
-	    			'user_id' => Auth::user()->id
+	    			'user_id' => $loginUser->id
 				]);
 	    		return self::getSubCommentStatus($request);
 	    	} else {
 	    		$commentLike  = static::where('vkit_project_id', $request->get('project_id'))
 	    					->where('vkit_project_comment_id', $request->get('comment_id'))
 	    					->where('vkit_project_sub_comment_id', $request->get('sub_comment_id'))
-	    					->where('user_id', Auth::user()->id)->first();
+	    					->where('user_id', $loginUser->id)->first();
 	    		if(is_object($commentLike)){
 	    			$commentLike->delete();
 	    			return self::getSubCommentStatus($request);

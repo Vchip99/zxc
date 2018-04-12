@@ -24,20 +24,31 @@ class ChatMessage extends Model
     protected static function showchatusers(){
         $chatusers = [];
         $chatmessageusers = [];
-        if(Cache::has('vchip:user-'.Auth()->user()->id.':chatusers')){
-            $userResult['chatusers'] = Cache::get('vchip:user-'.Auth()->user()->id.':chatusers');
+        $loginUser = Auth()->user();
+        if(Cache::has('vchip:user-'.$loginUser->id.':chatusers')){
+            $userResult['chatusers'] = Cache::get('vchip:user-'.$loginUser->id.':chatusers');
         } else {
-            $result = static::where('sender_id', Auth()->user()->id)->Orwhere('receiver_id',  Auth()->user()->id)->orderBy('id', 'desc')->get();
+
+            $adminChatUser = User::where('email', 'ceo@vchiptech.com')->first();
+            if(is_object($adminChatUser)){
+                $adminChatUserId = $adminChatUser->id;
+            } else {
+                $adminChatUserId = 0;
+            }
+
+            $result = static::where('sender_id', $loginUser->id)->Orwhere('receiver_id',  $loginUser->id)->orderBy('id', 'desc')->get();
 
             if(is_object($result) && false == $result->isEmpty()){
                 foreach($result as $message){
-                    if(Auth()->user()->id != $message->sender_id){
+                    if($loginUser->id != $message->sender_id && $adminChatUserId != $message->sender_id){
                         if(!in_array($message->sender_id, $chatmessageusers)){
                             $chatmessageusers[] = $message->sender_id;
                         }
                     } else {
-                        if(!in_array($message->receiver_id, $chatmessageusers)){
-                            $chatmessageusers[] = $message->receiver_id;
+                        if($adminChatUserId != $message->receiver_id){
+                            if(!in_array($message->receiver_id, $chatmessageusers) && $message->receiver_id != $loginUser->id){
+                                $chatmessageusers[] = $message->receiver_id;
+                            }
                         }
                     }
                 }
@@ -67,7 +78,8 @@ class ChatMessage extends Model
                 }
             }
 
-            array_push($chatmessageusers, Auth()->user()->id);
+            array_push($chatmessageusers, $adminChatUserId);
+            array_push($chatmessageusers, $loginUser->id);
             $users = User::whereNotIn('id', $chatmessageusers)->skip(0)->take(10)->get();
 
             if(is_object($users) && false == $users->isEmpty()){
@@ -90,10 +102,10 @@ class ChatMessage extends Model
                 }
             }
 
-            Cache::put('vchip:user-'.Auth()->user()->id.':chatusers', $chatusers, 60);
+            Cache::put('vchip:user-'.$loginUser->id.':chatusers', $chatusers, 60);
             $userResult['chatusers'] = $chatusers;
         }
-        $messageResult = static::where('receiver_id',  Auth()->user()->id)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
+        $messageResult = static::where('receiver_id',  $loginUser->id)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
         if(is_object($messageResult) && false == $messageResult->isEmpty()){
             foreach($messageResult as $message){
                 $userResult['unreadCount'][$message->sender_id] = $message->unread;
@@ -103,7 +115,6 @@ class ChatMessage extends Model
         }
 
         $userResult['onlineUsers'] = static::checkOnlineUsers();
-
         return $userResult;
     }
 

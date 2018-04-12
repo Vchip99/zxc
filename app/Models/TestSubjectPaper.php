@@ -86,16 +86,18 @@ class TestSubjectPaper extends Model
                     // update or delete
                     foreach($allSessions as $paperSession){
                         if(false == in_array($paperSession->id, $addPaperSessions)){
-                            if(isset($updatePaperSessions[$paperSession->id])){
-                                $paperSession->name = $updatePaperSessions[$paperSession->id]['session'];
-                                $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
-                                $paperSession->test_category_id = $catId;
-                                $paperSession->test_sub_category_id =$subcatId;
-                                $paperSession->test_subject_id = $subjectId;
-                                $paperSession->test_subject_paper_id = $paperId;
-                                $paperSession->save();
-                            } else {
-                                $paperSession->delete();
+                            if(isset($updatePaperSessions[$paperSession->id]) && !empty($updatePaperSessions[$paperSession->id]['session'])){
+                                if(isset($updatePaperSessions[$paperSession->id])){
+                                    $paperSession->name = str_replace(" ", "_", $updatePaperSessions[$paperSession->id]['session']);
+                                    $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
+                                    $paperSession->test_category_id = $catId;
+                                    $paperSession->test_sub_category_id =$subcatId;
+                                    $paperSession->test_subject_id = $subjectId;
+                                    $paperSession->test_subject_paper_id = $paperId;
+                                    $paperSession->save();
+                                } else {
+                                    $paperSession->delete();
+                                }
                             }
                         }
                     }
@@ -103,14 +105,16 @@ class TestSubjectPaper extends Model
                 // add new
                 foreach($updatePaperSessions as $index => $updatePaperSession){
                     if(true == in_array($index, $addPaperSessions)){
-                        $paperSession = new PaperSection;
-                        $paperSession->name = $updatePaperSession['session'];
-                        $paperSession->duration = $updatePaperSession['duration'];
-                        $paperSession->test_category_id = $catId;
-                        $paperSession->test_sub_category_id =$subcatId;
-                        $paperSession->test_subject_id = $subjectId;
-                        $paperSession->test_subject_paper_id = $paperId;
-                        $paperSession->save();
+                        if(!empty($updatePaperSession['session'])){
+                            $paperSession = new PaperSection;
+                            $paperSession->name = str_replace(" ", "_", $updatePaperSession['session']);
+                            $paperSession->duration = $updatePaperSession['duration'];
+                            $paperSession->test_category_id = $catId;
+                            $paperSession->test_sub_category_id =$subcatId;
+                            $paperSession->test_subject_id = $subjectId;
+                            $paperSession->test_subject_paper_id = $paperId;
+                            $paperSession->save();
+                        }
                     }
                 }
             }
@@ -122,7 +126,7 @@ class TestSubjectPaper extends Model
                     $duration = $request->get('duration_'.$i);
                     if(!empty($session)){
                         $sessions[] = [
-                                    'name' => $session,
+                                    'name' => str_replace(" ", "_", $session),
                                     'duration' => $duration,
                                     'test_category_id' => $catId,
                                     'test_sub_category_id' => $subcatId,

@@ -189,7 +189,7 @@
           @endforeach
         @else
           <tr id="tr_1">
-            <td class="col-sm-3"><input type="text" class="form-control" name="session_1" value="Section 1" required="true"></td>
+            <td class="col-sm-3"><input type="text" class="form-control" name="session_1" value="Section_1" required="true"></td>
             <td class="col-sm-3 duration"><input type="text" class="form-control " name="duration_1" value=""></td>
             <td class=""><button type="button" onClick="addSessions();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
             @if(isset($paper))
@@ -252,7 +252,7 @@
 <input type="hidden" id="selected_time_out" name="selected_time_out" value="{{$paper->time_out_by}}">
 <script type="text/javascript">
   function addSessions(){
-    event.preventDefault();
+    // event.preventDefault();
     var allSession = document.getElementById('all_session');
     var count = parseInt(document.getElementById('all_session_count').value) + 1;
 
@@ -324,7 +324,7 @@
   }
 
   function removeElement(parent,childId){
-      event.preventDefault();
+      // event.preventDefault();
       var childTr = document.getElementById('tr_'+childId);
       var childBr = document.getElementById('br_'+childId);
       var parent = document.getElementById(parent);

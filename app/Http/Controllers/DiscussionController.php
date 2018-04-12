@@ -130,7 +130,7 @@ class DiscussionController extends Controller
             $post = DiscussionPost::find($comment->discussion_post_id);
             if(is_object($post) && is_object($comment)){
                 $string = (strlen($post->body) > 50) ? substr($post->body,0,50).'...' : $post->body;
-                $notificationMessage = '<a href="'.$request->root().'/discussion/'.$comment->id.'">A reply of your post: '. trim($string, '<p></p>')  .'</a>';
+                $notificationMessage = '<a href="'.$request->root().'/discussion/'.$comment->id.' target="_blank"">A reply of your post: '. trim($string, '<p></p>')  .'</a>';
                 Notification::addCommentNotification($notificationMessage, Notification::USERDISCUSSIONCOMMENTNOTIFICATION, $comment->id,$comment->user_id,$post->user_id);
             }
             DB::commit();
@@ -159,7 +159,7 @@ class DiscussionController extends Controller
             }
             if(is_object($parentComment)){
                 $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
-                $notificationMessage = '<a href="'.$request->root().'/discussion/'.$parentComment->id.'/'.$subcomment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
+                $notificationMessage = '<a href="'.$request->root().'/discussion/'.$parentComment->id.'/'.$subcomment->id.'" target="_blank">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
                 Notification::addCommentNotification($notificationMessage, Notification::USERDISCUSSIONSUBCOMMENTNOTIFICATION, $subcomment->id,$subcomment->user_id,$parentComment->user_id);
             }
 

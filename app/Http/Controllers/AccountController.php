@@ -122,8 +122,9 @@ class AccountController extends Controller
         $collegeDepts = [];
         $users = self::Users;
         $colleges = College::all();
-        if(Auth::user()->college_id > 0){
-            $collegeDepts = CollegeDept::where('college_id', Auth::user()->college_id)->get();
+        $loginUser = Auth::user();
+        if($loginUser->college_id > 0){
+            $collegeDepts = CollegeDept::where('college_id', $loginUser->college_id)->get();
         }
 
         return view('dashboard.profile', compact('users', 'colleges', 'collegeDepts'));
@@ -189,18 +190,20 @@ class AccountController extends Controller
     }
 
     protected function myQuestions(){
-        $posts = DiscussionPost::where('user_id', Auth::user()->id)->orderBy('discussion_posts.id', 'desc')->get();
+        $loginUser = Auth::user();
+        $posts = DiscussionPost::where('user_id', $loginUser->id)->orderBy('discussion_posts.id', 'desc')->get();
         $user = new User;
         $allPostModuleId = self::AllPostModuleIdForMyQuestions;
         $likesCount = DiscussionPostLike::getLikes();
-        $currentUser = Auth::user()->id;
+        $currentUser = $loginUser->id;
         $discussionCategories =DiscussionCategory::all();
         return view('dashboard.myQuestions', compact('posts', 'user', 'allPostModuleId', 'likesCount', 'currentUser', 'discussionCategories'));
     }
 
     protected function myReplies(){
         $postIds = [];
-        $discussionComments = DiscussionComment::where('user_id', Auth::user()->id)->select('discussion_post_id')->get();
+        $loginUser = Auth::user();
+        $discussionComments = DiscussionComment::where('user_id', $loginUser->id)->select('discussion_post_id')->get();
         if(false == $discussionComments->isEmpty()){
             foreach($discussionComments as $discussionComment){
                 $postIds[]= $discussionComment->discussion_post_id;
@@ -213,7 +216,7 @@ class AccountController extends Controller
         $likesCount = DiscussionPostLike::getLikes();
         $commentLikesCount = DiscussionCommentLike::getLiksByPosts($posts);
         $subcommentLikesCount = DiscussionSubCommentLike::getLiksByPosts($posts);
-        $currentUser = Auth::user()->id;
+        $currentUser = $loginUser->id;
         return view('dashboard.myReplies', compact('posts', 'user', 'allPostModuleId', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
     }
 
@@ -501,7 +504,8 @@ class AccountController extends Controller
         DB::beginTransaction();
         try
         {
-            Notification::readUserNotifications(Auth::user()->id);
+            $loginUser = Auth::user();
+            Notification::readUserNotifications($loginUser->id);
             DB::commit();
         }
         catch(\Exception $e)
@@ -509,7 +513,7 @@ class AccountController extends Controller
             DB::rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }
-        $notifications =  Notification::where('admin_id', 0)->where('created_to', Auth::user()->id)->orderBy('id', 'desc')->paginate();
+        $notifications =  Notification::where('admin_id', 0)->where('created_to', $loginUser->id)->orderBy('id', 'desc')->paginate();
         return view('dashboard.notifications', compact('notifications'));
     }
 
@@ -615,8 +619,9 @@ class AccountController extends Controller
         $questionId   = InputSanitise::inputInt($request->get('assignment_question_id'));
         $studentId   = InputSanitise::inputInt($request->get('student_id'));
         $answer = $request->get('answer');
+        $loginUser = Auth::user();
         if(empty($answer) && false == $request->exists('attached_link')){
-            if(User::Student == Auth::user()->user_type){
+            if(User::Student == $loginUser->user_type){
                 return Redirect::to('doAssignment/'.$questionId);
             } else {
                 return Redirect::to('assignmentRemark/'.$questionId.'/'.$studentId);
@@ -628,7 +633,7 @@ class AccountController extends Controller
         {
             AssignmentAnswer::addAssignmentAnswer($request);
             DB::commit();
-            if(User::Student == Auth::user()->user_type){
+            if(User::Student == $loginUser->user_type){
                 return Redirect::to('doAssignment/'.$questionId)->with('message', 'Assignment updated successfully.');
             } else {
                 return Redirect::to('assignmentRemark/'.$questionId.'/'.$studentId )->with('message', 'Assignment updated successfully.');

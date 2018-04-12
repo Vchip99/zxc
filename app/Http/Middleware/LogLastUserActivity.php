@@ -21,6 +21,10 @@ class LogLastUserActivity
         if(Auth::check()) {
             $expiresAt = Carbon::now()->addMinutes(5);
             Cache::put('vchip:online_user-' . Auth::user()->id, true, $expiresAt);
+            $expiresChatAt = Carbon::now()->addMinutes(60);
+            if('ceo@vchiptech.com' == Auth::user()->email){
+                Cache::put('vchip:chatAdminLive', true, $expiresChatAt);
+            }
         }
         return $next($request);
     }

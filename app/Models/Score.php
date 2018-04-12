@@ -42,11 +42,12 @@ class Score extends Model
 
     protected static function getTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds){
         $paperIds = [];
-        if(is_object(Auth::user())){
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
             $scores = static::where('category_id', $catId)
                     ->where('subcat_id', $subcatId)
                     ->whereIn('paper_id', $testSubjectPaperIds)
-                    ->where('user_id', Auth::user()->id)->get();
+                    ->where('user_id', $loginUser->id)->get();
             if(is_object($scores) && false == $scores->isEmpty()){
                 foreach($scores as $score){
                     $paperIds[] = $score->paper_id;

@@ -58,10 +58,11 @@ class ClientOnlineSubCategory extends Model
     }
 
     protected static function getOnlineSubCategoriesByCategoryId($id, Request $request){
-        if(is_object(Auth::guard('client')->user())){
+        $loginUser = Auth::guard('client')->user();
+        if(is_object($loginUser)){
             return DB::connection('mysql2')->table('client_online_sub_categories')
                         ->where('category_id', $id)
-                        ->where('client_id', Auth::guard('client')->user()->id)
+                        ->where('client_id', $loginUser->id)
                         ->select('client_online_sub_categories.*')
                         ->get();
         } else {
@@ -90,8 +91,9 @@ class ClientOnlineSubCategory extends Model
     }
 
     protected static function showSubCategories(Request $request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginUser = Auth::guard('client')->user();
+        if(is_object($loginUser)){
+            $clientId = $loginUser->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }

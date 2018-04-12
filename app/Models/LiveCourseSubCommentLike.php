@@ -31,20 +31,21 @@ class LiveCourseSubCommentLike extends Model
     }
 
     protected static function getLikeVideoSubComment(Request $request){
-    	if(is_object(Auth::user())){
+    	$loginUser = Auth::user();
+    	if(is_object($loginUser)){
 	    	if( 0 == $request->get('dis_like')){
 	    		static::create([
 	    			'live_course_video_id' => $request->get('video_id'),
 	    			'live_course_comment_id' => $request->get('comment_id'),
 	    			'live_course_sub_comment_id' => $request->get('sub_comment_id'),
-	    			'user_id' => Auth::user()->id
+	    			'user_id' => $loginUser->id
 				]);
 	    		return self::getSubCommentStatus($request);
 	    	} else {
 	    		$commentLike  = static::where('live_course_video_id', $request->get('video_id'))
 	    					->where('live_course_comment_id', $request->get('comment_id'))
 	    					->where('live_course_sub_comment_id', $request->get('sub_comment_id'))
-	    					->where('user_id', Auth::user()->id)->first();
+	    					->where('user_id', $loginUser->id)->first();
 	    		if(is_object($commentLike)){
 	    			$commentLike->delete();
 	    			return self::getSubCommentStatus($request);

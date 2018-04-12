@@ -152,7 +152,7 @@ class BlogController extends Controller
             }
             if(is_object($parentComment)){
                 $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
-                $notificationMessage = '<a href="'.$request->root().'/blogComment/'.$blogId.'/'.$blogComment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
+                $notificationMessage = '<a href="'.$request->root().'/blogComment/'.$blogId.'/'.$blogComment->id.'" target="_blank">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
                 Notification::addCommentNotification($notificationMessage, Notification::USERBLOGNOTIFICATION, $blogComment->id,$blogComment->user_id,$parentComment->user_id);
             }
 

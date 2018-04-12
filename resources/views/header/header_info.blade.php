@@ -100,6 +100,7 @@
     </div>
   </div>
 </header>
+
   <!-- Modal collage-->
   <div class="modal fade" id="collegeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">

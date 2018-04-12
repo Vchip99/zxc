@@ -79,7 +79,7 @@ class Clientuser extends Authenticatable
                 ->first();
     }
 
-    protected static function searchUsers($subdomainName,$request){
+    protected static function searchUsers($request){
         $results = [];
         $courseId = InputSanitise::inputInt($request->get('course_id'));
         $clientId = Auth::guard('client')->user()->id;
@@ -251,12 +251,13 @@ class Clientuser extends Authenticatable
         return static::where('client_id', Auth::guard('client')->user()->id)->select('clientusers.*')->get();
     }
 
-    protected static function isInBetweenFirstTwenty(){
+    protected static function isInBetweenFirstTen(){
         $result = 'false';
-        $users = static::where('client_id', Auth::guard('clientuser')->user()->client_id)->take(20)->get();
+        $loginUser = Auth::guard('clientuser')->user();
+        $users = static::where('client_id', $loginUser->client_id)->take(10)->get();
         if(is_object($users) && false == $users->isEmpty()){
             foreach($users as $user){
-                if(Auth::guard('clientuser')->user()->id == $user->id){
+                if($loginUser->id == $user->id){
                     $result = 'true';
                 }
             }

@@ -187,8 +187,9 @@ class CourseController extends Controller
 
     protected function getRegisteredCourseIds(){
         $registeredCourseIds = [];
-        if(is_object(Auth::user())){
-            $userId = Auth::user()->id;
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
+            $userId = $loginUser->id;
             $registeredCourses = RegisterOnlineCourse::getRegisteredOnlineCoursesByUserId($userId);
             if(false == $registeredCourses->isEmpty()){
                 foreach($registeredCourses as $registeredCourse){
@@ -400,7 +401,7 @@ class CourseController extends Controller
 
             if(is_object($parentComment)){
                 $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
-                $notificationMessage = '<a href="'.$request->root().'/episode/'.$videoId.'/'.$subComment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
+                $notificationMessage = '<a href="'.$request->root().'/episode/'.$videoId.'/'.$subComment->id.'" target="_blank">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
 
                 Notification::addCommentNotification($notificationMessage, Notification::USERCOURSENOTIFICATION, $subComment->id,$subComment->user_id,$parentComment->user_id);
             }

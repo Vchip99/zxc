@@ -41,17 +41,18 @@ class DiscussionCommentLike extends Model
     }
 
     protected static function getLikeComment(Request $request){
-    	if(is_object(Auth::user())){
+    	$loginUser = Auth::user();
+    	if(is_object($loginUser)){
 	    	if( 0 == $request->get('dis_like')){
 	    		static::create([
 	    			'discussion_post_id' => $request->get('post_id'),
 	    			'discussion_comment_id' => $request->get('comment_id'),
-	    			'user_id' => Auth::user()->id,
+	    			'user_id' => $loginUser->id,
 	    			'is_like' => self::IsLike
 				]);
 	    		return self::getCommentStatus($request);
 	    	} else {
-	    		$commentLike  = static::where('discussion_post_id', $request->get('post_id'))->where('discussion_comment_id', $request->get('comment_id'))->where('is_like', self::IsLike)->where('user_id', Auth::user()->id)->first();
+	    		$commentLike  = static::where('discussion_post_id', $request->get('post_id'))->where('discussion_comment_id', $request->get('comment_id'))->where('is_like', self::IsLike)->where('user_id', $loginUser->id)->first();
 	    		if(is_object($commentLike)){
 	    			$commentLike->delete();
 	    			return self::getCommentStatus($request);

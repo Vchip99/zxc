@@ -109,7 +109,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 					$testSubjectPaperIds = array_values($testSubjectPaperIds);
 				}
 				$registeredPaperIds = $this->getRegisteredPaperIds($subdomainName);
-				$alreadyGivenPapers = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($subdomainName,$catId, $subcatId, $testSubjectPaperIds);
+				$alreadyGivenPapers = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 				$currentDate = date('Y-m-d H:i:s');
 				if(is_object($loginUser)){
 			        $clientId = $loginUser->client_id;
@@ -140,8 +140,8 @@ class ClientOnlineTestFrontController extends ClientHomeController
 		return Redirect::to('/');
 	}
 
-	protected function getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($subdomainName,$catId, $subcatId, $testSubjectPaperIds){
-		return ClientScore::getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($subdomainName,$catId, $subcatId, $testSubjectPaperIds);
+	protected function getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds){
+		return ClientScore::getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 	}
 
 	protected function getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($subdomainName,Request $request){
@@ -190,7 +190,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 					$testSubjectPaperIds = array_values($testSubjectPaperIds);
 				}
 
-				$result['alreadyGivenPapers'] = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($subdomainName,$catId, $subcatId, $testSubjectPaperIds);
+				$result['alreadyGivenPapers'] = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 				$result['currentDate'] = date('Y-m-d H:i:s');
 			}
 			return $result;
@@ -217,7 +217,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 				$testSubjectPaperIds = array_values($testSubjectPaperIds);
 			}
 
-			$result['alreadyGivenPapers'] = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($subdomainName,$catId, $subcatId, $testSubjectPaperIds);
+			$result['alreadyGivenPapers'] = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 			$result['currentDate'] = date('Y-m-d H:i:s');
 
 			return $result;
@@ -252,9 +252,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
         $subcategoryId = Session::get('client_subcategory');
         $subjectId = Session::get('client_subject');
         $paperId = Session::get('client_paper');
-        if(!is_object(Auth::guard('clientuser')->user())){
-        	return Redirect::to('/');
-        }
+
         return view('client.front.instructions', compact('categoryId', 'subcategoryId', 'subjectId', 'paperId'));
     }
 
@@ -290,19 +288,19 @@ class ClientOnlineTestFrontController extends ClientHomeController
         $userAnswers = [];
         $positiveMarks = 0;
         $negativeMarks = 0;
-        $score = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$categoryId,$subcategoryId,$paperId,$subjectId,$userId);
+        $score = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId);
 
         if(is_object($score)){
-        	$rank = ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($subdomainName,$categoryId,$subcategoryId,$subjectId, $paperId,$score->test_score);
-        	$totalRank = ClientScore::getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$categoryId,$subcategoryId,$subjectId, $paperId);
+        	$rank = ClientScore::getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$score->test_score);
+        	$totalRank = ClientScore::getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId);
 
-        	$userSolutions = ClientUserSolution::getClientUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($subdomainName,$userId, $score->id, $subjectId, $paperId);
+        	$userSolutions = ClientUserSolution::getClientUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $score->id, $subjectId, $paperId);
         	if(is_object($userSolutions) && false == $userSolutions->isEmpty()){
         		foreach($userSolutions as $userSolution){
         			$userAnswers[$userSolution->ques_id] = $userSolution->user_answer;
         		}
         	}
-        	$questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$categoryId, $subcategoryId, $subjectId, $paperId, $request);
+        	$questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
         	if(is_object($questions) && false == $questions->isEmpty()){
 	        	foreach($questions as $question){
 	        		if(isset($userAnswers[$question->id])){
@@ -354,7 +352,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
         $paperId = $request->get('paper');
         $userId = Auth::guard('clientuser')->user()->id;
 
-        $score = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$categoryId,$subcategoryId,$paperId,$subjectId,$userId);
+        $score = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId);
         if(is_object($score)){
         	return 'true';
         }else{

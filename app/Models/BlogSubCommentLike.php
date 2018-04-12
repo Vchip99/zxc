@@ -31,20 +31,21 @@ class BlogSubCommentLike extends Model
     }
 
     protected static function getLikeBlogSubComment(Request $request){
-    	if(is_object(Auth::user())){
+    	$loginUser = Auth::user();
+    	if(is_object($loginUser)){
 	    	if( 0 == $request->get('dis_like')){
 	    		static::create([
 	    			'blog_id' => $request->get('blog_id'),
 	    			'blog_comment_id' => $request->get('comment_id'),
 	    			'blog_sub_comment_id' => $request->get('sub_comment_id'),
-	    			'user_id' => Auth::user()->id
+	    			'user_id' => $loginUser->id
 				]);
 	    		return self::getSubCommentStatus($request);
 	    	} else {
 	    		$commentLike  = static::where('blog_id', $request->get('blog_id'))
 	    					->where('blog_comment_id', $request->get('comment_id'))
 	    					->where('blog_sub_comment_id', $request->get('sub_comment_id'))
-	    					->where('user_id', Auth::user()->id)->first();
+	    					->where('user_id', $loginUser->id)->first();
 	    		if(is_object($commentLike)){
 	    			$commentLike->delete();
 	    			return self::getSubCommentStatus($request);

@@ -41,7 +41,7 @@ class ClientScore extends Model
     	return $score;
     }
 
-    protected static function getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($subdomainName,$catId, $subcatId, $testSubjectPaperIds){
+    protected static function getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds){
         $paperIds = [];
         $loginUser = Auth::guard('clientuser')->user();
         if(is_object($loginUser)){
@@ -60,7 +60,7 @@ class ClientScore extends Model
         return $paperIds;
     }
 
-    protected static function getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$categoryId,$subcategoryId,$paperId,$subjectId,$userId){
+    protected static function getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId){
             return static::where('category_id', $categoryId)
                 ->where('subcat_id', $subcategoryId)
                 ->where('paper_id', $paperId)
@@ -85,7 +85,7 @@ class ClientScore extends Model
         return $paperIds;
     }
 
-   protected static function getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($subdomainName,$categoryId,$subcategoryId,$subjectId, $paperId,$testScore){
+   protected static function getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcategoryId,$subjectId, $paperId,$testScore){
         return static::where('category_id', $categoryId)
                 ->where('subcat_id', $subcategoryId)
                 ->where('paper_id', $paperId)
@@ -94,7 +94,7 @@ class ClientScore extends Model
                 ->count();
     }
 
-    protected static function getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$categoryId,$subcategoryId,$subjectId, $paperId){
+    protected static function getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$subjectId, $paperId){
         return static::where('category_id', $categoryId)
             ->where('subcat_id', $subcategoryId)
             ->where('paper_id', $paperId)
@@ -135,17 +135,15 @@ class ClientScore extends Model
     }
 
     public function rank(){
-        $clientUser = Auth::guard('clientuser')->user();
-        $hostName = $clientUser->client->subdomain;
-        $subdomainName = explode('.', $hostName)[0];
-        $rank =$this->getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($subdomainName,$this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id,$this->test_score);
-        $totalRank =$this->getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id);
+        $rank =$this->getClientUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id,$this->test_score);
+        $totalRank =$this->getClientUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id);
         return ($rank + 1).'/'.$totalRank;
     }
     public function totalMarks(){
         $totalMarks = 0;
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else {
             $clientId = Auth::guard('clientuser')->user()->client_id;
         }

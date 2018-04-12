@@ -18,15 +18,16 @@ class PlacementProcessLike extends Model
     protected $fillable = ['company_id', 'user_id'];
 
     protected static function getLikePlacementProcess(Request $request){
-        if(is_object(Auth::user())){
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
             if( 1 == $request->get('dis_like')){
-                $likePost = static::where('company_id',$request->get('company_id'))->where('user_id' ,Auth::user()->id)->first();
+                $likePost = static::where('company_id',$request->get('company_id'))->where('user_id' ,$loginUser->id)->first();
                 if(is_object($likePost)){
                     $likePost->delete();
                     return self::getLikeStatus($request);
                 }
             } else {
-                static::create(['company_id' => $request->get('company_id'), 'user_id' => Auth::user()->id]);
+                static::create(['company_id' => $request->get('company_id'), 'user_id' => $loginUser->id]);
                 return self::getLikeStatus($request);
             }
         }

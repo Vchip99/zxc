@@ -20,15 +20,16 @@ class ClientOnlineVideoLike extends Model
     protected $fillable = ['client_online_video_id', 'user_id', 'client_id'];
 
     protected static function getLikeVideo(Request $request){
-        if(is_object(Auth::guard('clientuser')->user())){
+        $loginUser = Auth::guard('clientuser')->user();
+        if(is_object($loginUser)){
             if( 1 == $request->get('dis_like')){
-                $likePost = static::where('client_online_video_id',$request->get('video_id'))->where('client_id', Auth::guard('clientuser')->user()->client_id)->where('user_id' ,Auth::guard('clientuser')->user()->id)->first();
+                $likePost = static::where('client_online_video_id',$request->get('video_id'))->where('client_id', $loginUser->client_id)->where('user_id' ,$loginUser->id)->first();
                 if(is_object($likePost)){
                     $likePost->delete();
                     return self::getLikeStatus($request);
                 }
             } else {
-                static::create(['client_online_video_id' => $request->get('video_id'), 'client_id' => Auth::guard('clientuser')->user()->client_id, 'user_id' => Auth::guard('clientuser')->user()->id]);
+                static::create(['client_online_video_id' => $request->get('video_id'), 'client_id' => $loginUser->client_id, 'user_id' => $loginUser->id]);
                 return self::getLikeStatus($request);
             }
         }
@@ -53,7 +54,8 @@ class ClientOnlineVideoLike extends Model
     }
 
     protected static function getLikeStatus(Request $request){
-        return static::where('client_online_video_id',$request->get('video_id'))->where('client_id', Auth::guard('clientuser')->user()->client_id)->where('user_id' ,Auth::guard('clientuser')->user()->id)->get();
+        $loginUser = Auth::guard('clientuser')->user();
+        return static::where('client_online_video_id',$request->get('video_id'))->where('client_id', $loginUser->client_id)->where('user_id' ,$loginUser->id)->get();
     }
 
     protected static function deleteClientOnlineVideoLikesByClientId($clientId){

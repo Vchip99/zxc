@@ -55,6 +55,7 @@ class ClientOnlineTestSubjectPaper extends Model
         } else{
             $paper = new static;
         }
+        $loginUser = Auth::guard('client')->user();
 
         $paper->name = $paperName;
         $paper->category_id = $catId;
@@ -62,7 +63,7 @@ class ClientOnlineTestSubjectPaper extends Model
         $paper->subject_id = $subjectId;
         $paper->date_to_active =  $dateToActive;
         $paper->time = $time;
-        $paper->client_id = Auth::guard('client')->user()->id;
+        $paper->client_id = $loginUser->id;
         $paper->date_to_inactive = $dateToInactive;
         $paper->show_calculator = $showCalculator;
         $paper->show_solution = $showSolution;
@@ -79,6 +80,7 @@ class ClientOnlineTestSubjectPaper extends Model
 
         if( $isUpdate && isset($paperId)){
             $allSessions = $request->except('_token','_method', 'paper_id', 'category', 'subcategory','subject', 'name', 'date_to_active', 'date_to_inactive', 'time', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'all_session_count', 'is_free', 'allowed_unauthorised_user');
+
             if(count($allSessions) > 0){
                 foreach($allSessions as $index => $paperSession){
                     $explodes = explode('_', $index);
@@ -91,22 +93,24 @@ class ClientOnlineTestSubjectPaper extends Model
             }
 
             if(count($updatePaperSessions) > 0){
-                $allSessions = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, Auth::guard('client')->user()->id);
+                $allSessions = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $loginUser->id);
                 if(is_object($allSessions) && false == $allSessions->isEmpty()){
                     // update or delete
                     foreach($allSessions as $paperSession){
                         if(false == in_array($paperSession->id, $addPaperSessions)){
-                            if(isset($updatePaperSessions[$paperSession->id])){
-                                $paperSession->name =  str_replace(" ", "_", $updatePaperSessions[$paperSession->id]['session']);
-                                $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
-                                $paperSession->category_id = $catId;
-                                $paperSession->sub_category_id =$subcatId;
-                                $paperSession->subject_id = $subjectId;
-                                $paperSession->paper_id = $paperId;
-                                $paperSession->client_id = Auth::guard('client')->user()->id;
-                                $paperSession->save();
-                            } else {
-                                $paperSession->delete();
+                            if(isset($updatePaperSessions[$paperSession->id]) && !empty($updatePaperSessions[$paperSession->id]['session'])){
+                                if(isset($updatePaperSessions[$paperSession->id])){
+                                    $paperSession->name =  str_replace(" ", "_", $updatePaperSessions[$paperSession->id]['session']);
+                                    $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
+                                    $paperSession->category_id = $catId;
+                                    $paperSession->sub_category_id =$subcatId;
+                                    $paperSession->subject_id = $subjectId;
+                                    $paperSession->paper_id = $paperId;
+                                    $paperSession->client_id = $loginUser->id;
+                                    $paperSession->save();
+                                } else {
+                                    $paperSession->delete();
+                                }
                             }
                         }
                     }
@@ -114,15 +118,17 @@ class ClientOnlineTestSubjectPaper extends Model
                 // add new
                 foreach($updatePaperSessions as $index => $updatePaperSession){
                     if(true == in_array($index, $addPaperSessions)){
-                        $paperSession = new ClientOnlinePaperSection;
-                        $paperSession->name = str_replace(" ", "_", $updatePaperSession['session']);
-                        $paperSession->duration = $updatePaperSession['duration'];
-                        $paperSession->category_id = $catId;
-                        $paperSession->sub_category_id =$subcatId;
-                        $paperSession->subject_id = $subjectId;
-                        $paperSession->paper_id = $paperId;
-                        $paperSession->client_id = Auth::guard('client')->user()->id;
-                        $paperSession->save();
+                        if(!empty($updatePaperSession['session'])){
+                            $paperSession = new ClientOnlinePaperSection;
+                            $paperSession->name = str_replace(" ", "_", $updatePaperSession['session']);
+                            $paperSession->duration = $updatePaperSession['duration'];
+                            $paperSession->category_id = $catId;
+                            $paperSession->sub_category_id =$subcatId;
+                            $paperSession->subject_id = $subjectId;
+                            $paperSession->paper_id = $paperId;
+                            $paperSession->client_id = $loginUser->id;
+                            $paperSession->save();
+                        }
                     }
                 }
             }
@@ -134,13 +140,13 @@ class ClientOnlineTestSubjectPaper extends Model
                     $duration = $request->get('duration_'.$i);
                     if(!empty($session)){
                         $sessions[] = [
-                                    'name' => $session,
+                                    'name' => str_replace(" ", "_", $session),
                                     'duration' => $duration,
                                     'category_id' => $catId,
                                     'sub_category_id' => $subcatId,
                                     'subject_id' => $subjectId,
                                     'paper_id' => $paper->id,
-                                    'client_id' => Auth::guard('client')->user()->id
+                                    'client_id' => $loginUser->id
                                 ];
                     }
                 }
@@ -186,8 +192,9 @@ class ClientOnlineTestSubjectPaper extends Model
     }
 
     protected static function showPaper($request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }
@@ -232,8 +239,9 @@ class ClientOnlineTestSubjectPaper extends Model
     protected static function getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request){
         $testSubjectPapers = [];
         $papers = [];
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }

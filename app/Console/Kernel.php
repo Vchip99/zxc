@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         Commands\UpdateApplicationAccessToken::class,
         Commands\UpdateClientAccessToken::class,
         Commands\CreateApplicationUser::class,
+        Commands\SignupUnRegisteredClient::class,
     ];
 
     /**
@@ -28,7 +29,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('updateapplicationaccesstoken:cron');
         $schedule->command('updateclientaccesstoken:cron');
-        $schedule->command('createapplicationuser:cron');
+        $schedule->command('createapplicationuser:command');
+        $schedule->command('signupunregisteredclient:command');
     }
 
     /**

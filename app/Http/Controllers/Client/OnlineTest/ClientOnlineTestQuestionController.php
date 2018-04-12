@@ -413,6 +413,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             $questions = \Excel::selectSheetsByIndex(0)->load($path, function($reader) {
                             $reader->formatDates(false);
                         })->get();
+            $loginUser = Auth::guard('client')->user();
             if($questions->count()){
                 foreach ($questions as $key => $question) {
                     preg_match_all('/image\[(.*)\]/', $question->question, $questionMatches);
@@ -499,7 +500,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                         'subject_id' => $request->get('subject'),
                         'paper_id' => $request->get('paper'),
                         'section_type' => $request->get('section_type'),
-                        'client_id' => Auth::guard('client')->user()->id
+                        'client_id' => $loginUser->id
                     ];
                 }
                 if(!empty($allQuestions)){

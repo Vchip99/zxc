@@ -51,7 +51,14 @@ class OnlineClientController extends Controller
     }
 
     public function pricing(){
-        return view('client.online.pricing');
+        $allPlan = [];
+        $plans = Plan::all();
+        if(is_object($plans) && false == $plans->isEmpty()){
+            foreach($plans as $plan){
+                $allPlan[$plan->id] = $plan;
+            }
+        }
+        return view('client.online.pricing', compact('allPlan'));
     }
 
     public function getWebdevelopment(){
@@ -256,7 +263,7 @@ class OnlineClientController extends Controller
     protected function validateClient(array $data){
         return Validator::make($data, [
             'name' => 'required|max:255',
-            'phone' => 'required|regex:/[0-9]{10}/',
+            'phone' => 'required|regex:/^[1-9]{1}[0-9]{9}$/',
             'email' => 'required|email|max:255|unique:mysql2.clients',
             'password' => 'required',
             'confirm_password' => 'required|same:password'

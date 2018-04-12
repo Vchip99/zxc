@@ -96,6 +96,12 @@
 .read-more{
     height: auto;
 }
+.free_first{
+  height: 369px;
+}
+.paid_secind_third{
+  height: 381px;
+}
 #readMore, #readMore-1, #readMore-2{
   font-weight: bolder;
   cursor: pointer;
@@ -131,9 +137,9 @@
                      <h2>Free</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong>Rs. 0000 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong>Rs. {{ $allPlan[1]->amount}} / year</strong></p>
                     </div>
-                    <ul class="list-group list-group-flush text-center">
+                    <ul class="list-group list-group-flush text-center free_first">
                       <li class="list-group-item" style="margin-top: 13px;">Online test series</li>
                       <li class="list-group-item">Online Courses</li>
                       <li class="list-group-item">Notification</li>
@@ -142,7 +148,7 @@
                       <li class="list-group-item">Payment Gateway</li>
                       <li class="list-group-item">Dashboard for students</li>
                       <li class="list-group-item">Admin panel (ERP)</li>
-                      <li class="list-group-item">Up-to 20 login</li>
+                      <li class="list-group-item">Up-to 10 login</li>
                     </ul>
                     <div class="panel-footer">
                       @if(1 == Auth::guard('client')->user()->plan_id)
@@ -163,7 +169,7 @@
                     <h2>Gold</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong> Rs. 2999 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong> Rs. {{ $allPlan[2]->amount}} / year</strong></p>
                     </div>
                     <ul class="list-group list-group-flush text-center read">
                       <li class="list-group-item">Online test series</li>
@@ -203,23 +209,18 @@
                     <h2>Platinum</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong>Rs. 4999 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong>Rs. {{ $allPlan[3]->amount}} / year</strong></p>
                     </div>
-                    <ul class="list-group list-group-flush text-center read-1">
-                      <li class="list-group-item">Online test series</li>
-                      <li class="list-group-item">Online Courses</li>
-                      <li class="list-group-item">Notification</li>
-                      <li class="list-group-item">Admin message</li>
-                      <li class="list-group-item">Assignment</li>
-                      <li class="list-group-item">Payment Gateway</li>
-                      <li class="list-group-item">Dashboard for students</li>
-                      <li class="list-group-item">Admin panel (ERP)</li>
-                      <li class="list-group-item">Unlimited users</li>
-                      <li class="list-group-item">Digital Advertisement (1 year)</li>
-                      <li class="list-group-item">SEO</li>
-                      <li class="list-group-item">Email marketing</li>
+                    <ul class="list-group list-group-flush text-center read-1 paid_secind_third">
+                      <li class="list-group-item">All in Gold plan</li>
+                      <li class="list-group-item">Custom web-site design</li>
+                      <li class="list-group-item">Developed website</li>
+                      <li class="list-group-item">Hosting for a year</li>
+                      <li class="list-group-item">Maintenance for a year</li>
+                      <li class="list-group-item">Solving any technical issues</li>
+                      <li class="list-group-item">Add/Remove pages</li>
+                      <li class="list-group-item">SEO (Basic)</li>
                     </ul>
-                   <p id="readMore-1" class="text-center"> Show More</p>
                     <div class="panel-footer">
                       @if(1 == Auth::guard('client')->user()->plan_id || 2 == Auth::guard('client')->user()->plan_id)
                         <button class="btn btn-lg btn-block btn-info" onClick="submitForm(this);" id="{{Auth::guard('client')->user()->id}}_3">Upgrade Now!</button>
@@ -245,29 +246,12 @@
                     <h2>Diamond</h2>
                     </div>
                     <div class="panel-body text-center">
-                      <p class="lead" style="font-size:20px"><strong> Rs. 9999 / year</strong></p>
+                      <p class="lead" style="font-size:20px"><strong> Rs. {{ $allPlan[4]->amount}} / year</strong></p>
                     </div>
-                    <ul class="list-group list-group-flush text-center read-2">
-                          <li class="list-group-item">Online test series</li>
-                          <li class="list-group-item">Online Courses</li>
-                          <li class="list-group-item">Notification</li>
-                          <li class="list-group-item">Admin message</li>
-                          <li class="list-group-item">Assignment</li>
-                          <li class="list-group-item">Payment Gateway</li>
-                          <li class="list-group-item">Dashboard for students</li>
-                          <li class="list-group-item">Admin panel (ERP)</li>
-                          <li class="list-group-item">Unlimited users</li>
-                          <li class="list-group-item">Hosting for one year</li>
-                          <li class="list-group-item">Domain name</li>
-                          <li class="list-group-item">Design websites</li>
-                          <li class="list-group-item">Developed website</li>
-                          <li class="list-group-item">Editing in any page</li>
-                          <li class="list-group-item">Add/remove the page</li>
-                          <li class="list-group-item">Solving any technical issues</li>
-                          <li class="list-group-item">Digital Marketing (one Month)</li>
-                          <li class="list-group-item">SEO</li>
+                    <ul class="list-group list-group-flush text-center read-2 paid_secind_third">
+                      <li class="list-group-item">All in Platinum plan</li>
+                      <li class="list-group-item">SEO (Advance)</li>
                     </ul>
-                   <p id="readMore-2">Show More</p>
                     <div class="panel-footer">
                       @if(4 == Auth::guard('client')->user()->plan_id)
                         <button class="btn btn-lg btn-block btn-info" disabled="true"><span style="color: red;">Current Plan!</span></button>
@@ -314,7 +298,7 @@ function submitForm(ele){
 function confirmSubmit(ele){
   $.confirm({
     title: 'Confirmation',
-    content: '<li>If you deactivate current plan, then you will automatically converted in to free plan.</li> <li> After deactivation of current plan, Only first <b>20</b> users can access/login this website.</li>',
+    content: '<li>If you deactivate current plan, then you will automatically converted in to free plan.</li> <li> After deactivation of current plan, Only first <b>10</b> users can access/login this website.</li>',
     type: 'red',
     typeAnimated: true,
     buttons: {

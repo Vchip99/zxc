@@ -131,10 +131,11 @@ class ClientAssignmentTopicController extends ClientBaseController
             DB::connection('mysql2')->beginTransaction();
             try
             {
-                $assignments = ClientAssignmentQuestion::where('client_assignment_topic_id', $topic->id)->where('client_id',Auth::guard('client')->user()->id)->get();
+                $loginUser = Auth::guard('client')->user();
+                $assignments = ClientAssignmentQuestion::where('client_assignment_topic_id', $topic->id)->where('client_id',$loginUser->id)->get();
                 if(is_object($assignments) && false == $assignments->isEmpty()){
                     foreach($assignments as $assignment){
-                        $answers = ClientAssignmentAnswer::where('client_assignment_question_id', $assignment->id)->where('client_id',Auth::guard('client')->user()->id)->get();
+                        $answers = ClientAssignmentAnswer::where('client_assignment_question_id', $assignment->id)->where('client_id',$loginUser->id)->get();
                         if(is_object($answers) && false == $answers->isEmpty()){
                             foreach($answers as $answer){
                                 $dir = dirname($answer->attached_link);

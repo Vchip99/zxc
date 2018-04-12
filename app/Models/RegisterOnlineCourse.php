@@ -35,8 +35,9 @@ class RegisterOnlineCourse extends Model
     }
 
     protected static function isCourseRegistered($courseId){
-        if(is_object(Auth::user())){
-            $userId = Auth::user()->id;
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
+            $userId = $loginUser->id;
             $registeredCourses = static::where('user_id', $userId)->where('online_course_id', $courseId)->get();
             if(false == $registeredCourses->isEmpty()){
                 return 'true';

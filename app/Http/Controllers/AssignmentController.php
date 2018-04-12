@@ -42,12 +42,13 @@ class AssignmentController extends Controller
     protected function show(){
         $assignmentTeachers = [];
         $departments = [];
-    	$assignments = AssignmentQuestion::where('lecturer_id', Auth::user()->id)->paginate();
-        if(User::Hod == Auth::user()->user_type){
+        $loginUser = Auth::user();
+    	$assignments = AssignmentQuestion::where('lecturer_id', $loginUser->id)->paginate();
+        if(User::Hod == $loginUser->user_type){
             $assignmentTeachers = User::getTeachers();
         }
-        if(User::Directore == Auth::user()->user_type){
-            $departments = CollegeDept::where('college_id', Auth::user()->college_id)->get();
+        if(User::Directore == $loginUser->user_type){
+            $departments = CollegeDept::where('college_id', $loginUser->college_id)->get();
         }
     	return view('assignment.list', compact('assignments', 'assignmentTeachers', 'departments'));
     }
@@ -98,13 +99,14 @@ class AssignmentController extends Controller
     	if(isset($assignmentId)){
     		$assignment = AssignmentQuestion::find($assignmentId);
     		if(is_object($assignment)){
+                $loginUser = Auth::user();
                 $subjects = '';
-                if(User::Lecturer == Auth::user()->user_type){
-    			    $subjects = AssignmentSubject::where('lecturer_id', Auth::user()->id)->get();
-                } else if(User::Hod == Auth::user()->user_type){
-                    $subjects = AssignmentSubject::where('college_dept_id', Auth::user()->college_dept_id)->get();
-                } else if(User::Directore == Auth::user()->user_type){
-                    $subjects = AssignmentSubject::where('college_id', Auth::user()->college_id)->get();
+                if(User::Lecturer == $loginUser->user_type){
+    			    $subjects = AssignmentSubject::where('lecturer_id', $loginUser->id)->get();
+                } else if(User::Hod == $loginUser->user_type){
+                    $subjects = AssignmentSubject::where('college_dept_id', $loginUser->college_dept_id)->get();
+                } else if(User::Directore == $loginUser->user_type){
+                    $subjects = AssignmentSubject::where('college_id', $loginUser->college_id)->get();
                 }
     			$topics = AssignmentTopic::getAssignmentTopics($assignment->assignment_subject_id);
     			return view('assignment.create', compact('subjects', 'assignment', 'topics'));

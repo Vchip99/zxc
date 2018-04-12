@@ -83,8 +83,9 @@ class LiveCourseVideoController extends Controller
             $likesCount = LiveCourseVideoLike::getLikesByVideoId($liveVideo->id);
             $commentLikesCount = LiveCourseCommentLike::getLikesByVideoId($liveVideo->id);
             $subcommentLikesCount = LiveCourseSubCommentLike::getLikesByVideoId($liveVideo->id);
-            if(is_object(Auth::user())){
-                $currentUser = Auth::user()->id;
+            $loginUser = Auth::user();
+            if(is_object($loginUser)){
+                $currentUser = $loginUser->id;
                 if($id > 0 || $subcomment > 0){
                     DB::beginTransaction();
                     try
@@ -151,8 +152,9 @@ class LiveCourseVideoController extends Controller
 
     protected function getRegisteredLiveCourseIds(){
         $registeredLiveCourseIds = [];
-        if(is_object(Auth::user())){
-            $userId = Auth::user()->id;
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
+            $userId = $loginUser->id;
             $registeredLiveCourses = RegisterLiveCourse::getRegisteredLiveCoursesByUserId($userId);
             if(false == $registeredLiveCourses->isEmpty()){
                 foreach($registeredLiveCourses as $registeredLiveCourse){
@@ -164,8 +166,9 @@ class LiveCourseVideoController extends Controller
     }
 
     protected function isLiveCourseRegistered($liveCourseId){
-        if(is_object(Auth::user())){
-            $userId = Auth::user()->id;
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
+            $userId = $loginUser->id;
             $registeredLiveCourses = RegisterLiveCourse::getRegisteredLiveCourseByUserIdByCourseId($userId, $liveCourseId);
             if(false == $registeredLiveCourses->isEmpty()){
                 return 'true';
@@ -334,7 +337,7 @@ class LiveCourseVideoController extends Controller
             }
             if(is_object($parentComment)){
                 $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
-                $notificationMessage = '<a href="'.$request->root().'/liveEpisode/'.$videoId.'/'.$subComment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
+                $notificationMessage = '<a href="'.$request->root().'/liveEpisode/'.$videoId.'/'.$subComment->id.'" target="_blank">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
                 Notification::addCommentNotification($notificationMessage, Notification::USERLIVECOURSENOTIFICATION, $subComment->id,$subComment->user_id,$parentComment->user_id);
             }
 

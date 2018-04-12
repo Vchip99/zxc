@@ -28,12 +28,12 @@ class DiscussionSubComment extends Model
         $userComment = $request->get('subcomment');
         $commentId = $request->get('comment_id');
         $parentId = $request->get('parent_id');
+        $loginUser = Auth::user();
 
         $comment = new static;
-
         $parentSubComment = DiscussionSubComment::find($parentId);
 
-        if( is_object($parentSubComment) && $parentSubComment->user_id !== Auth::user()->id ){
+        if( is_object($parentSubComment) && $parentSubComment->user_id !== $loginUser->id ){
         	$comment->body = $userComment;
         	$user = User::find($parentSubComment->user_id);
         	if(is_object($user)){
@@ -47,7 +47,7 @@ class DiscussionSubComment extends Model
         $comment->discussion_post_id = $postId;
         $comment->discussion_comment_id = $commentId;
         $comment->parent_id = $parentId?:0;
-        $comment->user_id = Auth::user()->id;
+        $comment->user_id = $loginUser->id;
         $comment->save();
         return $comment;
     }

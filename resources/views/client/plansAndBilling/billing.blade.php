@@ -23,27 +23,34 @@ font-weight: bolder;}
   <div class="container text-center">
     <div class="row ">
     <div class="heading "> <h2>BILLING </h2> </div>
-    @if('Credit' == $clientPlan->payment_status || 'free' == $clientPlan->payment_status)
-    <div class="body">
-      <h3> Your Payment Rs. {{$clientPlan->final_amount}} has been successfully completed for {{$clientPlan->start_date}} to {{$clientPlan->end_date}}. Thank you.</h3>
-    <br/>
-      <!-- <a class="btn btn-md  btn-primary" href="#" style=" width: 100px;"><strong>Paid </strong></a> -->
-    </div>
-    @else
-    <div class="body">
-    <h3> Your Payment Rs. {{$clientPlan->final_amount}} has not been Paid for {{$clientPlan->start_date}} to {{$clientPlan->end_date}}. Kindly pay the payment.</h3>
-    <br/>
-      <button class="btn btn-md btn-primary" style=" width: 100px;" onClick="submitForm(this);" ><strong>Pay </strong></button>
-      <form method="POST" action="{{ url('continuePayment') }}" id="pay_bill">
-        {{ csrf_field() }}
-        <input type="hidden" name="plan_id" value="{{Auth::guard('client')->user()->plan_id}}" />
-        <input type="hidden" name="client_plan_id" value="{{$clientPlan->id}}" />
-      </form>
-    </div>
-    <div class="">
+    @if(is_object($clientPlan))
+      @if('Credit' == $clientPlan->payment_status || 'free' == $clientPlan->payment_status)
+      <div class="body">
+        <h3> Your Payment Rs. {{$clientPlan->final_amount}} has been successfully completed for {{$clientPlan->start_date}} to {{$clientPlan->end_date}}. Thank you.</h3>
       <br/>
-     <h4> <b>Note:</b> please pay your bill before {{ $dueDate }} to avoid deactivation of your  account</h4>
-    </div>
+        <!-- <a class="btn btn-md  btn-primary" href="#" style=" width: 100px;"><strong>Paid </strong></a> -->
+      </div>
+      @else
+      <div class="body">
+      <h3> Your Payment Rs. {{$clientPlan->final_amount}} has not been Paid for {{$clientPlan->start_date}} to {{$clientPlan->end_date}}. Kindly pay the payment.</h3>
+      <br/>
+        <button class="btn btn-md btn-primary" style=" width: 100px;" onClick="submitForm(this);" ><strong>Pay </strong></button>
+        <form method="POST" action="{{ url('continuePayment') }}" id="pay_bill">
+          {{ csrf_field() }}
+          <input type="hidden" name="plan_id" value="{{Auth::guard('client')->user()->plan_id}}" />
+          <input type="hidden" name="client_plan_id" value="{{$clientPlan->id}}" />
+        </form>
+      </div>
+      <div class="">
+        <br/>
+       <h4> <b>Note:</b> please pay your bill before {{ $dueDate }} to avoid deactivation of your  account</h4>
+      </div>
+      @endif
+    @else
+      <div class="">
+        <br/>
+       <h4> <b>Note:</b> Currently no bill created.</h4>
+      </div>
     @endif
     <!-- /.box-footer-->
     </div>

@@ -30,7 +30,7 @@ class ClientOnlineTestSubCategory extends Model
         $catId = InputSanitise::inputInt($request->get('category'));
         $name = InputSanitise::inputString($request->get('name'));
         $price = InputSanitise::inputString($request->get('price'));
-
+        $loginUser = Auth::guard('client')->user();
         if( $isUpdate && isset($subcatId)){
             $testSubcategory = static::find($subcatId);
             if(!is_object($testSubcategory)){
@@ -41,10 +41,10 @@ class ClientOnlineTestSubCategory extends Model
         }
         $testSubcategory->name = $name;
         $testSubcategory->category_id = $catId;
-        $testSubcategory->client_id = Auth::guard('client')->user()->id;
+        $testSubcategory->client_id = $loginUser->id;
         $testSubcategory->price = $price;
 
-        $subdomainArr = explode('.', Auth::guard('client')->user()->subdomain);
+        $subdomainArr = explode('.', $loginUser->subdomain);
         $clientName = $subdomainArr[0];
 
         if($request->exists('image_path')){
@@ -87,10 +87,12 @@ class ClientOnlineTestSubCategory extends Model
     }
 
     protected static function getOnlineTestSubcategoriesByCategoryId($id, Request $request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
-        } else if(is_object(Auth::guard('clientuser')->user())){
-            $clientId = Auth::guard('clientuser')->user()->client_id;
+        $loginClient = Auth::guard('client')->user();
+        $loginUser = Auth::guard('clientuser')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
+        } else if(is_object($loginUser)){
+            $clientId = $loginUser->client_id;
         }
         if($clientId > 0 && $id > 0){
             return DB::connection('mysql2')->table('client_online_test_sub_categories')
@@ -102,10 +104,12 @@ class ClientOnlineTestSubCategory extends Model
     }
 
     protected static function getOnlineTestSubcategoriesByCategoryIdWithPapers($id, Request $request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
-        } else if(is_object(Auth::guard('clientuser')->user())){
-            $clientId = Auth::guard('clientuser')->user()->client_id;
+        $loginClient = Auth::guard('client')->user();
+        $loginUser = Auth::guard('clientuser')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
+        } else if(is_object($loginUser)){
+            $clientId = $loginUser->client_id;
         }
         if($clientId > 0 && $id > 0){
             return DB::connection('mysql2')->table('client_online_test_sub_categories')
@@ -127,9 +131,9 @@ class ClientOnlineTestSubCategory extends Model
     }
 
     protected static function getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($id, Request $request){
-
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }
@@ -165,8 +169,9 @@ class ClientOnlineTestSubCategory extends Model
 
 
     protected static function showSubCategories($request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }
@@ -181,8 +186,9 @@ class ClientOnlineTestSubCategory extends Model
     }
 
     protected static function showSubCategoriesAssociatedWithQuestion($request){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }

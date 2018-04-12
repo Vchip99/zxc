@@ -26,12 +26,12 @@ class ClientCourseComment extends Model
     protected static function createComment(Request $request){
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
     	$userComment = $request->get('comment');
-
+        $loginUser = Auth::guard('clientuser')->user();
     	$comment = new static;
     	$comment->body = $userComment;
     	$comment->client_online_video_id = $videoId;
-    	$comment->user_id = Auth::guard('clientuser')->user()->id;
-    	$comment->client_id = Auth::guard('clientuser')->user()->client_id;
+    	$comment->user_id = $loginUser->id;
+    	$comment->client_id = $loginUser->client_id;
     	$comment->save();
     	return $comment;
     }

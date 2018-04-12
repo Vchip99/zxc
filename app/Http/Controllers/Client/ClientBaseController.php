@@ -57,15 +57,16 @@ class ClientBaseController extends BaseController
     }
 
     protected function manageClientHome(){
-        $onlineCourses = ClientOnlineCourse::getCurrentCoursesByClient(Auth::guard('client')->user()->subdomain);
+        $loginUser = Auth::guard('client')->user();
+        $onlineCourses = ClientOnlineCourse::getCurrentCoursesByClient($loginUser->subdomain);
         $defaultCourse = ClientOnlineCourse::where('name', 'How to use course')->first();
         $defaultTest = ClientOnlineCourse::where('name', 'How to use test')->first();
 
-        $onlineTestSubcategories = ClientOnlineTestSubCategory::getCurrentSubCategoriesAssociatedWithQuestion(Auth::guard('client')->user()->subdomain);
-        $subdomain = ClientHomePage::where('subdomain', Auth::guard('client')->user()->subdomain)->first();
-        $testimonials = ClientTestimonial::where('client_id', Auth::guard('client')->user()->id)->get();
-        $clientTeam = ClientTeam::where('client_id', Auth::guard('client')->user()->id)->get();
-        $clientCustomers = ClientCustomer::where('client_id', Auth::guard('client')->user()->id)->get();
+        $onlineTestSubcategories = ClientOnlineTestSubCategory::getCurrentSubCategoriesAssociatedWithQuestion($loginUser->subdomain);
+        $subdomain = ClientHomePage::where('subdomain', $loginUser->subdomain)->first();
+        $testimonials = ClientTestimonial::where('client_id', $loginUser->id)->get();
+        $clientTeam = ClientTeam::where('client_id', $loginUser->id)->get();
+        $clientCustomers = ClientCustomer::where('client_id', $loginUser->id)->get();
         return view('client.home', compact('subdomain', 'testimonials', 'clientTeam', 'clientCustomers','onlineCourses', 'defaultCourse', 'defaultTest', 'onlineTestSubcategories'));
     }
 
@@ -88,13 +89,20 @@ class ClientBaseController extends BaseController
     }
 
     protected function managePlans(){
-        return view('client.plansAndBilling.plans', compact('isBillPaid'));
+        $allPlan = [];
+        $plans = Plan::all();
+        if(is_object($plans) && false == $plans->isEmpty()){
+            foreach($plans as $plan){
+                $allPlan[$plan->id] = $plan;
+            }
+        }
+        return view('client.plansAndBilling.plans', compact('allPlan'));
     }
 
     protected function manageBillings(){
         $dueDate = '';
         $clientPlan = ClientPlan::getLastClientPlanForBill();
-        if('Credit' != $clientPlan->payment_status || 'free' != $clientPlan->payment_status){
+        if(is_object($clientPlan) && ('Credit' != $clientPlan->payment_status || 'free' != $clientPlan->payment_status)){
             $dueDate = date('Y-m-d', strtotime('+1 month', strtotime($clientPlan->end_date)));
         }
         return view('client.plansAndBilling.billing', compact('clientPlan', 'dueDate'));
@@ -113,7 +121,8 @@ class ClientBaseController extends BaseController
     protected function getClientUserPayments(Request $request){
         $results = [];
         $total = 0;
-        $userCourses = ClientUserPurchasedCourse::getClientUserPurchasedCourses(Auth::guard('client')->user()->id, $request->get('client_user_id'));
+        $loginUser = Auth::guard('client')->user();
+        $userCourses = ClientUserPurchasedCourse::getClientUserPurchasedCourses($loginUser->id, $request->get('client_user_id'));
         if(is_object($userCourses) && false == $userCourses->isEmpty()){
             foreach($userCourses as $userCourse){
                 $results['purchased'][] = [
@@ -126,7 +135,7 @@ class ClientBaseController extends BaseController
             }
         }
 
-        $userTestSubCategories = ClientUserPurchasedTestSubCategory::getClientUserPurchasedTestSubCategories(Auth::guard('client')->user()->id, $request->get('client_user_id'));
+        $userTestSubCategories = ClientUserPurchasedTestSubCategory::getClientUserPurchasedTestSubCategories($loginUser->id, $request->get('client_user_id'));
         if(is_object($userTestSubCategories) && false == $userTestSubCategories->isEmpty()){
             foreach($userTestSubCategories as $userTestSubCategory){
                 $results['purchased'][] = [
@@ -144,9 +153,10 @@ class ClientBaseController extends BaseController
     }
 
     protected function continuePayment(Request $request){
-        $name = Auth::guard('client')->user()->name;
-        $phone = Auth::guard('client')->user()->phone;
-        $email = Auth::guard('client')->user()->email;
+        $loginUser = Auth::guard('client')->user();
+        $name = $loginUser->name;
+        $phone = $loginUser->phone;
+        $email = $loginUser->email;
         $plan = Plan::find($request->get('plan_id'));
         $finalAmount = 0;
         if(is_object($plan)){
@@ -198,9 +208,10 @@ class ClientBaseController extends BaseController
     }
 
     protected function degradePayment(Request $request){
-        $name = Auth::guard('client')->user()->name;
-        $phone = Auth::guard('client')->user()->phone;
-        $email = Auth::guard('client')->user()->email;
+        $loginUser = Auth::guard('client')->user();
+        $name = $loginUser->name;
+        $phone = $loginUser->phone;
+        $email = $loginUser->email;
         $plan = Plan::find($request->get('plan_id'));
         $finalAmount = 0;
         if(is_object($plan)){
@@ -260,13 +271,14 @@ class ClientBaseController extends BaseController
     }
 
     protected function upgradePayment(Request $request){
-        $name = Auth::guard('client')->user()->name;
-        $phone = Auth::guard('client')->user()->phone;
-        $email = Auth::guard('client')->user()->email;
+        $loginUser = Auth::guard('client')->user();
+        $name = $loginUser->name;
+        $phone = $loginUser->phone;
+        $email = $loginUser->email;
         $plan = Plan::find($request->get('plan_id'));
         $finalAmount = 0;
         if(is_object($plan)){
-            $currentPlan = ClientPlan::getLastClientPlanByPlanId(Auth::guard('client')->user()->plan_id);
+            $currentPlan = ClientPlan::getLastClientPlanByPlanId($loginUser->plan_id);
             if(is_object($currentPlan)){
                 $dateDiff = date_diff( new DateTime(date('Y-m-d')), new DateTime($currentPlan->start_date));
                 $days = $dateDiff->d + 1;
@@ -333,9 +345,10 @@ class ClientBaseController extends BaseController
 
                 $paymentRequestId = $response['id'];
                 $paymentId = $response['payments'][0]['payment_id'];
-                $name = Auth::guard('client')->user()->name;
-                $phone = Auth::guard('client')->user()->phone;
-                $email = Auth::guard('client')->user()->email;
+                $loginUser = Auth::guard('client')->user();
+                $name = $loginUser->name;
+                $phone = $loginUser->phone;
+                $email = $loginUser->email;
                 $status = $response['payments'][0]['status'];
                 $planId = Session::get('client_selected_plan_id');
                 $finalAmount = Session::get('client_selected_plan_price');
@@ -346,7 +359,7 @@ class ClientBaseController extends BaseController
                     DB::connection('mysql2')->beginTransaction();
                     try
                     {
-                        $client = Client::find(Auth::guard('client')->user()->id);
+                        $client = Client::find($loginUser->id);
                         if( is_object($client)){
                             // for degrade
                             if($planId < $client->plan_id){
@@ -623,7 +636,8 @@ class ClientBaseController extends BaseController
 
     protected function updateBankDetails(Request $request){
         $instamojoErrors = '';
-        $userAuth = UserBasedAuthentication::where('vchip_client_id', Auth::guard('client')->user()->id)->first();
+        $loginUser = Auth::guard('client')->user();
+        $userAuth = UserBasedAuthentication::where('vchip_client_id', $loginUser->id)->first();
         if(is_object($userAuth)){
             $instamojoClientId = $userAuth->instamojo_client_id;
             $userAccessToken = $userAuth->access_token;
@@ -672,7 +686,7 @@ class ClientBaseController extends BaseController
                     if(count($results) > 0){
                         $instamojoErrors.= '--------application_auth_error--------';
                         foreach($results as $key => $result){
-                            $instamojoErrors.= 'user -'.Auth::guard('client')->user()->email.'->'.$key.'->'.$result[0];
+                            $instamojoErrors.= 'user -'.$loginUser->email.'->'.$key.'->'.$result[0];
                         }
                     }
                 }

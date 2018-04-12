@@ -68,7 +68,7 @@ class ClientUsersInfoController extends BaseController
     }
 
     protected function searchUsers($subdomainName,Request $request){
-        return Clientuser::searchUsers($subdomainName,$request);
+        return Clientuser::searchUsers($request);
     }
 
     protected function deleteStudent($subdomainName,Request $request){
@@ -86,7 +86,7 @@ class ClientUsersInfoController extends BaseController
         {
             DB::connection('mysql2')->rollback();
         }
-        return Clientuser::searchUsers($subdomainName,$request);
+        return Clientuser::searchUsers($request);
     }
 
     protected function changeClientUserApproveStatus(Request $request){

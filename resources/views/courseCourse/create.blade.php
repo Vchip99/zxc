@@ -1,6 +1,5 @@
 @extends('admin.master')
-  &nbsp;
-  @section('module_title')
+@section('module_title')
   <section class="content-header">
     <h1> Manage Course </h1>
     <ol class="breadcrumb">
@@ -10,6 +9,7 @@
   </section>
 @stop
 @section('admin_content')
+  &nbsp;
     <script src="{{asset('js/moment-with-locales.min.js?ver=1.0')}}" type="text/javascript"></script>
     <script src="{{asset('js/bootstrap-datetimepicker.min.js?ver=1.0')}}" type="text/javascript"></script>
     <link href="{{asset('css/bootstrap-datetimepicker.min.css?ver=1.0')}}" rel="stylesheet"/>
@@ -179,8 +179,8 @@
           <button type="button" class="btn btn-primary" onclick="searchCourse();">Submit</button>
         </div>
       </div>
+  </form>
   </div>
-</form>
 
 <script type="text/javascript">
 
@@ -217,13 +217,6 @@
     var id = parseInt($(ele).val());
     getCourseSubCategories(id);
   }
-  // $(document).ready(function(){
-  //   var course = document.getElementById('course_id');
-  //   if( course && 0 < parseInt(course.value)){
-  //       categoryId = parseInt(document.getElementById('category').value);
-  //       getCourseSubCategories(categoryId);
-  //   }
-  // });
 
   function searchCourse(){
     var category = document.getElementById('category').value;

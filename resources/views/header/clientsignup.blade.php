@@ -94,8 +94,9 @@
                             @if($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
                           </div>
                           <div class="form-group @if ($errors->has('phone')) has-error @endif">
-                            <input id="phone" type="phone" class="form-control" name="phone" value="{{ is_object(Auth::user())?Auth::user()->phone: old('phone')?:''}}" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" required="true">
+                            <input id="phone" type="phone" class="form-control" name="phone" value="{{ is_object(Auth::user())?Auth::user()->phone: old('phone')?:''}}" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" required="true" onkeyup="isMobileNumber();">
                             <span class="help-block"></span>
+                            <p class="help-block hide" id="phone_error" style="color: red;">Please enter valid mobile number.</p>
                             @if($errors->has('phone')) <p class="help-block">{{ $errors->first('phone') }}</p> @endif
                           </div>
                           <div class="form-group @if ($errors->has('email')) has-error @endif">
@@ -183,8 +184,27 @@
   }
 
   function confirmSubmit(){
-    document.getElementById('registerBtn').disabled = true;
-    document.getElementById('registerClient').submit();
+    if(true == isMobileNumber()){
+      document.getElementById('registerBtn').disabled = true;
+      document.getElementById('registerClient').submit();
+    }
+    return false;
+  }
+
+  function isMobileNumber() {
+    var mob = /^[1-9]{1}[0-9]{9}$/;
+    var mobile = document.getElementById('phone').value;
+      if( mob.test(mobile) == false) {
+          document.getElementById('phone_error').classList.remove('hide');
+          document.getElementById('registerBtn').disabled = true;
+
+          document.getElementById('phone').focus();
+          return false;
+      } else {
+        document.getElementById('phone_error').classList.add('hide');
+        document.getElementById('registerBtn').disabled = false;
+        return true;
+      }
   }
 </script>
 </body>

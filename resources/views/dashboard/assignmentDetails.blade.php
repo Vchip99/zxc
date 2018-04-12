@@ -182,7 +182,7 @@
             <!-- </div>
             <div class="box-footer"> -->
             <hr>
-              <form action="{{url('createAssignmentAnswer')}}" method="POST" enctype="multipart/form-data">
+              <form  id="myAnswer" action="{{url('createAssignmentAnswer')}}" method="POST" enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <div class="form-group row @if ($errors->has('answer')) has-error @endif">
                   <label for="answer" class="col-sm-2 col-form-label">Solution:</label>
@@ -205,7 +205,7 @@
                 <input type="hidden" name="lecturer_id" value="{{$assignment->lecturer_id}}">
                 <div class="form-group row">
                   <div class="offset-sm-2 col-sm-3" title="Submit">
-                    <button type="submit" class="btn btn-primary" style="width: 90px !important;">Submit</button>
+                    <a class="btn btn-primary" style="width: 90px !important;" onclick="checkSubmit();">Submit</a>
                   </div>
                 </div>
               </form>
@@ -238,5 +238,15 @@
         </div>
       </div>
     </div>
-
+<script type="text/javascript">
+  function checkSubmit(){
+    var answer = CKEDITOR.instances.answer.getData().length;
+    var attachedLink = document.getElementById('attached_link').value;
+    if(0 == answer && 0 == attachedLink.length){
+      alert('please enter answer or attach link.');
+    } else {
+      document.getElementById('myAnswer').submit();
+    }
+  }
+</script>
 @stop

@@ -22,8 +22,9 @@ class ClientCustomer extends Model
 
     protected static function updateCustomer(Request $request){
         $ArrVal = array_keys($request->all());
-        $clientCustomers = static::where('client_id', Auth::guard('client')->user()->id)->get();
-        $subdomainArr = explode('.', Auth::guard('client')->user()->subdomain);
+        $loginUser = Auth::guard('client')->user();
+        $clientCustomers = static::where('client_id', $loginUser->id)->get();
+        $subdomainArr = explode('.', $loginUser->subdomain);
         $clientName = $subdomainArr[0];
 
         if(count($clientCustomers)>0){

@@ -37,12 +37,13 @@ class AssignmentQuestion extends Model
         } else {
             $assignment = new static;
         }
+        $loginUser = Auth::user();
         $assignment->question = $question;
         $assignment->assignment_subject_id = $subjectId;
         $assignment->assignment_topic_id = $topicId;
-        $assignment->lecturer_id = Auth::user()->id;
-        $assignment->college_id = Auth::user()->college_id;
-        $assignment->college_dept_id = Auth::user()->college_dept_id;
+        $assignment->lecturer_id = $loginUser->id;
+        $assignment->college_id = $loginUser->college_id;
+        $assignment->college_dept_id = $loginUser->college_dept_id;
         $assignment->year = $year;
 
         if($request->exists('attached_link')){
@@ -77,28 +78,30 @@ class AssignmentQuestion extends Model
     }
 
     protected static function getStudentAssignments(){
-        return static::where('college_id', Auth::user()->college_id)
-                ->where('college_dept_id', Auth::user()->college_dept_id)
-                ->where('year', Auth::user()->year)
+        $loginUser = Auth::user();
+        return static::where('college_id', $loginUser->college_id)
+                ->where('college_dept_id', $loginUser->college_dept_id)
+                ->where('year', $loginUser->year)
                 ->paginate();
     }
 
     protected static function getAssignments(Request $request){
-        $resultQuery = static::where('college_id', Auth::user()->college_id);
+        $loginUser = Auth::user();
+        $resultQuery = static::where('college_id', $loginUser->college_id);
 
         if(!empty($request->department)){
             $resultQuery->where('college_dept_id', $request->department);
         } else {
-            $resultQuery->where('college_dept_id', Auth::user()->college_dept_id);
+            $resultQuery->where('college_dept_id', $loginUser->college_dept_id);
         }
         if(!empty($request->year)){
             $resultQuery->where('year', $request->year);
         }else{
-            $resultQuery->where('year', Auth::user()->id);
+            $resultQuery->where('year', $loginUser->id);
         }
 
-        if(User::Lecturer == Auth::user()->user_type){
-            $resultQuery->where('lecturer_id', Auth::user()->id);
+        if(User::Lecturer == $loginUser->user_type){
+            $resultQuery->where('lecturer_id', $loginUser->id);
         } else if(!empty($request->lecturer_id)){
             $resultQuery->where('lecturer_id', $request->lecturer_id);
         }

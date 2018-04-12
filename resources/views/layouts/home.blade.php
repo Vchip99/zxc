@@ -251,28 +251,28 @@
       border-top: 0px !important;
     }
        /*tree*/
-  .tree-tital{
-    font-weight: 800;
-    color: #448eda;
-    font-size: 23px;
-  }
-  .tree-menu {
-    margin: 13% 0 25%;
-    float: left;
-    font-weight: bolder;
-    width: 100%;
-  }
-  @media screen and (max-width: 991px){
-    .tree-menu{
-        margin: 2% 0;
-        line-height: 1;
+    .tree-tital{
+      font-weight: 800;
+      color: #448eda;
+      font-size: 23px;
     }
-  }
-  @media screen and (max-width: 991px){
-    .tree-menu ,.tree-tital{
-        text-align: center;
+    .tree-menu {
+      margin: 13% 0 25%;
+      float: left;
+      font-weight: bolder;
+      width: 100%;
     }
-  }
+    @media screen and (max-width: 991px){
+      .tree-menu{
+          margin: 2% 0;
+          line-height: 1;
+      }
+    }
+    @media screen and (max-width: 991px){
+      .tree-menu ,.tree-tital{
+          text-align: center;
+      }
+    }
   </style>
 @stop
 @section('header-js')

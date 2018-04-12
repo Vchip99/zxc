@@ -86,6 +86,7 @@
               </span>
             </a>
             <ul class="treeview-menu">
+              <li title="Manage All"><a href="{{ url('admin/manageCourseAll')}}"><i class="fa fa-circle-o"></i> Manage All </a></li>
               <li title="Manage Category"><a href="{{ url('admin/manageCourseCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
               <li title="Manage Sub Category"><a href="{{ url('admin/manageCourseSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
               <li title="Manage Course"><a href="{{ url('admin/manageCourseCourse')}}"><i class="fa fa-circle-o"></i> Manage Course </a></li>
@@ -103,6 +104,7 @@
               </span>
             </a>
             <ul class="treeview-menu">
+              <li title="Manage All"><a href="{{ url('admin/manageTestAll')}}"><i class="fa fa-circle-o"></i> Manage All </a></li>
               <li title="Manage Category"><a href="{{ url('admin/manageCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
               <li title="Manage Sub Category"><a href="{{ url('admin/manageSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
               <li title="Manage Subject"><a href="{{ url('admin/manageSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>

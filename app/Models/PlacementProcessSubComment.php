@@ -27,13 +27,14 @@ class PlacementProcessSubComment extends Model
     	$userComment = $request->get('subcomment');
     	$commentId = $request->get('comment_id');
     	$subcommentId = $request->get('subcomment_id');
+        $loginUser = Auth::user();
 
     	$subcomment = new static;
         if($subcommentId > 0){
         	$parentSubComment = static::find($subcommentId);
     	}
 
-        if( is_object($parentSubComment) && $parentSubComment->user_id !== Auth::user()->id ){
+        if( is_object($parentSubComment) && $parentSubComment->user_id !== $loginUser->id ){
             $subcomment->body = $userComment;
             $user = User::find($parentSubComment->user_id);
             if(is_object($user)){
@@ -46,7 +47,7 @@ class PlacementProcessSubComment extends Model
     	$subcomment->company_id = $companyId;
     	$subcomment->placement_process_comment_id = $commentId;
     	$subcomment->parent_id = $subcommentId?:0;
-    	$subcomment->user_id = Auth::user()->id;
+    	$subcomment->user_id = $loginUser->id;
     	$subcomment->save();
     	return $subcomment;
     }

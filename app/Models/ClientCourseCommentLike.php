@@ -21,11 +21,12 @@ class ClientCourseCommentLike extends Model
     protected $fillable = ['client_online_video_id', 'client_course_comment_id', 'user_id', 'client_id'];
 
     protected static function getLikeVideoComment(Request $request){
-        if(is_object(Auth::guard('clientuser')->user())){
+        $loginUser = Auth::guard('clientuser')->user();
+        if(is_object($loginUser)){
             if( 1 == $request->get('dis_like')){
                 $likeBlogComment = static::where('client_online_video_id',$request->get('video_id'))
-                                        ->where('client_id', Auth::guard('clientuser')->user()->client_id)
-                                        ->where('user_id' ,Auth::guard('clientuser')->user()->id)
+                                        ->where('client_id', $loginUser->client_id)
+                                        ->where('user_id' ,$loginUser->id)
                                         ->where('client_course_comment_id', $request->get('comment_id'))
                                         ->first();
                 if(is_object($likeBlogComment)){
@@ -33,7 +34,7 @@ class ClientCourseCommentLike extends Model
                     return self::getLikeStatus($request);
                 }
             } else {
-                static::create(['client_online_video_id' => $request->get('video_id'), 'client_id' => Auth::guard('clientuser')->user()->client_id, 'user_id' => Auth::guard('clientuser')->user()->id, 'client_course_comment_id' => $request->get('comment_id')]);
+                static::create(['client_online_video_id' => $request->get('video_id'), 'client_id' => $loginUser->client_id, 'user_id' => $loginUser->id, 'client_course_comment_id' => $request->get('comment_id')]);
                 return self::getLikeStatus($request);
             }
         }

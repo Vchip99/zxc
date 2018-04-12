@@ -1,3 +1,14 @@
+<div class="container-box rotated">
+  @if(is_object(Auth::user()))
+    @if('ceo@vchiptech.com' != Auth::user()->email)
+      <button type="button" class="btn btn-info btn-lg turned-button" id="{{$chatAdminId}}" data-user_name="Admin Chat" onclick="showChat(this);">Get In Touch</button>
+    @else
+      <button type="button" class="btn btn-info btn-lg turned-button">Get In Touch</button>
+    @endif
+  @else
+    <button type="button" class="btn btn-info btn-lg turned-button" data-toggle="modal" data-target="#loginUserModel">Get In Touch</button>
+  @endif
+</div>
 <footer>
   @php
     if('local' == \Config::get('app.env')){
@@ -63,7 +74,7 @@
            <form action="{{url('subscribedUser')}}" method="POST">
             {{csrf_field()}}
               <div class="v_subscribe_form input-group">
-                 <input class="btn btn-sm" name="email" id="email" type="email" placeholder="Email" required>
+                 <input class="btn btn-sm" name="email" id="subscribe_email" type="email" placeholder="Email" required>
                  <button class=" btn-info btn-sm" type="submit">Subscribe</button>
               </div>
            </form>
@@ -107,7 +118,7 @@
               <span class="help-block"></span>
             </div>
             <div class="form-group">
-              <input id="password" name="password" type="text" class="form-control" placeholder="password" data-type="password" onfocus="changeType('password');" autocomplete="off" required >
+              <input id="userpassword" name="password" type="password" class="form-control" placeholder="password" data-type="password" onfocus="changeType('password');" autocomplete="off" required >
               <span class="help-block"></span>
             </div>
             <div id="loginErrorMsg" class="hide">Wrong username or password</div>
@@ -135,7 +146,7 @@
 <script type="text/javascript">
   function loginUser(){
     var email = document.getElementById('useremail').value;
-    var password = document.getElementById('password').value;
+    var password = document.getElementById('userpassword').value;
     if(email && password){
       $.ajax({
           method: "POST",

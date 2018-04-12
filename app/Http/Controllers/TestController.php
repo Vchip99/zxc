@@ -94,8 +94,9 @@ class TestController extends Controller
 
 				$registeredPaperIds = $this->getRegisteredPaperIds();
 				$alreadyGivenPapers = $this->getTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
-				if(is_object(Auth::user())){
-                    $currentUser = Auth::user()->id;
+				$loginUser = Auth::user();
+				if(is_object($loginUser)){
+                    $currentUser = $loginUser->id;
                     if($subject > 0 && $paper > 0){
                         DB::beginTransaction();
                         try
@@ -240,8 +241,9 @@ class TestController extends Controller
 
     protected function getRegisteredPaperIds(){
     	$registeredPaperIds = [];
-    	if(is_object(Auth::user())){
-			$userId = Auth::user()->id;
+    	$loginUser = Auth::user();
+    	if(is_object($loginUser)){
+			$userId = $loginUser->id;
 			$registeredPapers = RegisterPaper::getRegisteredPapersByUserId($userId);
 			if(false == $registeredPapers->isEmpty()){
 				foreach($registeredPapers as $registeredPaper){
@@ -258,8 +260,9 @@ class TestController extends Controller
         $subcatId   = $request->get('subcategory_id');
         $paperId   = $request->get('paper_id');
         $subjectId  = $request->get('subject_id');
-        $userId = Auth::user()->id;
-        $collegeId = Auth::user()->college_id;
+        $loginUser = Auth::user();
+        $userId = $loginUser->id;
+        $collegeId = $loginUser->college_id;
         $totalMarks = 0 ;
         $userAnswers = [];
         $positiveMarks = 0;

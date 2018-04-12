@@ -130,13 +130,14 @@ class ClientAssignmentSubjectController extends ClientBaseController
             DB::connection('mysql2')->beginTransaction();
             try
             {
-                $topics = ClientAssignmentTopic::where('client_assignment_subject_id', $subject->id)->where('client_id',Auth::guard('client')->user()->id)->get();
+                $loginUser = Auth::guard('client')->user();
+                $topics = ClientAssignmentTopic::where('client_assignment_subject_id', $subject->id)->where('client_id',$loginUser->id)->get();
                 if(is_object($topics) && false == $topics->isEmpty()){
                     foreach($topics as $topic){
-                        $assignments = ClientAssignmentQuestion::where('client_assignment_topic_id', $topic->id)->where('client_id',Auth::guard('client')->user()->id)->get();
+                        $assignments = ClientAssignmentQuestion::where('client_assignment_topic_id', $topic->id)->where('client_id',$loginUser->id)->get();
                         if(is_object($assignments) && false == $assignments->isEmpty()){
                             foreach($assignments as $assignment){
-                                $answers = ClientAssignmentAnswer::where('client_assignment_question_id', $assignment->id)->where('client_id',Auth::guard('client')->user()->id)->get();
+                                $answers = ClientAssignmentAnswer::where('client_assignment_question_id', $assignment->id)->where('client_id',$loginUser->id)->get();
                                 if(is_object($answers) && false == $answers->isEmpty()){
                                     foreach($answers as $answer){
                                         $dir = dirname($answer->attached_link);

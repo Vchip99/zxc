@@ -47,8 +47,9 @@ class ClientAssignmentTopic extends Model
     }
 
     protected static function getAssignmentTopicsBySubject($subjectId){
-        if(is_object(Auth::guard('client')->user())){
-            return static::where('client_id', Auth::guard('client')->user()->id)->where('client_assignment_subject_id', $subjectId)->get();
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            return static::where('client_id', $loginClient->id)->where('client_assignment_subject_id', $subjectId)->get();
         } else {
             return static::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('client_assignment_subject_id', $subjectId)->get();
         }

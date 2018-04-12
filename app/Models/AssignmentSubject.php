@@ -32,28 +32,28 @@ class AssignmentSubject extends Model
         } else{
             $subject = new static;
         }
+        $loginUser = Auth::user();
         $subject->name = $subjectName;
-        $subject->lecturer_id = Auth::user()->id;
-        $subject->college_id = Auth::user()->college_id;
-        $subject->college_dept_id = Auth::user()->college_dept_id;
+        $subject->lecturer_id = $loginUser->id;
+        $subject->college_id = $loginUser->college_id;
+        $subject->college_dept_id = $loginUser->college_dept_id;
         $subject->year = $year;
         $subject->save();
         return $subject;
     }
 
     protected static function getAssignmentSubjectsByYear($year,$lecturer=NULL,$collegeDept=NULL){
+        $loginUser = Auth::user();
         if($lecturer > 0){
-            $query = static::join('assignment_topics','assignment_topics.assignment_subject_id', '=', 'assignment_subjects.id')
-                        ->where('assignment_subjects.lecturer_id', $lecturer);
+            $query = static::join('assignment_topics','assignment_topics.assignment_subject_id', '=', 'assignment_subjects.id')->where('assignment_subjects.lecturer_id', $lecturer);
         } else {
-            $query = static::join('assignment_topics','assignment_topics.assignment_subject_id', '=', 'assignment_subjects.id')
-                        ->where('assignment_subjects.lecturer_id', Auth::user()->id);
+            $query = static::join('assignment_topics','assignment_topics.assignment_subject_id', '=', 'assignment_subjects.id')->where('assignment_subjects.lecturer_id', $loginUser->id);
         }
-        $query->where('assignment_subjects.college_id', Auth::user()->college_id);
+        $query->where('assignment_subjects.college_id', $loginUser->college_id);
         if($collegeDept > 0){
             $query->where('assignment_subjects.college_dept_id', $collegeDept);
         } else {
-            $query->where('assignment_subjects.college_dept_id', Auth::user()->college_dept_id);
+            $query->where('assignment_subjects.college_dept_id', $loginUser->college_dept_id);
         }
         return    $query->where('assignment_subjects.year', $year)->select('assignment_subjects.id','assignment_subjects.*')->groupBy('assignment_subjects.id')->get();
     }

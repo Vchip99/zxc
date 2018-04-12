@@ -15,7 +15,7 @@ class CreateApplicationUser extends Command
      *
      * @var string
      */
-    protected $signature = 'createapplicationuser:cron';
+    protected $signature = 'createapplicationuser:command';
 
     /**
      * The console command description.

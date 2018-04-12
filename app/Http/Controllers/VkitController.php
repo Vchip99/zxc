@@ -141,8 +141,9 @@ class VkitController extends Controller
 
     protected function getRegisteredProjectIds(){
         $registeredProjectIds = [];
-        if(is_object(Auth::user())){
-            $userId = Auth::user()->id;
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
+            $userId = $loginUser->id;
             $registeredProjects = RegisterProject::getRegisteredVkitProjectsByUserId($userId);
             if(false == $registeredProjects->isEmpty()){
                 foreach($registeredProjects as $registeredProject){
@@ -245,7 +246,7 @@ class VkitController extends Controller
 
             if(is_object($parentComment)){
                 $string = (strlen($parentComment->body) > 50) ? substr($parentComment->body,0,50).'...' : $parentComment->body;
-                $notificationMessage = '<a href="'.$request->root().'/vkitproject/'.$projectId.'/'.$VkitProjectSubComment->id.'">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
+                $notificationMessage = '<a href="'.$request->root().'/vkitproject/'.$projectId.'/'.$VkitProjectSubComment->id.'" target="_blank">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
                 Notification::addCommentNotification($notificationMessage, Notification::USERVKITPROJECTNOTIFICATION, $VkitProjectSubComment->id,$VkitProjectSubComment->user_id,$parentComment->user_id);
             }
             DB::commit();

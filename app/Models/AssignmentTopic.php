@@ -33,11 +33,12 @@ class AssignmentTopic extends Model
         } else {
             $topic = new static;
         }
+        $loginUser = Auth::user();
         $topic->name = $topicName;
         $topic->assignment_subject_id = $subjectId;
-        $topic->lecturer_id = Auth::user()->id;
-        $topic->college_id = Auth::user()->college_id;
-        $topic->college_dept_id = Auth::user()->college_dept_id;
+        $topic->lecturer_id = $loginUser->id;
+        $topic->college_id = $loginUser->college_id;
+        $topic->college_dept_id = $loginUser->college_dept_id;
         $topic->save();
         return $topic;
     }

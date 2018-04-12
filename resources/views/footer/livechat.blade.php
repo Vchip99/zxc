@@ -1,6 +1,9 @@
-@if(Auth::user())
-  <input type="hidden" id="currentUser" value="{{ Auth::user()->id }}">
-  <input type="hidden" id="currentUserName" value="{{ Auth::user()->name }}">
+@php
+  $loginUser = Auth::user();
+@endphp
+@if($loginUser)
+  <input type="hidden" id="currentUser" value="{{ $loginUser->id }}">
+  <input type="hidden" id="currentUserName" value="{{ $loginUser->name }}">
   <div class="container">
     <div class="row">
       <div class="col-md-6">
@@ -11,7 +14,7 @@
                 <div class="pull-left">
                   <h3 class="panel-title"><span class="fa fa-comments"></span> <b>Messaging</b>
                     <span id="message_header">
-                      <span class="badge" style="background-color: #f50909 !important;" id="msg_count_1_{{ Auth::user()->id }}"></span>
+                      <span class="badge" style="background-color: #f50909 !important;" id="msg_count_1_{{ $loginUser->id }}"></span>
                     </span>
                   </h3>
                 </div>
@@ -21,6 +24,24 @@
               </div>
               <div id="search">
                 <input type="text" id="search_contact" name="student" class="form-control" placeholder="Search contacts..." onkeyup="searchContact(this.value,false);" style="color: black; background: #ddd;">
+              </div>
+              <div id="chatAdmin">
+                @if('ceo@vchiptech.com' != $loginUser->email)
+                  <div class="chat-body clearfix" style="">
+                    <div class="header">
+                      <strong class="primary-font"><button style="width: 87%; background:  skyblue;" id="{{$chatAdminId}}" data-user_name="Admin Chat" onclick="showChat(this);">Click to chat with Admin</button> </strong>
+                      <span id="unread_{{$chatAdminId}}" style="color: red;"></span>
+                      <span class="chat-img pull-right">
+
+                        @if($chatAdminLive)
+                          <img src="/images/online.png" id="userstatus_{{$chatAdminId}}" data-user_id="{{$chatAdminId}}" style="height:  20px; width: 20px;">
+                        @else
+                          <img src="/images/offline.png" id="userstatus_{{$chatAdminId}}" data-user_id="{{$chatAdminId}}" style="height:  20px; width: 20px;">
+                        @endif
+                      </span>
+                    </div>
+                  </div>
+                @endif
               </div>
               <div class="panel-body">
                 <ul class="chat" id="chat_users">
@@ -105,7 +126,7 @@
     function calculate_popups()
     {
         var width = window.innerWidth;
-        if(width < 540)
+        if(width < 605)
         {
           total_popups = 0;
         }
@@ -182,6 +203,7 @@
           popupBodyText.setAttribute('cols', '31');
           popupBodyText.setAttribute('name', 'message');
           popupBodyText.setAttribute('onfocus', 'readmessagecount(this);');
+          popupBodyText.setAttribute('style', 'width: 268px;');
           popupBodyDiv.appendChild(popupBodyText);
 
           var popupFooterDiv = document.createElement('div');
@@ -214,6 +236,9 @@
                   var chatMessageId = document.getElementById('chatmessages_'+roomArr[0]+'_'+roomArr[1]);
                   var senderImgPath = $('#currentUserImage').attr('src');
                   var receiverImgPath = $($('li#'+receiverId+' span img')[0]).attr('src');
+                  if('undefined' == typeof receiverImgPath){
+                    receiverImgPath = 'images/user1.png';
+                  }
                   $.each(messages['messages'],function(idx,obj){
                     if(current_user == obj.sender_id){
                         $('#chatmessages_'+roomArr[0]+'_'+roomArr[1]).prepend('<li class="right clearfix addChat"><span class="chat-img pull-right "><img src="'+senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+obj.message+'</p></div><div class="chat-time clearfix"><span class="pull-right">'+messagteTime(obj.created_at)+'</span></div></li>');
@@ -587,11 +612,13 @@
           $this.addClass('panel-collapsed');
           $('#minim_chat_window').removeClass('fa-minus').addClass('fa-plus');
           $('#search').addClass('hide');
+          $('#chatAdmin').addClass('hide');
         } else {
           $this.parents('.panel').find('.panel-body').slideDown();
           $this.removeClass('panel-collapsed');
           $('#minim_chat_window').removeClass('fa-plus').addClass('fa-minus');
           $('#search').removeClass('hide');
+          $('#chatAdmin').removeClass('hide');
         }
       });
 
@@ -599,7 +626,6 @@
       $(document).on('click', '#userchatwindow .top-bar', function (e) {
         var $this = $(this);
         var userId = $(this).attr('id');
-        // console.log($this.parents('#qnimate_'+userId).find('.panel-body'));
         if(!$this.hasClass('panel-collapsed')) {
           $this.parents('#qnimate_'+userId).find('.panel-body').slideUp();
           $this.addClass('panel-collapsed');
@@ -668,20 +694,21 @@
               dataType: "json",
               data: {'_token':token},
               success:function(onlineusers){
-                  if(onlineusers.length > 0){
-                      var messageUsers = $('img[id^=userstatus_]');
-                      $.each(messageUsers, function(idx, obj){
-                          var userId = $(obj).data('user_id');
-                          if(current_user != userId){
-                              var userStatus = document.getElementById('userstatus_'+userId);
-                              if(onlineusers.indexOf(userId) > -1){
-                                  userStatus.setAttribute('src', '/images/online.png');
-                              } else {
-                                  userStatus.setAttribute('src', '/images/offline.png');
-                              }
+                if(onlineusers){
+                  var messageUsers = $('img[id^=userstatus_]');
+                  $.each(messageUsers, function(idx, obj){
+                      var userId = $(obj).data('user_id');
+                      if(current_user != userId){
+                          var userStatus = document.getElementById('userstatus_'+userId);
+                          if(onlineusers[userId]){
+                              userStatus.setAttribute('src', '/images/online.png');
+                          } else {
+                              userStatus.setAttribute('src', '/images/offline.png');
                           }
-                      });
-                  }
+                      }
+
+                  });
+                }
               }
           });
       }

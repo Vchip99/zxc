@@ -30,8 +30,8 @@ class ClientCourseSubComment extends Model
         if($subcommentId > 0){
         	$parentSubComment = static::find($subcommentId);
     	}
-
-        if( is_object($parentSubComment) && $parentSubComment->user_id !== Auth::guard('clientuser')->user()->id ){
+        $loginUser = Auth::guard('clientuser')->user();
+        if( is_object($parentSubComment) && $parentSubComment->user_id !== $loginUser->id ){
             $subcomment->body = $userComment;
             $user = Clientuser::find($parentSubComment->user_id);
             if(is_object($user)){
@@ -44,8 +44,8 @@ class ClientCourseSubComment extends Model
     	$subcomment->client_online_video_id = $videoId;
     	$subcomment->client_course_comment_id = $commentId;
     	$subcomment->parent_id = $subcommentId?:0;
-    	$subcomment->user_id = Auth::guard('clientuser')->user()->id;
-    	$subcomment->client_id = Auth::guard('clientuser')->user()->client_id;
+    	$subcomment->user_id = $loginUser->id;
+    	$subcomment->client_id = $loginUser->client_id;
     	$subcomment->save();
     	return $subcomment;
     }

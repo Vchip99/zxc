@@ -20,16 +20,17 @@ class ClientReadNotification extends Model
     protected $fillable = ['client_notification_id', 'notification_module','created_module_id', 'client_id', 'client_user_id','created_at'];
 
     protected static function readNotificationByModuleByModuleIdByUser($notificationModuleId, $createdModuleId,$currentUser){
-    	$readNotitication = static::where('notification_module',$notificationModuleId)->where('created_module_id', $createdModuleId)->where('client_id',Auth::guard('clientuser')->user()->client_id)->where('client_user_id', $currentUser)->first();
+        $loginUser = Auth::guard('clientuser')->user();
+    	$readNotitication = static::where('notification_module',$notificationModuleId)->where('created_module_id', $createdModuleId)->where('client_id',$loginUser->client_id)->where('client_user_id', $currentUser)->first();
 
     	if(! is_object($readNotitication)){
-    		$notitication = ClientNotification::where('notification_module',$notificationModuleId)->where('created_module_id', $createdModuleId)->where('client_id',Auth::guard('clientuser')->user()->client_id)->first();
+    		$notitication = ClientNotification::where('notification_module',$notificationModuleId)->where('created_module_id', $createdModuleId)->where('client_id',$loginUser->client_id)->first();
     		if(is_object($notitication)){
     			$objReadNotification = new static;
     			$objReadNotification->client_notification_id = $notitication->id;
     			$objReadNotification->notification_module = $notificationModuleId;
     			$objReadNotification->created_module_id = $createdModuleId;
-    			$objReadNotification->client_id = Auth::guard('clientuser')->user()->client_id;
+    			$objReadNotification->client_id = $loginUser->client_id;
     			$objReadNotification->client_user_id = $currentUser;
                 $objReadNotification->created_at = $notitication->created_at;
     			$objReadNotification->save();

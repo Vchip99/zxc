@@ -133,13 +133,14 @@ class AssignmentSubjectController extends Controller
             DB::beginTransaction();
             try
             {
-                $topics = AssignmentTopic::where('lecturer_id',Auth::user()->id)->where('assignment_subject_id',$subject->id)->get();
+                $loginUser = Auth::user();
+                $topics = AssignmentTopic::where('lecturer_id',$loginUser->id)->where('assignment_subject_id',$subject->id)->get();
                 if(is_object($topics) && false == $topics->isEmpty()){
                     foreach($topics as $topic){
-                        $assignments = AssignmentQuestion::where('lecturer_id',Auth::user()->id)->where('assignment_topic_id',$topic->id)->get();
+                        $assignments = AssignmentQuestion::where('lecturer_id',$loginUser->id)->where('assignment_topic_id',$topic->id)->get();
                         if(is_object($assignments) && false == $assignments->isEmpty()){
                             foreach($assignments as $assignment){
-                                $answers = AssignmentAnswer::where('assignment_question_id', $assignment->id)->where('lecturer_id',Auth::user()->id)->get();
+                                $answers = AssignmentAnswer::where('assignment_question_id', $assignment->id)->where('lecturer_id',$loginUser->id)->get();
                                 if(is_object($answers) && false == $answers->isEmpty()){
                                     foreach($answers as $answer){
                                         $answer->delete();

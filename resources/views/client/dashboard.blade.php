@@ -238,10 +238,11 @@
             </span>
           </a>
           <ul class="treeview-menu">
+            <li title="Manage All"><a href="{{ url('manageAllCourse')}}"><i class="fa fa-circle-o"></i> Manage All </a></li>
             <li title="Manage Category"><a href="{{ url('manageOnlineCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
-              <li title="Manage Sub Category"><a href="{{ url('manageOnlineSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
-              <li title="Manage Course"><a href="{{ url('manageOnlineCourse')}}"><i class="fa fa-circle-o"></i> Manage Course </a></li>
-              <li title="Manage Video"><a href="{{ url('manageOnlineVideo')}}"><i class="fa fa-circle-o"></i> Manage Video </a></li>
+            <li title="Manage Sub Category"><a href="{{ url('manageOnlineSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
+            <li title="Manage Course"><a href="{{ url('manageOnlineCourse')}}"><i class="fa fa-circle-o"></i> Manage Course </a></li>
+            <li title="Manage Video"><a href="{{ url('manageOnlineVideo')}}"><i class="fa fa-circle-o"></i> Manage Video </a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -253,12 +254,13 @@
             </span>
           </a>
           <ul class="treeview-menu">
+            <li title="Manage All"><a href="{{ url('manageAllTest')}}"><i class="fa fa-circle-o"></i> Manage All </a></li>
             <li title="Manage Category"><a href="{{ url('manageOnlineTestCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
-              <li title="Manage Sub Category"><a href="{{ url('manageOnlineTestSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
-              <li title="Manage Subject"><a href="{{ url('manageOnlineTestSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
-              <li title="Manage Paper"><a href="{{ url('manageOnlineTestSubjectPaper')}}"><i class="fa fa-circle-o"></i> Manage Paper </a></li>
-              <li title="Manage Question"><a href="{{ url('manageOnlineTestQuestion')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
-              <li title="Upload Excel File"><a href="{{ url('manageUploadQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
+            <li title="Manage Sub Category"><a href="{{ url('manageOnlineTestSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
+            <li title="Manage Subject"><a href="{{ url('manageOnlineTestSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
+            <li title="Manage Paper"><a href="{{ url('manageOnlineTestSubjectPaper')}}"><i class="fa fa-circle-o"></i> Manage Paper </a></li>
+            <li title="Manage Question"><a href="{{ url('manageOnlineTestQuestion')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
+            <li title="Upload Excel File"><a href="{{ url('manageUploadQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
           </ul>
         </li>
         <li class="treeview">

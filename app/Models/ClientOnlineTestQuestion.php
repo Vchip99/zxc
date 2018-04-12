@@ -138,7 +138,7 @@ class ClientOnlineTestQuestion extends Model
     }
 
 
-    protected static function getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($subdomainName,$categoryId, $subcategoryId, $subjectId, $paperId, $request){
+    protected static function getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request){
         return DB::connection('mysql2')->table('client_online_test_questions')
                 ->join('clients', 'clients.id', '=', 'client_online_test_questions.client_id')
                 ->where('client_online_test_questions.category_id', $categoryId)

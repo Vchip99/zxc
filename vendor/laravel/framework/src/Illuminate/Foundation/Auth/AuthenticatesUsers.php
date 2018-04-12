@@ -12,7 +12,7 @@ use App\Models\Client;
 use App\Models\User;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Session;
+use Session,Cache;
 
 trait AuthenticatesUsers
 {
@@ -87,9 +87,9 @@ trait AuthenticatesUsers
                         }
                         return $this->sendFailedLoginResponse($request, 'true');
                     } else {
-                        // if free plan and user is not in first 20 user then dont allow to login
+                        // if free plan and user is not in first 10 user then dont allow to login
                         if(1 == $clientUser->client->plan_id){
-                            if( 'false' == $clientUser::isInBetweenFirstTwenty()){
+                            if( 'false' == $clientUser::isInBetweenFirstTen()){
                                 $data['name'] = $clientUser->name;
                                 $data['email'] = $clientUser->email;
                                 $data['client'] = $clientUser->client->name;
@@ -206,6 +206,9 @@ trait AuthenticatesUsers
      */
     protected function authenticated(Request $request, $user)
     {
+        if('ceo@vchiptech.com' == $user->email){
+            Cache::put('vchip:chatAdminLive', true, 60);
+        }
         return redirect()->intended($this->redirectPath())->with('message', 'Welcome '. $user->name);
     }
 

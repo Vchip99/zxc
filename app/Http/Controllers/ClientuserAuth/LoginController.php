@@ -90,7 +90,7 @@ class LoginController extends Controller
             // if free plan and user is not in first 20 user then dont allow to login
             $clientUser = Auth::guard('clientuser')->user();
             if(1 == $clientUser->client->plan_id){
-                if( 'false' == $clientUser::isInBetweenFirstTwenty()){
+                if( 'false' == $clientUser::isInBetweenFirstTen()){
                     $data['name'] = $clientUser->name;
                     $data['email'] = $clientUser->email;
                     $data['client'] = $clientUser->client->name;

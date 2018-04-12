@@ -39,6 +39,7 @@ class ClientOnlineCourse extends Model
         $certified = InputSanitise::inputString($request->get('certified'));
         $release_date = trim(strip_tags($request->get('release_date')));
         $courseId = InputSanitise::inputString($request->get('course_id'));
+        $loginUser = Auth::guard('client')->user();
 
     	if( $isUpdate && !empty($courseId)){
     		$course = static::find($courseId);
@@ -57,7 +58,7 @@ class ClientOnlineCourse extends Model
     	$course->difficulty_level = $difficultyLevel;
         $course->author_introduction = $authorIntroduction;
         $course->certified = $certified;
-        $subdomainArr = explode('.', Auth::guard('client')->user()->subdomain);
+        $subdomainArr = explode('.', $loginUser->subdomain);
         $clientName = $subdomainArr[0];
 
         if($request->exists('author_image')){
@@ -109,7 +110,7 @@ class ClientOnlineCourse extends Model
         }
 
     	$course->release_date = $release_date;
-    	$course->client_id = Auth::guard('client')->user()->id;
+    	$course->client_id = $loginUser->id;
     	$course->save();
     	return $course;
 
@@ -143,8 +144,9 @@ class ClientOnlineCourse extends Model
                         $join->on('clients.id', '=', 'client_online_videos.client_id');
                         $join->on('clients.id', '=', 'client_online_sub_categories.client_id');
                     });
-        if(is_object(Auth::guard('client')->user())){
-            $query->where('clients.id', Auth::guard('client')->user()->id);
+        $loginUser = Auth::guard('client')->user();
+        if(is_object($loginUser)){
+            $query->where('clients.id', $loginUser->id);
         } else if(!empty($subdomain)) {
             $query->where('clients.subdomain', $subdomain);
         }
@@ -182,8 +184,9 @@ class ClientOnlineCourse extends Model
     }
 
     protected static function showCourses(Request $request, $withVideo=false){
-        if(is_object(Auth::guard('client')->user())){
-            $clientId = Auth::guard('client')->user()->id;
+        $loginUser = Auth::guard('client')->user();
+        if(is_object($loginUser)){
+            $clientId = $loginUser->id;
         } else{
             $client = InputSanitise::getCurrentClient($request);
         }

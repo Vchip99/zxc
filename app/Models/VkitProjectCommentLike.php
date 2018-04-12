@@ -17,15 +17,16 @@ class VkitProjectCommentLike extends Model
     protected $fillable = ['vkit_project_id', 'vkit_project_comment_id', 'user_id'];
 
      protected static function getLikeVkitProject(Request $request){
-        if(is_object(Auth::user())){
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
             if( 1 == $request->get('dis_like')){
-                $likeBlogComment = static::where('vkit_project_id',$request->get('project_id'))->where('user_id' ,Auth::user()->id)->where('vkit_project_comment_id', $request->get('comment_id'))->first();
+                $likeBlogComment = static::where('vkit_project_id',$request->get('project_id'))->where('user_id' ,$loginUser->id)->where('vkit_project_comment_id', $request->get('comment_id'))->first();
                 if(is_object($likeBlogComment)){
                     $likeBlogComment->delete();
                     return self::getLikeStatus($request);
                 }
             } else {
-                static::create(['vkit_project_id' => $request->get('project_id'), 'user_id' => Auth::user()->id, 'vkit_project_comment_id' => $request->get('comment_id')]);
+                static::create(['vkit_project_id' => $request->get('project_id'), 'user_id' => $loginUser->id, 'vkit_project_comment_id' => $request->get('comment_id')]);
                 return self::getLikeStatus($request);
             }
         }

@@ -17,15 +17,16 @@ class BlogCommentLike extends Model
     protected $fillable = ['blog_id', 'blog_comment_id', 'user_id'];
 
      protected static function getLikeBlogComment(Request $request){
-        if(is_object(Auth::user())){
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
             if( 1 == $request->get('dis_like')){
-                $likeBlogComment = static::where('blog_id',$request->get('blog_id'))->where('user_id' ,Auth::user()->id)->where('blog_comment_id', $request->get('comment_id'))->first();
+                $likeBlogComment = static::where('blog_id',$request->get('blog_id'))->where('user_id' ,$loginUser->id)->where('blog_comment_id', $request->get('comment_id'))->first();
                 if(is_object($likeBlogComment)){
                     $likeBlogComment->delete();
                     return self::getLikeStatus($request);
                 }
             } else {
-                static::create(['blog_id' => $request->get('blog_id'), 'user_id' => Auth::user()->id, 'blog_comment_id' => $request->get('comment_id')]);
+                static::create(['blog_id' => $request->get('blog_id'), 'user_id' => $loginUser->id, 'blog_comment_id' => $request->get('comment_id')]);
                 return self::getLikeStatus($request);
             }
         }

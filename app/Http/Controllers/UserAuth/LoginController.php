@@ -71,6 +71,9 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         Cache::forget('vchip:online_user-' . $this->guard('user')->user()->id);
+        if('ceo@vchiptech.com' == $this->guard('user')->user()->email){
+            Cache::forget('vchip:chatAdminLive');
+        }
         $this->guard()->logout();
 
         Session::flush();
@@ -82,6 +85,9 @@ class LoginController extends Controller
 
     public function userLogin(Request $request){
         if($this->guard('user')->attempt($this->credentials($request))){
+            if('ceo@vchiptech.com' == $this->guard('user')->user()->email){
+                Cache::put('vchip:chatAdminLive', true, 60);
+            }
             $request->session()->regenerate();
             return 'true';
         } else {
