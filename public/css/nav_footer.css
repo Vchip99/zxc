@@ -821,5 +821,6 @@ color: #fff;
     border: 1px solid #fff;*/
     position: fixed;
     top: 55%;
-    right: -91px;
+    right: -100px;
+    z-index: 2000;
   }

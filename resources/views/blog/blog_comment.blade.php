@@ -376,11 +376,11 @@ border-radius: 0px!important
           <div class="modal-body">
             <div class="modal-data">
                 <div class="form-group">
-                  <input id="email" name="email" type="text" class="form-control" placeholder="vchip@gmail.com" onfocus="changeType('email');" autocomplete="off" required>
+                  <input id="email" name="email" type="email" class="form-control" placeholder="vchip@gmail.com" autocomplete="off" required>
                   <span class="help-block"></span>
                 </div>
                 <div class="form-group">
-                  <input id="password" name="password" type="text" class="form-control" placeholder="password" data-type="password" onfocus="changeType('password');" autocomplete="off" required >
+                  <input id="password" name="password" type="password" class="form-control" placeholder="password" data-type="password" autocomplete="off" required >
                   <span class="help-block"></span>
                 </div>
                 <div id="loginErrorMsg" class="hide">Wrong username or password</div>
@@ -973,10 +973,6 @@ border-radius: 0px!important
     }
   }
 
-  function changeType(ele){
-    document.getElementById(ele).setAttribute('type', ele);
-    document.getElementById('loginErrorMsg').classList.add('hide');
-  }
   $(window).on('load', function(e){
     if (window.location.hash == '#_=_') {
       window.location.hash = ''; // for older browsers, leaves a # behind

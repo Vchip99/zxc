@@ -114,21 +114,21 @@
       <div class="modal-body">
         <div class="modal-data">
             <div class="form-group">
-              <input id="useremail" name="email" type="text" class="form-control" placeholder="vchip@gmail.com" onfocus="changeType('email');" autocomplete="off" required>
+              <input id="useremail" name="email" type="email" class="form-control" placeholder="vchip@gmail.com" autocomplete="off" required>
               <span class="help-block"></span>
             </div>
             <div class="form-group">
-              <input id="userpassword" name="password" type="password" class="form-control" placeholder="password" data-type="password" onfocus="changeType('password');" autocomplete="off" required >
+              <input id="userpassword" name="password" type="password" class="form-control" placeholder="password" data-type="password" autocomplete="off" required >
               <span class="help-block"></span>
             </div>
             <div id="loginErrorMsg" class="hide">Wrong username or password</div>
             <button type="submit" value="login" name="submit" class="btn btn-info btn-block" onClick="loginUser();">Login</button>
             <br />
             <div class="form-group">
-              <a href="{{ url('/auth/facebook') }}" class="btn btn-facebook btn-info" style="width: 209px; background-color: #3B5998; border-color: #3B5998;"><i class="fa fa-facebook"></i> Login </a>
+              <a href="{{ url('/auth/facebook') }}" class="btn btn-facebook btn-info btn-block" style="background-color: #3B5998; border-color: #3B5998;"><i class="fa fa-facebook"></i> Login </a>
             </div>
             <div class="form-group">
-              <a href="{{ url('/auth/google') }}" class="btn btn-google btn-info" style="width: 209px; background-color: #DD4B39; border-color: #DD4B39;"><i class="fa fa-google"></i> Login </a>
+              <a href="{{ url('/auth/google') }}" class="btn btn-google btn-info btn-block" style="background-color: #DD4B39; border-color: #DD4B39;"><i class="fa fa-google"></i> Login </a>
             </div>
             <div class="form-group">
               <div class="col-md-12 control">
@@ -161,11 +161,6 @@
         }
       });
     }
-  }
-
-  function changeType(ele){
-    document.getElementById(ele).setAttribute('type', ele);
-    document.getElementById('loginErrorMsg').classList.add('hide');
   }
 
   $(window).on('load', function(e){

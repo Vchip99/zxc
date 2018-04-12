@@ -57,11 +57,11 @@
                         <form id="loginForm" method="post" action="{{ url('login') }}">
                             {!! csrf_field() !!}
                           <div class="form-group">
-                            <input id="email" name="email" type="text" class="form-control" placeholder="vchip@gmail.com" onfocus="this.type='email'" autocomplete="off" required>
+                            <input name="email" type="email" class="form-control" placeholder="vchip@gmail.com" autocomplete="off" required>
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input id="password" name="password" type="text" class="form-control" placeholder="password" data-type="password" onfocus="this.type='password'" autocomplete="off" required >
+                            <input name="password" type="password" class="form-control" placeholder="password" data-type="password" autocomplete="off" required >
                             <span class="help-block"></span>
                           </div>
                           <div id="loginErrorMsg" class="alert alert-error hide">Wrong username or password</div>
@@ -94,15 +94,15 @@
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input id="email" name="email" type="text" class="form-control" onfocus="this.type='email'" autocomplete="off" placeholder="vchip@gmail.com" required>
+                            <input name="email" type="email" class="form-control" autocomplete="off" placeholder="vchip@gmail.com" required>
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input id="password" name="password" type="text" class="form-control" data-type="password" onfocus="this.type='password'" autocomplete="off" placeholder="password" required>
+                            <input name="password" type="password" class="form-control" data-type="password" autocomplete="off" placeholder="password" required>
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input id="confirm_password" name="confirm_password" type="text" class="form-control" data-type="password" onfocus="this.type='password'" autocomplete="off" placeholder="confirm password" required>
+                            <input id="confirm_password" name="confirm_password" type="password" class="form-control" data-type="password" autocomplete="off" placeholder="confirm password" required>
                             <span class="help-block"></span>
                           </div>
                           </br>
