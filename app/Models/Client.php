@@ -24,9 +24,17 @@ use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestSubjectPaper;
+use App\Models\ClientOnlinePaperSection;
 use App\Models\ClientOnlineVideo;
 use App\Models\ClientOnlineVideoLike;
 use App\Models\Clientuser;
+use App\Models\ClientAssignmentSubject;
+use App\Models\ClientAssignmentTopic;
+use App\Models\ClientAssignmentQuestion;
+use App\Models\ClientAssignmentAnswer;
+use App\Models\ClientReadNotification;
+use App\Models\ClientNotification;
+use App\Models\BankDetail;
 use Auth;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -93,7 +101,7 @@ class Client extends Authenticatable
         if(is_dir($clientUserFolder)){
             InputSanitise::delFolder($clientUserFolder);
         }
-        $clientHomePage = ClientHomePage::find($client->id);
+        $clientHomePage = ClientHomePage::where('client_id',$client->id)->get();
         if(is_object($clientHomePage)){
             $clientHomePage->delete();
         }
@@ -118,8 +126,8 @@ class Client extends Authenticatable
 
         ClientCourseComment::deleteClientCourseCommentsByClientId($client->id);
         ClientCourseCommentLike::deleteClientCourseCommentLikesByClientId($client->id);
-        ClientCourseSubComment::deleteClientCourseSubCommentsByUserId($client->id);
-        ClientCourseSubCommentLike::deleteClientCourseSubCommentLikesByUserId($client->id);
+        ClientCourseSubComment::deleteClientCourseSubCommentsByClientId($client->id);
+        ClientCourseSubCommentLike::deleteClientCourseSubCommentLikesByClientId($client->id);
         ClientOnlineCategory::deleteClientOnlineCategoriesByClientId($client->id);
         ClientOnlineCourse::deleteClientOnlineCoursesByClientId($client->id);
         ClientOnlineSubCategory::deleteClientOnlineSubCategoriesByClientId($client->id);
@@ -128,8 +136,17 @@ class Client extends Authenticatable
         ClientOnlineTestSubCategory::deleteClientOnlineTestSubCategoriesByClientId($client->id);
         ClientOnlineTestSubject::deleteClientOnlineTestSubjectsByClientId($client->id);
         ClientOnlineTestSubjectPaper::deleteClientOnlineTestSubjectPapersByClientId($client->id);
+        ClientOnlinePaperSection::deleteClientPaperSectionsByClientId($client->id);
         ClientOnlineVideo::deleteClientOnlineVideosByClientId($client->id);
         ClientOnlineVideoLike::deleteClientOnlineVideoLikesByClientId($client->id);
+        ClientAssignmentSubject::deleteClientAssignmentSubjectByClientId($client->id);
+        ClientAssignmentTopic::deleteClientAssignmentTopicByClientId($client->id);
+        ClientAssignmentQuestion::deleteClientAssignmentQuestionByClientId($client->id);
+        ClientAssignmentAnswer::deleteClientAssignmentAnswerByClientId($client->id);
+        ClientReadNotification::deleteClientReadNotification($client->id);
+        ClientNotification::deleteClientNotification($client->id);
+        BankDetail::deleteBankDetails($client->id);
+        InputSanitise::delFolder("clientAssignmentStorage/".$client->id);
         return;
     }
 

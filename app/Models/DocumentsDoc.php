@@ -11,9 +11,6 @@ use Intervention\Image\ImageManagerStatic as Image;
 
 class DocumentsDoc extends Model
 {
-	// public $table = 'documents_docs';
-    public $timestamps = false;
-
     /**
      * The attributes that are mass assignable.
      *

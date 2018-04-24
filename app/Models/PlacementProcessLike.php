@@ -9,7 +9,6 @@ use Auth;
 
 class PlacementProcessLike extends Model
 {
-    public $timestamps = false;
 	/**
      * The attributes that are mass assignable.
      *

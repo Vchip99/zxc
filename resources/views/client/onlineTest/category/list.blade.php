@@ -37,15 +37,25 @@
           @foreach($testCategories as $index => $testCategory)
           <tr>
             <th scope="row">{{$index + 1}}</th>
-            <td>{{$testCategory->name}}</td>
+            @if(in_array($testCategory->id, $isPurchasedSubCategories))
+              <td>{{$testCategory->name}}*</td>
+            @else
+              <td>{{$testCategory->name}}</td>
+            @endif
             <td>
               <a href="{{url('onlinetestcategory')}}/{{$testCategory->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testCategory->name}}" />
                 </a>
             </td>
             <td>
-            <a id="{{$testCategory->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testCategory->name}}" />
-                </a>
+            @if(in_array($testCategory->id, $isPurchasedSubCategories))
+              <a id="{{$testCategory->id}}" onclick="confirmDelete(this, true);">
+            @else
+              <a id="{{$testCategory->id}}" onclick="confirmDelete(this, false);">
+            @endif
+
+              <img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testCategory->name}}" />
+            </a>
                 <form id="deleteCategory_{{$testCategory->id}}" action="{{url('deleteOnlineTestCategory')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
@@ -60,14 +70,20 @@
         @endif
       </tbody>
     </table>
+    <p><b>Note: * means Category have purchased sub category.</b> </p>
   </div>
   </div>
 <script type="text/javascript">
 
-    function confirmDelete(ele){
+    function confirmDelete(ele, isPurchasedSubCategory){
+      if(isPurchasedSubCategory){
+        message = 'This Category have purchase sub category and if you delete this category, all associated sub categories and purchased subcategory, subjects, papers and questions will be deleted.'
+      } else {
+        message = 'If you delete this category, all associated sub categories, subjects, papers and questions will be deleted.'
+      }
       $.confirm({
         title: 'Confirmation',
-        content: 'If you delete this category, all associated sub categories, subjects, papers and questions will be deleted.',
+        content: message,
         type: 'red',
         typeAnimated: true,
         buttons: {

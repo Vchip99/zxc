@@ -9,7 +9,6 @@ use App\Libraries\InputSanitise;
 
 class CourseCategory extends Model
 {
-	public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

@@ -19,12 +19,48 @@
     <form action="{{url('admin/createCourseVideo')}}" method="POST" enctype="multipart/form-data" id="submitForm">
   @endif
     {{ csrf_field() }}
+    <div class="form-group row @if ($errors->has('category')) has-error @endif">
+      <label class="col-sm-2 col-form-label">Category Name:</label>
+      <div class="col-sm-3">
+        <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
+            <option value="">Select Category</option>
+            @if(count($courseCategories) > 0)
+              @foreach($courseCategories as $category)
+                @if( !empty($video->id) && $video->course_category_id == $category->id)
+                  <option value="{{$category->id}}" selected="true">{{$category->name}}</option>
+                @else
+                  <option value="{{$category->id}}">{{$category->name}}</option>
+                @endif
+              @endforeach
+            @endif
+        </select>
+        @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
+      <label class="col-sm-2 col-form-label">Sub Category Name:</label>
+      <div class="col-sm-3">
+        <select id="subcategory" class="form-control" name="subcategory" onChange="selectCourse(this);" required title="Sub Category">
+          <option value="">Select Sub Category</option>
+          @if(!empty($video->id) && count($courseSubCategories) > 0 )
+            @foreach($courseSubCategories as $subCategory)
+              @if( $video->course_sub_category_id == $subCategory->id )
+                <option value="{{ $subCategory->id }}" selected> {{ $subCategory->name }} </option>
+              @else
+                <option value="{{ $subCategory->id }}"> {{ $subCategory->name }} </option>
+              @endif
+            @endforeach
+          @endif
+        </select>
+        @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
+      </div>
+    </div>
     <div class="form-group row @if ($errors->has('course')) has-error @endif">
       <label class="col-sm-2 col-form-label">Course Name</label>
       <div class="col-sm-3">
         <select id="course" class="form-control" name="course" required title="Course">
             <option value="">Select Course ...</option>
-            @if(count($courseCourses) > 0)
+            @if(!empty($video->id) && count($courseCourses) > 0)
               @foreach($courseCourses as $courseCourse)
                 @if( isset($video->id) && $video->course_id == $courseCourse->id)
                   <option value="{{$courseCourse->id}}" selected="true">{{$courseCourse->name}}</option>
@@ -114,6 +150,61 @@
       alert('please select video.');
     } else if(!course){
       alert('please enter name.');
+    }
+  }
+
+  function selectSubcategory(ele){
+    var id = parseInt($(ele).val());
+    if( 0 < id ){
+      $.ajax({
+          method: "POST",
+          url: "{{url('admin/getCourseSubCategories')}}",
+          data: {id:id}
+      })
+      .done(function( msg ) {
+        select = document.getElementById('subcategory');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '0';
+        opt.innerHTML = 'Select Sub Category';
+        select.appendChild(opt);
+        if( 0 < msg.length){
+          $.each(msg, function(idx, obj) {
+              var opt = document.createElement('option');
+              opt.value = obj.id;
+              opt.innerHTML = obj.name;
+              select.appendChild(opt);
+          });
+        }
+      });
+    }
+  }
+
+  function selectCourse(ele){
+    var id = parseInt($(ele).val());
+    var category = document.getElementById('category').value;
+    if( 0 < id ){
+      $.ajax({
+          method: "POST",
+          url: "{{url('admin/getCourseByCatIdBySubCatIdForAdmin')}}",
+          data: {category:category,subcategory:id}
+      })
+      .done(function( msg ) {
+        select = document.getElementById('course');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '0';
+        opt.innerHTML = 'Select Course';
+        select.appendChild(opt);
+        if( 0 < msg.length){
+          $.each(msg, function(idx, obj) {
+              var opt = document.createElement('option');
+              opt.value = obj.id;
+              opt.innerHTML = obj.name;
+              select.appendChild(opt);
+          });
+        }
+      });
     }
   }
 </script>

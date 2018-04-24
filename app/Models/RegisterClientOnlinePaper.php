@@ -52,5 +52,15 @@ class RegisterClientOnlinePaper extends Model
         return;
     }
 
+    protected static function deleteRegisteredPapersByClientIdByPaperId($clientId, $paperId){
+        $papers = static::where('client_id', $clientId)->where('client_paper_id', $paperId)->get();
+        if(is_object($papers) && false == $papers->isEmpty()){
+            foreach($papers as $paper){
+                $paper->delete();
+            }
+        }
+        return;
+    }
+
 
 }

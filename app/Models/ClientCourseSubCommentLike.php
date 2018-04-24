@@ -74,12 +74,23 @@ class ClientCourseSubCommentLike extends Model
 					->get();
     }
 
-    protected static function deleteClientCourseSubCommentLikesByUserId($clientId){
+    protected static function deleteClientCourseSubCommentLikesByClientId($clientId){
         $subcommentLikes = static::where('client_id', $clientId)->get();
         if(is_object($subcommentLikes) && false == $subcommentLikes->isEmpty()){
             foreach($subcommentLikes as $subcommentLike){
                 $subcommentLike->delete();
             }
         }
+        return;
+    }
+
+    protected static function deleteClientCourseSubCommentLikesByClientIdByUserId($clientId,$userId){
+        $subcommentLikes = static::where('client_id', $clientId)->where('user_id', $userId)->get();
+        if(is_object($subcommentLikes) && false == $subcommentLikes->isEmpty()){
+            foreach($subcommentLikes as $subcommentLike){
+                $subcommentLike->delete();
+            }
+        }
+        return;
     }
 }

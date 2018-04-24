@@ -12,8 +12,6 @@ use App\Models\ClientOnlineTestSubCategory;
 class ClientOnlineTestCategory extends Model
 {
     protected $connection = 'mysql2';
-
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -21,7 +19,7 @@ class ClientOnlineTestCategory extends Model
      */
     protected $fillable = ['name', 'client_id'];
 
-     /**
+    /**
      *  add/update test category
      */
     protected static function addOrUpdateCategory( Request $request, $isUpdate=false){
@@ -102,6 +100,34 @@ class ClientOnlineTestCategory extends Model
         }
         return $result->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))
             ->select('client_online_test_categories.id', 'client_online_test_categories.name')
+            ->groupBy('client_online_test_categories.id')->get();
+    }
+
+    protected static function getOnlineTestCategoriesAssociatedWithPayableSubCategory($request,$categoryIds){
+        $loginUser = Auth::guard('client')->user();
+        if(is_object($loginUser)){
+            $clientId = $loginUser->id;
+        } else{
+            $client = InputSanitise::getCurrentClient($request);
+        }
+
+        $result = DB::connection('mysql2')->table('client_online_test_categories')
+                    ->join('payable_client_sub_categories', function($join){
+                        $join->on('payable_client_sub_categories.category_id', '=', 'client_online_test_categories.id');
+                    })
+                    ->join('clients', function($join){
+                        $join->on('clients.id', '=', 'client_online_test_categories.client_id');
+                        $join->on('clients.id', '=', 'payable_client_sub_categories.client_id');
+                    });
+        if(!empty($clientId)){
+            $result->where('clients.id', $clientId);
+        } else {
+            $result->where('clients.subdomain', $client);
+        }
+        if(count($categoryIds) > 0){
+            $result->whereNotIn('client_online_test_categories.id', $categoryIds);
+        }
+        return $result->select('client_online_test_categories.id', 'client_online_test_categories.name')
             ->groupBy('client_online_test_categories.id')->get();
     }
 

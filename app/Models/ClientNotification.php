@@ -56,4 +56,14 @@ class ClientNotification extends Model
     protected static function readUserNotifications($userId){
         return static::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('created_to', $userId)->where('is_seen', 0)->update(['is_seen' => 1]);
     }
+
+    protected static function deleteClientNotification($clientId){
+        $results = static::where('client_id', $clientId)->get();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                $result->delete();
+            }
+        }
+        return;
+    }
 }

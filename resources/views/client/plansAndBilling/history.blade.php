@@ -99,16 +99,19 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
                         <th>#</th>
                         <th>START DATE</th>
                         <th>END DATE</th>
-                        <th>PLAN</th>
+                        <th>PLAN/SUB CATEGORY*</th>
                         <th>AMOUNT</th>
                         <th>STATUS</th>
                     </tr>
                 </thead>
+                @php
+                  $index = 1;
+                @endphp
                 <tbody id="client_history">
                   @if(count($clientPlans) > 0)
-                    @foreach($clientPlans as $index => $clientPlan)
+                    @foreach($clientPlans as $clientPlan)
                       <tr class="">
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $index++ }}</td>
                         <td>{{$clientPlan->start_date}}</td>
                         <td>{{$clientPlan->end_date}}</td>
                         <td>{{$clientPlan->plan->name}}</td>
@@ -129,7 +132,20 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
                         @endif
                       </tr>
                     @endforeach
-                  @else
+                  @endif
+                  @if(count($payableSubCategories) > 0)
+                    @foreach($payableSubCategories as  $purchasedPayableSubCategory)
+                      <tr class="">
+                        <td>{{ $index++ }}</td>
+                        <td>{{$purchasedPayableSubCategory->start_date}}</td>
+                        <td>{{$purchasedPayableSubCategory->end_date}}</td>
+                        <td>{{$purchasedPayableSubCategory->sub_category}}</td>
+                        <td>Rs. {{$purchasedPayableSubCategory->admin_price}}</td>
+                        <td>Credit</td>
+                      </tr>
+                    @endforeach
+                  @endif
+                  @if(count($clientPlans) < 0 && count($payableSubCategories) < 0)
                     <tr class=""><td colspan="6">No Result!</td></tr>
                   @endif
                 </tbody>

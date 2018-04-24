@@ -16,6 +16,7 @@ use App\Models\ClientScore;
 use App\Models\ClientUserSolution;
 use App\Models\ClientOnlinePaperSection;
 use App\Models\RegisterClientOnlinePaper;
+use App\Models\PayableClientSubCategory;
 
 class ClientOnlineQuestionFrontController extends ClientHomeController
 {
@@ -43,7 +44,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         $subjectId = $request->get('subject_id');
         $paperId = $request->get('paper_id');
 
-        if(!empty($categoryId) && !empty($subcategoryId) && !empty($subjectId) && !empty($paperId)){
+        if(!empty($subcategoryId) && !empty($subjectId) && !empty($paperId)){
             $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
 
             if(is_object($questions) && true == $questions->isEmpty()){
@@ -60,7 +61,12 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 } else {
                     $clientId = 0;
                 }
-                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
+                if($categoryId > 0){
+                    $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
+                } else {
+                    $paperSections = ClientOnlinePaperSection::payablePaperSectionsByPaperId($paperId);
+                }
+
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
                         if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -69,8 +75,11 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                     }
                 }
             }
-            $paper = ClientOnlineTestSubjectPaper::getOnlineTestSubjectPaperById($paperId, $request);
-
+            if($categoryId > 0){
+                $paper = ClientOnlineTestSubjectPaper::getOnlineTestSubjectPaperById($paperId, $request);
+            } else {
+                $paper = ClientOnlineTestSubjectPaper::getPayablePaperById($paperId);
+            }
         	return view('client.front.question.questions', compact('results','paper', 'sections'));
         } else {
             return Redirect::to('/');
@@ -98,14 +107,29 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $clientUser = Auth::guard('clientuser')->user();
                 if(is_object($clientUser)){
                     $userId = $clientUser->id;
+                    $clientId = $clientUser->client_id;
                 } else {
                     $userId = 0;
+                    $clientId = 0;
                 }
 
-                $categoryId = $request->get('category_id');
                 $subcategoryId = $request->get('sub_category_id');
                 $subjectId = $request->get('subject_id');
                 $paperId = $request->get('paper_id');
+
+                if($request->get('category_id') > 0){
+                    $categoryId = $request->get('category_id');
+                } else {
+                    if($clientId > 0){
+                        $payableSubCategory = PayableClientSubCategory::getPayableSubCategoryByClientIdBySubCategoryId($clientId , $subcategoryId);
+                        if(is_object($payableSubCategory)){
+                            $categoryId = $payableSubCategory->category_id;
+                        } else {
+                            $categoryId = 0;
+                        }
+                    }
+                }
+
 
                 $quesResults = $request->except(['_token', 'category_id', 'sub_category_id', 'subject_id', 'paper_id']);
                 foreach($quesResults as $index => $quesResult){
@@ -148,7 +172,9 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                                         'user_answer' => $userAnswer,
                                         'client_user_id'     => $userId,
                                         'paper_id'    => $paperId,
-                                        'subject_id'  => $subjectId
+                                        'subject_id'  => $subjectId,
+                                        'created_at' => date('Y-m-d H:i:s'),
+                                        'updated_at' => date('Y-m-d H:i:s')
                                     ];
                 }
 
@@ -218,28 +244,40 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         $sections = [];
         $loginUser = Auth::guard('clientuser')->user();
         $userId = $loginUser->id;
+        $clientId = $loginUser->client_id;
+
         $categoryId = $request->get('category_id');
         $subcategoryId = $request->get('sub_category_id');
         $subjectId = $request->get('subject_id');
         $paperId = $request->get('paper_id');
 
-        $score = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId);
-        $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
-
-        foreach($questions as $question){
-            $results['questions'][$question->section_type][] = $question;
-        }
-        if(count(array_keys($results['questions'])) > 0){
-            $clientId = $loginUser->client_id;
-            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
-            if(is_object($paperSections) && false == $paperSections->isEmpty()){
-                foreach($paperSections as $paperSection){
-                    if(in_array($paperSection->id, array_keys($results['questions']))){
-                        $sections[$paperSection->id] = $paperSection;
+        if($clientId > 0){
+            $payableSunCategory = PayableClientSubCategory::getPayableSubCategoryByClientIdBySubCategoryId($clientId , $subcategoryId);
+            if(is_object($payableSunCategory)){
+                $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId(0, $subcategoryId, $subjectId, $paperId, $request);
+            } else {
+                $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
+            }
+            foreach($questions as $question){
+                $results['questions'][$question->section_type][] = $question;
+            }
+            if(count(array_keys($results['questions'])) > 0){
+                if(is_object($payableSunCategory)){
+                    $paperSections = ClientOnlinePaperSection::payablePaperSectionsByPaperId($paperId);
+                } else {
+                    $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
+                }
+                if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                    foreach($paperSections as $paperSection){
+                        if(in_array($paperSection->id, array_keys($results['questions']))){
+                            $sections[$paperSection->id] = $paperSection;
+                        }
                     }
                 }
             }
         }
+        $score = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId);
+
         $userSolutions = ClientUserSolution::getClientUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $score->id, $subjectId, $paperId);
         foreach ($userSolutions  as $key => $result) {
             $userResults[$result->ques_id] = $result;
@@ -259,10 +297,15 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             foreach($questions as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
+
             if(count(array_keys($results['questions'])) > 0){
                 $clientId = Auth::guard('clientuser')->user()->client_id;
                 $paperId = $paper->id;
-                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
+                if(0 == $paper->category_id){
+                    $paperSections = ClientOnlinePaperSection::payablePaperSectionsByPaperId($paperId);
+                } else {
+                    $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
+                }
                 if(is_object($paperSections) && false == $paperSections->isEmpty()){
                     foreach($paperSections as $paperSection){
                         if(in_array($paperSection->id, array_keys($results['questions']))){
@@ -291,7 +334,15 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         $subcategoryId = $request->get('subcategory');
         $subjectId = $request->get('subject');
         $paperId = $request->get('paper');
-        $allQuestions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
+
+        $subdomain = InputSanitise::checkDomain($request);
+
+        $payableSunCategory = PayableClientSubCategory::getPayableSubCategoryByClientIdBySubCategoryId($subdomain->client_id , $subcategoryId);
+        if(is_object($payableSunCategory)){
+            $allQuestions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId(0, $subcategoryId, $subjectId, $paperId, $request);
+        } else {
+            $allQuestions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
+        }
 
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
@@ -303,7 +354,11 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             } else {
                 $clientId = 0;
             }
-            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
+            if(is_object($payableSunCategory)){
+                $paperSections = ClientOnlinePaperSection::payablePaperSectionsByPaperId($paperId);
+            } else {
+                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
+            }
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
                     if(in_array($paperSection->id, array_keys($questions))){
@@ -312,8 +367,8 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 }
             }
         }
-        $clientSubdomain = $request->route()->getParameter('client');
-        return view('client.front.question.show_questions', compact('questions', 'clientSubdomain', 'sections'));
+
+        return view('client.front.question.show_questions', compact('questions', 'sections'));
     }
 
     /**
@@ -325,15 +380,23 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
         $subcategoryId = $subcategory;
         $subjectId = $subject;
         $paperId = $paper;
-        $clientSubdomain = $request->route()->getParameter('client');
-        $allQuestions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
+        $clientSubdomain = $subdomainName;
+        if(0 == $categoryId){
+            $allQuestions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId(0, $subcategoryId, $subjectId, $paperId, $request);
+        } else {
+            $allQuestions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
+        }
 
         foreach($allQuestions as $question){
             $questions[$question->section_type][] = $question;
         }
         if(count(array_keys($questions)) > 0){
             $clientId = Auth::guard('clientuser')->user()->client_id;
-            $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
+            if(0 == $categoryId){
+                $paperSections = ClientOnlinePaperSection::payablePaperSectionsByPaperId($paperId);
+            } else {
+                $paperSections = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId,$request);
+            }
             if(is_object($paperSections) && false == $paperSections->isEmpty()){
                 foreach($paperSections as $paperSection){
                     if(in_array($paperSection->id, array_keys($questions))){
@@ -343,7 +406,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             }
         }
 
-        $html = view('client.front.question.show_questions', compact('questions', 'clientSubdomain', 'sections'));
+        $html = view('client.front.question.show_questions', compact('questions', 'sections'));
         $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8','tempDir' => __DIR__ .'/../../mpdfFont']);
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;

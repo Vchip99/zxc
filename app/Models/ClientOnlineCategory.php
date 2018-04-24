@@ -11,8 +11,6 @@ use App\Models\ClientOnlineSubCategory;
 class ClientOnlineCategory extends Model
 {
 	protected $connection = 'mysql2';
-
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

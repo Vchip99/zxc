@@ -9,6 +9,10 @@ use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
+use App\Models\ClientUserSolution;
+use App\Models\ClientScore;
+use App\Models\ClientUserPurchasedTestSubCategory;
+use App\Models\ClientOnlinePaperSection;
 
 class ClientOnlineTestSubCategoryController extends ClientBaseController
 {
@@ -141,9 +145,12 @@ class ClientOnlineTestSubCategoryController extends ClientBaseController
                                 foreach($testSubject->papers as $paper){
                                     if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
                                         foreach($paper->questions as $question){
+                                            ClientUserSolution::deleteClientUserSolutionsByQuestionId($question->id);
                                             $question->delete();
                                         }
                                     }
+                                    ClientScore::deleteScoresByPaperId($paper->id);
+                                    ClientOnlinePaperSection::deleteClientPaperSectionsByClientIdByPaperId($paper->client_id,$paper->id);
                                     $paper->deleteRegisteredPaper();
                                     $paper->delete();
                                 }

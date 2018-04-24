@@ -163,14 +163,16 @@
       </thead>
       <tbody id="all_session">
         @if(count($allSessions) > 0)
-          @foreach($allSessions as $session)
+          @foreach($allSessions as $index => $session)
             <tr id="tr_{{$session->id}}">
               <td class="col-sm-3"><input type="text" class="form-control" name="session_{{$session->id}}" value="{{$session->name}}" required="true"></td>
               <td class="col-sm-3 duration">
                 <input type="text" class="form-control" name="duration_{{$session->id}}" value="{{$session->duration}}">
               </td>
               <td class=""><button type="button" onClick="addSessions();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
-              <td class=""><button onClick="removeElement('all_session',{{$session->id}});"> <i class="fa fa-minus-circle" aria-hidden="true"></i></button></td>
+              @if($index > 0 )
+                <td class=""><button onClick="removeElement('all_session',{{$session->id}});"> <i class="fa fa-minus-circle" aria-hidden="true"></i></button></td>
+              @endif
             </tr>
           @endforeach
         @else
@@ -228,6 +230,48 @@
     @if($errors->has('option_count')) <p class="help-block">{{ $errors->first('option_count') }}</p> @endif
     </div>
   </div>
+  <div class="form-group row">
+    <label for="paper" class="col-sm-2 col-form-label">Generate Verification Code:</label>
+    <div class="col-sm-3">
+      @if(isset($paper->id))
+        <label class="radio-inline"><input type="radio" name="is_verification_code" value="1" onClick="toggleVerificationCount(this);"  @if($paper->verification_code_count > 0) checked @endif> Yes</label>
+        <label class="radio-inline"><input type="radio" name="is_verification_code" value="0" onClick="toggleVerificationCount(this);" @if(empty($paper->verification_code_count)) checked @endif> No</label>
+      @else
+        <label class="radio-inline"><input type="radio" name="is_verification_code" value="1" onClick="toggleVerificationCount(this);"> Yes</label>
+        <label class="radio-inline"><input type="radio" name="is_verification_code" value="0" onClick="toggleVerificationCount(this);" checked> No</label>
+      @endif
+    </div>
+  </div>
+  @if(isset($paper->id) && $paper->verification_code_count > 0)
+    <div class="form-group row verification_code_count">
+  @else
+    <div class="form-group row verification_code_count hide">
+  @endif
+    <label for="name" class="col-sm-2 col-form-label">No of Verification Code:</label>
+    <div class="col-sm-3">
+        <input type="text" class="form-control" name="verification_code_count" id="verification_code_count" value="{{$paper->verification_code_count}}" placeholder="No of Verification Code">
+    </div>
+  </div>
+  @if(isset($paper->id))
+    @if($paper->verification_code_count > 0)
+      <div class="form-group row verification_code">
+        <label for="name" class="col-sm-2 col-form-label">Verification Code:</label>
+        <div class="col-sm-10">
+          <textarea class="form-control" rows="5">{{$paper->verification_code}}</textarea>
+        </div>
+      </div>
+    @endif
+    @if($paper->verification_code_count > 0)
+      <div class="form-group row add_verification_code_count">
+    @else
+      <div class="form-group row add_verification_code_count hide">
+    @endif
+      <label for="name" class="col-sm-2 col-form-label">Add No of Verification Code:</label>
+      <div class="col-sm-3">
+          <input type="text" class="form-control" name="add_verification_code_count" id="add_verification_code_count" value="" placeholder="No of Verification Code">
+      </div>
+    </div>
+  @endif
   <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
         <button type="button" class="btn btn-primary" onclick="searchPaper();">Submit</button>
@@ -443,6 +487,22 @@
       } else if(!paper){
         alert('please enter paper name.');
       }
+    }
+
+    function toggleVerificationCount(ele){
+      if(1 == $(ele).val()){
+        $('.verification_code_count').removeClass('hide');
+        if($('#verification_code_count').val() > 0){
+          $('.verification_code').removeClass('hide');
+        }
+        $('.add_verification_code_count').removeClass('hide');
+      } else {
+        $('.verification_code_count').addClass('hide');
+        $('.verification_code').addClass('hide');
+        $('.add_verification_code_count').addClass('hide');
+
+      }
+
     }
 </script>
 @stop

@@ -46,6 +46,7 @@ class PaperController extends Controller
         'name' => 'required|string',
         'date_to_active' => 'required',
         'date_to_inactive' => 'required',
+        'is_verification_code' => 'required',
     ];
 
     /**
@@ -162,6 +163,7 @@ class PaperController extends Controller
                         }
                     }
                     Score::deleteUserScoresByPaperId($paper->id);
+                    PaperSection::deletePaperSectionsByPaperId($paper->id);
                     $paper->deleteRegisteredPaper();
     	    		$paper->delete();
                     DB::commit();

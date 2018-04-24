@@ -10,7 +10,6 @@ use App\Models\AssignmentSubject;
 
 class AssignmentTopic extends Model
 {
-	public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

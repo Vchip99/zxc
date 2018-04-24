@@ -42,7 +42,7 @@ class PlacementExperiance extends Model
         $placementExperiance->title = $title;
         $placementExperiance->question = $question;
         $placementExperiance->user_id = Auth::user()->id;
-		$placementExperiance->created_at = date('Y-m-d h:i:s');
+		$placementExperiance->created_at = date('Y-m-d H:i:s');
         $placementExperiance->save();
         return $placementExperiance;
     }

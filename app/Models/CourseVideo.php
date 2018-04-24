@@ -8,16 +8,18 @@ use App\Models\CourseCourse;
 use App\Libraries\InputSanitise;
 use App\Models\CourseComment;
 use App\Models\CourseVideoLike;
+use App\Models\CourseSubCategory;
+use App\Models\CourseCategory;
+
 
 class CourseVideo extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name', 'description', 'duration', 'video_path','course_id'];
+    protected $fillable = ['name', 'description', 'duration', 'video_path','course_id', 'course_category_id', 'course_sub_category_id'];
 
     /**
      *  create/update video
@@ -27,6 +29,8 @@ class CourseVideo extends Model
     	$description = InputSanitise::inputString($request->get('description'));
     	$duration = InputSanitise::inputInt($request->get('duration'));
     	$course = InputSanitise::inputInt($request->get('course'));
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
     	$videoPath = trim($request->get('video_path'));
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
 
@@ -44,6 +48,8 @@ class CourseVideo extends Model
     	$video->duration = $duration;
     	$video->video_path = $videoPath;
     	$video->course_id = $course;
+        $video->course_category_id = $categoryId;
+        $video->course_sub_category_id = $subcategoryId;
     	$video->save();
     	return $video;
     }
@@ -61,6 +67,30 @@ class CourseVideo extends Model
      */
     public function course(){
         return $this->belongsTo(CourseCourse::class, 'course_id');
+    }
+
+    /**
+     *  get category of video
+     */
+    public function category(){
+        $category = CourseCategory::find($this->course_category_id);
+        if(is_object($category)){
+            return $category->name;
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     *  get subcategory of video
+     */
+    public function subcategory(){
+        $subcategory = CourseSubCategory::find($this->course_sub_category_id);
+        if(is_object($subcategory)){
+            return $subcategory->name;
+        } else {
+            return '';
+        }
     }
 
     protected static function getCoursevideoCount($courseIds){

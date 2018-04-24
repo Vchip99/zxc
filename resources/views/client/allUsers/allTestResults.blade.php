@@ -223,11 +223,21 @@
             opt.value = 0;
             opt.innerHTML = 'Select Sub Category';
             select.appendChild(opt);
-            if( 0 < msg.length){
-              $.each(msg, function(idx, obj) {
+            if( 0 < msg['subcategories'].length){
+              $.each(msg['subcategories'], function(idx, obj) {
                   var opt = document.createElement('option');
                   opt.value = obj.id;
                   opt.innerHTML = obj.name;
+                  opt.setAttribute('data-payable',false);
+                  select.appendChild(opt);
+              });
+            }
+            if( 0 < msg['payableSubCategories'].length){
+              $.each(msg['payableSubCategories'], function(idx, obj) {
+                  var opt = document.createElement('option');
+                  opt.value = obj.id;
+                  opt.innerHTML = obj.name;
+                  opt.setAttribute('data-payable',true);
                   select.appendChild(opt);
               });
             }
@@ -246,8 +256,12 @@
     document.getElementById('paper').value = 0;
     document.getElementById('all_test_result').innerHTML = '';
     subcatId = parseInt($(ele).val());
-    catId = parseInt(document.getElementById('category').value);
-    if( 0 < catId && 0 < subcatId ){
+    if($(ele).find(':selected').data('payable')){
+      catId = 0;
+    } else {
+      catId = parseInt(document.getElementById('category').value);
+    }
+    if( 0 < subcatId ){
       $.ajax({
               method: "POST",
               url: "{{url('getOnlineSubjectsByCatIdBySubcatId')}}",
@@ -281,12 +295,17 @@
 
   function selectPaper(ele){
     subjectId = parseInt($(ele).val());
+    if($('#subcategory option:selected').data('payable')){
+      categoryId = 0;
+    } else {
+      categoryId = parseInt(document.getElementById('category').value);
+    }
     document.getElementById('all_test_result').innerHTML = '';
     if( 0 < subjectId ){
       $.ajax({
           method: "POST",
             url: "{{url('getOnlinePapersBySubjectId')}}",
-            data: {subjectId:subjectId}
+            data: {categoryId:categoryId,subjectId:subjectId}
       }).done(function( msg ) {
         select = document.getElementById('paper');
         select.innerHTML = '';

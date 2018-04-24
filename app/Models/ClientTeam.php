@@ -10,7 +10,6 @@ use DB, Session;
 
 class ClientTeam extends Model
 {
-	public $timestamps = false;
     protected $connection = 'mysql2';
 
     /**

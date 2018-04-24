@@ -28,6 +28,8 @@
         <tr>
           <th>#</th>
           <th>Video Name</th>
+          <th>Category Name</th>
+          <th>Sub Category Name</th>
           <th>Course Name</th>
           <th>Edit Video</th>
           <th>Delete Video</th>
@@ -39,6 +41,8 @@
           <tr>
             <th scope="row">{{$index + 1}}</th>
             <td>{{$courseVideo->name}}</td>
+            <td>{{$courseVideo->category()}}</td>
+            <td>{{$courseVideo->subcategory()}}</td>
             <td>{{$courseVideo->course->name}}</td>
             <td>
               <a href="{{url('admin/courseVideo')}}/{{$courseVideo->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$courseVideo->name}}" />

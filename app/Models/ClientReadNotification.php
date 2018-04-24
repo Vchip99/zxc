@@ -60,4 +60,24 @@ class ClientReadNotification extends Model
     	}
     	return $ids;
     }
+
+    protected static function deleteClientReadNotification($clientId){
+        $results = static::where('client_id', $clientId)->get();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                $result->delete();
+            }
+        }
+        return;
+    }
+
+    protected static function deleteClientReadNotificationByClientIdByUserId($clientId,$userId){
+        $results = static::where('client_id', $clientId)->where('client_user_id', $userId)->get();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                $result->delete();
+            }
+        }
+        return;
+    }
 }

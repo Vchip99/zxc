@@ -21,7 +21,7 @@ class ClientCourseComment extends Model
     protected $fillable = ['client_online_video_id', 'user_id', 'client_id', 'body'];
 
     /**
-     *  create comment with assocaited vkit project Id
+     *  create comment with assocaited  Id
      */
     protected static function createComment(Request $request){
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
@@ -74,5 +74,16 @@ class ClientCourseComment extends Model
                 $comment->delete();
             }
         }
+        return;
+    }
+
+    protected static function deleteClientCourseCommentsByClientIdByUserId($clientId, $userId){
+        $comments = static::where('client_id', $clientId)->where('user_id', $userId)->get();
+        if(is_object($comments) && false == $comments->isEmpty()){
+            foreach($comments as $comment){
+                $comment->delete();
+            }
+        }
+        return;
     }
 }

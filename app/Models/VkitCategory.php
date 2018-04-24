@@ -10,7 +10,6 @@ use App\Models\VkitProject;
 
 class VkitCategory extends Model
 {
-	public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

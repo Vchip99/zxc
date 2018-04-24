@@ -8,7 +8,6 @@ use App\Libraries\InputSanitise;
 
 class OfflineWorkshopCategory extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

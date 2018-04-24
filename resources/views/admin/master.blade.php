@@ -370,6 +370,22 @@
               <li title="Web Development"><a href="{{ url('admin/manageWebDevelopments')}}"><i class="fa fa-circle-o"></i> Web Development </a></li>
             </ul>
           </li>
+          <li class="treeview">
+            <a href="#" title="Payable Test">
+              <i class="fa fa-files-o"></i>
+              <span>Payable Test</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Manage Sub Category"><a href="{{ url('admin/managePayableSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
+              <li title="Manage Subject"><a href="{{ url('admin/managePayableSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
+              <li title="Manage Paper"><a href="{{ url('admin/managePayablePaper')}}"><i class="fa fa-circle-o"></i> Manage Paper </a></li>
+              <li title="Manage Question"><a href="{{ url('admin/managePayableQuestions')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
+              <li title="Upload Excel File"><a href="{{ url('admin/uploadPayableQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
+            </ul>
+          </li>
         @endif
         <li class="header">LABELS</li>
         <li>

@@ -9,7 +9,6 @@ use App\Libraries\InputSanitise;
 
 class PlacementArea extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

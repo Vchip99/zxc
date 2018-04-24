@@ -10,8 +10,6 @@ use App\Libraries\InputSanitise;
 class ClientOnlinePaperSection extends Model
 {
     protected $connection = 'mysql2';
-
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -26,5 +24,39 @@ class ClientOnlinePaperSection extends Model
             $client = InputSanitise::getCurrentClient($request);
             return static::join('clients', 'clients.id', '=', 'client_online_paper_sections.client_id')->where('clients.subdomain', $client)->where('paper_id', $paperId)->select('client_online_paper_sections.*')->get();
         }
+    }
+
+    protected static function payablePaperSectionsByPaperId($paperId){
+        return static::where('client_id', 0)->where('category_id', 0)->where('paper_id', $paperId)->get();
+    }
+
+    protected static function deletePayablePaperSectionsByPaperId($paperId){
+        $results = static::where('client_id', 0)->where('category_id', 0)->where('paper_id', $paperId)->get();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                $result->delete();
+            }
+        }
+        return;
+    }
+
+    protected static function deleteClientPaperSectionsByClientIdByPaperId($clientId,$paperId){
+        $results = static::where('client_id', $clientId)->where('paper_id', $paperId)->get();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                $result->delete();
+            }
+        }
+        return;
+    }
+
+    protected static function deleteClientPaperSectionsByClientId($clientId){
+        $results = static::where('client_id', $clientId)->get();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                $result->delete();
+            }
+        }
+        return;
     }
 }

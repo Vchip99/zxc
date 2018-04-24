@@ -17,6 +17,8 @@ class Kernel extends ConsoleKernel
         Commands\UpdateClientAccessToken::class,
         Commands\CreateApplicationUser::class,
         Commands\SignupUnRegisteredClient::class,
+        Commands\GenerateBillAndDeActivatePlan::class,
+        Commands\DeActivateClientPayableSubCategory::class,
     ];
 
     /**
@@ -31,6 +33,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('updateclientaccesstoken:cron');
         $schedule->command('createapplicationuser:command');
         $schedule->command('signupunregisteredclient:command');
+        $schedule->command('generatebillanddeactivateplan:cron');
+        $schedule->command('deactivateclientpayablesubcategory:cron');
     }
 
     /**

@@ -46,6 +46,7 @@ class QuizController extends Controller
         $subcategoryId = $request->get('sub_category_id');
         $subjectId = $request->get('subject_id');
         $paperId = $request->get('paper_id');
+        $checkVerificationCode = $request->get('verification_code');
 
         if(!empty($categoryId) && !empty($subcategoryId) && !empty($subjectId) && !empty($paperId)){
             $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
@@ -70,7 +71,7 @@ class QuizController extends Controller
 
             $paper = $this->getPaperById($paperId);
 
-    	   return view('quiz.questions', compact('results','paper', 'sections'));
+    	   return view('quiz.questions', compact('results','paper', 'sections', 'checkVerificationCode'));
         } else {
             return Redirect::to('/');
         }
@@ -168,8 +169,9 @@ class QuizController extends Controller
                 $subcategoryId = $request->get('sub_category_id');
                 $subjectId = $request->get('subject_id');
                 $paperId = $request->get('paper_id');
+                $verificationCode = $request->get('verification_code');
 
-                $quesResults = $request->except(['_token', 'category_id', 'sub_category_id', 'subject_id', 'paper_id']);
+                $quesResults = $request->except(['_token', 'category_id', 'sub_category_id', 'subject_id', 'paper_id', 'verification_code']);
                 foreach($quesResults as $index => $quesResult){
                     if($index > 0){
                         $questionIds[] = $index;
@@ -209,7 +211,9 @@ class QuizController extends Controller
                                         'user_answer' => $userAnswer,
                                         'user_id'     => $userId,
                                         'paper_id'    => $paperId,
-                                        'subject_id'  => $subjectId
+                                        'subject_id'  => $subjectId,
+                                        'created_at' => date('Y-m-d H:i:s'),
+                                        'updated_at' => date('Y-m-d H:i:s')
                                     ];
                 }
 
@@ -222,6 +226,7 @@ class QuizController extends Controller
                 $result['wrong_answered'] = $wrongAnswer;
                 $result['unanswered'] = $unanswered;
                 $result['marks'] = $marks;
+                $result['verification_code'] = $verificationCode;
                 $score = Score::getUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId);
                 if(!is_object($score)){
                     $score = Score::addScore($userId, $result);

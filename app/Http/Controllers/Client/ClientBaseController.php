@@ -25,6 +25,7 @@ use App\Models\BankDetail;
 use App\Models\UserBasedAuthentication;
 use App\Models\ClientUserPurchasedCourse;
 use App\Models\ClientUserPurchasedTestSubCategory;
+use App\Models\PayableClientSubCategory;
 use Illuminate\Http\Request;
 use Auth, Redirect, View, DB, Session;
 use App\Http\Controllers\Instamojo;
@@ -100,6 +101,7 @@ class ClientBaseController extends BaseController
     }
 
     protected function manageBillings(){
+
         $dueDate = '';
         $clientPlan = ClientPlan::getLastClientPlanForBill();
         if(is_object($clientPlan) && ('Credit' != $clientPlan->payment_status || 'free' != $clientPlan->payment_status)){
@@ -114,8 +116,10 @@ class ClientBaseController extends BaseController
     }
 
     protected function manageHistory(){
-        $clientPlans = ClientPlan::where('client_id', Auth::guard('client')->user()->id)->get();
-        return view('client.plansAndBilling.history', compact('clientPlans'));
+        $client = Auth::guard('client')->user();
+        $clientPlans = ClientPlan::where('client_id', $client->id)->orderBy('id')->get();
+        $payableSubCategories = PayableClientSubCategory::where('client_id', $client->id)->get();
+        return view('client.plansAndBilling.history', compact('clientPlans','payableSubCategories'));
     }
 
     protected function getClientUserPayments(Request $request){
@@ -126,8 +130,9 @@ class ClientBaseController extends BaseController
         if(is_object($userCourses) && false == $userCourses->isEmpty()){
             foreach($userCourses as $userCourse){
                 $results['purchased'][] = [
+                                'user' => $userCourse->clientUser(),
                                 'type' => 'Course',
-                                'name' => $userCourse->course->name,
+                                'name' => $userCourse->course,
                                 'amount' => $userCourse->price,
                                 'date' => $userCourse->updated_at
                             ];
@@ -139,8 +144,9 @@ class ClientBaseController extends BaseController
         if(is_object($userTestSubCategories) && false == $userTestSubCategories->isEmpty()){
             foreach($userTestSubCategories as $userTestSubCategory){
                 $results['purchased'][] = [
+                                'user' => $userTestSubCategory->clientUser(),
                                 'type' => 'SubCategory',
-                                'name' => $userTestSubCategory->testSubCategory->name,
+                                'name' => $userTestSubCategory->test_sub_category,
                                 'amount' => $userTestSubCategory->price,
                                 'date' => $userTestSubCategory->updated_at
                             ];

@@ -3,12 +3,20 @@
 <head>
   <title>ONLINE TEST SERIES</title>
   <meta charset="utf-8">
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   	<link href="{{asset('css/bootstrap.min.css?ver=1.0')}}" rel="stylesheet">
   	<link href="{{asset('css/jquery-confirm.min.css?ver=1.0')}}" rel="stylesheet"/>
   	<script src="{{asset('js/jquery.min.js?ver=1.0')}}"></script>
 	<script src="{{asset('js/bootstrap.min.js?ver=1.0')}}"></script>
   	<script src="{{asset('js/jquery-confirm.min.js?ver=1.0')}}"></script>
+  	<script type="text/javascript">
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+  </script>
 </head>
 <style type="text/css">
 	body{font-family:  Century Gothic, serif}
@@ -80,6 +88,8 @@
 			}
 			.btn-voilate{  background: #7f43c4;
 			}
+			.btn-unsolved{  background: #bce8f1;
+			}
 			h3{color: #c00000; font-size: 15px; font-weight: bolder;}
 
 </style>
@@ -118,11 +128,11 @@
 	                <div class="panel-body">
 
 					<ul class="list3">
-						<li>1. The clock will be set at the server. The countdown timer at the right corner of the screen will display the remaining time available for you to complete the examination. When the timer reaches zero the examination ends by itself. You need to terminate the examination or submit the paper.</li>
+						<li>1. The clock will be set at the server. The countdown timer at the right corner of the screen will display the remaining time available for you to complete the examination. When the timer reaches zero the examination ends by itself.</li>
 
 						<li>2. The question palette displayed on the right side of the screen will show the status of each question using one of the following color:</li>
 						<ul class="custom-list-style">
-							<li><button type="button" class="btn btn-default btn-circle"></button>You have not visited the question yet
+							<li><button type="button" class="btn btn-unsolved btn-circle"></button>You have not visited the question yet
 							</li>
 							<li><button type="button" class="btn btn-danger btn-circle"></button>You have not answered the question.</li>
 							<li><button type="button" class="btn btn-success btn-circle"></button>You have answered the question.</li>
@@ -130,107 +140,56 @@
 						</ul>
 						<li>3. The Marked for Review status for a question simply indicates that you would like to look at that question again. If a question is answered, but marked for review, then the answer to that question will be considered in the evaluation, unless the status is modified by the candidate.
 						</li>
-						<h3> Navigating to a Question </h3>
-						 <li>4. To answer a question, do the following:</li>
-						<ul class="custom-list-style-1">
-								<li>Click on the question number in the Question Palette to go to that question directly.</li>
 
-						        <li>Select an answer for a multiple choice type question by clicking on bubble placed before the 4 choices A, B, C, D. Use the virtual numeric keypad to enter a number as an answer to a numerical type question.</li>
-
-						        <li>Click on Save and Next to save your answer for the current question and then go to the next question.</li>
-
-						        <li>Click on Mark for Review and Next to save your answer for the current question, mark it for review, and then go to the next question.</li>
-						</ul>
-						<li>5. Caution: Note that your answer for the current question will not be saved, if you navigate to another question directly by clicking on its question number.
-						You can view all the questions by clicking on the Question Paper button. This feature is provided so that you can see the entire question paper at a glance. Note that the options for multiple choice type questions will not be shown.</li>
-						<h3> Answering a Question</h3>
-					    <li>6. Procedure for answering a multiple choice type question:</li>
-					    <ul class="custom-list-style-1">
-					       <li> To select your answer, click on the button of one of the options A, B, C, D</li>
-
-					        <li>To deselect your chosen answer, click on the button of the chosen option again or click on the Clear Response button</li>
-
-					       <li> To change your chosen answer, click on the button of another option</li>
-
-					       <li> To save your answer, you MUST click on the Save & Next button</li>
-
-					       <li> To mark the question for review, click on the Mark for Review & Next button. If an answer is selected for a question that is Marked for Review, that answer will be considered in the evaluation.</li>
-						</ul>
-					   <li>7.  Procedure for answering a numerical answer type question:</li>
-						<ul class="custom-list-style-1">
-
-						    <li>To enter a number as your answer, use the virtual numerical keypad</li>
-
-						    <li>In Numerical Type Questions, you are limited to answer till two decimal points.</li>
-
-						    <li>A fraction (eg. -0.3 or -.3) can be entered as an answer with or without "0" before the decimal point</li>
-
-							 <li>To clear your answer, click on the Clear Response button
-								<ul class="custom-list-style-1">
-								       <li> To save your answer, you MUST click on the Save & Next button</li>
-
-								       <li> To mark the question for review, click on the Mark for Review and Next button. If an answer is entered for a question that is Marked for Review, that answer will be considered in the evaluation.</li>
-
-								       <li> To change your answer to a question that has already been answered, first select that question for answering and then follow the procedure for answering that type of question.</li>
-
-								        <li>Note that ONLY Questions for which answers are saved or MARKED FOR REVIEW after answering will be considered for evaluation</li>
-								</ul>
-							</li>
-						</ul>
-						<h3>8. Sections</h3>
-						<ul class="custom-list-style-1">
-							<li>a. Sections in the question paper will be displayed in the top bar of the screen. Questions in a section can be viewed by clicking on the name of that Section. The Section you are currently viewing will be highlighted</li>
-
-							<li>b. After clicking on Save & the Next button for the last question in a Section, you will be automatically taken to the first question of the next Section in a sequence.</li>
-
-							<li>c. You can move the mouse cursor over the name of the Section to view the answering status of that Section.</li>
-
-							<li>d. You can shuffle between different Sections or change the optional Sections any number of times.</li>
-						</ul>
-						<h3>9. Calculators</h3>
-						Online Scientific Calculators will be available in GATE Online Test Platform.
-						<h3>Disclaimer:</h3>
-						This Online Test Series is designed by studying and surveying the previous platforms of the respective examinations. And efforts are made to replicate the actual exam patterns in all the aspects. However ONLINE TEST will not be responsible for any changes in exam pattern or functionality update	s in the actual examinations.
-						<h3>Declaration:</h3>
-						I have read and understood all the above mentioned instructions. Also, I confirm that at the start of the examination all the computer hardware and internet connection are in proper working condition.
 					</ul>
 	                </div>
 	                <div class="panel-footer">
-						<label class="checkbox-inline"><input type="checkbox" name="checkMe" value="" class="mrgn" id="checkMe">I agree all terms and conditions.</label>
-						<button type="button "  class=" next-btn" onClick="return checkCondition();" >Next</button>
+	                	@if($isVerificationCode)
+	                		<label >Please enter correct verification code and verification code can use only once.</label><br>
+	                		<label class="checkbox-inline">Verification Code:</label>
+	                		<input type="text" name="verification_code" id="verification_code" value="" class="mrgn" placeholder="Verification Code" required>
+							<a class="btn btn-primary next-btn" onClick="checkVerificationCode();" >Next</a>
+	                	@else
+	                		<button type="submit" class="next-btn">Next</button>
+						@endif
 			  		</div>
 	        </div>
 	    </div>
 
 	</div>
 </div>
-
-<!-- <div class="panel-footer">
-  	<div class="row">
-  		<div class="col-md-6 col-sm-6 col-xs-12">
-			<label class="checkbox-inline"><input type="checkbox" name="checkMe" value="" class="mrgn" id="checkMe">I agree all terms and conditions.</label>
-			<button type="button "  class=" next-btn" onClick="return checkCondition();" >Next</button>
-  		</div>
-  	</div>
-  </div> -->
-<input type="hidden" id="category_id" name="category_id" value="{{$categoryId}}">
-		    <input type="hidden" id="sub_category_id" name="sub_category_id" value="{{$subcategoryId}}">
-		    <input type="hidden" id="subject_id" name="subject_id" value="{{$subjectId}}">
-		    <input type="hidden" id="paper_id" name="paper_id" value="{{$paperId}}">
+		<input type="hidden" id="category_id" name="category_id" value="{{$categoryId}}">
+	    <input type="hidden" id="sub_category_id" name="sub_category_id" value="{{$subcategoryId}}">
+	    <input type="hidden" id="subject_id" name="subject_id" value="{{$subjectId}}">
+	    <input type="hidden" id="paper_id" name="paper_id" value="{{$paperId}}">
 </div>
 </form>
 </div>
 </div>
 <script>
-	function checkCondition(){
-		if(document.getElementById('checkMe').checked == true){
-			document.instructionForm.submit();
+	function checkVerificationCode(){
+		var verificationCode = document.getElementById('verification_code').value;
+		var paperId = document.getElementById('paper_id').value;
+		if(verificationCode && paperId){
+			$.ajax({
+	          method:'POST',
+	          url: "{{url('checkVerificationCode')}}",
+	          data:{verification_code:verificationCode,paper_id:paperId}
+	        }).done(function( msg ) {
+	          if('true' == msg){
+	            document.instructionForm.submit();
+	          } else {
+	            $.alert({
+				    title: 'Alert!',
+				    content: 'Please enter correct verification code.',
+				});
+	          }
+	        });
 		} else {
 			$.alert({
 			    title: 'Alert!',
-			    content: 'Please mark Checkbox.',
+			    content: 'Please enter verification code.',
 			});
-			return false;
 		}
 	}
 </script>

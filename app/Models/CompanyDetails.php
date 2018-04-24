@@ -11,7 +11,6 @@ use App\Models\PlacementCompany;
 
 class CompanyDetails extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

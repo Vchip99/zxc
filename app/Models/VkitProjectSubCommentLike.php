@@ -8,7 +8,6 @@ use Auth;
 
 class VkitProjectSubCommentLike extends Model
 {
-    public $timestamps = false;
 	/**
      * The attributes that are mass assignable.
      *

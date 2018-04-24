@@ -152,6 +152,7 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
                         }
                     }
                     ClientScore::deleteScoresByPaperId($paper->id);
+                    ClientOnlinePaperSection::deleteClientPaperSectionsByClientIdByPaperId($paper->client_id,$paper->id);
                     $paper->deleteRegisteredPaper();
     	    		$paper->delete();
                     DB::connection('mysql2')->commit();
@@ -170,7 +171,12 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     protected function getOnlinePapersBySubjectId(Request $request){
         if($request->ajax()){
             $subjectId = InputSanitise::inputInt($request->get('subjectId'));
-            return ClientOnlineTestSubjectPaper::getOnlinePapersBySubjectId($subjectId);
+            $categoryId = $request->get('categoryId');
+            if($categoryId > 0){
+                return ClientOnlineTestSubjectPaper::getOnlinePapersBySubjectId($subjectId);
+            } else {
+                return ClientOnlineTestSubjectPaper::getPayablePapersBySubjectId($subjectId);
+            }
         }
     }
 

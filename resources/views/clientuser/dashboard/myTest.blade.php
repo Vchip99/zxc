@@ -208,6 +208,9 @@
     $('li#onlineTest').addClass('active');
 
     function startTest(ele){
+      var windowHeight = screen.height;
+      var windowWidth = screen.width;
+      var popup_window =window.open("", 'My Window', 'height='+windowHeight+'px !important,width='+windowWidth+'px !important');
       var paper = parseInt($(ele).data('paper'));
       var subject = parseInt($(ele).data('subject'));
       var category = parseInt($(ele).data('category'));
@@ -221,7 +224,8 @@
             })
             .done(function( msg ) {
               if( msg ){
-                window.open("{{ url('instructions')}}", 'My Window', 'height=900px !important,width=1500px !important');
+                popup_window.location = "{{ url('instructions')}}";
+                popup_window.focus();
               }
             });
       } else {
@@ -245,308 +249,316 @@
       }
     }
 
-  function selectSubcategory(ele){
-    id = parseInt($(ele).val());
-    var userId = parseInt(document.getElementById('user_id').value);
-    if( 0 < id && 0 < userId ){
-      $.ajax({
-              method: "POST",
-              url: "{{url('getOnlineTestSubcategoriesWithPapers')}}",
-              data: {id:id, userId:userId}
-          })
-          .done(function( msg ) {
-            select = document.getElementById('subcategory');
-            select.innerHTML = '';
-            var opt = document.createElement('option');
-          opt.value = '';
-          opt.innerHTML = 'Select Sub Category';
-          select.appendChild(opt);
-          if( 0 < msg.length){
-          $.each(msg, function(idx, obj) {
+    function selectSubcategory(ele){
+      id = parseInt($(ele).val());
+      var userId = parseInt(document.getElementById('user_id').value);
+      if( 0 < id && 0 < userId ){
+        $.ajax({
+                method: "POST",
+                url: "{{url('getOnlineTestSubcategoriesWithPapers')}}",
+                data: {id:id, userId:userId}
+            })
+            .done(function( msg ) {
+              select = document.getElementById('subcategory');
+              select.innerHTML = '';
               var opt = document.createElement('option');
-              opt.value = obj.id;
-              opt.innerHTML = obj.name;
+              opt.value = '';
+              opt.innerHTML = 'Select Sub Category';
               select.appendChild(opt);
-          });
-        }
+              if( 0 < msg['subcategories'].length){
+                $.each(msg['subcategories'], function(idx, obj) {
+                    var opt = document.createElement('option');
+                    opt.value = obj.id;
+                    opt.innerHTML = obj.name;
+                    select.appendChild(opt);
+                });
+              }
+              if( 0 < msg['payableSubCategories'].length){
+                $.each(msg['payableSubCategories'], function(idx, obj) {
+                    var opt = document.createElement('option');
+                    opt.value = obj.id;
+                    opt.innerHTML = obj.name;
+                    select.appendChild(opt);
+                });
+              }
+            });
+      }
+    }
+    function showUserTestResult(ele){
+      $.confirm({
+          title: 'Confirmation',
+          content: 'Do you want to see result?',
+          type: 'red',
+          typeAnimated: true,
+          buttons: {
+                Ok: {
+                    text: 'Ok',
+                    btnClass: 'btn-red',
+                    action: function(){
+                      var paperId = parseInt($(ele).data('paper_id'));
+                      document.getElementById('showUserTestResult_'+paperId).submit();
+                    }
+                },
+                Cancle: function () {
+                }
+            }
           });
     }
-  }
-  function showUserTestResult(ele){
-    $.confirm({
-        title: 'Confirmation',
-        content: 'Do you want to see result?',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    var paperId = parseInt($(ele).data('paper_id'));
-                    document.getElementById('showUserTestResult_'+paperId).submit();
+
+    function selectPanel(argument) {
+      var cat = parseInt($('select#category').val());
+      var subcat = parseInt($('select#subcategory').val());
+      var userId = parseInt(document.getElementById('user_id').value);
+      if( 0 < cat && 0 < subcat ){
+        $.ajax({
+                method: "POST",
+                url: "{{url('getRegisteredSubjectsAndPapersByCatIdBySubcatId')}}",
+                data: {cat:cat, subcat:subcat, userId:userId}
+            })
+            .done(function( msg ) {
+              divEle = document.getElementById('subjects');
+              divEle.innerHTML = '';
+              if(undefined !== msg['subjects'] && 0 < msg['subjects'].length) {
+                $.each(msg['subjects'], function(ind, obj){
+                  var subId = obj.id;
+
+                  var mainPanelDiv = document.createElement('div');
+                  mainPanelDiv.className = "panel-group";
+                  mainPanelDiv.setAttribute('role','tablist');
+                  mainPanelDiv.setAttribute('aria-multiselectable','true');
+                  mainPanelDiv.id = 'headingOne';
+
+                  var defaultPanelDiv = document.createElement('div');
+                  defaultPanelDiv.className = "panel panel-default";
+
+                  var firstMainDiv = document.createElement('div');
+                  firstMainDiv.className = "panel-heading";
+                  firstMainDiv.setAttribute('role','tab');
+                  firstMainDiv.id = 'headingOne';
+
+                  var h4Ele = document.createElement('h4');
+                  h4Ele.className = 'panel-title';
+                  h4Ele.title = obj.name;
+                  h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#subject'+ subId +'" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>'+ obj.name + '</a>';
+                  firstMainDiv.appendChild(h4Ele);
+                  defaultPanelDiv.appendChild(firstMainDiv);
+
+                  var secondMainDiv = document.createElement('div');
+                  secondMainDiv.id = 'subject'+ subId;
+                  secondMainDiv.className = "panel-collapse collapse panel-lg";
+                  secondMainDiv.setAttribute('role','tabpanel');
+                  secondMainDiv.setAttribute('aria-labelledby','headingOne');
+
+                  var tableDiv = document.createElement('div');
+                  tableDiv.className = 'panel-body';
+
+                  var tableEle = document.createElement('table');
+                  tableEle.className = "table data-lg";
+                  if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
+                    var tableHead = document.createElement('thead');
+                    var tableTr = document.createElement('tr');
+                    var trInnerhtml = '';
+                    trInnerhtml += '<th>Test Name</th>';
+                    trInnerhtml += '<th>Start Test</th>';
+                    trInnerhtml += '<th>Result</th>';
+                    trInnerhtml += '<th>Date to Active</th>';
+                    trInnerhtml += '<th>Date to Inactive</th>';
+                    tableTr.innerHTML = trInnerhtml;
+                    tableHead.appendChild(tableTr);
+                    tableEle.appendChild(tableHead);
                   }
-              },
-              Cancle: function () {
-              }
-          }
-        });
-  }
-
-  function selectPanel(argument) {
-    var cat = parseInt($('select#category').val());
-    var subcat = parseInt($('select#subcategory').val());
-    var userId = parseInt(document.getElementById('user_id').value);
-    if( 0 < cat && 0 < subcat ){
-      $.ajax({
-              method: "POST",
-              url: "{{url('getRegisteredSubjectsAndPapersByCatIdBySubcatId')}}",
-              data: {cat:cat, subcat:subcat, userId:userId}
-          })
-          .done(function( msg ) {
-            divEle = document.getElementById('subjects');
-            divEle.innerHTML = '';
-            if(undefined !== msg['subjects'] && 0 < msg['subjects'].length) {
-              $.each(msg['subjects'], function(ind, obj){
-                var subId = obj.id;
-
-                var mainPanelDiv = document.createElement('div');
-                mainPanelDiv.className = "panel-group";
-                mainPanelDiv.setAttribute('role','tablist');
-                mainPanelDiv.setAttribute('aria-multiselectable','true');
-                mainPanelDiv.id = 'headingOne';
-
-                var defaultPanelDiv = document.createElement('div');
-                defaultPanelDiv.className = "panel panel-default";
-
-                var firstMainDiv = document.createElement('div');
-                firstMainDiv.className = "panel-heading";
-                firstMainDiv.setAttribute('role','tab');
-                firstMainDiv.id = 'headingOne';
-
-                var h4Ele = document.createElement('h4');
-                h4Ele.className = 'panel-title';
-                h4Ele.title = obj.name;
-                h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#subject'+ subId +'" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>'+ obj.name + '</a>';
-                firstMainDiv.appendChild(h4Ele);
-                defaultPanelDiv.appendChild(firstMainDiv);
-
-                var secondMainDiv = document.createElement('div');
-                secondMainDiv.id = 'subject'+ subId;
-                secondMainDiv.className = "panel-collapse collapse panel-lg";
-                secondMainDiv.setAttribute('role','tabpanel');
-                secondMainDiv.setAttribute('aria-labelledby','headingOne');
-
-                var tableDiv = document.createElement('div');
-                tableDiv.className = 'panel-body';
-
-                var tableEle = document.createElement('table');
-                tableEle.className = "table data-lg";
-                if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
-                  var tableHead = document.createElement('thead');
-                  var tableTr = document.createElement('tr');
-                  var trInnerhtml = '';
-                  trInnerhtml += '<th>Test Name</th>';
-                  trInnerhtml += '<th>Start Test</th>';
-                  trInnerhtml += '<th>Result</th>';
-                  trInnerhtml += '<th>Date to Active</th>';
-                  trInnerhtml += '<th>Date to Inactive</th>';
-                  tableTr.innerHTML = trInnerhtml;
-                  tableHead.appendChild(tableTr);
-                  tableEle.appendChild(tableHead);
-                }
-                var tableBody = document.createElement('tbody');
-                if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
-                  $.each(msg['papers'][subId], function(ind, obj){
-                    var tbodyTr = document.createElement("tr");
-                    var divInnerHtml = '';
-                    divInnerHtml += '<td class=" ">'+ obj.name+'</td>';
-                    if(msg['currentDate'] < obj.date_to_active){
-                      divInnerHtml += '<td id="startTest"><button disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
-                    } else {
-                      if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                        divInnerHtml += '<td id="startTest"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+                  var tableBody = document.createElement('tbody');
+                  if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
+                    $.each(msg['papers'][subId], function(ind, obj){
+                      var tbodyTr = document.createElement("tr");
+                      var divInnerHtml = '';
+                      divInnerHtml += '<td class=" ">'+ obj.name+'</td>';
+                      if(msg['currentDate'] < obj.date_to_active){
+                        divInnerHtml += '<td id="startTest"><button disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
                       } else {
-                        divInnerHtml += '<td id="startTest"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'" data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+                        if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                          divInnerHtml += '<td id="startTest"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+                        } else {
+                          divInnerHtml += '<td id="startTest"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+                        }
                       }
-                    }
-                    if(msg['currentDate'] < obj.date_to_active){
-                      divInnerHtml += '<td class=" ">';
-                      divInnerHtml += '<button disabled="true" data-toggle="tooltip" title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
-                      divInnerHtml += '</td>';
-                    } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                      var testUrl = "{{ url('showUserTestResult') }}";
-                      var csrf_token = '{{ csrf_field() }}';
-                      divInnerHtml += '<td class=" ">';
-                      divInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
-                      divInnerHtml += csrf_token;
-                      divInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.subject_id +'"></form>';
-                      divInnerHtml += '<button onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
-                      divInnerHtml += '</td>';
-                    } else {
-                      divInnerHtml += '<td class=" ">';
-                      divInnerHtml += '<button disabled="true" data-toggle="tooltip" title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
-                      divInnerHtml += '</td>';
-                    }
-                    divInnerHtml += '<td class=" ">'+ obj.date_to_active +'</td>';
-                    divInnerHtml += '<td class=" ">'+ obj.date_to_inactive +'</td>';
+                      if(msg['currentDate'] < obj.date_to_active){
+                        divInnerHtml += '<td class=" ">';
+                        divInnerHtml += '<button disabled="true" data-toggle="tooltip" title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+                        divInnerHtml += '</td>';
+                      } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                        var testUrl = "{{ url('showUserTestResult') }}";
+                        var csrf_token = '{{ csrf_field() }}';
+                        divInnerHtml += '<td class=" ">';
+                        divInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
+                        divInnerHtml += csrf_token;
+                        divInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.subject_id +'"></form>';
+                        divInnerHtml += '<button onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+                        divInnerHtml += '</td>';
+                      } else {
+                        divInnerHtml += '<td class=" ">';
+                        divInnerHtml += '<button disabled="true" data-toggle="tooltip" title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+                        divInnerHtml += '</td>';
+                      }
+                      divInnerHtml += '<td class=" ">'+ obj.date_to_active +'</td>';
+                      divInnerHtml += '<td class=" ">'+ obj.date_to_inactive +'</td>';
 
-                    tbodyTr.innerHTML = divInnerHtml;
-                    tableBody.appendChild(tbodyTr);
+                      tbodyTr.innerHTML = divInnerHtml;
+                      tableBody.appendChild(tbodyTr);
+                      tableEle.appendChild(tableBody);
+                    });
+                  } else {
+                    tableBody.innerHTML = 'No papers are available..';
                     tableEle.appendChild(tableBody);
-                  });
-                } else {
-                  tableBody.innerHTML = 'No papers are available..';
-                  tableEle.appendChild(tableBody);
-                }
-                tableDiv.appendChild(tableEle);
+                  }
+                  tableDiv.appendChild(tableEle);
 
-                var mainSmallDiv = document.createElement('div');
-                mainSmallDiv.className = "data-sm";
+                  var mainSmallDiv = document.createElement('div');
+                  mainSmallDiv.className = "data-sm";
 
-                if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
-                  $.each(msg['papers'][subId], function(ind, obj){
-                    var panelDiv = document.createElement('div');
-                    panelDiv.className = 'panel panel-info';
+                  if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
+                    $.each(msg['papers'][subId], function(ind, obj){
+                      var panelDiv = document.createElement('div');
+                      panelDiv.className = 'panel panel-info';
 
-                    var panelHeadingDiv = document.createElement('div');
-                    panelHeadingDiv.className = 'toggle panel-heading';
-                    panelHeadingDiv.setAttribute('data-toggle','paper'+obj.id);
-                    panelHeadingDiv.innerHTML = obj.name;
+                      var panelHeadingDiv = document.createElement('div');
+                      panelHeadingDiv.className = 'toggle panel-heading';
+                      panelHeadingDiv.setAttribute('data-toggle','paper'+obj.id);
+                      panelHeadingDiv.innerHTML = obj.name;
 
-                    var spanEle = document.createElement('span');
-                    spanEle.className = 'col-xs-2 pull-right';
-                    spanEle.innerHTML = '<i class="fa fa-chevron-down pull-right"></i>';
-                    panelHeadingDiv.appendChild(spanEle);
+                      var spanEle = document.createElement('span');
+                      spanEle.className = 'col-xs-2 pull-right';
+                      spanEle.innerHTML = '<i class="fa fa-chevron-down pull-right"></i>';
+                      panelHeadingDiv.appendChild(spanEle);
 
-                    panelDiv.appendChild(panelHeadingDiv);
+                      panelDiv.appendChild(panelHeadingDiv);
 
-                    var panelContentDiv = document.createElement('div');
-                    panelContentDiv.id = 'paper'+obj.id;
-                    panelContentDiv.className = 'panel-body';
+                      var panelContentDiv = document.createElement('div');
+                      panelContentDiv.id = 'paper'+obj.id;
+                      panelContentDiv.className = 'panel-body';
 
-                    var containerDiv = document.createElement('div');
-                    containerDiv.className='container';
+                      var containerDiv = document.createElement('div');
+                      containerDiv.className='container';
 
-                    var rowDiv = document.createElement('div');
-                    rowDiv.className = 'fluid-row';
+                      var rowDiv = document.createElement('div');
+                      rowDiv.className = 'fluid-row';
 
-                    var ulDiv = document.createElement('ul');
-                    ulDivInnerHtml = '';
-                    if(msg['currentDate'] < obj.date_to_active){
-                      ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
-                    } else {
-                      if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                        ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                      var ulDiv = document.createElement('ul');
+                      ulDivInnerHtml = '';
+                      if(msg['currentDate'] < obj.date_to_active){
+                        ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
                       } else {
-                        ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                        if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                          ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                        } else {
+                          ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                        }
                       }
-                    }
-                    if(msg['currentDate'] < obj.date_to_active){
+                      if(msg['currentDate'] < obj.date_to_active){
+                          ulDivInnerHtml += '<li class=" ">';
+                          ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
+                          ulDivInnerHtml += '</li>';
+                      } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                          var testUrl = "{{ url('showUserTestResult') }}";
+                          var csrf_token = '{{ csrf_field() }}';
+                          ulDivInnerHtml += '<li class=" ">';
+                          ulDivInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
+                          ulDivInnerHtml += csrf_token;
+                          ulDivInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.subject_id +'"></form>';
+                          ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
+                          ulDivInnerHtml += '</li>';
+                      } else {
                         ulDivInnerHtml += '<li class=" ">';
                         ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
                         ulDivInnerHtml += '</li>';
-                    } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                        var testUrl = "{{ url('showUserTestResult') }}";
-                        var csrf_token = '{{ csrf_field() }}';
-                        ulDivInnerHtml += '<li class=" ">';
-                        ulDivInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
-                        ulDivInnerHtml += csrf_token;
-                        ulDivInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.test_category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.test_sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.test_subject_id +'"></form>';
-                        ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
-                        ulDivInnerHtml += '</li>';
-                    } else {
-                      ulDivInnerHtml += '<li class=" ">';
-                      ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
-                      ulDivInnerHtml += '</li>';
-                    }
-                    ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li><li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_inactive +'</button></li>';
-                    ulDiv.innerHTML = ulDivInnerHtml;
-                    rowDiv.appendChild(ulDiv);
-                    containerDiv.appendChild(rowDiv);
-                    panelContentDiv.appendChild(containerDiv);
-                    panelDiv.appendChild(panelContentDiv);
-                    mainSmallDiv.appendChild(panelDiv);
-                  });
-                }
-                tableDiv.appendChild(mainSmallDiv);
-                secondMainDiv.appendChild(tableDiv);
-                defaultPanelDiv.appendChild(secondMainDiv);
-                mainPanelDiv.appendChild(defaultPanelDiv);
-                divEle.appendChild(mainPanelDiv);
-              });
-            } else {
-                var mainPanelDiv = document.createElement('div');
-                mainPanelDiv.className = "panel-group";
-                mainPanelDiv.setAttribute('role','tablist');
-                mainPanelDiv.setAttribute('aria-multiselectable','true');
-                mainPanelDiv.id = 'headingOne';
+                      }
+                      ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li><li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_inactive +'</button></li>';
+                      ulDiv.innerHTML = ulDivInnerHtml;
+                      rowDiv.appendChild(ulDiv);
+                      containerDiv.appendChild(rowDiv);
+                      panelContentDiv.appendChild(containerDiv);
+                      panelDiv.appendChild(panelContentDiv);
+                      mainSmallDiv.appendChild(panelDiv);
+                    });
+                  }
+                  tableDiv.appendChild(mainSmallDiv);
+                  secondMainDiv.appendChild(tableDiv);
+                  defaultPanelDiv.appendChild(secondMainDiv);
+                  mainPanelDiv.appendChild(defaultPanelDiv);
+                  divEle.appendChild(mainPanelDiv);
+                });
+              } else {
+                  var mainPanelDiv = document.createElement('div');
+                  mainPanelDiv.className = "panel-group";
+                  mainPanelDiv.setAttribute('role','tablist');
+                  mainPanelDiv.setAttribute('aria-multiselectable','true');
+                  mainPanelDiv.id = 'headingOne';
 
-                var defaultPanelDiv = document.createElement('div');
-                defaultPanelDiv.className = "panel panel-default";
+                  var defaultPanelDiv = document.createElement('div');
+                  defaultPanelDiv.className = "panel panel-default";
 
-                var firstMainDiv = document.createElement('div');
-                firstMainDiv.className = "panel-heading";
-                firstMainDiv.setAttribute('role','tab');
-                firstMainDiv.id = 'headingOne'
+                  var firstMainDiv = document.createElement('div');
+                  firstMainDiv.className = "panel-heading";
+                  firstMainDiv.setAttribute('role','tab');
+                  firstMainDiv.id = 'headingOne'
 
-                var h4Ele = document.createElement('h4');
-                h4Ele.className = 'panel-title';
-                h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
-                firstMainDiv.appendChild(h4Ele);
-                defaultPanelDiv.appendChild(firstMainDiv);
-                mainPanelDiv.appendChild(defaultPanelDiv);
-                divEle.appendChild(mainPanelDiv);
-            }
-          $('[id^=paper]').hide();
-          $('.toggle').click(function() {
-            $input = $( this );
-            $target = $('#'+$input.attr('data-toggle'));
-            $target.slideToggle();
-            if($input.find('.col-xs-2 i').attr('class')=="fa fa-chevron-down pull-right")
-            {
-             $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
-             $input.find('.col-xs-2 i').addClass('fa-chevron-up');
-           }
-           else if($input.find('.col-xs-2 i').attr('class')=="fa pull-right fa-chevron-up")
-           {
-             $input.find('.col-xs-2 i').removeClass('fa-chevron-up');
-             $input.find('.col-xs-2 i').addClass('fa-chevron-down');
-           }
-           else if($input.find('.col-xs-2 i').attr('class')=="fa pull-right fa-chevron-down")
-           {
-             $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
-             $input.find('.col-xs-2 i').addClass('fa-chevron-up');
-           }
-         });
-      });
-    } else {
-      divEle = document.getElementById('subjects');
-      divEle.innerHTML = '';
+                  var h4Ele = document.createElement('h4');
+                  h4Ele.className = 'panel-title';
+                  h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
+                  firstMainDiv.appendChild(h4Ele);
+                  defaultPanelDiv.appendChild(firstMainDiv);
+                  mainPanelDiv.appendChild(defaultPanelDiv);
+                  divEle.appendChild(mainPanelDiv);
+              }
+            $('[id^=paper]').hide();
+            $('.toggle').click(function() {
+              $input = $( this );
+              $target = $('#'+$input.attr('data-toggle'));
+              $target.slideToggle();
+              if($input.find('.col-xs-2 i').attr('class')=="fa fa-chevron-down pull-right")
+              {
+               $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
+               $input.find('.col-xs-2 i').addClass('fa-chevron-up');
+             }
+             else if($input.find('.col-xs-2 i').attr('class')=="fa pull-right fa-chevron-up")
+             {
+               $input.find('.col-xs-2 i').removeClass('fa-chevron-up');
+               $input.find('.col-xs-2 i').addClass('fa-chevron-down');
+             }
+             else if($input.find('.col-xs-2 i').attr('class')=="fa pull-right fa-chevron-down")
+             {
+               $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
+               $input.find('.col-xs-2 i').addClass('fa-chevron-up');
+             }
+           });
+        });
+      } else {
+        divEle = document.getElementById('subjects');
+        divEle.innerHTML = '';
 
-      var mainPanelDiv = document.createElement('div');
-      mainPanelDiv.className = "panel-group";
-      mainPanelDiv.setAttribute('role','tablist');
-      mainPanelDiv.setAttribute('aria-multiselectable','true');
-      mainPanelDiv.id = 'headingOne';
+        var mainPanelDiv = document.createElement('div');
+        mainPanelDiv.className = "panel-group";
+        mainPanelDiv.setAttribute('role','tablist');
+        mainPanelDiv.setAttribute('aria-multiselectable','true');
+        mainPanelDiv.id = 'headingOne';
 
-      var defaultPanelDiv = document.createElement('div');
-      defaultPanelDiv.className = "panel panel-default";
+        var defaultPanelDiv = document.createElement('div');
+        defaultPanelDiv.className = "panel panel-default";
 
-      var firstMainDiv = document.createElement('div');
-      firstMainDiv.className = "panel-heading";
-      firstMainDiv.setAttribute('role','tab');
-      firstMainDiv.id = 'headingOne'
+        var firstMainDiv = document.createElement('div');
+        firstMainDiv.className = "panel-heading";
+        firstMainDiv.setAttribute('role','tab');
+        firstMainDiv.id = 'headingOne'
 
-      var h4Ele = document.createElement('h4');
-      h4Ele.className = 'panel-title';
-      h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" href="" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
-      firstMainDiv.appendChild(h4Ele);
-      defaultPanelDiv.appendChild(firstMainDiv);
-      mainPanelDiv.appendChild(defaultPanelDiv);
-      divEle.appendChild(mainPanelDiv);
+        var h4Ele = document.createElement('h4');
+        h4Ele.className = 'panel-title';
+        h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" href="" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
+        firstMainDiv.appendChild(h4Ele);
+        defaultPanelDiv.appendChild(firstMainDiv);
+        mainPanelDiv.appendChild(defaultPanelDiv);
+        divEle.appendChild(mainPanelDiv);
+      }
     }
-  }
   </script>
 <script >
   function toggleIcon(e) {

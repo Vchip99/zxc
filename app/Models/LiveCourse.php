@@ -12,7 +12,6 @@ use Intervention\Image\ImageManagerStatic as Image;
 
 class LiveCourse extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

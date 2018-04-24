@@ -14,14 +14,13 @@ use DB;
 
 class TestSubjectPaper extends Model
 {
-    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name', 'test_category_id', 'test_sub_category_id', 'test_subject_id', 'price','date_to_active','time', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by'];
+    protected $fillable = ['name', 'test_category_id', 'test_sub_category_id', 'test_subject_id', 'price','date_to_active','time', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'verification_code_count', 'verification_code'];
 
     /**
      *  add/update paper
@@ -30,6 +29,7 @@ class TestSubjectPaper extends Model
         $sessions = [];
         $addPaperSessions = [];
         $updatePaperSessions = [];
+        $verificationCodeString = '';
         $paperId = InputSanitise::inputInt($request->get('paper_id'));
         $catId = InputSanitise::inputInt($request->get('category'));
         $subcatId = InputSanitise::inputInt($request->get('subcategory'));
@@ -42,15 +42,49 @@ class TestSubjectPaper extends Model
         $showCalculator = InputSanitise::inputInt($request->get('show_calculator'));
         $showSolution = InputSanitise::inputInt($request->get('show_solution'));
         $optionCount = InputSanitise::inputInt($request->get('option_count'));
+        $isVerificationCode = InputSanitise::inputInt($request->get('is_verification_code'));
+        $verificationCodeCount = InputSanitise::inputInt($request->get('verification_code_count'));
+        $addVerificationCodeCount = InputSanitise::inputInt($request->get('add_verification_code_count'));
         $timeOutBy = $request->get('time_out_by');
 
-        if( $isUpdate && isset($paperId)){
+
+        if($isUpdate && isset($paperId)){
             $paper = static::find($paperId);
             if(!is_object($paper)){
                 return Redirect::to('admin/managePaper');
             }
-        } else{
+            if(1 == $isVerificationCode){
+                if($addVerificationCodeCount > 0){
+                    for($i=1; $i <= $addVerificationCodeCount; $i++) {
+                        $code = substr(md5(uniqid(mt_rand(), true)) , 0, 8);
+                        if(empty($paper->verification_code)){
+                            $paper->verification_code = $code;
+                        } else {
+                            $paper->verification_code = trim($paper->verification_code.','.$code);
+                        }
+                    }
+                    $paper->verification_code_count = $paper->verification_code_count + $addVerificationCodeCount;
+                    $paper->verification_code = $paper->verification_code;
+                }
+            } else {
+                $paper->verification_code_count = '';
+                $paper->verification_code = '';
+            }
+        } else {
             $paper = new static;
+
+            if($verificationCodeCount > 0){
+                for($i=1; $i <= $verificationCodeCount; $i++) {
+                    $code = substr(md5(uniqid(mt_rand(), true)) , 0, 8);
+                    if(1 == $i){
+                        $verificationCodeString = $code;
+                    } else {
+                        $verificationCodeString .= ','.$code;
+                    }
+                }
+            }
+            $paper->verification_code_count = $verificationCodeCount;
+            $paper->verification_code = $verificationCodeString;
         }
 
         $paper->name = $paperName;
@@ -65,6 +99,7 @@ class TestSubjectPaper extends Model
         $paper->option_count = $optionCount;
         $paper->time_out_by = $timeOutBy;
         $paper->time = $time;
+
         $paper->save();
 
         if( $isUpdate && isset($paperId)){
@@ -131,7 +166,9 @@ class TestSubjectPaper extends Model
                                     'test_category_id' => $catId,
                                     'test_sub_category_id' => $subcatId,
                                     'test_subject_id' => $subjectId,
-                                    'test_subject_paper_id' => $paper->id
+                                    'test_subject_paper_id' => $paper->id,
+                                    'created_at' => date('Y-m-d H:i:s'),
+                                    'updated_at' => date('Y-m-d H:i:s')
                                 ];
                     }
                 }

@@ -52,6 +52,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteCourseCourse', 'Course\CourseCourseController@delete');
 	Route::post('admin/getCourseSubCategories', 'Course\CourseCourseController@getCourseSubCategories');
 	Route::post('admin/isCourseCourseExist', 'Course\CourseCourseController@isCourseCourseExist');
+	Route::post('admin/getCourseByCatIdBySubCatIdForAdmin', 'Course\CourseCourseController@getCourseByCatIdBySubCatIdForAdmin');
 
 	// admin course video
 	Route::get('admin/manageCourseVideo', 'Course\CourseVideoController@show');
@@ -117,7 +118,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('userLogin', 'UserAuth\LoginController@userLogin');
 
 	//User Register
-	// Route::get('register', 'UserAuth\RegisterController@showRegistrationForm');
+	// Route::get('register',. 'UserAuth\RegisterController@showRegistrationForm');
 	Route::post('register', 'UserAuth\RegisterController@register');
 	Route::get('forgotPassword', 'UserAuth\ForgotPasswordController@showLinkRequestForm');
 	Route::post('password/email', 'UserAuth\ForgotPasswordController@sendPasswordResetLink');
@@ -163,6 +164,15 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/getSubCategories', [ 'as' => 'admin/getSubCategories', 'uses' => 'Test\SubCategoryController@getSubCategories' ]);
 	Route::post('admin/isTestSubCategoryExist', 'Test\SubCategoryController@isTestSubCategoryExist');
 
+	// admin payable test sub category
+	Route::get('admin/managePayableSubCategory', 'PayableTest\PayableSubCategoryController@show');
+	Route::get('admin/createPayableSubCategory', 'PayableTest\PayableSubCategoryController@create');
+	Route::post('admin/createPayableSubCategory', 'PayableTest\PayableSubCategoryController@store');
+	Route::get('admin/payableSubCategory/{id}/edit', 'PayableTest\PayableSubCategoryController@edit');
+	Route::put('admin/updatePayableSubCategory', 'PayableTest\PayableSubCategoryController@update');
+	Route::delete('admin/deletePayableSubCategory', 'PayableTest\PayableSubCategoryController@delete');
+	Route::post('admin/isPayableTestSubCategoryExist', 'PayableTest\PayableSubCategoryController@isPayableTestSubCategoryExist');
+
 	// admin test subject
 	Route::get('admin/manageSubject', 'Test\SubjectController@show');
 	Route::get('admin/createSubject', 'Test\SubjectController@create');
@@ -171,6 +181,16 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateSubject', 'Test\SubjectController@update');
 	Route::delete('admin/deleteSubject', 'Test\SubjectController@delete');
 	Route::post('admin/isTestSubjectExist', 'Test\SubjectController@isTestSubjectExist');
+
+	// admin payable subject
+	Route::get('admin/managePayableSubject', 'PayableTest\PayableSubjectController@show');
+	Route::get('admin/createPayableSubject', 'PayableTest\PayableSubjectController@create');
+	Route::post('admin/createPayableSubject', 'PayableTest\PayableSubjectController@store');
+	Route::get('admin/payableSubject/{id}/edit', 'PayableTest\PayableSubjectController@edit');
+	Route::put('admin/updatePayableSubject', 'PayableTest\PayableSubjectController@update');
+	Route::delete('admin/deletePayableSubject', 'PayableTest\PayableSubjectController@delete');
+	Route::post('admin/isPayableSubjectExist', 'PayableTest\PayableSubjectController@isPayableSubjectExist');
+	Route::post('admin/getPayableSubjectsBySubcatId', 'PayableTest\PayableSubjectController@getPayableSubjectsBySubcatId');
 
 	// admin  test paper
 	Route::get('admin/managePaper', 'Test\PaperController@show');
@@ -183,7 +203,18 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/getPaperSectionsByPaperId', [ 'as' => 'admin/getPaperSectionsByPaperId','uses' => 'Test\PaperController@getPaperSectionsByPaperId' ]);
 	Route::post('admin/isTestPaperExist', 'Test\PaperController@isTestPaperExist');
 
-	// admin  test questions
+	// admin payable paper
+	Route::get('admin/managePayablePaper', 'PayableTest\PayablePaperController@show');
+	Route::get('admin/createPayablePaper', 'PayableTest\PayablePaperController@create');
+	Route::post('admin/createPayablePaper', 'PayableTest\PayablePaperController@store');
+	Route::get('admin/payablePaper/{id}/edit', 'PayableTest\PayablePaperController@edit');
+	Route::put('admin/updatePayablePaper', 'PayableTest\PayablePaperController@update');
+	Route::delete('admin/deletePayablePaper', 'PayableTest\PayablePaperController@delete');
+	Route::post('admin/isPayablePaperExist', 'PayableTest\PayablePaperController@isPayablePaperExist');
+	Route::post('admin/getPayablePapersBySubjectId', 'PayableTest\PayablePaperController@getPayablePapersBySubjectId');
+	Route::post('admin/getPayablePaperSectionsByPaperId', 'PayableTest\PayablePaperController@getPayablePaperSectionsByPaperId');
+
+	// admin  test questions.
 	Route::get('admin/manageQuestions', 'Test\QuestionController@index');
 	Route::post('admin/showQuestions', 'Test\QuestionController@show');
 	Route::get('admin/createQuestion', 'Test\QuestionController@create');
@@ -201,6 +232,22 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/associateSession', 'Test\QuestionController@associateSession');
 	Route::post('admin/updateQuestionSession', 'Test\QuestionController@updateQuestionSession');
 	Route::post('admin/uploadTestImages', 'Test\QuestionController@uploadTestImages');
+
+	// admin payable question
+	Route::get('admin/managePayableQuestions', 'PayableTest\PayableQuestionController@index');
+	Route::post('admin/showPayableQuestions', 'PayableTest\PayableQuestionController@show');
+	Route::get('admin/createPayableQuestion', 'PayableTest\PayableQuestionController@create');
+	Route::post('admin/createPayableQuestion', 'PayableTest\PayableQuestionController@store');
+	Route::get('admin/payableQuestion/{id}/edit', 'PayableTest\PayableQuestionController@edit');
+	Route::put('admin/updatePayableQuestion', 'PayableTest\PayableQuestionController@update');
+	Route::delete('admin/deletePayableQuestion', 'PayableTest\PayableQuestionController@delete');
+	Route::post('admin/getPayableNextQuestionCount', [ 'as' => 'admin/getPayableNextQuestionCount','uses' => 'PayableTest\PayableQuestionController@getPayableNextQuestionCount' ]);
+	Route::post('admin/getPayableCurrentQuestionCount', [ 'as' => 'admin/getPayableCurrentQuestionCount','uses' => 'PayableTest\PayableQuestionController@getPayableCurrentQuestionCount' ]);
+	Route::post('admin/getPayablePrevQuestionCount', [ 'as' => 'admin/getPayablePrevQuestionCount','uses' => 'PayableTest\PayableQuestionController@getPayablePrevQuestionCount' ]);
+	Route::get('admin/uploadPayableQuestions', 'PayableTest\PayableQuestionController@uploadPayableQuestions');
+	Route::post('admin/uploadPayableQuestions', 'PayableTest\PayableQuestionController@importPayableQuestions');
+	Route::post('admin/uploadPayableImages', 'PayableTest\PayableQuestionController@uploadPayableImages');
+
 
 	// verify account
 	Route::get('verifyAccount', 'HomeController@verifyAccount');
@@ -252,7 +299,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('likeCourseVideo', 'CourseController@likeCourseVideo');
 	Route::post('likeCourseVideoComment', 'CourseController@likeCourseVideoComment');
 	Route::post('likeCourseVideoSubComment', 'CourseController@likeCourseVideoSubComment');
-
 
 	/// user Post Comment
 	Route::post('createAllPost',  'PostCommentController@createAllPost');
@@ -433,6 +479,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('registerPaper', 'TestController@registerPaper');
 	Route::post('showUserTestResult', 'TestController@showUserTestResult');
 	Route::post('isTestGiven', 'TestController@isTestGiven');
+	Route::post('checkVerificationCode', 'TestController@checkVerificationCode');
+
 
 	// test Quiz front
 	Route::post('/start-quiz', 'QuizController@startQuiz');
@@ -860,7 +908,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('getOnlineCategories', 'Client\OnlineCourse\ClientOnlineSubCategoryController@getOnlineCategories');
   	Route::post('isClientCourseSubCategoryExist', 'Client\OnlineCourse\ClientOnlineSubCategoryController@isClientCourseSubCategoryExist');
 
-
   	// Online course
   	Route::get('manageOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@show');
   	Route::get('createOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@create');
@@ -868,7 +915,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('onlinecourse/{id}/edit', 'Client\OnlineCourse\ClientOnlineCourseController@edit');
   	Route::put('updateOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@update');
   	Route::delete('deleteOnlineCourse', 'Client\OnlineCourse\ClientOnlineCourseController@delete');
-	Route::post('getOnlineCourseByInstituteCourseId', 'Client\OnlineCourse\ClientOnlineCourseController@getOnlineCourseByInstituteCourseId');
+	Route::post('getOnlineCourseByCatIdBySubCatIdForClient', 'Client\OnlineCourse\ClientOnlineCourseController@getOnlineCourseByCatIdBySubCatIdForClient');
 	Route::post('isClientOnlineCourseExist', 'Client\OnlineCourse\ClientOnlineCourseController@isClientOnlineCourseExist');
 
   	// Online video
@@ -1071,5 +1118,16 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('getAssignmentByTopicForStudent', 'Client\ClientAssignmentController@getAssignmentByTopicForStudent');
 	Route::get('assignmentRemark/{id}/{studentId}', 'Client\ClientAssignmentController@assignmentRemark');
 	Route::post('createAssignmentRemark', 'Client\ClientAssignmentController@createAssignmentRemark');
+
+	Route::get('managePayableSubCategory', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@show');
+	Route::get('showPayableSubcategory/{id}', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@showPayableSubcategory');
+	Route::post('getPayableSubjectsAndPapersBySubcatIdAssociatedWithQuestion', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@getPayableSubjectsAndPapersBySubcatIdAssociatedWithQuestion');
+	Route::post('purchasePayableSubCategory', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@purchasePayableSubCategory');
+	Route::get('thankyouPayable', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@thankyouPayable');
+	Route::post('webhookPayable', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@webhookPayable');
+	Route::post('updatePayableSubCategory', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@updatePayableSubCategory');
+	Route::get('managePurchasedSubCategory', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@managePurchasedSubCategory');
+	Route::get('showPurchaseSubcategory/{id}', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@showPurchaseSubcategory');
+
 
 });

@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Redirect;
 use App\Models\TestCategory;
+use App\Models\UserSolution;
+use App\Models\Score;
+use App\Models\PaperSection;
 use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 
@@ -141,9 +144,12 @@ class CategoryController extends Controller
                                         foreach($subject->papers as $paper){
                                             if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
                                                 foreach($paper->questions as $question){
+                                                    UserSolution::deleteUserSolutionsByQuestionId($question->id);
                                                     $question->delete();
                                                 }
                                             }
+                                            Score::deleteUserScoresByPaperId($paper->id);
+                                            PaperSection::deletePaperSectionsByPaperId($paper->id);
                                             $paper->deleteRegisteredPaper();
                                             $paper->delete();
                                         }

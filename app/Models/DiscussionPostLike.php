@@ -8,7 +8,6 @@ use Auth;
 
 class DiscussionPostLike extends Model
 {
-    public $timestamps = false;
 
     const IsLike = 1;
 	/**

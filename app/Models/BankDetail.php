@@ -39,4 +39,12 @@ class BankDetail extends Model
     	$bankDetail->save();
     	return;
     }
+
+    protected static function deleteBankDetails($clientId){
+        $result = static::where('client_id', $clientId)->first();
+        if(is_object($result)){
+            $result->delete();
+        }
+        return;
+    }
 }

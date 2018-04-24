@@ -217,19 +217,6 @@
             </ul>
         </li>
         <li class="header">Vchip TECHNOLOGY</li>
-        <!-- <li class="treeview">
-          <a href="#" title="Institute Courses">
-            <i class="fa fa-university"></i>
-            <span>Institute Courses</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-            <li title="Manage Courses"><a href="{{ url('manageInstituteCourses')}}"><i class="fa fa-circle-o"></i> Manage Courses </a></li>
-          </ul>
-        </li> -->
-
         <li class="treeview ">
           <a href="#" title="Online Courses">
             <i class="fa fa-dashboard"></i> <span>Online Courses</span>
@@ -304,20 +291,32 @@
             </ul>
           </li>
         <li class="treeview">
-            <a href="#" title="Plans & Billing">
-              <i class="fa fa-inr"></i> <span>Plans & Billing</span>
-              <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
-            </a>
-            <ul class="treeview-menu">
-              <li title="Plans"><a href="{{ url('managePlans')}}"><i class="fa fa-circle-o"></i> Plans </a></li>
-              <li title="Billing"><a href="{{ url('manageBillings')}}"><i class="fa fa-circle-o"></i> Billing </a></li>
-              <li title="History"><a href="{{ url('manageHistory')}}"><i class="fa fa-circle-o"></i> History </a></li>
-              <li title="Bank Details"><a href="{{ url('manageBankDetails')}}"><i class="fa fa-circle-o"></i> Bank Details </a></li>
-              <li title="User Payments"><a href="{{ url('manageUserPayments')}}"><i class="fa fa-circle-o"></i> User Payments </a></li>
-            </ul>
-          </li>
+          <a href="#" title="Plans & Billing">
+            <i class="fa fa-inr"></i> <span>Plans & Billing</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Plans"><a href="{{ url('managePlans')}}"><i class="fa fa-circle-o"></i> Plans </a></li>
+            <li title="Billing"><a href="{{ url('manageBillings')}}"><i class="fa fa-circle-o"></i> Billing </a></li>
+            <li title="History"><a href="{{ url('manageHistory')}}"><i class="fa fa-circle-o"></i> History </a></li>
+            <li title="Bank Details"><a href="{{ url('manageBankDetails')}}"><i class="fa fa-circle-o"></i> Bank Details </a></li>
+            <li title="User Payments"><a href="{{ url('manageUserPayments')}}"><i class="fa fa-circle-o"></i> User Payments </a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="Market Palce">
+            <i class="fa fa-shopping-cart"></i> <span>Market Palce</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Payable SubCategory"><a href="{{ url('managePayableSubCategory')}}"><i class="fa fa-circle-o"></i> Payable SubCategory </a></li>
+            <li title="Purchased SubCategory"><a href="{{ url('managePurchasedSubCategory')}}"><i class="fa fa-circle-o"></i> Purchased SubCategory </a></li>
+          </ul>
+        </li>
         <li class="header">LABELS</li>
         <li title="Logout">
           <a href="{{ url('client/logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

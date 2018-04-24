@@ -222,15 +222,22 @@ class TestController extends Controller
 	/**
 	 *	show instructions
 	 */
-	public function showInstructions(){
+	public function showInstructions(Request $request){
 		$categoryId = Session::get('category');
         $subcategoryId = Session::get('subcategory');
         $subjectId = Session::get('subject');
         $paperId = Session::get('paper');
+        $isVerificationCode = false;
         if(!is_object(Auth::user())){
         	return Redirect::to('/');
         }
-        return view('layouts.instructions', compact('categoryId', 'subcategoryId', 'subjectId', 'paperId'));
+        if($paperId > 0){
+        	$paper = TestSubjectPaper::find($paperId);
+        	if(is_object($paper) && $paper->verification_code_count > 0){
+        		$isVerificationCode = true;
+        	}
+        }
+        return view('layouts.instructions', compact('categoryId', 'subcategoryId', 'subjectId', 'paperId', 'isVerificationCode'));
     }
 
     protected function registerPaper(Request $request){
@@ -325,6 +332,52 @@ class TestController extends Controller
         }else{
         	return 'false';
         }
+    }
+
+    protected function checkVerificationCode(Request $request){
+    	$paperId = $request->get('paper_id');
+        $checkVerificationCode = $request->get('verification_code');
+        // return $request->all();
+        DB::beginTransaction();
+        try
+        {
+            if($paperId > 0 && !empty($checkVerificationCode)){
+                $isVerificationCodeRemoved = false;
+                $remainingVerificationCode = '';
+                $paper = TestSubjectPaper::find($paperId);
+                if(is_object($paper) && $paper->verification_code_count > 0){
+                    $allVerificationCode = explode(',', $paper->verification_code);
+
+                    if(is_array($allVerificationCode)){
+                        foreach($allVerificationCode as $verificationCode){
+                            if($checkVerificationCode == $verificationCode){
+                                $isVerificationCodeRemoved = true;
+                            } else {
+                                if(empty($remainingVerificationCode)){
+                                    $remainingVerificationCode = $verificationCode;
+                                } else {
+                                    $remainingVerificationCode .= ','.$verificationCode;
+                                }
+                            }
+                        }
+                    }
+                }
+                if(true == $isVerificationCodeRemoved && !empty($remainingVerificationCode)){
+                    $paper->verification_code = $remainingVerificationCode;
+                    $paper->save();
+                    DB::commit();
+                    return 'true';
+                } else {
+                    return 'false';
+                }
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return 'false';
+        }
+        return 'false';
     }
 
 }

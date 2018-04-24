@@ -11,7 +11,6 @@ use App\Models\LiveCourseVideoLike;
 
 class LiveVideo extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

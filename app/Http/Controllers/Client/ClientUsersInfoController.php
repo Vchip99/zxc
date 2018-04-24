@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Client;
 
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Libraries\InputSanitise;
 use App\Models\ClientHomePage;
 use App\Models\ClientTestimonial;
 use App\Models\ClientTeam;
@@ -20,8 +22,7 @@ use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientUserPurchasedCourse;
 use App\Models\ClientUserPurchasedTestSubCategory;
 use App\Models\ClientOnlineTestSubCategory;
-use Illuminate\Http\Request;
-use App\Libraries\InputSanitise;
+use App\Models\PayableClientSubCategory;
 use Auth, Redirect, View, DB, Session, Validator, Hash,Cache;
 use Excel;
 
@@ -58,13 +59,24 @@ class ClientUsersInfoController extends BaseController
     ];
 
     protected function allUsers($subdomainName,Request $request){
+        $purchasedPayableSubCategories = [];
+        $clientPurchasedSubCategories = [];
         $clientId = Auth::guard('client')->user()->id;
         $clientusers = Clientuser::where('client_id', $clientId)->get();
         $courses = ClientOnlineCourse::getCourseAssocaitedWithVideos();
         $userPurchasedCourses = ClientUserPurchasedCourse::getClientUserCourses($clientId);
         $userPurchasedTestSubCategories = ClientUserPurchasedTestSubCategory::getClientUserTestSubCategories($clientId);
         $testSubCategories = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
-        return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories'));
+        $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId($clientId);
+        if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
+            foreach($payableSubCategories as $payableSubCategory){
+                $purchasedPayableSubCategories[$payableSubCategory->sub_category_id] = $payableSubCategory;
+            }
+        }
+        if(count(array_keys($purchasedPayableSubCategories)) > 0){
+            $clientPurchasedSubCategories = ClientOnlineTestSubCategory::showPayableSubcategoriesByIdesAssociatedWithQuestion(array_keys($purchasedPayableSubCategories));
+        }
+        return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories', 'clientPurchasedSubCategories', 'purchasedPayableSubCategories'));
     }
 
     protected function searchUsers($subdomainName,Request $request){

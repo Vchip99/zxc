@@ -172,8 +172,10 @@ class ClientOnlineCourseController extends ClientBaseController
     	return Redirect::to('manageOnlineCourse');
     }
 
-    protected function getOnlineCourseByInstituteCourseId(Request $request){
-        return ClientOnlineCourse::getCoursesByClientInstituteCourseId($request);
+    protected function getOnlineCourseByCatIdBySubCatIdForClient(Request $request){
+        $subCategoryId = InputSanitise::inputInt($request->get('sub_category_id'));
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        return ClientOnlineCourse::getOnlineCourseByCatIdBySubCatIdForClient($categoryId,$subCategoryId);
     }
 
     protected function isClientOnlineCourseExist(Request $request){

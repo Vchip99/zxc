@@ -8,6 +8,11 @@ use Redirect;
 use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
+use App\Models\PayableClientSubCategory;
+use App\Models\ClientUserSolution;
+use App\Models\ClientScore;
+use App\Models\ClientUserPurchasedTestSubCategory;
+use App\Models\ClientOnlinePaperSection;
 
 class ClientOnlineTestCategoryController extends ClientBaseController
 {
@@ -31,8 +36,15 @@ class ClientOnlineTestCategoryController extends ClientBaseController
      * show all category
      */
     protected function show(Request $request){
+        $isPurchasedSubCategories = [];
     	$testCategories = ClientOnlineTestCategory::showCategories($request);
-    	return view('client.onlineTest.category.list', compact('testCategories'));
+        $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId(Auth::guard('client')->user()->id);
+        if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
+            foreach($payableSubCategories as $payableSubCategory){
+                $isPurchasedSubCategories[] = $payableSubCategory->category_id;
+            }
+        }
+    	return view('client.onlineTest.category.list', compact('testCategories', 'isPurchasedSubCategories'));
     }
 
     /**
@@ -131,18 +143,37 @@ class ClientOnlineTestCategoryController extends ClientBaseController
                                         foreach($testSubject->papers as $paper){
                                             if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
                                                 foreach($paper->questions as $question){
-                                                    $question->delete();
+                                                    ClientUserSolution::deleteClientUserSolutionsByQuestionId($question->id);
+                                                    if($question->category_id > 0){
+                                                        $question->delete();
+                                                    }
                                                 }
                                             }
+                                            ClientScore::deleteScoresByPaperId($paper->id);
                                             $paper->deleteRegisteredPaper();
-                                            $paper->delete();
+                                            if($paper->category_id > 0){
+                                                ClientOnlinePaperSection::deleteClientPaperSectionsByClientIdByPaperId($paper->client_id,$paper->id);
+                                                $paper->delete();
+                                            }
                                         }
                                     }
-                                    $testSubject->delete();
+                                    if($testSubject->category_id > 0){
+                                        $testSubject->delete();
+                                    }
                                 }
                             }
-                            $testSubcategory->deleteSubCategoryImageFolder($request);
-                            $testSubcategory->delete();
+                            if($testSubcategory->category_id > 0){
+                                $testSubcategory->deleteSubCategoryImageFolder($request);
+                                $testSubcategory->delete();
+                            }
+                        }
+                    }
+                    $client = Auth::guard('client')->user();
+                    $purchasedSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdByCategoryId($client->id, $catId);
+                    if(is_object($purchasedSubCategories) && false == $purchasedSubCategories->isEmpty()){
+                        foreach($purchasedSubCategories as $purchasedSubCategory){
+                            $purchasedSubCategory->end_date = date('Y-m-d');
+                            $purchasedSubCategory->save();
                         }
                     }
         			$category->delete();

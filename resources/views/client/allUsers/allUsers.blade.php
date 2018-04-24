@@ -93,6 +93,9 @@
                     </tbody>
                 </table>
               </div>
+              @php
+                $index = 1;
+              @endphp
               <div id="courses_tests">
                 @if(count($clientusers) > 0)
                   @foreach($clientusers as  $clientuser)
@@ -154,13 +157,28 @@
                                 @if(count($testSubCategories) > 0)
                                   @foreach($testSubCategories as  $index => $testSubCategory)
                                     <tr>
-                                      <td> {{ $index + 1 }} </td>
+                                      <td> {{ $index++ }} </td>
                                       <td>{{ $testSubCategory->name }}</td>
                                       <td>
                                         @if(isset($userPurchasedTestSubCategories[$clientuser->id]) && in_array($testSubCategory->id, $userPurchasedTestSubCategories[$clientuser->id]))
                                           <input type="checkbox" value="" data-client_user_id="{{ $clientuser->id }}" data-client_id="{{ $clientuser->client_id }}" data-test_category_id="{{$testSubCategory->category_id}}" data-test_sub_category_id="{{$testSubCategory->id}}" onclick="changeTestSubCategoryStatus(this);" checked="checked">
                                         @else
                                           <input type="checkbox" value="" data-client_user_id="{{ $clientuser->id }}" data-client_id="{{ $clientuser->client_id }}" data-test_category_id="{{$testSubCategory->category_id}}" data-test_sub_category_id="{{$testSubCategory->id}}" onclick="changeTestSubCategoryStatus(this);">
+                                        @endif
+                                      </td>
+                                    </tr>
+                                  @endforeach
+                                @endif
+                                @if(count($clientPurchasedSubCategories) > 0)
+                                  @foreach($clientPurchasedSubCategories as  $index => $clientPurchasedSubCategory)
+                                    <tr>
+                                      <td> {{ $index++ }} </td>
+                                      <td>{{ $clientPurchasedSubCategory->name }}</td>
+                                      <td>
+                                        @if(isset($userPurchasedTestSubCategories[$clientuser->id]) && in_array($clientPurchasedSubCategory->id, $userPurchasedTestSubCategories[$clientuser->id]))
+                                          <input type="checkbox" value="" data-client_user_id="{{ $clientuser->id }}" data-client_id="{{ $clientuser->client_id }}" data-test_category_id="{{$purchasedPayableSubCategories[$clientPurchasedSubCategory->id]->category_id}}" data-test_sub_category_id="{{$clientPurchasedSubCategory->id}}" onclick="changeTestSubCategoryStatus(this);" checked="checked">
+                                        @else
+                                          <input type="checkbox" value="" data-client_user_id="{{ $clientuser->id }}" data-client_id="{{ $clientuser->client_id }}" data-test_category_id="{{$purchasedPayableSubCategories[$clientPurchasedSubCategory->id]->category_id}}" data-test_sub_category_id="{{$clientPurchasedSubCategory->id}}" onclick="changeTestSubCategoryStatus(this);">
                                         @endif
                                       </td>
                                     </tr>
@@ -297,6 +315,18 @@
               subcategoryModelInnerHTML +='<input type="checkbox" value="" data-client_user_id="'+ userId +'" data-client_id="'+obj.client_id+'" data-test_category_id="'+obj.category_id+'" data-test_sub_category_id="'+obj.id+'" onclick="changeTestSubCategoryStatus(this);" checked="checked">';
             } else {
               subcategoryModelInnerHTML +='<input type="checkbox" value="" data-client_user_id="'+ userId +'" data-client_id="'+obj.client_id+'" data-test_category_id="'+obj.category_id+'" data-test_sub_category_id="'+obj.id+'" onclick="changeTestSubCategoryStatus(this);">';
+            }
+            subcategoryModelInnerHTML +='</td></tr>';
+          });
+        }
+        if( 0 < msg['clientPurchasedSubCategories'].length){
+          $.each(msg['clientPurchasedSubCategories'], function(idx, obj) {
+            var index = idx + 1;
+            subcategoryModelInnerHTML +='<tr><td>'+ index +'</td><td>'+obj.name+'</td><td>';
+            if(undefined !== msg['userPurchasedTestSubCategories'][userId] && msg['userPurchasedTestSubCategories'][userId].length > 0 && true == msg['userPurchasedTestSubCategories'][userId].indexOf(obj.id) > -1){
+              subcategoryModelInnerHTML +='<input type="checkbox" value="" data-client_user_id="'+ userId +'" data-client_id="'+msg['purchasedPayableSubCategories'][obj.id].client_id+'" data-test_category_id="'+msg['purchasedPayableSubCategories'][obj.id].category_id+'" data-test_sub_category_id="'+obj.id+'" onclick="changeTestSubCategoryStatus(this);" checked="checked">';
+            } else {
+              subcategoryModelInnerHTML +='<input type="checkbox" value="" data-client_user_id="'+ userId +'" data-client_id="'+msg['purchasedPayableSubCategories'][obj.id].client_id+'" data-test_category_id="'+msg['purchasedPayableSubCategories'][obj.id].category_id+'" data-test_sub_category_id="'+obj.id+'" onclick="changeTestSubCategoryStatus(this);">';
             }
             subcategoryModelInnerHTML +='</td></tr>';
           });

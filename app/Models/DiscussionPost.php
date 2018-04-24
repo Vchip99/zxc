@@ -54,8 +54,8 @@ class DiscussionPost extends Model
 
         $results = DiscussionPost::query();
         if( 1 == $recent ){
-            $currentDate = date('Y-m-d h:i:s');
-            $previousDate = date('Y-m-d h:i:s', strtotime("-30 days"));
+            $currentDate = date('Y-m-d H:i:s');
+            $previousDate = date('Y-m-d H:i:s', strtotime("-30 days"));
             $results->whereBetween('created_at',[$previousDate, $currentDate]);
         }
         if( 1 == $mostpopular ){

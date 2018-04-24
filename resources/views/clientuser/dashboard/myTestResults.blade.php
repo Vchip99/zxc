@@ -182,15 +182,23 @@
           opt.value = '';
           opt.innerHTML = 'Select Sub Category';
           select.appendChild(opt);
-          if( 0 < msg.length){
-          $.each(msg, function(idx, obj) {
-              var opt = document.createElement('option');
-              opt.value = obj.id;
-              opt.innerHTML = obj.name;
-              select.appendChild(opt);
-          });
-        }
-          });
+          if( 0 < msg['subcategories'].length){
+            $.each(msg['subcategories'], function(idx, obj) {
+                var opt = document.createElement('option');
+                opt.value = obj.id;
+                opt.innerHTML = obj.name;
+                select.appendChild(opt);
+            });
+          }
+          if( 0 < msg['payableSubCategories'].length){
+            $.each(msg['payableSubCategories'], function(idx, obj) {
+                var opt = document.createElement('option');
+                opt.value = obj.id;
+                opt.innerHTML = obj.name;
+                select.appendChild(opt);
+            });
+          }
+        });
     }
   }
 </script>

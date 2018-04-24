@@ -10,8 +10,6 @@ use Auth;
 class ClientOnlineVideoLike extends Model
 {
 	protected $connection = 'mysql2';
-
-    public $timestamps = false;
 	/**
      * The attributes that are mass assignable.
      *
@@ -65,5 +63,16 @@ class ClientOnlineVideoLike extends Model
                 $videoLike->delete();
             }
         }
+        return;
+    }
+
+    protected static function deleteClientOnlineVideoLikesByClientIdByUserId($clientId,$userId){
+        $videoLikes = static::where('client_id', $clientId)->where('user_id', $userId)->get();
+        if(is_object($videoLikes) && false == $videoLikes->isEmpty()){
+            foreach($videoLikes as $videoLike){
+                $videoLike->delete();
+            }
+        }
+        return;
     }
 }

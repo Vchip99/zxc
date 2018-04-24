@@ -75,10 +75,11 @@ only screen and (max-width: 760px),
   */
   #client_history td:nth-of-type(1):before { content: "#" ; font-weight: bolder; }
   #client_history td:nth-of-type(2):before { content: "START DATE" ; font-weight: bolder; }
-  #client_history td:nth-of-type(3):before { content: "END DATE"; font-weight: bolder;}
-  #client_history td:nth-of-type(4):before { content: "PLAN";  font-weight: bolder;}
-  #client_history td:nth-of-type(5):before { content: "AMOUNT"; font-weight: bolder;}
-  #client_history td:nth-of-type(6):before { content: "STATUS"; font-weight: bolder;}
+  #client_history td:nth-of-type(3):before { content: "START DATE" ; font-weight: bolder; }
+  #client_history td:nth-of-type(4):before { content: "END DATE"; font-weight: bolder;}
+  #client_history td:nth-of-type(5):before { content: "PLAN/Sub Category";  font-weight: bolder;}
+  #client_history td:nth-of-type(6):before { content: "AMOUNT"; font-weight: bolder;}
+  #client_history td:nth-of-type(7):before { content: "STATUS"; font-weight: bolder;}
 
 }
 
@@ -98,6 +99,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="client" name="client" onChange="showClientHistory(this);">
                 <option value="0"> Select Client </option>
+                <option value="All"> All </option>
                 @if(count($clients) > 0)
                   @foreach($clients as $client)
                     <option value="{{$client->id}}">{{$client->name}}</option>
@@ -116,9 +118,10 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
               <thead>
                   <tr>
                       <th>#</th>
+                      <th>Client</th>
                       <th>START DATE</th>
                       <th>END DATE</th>
-                      <th>PLAN</th>
+                      <th>PLAN/Sub Category</th>
                       <th>AMOUNT</th>
                       <th>STATUS</th>
                   </tr>
@@ -144,12 +147,17 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
     .done(function( msg ) {
       body = document.getElementById('client_history');
       body.innerHTML = '';
+      var index = 1;
       if( 0 < msg['plans'].length){
         $.each(msg['plans'], function(idx, obj) {
             var eleTr = document.createElement('tr');
             var eleIndex = document.createElement('td');
-            eleIndex.innerHTML = idx + 1;
+            eleIndex.innerHTML = index++;
             eleTr.appendChild(eleIndex);
+
+            var eleClient = document.createElement('td');
+            eleClient.innerHTML = obj.client;
+            eleTr.appendChild(eleClient);
 
             var eleStartDate = document.createElement('td');
             eleStartDate.innerHTML = obj.start_date;
@@ -177,11 +185,45 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
                 eleStatus.innerHTML = '<button class="btn btn-warning btn-sm">Pay</button>';
               }
             }
+            eleTr.appendChild(eleStatus);
+            body.appendChild(eleTr);
+        });
+      }
+      if( 0 < msg['purchasedSubCategories'].length){
+        $.each(msg['purchasedSubCategories'], function(idx, obj) {
+            var eleTr = document.createElement('tr');
+            var eleIndex = document.createElement('td');
+            eleIndex.innerHTML = index++;
+            eleTr.appendChild(eleIndex);
+
+            var eleClient = document.createElement('td');
+            eleClient.innerHTML = obj.client;
+            eleTr.appendChild(eleClient);
+
+            var eleStartDate = document.createElement('td');
+            eleStartDate.innerHTML = obj.start_date;
+            eleTr.appendChild(eleStartDate);
+
+            var eleEndDate = document.createElement('td');
+            eleEndDate.innerHTML = obj.end_date;
+            eleTr.appendChild(eleEndDate);
+
+            var elePlan = document.createElement('td');
+            elePlan.innerHTML = obj.sub_category;
+            eleTr.appendChild(elePlan);
+
+            var eleAmount = document.createElement('td');
+            eleAmount.innerHTML = 'Rs. '+ obj.price;
+            eleTr.appendChild(eleAmount);
+
+            var eleStatus = document.createElement('td');
+            eleStatus.innerHTML = '<button class="btn btn-success btn-sm">Paid</button>';
 
             eleTr.appendChild(eleStatus);
             body.appendChild(eleTr);
         });
-
+      }
+      if( 0 < msg['plans'].length || 0 < msg['purchasedSubCategories'].length){
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = '';
@@ -201,7 +243,8 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
         eleTr.appendChild(eleStatus);
 
         body.appendChild(eleTr);
-      } else {
+      }
+      if( 0 > msg['plans'].length && 0 > msg['purchasedSubCategories'].length){
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = 'No result!';

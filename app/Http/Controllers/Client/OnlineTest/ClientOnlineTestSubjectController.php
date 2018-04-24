@@ -10,6 +10,9 @@ use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
+use App\Models\ClientUserSolution;
+use App\Models\ClientScore;
+use App\Models\ClientOnlinePaperSection;
 
 class ClientOnlineTestSubjectController extends ClientBaseController
 {
@@ -137,9 +140,12 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 		        		foreach($testSubject->papers as $paper){
 		        			if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
 		                        foreach($paper->questions as $question){
+		                        	ClientUserSolution::deleteClientUserSolutionsByQuestionId($question->id);
 		                            $question->delete();
 		                        }
 		                    }
+		                    ClientScore::deleteScoresByPaperId($paper->id);
+		                    ClientOnlinePaperSection::deleteClientPaperSectionsByClientIdByPaperId($paper->client_id,$paper->id);
 		                    $paper->deleteRegisteredPaper();
 		                    $paper->delete();
 		        		}
@@ -162,7 +168,11 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 		if($request->ajax()){
     		$catId = InputSanitise::inputInt($request->get('catId'));
     		$subcatId = InputSanitise::inputInt($request->get('subcatId'));
-			return ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId($catId, $subcatId, $request);
+    		if($catId > 0){
+				return ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId($catId, $subcatId, $request);
+    		} else {
+    			return ClientOnlineTestSubject::getPayableSubjectsBySubcatId($subcatId);
+    		}
     	}
     	return Redirect::to('manageOnlineTestSubject');
 	}

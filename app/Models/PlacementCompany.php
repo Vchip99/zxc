@@ -10,7 +10,6 @@ use App\Models\PlacementArea;
 
 class PlacementCompany extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

@@ -5,12 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Models\ClientOnlineTestSubCategory;
-use Auth;
-use DB, Session;
+use App\Models\Clientuser;
+use Auth,DB, Session;
 
 class ClientUserPurchasedTestSubCategory extends Model
 {
-    public $timestamps = false;
     protected $connection = 'mysql2';
 
     /**
@@ -18,7 +17,7 @@ class ClientUserPurchasedTestSubCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'test_category_id', 'test_sub_category_id' ,'client_id', 'payment_id', 'price'];
+    protected $fillable = ['user_id', 'test_category_id', 'test_sub_category_id' ,'client_id', 'payment_id', 'price', 'test_sub_category'];
 
     protected static function getClientUserTestSubCategories($clientId){
     	$testSubCategories = [];
@@ -36,17 +35,19 @@ class ClientUserPurchasedTestSubCategory extends Model
         $results = static::where('client_id', $clientId)->where('user_id', $userId)->get();
         if(is_object($results) && false == $results->isEmpty()){
             foreach($results as $result){
-                $userTestSubCategories[] = $result->test_sub_category_id;
+                $userTestSubCategories[$result->test_category_id][$result->test_sub_category_id] = $result->test_sub_category_id;
             }
         }
         return $userTestSubCategories;
     }
 
     protected static function getClientUserPurchasedTestSubCategories($clientId, $userId){
-        return static::join('client_user_payments', 'client_user_payments.payment_id', '=', 'client_user_purchased_test_sub_categories.payment_id')
-                ->where('client_user_purchased_test_sub_categories.client_id', $clientId)
-                ->where('client_user_purchased_test_sub_categories.user_id', $userId)
-                ->select('client_user_purchased_test_sub_categories.*', 'client_user_payments.updated_at')->get();
+        $result = static::join('client_user_payments', 'client_user_payments.payment_id', '=', 'client_user_purchased_test_sub_categories.payment_id')
+                ->where('client_user_purchased_test_sub_categories.client_id', $clientId);
+        if($userId > 0){
+            $result->where('client_user_purchased_test_sub_categories.user_id', $userId);
+        }
+        return $result->select('client_user_purchased_test_sub_categories.*', 'client_user_payments.updated_at')->get();
     }
 
     protected static function isTestSubCategoryPurchased($clientId, $userId, $testSubCategoryId){
@@ -66,6 +67,7 @@ class ClientUserPurchasedTestSubCategory extends Model
     		$newTestSubCategory->test_sub_category_id = $request->test_sub_category_id;
     		$newTestSubCategory->client_id = $request->client_id;
             $newTestSubCategory->payment_id = '';
+            $newTestSubCategory->test_sub_category = $newTestSubCategory->testSubCategory->name;
     		$newTestSubCategory->save();
     		return 'true';
     	}elseif(true == is_object($testSubCategory)){
@@ -78,5 +80,24 @@ class ClientUserPurchasedTestSubCategory extends Model
 
     public function testSubCategory(){
         return $this->belongsTo(ClientOnlineTestSubCategory::class, 'test_sub_category_id');
+    }
+
+    protected static function deleteClientUserTestSubCategories($clientId){
+        $results = static::where('client_id', $clientId)->get();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                $result->delete();
+            }
+        }
+        return;
+    }
+
+    public function clientUser(){
+        $user = Clientuser::find($this->user_id);
+        if(is_object($user)){
+            return $user->name;
+        } else {
+            return 'deleted';
+        }
     }
 }

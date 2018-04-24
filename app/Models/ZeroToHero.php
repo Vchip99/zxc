@@ -11,7 +11,6 @@ use App\Models\Area;
 
 class ZeroToHero extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

@@ -75,5 +75,16 @@ class ClientCourseCommentLike extends Model
                 $commentLike->delete();
             }
         }
+        return;
+    }
+
+    protected static function deleteClientCourseCommentLikesByClientIdByUserId($clientId, $userId){
+        $commentLikes = static::where('client_id', $clientId)->where('user_id', $userId)->get();
+        if(is_object($commentLikes) && false == $commentLikes->isEmpty()){
+            foreach($commentLikes as $commentLike){
+                $commentLike->delete();
+            }
+        }
+        return;
     }
 }

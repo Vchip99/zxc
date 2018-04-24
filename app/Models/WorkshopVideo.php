@@ -11,7 +11,6 @@ use App\Models\WorkshopDetail;
 
 class WorkshopVideo extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

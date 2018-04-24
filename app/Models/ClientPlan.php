@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\Plan;
+use App\Models\Client;
 
 class ClientPlan extends Model
 {
@@ -33,6 +34,15 @@ class ClientPlan extends Model
 
     public function plan(){
         return $this->belongsTo(Plan::class, 'plan_id');
+    }
+
+    public function client(){
+        $client =Client::find($this->client_id);
+        if(is_object($client)){
+            return $client->name;
+        } else {
+            return 'deleted';
+        }
     }
 
     protected static function getLastPaidClientPlan(){

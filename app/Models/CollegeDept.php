@@ -55,7 +55,9 @@ class CollegeDept extends Model
 	    		for($i=1; $i<=$deptments; $i++){
 	    			$deptmentArr[] = [
 	    				'name' => $request->get('department_'.$i),
-	    				'college_id' => $collegeId
+	    				'college_id' => $collegeId,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s')
 	    			];
 	    		}
 	    		if(count($deptmentArr) > 0){

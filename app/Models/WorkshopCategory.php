@@ -10,7 +10,6 @@ use App\Models\WorkshopDetail;
 
 class WorkshopCategory extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

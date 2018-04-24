@@ -10,7 +10,6 @@ use App\Models\Area;
 
 class Designation extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

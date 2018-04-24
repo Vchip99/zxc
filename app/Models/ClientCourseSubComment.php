@@ -62,12 +62,23 @@ class ClientCourseSubComment extends Model
         return Clientuser::find($userId);
     }
 
-    protected static function deleteClientCourseSubCommentsByUserId($clientId){
+    protected static function deleteClientCourseSubCommentsByClientId($clientId){
         $subcomments = static::where('client_id', $clientId)->get();
         if(is_object($subcomments) && false == $subcomments->isEmpty()){
             foreach($subcomments as $subcomment){
                 $subcomment->delete();
             }
         }
+        return;
+    }
+
+    protected static function deleteClientCourseSubCommentsByClientIdByUserId($clientId,$userId){
+        $subcomments = static::where('client_id', $clientId)->where('user_id', $userId)->get();
+        if(is_object($subcomments) && false == $subcomments->isEmpty()){
+            foreach($subcomments as $subcomment){
+                $subcomment->delete();
+            }
+        }
+        return;
     }
 }

@@ -12,7 +12,6 @@ use App\Models\ClientAssignmentTopic;
 class ClientAssignmentQuestion extends Model
 {
     protected $connection = 'mysql2';
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -82,5 +81,18 @@ class ClientAssignmentQuestion extends Model
     		$result['status'] = 'false';
     	}
     	return $result;
+    }
+
+    protected static function deleteClientAssignmentQuestionByClientId($clientId){
+        $assignments = static::where('client_id', $clientId)->get();
+        if(is_object($assignments) && false == $assignments->isEmpty()){
+            foreach($assignments as $assignment){
+                if(file_exists($assignment->attached_link)){
+                    unlink($assignment->attached_link);
+                }
+                $assignment->delete();
+            }
+        }
+        return;
     }
 }

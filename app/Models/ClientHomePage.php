@@ -12,8 +12,6 @@ class ClientHomePage extends Model
 {
     protected $connection = 'mysql2';
 
-    public $timestamps = false;
-
     /**
      * The attributes that are mass assignable.
      *

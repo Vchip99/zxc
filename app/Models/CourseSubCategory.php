@@ -11,7 +11,6 @@ use App\Models\CourseCourse;
 
 class CourseSubCategory extends Model
 {
-	public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

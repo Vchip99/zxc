@@ -17,7 +17,7 @@ class Score extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'category_id', 'subcat_id', 'subject_id', 'paper_id','right_answered', 'wrong_answered', 'unanswered', 'test_score'];
+    protected $fillable = ['user_id', 'category_id', 'subcat_id', 'subject_id', 'paper_id','right_answered', 'wrong_answered', 'unanswered', 'test_score', 'verification_code'];
 
     /**
      *  add score
@@ -35,6 +35,7 @@ class Score extends Model
     	$score->wrong_answered = $result['wrong_answered'];
     	$score->unanswered	   = $result['unanswered'];
         $score->test_score     = $result['marks'];
+        $score->verification_code = $result['verification_code'];
     	$score->save();
 
     	return $score;

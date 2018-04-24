@@ -11,7 +11,6 @@ use App\Models\ClientAssignmentSubject;
 class ClientAssignmentTopic extends Model
 {
     protected $connection = 'mysql2';
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -53,5 +52,15 @@ class ClientAssignmentTopic extends Model
         } else {
             return static::where('client_id', Auth::guard('clientuser')->user()->client_id)->where('client_assignment_subject_id', $subjectId)->get();
         }
+    }
+
+    protected static function deleteClientAssignmentTopicByClientId($clientId){
+        $topics = static::where('client_id', $clientId)->get();
+        if(is_object($topics) && false == $topics->isEmpty()){
+            foreach($topics as $topic){
+                $topic->delete();
+            }
+        }
+        return;
     }
 }

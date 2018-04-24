@@ -32,6 +32,8 @@ use App\Models\UserBasedAuthentication;
 use App\Models\ClientUserPayment;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientUserPurchasedTestSubCategory;
+use App\Models\PayableClientSubCategory;
+use App\Models\RegisterClientOnlineCourses;
 use App\Libraries\InputSanitise;
 
 class ClientUserController extends BaseController
@@ -366,6 +368,7 @@ class ClientUserController extends BaseController
             return redirect()->back()->withErrors('something went wrong.');
         }
         Session::put('client_course_id', $clientCourse->id);
+        Session::put('client_course', $clientCourse->name);
         Session::save();
         $loginUser = Auth::guard('clientuser')->user();
         $purchasePostFields = [
@@ -476,13 +479,21 @@ class ClientUserController extends BaseController
                     try
                     {
                         $clientCourseId = Session::get('client_course_id');
+                        $clientCourse = Session::get('client_course');
                         $newUserCourse = new ClientUserPurchasedCourse;
                         $newUserCourse->user_id = $userId;
                         $newUserCourse->course_id = $clientCourseId;
                         $newUserCourse->client_id = $clientId;
                         $newUserCourse->payment_id = $paymentId;
                         $newUserCourse->price = $result->amount;
+                        $newUserCourse->course = $clientCourse;
                         $newUserCourse->save();
+
+                        $registerCourse = new RegisterClientOnlineCourses;
+                        $registerCourse->client_user_id = $userId;
+                        $registerCourse->client_online_course_id = $clientCourseId;
+                        $registerCourse->client_id = $clientId;
+                        $registerCourse->save();
 
                         $clientUserPayment = new ClientUserPayment;
                         $clientUserPayment->client_id = $clientId;
@@ -492,6 +503,7 @@ class ClientUserController extends BaseController
                         $clientUserPayment->save();
                         DB::connection('mysql2')->commit();
                         Session::remove('client_course_id');
+                        Session::remove('client_course');
 
                         // mail to client
                         $to = $loginUser->client->email;
@@ -571,14 +583,25 @@ class ClientUserController extends BaseController
         if(!is_object($subCategory)){
             return redirect()->back()->withErrors('something went wrong.');
         }
-
-        Session::put('client_sub_category_id', $subCategory->id);
-        Session::put('client_category_id', $subCategory->category_id);
-        Session::save();
         $loginUser = Auth::guard('clientuser')->user();
+        if(0 == $subCategory->client_id && 0 == $subCategory->category_id){
+            $selectedPayableSubCategory = PayableClientSubCategory::getPayableSubCategoryByClientIdBySubCategoryId($loginUser->client_id, $subCategory->id);
+            if(!is_object($selectedPayableSubCategory)){
+                return redirect()->back()->withErrors('something went wrong.');
+            }
+            $categoryId = $selectedPayableSubCategory->category_id;
+            $price = $selectedPayableSubCategory->client_user_price;
+        } else {
+            $categoryId = $subCategory->category_id;
+            $price = $subCategory->price;
+        }
+        Session::put('client_test_sub_category_id', $subCategory->id);
+        Session::put('client_test_category_id', $categoryId);
+        Session::put('client_test_sub_category', $subCategory->name);
+        Session::save();
         $purchasePostFields = [
                                 'purpose' => 'purchase '. $subCategory->name,
-                                'amount'  =>   $subCategory->price,
+                                'amount'  =>   $price,
                                 'buyer_name' => $loginUser->name,
                                 'email'  => $loginUser->email,
                                 'phone'  => $loginUser->phone,
@@ -690,8 +713,10 @@ class ClientUserController extends BaseController
                     DB::connection('mysql2')->beginTransaction();
                     try
                     {
-                        $clientSubCategoryId = Session::get('client_sub_category_id');
-                        $clientCategoryId = Session::get('client_category_id');
+                        $clientSubCategoryId = Session::get('client_test_sub_category_id');
+                        $clientCategoryId = Session::get('client_test_category_id');
+                        $clientSubCategory = Session::get('client_test_sub_category');
+
                         $newTestSubCategory = new ClientUserPurchasedTestSubCategory;
                         $newTestSubCategory->user_id = $userId;
                         $newTestSubCategory->test_category_id = $clientCategoryId;
@@ -699,6 +724,7 @@ class ClientUserController extends BaseController
                         $newTestSubCategory->client_id = $clientId;
                         $newTestSubCategory->payment_id = $paymentId;
                         $newTestSubCategory->price = $result->amount;
+                        $newTestSubCategory->test_sub_category = $clientSubCategory;
                         $newTestSubCategory->save();
 
                         $clientUserPayment = new ClientUserPayment;
@@ -708,8 +734,9 @@ class ClientUserController extends BaseController
                         $clientUserPayment->payment_id = $paymentId;
                         $clientUserPayment->save();
                         DB::connection('mysql2')->commit();
-                        Session::remove('client_sub_category_id');
-                        Session::remove('client_category_id');
+                        Session::remove('client_test_sub_category_id');
+                        Session::remove('client_test_category_id');
+                        Session::remove('client_test_sub_category');
 
                         // mail to client
                         $to = $loginUser->client->email;

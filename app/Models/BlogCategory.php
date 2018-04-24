@@ -10,7 +10,6 @@ use App\Models\Blog;
 
 class BlogCategory extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

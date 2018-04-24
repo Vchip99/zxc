@@ -19,12 +19,48 @@
     <form action="{{url('createOnlineVideo')}}" method="POST" enctype="multipart/form-data" id="submitForm">
   @endif
     {{ csrf_field() }}
+    <div class="form-group row @if ($errors->has('category')) has-error @endif">
+      <label class="col-sm-2 col-form-label">Category Name:</label>
+      <div class="col-sm-3">
+        <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
+            <option value="">Select Category</option>
+            @if(count($categories) > 0)
+              @foreach($categories as $category)
+                @if( !empty($video->id) && $video->category_id == $category->id)
+                  <option value="{{$category->id}}" selected="true">{{$category->name}}</option>
+                @else
+                  <option value="{{$category->id}}">{{$category->name}}</option>
+                @endif
+              @endforeach
+            @endif
+        </select>
+        @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
+      <label class="col-sm-2 col-form-label">Sub Category Name:</label>
+      <div class="col-sm-3">
+        <select id="subcategory" class="form-control" name="subcategory" onChange="selectCourse(this);" required title="Sub Category">
+          <option value="">Select Sub Category</option>
+          @if(!empty($video->id) && count($subCategories) > 0 )
+            @foreach($subCategories as $subCategory)
+              @if( $video->sub_category_id == $subCategory->id )
+                <option value="{{ $subCategory->id }}" selected> {{ $subCategory->name }} </option>
+              @else
+                <option value="{{ $subCategory->id }}"> {{ $subCategory->name }} </option>
+              @endif
+            @endforeach
+          @endif
+        </select>
+        @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
+      </div>
+    </div>
     <div class="form-group row @if ($errors->has('course')) has-error @endif">
       <label class="col-sm-2 col-form-label">Course Name</label>
       <div class="col-sm-3">
         <select id="course" class="form-control" name="course" required title="Course">
             <option value="">Select Course</option>
-            @if(count($courses) > 0)
+            @if(!empty($video->id) && count($courses) > 0)
               @foreach($courses as $course)
                 @if( isset($video->id) && $video->course_id == $course->id)
                   <option value="{{$course->id}}" selected="true">{{$course->name}}</option>
@@ -38,7 +74,7 @@
       </div>
     </div>
      <div class="form-group row @if ($errors->has('video')) has-error @endif">
-      <label for="course" class="col-sm-2 col-form-label">Video Name</label>
+      <label for="" class="col-sm-2 col-form-label">Video Name</label>
       <div class="col-sm-3">
         @if(isset($video->id))
           <input type="text" class="form-control" name="video" id="video" value="{{$video->name}}" required="true">
@@ -49,7 +85,7 @@
       </div>
     </div>
     <div class="form-group row @if ($errors->has('description')) has-error @endif">
-      <label for="course" class="col-sm-2 col-form-label">Description</label>
+      <label for="" class="col-sm-2 col-form-label">Description</label>
       <div class="col-sm-3">
         @if(isset($video->id))
           <textarea type="text" class="form-control" name="description" required="true">{{$video->description}}</textarea>
@@ -61,7 +97,7 @@
       </div>
     </div>
     <div class="form-group row @if ($errors->has('duration')) has-error @endif">
-      <label for="course" class="col-sm-2 col-form-label">Duration</label>
+      <label for="" class="col-sm-2 col-form-label">Duration</label>
       <div class="col-sm-3">
         @if(isset($video->id))
           <input type="text" class="form-control" name="duration" value="{{$video->duration}}" required="true">
@@ -72,13 +108,13 @@
       </div>
     </div>
     <div class="form-group row">
-      <label for="course" class="col-sm-2 col-form-label">Video Path</label>
+      <label for="" class="col-sm-2 col-form-label">Video Path</label>
       <div class="col-sm-3">
         <input type="text" class="form-control"  name="video_path" value="{{($video->video_path)?$video->video_path:NULL}}" placeholder="Add video path with iframe" required="true">
       </div>
     </div>
     <div class="form-group row @if ($errors->has('is_free')) has-error @endif">
-      <label for="course" class="col-sm-2 col-form-label">Free Video:</label>
+      <label for="" class="col-sm-2 col-form-label">Free Video:</label>
       <div class="col-sm-3">
           @if(isset($video->id))
           <label class="radio-inline"><input type="radio" name="is_free" value="1" @if(1 == $video->is_free) checked="true" @endif> Yes</label>
@@ -99,13 +135,42 @@
 </form>
 
 <script type="text/javascript">
-  function selectCourse(ele){
+
+  function selectSubcategory(ele){
     var id = parseInt($(ele).val());
     if( 0 < id ){
       $.ajax({
+          method: "POST",
+          url: "{{url('getOnlineSubCategories')}}",
+          data: {id:id}
+      })
+      .done(function( msg ) {
+        select = document.getElementById('subcategory');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = 'Select Sub Category';
+        select.appendChild(opt);
+        if( 0 < msg.length){
+          $.each(msg, function(idx, obj) {
+              var opt = document.createElement('option');
+              opt.value = obj.id;
+              opt.innerHTML = obj.name;
+              select.appendChild(opt);
+          });
+        }
+      });
+    }
+  }
+
+  function selectCourse(ele){
+    var id = parseInt($(ele).val());
+    var category = document.getElementById('category').value;
+    if( 0 < id ){
+      $.ajax({
               method: "POST",
-              url: "{{url('getOnlineCourseByInstituteCourseId')}}",
-              data: {id:id}
+              url: "{{url('getOnlineCourseByCatIdBySubCatIdForClient')}}",
+              data: {category:category,sub_category_id:id}
           })
           .done(function( msg ) {
             select = document.getElementById('course');

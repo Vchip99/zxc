@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Auth;
-use DB, Session,Cache;
+use Auth,DB, Session,Cache;
 use App\Models\ClientOnlineCourse;
+use App\Models\Clientuser;
 
 class ClientUserPurchasedCourse extends Model
 {
-    public $timestamps = false;
     protected $connection = 'mysql2';
 
     /**
@@ -18,7 +17,7 @@ class ClientUserPurchasedCourse extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'course_id' ,'client_id', 'payment_id', 'price'];
+    protected $fillable = ['user_id', 'course_id' ,'client_id', 'payment_id', 'price', 'course'];
 
     protected static function getClientUserCourses($clientId){
     	$userCourses = [];
@@ -43,10 +42,12 @@ class ClientUserPurchasedCourse extends Model
     }
 
     protected static function getClientUserPurchasedCourses($clientId, $userId){
-        return static::join('client_user_payments', 'client_user_payments.payment_id', '=', 'client_user_purchased_courses.payment_id')
-                ->where('client_user_purchased_courses.client_id', $clientId)
-                ->where('client_user_purchased_courses.user_id', $userId)
-                ->select('client_user_purchased_courses.*', 'client_user_payments.updated_at')->get();
+        $result = static::join('client_user_payments', 'client_user_payments.payment_id', '=', 'client_user_purchased_courses.payment_id')
+                ->where('client_user_purchased_courses.client_id', $clientId);
+        if($userId > 0){
+            $result->where('client_user_purchased_courses.user_id', $userId);
+        }
+        return $result->select('client_user_purchased_courses.*', 'client_user_payments.updated_at')->get();
     }
 
     protected static function isCoursePurchased($clientId, $userId, $courseId){
@@ -64,6 +65,7 @@ class ClientUserPurchasedCourse extends Model
     		$newUserCourse->user_id = $request->client_user_id;
     		$newUserCourse->course_id = $request->course_id;
     		$newUserCourse->client_id = $request->client_id;
+            $newUserCourse->course = $newUserCourse->course->name;
     		$newUserCourse->save();
     		return 'true';
     	}elseif(true == is_object($userCourse)){
@@ -76,5 +78,25 @@ class ClientUserPurchasedCourse extends Model
 
     public function course(){
         return $this->belongsTo(ClientOnlineCourse::class, 'course_id');
+    }
+
+    public function clientUser(){
+        $user = Clientuser::find($this->user_id);
+        if(is_object($user)){
+            return $user->name;
+        } else {
+            return 'deleted';
+        }
+    }
+
+    protected static function deleteClientUserCourses($clientId){
+        $userCourses = [];
+        $results = static::where('client_id', $clientId)->get();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                $result->delete();
+            }
+        }
+        return;
     }
 }

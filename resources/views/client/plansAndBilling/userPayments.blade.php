@@ -74,10 +74,11 @@ only screen and (max-width: 760px),
   Label the data
   */
   #client_history td:nth-of-type(1):before { content: "#" ; font-weight: bolder; }
-  #client_history td:nth-of-type(2):before { content: "Type" ; font-weight: bolder; }
-  #client_history td:nth-of-type(3):before { content: "Name"; font-weight: bolder;}
-  #client_history td:nth-of-type(4):before { content: "Amount";  font-weight: bolder;}
-  #client_history td:nth-of-type(5):before { content: "Date"; font-weight: bolder;}
+  #client_history td:nth-of-type(2):before { content: "User" ; font-weight: bolder; }
+  #client_history td:nth-of-type(3):before { content: "Type" ; font-weight: bolder; }
+  #client_history td:nth-of-type(4):before { content: "Name"; font-weight: bolder;}
+  #client_history td:nth-of-type(5):before { content: "Amount";  font-weight: bolder;}
+  #client_history td:nth-of-type(6):before { content: "Date"; font-weight: bolder;}
 }
 
 /**/
@@ -94,6 +95,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
         <div class="col-md-3 mrgn_10_btm">
           <select class="form-control" id="client" name="client" onChange="showClientUserPayments(this);">
             <option value="0"> Select User </option>
+            <option value="All"> All </option>
             @if(count($clientUsers) > 0)
               @foreach($clientUsers as $clientUser)
                 <option value="{{$clientUser->id}}">{{$clientUser->name}}</option>
@@ -112,6 +114,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>User</th>
                         <th>Type</th>
                         <th>Name</th>
                         <th>Amount</th>
@@ -127,7 +130,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
     </div>
 <script type="text/javascript">
   function showClientUserPayments(ele){
-    var userId = parseInt($(ele).val());
+    var userId = $(ele).val();
     document.getElementById('client_history').innerHTML = '';
     $.ajax({
       method: "POST",
@@ -144,6 +147,10 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
             eleIndex.innerHTML = idx + 1;
             eleTr.appendChild(eleIndex);
 
+            var eleUser = document.createElement('td');
+            eleUser.innerHTML = obj['user'];
+            eleTr.appendChild(eleUser);
+
             var eleType = document.createElement('td');
             eleType.innerHTML = obj['type'];
             eleTr.appendChild(eleType);
@@ -157,7 +164,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
             eleTr.appendChild(eleAmount);
 
             var eleDate = document.createElement('td');
-            eleDate.innerHTML = obj['date'];
+            eleDate.innerHTML = format_time(new Date(obj['date']['date']));
             eleTr.appendChild(eleDate);
 
             body.appendChild(eleTr);
@@ -191,6 +198,25 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
         body.appendChild(eleTr);
       }
     });
+  }
+
+  function format_time(date_obj) {
+    // formats a javascript Date object into a 12h AM/PM time string
+    var day = date_obj.getDate();
+    var month = date_obj.getMonth()+1;
+    var year = date_obj.getFullYear();
+    var hour = date_obj.getHours();
+    var minute = date_obj.getMinutes();
+    var amPM = (hour > 11) ? " PM" : " AM";
+    if(hour > 12) {
+      hour -= 12;
+    } else if(hour == 0) {
+      hour = "12";
+    }
+    if(minute < 10) {
+      minute = "0" + minute;
+    }
+    return year+"-"+month+"-"+day+" "+hour+":"+minute+":"+amPM;
   }
 </script>
 @stop

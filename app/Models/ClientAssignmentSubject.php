@@ -10,7 +10,6 @@ use App\Libraries\InputSanitise;
 class ClientAssignmentSubject extends Model
 {
     protected $connection = 'mysql2';
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -46,5 +45,15 @@ class ClientAssignmentSubject extends Model
         } else {
             return static::where('client_id', Auth::guard('clientuser')->user()->client_id)->get();
         }
+    }
+
+    protected static function deleteClientAssignmentSubjectByClientId($clientId){
+        $subjects = static::where('client_id', $clientId)->get();
+        if(is_object($subjects) && false == $subjects->isEmpty()){
+            foreach($subjects as $subject){
+                $subject->delete();
+            }
+        }
+        return;
     }
 }

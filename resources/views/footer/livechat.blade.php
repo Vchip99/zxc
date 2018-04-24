@@ -237,7 +237,7 @@
                   var senderImgPath = $('#currentUserImage').attr('src');
                   var receiverImgPath = $($('li#'+receiverId+' span img')[0]).attr('src');
                   if('undefined' == typeof receiverImgPath){
-                    receiverImgPath = 'images/user1.png';
+                    receiverImgPath = '/images/user1.png';
                   }
                   $.each(messages['messages'],function(idx,obj){
                     if(current_user == obj.sender_id){

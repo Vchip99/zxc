@@ -11,7 +11,6 @@ use App\Models\MotivationalSpeechCategory;
 
 class MotivationalSpeechVideo extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

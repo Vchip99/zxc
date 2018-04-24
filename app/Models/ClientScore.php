@@ -8,13 +8,15 @@ use App\Models\ClientOnlineTestSubject;
 use App\Models\ClientOnlineTestSubjectPaper;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\Clientuser;
+use App\Models\ClientOnlineTestSubCategory;
+use App\Models\ClientUserSolution;
+use App\Models\RegisterClientOnlinePaper;
 use App\Libraries\InputSanitise;
 use DB, Session, Auth, Cache;
 
 class ClientScore extends Model
 {
 	protected $connection = 'mysql2';
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -122,6 +124,10 @@ class ClientScore extends Model
         return;
     }
 
+    public function solutions(){
+        return $this->hasMany(ClientUserSolution::class, 'id');
+    }
+
     public function subject(){
         return $this->belongsTo(ClientOnlineTestSubject::class, 'subject_id');
     }
@@ -147,7 +153,12 @@ class ClientScore extends Model
         } else {
             $clientId = Auth::guard('clientuser')->user()->client_id;
         }
-        $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByClientId($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id ,$clientId);
+        $subcategory = ClientOnlineTestSubCategory::find($this->subcat_id);
+        if( is_object($subcategory) && 0 == $subcategory->client_id && 0 == $subcategory->category_id){
+            $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByClientId($subcategory->category_id,$this->subcat_id,$this->subject_id,$this->paper_id ,$subcategory->client_id);
+        } else {
+            $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByClientId($this->category_id,$this->subcat_id,$this->subject_id,$this->paper_id ,$clientId);
+        }
         if( is_object($questions) && false == $questions->isEmpty()){
             foreach($questions as $question){
                 $totalMarks += $question->positive_marks;

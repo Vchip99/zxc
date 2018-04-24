@@ -10,6 +10,8 @@ use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineVideo;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientNotification;
+use App\Models\ClientOnlineCategory;
+use App\Models\ClientOnlineSubCategory;
 
 class ClientOnlineVideoController extends ClientBaseController
 {
@@ -26,10 +28,12 @@ class ClientOnlineVideoController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateVideo = [
+        'category' => 'required|integer',
+        'subcategory' => 'required|integer',
+        'course' => 'required|integer',
         'video' => 'required|string',
         'description' => 'required|string',
         'duration' => 'required|integer',
-        'course' => 'required|integer',
         'video_path' => 'required|string'
     ];
 
@@ -46,9 +50,11 @@ class ClientOnlineVideoController extends ClientBaseController
      */
     protected function create(Request $request){
         $clientId = Auth::guard('client')->user()->id;
-    	$courses = ClientOnlineCourse::where('client_id', $clientId)->get();
+        $categories   = ClientOnlineCategory::where('client_id', $clientId)->get();
+        $subCategories = new ClientOnlineSubCategory;
+        $courses = new ClientOnlineCourse;
     	$video = new ClientOnlineVideo;
-    	return view('client.onlineCourse.video.create', compact('instituteCourses','courses', 'video'));
+    	return view('client.onlineCourse.video.create', compact('categories','subCategories','courses', 'video'));
     }
 
     /**
@@ -88,7 +94,10 @@ class ClientOnlineVideoController extends ClientBaseController
     		$video = ClientOnlineVideo::find($id);
     		if(is_object($video)){
     			$courses = ClientOnlineCourse::showCourses($request);
-    			return view('client.onlineCourse.video.create', compact('courses', 'video'));
+                $categories = ClientOnlineCategory::where('client_id', $video->client_id)->get();
+                $subCategories = ClientOnlineSubCategory::getOnlineSubCategoriesByCategoryId($video->category_id, $request);
+                $courses = ClientOnlineCourse::getOnlineCourseByCatIdBySubCatIdForClient($video->category_id,$video->sub_category_id);
+    			return view('client.onlineCourse.video.create', compact('categories','subCategories','courses', 'video'));
     		}
     	}
     	return Redirect::to('manageOnlineVideo');

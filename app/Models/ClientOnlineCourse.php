@@ -15,8 +15,6 @@ use Intervention\Image\ImageManagerStatic as Image;
 class ClientOnlineCourse extends Model
 {
     protected $connection = 'mysql2';
-
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -283,10 +281,9 @@ class ClientOnlineCourse extends Model
             ->get();
     }
 
-    protected function getCoursesByClientInstituteCourseId($request){
-        $id = InputSanitise::inputInt($request->get('id'));
+    protected function getOnlineCourseByCatIdBySubCatIdForClient($categoryId,$subCategoryId){
         $client = Auth::guard('client')->user();
-        return static::where('client_id', $client->id)->where('client_institute_course_id', $id)->get();
+        return static::where('client_id', $client->id)->where('category_id', $categoryId)->where('sub_category_id', $subCategoryId)->get();
     }
 
     protected static function deleteClientOnlineCoursesByClientId($clientId){

@@ -9,7 +9,6 @@ use App\Libraries\InputSanitise;
 
 class PaperSection extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -34,5 +33,15 @@ class PaperSection extends Model
         $section->name = $sectionName;
         $section->save();
         return $section;
+    }
+
+    protected static function deletePaperSectionsByPaperId($paperId){
+        $results = static::where('test_subject_paper_id', $paperId)->get();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                $result->delete();
+            }
+        }
+        return;
     }
 }

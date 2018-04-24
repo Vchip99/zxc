@@ -17,6 +17,15 @@ use App\Models\ClientNotification;
 use App\Models\ClientReadNotification;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientUserPurchasedCourse;
+use App\Models\ClientOnlineTestSubCategory;
+use App\Models\PayableClientSubCategory;
+use App\Models\ClientUserPurchasedTestSubCategory;
+use App\Models\ClientCourseComment;
+use App\Models\ClientCourseCommentLike;
+use App\Models\ClientCourseSubComment;
+use App\Models\ClientCourseSubCommentLike;
+use App\Models\ClientOnlineVideoLike;
+use App\Models\ClientAssignmentAnswer;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class Clientuser extends Authenticatable
@@ -94,6 +103,20 @@ class Clientuser extends Authenticatable
         $results['userPurchasedCourses'] = ClientUserPurchasedCourse::getClientUserCourses($clientId);
         $results['testSubCategories'] = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
         $results['userPurchasedTestSubCategories'] = ClientUserPurchasedTestSubCategory::getClientUserTestSubCategories($clientId);
+
+        $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId($clientId);
+        if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
+            foreach($payableSubCategories as $payableSubCategory){
+                $results['purchasedPayableSubCategories'][$payableSubCategory->sub_category_id] = $payableSubCategory;
+            }
+        } else {
+            $results['purchasedPayableSubCategories'] = [];
+        }
+        if(count(array_keys($results['purchasedPayableSubCategories'])) > 0){
+            $results['clientPurchasedSubCategories'] = ClientOnlineTestSubCategory::showPayableSubcategoriesByIdesAssociatedWithQuestion(array_keys($results['purchasedPayableSubCategories']));
+        } else {
+            $results['clientPurchasedSubCategories'] = [];
+        }
         return $results;
     }
 
@@ -116,6 +139,13 @@ class Clientuser extends Authenticatable
         RegisterClientOnlinePaper::deleteRegisteredPapersByUserId($userId,$clientId);
         ClientScore::deleteClientUserScores($userId);
         ClientUserSolution::deleteClientUserSolutions($userId);
+        ClientCourseComment::deleteClientCourseCommentsByClientIdByUserId($clientId, $userId);
+        ClientCourseCommentLike::deleteClientCourseCommentLikesByClientIdByUserId($clientId, $userId);
+        ClientCourseSubComment::deleteClientCourseSubCommentsByClientIdByUserId($clientId,$userId);
+        ClientCourseSubCommentLike::deleteClientCourseSubCommentLikesByClientIdByUserId($clientId,$userId);
+        ClientOnlineVideoLike::deleteClientOnlineVideoLikesByClientIdByUserId($clientId,$userId);
+        ClientAssignmentAnswer::deleteClientAssignmentAnswerByClientIdByUserId($clientId,$userId);
+        ClientReadNotification::deleteClientReadNotificationByClientIdByUserId($clientId,$userId);
         return;
     }
 
@@ -209,6 +239,8 @@ class Clientuser extends Authenticatable
         }
         RegisterClientOnlineCourses::deleteRegisteredOnlineCoursesClientId($clientId);
         RegisterClientOnlinePaper::deleteRegisteredPapersClientId($clientId);
+        ClientUserPurchasedCourse::deleteClientUserCourses($clientId);
+        ClientUserPurchasedTestSubCategory::deleteClientUserTestSubCategories($clientId);
     }
 
     function adminNotificationCount($year=NULL,$month=NULL){

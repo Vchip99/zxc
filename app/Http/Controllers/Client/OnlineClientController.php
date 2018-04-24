@@ -666,7 +666,7 @@ class OnlineClientController extends Controller
             $message = "<h1>Dear ".$data['buyer']."</h1></br>";
             $message .= "Thank you for paying. Your Payment has been successfully processed.</br>";
             $message .= "<hr>";
-            $message = "<h1>Payment Details</h1>";
+            $message .= "<h1>Payment Details</h1>";
             $message .= '<p><b>Payment Id:</b> '.$data['payment_id'].'</p>';
             $message .= '<p><b>Payment Status:</b> '.$data['status'].'</p>';
             $message .= '<p><b>Amount:</b> '.$data['amount'].'</p>';

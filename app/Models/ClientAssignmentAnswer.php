@@ -65,4 +65,30 @@ class ClientAssignmentAnswer extends Model
     public function teacher(){
         return $this->belongsTo(Client::class, 'client_id');
     }
+
+    protected static function deleteClientAssignmentAnswerByClientId($clientId){
+        $assignmentAnswers = static::where('client_id', $clientId)->get();
+        if(is_object($assignmentAnswers) && false == $assignmentAnswers->isEmpty()){
+            foreach($assignmentAnswers as $assignmentAnswer){
+                if(file_exists($assignmentAnswer->attached_link)){
+                    unlink($assignmentAnswer->attached_link);
+                }
+                $assignmentAnswer->delete();
+            }
+        }
+        return;
+    }
+
+    protected static function deleteClientAssignmentAnswerByClientIdByUserId($clientId,$userId){
+        $assignmentAnswers = static::where('client_id', $clientId)->where('student_id', $userId)->get();
+        if(is_object($assignmentAnswers) && false == $assignmentAnswers->isEmpty()){
+            foreach($assignmentAnswers as $assignmentAnswer){
+                if(file_exists($assignmentAnswer->attached_link)){
+                    unlink($assignmentAnswer->attached_link);
+                }
+                $assignmentAnswer->delete();
+            }
+        }
+        return;
+    }
 }

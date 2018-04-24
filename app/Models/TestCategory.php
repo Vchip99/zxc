@@ -17,8 +17,6 @@ class TestCategory extends Model
      */
     protected $fillable = ['name'];
 
-    public $timestamps = false;
-
     /**
      *  add/update test category
      */

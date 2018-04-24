@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\TestCategory;
 use App\Models\TestSubCategory;
 use App\Models\TestSubject;
+use App\Models\UserSolution;
+use App\Models\Score;
+use App\Models\PaperSection;
 use Redirect;
 use Validator, Auth, DB;
 use App\Libraries\InputSanitise;
@@ -146,9 +149,13 @@ class SubjectController extends Controller
 						foreach($testSubject->papers as $paper){
 							if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
 								foreach($paper->questions as $question){
+									UserSolution::deleteUserSolutionsByQuestionId($question->id);
 									$question->delete();
 								}
 							}
+							Score::deleteUserScoresByPaperId($paper->id);
+							PaperSection::deletePaperSectionsByPaperId($paper->id);
+                    		$paper->deleteRegisteredPaper();
 							$paper->delete();
 						}
 					}

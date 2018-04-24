@@ -10,7 +10,6 @@ use App\Models\User;
 
 class ApplyJob extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

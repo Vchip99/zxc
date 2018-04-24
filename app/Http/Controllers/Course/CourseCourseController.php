@@ -183,6 +183,12 @@ class CourseCourseController extends Controller
     protected function isCourseCourseExist(Request $request){
         return CourseCourse::isCourseCourseExist($request);
     }
+
+    protected function getCourseByCatIdBySubCatIdForAdmin(Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        return CourseCourse::getCourseByCatIdBySubCatIdForAdmin($categoryId,$subcategoryId);
+    }
 }
 
 

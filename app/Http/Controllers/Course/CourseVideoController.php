@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Redirect;
 use App\Models\CourseCourse;
 use App\Models\CourseVideo;
+use App\Models\CourseSubCategory;
+use App\Models\CourseCategory;
 use App\Models\Notification;
 use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
@@ -37,10 +39,12 @@ class CourseVideoController extends Controller
      * the controller to reuse the rules.
      */
     protected $validateCourseVideo = [
+        'category' => 'required|integer',
+        'subcategory' => 'required|integer',
+        'course' => 'required|integer',
         'video' => 'required|string',
         'description' => 'required|string',
         'duration' => 'required|integer',
-        'course' => 'required|integer',
         'video_path' => 'required|string'
     ];
 
@@ -56,9 +60,11 @@ class CourseVideoController extends Controller
      *  show create course video UI
      */
     protected function create(){
-    	$courseCourses = CourseCourse::all();
+        $courseCategories   = CourseCategory::all();
+        $courseSubCategories = new CourseSubCategory;
+        $courseCourses= new CourseCourse;
     	$video = new CourseVideo;
-    	return view('courseVideo.create', compact('courseCourses', 'video'));
+    	return view('courseVideo.create', compact('courseCategories','courseSubCategories','courseCourses', 'video'));
     }
 
     /**
@@ -115,8 +121,10 @@ class CourseVideoController extends Controller
     	if(isset($id)){
     		$video = CourseVideo::find($id);
     		if(is_object($video)){
-    			$courseCourses = CourseCourse::all();
-    			return view('courseVideo.create', compact('courseCourses', 'video'));
+    			$courseCategories   = CourseCategory::all();
+                $courseSubCategories = CourseSubCategory::getCourseSubCategoriesByCategoryId($video->course_category_id);
+                $courseCourses= CourseCourse::getCourseByCatIdBySubCatIdForAdmin($video->course_category_id,$video->course_sub_category_id);
+    			return view('courseVideo.create', compact('courseCategories','courseSubCategories','courseCourses', 'video'));
     		}
     	}
     	return Redirect::to('admin/manageCourseVideo');

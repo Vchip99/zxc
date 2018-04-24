@@ -12,7 +12,6 @@ use Intervention\Image\ImageManagerStatic as Image;
 
 class OfflineWorkshopDetail extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

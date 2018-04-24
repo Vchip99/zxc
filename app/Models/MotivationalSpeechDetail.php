@@ -12,7 +12,6 @@ use Intervention\Image\ImageManagerStatic as Image;
 
 class MotivationalSpeechDetail extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

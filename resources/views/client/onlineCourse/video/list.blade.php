@@ -28,6 +28,8 @@
         <tr>
           <th>#</th>
           <th>Video Name</th>
+          <th>Category Name</th>
+          <th>Sub Category Name</th>
           <th>Course Name</th>
           <th>Edit Video</th>
           <th>Delete Video</th>
@@ -39,6 +41,8 @@
           <tr>
             <th scope="row">{{ $index + 1}}</th>
             <td>{{$video->name}}</td>
+            <td>{{$video->category()}}</td>
+            <td>{{$video->subcategory()}}</td>
             <td>{{$video->course->name}}</td>
             <td>
               <a href="{{url('onlinevideo')}}/{{$video->id}}/edit"

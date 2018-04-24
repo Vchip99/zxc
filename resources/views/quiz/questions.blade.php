@@ -194,6 +194,8 @@
 				    <input type="hidden" id="sub_category_id" name="sub_category_id" value="{{$paper->test_sub_category_id}}">
 				    <input type="hidden" id="subject_id" name="subject_id" value="{{$paper->test_subject_id}}">
 				    <input type="hidden" id="paper_id" name="paper_id" value="{{$paper->id}}">
+					<input type="hidden" name="verification_code" value="{{$checkVerificationCode}}">
+
 				</form>
 			</div>
 		    <input type="hidden" id="all_sections" value="">

@@ -9,7 +9,6 @@ use DB;
 
 class InstamojoDetail extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

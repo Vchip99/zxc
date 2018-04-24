@@ -19,7 +19,6 @@ use App\Models\PlacementExperiance;
 
 class PlacementProcess extends Model
 {
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

@@ -9,7 +9,6 @@ use Auth;
 
 class DiscussionCommentLike extends Model
 {
-     public $timestamps = false;
 
     const IsLike = 1;
 	/**

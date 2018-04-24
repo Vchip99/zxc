@@ -8,7 +8,6 @@ use Auth;
 
 class BlogLikes extends Model
 {
-    public $timestamps = false;
 	/**
      * The attributes that are mass assignable.
      *

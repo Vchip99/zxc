@@ -9,18 +9,18 @@ use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientCourseComment;
 use App\Models\ClientOnlineVideoLike;
+use App\Models\ClientOnlineCategory;
+use App\Models\ClientOnlineSubCategory;
 
 class ClientOnlineVideo extends Model
 {
     protected $connection = 'mysql2';
-
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name', 'description', 'duration', 'video_path','course_id', 'client_id', 'is_free'];
+    protected $fillable = ['name', 'description', 'duration', 'video_path','course_id', 'client_id', 'is_free', 'category_id', 'sub_category_id'];
 
     /**
      *  create/update video
@@ -29,7 +29,9 @@ class ClientOnlineVideo extends Model
     	$videoName = InputSanitise::inputString($request->get('video'));
     	$description = InputSanitise::inputString($request->get('description'));
     	$duration = InputSanitise::inputInt($request->get('duration'));
-    	$course = InputSanitise::inputInt($request->get('course'));
+    	$courseId = InputSanitise::inputInt($request->get('course'));
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
     	$videoPath = trim($request->get('video_path'));
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
         $isFree = InputSanitise::inputInt($request->get('is_free'));
@@ -47,7 +49,9 @@ class ClientOnlineVideo extends Model
     	$video->description = $description;
     	$video->duration = $duration;
     	$video->video_path = $videoPath;
-    	$video->course_id = $course;
+    	$video->course_id = $courseId;
+        $video->category_id = $categoryId;
+        $video->sub_category_id = $subcategoryId;
     	$video->client_id = Auth::guard('client')->user()->id;
         $video->is_free = $isFree;
     	$video->save();
@@ -60,6 +64,30 @@ class ClientOnlineVideo extends Model
      */
     public function course(){
         return $this->belongsTo(ClientOnlineCourse::class, 'course_id');
+    }
+
+    /**
+     *  get category of video
+     */
+    public function category(){
+        $category = ClientOnlineCategory::find($this->category_id);
+        if(is_object($category)){
+            return $category->name;
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     *  get subcategory of video
+     */
+    public function subcategory(){
+        $subcategory = ClientOnlineSubCategory::find($this->sub_category_id);
+        if(is_object($subcategory)){
+            return $subcategory->name;
+        } else {
+            return '';
+        }
     }
 
     public static function getClientCourseVideosByCourseId($courseId, Request $request){

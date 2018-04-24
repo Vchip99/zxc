@@ -13,6 +13,7 @@ use App\Models\Client;
 use App\Models\Clientuser;
 use App\Models\ClientPlan;
 use App\Models\WebdevelopmentPayment;
+use App\Models\PayableClientSubCategory;
 use App\Mail\MailToSubscribedUser;
 use Auth,Hash,Session,Redirect,Validator,DB;
 use App\Libraries\InputSanitise;
@@ -93,6 +94,13 @@ class AdminController extends Controller
             if(is_object($client)){
                 Clientuser::deleteAllClientUsersInfoByClientId($client->id);
                 $client->deleteOtherInfoByClient($client);
+                $purchasedSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId($client->id);
+                    if(is_object($purchasedSubCategories) && false == $purchasedSubCategories->isEmpty()){
+                        foreach($purchasedSubCategories as $purchasedSubCategory){
+                            $purchasedSubCategory->end_date = date('Y-m-d');
+                            $purchasedSubCategory->save();
+                        }
+                    }
                 $client->delete();
                 DB::connection('mysql2')->commit();
                 return Redirect::to('admin/manageClients')->with('message', 'Client deleted successfully');
@@ -113,11 +121,16 @@ class AdminController extends Controller
     protected function getClientHistory(Request $request){
         $result = [];
         $total = 0;
-        $clientPlans = ClientPlan::where('client_id', $request->client_id)->get();
+        if($request->client_id > 0){
+            $clientPlans = ClientPlan::where('client_id', $request->client_id)->get();
+        } else {
+            $clientPlans = ClientPlan::all();
+        }
         if(is_object($clientPlans) && false == $clientPlans->isEmpty()){
             foreach($clientPlans as $clientPlan){
                 $result['plans'][]= [
-                                'start_date' => $clientPlan ->start_date,
+                                'client' => $clientPlan->client(),
+                                'start_date' => $clientPlan->start_date,
                                 'plan' => $clientPlan->plan->name,
                                 'end_date' => $clientPlan->end_date,
                                 'final_amount' => $clientPlan->final_amount,
@@ -128,6 +141,26 @@ class AdminController extends Controller
             }
         } else {
             $result['plans'] = [];
+        }
+        if($request->client_id > 0){
+            $purchasedSubCategories = PayableClientSubCategory::where('client_id', $request->client_id)->get();
+        } else {
+            $purchasedSubCategories = PayableClientSubCategory::all();
+        }
+
+        if(is_object($purchasedSubCategories) && false == $purchasedSubCategories->isEmpty()){
+            foreach($purchasedSubCategories as $purchasedSubCategory){
+                $result['purchasedSubCategories'][]= [
+                                'client' => $purchasedSubCategory->clientName(),
+                                'start_date' => $purchasedSubCategory->start_date,
+                                'end_date' => $purchasedSubCategory->end_date,
+                                'sub_category' => $purchasedSubCategory->sub_category,
+                                'price' => $purchasedSubCategory->admin_price,
+                            ];
+                $total += $purchasedSubCategory->admin_price;
+            }
+        } else {
+            $result['purchasedSubCategories'] = [];
         }
         $result['total'] = $total;
         return $result;

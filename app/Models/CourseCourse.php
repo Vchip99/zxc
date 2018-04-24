@@ -14,9 +14,8 @@ use Intervention\Image\ImageManagerStatic as Image;
 
 class CourseCourse extends Model
 {
-    public $timestamps = false;
 
-     /**
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -192,13 +191,13 @@ class CourseCourse extends Model
             }
         }
         if( 1 == $startingsoon){
-            $currentDate = date('Y-m-d h:i:s');
-            $nextDate = date('Y-m-d h:i:s', strtotime("+30 days"));
+            $currentDate = date('Y-m-d H:i:s');
+            $nextDate = date('Y-m-d H:i:s', strtotime("+30 days"));
             $results->whereBetween('release_date',[$currentDate,$nextDate]);
         }
         if( 1 == $latest ){
-            $currentDate = date('Y-m-d h:i:s');
-            $previousDate = date('Y-m-d h:i:s', strtotime("-30 days"));
+            $currentDate = date('Y-m-d H:i:s');
+            $previousDate = date('Y-m-d H:i:s', strtotime("-30 days"));
             $results->whereBetween('release_date',[$previousDate, $currentDate]);
         }
         if(!empty($categoryId)){
@@ -297,6 +296,10 @@ class CourseCourse extends Model
             return 'false';
         }
         return 'false';
+    }
+
+    protected static function getCourseByCatIdBySubCatIdForAdmin($categoryId,$subcategoryId){
+        return static::where('course_category_id', $categoryId)->where('course_sub_category_id', $subcategoryId)->get();
     }
 
 }

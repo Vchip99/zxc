@@ -11,7 +11,6 @@ use App\Models\DiscussionPost;
 
 class DiscussionCategory extends Model
 {
-        public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

@@ -19,12 +19,16 @@ use App\Models\ClientNotification;
 use App\Models\ClientReadNotification;
 use App\Models\ClientUserPurchasedTestSubCategory;
 use App\Models\ClientUserSolution;
+use App\Models\PayableClientSubCategory;
 
 class ClientOnlineTestFrontController extends ClientHomeController
 {
 	protected function tests($subdomainName,Request $request){
 		$purchasedSubCategories = [] ;
+		$payableTestCategories = [];
+		$categoryIds = [];
 		$subdomain = InputSanitise::checkDomain($request);
+
 		if(!is_object($subdomain)){
 			if('local' == \Config::get('app.env')){
                 return Redirect::away('http://localvchip.com');
@@ -42,15 +46,45 @@ class ClientOnlineTestFrontController extends ClientHomeController
 		view::share('subdomain', $subdomain);
 
         $testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
-
+        if(is_object($testCategories) && false == $testCategories->isEmpty()){
+        	foreach($testCategories as $testCategory){
+        		$categoryIds[] = $testCategory->id;
+        	}
+        }
+        $payableTestCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithPayableSubCategory($request,$categoryIds);
         $testSubCategories = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
-
         if(is_object($loginUser)){
         	$clientId = $loginUser->client_id;
         	$clientUserId = $loginUser->id;
         	$purchasedSubCategories = ClientUserPurchasedTestSubCategory::getUserPurchasedTestSubCategories($clientId, $clientUserId);
         }
-		return view('client.front.onlineTests.tests', compact('testCategories', 'testSubCategories', 'purchasedSubCategories'));
+
+        $purchasedPayableSubCategories = [];
+        $clientPurchasedSubCategories = [];
+        $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId($subdomain->client_id);
+
+        if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
+            foreach($payableSubCategories as $payableSubCategory){
+                $purchasedPayableSubCategories[$payableSubCategory->sub_category_id] = $payableSubCategory;
+            }
+        }
+        $clientPurchasedSubCat = [];
+        if(count(array_keys($purchasedPayableSubCategories)) > 0){
+        	$clientPurchasedSubCategories = ClientOnlineTestSubCategory::showPayableSubcategoriesByIdesAssociatedWithQuestion(array_keys($purchasedPayableSubCategories));
+        	if(is_object($clientPurchasedSubCategories) &&  false == $clientPurchasedSubCategories->isEmpty()){
+        		foreach($clientPurchasedSubCategories as $clientPurchasedSubCategory){
+        			$clientPurchasedSubCat[$clientPurchasedSubCategory->id] = [
+        				'sub_category_id' =>	$clientPurchasedSubCategory->id,
+        				'category_id' =>	$purchasedPayableSubCategories[$clientPurchasedSubCategory->id]->category_id,
+        				'sub_category' =>	$purchasedPayableSubCategories[$clientPurchasedSubCategory->id]->sub_category,
+        				'client_image' =>	$purchasedPayableSubCategories[$clientPurchasedSubCategory->id]->client_image,
+        				'image_path' =>	$clientPurchasedSubCategory->image_path,
+        				'client_user_price' => $purchasedPayableSubCategories[$clientPurchasedSubCategory->id]->client_user_price,
+        			];
+        		}
+        	}
+        }
+		return view('client.front.onlineTests.tests', compact('testCategories', 'testSubCategories', 'purchasedSubCategories', 'clientPurchasedSubCat', 'payableTestCategories'));
 	}
 
     /**
@@ -59,7 +93,21 @@ class ClientOnlineTestFrontController extends ClientHomeController
     public function getOnlineTestSubCategories($subdomainName,Request $request){
         if($request->ajax()){
             $id = InputSanitise::inputInt($request->get('id'));
-            return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($id, $request);
+            $result['subcategories'] = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($id, $request);
+            $subdomain = InputSanitise::checkDomain($request);
+            $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdByCategoryId($subdomain->client_id, $id);
+           	if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
+           		$subCategoryArr = [];
+           		foreach($payableSubCategories as $payableSubCategory){
+           			$subCategoryArr[] = $payableSubCategory->sub_category_id;
+           		}
+           		if(count($subCategoryArr) > 0){
+           			$result['payableSubCategories'] = ClientOnlineTestSubCategory::getPayableSubcategoriesByIdsWithPapers($subCategoryArr);
+           		}
+           	} else {
+           		$result['payableSubCategories'] = [];
+           	}
+            return $result;
         }
     }
 
@@ -69,7 +117,21 @@ class ClientOnlineTestFrontController extends ClientHomeController
     public function getOnlineTestSubcategoriesWithPapers($subdomainName,Request $request){
         if($request->ajax()){
             $id = InputSanitise::inputInt($request->get('id'));
-            return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdWithPapers($id, $request);
+            $result['subcategories'] = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdWithPapers($id, $request);
+            $subdomain = InputSanitise::checkDomain($request);
+            $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdByCategoryId($subdomain->client_id, $id);
+           	if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
+           		$subCategoryArr = [];
+           		foreach($payableSubCategories as $payableSubCategory){
+           			$subCategoryArr[] = $payableSubCategory->sub_category_id;
+           		}
+           		if(count($subCategoryArr) > 0){
+           			$result['payableSubCategories'] = ClientOnlineTestSubCategory::getPayableSubcategoriesByIdsWithPapers($subCategoryArr);
+           		}
+           	} else {
+           		$result['payableSubCategories'] = [];
+           	}
+            return $result;
         }
     }
 
@@ -80,6 +142,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 		$subcatId = json_decode($id);
 		$testSubjectPaperIds = [];
 		$isTestSubCategoryPurchased = 'false';
+
 		$loginUser = Auth::guard('clientuser')->user();
 		if(is_object($loginUser)){
             $clientResult = InputSanitise::checkUserClient($request, $loginUser);
@@ -90,30 +153,72 @@ class ClientOnlineTestFrontController extends ClientHomeController
 		if(isset($subcatId)){
 			$subcategory = ClientOnlineTestSubCategory::find($subcatId);
 			if(is_object($subcategory)){
-				$catId = $subcategory->category_id;
-				$selectedSubCategory = $subcategory;
+
 				$testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
+        		$payableTestSubCategories = [];
+				$purchasedPayableSubCategories = [];
+				if( 0 == $subcategory->client_id && 0 == $subcategory->category_id){
+					$isPayableSubCategory = 'true';
+					$subdomain = InputSanitise::checkDomain($request);
+					$selectedPayableSubCategory = PayableClientSubCategory::getPayableSubCategoryByClientIdBySubCategoryId($subdomain->client_id, $subcategory->id);
+					$catId = $selectedPayableSubCategory->category_id;
+					$selectedSubCategory = $selectedPayableSubCategory;
+					$payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdByCategoryId($subdomain->client_id, $catId);
 
-				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($catId, $request);
-
-				$testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
-
-				$testSubjectPapers = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
-
-				if(is_array($testSubjectPapers)){
-					foreach($testSubjectPapers as $testPapers){
-						foreach($testPapers as $testPaper){
-							$testSubjectPaperIds[] = $testPaper->id;
+			        if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
+			            foreach($payableSubCategories as $payableSubCategory){
+			                $purchasedPayableSubCategories[$payableSubCategory->sub_category_id] = $payableSubCategory;
+			            }
+			        }
+			        if(count(array_keys($purchasedPayableSubCategories)) > 0){
+			        	$payableTestSubCategories = ClientOnlineTestSubCategory::showPayableSubcategoriesByIdesAssociatedWithQuestion(array_keys($purchasedPayableSubCategories));
+			        }
+			        $testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($catId, $request);
+			        $testSubjects = ClientOnlineTestSubject::showPayableSubjectsBySubCategoryIdAssociatedWithQuestion($subcatId);
+			        $testSubjectPapers = ClientOnlineTestSubjectPaper::showPayablePapersBySubCategoryIdAssociatedWithQuestion($subcatId);
+			        if(is_array($testSubjectPapers)){
+						foreach($testSubjectPapers as $testPapers){
+							foreach($testPapers as $testPaper){
+								$testSubjectPaperIds[] = $testPaper->id;
+							}
 						}
+						$testSubjectPaperIds = array_values($testSubjectPaperIds);
 					}
-					$testSubjectPaperIds = array_values($testSubjectPaperIds);
+				} else {
+					$isPayableSubCategory = 'false';
+					$catId = $subcategory->category_id;
+					$selectedSubCategory = $subcategory;
+					$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($catId, $request);
+
+					$payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdByCategoryId($subcategory->client_id, $catId);
+
+			        if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
+			            foreach($payableSubCategories as $payableSubCategory){
+			                $purchasedPayableSubCategories[$payableSubCategory->sub_category_id] = $payableSubCategory;
+			            }
+			        }
+			        if(count(array_keys($purchasedPayableSubCategories)) > 0){
+			        	$payableTestSubCategories = ClientOnlineTestSubCategory::showPayableSubcategoriesByIdesAssociatedWithQuestion(array_keys($purchasedPayableSubCategories));
+			        }
+					$testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
+
+					$testSubjectPapers = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
+
+					if(is_array($testSubjectPapers)){
+						foreach($testSubjectPapers as $testPapers){
+							foreach($testPapers as $testPaper){
+								$testSubjectPaperIds[] = $testPaper->id;
+							}
+						}
+						$testSubjectPaperIds = array_values($testSubjectPaperIds);
+					}
 				}
-				$registeredPaperIds = $this->getRegisteredPaperIds($subdomainName);
-				$alreadyGivenPapers = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 				$currentDate = date('Y-m-d H:i:s');
 				if(is_object($loginUser)){
 			        $clientId = $loginUser->client_id;
 			        $userId = $loginUser->id;
+					$registeredPaperIds = $this->getRegisteredPaperIds($subdomainName);
+					$alreadyGivenPapers = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 
 			        $isTestSubCategoryPurchased = ClientUserPurchasedTestSubCategory::isTestSubCategoryPurchased($clientId, $userId, $subcatId);
                     if($subject > 0 && $paper > 0){
@@ -131,10 +236,13 @@ class ClientOnlineTestFrontController extends ClientHomeController
                             return redirect()->back()->withErrors('something went wrong.');
                         }
                     }
+                } else {
+                	$registeredPaperIds = [];
+                	$alreadyGivenPapers = [];
                 }
 
 
-				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper', 'selectedSubCategory', 'loginUser'));
+				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper', 'selectedSubCategory', 'loginUser', 'isPayableSubCategory', 'payableTestSubCategories', 'purchasedPayableSubCategories'));
 			}
 		}
 		return Redirect::to('/');
@@ -147,8 +255,34 @@ class ClientOnlineTestFrontController extends ClientHomeController
 	protected function getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($subdomainName,Request $request){
 		if($request->ajax()){
 			$result = [];
+			$purchasedPayableSubCategories = [];
             $id = InputSanitise::inputInt($request->get('id'));
             $result['sub_categories'] = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryIdAssociatedWithQuestion($id, $request);
+            $subdomain = InputSanitise::checkDomain($request);
+            $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdByCategoryId($subdomain->client_id, $id);
+	        if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
+	            foreach($payableSubCategories as $payableSubCategory){
+	                $purchasedPayableSubCategories[$payableSubCategory->sub_category_id] = $payableSubCategory;
+	            }
+	        }
+	        if(count(array_keys($purchasedPayableSubCategories)) > 0){
+	        	$clientPurchasedSubCategories = ClientOnlineTestSubCategory::showPayableSubcategoriesByIdesAssociatedWithQuestion(array_keys($purchasedPayableSubCategories));
+	        	if(is_object($clientPurchasedSubCategories) &&  false == $clientPurchasedSubCategories->isEmpty()){
+	        		foreach($clientPurchasedSubCategories as $clientPurchasedSubCategory){
+	        			$result['clientPurchasedSubCategories'][$clientPurchasedSubCategory->id] = [
+	        				'sub_category_id' =>	$clientPurchasedSubCategory->id,
+	        				'category_id' =>	$purchasedPayableSubCategories[$clientPurchasedSubCategory->id]->category_id,
+	        				'sub_category' =>	$purchasedPayableSubCategories[$clientPurchasedSubCategory->id]->sub_category,
+	        				'client_image' =>	$purchasedPayableSubCategories[$clientPurchasedSubCategory->id]->client_image,
+	        				'image_path' =>	$clientPurchasedSubCategory->image_path,
+	        				'client_user_price' => $purchasedPayableSubCategories[$clientPurchasedSubCategory->id]->client_user_price,
+	        			];
+	        		}
+	        	}
+	        } else {
+	        	$result['clientPurchasedSubCategories'] = [];
+	        }
+
             $loginUser = Auth::guard('clientuser')->user();
             if(is_object($loginUser)){
             	$clientId = $loginUser->client_id;
@@ -170,15 +304,21 @@ class ClientOnlineTestFrontController extends ClientHomeController
 			$catId = InputSanitise::inputInt($request->get('cat'));
 			$subcatId = InputSanitise::inputInt($request->get('subcat'));
 			$loginUser = Auth::guard('clientuser')->user();
+			$subcategory = ClientOnlineTestSubCategory::find($subcatId);
+			if( is_object($subcategory) && 0 == $subcategory->client_id && 0 == $subcategory->category_id){
+				$result['subjects'] = ClientOnlineTestSubject::showPayableSubjectsBySubCategoryIdAssociatedWithQuestion($subcatId);
 
-			$result['subjects']  = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
+		        $result['papers'] = ClientOnlineTestSubjectPaper::showPayablePapersBySubCategoryIdAssociatedWithQuestion($subcatId);
+			} else {
+				$result['subjects']  = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
 
-			$result['papers'] = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
+				$result['papers'] = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
+			}
 
-			$result['registeredPaperIds'] = $this->getRegisteredPaperIds($subdomainName);
 			if(is_object($loginUser)){
 		        $clientId = $loginUser->client_id;
 		        $userId = $loginUser->id;
+				$result['registeredPaperIds'] = $this->getRegisteredPaperIds($subdomainName);
 		       	$result['isTestSubCategoryPurchased'] = ClientUserPurchasedTestSubCategory::isTestSubCategoryPurchased($clientId, $userId, $subcatId);
 
 				if(is_array($result['papers'])){
@@ -192,6 +332,8 @@ class ClientOnlineTestFrontController extends ClientHomeController
 
 				$result['alreadyGivenPapers'] = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 				$result['currentDate'] = date('Y-m-d H:i:s');
+			} else {
+				$result['registeredPaperIds'] = [];
 			}
 			return $result;
 		}
@@ -205,9 +347,18 @@ class ClientOnlineTestFrontController extends ClientHomeController
 			$catId = InputSanitise::inputInt($request->get('cat'));
 			$subcatId = InputSanitise::inputInt($request->get('subcat'));
 			$userId = InputSanitise::inputInt($request->get('userId'));
-			$result['subjects']  = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
+			$subcategory = ClientOnlineTestSubCategory::find($subcatId);
 
-			$result['papers'] = ClientOnlineTestSubjectPaper::getRegisteredPapersByCatIdBySubCatId($catId, $subcatId, $userId);
+			if( is_object($subcategory) && 0 == $subcategory->client_id && 0 == $subcategory->category_id){
+				$result['subjects'] = ClientOnlineTestSubject::showPayableSubjectsBySubCategoryIdAssociatedWithQuestion($subcatId);
+
+		        $result['papers'] = ClientOnlineTestSubjectPaper::showPayablePapersBySubCategoryIdAssociatedWithQuestion($subcatId);
+			} else {
+
+				$result['subjects']  = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatIdWithQuestion($catId, $subcatId, $request);
+
+				$result['papers'] = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
+			}
 			if(is_array($result['papers'])){
 				foreach($result['papers'] as $testPapers){
 					foreach($testPapers as $testPaper){
@@ -279,15 +430,22 @@ class ClientOnlineTestFrontController extends ClientHomeController
     }
 
     protected function showUserTestResult($subdomainName,Request $request){
-    	$categoryId = $request->get('category_id');
         $subcategoryId = $request->get('subcategory_id');
         $subjectId = $request->get('subject_id');
         $paperId = $request->get('paper_id');
-        $userId = Auth::guard('clientuser')->user()->id;
+        $loginUser = Auth::guard('clientuser')->user();
+        $userId = $loginUser->id;
+        $clientId = $loginUser->client_id;
         $totalMarks = 0 ;
         $userAnswers = [];
         $positiveMarks = 0;
         $negativeMarks = 0;
+    	$selectedPayableSubCategory = PayableClientSubCategory::getPayableSubCategoryByClientIdBySubCategoryId($clientId, $subcategoryId);
+    	if(is_object($selectedPayableSubCategory)){
+    		$categoryId = $selectedPayableSubCategory->category_id;
+    	} else {
+    		$categoryId = $request->get('category_id');
+    	}
         $score = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcategoryId,$paperId,$subjectId,$userId);
 
         if(is_object($score)){
@@ -300,7 +458,11 @@ class ClientOnlineTestFrontController extends ClientHomeController
         			$userAnswers[$userSolution->ques_id] = $userSolution->user_answer;
         		}
         	}
-        	$questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
+        	if(is_object($selectedPayableSubCategory)){
+        		$questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId(0, $subcategoryId, $subjectId, $paperId, $request);
+        	} else {
+        		$questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
+        	}
         	if(is_object($questions) && false == $questions->isEmpty()){
 	        	foreach($questions as $question){
 	        		if(isset($userAnswers[$question->id])){

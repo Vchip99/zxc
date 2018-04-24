@@ -177,14 +177,16 @@
       </thead>
       <tbody id="all_session">
         @if(count($allSessions) > 0)
-          @foreach($allSessions as $session)
+          @foreach($allSessions as $index => $session)
             <tr id="tr_{{$session->id}}">
               <td class="col-sm-3"><input type="text" class="form-control" name="session_{{$session->id}}" value="{{$session->name}}" required="true"></td>
               <td class="col-sm-3 duration">
                 <input type="text" class="form-control" name="duration_{{$session->id}}" value="{{$session->duration}}">
               </td>
               <td class=""><button type="button" onClick="addSessions();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
-              <td class=""><button onClick="removeElement('all_session',{{$session->id}});"> <i class="fa fa-minus-circle" aria-hidden="true"></i></button></td>
+              @if($index > 0)
+                <td class=""><button onClick="removeElement('all_session',{{$session->id}});"> <i class="fa fa-minus-circle" aria-hidden="true"></i></button></td>
+              @endif
             </tr>
           @endforeach
         @else

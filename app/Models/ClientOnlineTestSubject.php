@@ -13,8 +13,6 @@ use App\Models\ClientOnlineTestSubjectPaper;
 class ClientOnlineTestSubject extends Model
 {
     protected $connection = 'mysql2';
-
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -22,10 +20,10 @@ class ClientOnlineTestSubject extends Model
      */
     protected $fillable = ['name', 'category_id', 'sub_category_id', 'client_id'];
 
-     /**
+    /**
      *  add/update subject
      */
-    protected static function addOrUpdateSubject( Request $request, $isUpdate=false){
+    protected static function addOrUpdateSubject(Request $request, $isUpdate=false){
         $categoryId = InputSanitise::inputInt($request->get('category'));
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
         $subjectName = InputSanitise::inputString($request->get('name'));
@@ -47,7 +45,31 @@ class ClientOnlineTestSubject extends Model
         return $testSubject;
     }
 
-      /**
+    /**
+     *  add/update payable subject
+     */
+    protected static function addOrUpdatePayableSubject(Request $request, $isUpdate=false){
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        $subjectName = InputSanitise::inputString($request->get('name'));
+        $subjectId = InputSanitise::inputInt($request->get('subject_id'));
+
+        if( $isUpdate && isset($subjectId)){
+            $testSubject = static::find($subjectId);
+            if(!is_object($testSubject)){
+                return Redirect::to('admin/managePayableSubject');
+            }
+        } else{
+            $testSubject = new static;
+        }
+        $testSubject->name = $subjectName;
+        $testSubject->category_id = 0;
+        $testSubject->sub_category_id = $subcategoryId;
+        $testSubject->client_id = 0;
+        $testSubject->save();
+        return $testSubject;
+    }
+
+    /**
      *  get category of sub category
      */
     public function category(){
@@ -133,7 +155,26 @@ class ClientOnlineTestSubject extends Model
         return  $result->select('client_online_test_subjects.*')->get();
     }
 
-     protected static function getSubjectsByIds($ids){
+    protected static function showPayableSubjects(){
+        return static::where('client_id', 0)->where('category_id', 0)->select('client_online_test_subjects.*')->get();
+    }
+
+    protected static function showPayableSubjectsBySubCategoryIdAssociatedWithQuestion($subcategoryId){
+        return  DB::connection('mysql2')->table('client_online_test_subjects')
+            ->join('client_online_test_subject_papers', function($join){
+                $join->on('client_online_test_subject_papers.subject_id', '=', 'client_online_test_subjects.id');
+            })
+            ->join('client_online_test_questions', function($join){
+                $join->on('client_online_test_questions.subject_id', '=', 'client_online_test_subjects.id');
+                $join->on('client_online_test_questions.paper_id', '=', 'client_online_test_subject_papers.id');
+            })->where('client_online_test_subjects.client_id', 0)
+            ->where('client_online_test_subjects.category_id', 0)
+            ->where('client_online_test_subjects.sub_category_id', $subcategoryId)
+            ->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))
+            ->select('client_online_test_subjects.*')->groupBy('client_online_test_subjects.id')->get();
+    }
+
+    protected static function getSubjectsByIds($ids){
         return DB::connection('mysql2')->table('client_online_test_subjects')->whereIn('id', $ids)
                         ->select('client_online_test_subjects.*')
                         ->get();
@@ -165,5 +206,26 @@ class ClientOnlineTestSubject extends Model
             return 'false';
         }
         return 'false';
+    }
+
+    protected static function isPayableSubjectExist(Request $request){
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        $subjectName = InputSanitise::inputString($request->get('subject'));
+        $subjectId = InputSanitise::inputInt($request->get('subject_id'));
+        $result = static::where('client_id', 0)->where('category_id', 0)->where('sub_category_id', $subcategoryId)->where('name', $subjectName);
+        if(!empty($subjectId)){
+            $result->where('id', '!=', $subjectId);
+        }
+        $result->first();
+        if(is_object($result) && 1 == $result->count()){
+            return 'true';
+        } else {
+            return 'false';
+        }
+        return 'false';
+    }
+
+    protected static function getPayableSubjectsBySubcatId($subcategoryId){
+        return static::where('client_id', 0)->where('category_id', 0)->where('sub_category_id', $subcategoryId)->select('client_online_test_subjects.*')->get();
     }
 }

@@ -236,7 +236,6 @@
 	}
 
 	function uploadImages(){
-		// console.log(document.getElementById('upload_images').files);
 		if(document.getElementById('upload_images').value.length > 0){
 			document.getElementById('uploadImagesForm').submit();
 		} else {

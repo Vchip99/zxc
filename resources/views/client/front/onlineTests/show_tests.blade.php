@@ -34,12 +34,10 @@
 		  text-align:center;
 		  overflow: visible;
 		}
-
-
-.pay-now span{
-color: #fff;
-font-weight: bold;
-}
+		.pay-now span{
+			color: #fff;
+			font-weight: bold;
+		}
   	</style>
 @stop
 @section('header-js')
@@ -61,10 +59,10 @@ font-weight: bold;
 	  </div>
 	</section>
   	<section class="v_container ">
-	 <div class="container">
+ 	<div class="container">
 	   <h2 class="v_h2_title text-center"> Exam</h2>
 	   <hr class="section-dash-dark"/>
-	  <div class="row label-primary">
+	  	<div class="row label-primary">
 	    <div class="col-md-8  col-md-offset-2  ">
 	      	<div class="row text-center">
 		        <div class="col-md-4 col-sm-4  col-xs-12 mrgn_10_top_btm  ">
@@ -93,23 +91,38 @@ font-weight: bold;
 		          				{{$testSubCategory->name}}
 		          			</option>
 		          		@endforeach
+		          		@if(count($payableTestSubCategories) > 0)
+		          			@foreach($payableTestSubCategories as $payableTestSubCategory)
+		          				@if($subcatId == $payableTestSubCategory->id)
+		          					<option value="{{$payableTestSubCategory->id}}" data-price="{{$purchasedPayableSubCategories[$payableTestSubCategory->id]->client_user_price}}" selected>
+			          			@else
+			          				<option value="{{$payableTestSubCategory->id}}" data-price="{{$purchasedPayableSubCategories[$payableTestSubCategory->id]->client_user_price}}">
+			          			@endif
+			          				{{$payableTestSubCategory->name}}
+			          			</option>
+		          			@endforeach
+		          		@endif
 		          	</select>
 		        </div>
 		        <div class="col-md-4 col-sm-4 mrgn_10_top_btm " style="display: inline-block !important; ">
 		        <div class="pay-now " >
-        			<span id="price">Price: {{$selectedSubCategory->price}} Rs.</span>
+		        	@if($selectedSubCategory->admin_price > 0 && $selectedSubCategory->client_user_price > 0)
+        				<span id="price">Price: {{$selectedSubCategory->client_user_price}} Rs.</span>
+        			@else
+        				<span id="price">Price: {{$selectedSubCategory->price}} Rs.</span>
+        			@endif
 			       	@if(is_object($loginUser))
 			        	@if('true' == $isTestSubCategoryPurchased)
 				        	<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" >Paid</a>
 				        @else
-				        	@if($selectedSubCategory->price > 0)
+				        	@if(($selectedSubCategory->admin_price > 0 && $selectedSubCategory->client_user_price > 0) || $selectedSubCategory->price > 0)
 								<a id="paidStatus" href="{{ url('purchaseTestSubCategory')}}/{{$subcatId}}" class="btn btn-sm btn-default" style="cursor: pointer;" >Pay Now</a>
 							@else
 								<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" >Free</a>
 							@endif
 						@endif
 					@else
-						@if($selectedSubCategory->price > 0)
+						@if(($selectedSubCategory->admin_price > 0 && $selectedSubCategory->client_user_price > 0) || $selectedSubCategory->price > 0)
 							<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" onClick="checkLogin();">Pay Now</a>
 						@else
 							<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" >Free</a>
@@ -128,7 +141,7 @@ font-weight: bold;
 	      <span></span>
 	    </div>
 	  </div>
-	 </div>
+ 	</div>
 	</section>
   	<section>
 	  	<div class="container exam-panel" id="subjects">
@@ -189,7 +202,7 @@ font-weight: bold;
 						                    	@else
 						                    		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 								                    	<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
-									                @elseif( 'true' == $isTestSubCategoryPurchased || 1 == $testSubjectPaper->is_free || $selectedSubCategory->price <= 0)
+									                @elseif( 'true' == $isTestSubCategoryPurchased || 1 == $testSubjectPaper->is_free || ('false' == $isPayableSubCategory && $selectedSubCategory->price <= 0 && $selectedSubCategory->admin_price > 0))
 									                	<td id="startTest_{{$testSubjectPaper->id}}"><button onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button></td>
 									                @else
 									                	<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
@@ -225,7 +238,7 @@ font-weight: bold;
 									                    @elseif('true' == $isTestSubCategoryPurchased )
 									                    	<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
 									                    @else
-									                    	@if($selectedSubCategory->price > 0)
+									                    	@if(($selectedSubCategory->admin_price > 0 && $selectedSubCategory->client_user_price > 0) || $selectedSubCategory->price > 0)
 									                    		<td><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to Add to Favourite!"><i class="fa
 									                    		fa-star" aria-hidden="true"></i></button></td>
 									                    	@else
@@ -264,7 +277,7 @@ font-weight: bold;
 										                    	@else
 										                    		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 											                    		<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" >Start</span></button></li>
-										                    		@elseif( 'true' == $isTestSubCategoryPurchased  || 1 == $testSubjectPaper->is_free || $selectedSubCategory->price <= 0)
+										                    		@elseif( 'true' == $isTestSubCategoryPurchased  || 1 == $testSubjectPaper->is_free ||('false' == $isPayableSubCategory && $selectedSubCategory->price <= 0))
 													                	<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true"></span>Start</button></li>
 													                @else
 													                	<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Please purchase sub category to give test."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
@@ -304,7 +317,7 @@ font-weight: bold;
 													                    @elseif('true' == $isTestSubCategoryPurchased)
 													                    	<li id="registerPaper_mobile_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!" class="btn-magick btn-sm btn3d"><span class="fa fa-star" aria-hidden="true" ></span> Add</button></li>
 													                    @else
-													                    	@if($selectedSubCategory->price > 0)
+													                    	@if(($selectedSubCategory->admin_price > 0 && $selectedSubCategory->client_user_price > 0) || $selectedSubCategory->price > 0)
 													                    		<li><button disabled="true" class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please purchase sub category to Add to Favourite!"><span class="fa fa-star" aria-hidden="true"></span> Add</button></li>
 													                    	@else
 													                    		<li id="registerPaper_mobile_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!" class="btn-magick btn-sm btn3d"><span class="fa fa-star" aria-hidden="true" ></span> Add</button></li>
@@ -352,7 +365,7 @@ font-weight: bold;
 		var category = parseInt($(ele).data('category'));
 		var subcategory = parseInt($(ele).data('subcategory'));
 		var userId = parseInt(document.getElementById('user_id').value);
-		if(0 < paper && 0 < subject && 0 < category && 0 < subcategory){
+		if(0 < paper && 0 < subject && 0 < subcategory){
 			$.ajax({
 	            method: "POST",
 	            url: "{{url('setClientUserSessions')}}",
