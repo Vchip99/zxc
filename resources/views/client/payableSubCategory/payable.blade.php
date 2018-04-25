@@ -111,7 +111,7 @@
                                       <div class="form-group row">
                                         <label class="col-sm-4 col-form-label">Total</label>
                                         <div class="col-sm-8">
-                                          <input type="text" name="total" id="total_{{$testSubCategory->id}}" value="{{$testSubCategory->monthly_price}}" required>
+                                          <input type="text" name="total" id="total_{{$testSubCategory->id}}" value="{{$testSubCategory->monthly_price}}" readonly="true" required>
                                         </div>
                                       </div>
                                   </div>

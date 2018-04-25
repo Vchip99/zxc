@@ -53,4 +53,14 @@ class ClientUserSolution extends Model
         }
         return;
     }
+
+    protected static function deleteClientUserSolutionsByUserIdPaperIdByScoreId($userId,$scoreId,$paperId){
+        $solutions = static::where('client_user_id', $userId)->where('client_score_id', $scoreId)->where('paper_id', $paperId)->get();
+        if(is_object($solutions) && false == $solutions->isEmpty()){
+            foreach($solutions as $solution){
+                $solution->delete();
+            }
+        }
+        return;
+    }
 }

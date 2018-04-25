@@ -213,7 +213,7 @@
     if( 0 < id ){
       $.ajax({
               method: "POST",
-              url: "{{url('getOnlineTestSubCategories')}}",
+              url: "{{url('getOnlineTestSubCategoriesForTestResult')}}",
               data: {id:id}
           })
           .done(function( msg ) {

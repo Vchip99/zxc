@@ -20,8 +20,8 @@ class CreatePayableClientSubCategoriesTable extends Migration
             $table->integer('sub_category_id');
             $table->string('admin_price');
             $table->string('client_user_price');
-            $table->string('payament_id');
-            $table->string('payament_request_id');
+            $table->string('payment_id');
+            $table->string('payment_request_id');
             $table->string('client_image');
             $table->date('start_date');
             $table->date('end_date');

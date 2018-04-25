@@ -35,11 +35,11 @@ class RegisterClientOnlineCourses extends Model
     protected static function isCourseRegistered($courseId){
         $loginUser = Auth::guard('clientuser')->user();
         if(is_object($loginUser)){
-            $registeredCourses = static::where('client_user_id', $loginUser->id)
+            $registeredCourse = static::where('client_user_id', $loginUser->id)
                                 ->where('client_id', $loginUser->client_id)
                                 ->where('client_online_course_id', $courseId)
-                                ->get();
-            if(false == $registeredCourses->isEmpty()){
+                                ->first();
+            if(is_object($registeredCourse)){
                 return 'true';
             }
         }
@@ -52,6 +52,15 @@ class RegisterClientOnlineCourses extends Model
             foreach($courses as $course){
                 $course->delete();
             }
+        }
+        return;
+    }
+
+    protected static function deleteRegisteredOnlineCoursesByClientIdByUserIdByCourseId($userId,$clientId,$courseId){
+        $course = static::where('client_user_id', $userId)->where('client_id', $clientId)->where('client_online_course_id', $courseId)->first();
+        if(is_object($course)){
+            $course->delete();
+            return 'deleted';
         }
         return;
     }

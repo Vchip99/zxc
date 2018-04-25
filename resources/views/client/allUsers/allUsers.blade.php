@@ -375,6 +375,7 @@
                           $(ele).prop('checked', '');
                         }
                       }
+                      window.location.reload();
                     });
                   }
               },
@@ -384,6 +385,7 @@
                 } else {
                   $(ele).prop('checked', '');
                 }
+                window.location.reload();
               }
           }
         });
@@ -420,6 +422,7 @@
                           $(ele).prop('checked', '');
                         }
                       }
+                      window.location.reload();
                     });
                   }
               },
@@ -429,6 +432,7 @@
                 } else {
                   $(ele).prop('checked', '');
                 }
+                window.location.reload();
               }
           }
         });

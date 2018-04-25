@@ -171,7 +171,7 @@ class PurchaseSubCategoryController extends ClientBaseController
 
         }
         catch (Exception $e) {
-            return redirect('pricing')->withErrors([$e->getMessage()]);
+            return redirect('managePayableSubCategory')->withErrors([$e->getMessage()]);
         }
     }
 
@@ -336,7 +336,7 @@ class PurchaseSubCategoryController extends ClientBaseController
         return view('client.purchaseSubCategory.purchase', compact('testSubCategories', 'purchasedSubCategories', 'testCategories'));
     }
 
-        /**
+    /**
      *  showPayableSubcategory
      */
     protected function showPurchaseSubcategory($subdomain,$id,Request $request){

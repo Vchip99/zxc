@@ -40,7 +40,7 @@ class Handler extends ExceptionHandler
         if ($this->shouldReport($exception)) {
             $requestedUri = request()->getUri();
             // sends an email
-            // $this->sendEmail($exception,$requestedUri);
+            $this->sendEmail($exception,$requestedUri);
         }
 
         parent::report($exception);

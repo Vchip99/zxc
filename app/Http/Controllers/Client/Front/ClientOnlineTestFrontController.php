@@ -93,6 +93,16 @@ class ClientOnlineTestFrontController extends ClientHomeController
     public function getOnlineTestSubCategories($subdomainName,Request $request){
         if($request->ajax()){
             $id = InputSanitise::inputInt($request->get('id'));
+            return ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($id, $request);
+        }
+    }
+
+     /**
+     *  return sub categories by categoryId
+     */
+    public function getOnlineTestSubCategoriesForTestResult($subdomainName,Request $request){
+        if($request->ajax()){
+            $id = InputSanitise::inputInt($request->get('id'));
             $result['subcategories'] = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($id, $request);
             $subdomain = InputSanitise::checkDomain($request);
             $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdByCategoryId($subdomain->client_id, $id);

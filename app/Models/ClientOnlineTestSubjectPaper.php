@@ -536,6 +536,13 @@ class ClientOnlineTestSubjectPaper extends Model
                     ->get();
     }
 
+    protected static function getPapersBySubCategoryId($subcategoryId){
+        return DB::connection('mysql2')->table('client_online_test_subject_papers')
+                    ->where('client_online_test_subject_papers.sub_category_id', $subcategoryId)
+                    ->select('client_online_test_subject_papers.*')
+                    ->get();
+    }
+
     public function deleteRegisteredPaper(){
         $registeredPapers = RegisterClientOnlinePaper::where('client_paper_id', $this->id)->where('client_id', Auth::guard('client')->user()->id)->get();
         if(is_object($registeredPapers) && false == $registeredPapers->isEmpty()){

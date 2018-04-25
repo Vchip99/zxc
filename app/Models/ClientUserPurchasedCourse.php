@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Auth,DB, Session,Cache;
 use App\Models\ClientOnlineCourse;
 use App\Models\Clientuser;
+use App\Models\RegisterClientOnlineCourses;
 
 class ClientUserPurchasedCourse extends Model
 {
@@ -69,6 +70,7 @@ class ClientUserPurchasedCourse extends Model
     		$newUserCourse->save();
     		return 'true';
     	}elseif(true == is_object($userCourse)){
+            RegisterClientOnlineCourses::deleteRegisteredOnlineCoursesByClientIdByUserIdByCourseId($userCourse->user_id,$userCourse->client_id,$userCourse->course_id);
     		$userCourse->delete();
     		return 'true';
     	} else {

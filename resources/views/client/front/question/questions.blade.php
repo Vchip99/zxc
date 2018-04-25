@@ -165,7 +165,7 @@
 												<div class="col-lg-12"  >
 												<td>
 												  <p>
-													<a data-path="{{ url('instructions1') }}" class="btn btn-sq-sm btn-primary load-ajax-modal" role="button" data-toggle="modal" data-target="#dynamic-modal">Instruction
+													<a class="btn btn-sq-sm btn-primary load-ajax-modal" role="button" data-toggle="modal" data-target="#dynamic-modal">Instruction
 													</a>
 													<a class="btn btn-sq-sm btn-success" role="button" data-toggle="modal" data-target="#user-profile">Profile</a >
 													<button id="btn1" type="button" class="btn btn-sq-sm btn-warning next btn btn-success" onClick="submitForm();">Submit

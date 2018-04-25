@@ -1029,7 +1029,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('isTestGiven', 'Client\Front\ClientOnlineTestFrontController@isTestGiven');
 	Route::post('getRegisteredSubjectsAndPapersByCatIdBySubcatId', 'Client\Front\ClientOnlineTestFrontController@getRegisteredSubjectsAndPapersByCatIdBySubcatId');
 	Route::post('getOnlineTestSubcategoriesWithPapers', 'Client\Front\ClientOnlineTestFrontController@getOnlineTestSubcategoriesWithPapers');
-
+	Route::post('getOnlineTestSubCategoriesForTestResult', 'Client\Front\ClientOnlineTestFrontController@getOnlineTestSubCategoriesForTestResult');
 
 	// client online question front
 	Route::post('questions', 'Client\Front\ClientOnlineQuestionFrontController@getQuestions');

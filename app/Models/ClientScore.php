@@ -71,6 +71,13 @@ class ClientScore extends Model
                 ->first();
     }
 
+    protected static function getClientUserTestResultBySubcategoryIdByPaperIdByUserId($subcategoryId,$paperId,$userId){
+            return static::where('subcat_id', $subcategoryId)
+                ->where('paper_id', $paperId)
+                ->where('client_user_id', $userId)
+                ->first();
+    }
+
     protected static function getClientUserTestScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $userId){
         $paperIds = [];
         if(count($testSubjectIds) > 0 && count($testSubjectPaperIds) > 0 && !empty($userId)) {

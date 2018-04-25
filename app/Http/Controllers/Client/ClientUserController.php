@@ -34,6 +34,7 @@ use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientUserPurchasedTestSubCategory;
 use App\Models\PayableClientSubCategory;
 use App\Models\RegisterClientOnlineCourses;
+use App\Models\RegisterClientOnlinePaper;
 use App\Libraries\InputSanitise;
 
 class ClientUserController extends BaseController
@@ -733,6 +734,17 @@ class ClientUserController extends BaseController
                         $clientUserPayment->payment_request_id = $paymentRequestId;
                         $clientUserPayment->payment_id = $paymentId;
                         $clientUserPayment->save();
+
+                        $subCategoryPapers = ClientOnlineTestSubjectPaper::getPapersBySubCategoryId($clientSubCategoryId);
+                        if(is_object($subCategoryPapers) && false == $subCategoryPapers->isEmpty()){
+                            foreach($subCategoryPapers as $subCategoryPaper){
+                                $registeredTestPaper = RegisterClientOnlinePaper::firstOrNew(['client_user_id' => $userId, 'client_paper_id' => $subCategoryPaper->id, 'client_id' =>  $clientId]);
+                                if(is_object($registeredTestPaper) && empty($registeredTestPaper->id)){
+                                    $registeredTestPaper->save();
+                                }
+                            }
+                        }
+
                         DB::connection('mysql2')->commit();
                         Session::remove('client_test_sub_category_id');
                         Session::remove('client_test_category_id');

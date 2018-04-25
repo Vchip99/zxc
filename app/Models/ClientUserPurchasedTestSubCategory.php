@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\Clientuser;
+use App\Models\ClientOnlineTestSubjectPaper;
+use App\Models\RegisterClientOnlinePaper;
+use App\Models\ClientScore;
+use App\Models\ClientUserSolution;
 use Auth,DB, Session;
 
 class ClientUserPurchasedTestSubCategory extends Model
@@ -71,7 +75,21 @@ class ClientUserPurchasedTestSubCategory extends Model
     		$newTestSubCategory->save();
     		return 'true';
     	}elseif(true == is_object($testSubCategory)){
-    		$testSubCategory->delete();
+            $subCategoryPapers = ClientOnlineTestSubjectPaper::getPapersBySubCategoryId($testSubCategory->test_sub_category_id);
+            if(is_object($subCategoryPapers) && false == $subCategoryPapers->isEmpty()){
+                foreach($subCategoryPapers as $subCategoryPaper){
+                    $registeredTestPaper = RegisterClientOnlinePaper::getRegisteredPapersByUserIdByClientIdByPaperId($testSubCategory->user_id,$testSubCategory->client_id,$subCategoryPaper->id);;
+                    if(is_object($registeredTestPaper)){
+                        $clientUserScore = ClientScore::getClientUserTestResultBySubcategoryIdByPaperIdByUserId($testSubCategory->test_sub_category_id,$subCategoryPaper->id,$testSubCategory->user_id);
+                        if(is_object($clientUserScore)){
+                            ClientUserSolution::deleteClientUserSolutionsByUserIdPaperIdByScoreId($testSubCategory->user_id,$clientUserScore->id,$subCategoryPaper->id);
+                            $clientUserScore->delete();
+                        }
+                        $registeredTestPaper->delete();
+                    }
+                }
+            }
+            $testSubCategory->delete();
     		return 'true';
     	} else {
     		return 'false';
