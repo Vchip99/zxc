@@ -173,7 +173,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = '';
-        eleIndex.setAttribute('colspan', '2');
+        eleIndex.setAttribute('colspan', '3');
         eleTr.appendChild(eleIndex);
 
         var elePlan = document.createElement('td');

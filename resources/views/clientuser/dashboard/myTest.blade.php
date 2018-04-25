@@ -57,9 +57,16 @@
           <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm  ">
             <select class="form-control" id="category" name="category" onChange="selectSubcategory(this);" title="Category">
               <option>Select Category</option>
-              @foreach($testCategories as $testCategory)
-                <option value="{{$testCategory->id}}"> {{$testCategory->name}} </option>
-              @endforeach
+              @if(count($testCategories) > 0)
+                @foreach($testCategories as $testCategory)
+                  <option value="{{$testCategory->id}}"> {{$testCategory->name}} </option>
+                @endforeach
+              @endif
+              @if(count($payableTestCategories) > 0)
+                @foreach($payableTestCategories as $payableTestCategory)
+                  <option value="{{$payableTestCategory->id}}"> {{$payableTestCategory->name}} </option>
+                @endforeach
+              @endif
             </select>
           </div>
           <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm">
@@ -255,7 +262,7 @@
       if( 0 < id && 0 < userId ){
         $.ajax({
                 method: "POST",
-                url: "{{url('getOnlineTestSubcategoriesWithPapers')}}",
+                url: "{{url('getClientUserTestSubcategoriesBycategoryId')}}",
                 data: {id:id, userId:userId}
             })
             .done(function( msg ) {
@@ -265,16 +272,8 @@
               opt.value = '';
               opt.innerHTML = 'Select Sub Category';
               select.appendChild(opt);
-              if( 0 < msg['subcategories'].length){
+              if(msg['subcategories']){
                 $.each(msg['subcategories'], function(idx, obj) {
-                    var opt = document.createElement('option');
-                    opt.value = obj.id;
-                    opt.innerHTML = obj.name;
-                    select.appendChild(opt);
-                });
-              }
-              if( 0 < msg['payableSubCategories'].length){
-                $.each(msg['payableSubCategories'], function(idx, obj) {
                     var opt = document.createElement('option');
                     opt.value = obj.id;
                     opt.innerHTML = obj.name;

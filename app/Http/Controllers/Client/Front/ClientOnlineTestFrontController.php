@@ -151,6 +151,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
 	protected function getTest( $subdomainName,$id,Request $request,$subject=NULL,$paper=NULL){
 		$subcatId = json_decode($id);
 		$testSubjectPaperIds = [];
+        $categoryIds = [];
 		$isTestSubCategoryPurchased = 'false';
 
 		$loginUser = Auth::guard('clientuser')->user();
@@ -165,6 +166,12 @@ class ClientOnlineTestFrontController extends ClientHomeController
 			if(is_object($subcategory)){
 
 				$testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
+                if(is_object($testCategories) && false == $testCategories->isEmpty()){
+                    foreach($testCategories as $testCategory){
+                        $categoryIds[] = $testCategory->id;
+                    }
+                }
+                $payableTestCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithPayableSubCategory($request,$categoryIds);
         		$payableTestSubCategories = [];
 				$purchasedPayableSubCategories = [];
 				if( 0 == $subcategory->client_id && 0 == $subcategory->category_id){
@@ -252,7 +259,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
                 }
 
 
-				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper', 'selectedSubCategory', 'loginUser', 'isPayableSubCategory', 'payableTestSubCategories', 'purchasedPayableSubCategories'));
+				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper', 'selectedSubCategory', 'loginUser', 'isPayableSubCategory', 'payableTestSubCategories', 'purchasedPayableSubCategories', 'payableTestCategories'));
 			}
 		}
 		return Redirect::to('/');

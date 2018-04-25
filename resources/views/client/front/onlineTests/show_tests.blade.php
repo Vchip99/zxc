@@ -77,6 +77,17 @@
 		              			{{$testCategory->name}}
 		              		</option>
 		              	@endforeach
+		              	@if(count($payableTestCategories) > 0)
+			              @foreach($payableTestCategories as $payableTestCategory)
+			              		@if( $catId == $payableTestCategory->id)
+			              			<option value="{{$payableTestCategory->id}}" selected="true">
+			              		@else
+			              			<option value="{{$payableTestCategory->id}}">
+			              		@endif
+			                  		{{$payableTestCategory->name}}
+			                  	</option>
+			              @endforeach
+			            @endif
 	          		</select>
 		        </div>
 		        <div class="col-md-4 col-sm-4  col-xs-12 mrgn_10_top_btm">
@@ -427,12 +438,21 @@
 			    opt.value = '';
 			    opt.innerHTML = 'Select Sub Category';
 			    select.appendChild(opt);
-			    if( 0 < msg['sub_categories'].length){
+			    if(msg['sub_categories']){
 		    		$.each(msg['sub_categories'], function(idx, obj) {
 					    var opt = document.createElement('option');
 					    opt.value = obj.id;
 					    opt.setAttribute('data-price', obj.price);
 					    opt.innerHTML = obj.name;
+					    select.appendChild(opt);
+					});
+				}
+				if(msg['clientPurchasedSubCategories']){
+		    		$.each(msg['clientPurchasedSubCategories'], function(idx, obj) {
+					    var opt = document.createElement('option');
+					    opt.value = obj['sub_category_id'];
+					    opt.setAttribute('data-price', obj['client_user_price']);
+					    opt.innerHTML = obj['sub_category'];
 					    select.appendChild(opt);
 					});
 				}

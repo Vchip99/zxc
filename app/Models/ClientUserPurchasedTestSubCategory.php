@@ -62,6 +62,10 @@ class ClientUserPurchasedTestSubCategory extends Model
         return 'false';
     }
 
+    protected static function ClientUserPurchasedTestSubCategoryByCategory($clientId, $userId, $testCategoryId){
+        return static::where('client_id', $clientId)->where('user_id', $userId)->where('test_category_id', $testCategoryId)->get();
+    }
+
     protected static function changeClientUserTestSubCategoryStatus(Request $request){
     	$testSubCategory = static::where('client_id', $request->client_id)->where('user_id', $request->client_user_id)->where('test_category_id', $request->test_category_id)->where('test_sub_category_id', $request->test_sub_category_id)->first();
     	if(false == is_object($testSubCategory)){

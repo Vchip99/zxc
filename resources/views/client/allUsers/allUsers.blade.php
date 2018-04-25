@@ -94,7 +94,7 @@
                 </table>
               </div>
               @php
-                $index = 1;
+                $indexCount = 1;
               @endphp
               <div id="courses_tests">
                 @if(count($clientusers) > 0)
@@ -157,7 +157,7 @@
                                 @if(count($testSubCategories) > 0)
                                   @foreach($testSubCategories as  $index => $testSubCategory)
                                     <tr>
-                                      <td> {{ $index++ }} </td>
+                                      <td> {{ $indexCount++ }} </td>
                                       <td>{{ $testSubCategory->name }}</td>
                                       <td>
                                         @if(isset($userPurchasedTestSubCategories[$clientuser->id]) && in_array($testSubCategory->id, $userPurchasedTestSubCategories[$clientuser->id]))
@@ -172,7 +172,7 @@
                                 @if(count($clientPurchasedSubCategories) > 0)
                                   @foreach($clientPurchasedSubCategories as  $index => $clientPurchasedSubCategory)
                                     <tr>
-                                      <td> {{ $index++ }} </td>
+                                      <td> {{ $indexCount++ }} </td>
                                       <td>{{ $clientPurchasedSubCategory->name }}</td>
                                       <td>
                                         @if(isset($userPurchasedTestSubCategories[$clientuser->id]) && in_array($clientPurchasedSubCategory->id, $userPurchasedTestSubCategories[$clientuser->id]))

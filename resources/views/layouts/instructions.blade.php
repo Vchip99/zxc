@@ -140,7 +140,6 @@
 						</ul>
 						<li>3. The Marked for Review status for a question simply indicates that you would like to look at that question again. If a question is answered, but marked for review, then the answer to that question will be considered in the evaluation, unless the status is modified by the candidate.
 						</li>
-
 					</ul>
 	                </div>
 	                <div class="panel-footer">

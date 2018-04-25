@@ -92,6 +92,7 @@ class ClientUserController extends BaseController
         $testSubjects        = [];
         $testSubjectPaperIds = [];
         $testSubjectIds      = [];
+        $categoryIds         = [];
         $clientUser = Auth::guard('clientuser')->user();
         $clientUserId = $clientUser->id;
         $clientId = $clientUser->client_id;
@@ -107,9 +108,36 @@ class ClientUserController extends BaseController
             $testSubjects = ClientOnlineTestSubject::getSubjectsByIds($testSubjectIds);
         }
         $testCategories = ClientOnlineTestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($clientUserId);
+        if(is_object($testCategories) && false == $testCategories->isEmpty()){
+            foreach($testCategories as $testCategory){
+                $categoryIds[] = $testCategory->id;
+            }
+        }
+        $payableTestCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithPayableSubCategory($request,$categoryIds);
         $alreadyGivenPapers = ClientScore::getClientUserTestScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $clientUserId);
         $currentDate = date('Y-m-d H:i:s');
-        return view('clientuser.dashboard.myTest', compact('testSubjects', 'testSubjectPapers', 'testCategories','currentDate', 'alreadyGivenPapers'));
+        return view('clientuser.dashboard.myTest', compact('testSubjects', 'testSubjectPapers', 'testCategories','currentDate', 'alreadyGivenPapers', 'payableTestCategories'));
+    }
+
+    /**
+     *  return sub categories by categoryId by userid by client
+     */
+    public function getClientUserTestSubcategoriesBycategoryId($subdomainName,Request $request){
+        if($request->ajax()){
+            $purchasedSubCategoryIds = [];
+            $id = InputSanitise::inputInt($request->get('id'));
+            $userId = InputSanitise::inputInt($request->get('userId'));
+            $loginUser = Auth::guard('clientuser')->user();
+            $clientId = $loginUser->client_id;
+            $purchasedSubCategories = ClientUserPurchasedTestSubCategory::ClientUserPurchasedTestSubCategoryByCategory($clientId, $userId,$id);
+            if(is_object($purchasedSubCategories) && false == $purchasedSubCategories->isEmpty()){
+                foreach($purchasedSubCategories as $purchasedSubCategory){
+                    $purchasedSubCategoryIds[] = $purchasedSubCategory->test_sub_category_id;
+                }
+            }
+            $result['subcategories'] = ClientOnlineTestSubCategory::find($purchasedSubCategoryIds);
+            return $result;
+        }
     }
 
     protected function getVideoCount($courses){

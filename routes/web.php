@@ -1067,6 +1067,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 
   	Route::get('purchaseTestSubCategory/{subCategoryId}', 'Client\ClientUserController@purchaseTestSubCategory');
   	Route::get('redirectTestSubCategoryPayment', 'Client\ClientUserController@redirectTestSubCategoryPayment');
+  	Route::post('getClientUserTestSubcategoriesBycategoryId', 'Client\ClientUserController@getClientUserTestSubcategoriesBycategoryId');
 
 
 	/// client user Post Comment
