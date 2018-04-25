@@ -171,6 +171,13 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     protected function getOnlinePapersBySubjectId(Request $request){
         if($request->ajax()){
             $subjectId = InputSanitise::inputInt($request->get('subjectId'));
+            return ClientOnlineTestSubjectPaper::getOnlinePapersBySubjectId($subjectId);
+        }
+    }
+
+    protected function getOnlinePapersBySubjectIdWithPayable(Request $request){
+        if($request->ajax()){
+            $subjectId = InputSanitise::inputInt($request->get('subjectId'));
             $categoryId = $request->get('categoryId');
             if($categoryId > 0){
                 return ClientOnlineTestSubjectPaper::getOnlinePapersBySubjectId($subjectId);

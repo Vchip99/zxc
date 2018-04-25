@@ -980,6 +980,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('getOnlinePapersBySubjectId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@getOnlinePapersBySubjectId');
   	Route::post('paperSectionsByPaperId', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@paperSectionsByPaperId');
   	Route::post('isClientTestPaperExist', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@isClientTestPaperExist');
+  	Route::post('getOnlinePapersBySubjectIdWithPayable', 'Client\OnlineTest\ClientOnlineTestSubjectPaperController@getOnlinePapersBySubjectIdWithPayable');
 
   	// test question
   	Route::get('manageOnlineTestQuestion', 'Client\OnlineTest\ClientOnlineTestQuestionController@index');

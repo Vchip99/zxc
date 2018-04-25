@@ -304,7 +304,7 @@
     if( 0 < subjectId ){
       $.ajax({
           method: "POST",
-            url: "{{url('getOnlinePapersBySubjectId')}}",
+            url: "{{url('getOnlinePapersBySubjectIdWithPayable')}}",
             data: {categoryId:categoryId,subjectId:subjectId}
       }).done(function( msg ) {
         select = document.getElementById('paper');

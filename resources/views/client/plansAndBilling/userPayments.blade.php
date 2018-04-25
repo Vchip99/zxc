@@ -122,7 +122,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
                     </tr>
                 </thead>
                 <tbody id="client_history">
-
+                <tr><td colspan="6">please select user</td></tr>
                 </tbody>
             </table>
           </div>
