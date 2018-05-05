@@ -320,7 +320,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 $userResults[$result->ques_id] = $result;
             }
 
-            return view('client.front.question.testSolution', compact('results', 'userResults', 'paper', 'sections'));
+            return view('client.front.question.testSolution', compact('results', 'userResults', 'paper', 'sections', 'subdomainName'));
         }
     }
 

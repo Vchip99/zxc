@@ -27,20 +27,25 @@
               </div>
               <div id="chatAdmin">
                 @if('ceo@vchiptech.com' != $loginUser->email)
-                  <div class="chat-body clearfix" style="">
-                    <div class="header">
-                      <strong class="primary-font"><button style="width: 87%; background:  skyblue;" id="{{$chatAdminId}}" data-user_name="Admin Chat" onclick="showChat(this);">Click to chat with Admin</button> </strong>
-                      <span id="unread_{{$chatAdminId}}" style="color: red;"></span>
-                      <span class="chat-img pull-right">
-
-                        @if($chatAdminLive)
-                          <img src="/images/online.png" id="userstatus_{{$chatAdminId}}" data-user_id="{{$chatAdminId}}" style="height:  20px; width: 20px;">
-                        @else
-                          <img src="/images/offline.png" id="userstatus_{{$chatAdminId}}" data-user_id="{{$chatAdminId}}" style="height:  20px; width: 20px;">
-                        @endif
-                      </span>
+                  <li class="left clearfix addChat" id="{{$chatAdminId}}" data-user_name="Vchip Admin" onclick="showChat(this);" style="list-style: none;padding-left: 13px;border-bottom: 1px dotted #B3A9A9;">
+                    <span class="chat-img pull-left">
+                      <img src="{{asset('images/user1.png')}}" alt="User Avatar" class="img-circle">
+                    </span>
+                    <div class="chat-body clearfix" style="padding-left: 60px;">
+                      <div class="header">
+                        <strong class="primary-font">Vchip Admin </strong>
+                          <span id="unread_{{$chatAdminId}}" style="color: red;"></span>
+                          <span class="chat-img pull-right" style="padding-right: 30px;">
+                          @if($chatAdminLive)
+                            <img src="/images/online.png" id="userstatus_{{$chatAdminId}}" data-user_id="{{$chatAdminId}}" style="height:  20px; width: 20px;">
+                          @else
+                            <img src="/images/offline.png" id="userstatus_{{$chatAdminId}}" data-user_id="{{$chatAdminId}}" style="height:  20px; width: 20px;">
+                          @endif
+                        </span>
+                      </div>
+                      <p>Vchip</p>
                     </div>
-                  </div>
+                  </li>
                 @endif
               </div>
               <div class="panel-body">
@@ -213,7 +218,6 @@
           popupBoxDiv.appendChild(popupBodyDiv);
           divChatWindows.appendChild(popupBoxDiv);
 
-
           $('.popup-messages').scroll(function() {
               if($(this).scrollTop() == 0){
                 getNextchatMessages($(this).attr('id'));
@@ -334,9 +338,7 @@
               var spanStatus = document.createElement('span');
               spanStatus.className = 'chat-img pull-right';
               if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
-              // if(users['onlineUsers'].indexOf(obj['id']) !== -1){
                   spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
-
               } else {
                   spanStatus.innerHTML += '<img src="/images/offline.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
               }
@@ -349,6 +351,13 @@
               divChatBody.appendChild(pEle);
               liEle.appendChild(divChatBody);
               chatUsers.appendChild(liEle);
+
+              var roomArr = [];
+              roomArr.push(obj['id']);
+              roomArr.push(current_user);
+              var roomMembers = roomArr.sort();
+              var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
+              socket.emit('subscribe', roomName);
             });
           });
         } else if('' == contact){
@@ -385,6 +394,7 @@
 
       // show chat users
       function loadChatUsers(limitStart){
+          var current_user = document.getElementById('user_id').value;
           var previuosChatUsers = document.getElementById('previuos_chat_users').value;
           var token = "{{ csrf_token() }}";
           $.ajax({
@@ -454,7 +464,6 @@
 
                     var spanStatus = document.createElement('span');
                     spanStatus.className = 'chat-img pull-right';
-                    // if(users['onlineUsers'].indexOf(obj['id']) !== -1){
                     if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
                         spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
 
@@ -470,6 +479,13 @@
                     divChatBody.appendChild(pEle);
                     liEle.appendChild(divChatBody);
                     chatUsers.appendChild(liEle);
+
+                    var roomArr = [];
+                    roomArr.push(obj['id']);
+                    roomArr.push(current_user);
+                    var roomMembers = roomArr.sort();
+                    var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
+                    socket.emit('subscribe', roomName);
                 });
                 $('#isUserScroll').val(0);
               } else {
@@ -501,7 +517,7 @@
         $.each(users['chatusers']['users'],function(idx,obj){
           var liEle = document.createElement('li');
           if(document.getElementById('user_id').value == obj['id']){
-              liEle.className = 'left clearfix addChat';
+              liEle.className = 'left clearfix addChat hide';
           } else {
               liEle.className = 'left clearfix addChat';
           }
@@ -555,7 +571,6 @@
 
           var spanStatus = document.createElement('span');
           spanStatus.className = 'chat-img pull-right';
-          // if(users['onlineUsers'].indexOf(obj['id']) !== -1){
           if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
               spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
 
@@ -571,6 +586,13 @@
           divChatBody.appendChild(pEle);
           liEle.appendChild(divChatBody);
           chatUsers.appendChild(liEle);
+
+          var roomArr = [];
+          roomArr.push(obj['id']);
+          roomArr.push(current_user);
+          var roomMembers = roomArr.sort();
+          var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
+          socket.emit('subscribe', roomName);
         });
       }
 
@@ -726,7 +748,7 @@
               var roomMembers = roomArr.sort();
               var roomName = 'chatmessages_'+roomArr[0]+'_'+roomArr[1];
               var userchat = $('.userchat#'+roomName);
-              if( null == document.getElementById('unread_'+data.sender)){
+              if( null == document.getElementById('unread_'+data.sender) && userchat.length > 0){
                 var spanUnread = document.createElement('span');
                 spanUnread.className = "hide";
                 spanUnread.id = 'unread_'+data.sender;
@@ -796,18 +818,20 @@
                 document.getElementById('userCnt_'+data.receiver).innerHTML = 1;
               }
 
-              if(current_user ==  data.sender){
+              if(current_user ==  data.sender && userchat.length > 0){
                   var liEle = document.createElement('li');
                   liEle.className = 'right clearfix addChat';
                   liEle.innerHTML = '<span class="chat-img pull-right "><img src="'+data.senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+data.message+'</p></div><div class="chat-time clearfix"><span class="pull-right">'+messagteTime(data.created_at)+'</span></div>';
                   userchat[0].appendChild(liEle);
-              } else {
+              } else if(userchat.length > 0){
                   var liEle = document.createElement('li');
                   liEle.className = 'left clearfix addChat';
                   liEle.innerHTML = '<span class="chat-img pull-left "><img src="'+data.senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+data.message+'</p></div><div class="chat-time clearfix"><span class="pull-left">'+messagteTime(data.created_at)+'</span></div>';
                   userchat[0].appendChild(liEle);
               }
-              $(userchat).parent().animate({scrollTop:$(userchat)[0].scrollHeight});
+              if(userchat.length > 0){
+                $(userchat).parent().animate({scrollTop:$(userchat)[0].scrollHeight});
+              }
           });
       };
       // send & insert message

@@ -1,4 +1,4 @@
-@extends('dashboard.dashboard')
+@extends('client.dashboard')
 @section('dashboard_header')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <style type="text/css">
@@ -21,7 +21,6 @@
     margin-bottom: 10px;
     padding-left: 6px !important;
   }
-
   ul#chat_messages {
     margin-top: 0;
     margin-bottom: 10px;
@@ -62,11 +61,9 @@
     width: 10% !important;
   }
 }
-@media screen and (min-width: 735px) {
-  div#admin{padding-left: 56px;}
-}
+
 @media screen and (max-width: 735px) {
-  .v-container .container {
+    .v-container .container {
     padding-left: 0px !important;
     padding-right: 0px !important;
   }
@@ -75,7 +72,7 @@
     margin-bottom: 10px;
     padding-left: 20px !important;
   }
-  div#admin{padding-left: 18px;}
+
   ul#chat_messages {
     margin-top: 0;
     margin-bottom: 10px;
@@ -256,7 +253,7 @@ ul#chat_messages div{
   display: block;
   cursor: pointer;
 }
-#contact_list li,#admin li{
+#contact_list li{
   list-style:none;
 }
 @media screen and (max-width: 735px) {
@@ -461,18 +458,9 @@ ul#chat_messages div{
     padding: 10px 0 15px 0px !important;
   }
 }
-#frame #sidepanel #contacts ul li.contact .wrap span{
+#frame #sidepanel #contacts ul li.contact .wrap span {
   position: absolute;
   left: 0;
-  margin: -2px 0 0 -2px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px solid #2c3e50;
-  background: #95a5a6;
-}
-#admin li.contact .wrap span {
-  position: absolute;
   margin: -2px 0 0 -2px;
   width: 10px;
   height: 10px;
@@ -495,17 +483,6 @@ ul#chat_messages div{
   border-radius: 50%;
   float: left;
   margin-right: 10px;
-}
-#admin li.contact .wrap img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  float: left;
-  margin-right: 10px;
-}
-
-#admin li.contact .wrap span.online {
-    background: #2ecc71;
 }
 @media screen and (max-width: 735px) {
   #frame #sidepanel #contacts ul li.contact .wrap img {
@@ -738,9 +715,9 @@ ul#chat_messages div{
 @stop
 @section('module_title')
   <section class="content-header">
-    <h1> Chat Messages</h1>
+    <h1> Chat Messages </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-comments"></i> Notifications</li>
+      <li><i class="fa fa-comments"></i> Chat Messages</li>
       <li class="active">Chat Messages </li>
     </ol>
   </section>
@@ -761,72 +738,49 @@ ul#chat_messages div{
       <div id="sidepanel">
         <div id="profile">
           <div class="wrap">
-            @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
-              <img src="{{ asset(Auth::user()->photo)}} " class="online" alt="User Image">
+            @if(is_file(Auth::guard('client')->user()->photo) || (!empty(Auth::guard('client')->user()->photo) && false == preg_match('/client_images/',Auth::guard('client')->user()->photo)))
+              <img src="{{ asset(Auth::guard('client')->user()->photo)}} " class="online" alt="User Image">
             @else
               <img src="{{ url('images/user/user1.png')}}" class="online" alt="User Image">
             @endif
-            <p>{{Auth::user()->name}}</p>
+            <p>{{Auth::guard('client')->user()->name}}</p>
           </div>
         </div>
         <div id="search">
           <label for=""><i class="fa fa-search" aria-hidden="true"></i></label>
           <input type="text" id="search_contact" name="student" class="form-control" placeholder="Search contacts..." onkeyup="searchContact(this.value);">
         </div>
-        <div id="admin">
-          <li class="contact" id="{{$chatAdminId}}" data-user_name="Vchip Admin" onclick="showChat(this);">
-            <div class="wrap">
-              @if($chatAdminLive)
-                <span id="status_{{$chatAdminId}}" data-user_id="{{$chatAdminId}}" class="contact-status online"></span>
-              @else
-                <span id="status_{{$chatAdminId}}" data-user_id="{{$chatAdminId}}" class="contact-status"></span>
-              @endif
-              <img id="image_{{$chatAdminId}}" src="/images/user/user1.png" class="online" alt="User Image">
-              <div class="meta">
-                <p class="name">Vchip Admin
-                    @if(isset($unreadCount[$chatAdminId]))
-                      <strong style="color: red;" id="unreadCount_{{$chatAdminId}}">{{$unreadCount[$chatAdminId]}}</strong>
-                    @else
-                      <strong style="color: red;" id="unreadCount_{{$chatAdminId}}"></strong>
-                    @endif
-                </p>
-                <p class="preview">vchiptech</p>
-              </div>
-              <input type="hidden" id="message_limit_{{$chatAdminId}}" value="">
-              <input type="hidden" id="is_scroll_{{$chatAdminId}}" value="">
-            </div>
-          </li>
-        </div>
         <div id="contacts">
           <ul id="contact_list">
-            @foreach($users['users'] as $chatuser)
-            <li class="contact" id="{{$chatuser['id']}}" data-user_name="{{$chatuser['name']}}" onclick="showChat(this);">
-              <div class="wrap">
-                @if(isset($onlineUsers[$chatuser['id']]))
-                  <span id="status_{{$chatuser['id']}}" data-user_id="{{$chatuser['id']}}" class="contact-status online"></span>
-                @else
-                  <span id="status_{{$chatuser['id']}}" data-user_id="{{$chatuser['id']}}" class="contact-status"></span>
-                @endif
-                @if(is_file($chatuser['photo']) || (!empty($chatuser['photo']) && false == preg_match('/userStorage/',$chatuser['photo'])))
-                  <img id="image_{{$chatuser['id']}}" src="{{ asset($chatuser['photo'])}}" class="online" alt="User Image">
-                @else
-                  <img id="image_{{$chatuser['id']}}" src="{{ url('images/user/user1.png')}}" class="online" alt="User Image">
-                @endif
-                <div class="meta">
-                  <p class="name">{{$chatuser['name']}}
-                    @if(isset($unreadCount[$chatuser['id']]))
-                      <strong style="color: red;" id="unreadCount_{{$chatuser['id']}}">{{$unreadCount[$chatuser['id']]}}</strong>
-                    @else
-                      <strong style="color: red;" id="unreadCount_{{$chatuser['id']}}"></strong>
-                    @endif
-                  </p>
-                  <p class="preview">{{$chatuser['college']}}</p>
+            @if(isset($users) && !empty($users['users']) && count($users['users']) > 0)
+              @foreach($users['users'] as $chatuser)
+              <li class="contact" id="{{$chatuser['id']}}" data-user_name="{{$chatuser['name']}}" onclick="showChat(this);">
+                <div class="wrap">
+                  @if(isset($onlineUsers[$chatuser['id']]))
+                    <span id="status_{{$subdomainName}}_{{$chatuser['id']}}" data-user_id="{{$chatuser['id']}}" class="contact-status online"></span>
+                  @else
+                    <span id="status_{{$subdomainName}}_{{$chatuser['id']}}" data-user_id="{{$chatuser['id']}}" class="contact-status"></span>
+                  @endif
+                  @if(is_file($chatuser['photo']) || (!empty($chatuser['photo']) && false == preg_match('/clientUserStorage/',$chatuser['photo'])))
+                    <img id="image_{{$subdomainName}}_{{$chatuser['id']}}" src="{{ asset($chatuser['photo'])}}" class="online" alt="User Image">
+                  @else
+                    <img id="image_{{$subdomainName}}_{{$chatuser['id']}}" src="{{ url('images/user/user1.png')}}" class="online" alt="User Image">
+                  @endif
+                  <div class="meta">
+                    <p class="name">{{$chatuser['name']}}
+                      @if(isset($unreadCount[$chatuser['id']]))
+                        <strong style="color: red;" id="unreadCount_{{$subdomainName}}_{{$chatuser['id']}}">{{$unreadCount[$chatuser['id']]}}</strong>
+                      @else
+                        <strong style="color: red;" id="unreadCount_{{$subdomainName}}_{{$chatuser['id']}}"></strong>
+                      @endif
+                    </p>
+                  </div>
+                  <input type="hidden" id="message_limit_{{$chatuser['id']}}" value="0">
+                  <input type="hidden" id="is_scroll_{{$chatuser['id']}}" value="0">
                 </div>
-                <input type="hidden" id="message_limit_{{$chatuser['id']}}" value="0">
-                <input type="hidden" id="is_scroll_{{$chatuser['id']}}" value="0">
-              </div>
-            </li>
-            @endforeach
+              </li>
+              @endforeach
+            @endif
           </ul>
           <input type="hidden" id="isUserScroll" value="0">
           <input type="hidden" id="previuos_chat_users" value="{{$users['chat_users']}}">
@@ -853,6 +807,9 @@ ul#chat_messages div{
   </div>
 <script type="text/javascript">
   var socket = io.connect(window.location.protocol+'//'+window.location.host+':8080', { secure: true, reconnect: true, rejectUnauthorized : false });
+  var full = window.location.host
+  var parts = full.split('.')
+  var subdomain = parts[0];
 
   $(document).ready(function () {
     $('#contact_list li:first')[0].click()
@@ -908,7 +865,7 @@ ul#chat_messages div{
         divEle.className = 'wrap';
 
         var spanStatus = document.createElement('span');
-        spanStatus.id = 'status_'+obj['id'];
+        spanStatus.id = 'status_'+subdomain+'_'+obj['id'];
         spanStatus.setAttribute('data-user_id', obj['id']);
         if(onlineUsers && onlineUsers[obj['id']]){
           spanStatus.className = 'contact-status online';
@@ -918,7 +875,7 @@ ul#chat_messages div{
         divEle.appendChild(spanStatus);
 
         var imgUser = document.createElement('img');
-        imgUser.id = 'image_'+obj['id'];
+        imgUser.id = 'image_'+subdomain+'_'+obj['id'];
         var webUrl = window.location.protocol+'//'+window.location.host;
         if('other' == obj['image_exist']){
           imgUser.setAttribute('src', obj['photo']);
@@ -936,11 +893,11 @@ ul#chat_messages div{
         var divMeta = document.createElement('div');
         divMeta.innerHTML = '<p class="name">'+obj['name'];
         if( unreadCount && unreadCount[obj['id']] > 0){
-          divMeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+obj['id']+'">'+unreadCount[obj['id']]+'</strong>';
+          divMeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+subdomain+'_'+obj['id']+'">'+unreadCount[obj['id']]+'</strong>';
         } else {
-          divMeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+obj['id']+'"></strong>';
+          divMeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+subdomain+'_'+obj['id']+'"></strong>';
         }
-        divMeta.innerHTML +='<p><p class="preview">'+obj['college']+'</p>';
+        divMeta.innerHTML +='</p>';
         divEle.appendChild(divMeta);
 
         var inputMsgLimit = document.createElement('input');
@@ -961,7 +918,6 @@ ul#chat_messages div{
 
   function checkOnlineUsers(){
     var token = "{{ csrf_token() }}";
-    var current_user = document.getElementById('user_id').value;
     $.ajax({
         type: "POST",
         url: '{!! URL::to("checkDashboardOnlineUsers") !!}',
@@ -969,15 +925,13 @@ ul#chat_messages div{
         data: {'_token':token},
         success:function(onlineusers){
             if(onlineusers.length > 0){
-                var messageUsers = $('span[id^=status_]');
+                var messageUsers = $('span[id^=status_'+subdomain+'_]');
                 $.each(messageUsers, function(idx, obj){
                   var userId = $(obj).data('user_id');
-                  if(current_user != userId){
-                      if(onlineusers.indexOf(userId) > -1){
-                          document.getElementById('status_'+userId).classList.add('online');
-                      } else {
-                          document.getElementById('status_'+userId).classList.remove('online');
-                      }
+                  if(onlineusers[userId]){
+                      document.getElementById('status_'+subdomain+'_'+userId).classList.add('online');
+                  } else {
+                      document.getElementById('status_'+subdomain+'_'+userId).classList.remove('online');
                   }
                 });
             }
@@ -990,26 +944,25 @@ ul#chat_messages div{
     var receiver = $(ele).attr('data-receiver_id');
     var current_user = document.getElementById('user_id').value;
     var token = "{{ csrf_token() }}";
-    if(receiver > 0 && document.getElementById('unreadCount_'+receiver) && parseInt(document.getElementById('unreadCount_'+receiver).innerHTML) > 0){
-      if(parseInt(document.getElementById('unreadCountDash_1_'+current_user).innerHTML) > 0){
-        document.getElementById('unreadCountDash_1_'+current_user).innerHTML -= parseInt(document.getElementById('unreadCount_'+receiver).innerHTML);
-        document.getElementById('unreadCountDash_2_'+current_user).innerHTML -= parseInt(document.getElementById('unreadCount_'+receiver).innerHTML);
+    if(receiver > 0 && document.getElementById('unreadCount_'+subdomain+'_'+receiver) && parseInt(document.getElementById('unreadCount_'+subdomain+'_'+receiver).innerHTML) > 0){
+      if(parseInt(document.getElementById('unreadCountDash_'+subdomain+'_1_'+current_user).innerHTML) > 0){
+        document.getElementById('unreadCountDash_'+subdomain+'_1_'+current_user).innerHTML -= parseInt(document.getElementById('unreadCount_'+subdomain+'_'+receiver).innerHTML);
+        document.getElementById('unreadCountDash_'+subdomain+'_2_'+current_user).innerHTML -= parseInt(document.getElementById('unreadCount_'+subdomain+'_'+receiver).innerHTML);
       }
       $.ajax({
         type: "POST",
-        url: '{!! URL::to("readChatMessages") !!}',
+        url: '{!! URL::to("readClientChatMessages") !!}',
         dataType: "json",
         data: {'_token':token, 'sender_id':receiver},
         success:function(msg){}
       });
-      document.getElementById('unreadCount_'+receiver).innerHTML = '';
+      document.getElementById('unreadCount_'+subdomain+'_'+receiver).innerHTML = '';
     }
   }
 
   // show next 10 messages
   function getNextchatMessages(receiverId){
       var current_user = document.getElementById('user_id').value;
-      // document.getElementById('sendButton').setAttribute('data-send_id',receiverId);
       var roomArr = [];
       roomArr.push(receiverId);
       roomArr.push(current_user);
@@ -1031,7 +984,7 @@ ul#chat_messages div{
                   var senderImgPath = $('#dashboardUserImage').attr('src');
                   var receiverImgPath = $($('li#'+receiverId+' .wrap img')[0]).attr('src');
                     $.each(messages['messages'],function(idx,obj){
-                        if(current_user == obj.sender_id){
+                        if(current_user == obj.sender_id && 1 == obj.created_by_client){
                             $(ulChatWindows).prepend('<li class="replies" id="'+obj.id+'"><img src="'+senderImgPath+'"><p>'+obj.message+'</p></li><span class="pull-right">'+messagteTime(obj.created_at)+'</span>');
                         } else {
                             $(ulChatWindows).prepend('<li class="sent" id="'+obj.id+'"><img src="'+receiverImgPath+'"><p>'+obj.message+'</p></li><span class="pull-left">'+messagteTime(obj.created_at)+'</span>');
@@ -1055,14 +1008,13 @@ ul#chat_messages div{
     $('#chat_messages').parent().attr('id', receiverId);
     var receiverName = $(ele).data('user_name');
     var current_user = document.getElementById('user_id').value;
-    $('#profile_image').attr('src',$('#image_'+receiverId).attr('src'));
+    $('#profile_image').attr('src',$('#image_'+subdomain+'_'+receiverId).attr('src'));
     document.getElementById('profile_name').innerHTML = receiverName;
     var roomArr = [];
-    roomArr.push(receiverId);
     roomArr.push(current_user);
-    var roomMembers = roomArr.sort();
-    var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
-    socket.emit('subscribe', roomName);
+    roomArr.push(receiverId);
+    var roomName = 'private_'+subdomain+'_'+roomArr[0]+'_'+roomArr[1];
+    socket.emit('clientSubscribe', roomName);
     // add chat window
     ulChatWindows = document.getElementById('chat_messages');
     ulChatWindows.innerHTML = '';
@@ -1086,7 +1038,7 @@ ul#chat_messages div{
           $.each(messages['messages'],function(idx,obj){
             var elePTime = document.createElement('div');
             elePTime.innerHTML = messagteTime(obj.created_at);
-            if(document.getElementById('user_id').value == obj.sender_id){
+            if(1 == obj.created_by_client){
                 elePTime.className = 'pull-right';
             } else {
                 elePTime.className = 'pull-left';
@@ -1094,7 +1046,7 @@ ul#chat_messages div{
             ulChatWindows.prepend(elePTime);
 
             var liEle = document.createElement('li');
-            if(document.getElementById('user_id').value == obj.sender_id){
+            if(1 == obj.created_by_client){
                 liEle.className = 'replies';
             } else {
                 liEle.className = 'sent';
@@ -1102,7 +1054,7 @@ ul#chat_messages div{
             liEle.id = obj['id'];
 
             var spanImage = document.createElement('img');
-            if(document.getElementById('user_id').value == obj.sender_id){
+            if(1 == obj.created_by_client){
               spanImage.setAttribute('src',senderImgPath);
             } else {
               spanImage.setAttribute('src',receiverImgPath);
@@ -1154,22 +1106,23 @@ ul#chat_messages div{
       message = document.getElementById('sendTextMessage').value;
       if(message != '' && id != ''){
           var roomArr = [];
-          roomArr.push(id);
           roomArr.push(document.getElementById('user_id').value);
-          var roomMembers = roomArr.sort();
-          var room = 'private_'+roomArr[0]+'_'+roomArr[1];
-          // var user = document.getElementById('currentUserName').value;
+          roomArr.push(id);
+          var room = 'private_'+subdomain+'_'+roomArr[0]+'_'+roomArr[1];
           var chatroomId = $(ele).data('chatroom_id');
           var receiver = id;
           var sender = document.getElementById('user_id').value;
           var token = "{{ csrf_token() }}";
           var created_at = new Date();
-          socket.emit('send', { room: room, message: message, sender:parseInt(sender) ,receiver:receiver, created_at:created_at});
+          var createdByClient = 1;
+          var senderImgPath = $('#dashboardUserImage').attr('src');
+          var clientId = document.getElementById('user_id').value;
+          socket.emit('sendClient', { room: room, message: message, sender:parseInt(sender) ,receiver:receiver, created_at:created_at,senderImgPath:senderImgPath,created_by_client:createdByClient});
           $.ajax({
               type: "POST",
               url: '{!! URL::to("dashboardSendMessage") !!}',
               dataType: "json",
-              data: {'_token':token,'message':message,'sender':parseInt(sender) ,'receiver':receiver, 'chatroomId':chatroomId},
+              data: {'_token':token,'message':message,'sender':parseInt(sender) ,'receiver':receiver, 'chatroomId':chatroomId, 'created_by_client':createdByClient, 'client_id':clientId},
               success:function(data){
                   document.getElementById('sendTextMessage').value = '';
               }
@@ -1185,25 +1138,22 @@ ul#chat_messages div{
 
   window.onload = function () {
     // receive message
-    socket.on('message', function (data) {
+    socket.on('clientMessage', function (data) {
         var roomArr = [];
         var current_user = document.getElementById('user_id').value;
-        roomArr.push(data.receiver);
-        roomArr.push(data.sender);
-        var roomMembers = roomArr.sort();
+        if(current_user ==  data.sender && 1 == data.created_by_client){
+          roomArr.push(data.sender);
+          roomArr.push(data.receiver);
+        } else {
+          roomArr.push(data.receiver);
+          roomArr.push(data.sender);
+        }
         var roomName = 'chatmessages_'+roomArr[0]+'_'+roomArr[1];
         var userchat = $('#chat_messages');
 
-        if(document.getElementById('unreadCount_'+data.sender)){
-          if(document.getElementById('unreadCount_'+data.sender).innerHTML > 0){
-            document.getElementById('unreadCount_'+data.sender).innerHTML = parseInt(document.getElementById('unreadCount_'+data.sender).innerHTML) + 1;
-          } else {
-            document.getElementById('unreadCount_'+data.sender).innerHTML = 1;
-          }
-        }
         var senderImgPath = $('#dashboardUserImage').attr('src');
         var receiverImgPath = $($('li#'+data.sender+' .wrap img')[0]).attr('src');
-        if(current_user ==  data.sender){
+        if(current_user ==  data.sender && 1 == data.created_by_client){
             var liEle = document.createElement('li');
             liEle.className = 'replies';
             liEle.innerHTML = '<img src="'+senderImgPath+'"><p>'+data.message+'</p>';
@@ -1221,8 +1171,15 @@ ul#chat_messages div{
             spanEle.className = 'pull-left';
             spanEle.innerHTML = messagteTime(data.created_at);
             userchat[0].appendChild(spanEle);
-            document.getElementById('unreadCountDash_1_'+data.receiver).innerHTML = parseInt(document.getElementById('unreadCountDash_1_'+data.receiver).innerHTML) + 1;
-            document.getElementById('unreadCountDash_2_'+data.receiver).innerHTML = parseInt(document.getElementById('unreadCountDash_2_'+data.receiver).innerHTML) + 1;
+            document.getElementById('unreadCountDash_'+subdomain+'_1_'+data.receiver).innerHTML = parseInt(document.getElementById('unreadCountDash_'+subdomain+'_1_'+data.receiver).innerHTML) + 1;
+            document.getElementById('unreadCountDash_'+subdomain+'_2_'+data.receiver).innerHTML = parseInt(document.getElementById('unreadCountDash_'+subdomain+'_2_'+data.receiver).innerHTML) + 1;
+            if(document.getElementById('unreadCount_'+subdomain+'_'+data.sender)){
+              if(document.getElementById('unreadCount_'+subdomain+'_'+data.sender).innerHTML > 0){
+                document.getElementById('unreadCount_'+subdomain+'_'+data.sender).innerHTML = parseInt(document.getElementById('unreadCount_'+subdomain+'_'+data.sender).innerHTML) + 1;
+              } else {
+                document.getElementById('unreadCount_'+subdomain+'_'+data.sender).innerHTML = 1;
+              }
+            }
         }
         $('div.chat_messages').scrollTop($('div.chat_messages')[0].scrollHeight);
         // $('#sendTextMessage').focus();
@@ -1234,18 +1191,18 @@ ul#chat_messages div{
          if(0 == $('#isUserScroll').val()){
              var limitStart = $("#contact_list li").length;
              $('#isUserScroll').val(1);
-             loadChatUsers(limitStart);
+             loadClientChatUsers(limitStart);
          }
       }
   });
 
   // show chat users
-  function loadChatUsers(limitStart){
+  function loadClientChatUsers(limitStart){
       var previuosChatUsers = document.getElementById('previuos_chat_users').value;
       var token = "{{ csrf_token() }}";
       $.ajax({
           type: "POST",
-          url: '{!! URL::to("loadChatUsers") !!}',
+          url: '{!! URL::to("loadClientChatUsers") !!}',
           dataType: "json",
           data: {'_token':token, 'limit_start':limitStart, 'previuos_chat_users':previuosChatUsers},
           success:function(users){
@@ -1266,7 +1223,7 @@ ul#chat_messages div{
                       divWrap.className = 'wrap';
 
                       var spanStatus = document.createElement('span');
-                      spanStatus.id = 'status_'+obj['id'];
+                      spanStatus.id = 'status_'+subdomain+'_'+obj['id'];
                       spanStatus.setAttribute('data-user_id', obj['id']);
                       if(obj['is_online']){
                         spanStatus.className = 'contact-status online';
@@ -1276,7 +1233,7 @@ ul#chat_messages div{
                       divWrap.appendChild(spanStatus);
 
                       var eleImage = document.createElement('img');
-                      eleImage.id = 'image_'+obj['id'];
+                      eleImage.id = 'image_'+subdomain+'_'+obj['id'];
                       eleImage.className = 'online';
                       var spanImage = document.createElement('img');
                       if(obj['photo']){
@@ -1291,9 +1248,9 @@ ul#chat_messages div{
                       divmeta.className = 'meta';
                       divmeta.innerHTML = '<p class="name">'+obj['name']+'</p>';
                       if(users['unreadCount'] && users['unreadCount'][obj['id']] > 0){
-                        divmeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+obj['id']+'">'+users['unreadCount'][obj['id']]+'</strong>';
+                        divmeta.innerHTML +='<strong style="color: red;" id="unreadCount_'+subdomain+'_'+obj['id']+'">'+users['unreadCount'][obj['id']]+'</strong>';
                       }
-                      divmeta.innerHTML +='<p class="preview">'+obj['college']+'</p><input type="hidden" id="message_limit_'+obj['id']+'" value="0"><input type="hidden" id="is_scroll_'+obj['id']+'" value="0">';
+                      divmeta.innerHTML +='<input type="hidden" id="message_limit_'+obj['id']+'" value="0"><input type="hidden" id="is_scroll_'+obj['id']+'" value="0">';
                       divWrap.appendChild(divmeta);
                       liEle.appendChild(divWrap);
                       chatUsers.appendChild(liEle);

@@ -37,20 +37,20 @@ class ClientOnlineTestSubjectController extends ClientBaseController
     /**
      *	show all subjects
      */
-	public function show(Request $request){
-		$testSubjects 	   = ClientOnlineTestSubject::showSubjects($request);
-		return view('client.onlineTest.subject.list', compact('testSubjects'));
+	public function show($subdomainName,Request $request){
+		$testSubjects = ClientOnlineTestSubject::showSubjects($request);
+		return view('client.onlineTest.subject.list', compact('testSubjects', 'subdomainName'));
 	}
 
 	/**
 	 *	show create UI for subject
 	 */
-	protected function create(Request $request){
+	protected function create($subdomainName,Request $request){
 		$clientId = Auth::guard('client')->user()->id;
 		$testCategories    = ClientOnlineTestCategory::where('client_id', $clientId)->get();
 		$testSubCategories = new ClientOnlineTestSubCategory;
 		$subject = new ClientOnlineTestSubject;
-		return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject'));
+		return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject', 'subdomainName'));
 	}
 
 	/**
@@ -83,14 +83,14 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 	/**
 	 *	edit subject
 	 */
-	protected function edit( $subdomain, $id, Request $request){
+	protected function edit( $subdomainName, $id, Request $request){
 		$id = InputSanitise::inputInt(json_decode($id));
 		if(isset($id)){
 			$subject = ClientOnlineTestSubject::find($id);
 			if(is_object($subject)){
 				$testCategories    = ClientOnlineTestCategory:: showCategories($request);
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($subject->category_id, $request);
-				return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject'));
+				return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject', 'subdomainName'));
 			}
 		}
 		return Redirect::to('manageOnlineTestSubject');

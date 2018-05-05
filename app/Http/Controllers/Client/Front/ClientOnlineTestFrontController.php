@@ -84,7 +84,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
         		}
         	}
         }
-		return view('client.front.onlineTests.tests', compact('testCategories', 'testSubCategories', 'purchasedSubCategories', 'clientPurchasedSubCat', 'payableTestCategories'));
+		return view('client.front.onlineTests.tests', compact('testCategories', 'testSubCategories', 'purchasedSubCategories', 'clientPurchasedSubCat', 'payableTestCategories', 'subdomainName'));
 	}
 
     /**
@@ -259,7 +259,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
                 }
 
 
-				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper', 'selectedSubCategory', 'loginUser', 'isPayableSubCategory', 'payableTestSubCategories', 'purchasedPayableSubCategories', 'payableTestCategories'));
+				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper', 'selectedSubCategory', 'loginUser', 'isPayableSubCategory', 'payableTestSubCategories', 'purchasedPayableSubCategories', 'payableTestCategories', 'subdomainName'));
 			}
 		}
 		return Redirect::to('/');
@@ -518,7 +518,7 @@ class ClientOnlineTestFrontController extends ClientHomeController
                 $accuracy = 0;
             }
 
-	        return view('client.front.onlineTests.user_test_result', compact('score', 'rank', 'totalMarks', 'totalRank', 'percentile', 'percentage', 'accuracy','result','positiveMarks','negativeMarks'));
+	        return view('client.front.onlineTests.user_test_result', compact('score', 'rank', 'totalMarks', 'totalRank', 'percentile', 'percentage', 'accuracy','result','positiveMarks','negativeMarks', 'subdomainName'));
         } else {
     		return Redirect::to('/');
         }

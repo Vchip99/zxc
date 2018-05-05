@@ -36,22 +36,22 @@ class ClientAssignmentController extends ClientBaseController
         'topic' => 'required',
     ];
 
-    protected function show(){
+    protected function show($subdomainName){
         $assignments = ClientAssignmentQuestion::where('client_id', Auth::guard('client')->user()->id)->paginate();
-        return view('client.assignment.list', compact('assignments'));
+        return view('client.assignment.list', compact('assignments', 'subdomainName'));
     }
 
     /**
      *  create assignment
      */
-    protected function create($subdomain){
-        if($subdomain){
-            InputSanitise::checkClientImagesDirForCkeditor($subdomain);
+    protected function create($subdomainName){
+        if($subdomainName){
+            InputSanitise::checkClientImagesDirForCkeditor($subdomainName);
         }
         $topics = [];
         $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
         $assignment = new ClientAssignmentQuestion;
-        return view('client.assignment.create', compact('subjects', 'topics', 'assignment'));
+        return view('client.assignment.create', compact('subjects', 'topics', 'assignment', 'subdomainName'));
     }
 
     /**
@@ -87,9 +87,9 @@ class ClientAssignmentController extends ClientBaseController
     /**
      * edit assignment
      */
-    protected function edit($subdomain, $id){
-        if($subdomain){
-            InputSanitise::checkClientImagesDirForCkeditor($subdomain);
+    protected function edit($subdomainName, $id){
+        if($subdomainName){
+            InputSanitise::checkClientImagesDirForCkeditor($subdomainName);
         }
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
@@ -98,7 +98,7 @@ class ClientAssignmentController extends ClientBaseController
             if(is_object($assignment)){
                 $topics = ClientAssignmentTopic::getAssignmentTopicsBySubject($assignment->client_assignment_subject_id);
                 $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
-                return view('client.assignment.create', compact('subjects', 'topics', 'assignment'));
+                return view('client.assignment.create', compact('subjects', 'topics', 'assignment', 'subdomainName'));
             }
         }
         return Redirect::to('manageAssignment');
@@ -144,7 +144,7 @@ class ClientAssignmentController extends ClientBaseController
         return ClientAssignmentSubject::getAssignmentSubjectsByCourse($request->institute_course_id);
     }
 
-    protected function studentsAssignment(){
+    protected function studentsAssignment($subdomainName){
         $assignment = '';
         $assignmentSubjects = [];
         $assignmentTopics = [];
@@ -164,7 +164,7 @@ class ClientAssignmentController extends ClientBaseController
             $assignment = ClientAssignmentQuestion::where('client_id', Auth::guard('client')->user()->id)
                     ->where('client_assignment_topic_id', $selectedAssignmentTopic)->first();
         }
-        return view('client.studentAssignment.studentsAssignment', compact('assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'selectedAssignmentCourse', 'selectedAssignmentSubject', 'selectedAssignmentTopic', 'selectedAssignmentStudent', 'assignment'));
+        return view('client.studentAssignment.studentsAssignment', compact('assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'selectedAssignmentCourse', 'selectedAssignmentSubject', 'selectedAssignmentTopic', 'selectedAssignmentStudent', 'assignment', 'subdomainName'));
     }
 
     protected function searchStudentForAssignment(Request $request){
@@ -189,13 +189,13 @@ class ClientAssignmentController extends ClientBaseController
         return $results;
     }
 
-    protected function assignmentRemark($subdomain, $id, $studentId){
+    protected function assignmentRemark($subdomainName, $id, $studentId){
         $id = InputSanitise::inputInt(json_decode($id));
         $studentId = InputSanitise::inputInt(json_decode($studentId));
         $assignment = ClientAssignmentQuestion::find($id);
         $student = Clientuser::find($studentId);
         $answers = ClientAssignmentAnswer::where('client_id', $student->client_id)->where('student_id', $student->id)->where('client_assignment_question_id', $assignment->id)->get();
-        return view('client.studentAssignment.assignmentRemark', compact('assignment', 'answers','student'));
+        return view('client.studentAssignment.assignmentRemark', compact('assignment', 'answers','student', 'subdomainName'));
     }
 
     protected function createAssignmentRemark(Request $request){

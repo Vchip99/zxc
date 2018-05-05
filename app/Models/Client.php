@@ -35,6 +35,7 @@ use App\Models\ClientAssignmentAnswer;
 use App\Models\ClientReadNotification;
 use App\Models\ClientNotification;
 use App\Models\BankDetail;
+use App\Models\ClientChatMessage;
 use Auth;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -101,7 +102,7 @@ class Client extends Authenticatable
         if(is_dir($clientUserFolder)){
             InputSanitise::delFolder($clientUserFolder);
         }
-        $clientHomePage = ClientHomePage::where('client_id',$client->id)->get();
+        $clientHomePage = ClientHomePage::where('client_id',$client->id)->first();
         if(is_object($clientHomePage)){
             $clientHomePage->delete();
         }
@@ -146,6 +147,7 @@ class Client extends Authenticatable
         ClientReadNotification::deleteClientReadNotification($client->id);
         ClientNotification::deleteClientNotification($client->id);
         BankDetail::deleteBankDetails($client->id);
+        ClientChatMessage::deleteClientChatMessagesByClientId($client->id);
         InputSanitise::delFolder("clientAssignmentStorage/".$client->id);
         return;
     }
@@ -217,5 +219,10 @@ class Client extends Authenticatable
         } else {
             return 'false';
         }
+    }
+
+    public function unreadChatMessagesCount(){
+        $clientId = Auth::guard('client')->user()->id;
+        return ClientChatMessage::where('receiver_id', $clientId)->where('client_id', $clientId)->where('is_read', 0)->count();
     }
 }

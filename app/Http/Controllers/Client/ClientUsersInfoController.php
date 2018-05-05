@@ -76,7 +76,7 @@ class ClientUsersInfoController extends BaseController
         if(count(array_keys($purchasedPayableSubCategories)) > 0){
             $clientPurchasedSubCategories = ClientOnlineTestSubCategory::showPayableSubcategoriesByIdesAssociatedWithQuestion(array_keys($purchasedPayableSubCategories));
         }
-        return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories', 'clientPurchasedSubCategories', 'purchasedPayableSubCategories'));
+        return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories', 'clientPurchasedSubCategories', 'purchasedPayableSubCategories', 'subdomainName'));
     }
 
     protected function searchUsers($subdomainName,Request $request){
@@ -119,7 +119,7 @@ class ClientUsersInfoController extends BaseController
         return $approveStatus;
     }
 
-    protected function userTestResults($subdomain,$id=NULL){
+    protected function userTestResults($subdomainName,$id=NULL){
         $results = [];
         $students = [];
         $collegeDepts = [];
@@ -141,7 +141,7 @@ class ClientUsersInfoController extends BaseController
         }
 
         $barchartLimits = range(100, 0, 10);
-        return view('client.allUsers.userTestResults', compact('students', 'results', 'selectedStudent','barchartLimits'));
+        return view('client.allUsers.userTestResults', compact('students', 'results', 'selectedStudent','barchartLimits', 'subdomainName'));
     }
 
     protected function showUserTestResults(Request $request){
@@ -164,7 +164,7 @@ class ClientUsersInfoController extends BaseController
         return $result;
     }
 
-    protected function userCourses($subdomain,$id=NULL){
+    protected function userCourses($subdomainName,$id=NULL){
         $students = [];
         $courses = [];
         $selectedStudent = '';
@@ -183,7 +183,7 @@ class ClientUsersInfoController extends BaseController
         } else {
             $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
         }
-        return view('client.allUsers.userCourses', compact('students', 'courses', 'selectedStudent'));
+        return view('client.allUsers.userCourses', compact('students', 'courses', 'selectedStudent', 'subdomainName'));
     }
 
     protected function showUserCourses(Request $request){
@@ -192,7 +192,7 @@ class ClientUsersInfoController extends BaseController
         return ClientOnlineCourse::getRegisteredOnlineCoursesByUserId($studentId);
     }
 
-    protected function userPlacement($subdomain,$id=NULL){
+    protected function userPlacement($subdomainName,$id=NULL){
         $students = [];
         $collegeDepts = [];
         $selectedStudent = '';
@@ -209,7 +209,7 @@ class ClientUsersInfoController extends BaseController
         } else {
             $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
         }
-        return view('client.allUsers.userPlacement', compact('students', 'selectedStudent'));
+        return view('client.allUsers.userPlacement', compact('students', 'selectedStudent', 'subdomainName'));
     }
 
     protected function getStudentById(Request $request){
@@ -218,7 +218,7 @@ class ClientUsersInfoController extends BaseController
         return Clientuser::getStudentById($studentId);
     }
 
-    protected function userVideo($subdomain,$id=NULL){
+    protected function userVideo($subdomainName,$id=NULL){
         $students = [];
         $collegeDepts = [];
         $selectedStudent = '';
@@ -235,7 +235,7 @@ class ClientUsersInfoController extends BaseController
         } else {
             $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
         }
-        return view('client.allUsers.userVideo', compact('students', 'selectedStudent'));
+        return view('client.allUsers.userVideo', compact('students', 'selectedStudent', 'subdomainName'));
     }
 
     protected function updateUserVideo(Request $request){
@@ -264,10 +264,10 @@ class ClientUsersInfoController extends BaseController
         return Redirect::to('userVideo');
     }
 
-    protected function allTestResults(Request $request){
+    protected function allTestResults($subdomainName,Request $request){
         $scores =[];
         $categories = ClientOnlineTestCategory::where('client_id', Auth::guard('client')->user()->id)->get();
-        return view('client.allUsers.allTestResults', compact('scores', 'categories'));
+        return view('client.allUsers.allTestResults', compact('scores', 'categories', 'subdomainName'));
     }
 
     protected function getAllTestResults(Request $request){
@@ -334,8 +334,8 @@ class ClientUsersInfoController extends BaseController
         return ClientUserPurchasedTestSubCategory::changeClientUserTestSubCategoryStatus($request);
     }
 
-    protected function profile(){
-        return view('client.clientLogin.profile');
+    protected function profile($subdomainName){
+        return view('client.clientLogin.profile', compact('subdomainName'));
     }
 
     protected function updateClientProfile(Request $request){

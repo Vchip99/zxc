@@ -169,7 +169,7 @@ class ClientHomePage extends Model
                                     Address: GITANJALI COLONY, NEAR RAJYOG SOCIETY,<br />
                                     WARJE, PUNE-411058, INDIA.<br />
                                     Email: info@vchiptech.com';
-        $subDomainHome->institute_name = 'Vchip Design Sys Pvt Ltd.';
+        $subDomainHome->institute_name = 'Vchip Tech Pvt Ltd.';
         $subDomainHome->institute_url = 'http://www.vchiptech.com/';
         $subDomainHome->facebook_url = 'https://www.facebook.com/';
         $subDomainHome->twitter_url = 'https://twitter.com/';

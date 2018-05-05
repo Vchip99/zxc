@@ -52,7 +52,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
     /**
      *  show questions associated with subject and paper
      */
-    protected function index(Request $request){
+    protected function index($subdomainName,Request $request){
         $clientId = Auth::guard('client')->user()->id;
         $testCategories = ClientOnlineTestCategory::showCategories($request);
 
@@ -79,13 +79,13 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             $sessions = [];
         }
 
-    	return view('client.onlineTest.question.list', compact('instituteCourses', 'testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions'));
+    	return view('client.onlineTest.question.list', compact('instituteCourses', 'testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName'));
     }
 
     /**
      *  show all question associated with subject and paper
      */
-    protected function show(Request $request){
+    protected function show($subdomainName,Request $request){
         $categoryId = InputSanitise::inputInt($request->get('category'));
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
     	$subjectId = InputSanitise::inputInt($request->get('subject'));
@@ -112,7 +112,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             $testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId(Session::get('client_search_selected_category'), Session::get('client_search_selected_subcategory'), $request);
             $papers = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCategoryIdBySubCategoryIdBySubjectId(Session::get('client_search_selected_category'), Session::get('client_search_selected_subcategory'), Session::get('client_search_selected_subject'));
             $sessions = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId);
-    		return view('client.onlineTest.question.list', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions'));
+    		return view('client.onlineTest.question.list', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName'));
     	} else {
     		return Redirect::to('manageOnlineTestQuestion');
     	}
@@ -121,9 +121,9 @@ class ClientOnlineTestQuestionController extends ClientBaseController
     /**
      *  show UI for create question
      */
-    protected function create($subdomain,Request $request){
-        if($subdomain){
-            InputSanitise::checkClientImagesDirForCkeditor($subdomain);
+    protected function create($subdomainName,Request $request){
+        if($subdomainName){
+            InputSanitise::checkClientImagesDirForCkeditor($subdomainName);
         }
 
         $clientId = Auth::guard('client')->user()->id;
@@ -156,7 +156,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         $nextQuestionId = 'new';
         $nextQuestionNo = $this->getNextQuestionNo(Session::get('client_selected_category'), Session::get('client_selected_subcategory'), Session::get('client_selected_subject'),Session::get('client_selected_paper'),Session::get('client_selected_section'));
         Session::put('client_next_question_no', $nextQuestionNo);
-		return view('client.onlineTest.question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'sessions'));
+		return view('client.onlineTest.question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'sessions', 'subdomainName'));
     }
 
     /**
@@ -221,9 +221,9 @@ class ClientOnlineTestQuestionController extends ClientBaseController
     /**
      *  edit question
      */
-    protected function edit( $subdomain, $id, Request $request){
-        if($subdomain){
-            InputSanitise::checkClientImagesDirForCkeditor($subdomain);
+    protected function edit( $subdomainName, $id, Request $request){
+        if($subdomainName){
+            InputSanitise::checkClientImagesDirForCkeditor($subdomainName);
         }
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
@@ -247,7 +247,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                 $nextQuestionNo = $this->getNextQuestionNo($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type);
                 Session::put('client_next_question_no', $nextQuestionNo);
                 $sessions = ClientOnlinePaperSection::paperSectionsByPaperId($testQuestion->paper_id, $testQuestion->client_id);
-                return view('client.onlineTest.question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'currentQuestionNo', 'sessions'));
+                return view('client.onlineTest.question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'currentQuestionNo', 'sessions', 'subdomainName'));
     		}
     	}
 		return Redirect::to('manageOnlineTestQuestion');
@@ -398,13 +398,13 @@ class ClientOnlineTestQuestionController extends ClientBaseController
      /**
      *  show questions associated with subject and paper
      */
-    protected function uploadQuestions(Request $request){
+    protected function uploadQuestions($subdomainName,Request $request){
         $testCategories = ClientOnlineTestCategory::showCategories($request);
         $testSubCategories = [];
         $testSubjects = [];
         $papers = [];
 
-        return view('client.onlineTest.question.uploadQuestions', compact('testCategories', 'testSubCategories', 'testSubjects', 'papers'));
+        return view('client.onlineTest.question.uploadQuestions', compact('testCategories', 'testSubCategories', 'testSubjects', 'papers', 'subdomainName'));
     }
 
     protected function importQuestions($subdomain, Request $request){
@@ -522,13 +522,13 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         return Redirect::to('manageUploadQuestions');
     }
 
-    protected function uploadClientTestImages($subdomain, Request $request){
+    protected function uploadClientTestImages($subdomainName, Request $request){
         $allowedImageTypes = ['image/png','image/jpeg'];
         if($request->exists('images')){
             foreach($request->file('images') as $file){
                 if(in_array($file->getClientMimeType(), $allowedImageTypes)){
                     $imageName = $file->getClientOriginalName();
-                    $clientImagesFolder = public_path().'/templateEditor/kcfinder/upload/images/'. $subdomain;
+                    $clientImagesFolder = public_path().'/templateEditor/kcfinder/upload/images/'. $subdomainName;
                     $file->move($clientImagesFolder, $imageName);
                     // open image
                     $img = Image::make($clientImagesFolder."/".$imageName);

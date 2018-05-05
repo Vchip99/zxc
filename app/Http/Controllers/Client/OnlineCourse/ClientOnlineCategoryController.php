@@ -31,17 +31,17 @@ class ClientOnlineCategoryController extends ClientBaseController
     /**
      *  show list of course category
      */
-    protected function show(Request $request){
+    protected function show($subdomainName,Request $request){
     	$categories = ClientOnlineCategory::showCategories($request);
-    	return view('client.onlineCourse.category.list', compact('categories'));
+    	return view('client.onlineCourse.category.list', compact('categories', 'subdomainName'));
     }
 
     /**
      *  show create course category UI
      */
-    protected function create(){
+    protected function create($subdomainName){
 		$category = new ClientOnlineCategory;
-		return view('client.onlineCourse.category.create', compact('category'));
+		return view('client.onlineCourse.category.create', compact('category', 'subdomainName'));
     }
 
     /**
@@ -73,12 +73,12 @@ class ClientOnlineCategoryController extends ClientBaseController
     /**
      *  edit course category
      */
-    protected function edit($subdomain, $id){
+    protected function edit($subdomainName, $id){
         $id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$category = ClientOnlineCategory::find($id);
     		if(is_object($category)){
-    			return view('client.onlineCourse.category.create', compact('category'));
+    			return view('client.onlineCourse.category.create', compact('category', 'subdomainName'));
     		}
     	}
     	return Redirect::to('manageOnlineCategory');

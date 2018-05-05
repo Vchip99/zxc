@@ -55,21 +55,21 @@ class ClientOnlineCourseController extends ClientBaseController
     /**
      *  show list of courses
      */
-    protected function show(Request $request){
+    protected function show($subdomainName,Request $request){
     	$courses = ClientOnlineCourse::showCourses($request);
-    	return view('client.onlineCourse.course.list', compact('courses'));
+    	return view('client.onlineCourse.course.list', compact('courses', 'subdomainName'));
     }
 
     /**
      *  show create course UI
      */
-    protected function create(Request $request){
+    protected function create($subdomainName,Request $request){
         $clientId = Auth::guard('client')->user()->id;
         $categories   = ClientOnlineCategory::where('client_id', $clientId)->get();
 		$subCategories = new ClientOnlineSubCategory;
 		$course= new ClientOnlineCourse;
 
-		return view('client.onlineCourse.course.create', compact('categories','subCategories','course'));
+		return view('client.onlineCourse.course.create', compact('categories','subCategories','course', 'subdomainName'));
     }
 
     /**
@@ -101,14 +101,14 @@ class ClientOnlineCourseController extends ClientBaseController
     /**
      *  edit course
      */
-    protected function edit($subdomain, $id, Request $request){
+    protected function edit($subdomainName, $id, Request $request){
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$course = ClientOnlineCourse::find($id);
     		if(is_object($course)){
     			$categories   = ClientOnlineCategory::showCategories($request);
 				$subCategories = ClientOnlineSubCategory::getOnlineSubCategoriesByCategoryId($course->category_id, $request);
-				return view('client.onlineCourse.course.create', compact('instituteCourses','categories','subCategories','course'));
+				return view('client.onlineCourse.course.create', compact('instituteCourses','categories','subCategories','course', 'subdomainName'));
     		}
     	}
     }

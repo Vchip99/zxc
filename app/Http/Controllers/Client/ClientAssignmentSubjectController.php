@@ -34,17 +34,17 @@ class ClientAssignmentSubjectController extends ClientBaseController
         'subject' => 'required',
     ];
 
-    protected function show(){
+    protected function show($subdomainName){
         $subjects = ClientAssignmentSubject::where('client_id', Auth::guard('client')->user()->id)->paginate();
-        return view('client.assignmentSubject.list', compact('subjects'));
+        return view('client.assignmentSubject.list', compact('subjects','subdomainName'));
     }
 
     /**
      *  create assignment subject
      */
-    protected function create(){
+    protected function create($subdomainName){
         $subject = new ClientAssignmentSubject;
-        return view('client.assignmentSubject.create', compact('subject'));
+        return view('client.assignmentSubject.create', compact('subject', 'subdomainName'));
     }
 
     /**
@@ -76,13 +76,13 @@ class ClientAssignmentSubjectController extends ClientBaseController
     /**
      *  edit assignment subject
      */
-    protected function edit($subdomain, $id){
+    protected function edit($subdomainName, $id){
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $subject = ClientAssignmentSubject::find($id);
 
             if(is_object($subject)){
-                return view('client.assignmentSubject.create', compact('subject'));
+                return view('client.assignmentSubject.create', compact('subject', 'subdomainName'));
             }
         }
         return Redirect::to('manageAssignmentSubject');

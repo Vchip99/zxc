@@ -26,6 +26,7 @@ use App\Models\UserBasedAuthentication;
 use App\Models\ClientUserPurchasedCourse;
 use App\Models\ClientUserPurchasedTestSubCategory;
 use App\Models\PayableClientSubCategory;
+use App\Models\ClientChatMessage;
 use Illuminate\Http\Request;
 use Auth, Redirect, View, DB, Session;
 use App\Http\Controllers\Instamojo;
@@ -53,11 +54,11 @@ class ClientBaseController extends BaseController
         }
     }
 
-    protected function showDashBoard(){
-        return view('client.dashboard');
+    protected function showDashBoard($subdomainName){
+        return view('client.dashboard',compact('subdomainName'));
     }
 
-    protected function manageClientHome(){
+    protected function manageClientHome($subdomainName){
         $loginUser = Auth::guard('client')->user();
         $onlineCourses = ClientOnlineCourse::getCurrentCoursesByClient($loginUser->subdomain);
         $defaultCourse = ClientOnlineCourse::where('name', 'How to use course')->first();
@@ -68,7 +69,7 @@ class ClientBaseController extends BaseController
         $testimonials = ClientTestimonial::where('client_id', $loginUser->id)->get();
         $clientTeam = ClientTeam::where('client_id', $loginUser->id)->get();
         $clientCustomers = ClientCustomer::where('client_id', $loginUser->id)->get();
-        return view('client.home', compact('subdomain', 'testimonials', 'clientTeam', 'clientCustomers','onlineCourses', 'defaultCourse', 'defaultTest', 'onlineTestSubcategories'));
+        return view('client.home', compact('subdomain', 'testimonials', 'clientTeam', 'clientCustomers','onlineCourses', 'defaultCourse', 'defaultTest', 'onlineTestSubcategories', 'subdomainName'));
     }
 
     protected function updateClientHome(Request $request){
@@ -89,7 +90,7 @@ class ClientBaseController extends BaseController
         }
     }
 
-    protected function managePlans(){
+    protected function managePlans($subdomainName){
         $allPlan = [];
         $plans = Plan::all();
         if(is_object($plans) && false == $plans->isEmpty()){
@@ -97,29 +98,29 @@ class ClientBaseController extends BaseController
                 $allPlan[$plan->id] = $plan;
             }
         }
-        return view('client.plansAndBilling.plans', compact('allPlan'));
+        return view('client.plansAndBilling.plans', compact('allPlan', 'subdomainName'));
     }
 
-    protected function manageBillings(){
+    protected function manageBillings($subdomainName){
 
         $dueDate = '';
         $clientPlan = ClientPlan::getLastClientPlanForBill();
         if(is_object($clientPlan) && ('Credit' != $clientPlan->payment_status || 'free' != $clientPlan->payment_status)){
             $dueDate = date('Y-m-d', strtotime('+1 month', strtotime($clientPlan->end_date)));
         }
-        return view('client.plansAndBilling.billing', compact('clientPlan', 'dueDate'));
+        return view('client.plansAndBilling.billing', compact('clientPlan', 'dueDate', 'subdomainName'));
     }
 
-    protected function manageUserPayments(){
+    protected function manageUserPayments($subdomainName){
         $clientUsers = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
-        return view('client.plansAndBilling.userPayments', compact('clientUsers'));
+        return view('client.plansAndBilling.userPayments', compact('clientUsers', 'subdomainName'));
     }
 
-    protected function manageHistory(){
+    protected function manageHistory($subdomainName){
         $client = Auth::guard('client')->user();
         $clientPlans = ClientPlan::where('client_id', $client->id)->orderBy('id')->get();
         $payableSubCategories = PayableClientSubCategory::where('client_id', $client->id)->get();
-        return view('client.plansAndBilling.history', compact('clientPlans','payableSubCategories'));
+        return view('client.plansAndBilling.history', compact('clientPlans','payableSubCategories', 'subdomainName'));
     }
 
     protected function getClientUserPayments(Request $request){
@@ -632,12 +633,12 @@ class ClientBaseController extends BaseController
         }
     }
 
-    protected function manageBankDetails(){
+    protected function manageBankDetails($subdomainName){
         $bankDetail = BankDetail::where('client_id', Auth::guard('client')->user()->id)->first();
         if(!is_object($bankDetail)){
             $bankDetail = new BankDetail;
         }
-        return view('client.plansAndBilling.bankDetails', compact('bankDetail'));
+        return view('client.plansAndBilling.bankDetails', compact('bankDetail', 'subdomainName'));
     }
 
     protected function updateBankDetails(Request $request){
@@ -702,5 +703,31 @@ class ClientBaseController extends BaseController
             }
         }
         return redirect('manageBankDetails');
+    }
+
+    protected function searchContact($subDomainName, Request $request){
+        return Clientuser::searchContact($subDomainName,$request);
+    }
+
+    protected function allChatMessages($subdomainName){
+        $result = ClientChatMessage::showClientChatUsers($subdomainName);
+        $users = $result['chatusers'];
+        if(isset($result['unreadCount'])){
+            $unreadCount = $result['unreadCount'];
+        }
+        $onlineUsers = $result['onlineUsers'];
+        return view('client.allChatMessages', compact('users', 'unreadCount', 'onlineUsers', 'subdomainName'));
+    }
+
+    protected function dashboardPrivateChat(Request $request){
+        return ClientChatMessage::privatechat($request);
+    }
+
+    protected function dashboardSendMessage(Request $request){
+        return ClientChatMessage::sendMessage($request);
+    }
+
+    protected function getContacts($subdomainName){
+        return ClientChatMessage::showClientChatUsers($subdomainName);
     }
 }

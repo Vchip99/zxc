@@ -843,8 +843,9 @@
 <input type="hidden" name="customer_section" id="customer_section" value="{{ $subdomain->customer_show_hide }}"">
 <input type="hidden" name="testimonial_section" id="testimonial_section" value="{{$subdomain->testimonial_show_hide}}">
 <input type="hidden" name="team_section" id="team_section" value="{{$subdomain->team_show_hide}}">
-<button class="btn btn-primary"  style="float: right; padding-right: 50px;" title="Update">Update</button>
+<button class="btn btn-primary"  style="float: left; margin-left: 50px;" title="Update">Update</button>
 </form>
+@include('footer.clientLiveChat')
 <!-- institute name -->
 <div class="modal fade" id="instituteName" >
   <div class="modal-dialog" role="document" >

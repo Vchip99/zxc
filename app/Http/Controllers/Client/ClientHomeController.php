@@ -14,6 +14,7 @@ use App\Models\ClientTeam;
 use App\Models\ClientCustomer;
 use App\Models\Clientuser;
 use App\Models\Client;
+use App\Models\ClientChatMessage;
 use App\Mail\ClientUserEmailVerification;
 use App\Libraries\InputSanitise;
 
@@ -37,8 +38,8 @@ class ClientHomeController extends Controller
         }
     }
 
-    public function adminHome(Request $request){
-        return view('client.home');
+    public function adminHome($subdomainName,Request $request){
+        return view('client.home',compact('subdomainName'));
     }
 
     protected function clientHome($subdomainName,Request $request){
@@ -77,7 +78,8 @@ class ClientHomeController extends Controller
                 $clientTeam = ClientTeam::getClientTeam($hostName);
 
                 $clientCustomers = ClientCustomer::getClientCustomer($hostName);
-                return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers'));
+
+                return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers', 'subdomainName'));
             } else {
                 if('local' == \Config::get('app.env')){
                     return Redirect::away('https://localvchip.com');
@@ -123,5 +125,4 @@ class ClientHomeController extends Controller
         }
         return redirect()->back()->withErrors(['Please enter email id.']);
     }
-
 }

@@ -6,6 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   <title>Dashboard</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
   <link href="{{ asset('css/bootstrap.min.css?ver=1.0')}}" rel="stylesheet">
   <link href="{{ asset('css/font-awesome/css/font-awesome.min.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/sidemenu/sidemenu_layout.css?ver=1.0')}}" rel="stylesheet"/>
@@ -14,6 +15,7 @@
   <link href="{{ asset('css/comment.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/jquery-confirm.min.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css?family=Hind" rel="stylesheet">
+  <link href="{{ asset('css/chat.css?ver=1.0')}}" rel="stylesheet"/>
 
   <script src="{{ asset('js/jquery.min.js?ver=1.0')}}"></script>
   <script src="{{ asset('js/bootstrap.min.js?ver=1.0')}}"></script>
@@ -64,9 +66,9 @@
         <div class="pull-left image">
           <a href="{{ url('myprofile') }}">
           @if(!empty(Auth::guard('client')->user()->photo))
-            <img src="{{ asset(Auth::guard('client')->user()->photo)}} " class="img-circle" alt="User Image">
+            <img src="{{ asset(Auth::guard('client')->user()->photo)}}" id="dashboardUserImage" class="img-circle" alt="User Image">
           @else
-            <img src="{{ asset('images/user/user1.png')}}" class="img-circle" alt="User Image">
+            <img src="{{ asset('images/user/user1.png')}}" id="dashboardUserImage" class="img-circle" alt="User Image">
           @endif
           </a>
         </div>
@@ -78,8 +80,18 @@
       </div>
       <ul class="sidebar-menu">
         <li class="header">Home Page</li>
-
-         <li class="treeview">
+        <li class="treeview ">
+          <a href="#">
+            <i class="fa fa-comments"></i><span> Chat Messages </span><b style="color: red;" id="unreadCountDash_{{$subdomainName}}_1_{{Auth::guard('client')->user()->id}}">{{Auth::guard('client')->user()->unreadChatMessagesCount()}}</b>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Chat Messages"><a href="{{ url('allChatMessages')}}"><i class="fa fa-circle-o"></i> Chat Messages : <b style="color: red;" id="unreadCountDash_{{$subdomainName}}_2_{{Auth::guard('client')->user()->id}}">{{Auth::guard('client')->user()->unreadChatMessagesCount()}}</b></a></li>
+          </ul>
+        </li>
+        <li class="treeview">
           <a href="#" title="Home Page">
             <i class="fa fa-home"></i> <span>Home Page</span>
             <span class="pull-right-container">

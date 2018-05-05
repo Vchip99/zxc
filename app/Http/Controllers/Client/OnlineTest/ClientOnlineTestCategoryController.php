@@ -35,7 +35,7 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     /**
      * show all category
      */
-    protected function show(Request $request){
+    protected function show($subdomainName,Request $request){
         $isPurchasedSubCategories = [];
     	$testCategories = ClientOnlineTestCategory::showCategories($request);
         $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId(Auth::guard('client')->user()->id);
@@ -44,15 +44,15 @@ class ClientOnlineTestCategoryController extends ClientBaseController
                 $isPurchasedSubCategories[] = $payableSubCategory->category_id;
             }
         }
-    	return view('client.onlineTest.category.list', compact('testCategories', 'isPurchasedSubCategories'));
+    	return view('client.onlineTest.category.list', compact('testCategories', 'isPurchasedSubCategories', 'subdomainName'));
     }
 
     /**
      * show UI for create category
      */
-    protected function create(){
+    protected function create($subdomainName){
     	$testCategory = new ClientOnlineTestCategory;
-    	return view('client.onlineTest.category.create', compact('testCategory'));
+    	return view('client.onlineTest.category.create', compact('testCategory', 'subdomainName'));
     }
 
     /**
@@ -84,12 +84,12 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     /**
      * edit category
      */
-    protected function edit($subdomain, $id){
+    protected function edit($subdomainName, $id){
     	$catId = InputSanitise::inputInt(json_decode($id));
     	if(isset($catId)){
     		$testCategory = ClientOnlineTestCategory::find($catId);
     		if(is_object($testCategory)){
-    			return view('client.onlineTest.category.create', compact('testCategory'));
+                return view('client.onlineTest.category.create', compact('testCategory', 'subdomainName'));
     		}
     	}
 		return Redirect::to('manageOnlineTestCategory');

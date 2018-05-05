@@ -41,22 +41,22 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     /**
      * show all test paper
      */
-    public function show(Request $request){
+    public function show($subdomainName,Request $request){
     	$testPapers = ClientOnlineTestSubjectPaper::showPaper($request);
-    	return view('client.onlineTest.paper.list', compact('testPapers'));
+    	return view('client.onlineTest.paper.list', compact('testPapers', 'subdomainName'));
     }
 
     /**
      *  show create UI for paper
      */
-    protected function create(Request $request){
+    protected function create($subdomainName,Request $request){
         $allSessions = [];
         $clientId = Auth::guard('client')->user()->id;
     	$testCategories    = ClientOnlineTestCategory::where('client_id', $clientId)->get();
 		$testSubCategories = new ClientOnlineTestSubCategory;
 		$testSubjects = new ClientOnlineTestSubject;
 		$paper = new ClientOnlineTestSubjectPaper;
-    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
+    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions', 'subdomainName'));
     }
 
     /**
@@ -89,7 +89,7 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     /**
      *  edit paper
      */
-    protected function edit($subdomain, $id, Request $request){
+    protected function edit($subdomainName, $id, Request $request){
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$paper = ClientOnlineTestSubjectPaper::find($id);
@@ -99,7 +99,7 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
 				$testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId($paper->category_id, $paper->sub_category_id, $request);
                 $allSessions = ClientOnlinePaperSection::paperSectionsByPaperId($paper->id, Auth::guard('client')->user()->id);
 
-		    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
+		    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions', 'subdomainName'));
     		}
     	}
 		return Redirect::to('manageOnlineTestSubjectPaper');

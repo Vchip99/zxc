@@ -26,6 +26,7 @@ use App\Models\ClientCourseSubComment;
 use App\Models\ClientCourseSubCommentLike;
 use App\Models\ClientOnlineVideoLike;
 use App\Models\ClientAssignmentAnswer;
+use App\Models\ClientChatMessage;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class Clientuser extends Authenticatable
@@ -146,6 +147,7 @@ class Clientuser extends Authenticatable
         ClientOnlineVideoLike::deleteClientOnlineVideoLikesByClientIdByUserId($clientId,$userId);
         ClientAssignmentAnswer::deleteClientAssignmentAnswerByClientIdByUserId($clientId,$userId);
         ClientReadNotification::deleteClientReadNotificationByClientIdByUserId($clientId,$userId);
+        ClientChatMessage::deleteClientChatMessagesByClientIdByUserId($clientId,$userId);
         return;
     }
 
@@ -299,5 +301,51 @@ class Clientuser extends Authenticatable
 
     public function client(){
         return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function chatroomid(){
+        $senderUserId = $this->client_id;
+        $receiverId = $this->id;
+        $roomMembers = [$senderUserId,$receiverId];
+        return 'chatmessages_'.$roomMembers[0].'_'.$roomMembers[1];
+    }
+
+    protected static function searchContact($subDomainName,Request $request){
+        $chatusers = [];
+        $unreadCount = [];
+        $currentUserId = Auth::guard('client')->user()->id;
+        $contact = InputSanitise::inputString($request->contact);
+        $users = static::where('name', 'LIKE', '%'.$contact.'%')->where('client_id', $currentUserId)->where('verified',1)->where('client_approve',1)->get();
+        if(is_object($users) && false == $users->isEmpty()){
+            foreach($users as $user){
+                if(is_file($user->photo) && true == preg_match('/clientUserStorage/',$user->photo)){
+                    $isImageExist = 'system';
+                } else if(!empty($user->photo) && false == preg_match('/clientUserStorage/',$user->photo)){
+                    $isImageExist = 'other';
+                } else {
+                    $isImageExist = 'false';
+                }
+                $chatusers[] = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'photo' => $user->photo,
+                    'image_exist' => $isImageExist,
+                    'chat_room_id' => $user->chatroomid(),
+                ];
+            }
+        }
+        if(count($chatusers) > 0){
+            $searchIds = array_column($chatusers, 'id');
+            $chatMessages = ClientChatMessage::where('receiver_id',  $currentUserId)->whereIn('sender_id', $searchIds)->where('client_id', $currentUserId)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
+            if(is_object($chatMessages) && false == $chatMessages->isEmpty()){
+                foreach($chatMessages as $chatMessage){
+                    $unreadCount[$chatMessage->sender_id] = $chatMessage->unread;
+                }
+            }
+        }
+        $result['users'] =  $chatusers;
+        $result['unreadCount'] =  $unreadCount;
+        $result['onlineUsers'] = ClientChatMessage::checkOnlineUsers($subDomainName);
+        return $result;
     }
 }

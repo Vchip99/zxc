@@ -23,7 +23,7 @@ class ClientReadNotification extends Model
         $loginUser = Auth::guard('clientuser')->user();
     	$readNotitication = static::where('notification_module',$notificationModuleId)->where('created_module_id', $createdModuleId)->where('client_id',$loginUser->client_id)->where('client_user_id', $currentUser)->first();
 
-    	if(! is_object($readNotitication)){
+    	if(!is_object($readNotitication)){
     		$notitication = ClientNotification::where('notification_module',$notificationModuleId)->where('created_module_id', $createdModuleId)->where('client_id',$loginUser->client_id)->first();
     		if(is_object($notitication)){
     			$objReadNotification = new static;
@@ -72,10 +72,21 @@ class ClientReadNotification extends Model
     }
 
     protected static function deleteClientReadNotificationByClientIdByUserId($clientId,$userId){
+        $clientNotificationIds = [];
         $results = static::where('client_id', $clientId)->where('client_user_id', $userId)->get();
         if(is_object($results) && false == $results->isEmpty()){
             foreach($results as $result){
+                $clientNotificationIds[] = $result->client_notification_id;
                 $result->delete();
+            }
+            array_unique($clientNotificationIds);
+        }
+        if(count($clientNotificationIds) > 0){
+            $clientNotifications = ClientNotification::findMany($clientNotificationIds);
+            if(is_object($clientNotifications) && false == $clientNotifications->isEmpty()){
+                foreach($clientNotifications as $clientNotification){
+                    $clientNotification->delete();
+                }
             }
         }
         return;

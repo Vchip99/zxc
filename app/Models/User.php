@@ -334,15 +334,13 @@ class User extends Authenticatable
         VkitProjectCommentLike::deleteVkitProjectCommentLikesByUserId($userId);
         VkitProjectSubComment::deleteVkitProjectSubCommentsByUserId($userId);
         VkitProjectSubCommentLike::deleteVkitProjectSubCommentLikesByUserId($userId);
-
         PlacementProcessComment::deletePlacementProcessCommentsByUserId($userId);
         PlacementProcessSubComment::deletePlacementProcessSubCommentsByUserId($userId);
-
         PlacementProcessLike::deletePlacementProcessLikesByUserId($userId);
         PlacementProcessCommentLike::deletePlacementProcessCommentLikesByUserId($userId);
         PlacementProcessSubCommentLike::deletePlacementProcessSubCommentLikesByUserId($userId);
-
-
+        ChatMessage::deleteChatMessagesByUserId($userId);
+        Notification::deleteUserNotificationByUserId($userId);
         return;
     }
 
@@ -461,7 +459,7 @@ class User extends Authenticatable
         $unreadCount = [];
         $currentUserId = Auth()->user()->id;
         $contact = InputSanitise::inputString($request->contact);
-        $users = static::where('users.name', 'LIKE', '%'.$contact.'%')->get();
+        $users = static::where('name', 'LIKE', '%'.$contact.'%')->where('verified',1)->where('admin_approve',1)->get();
         if(is_object($users) && false == $users->isEmpty()){
             foreach($users as $user){
                 if($currentUserId != $user->id){

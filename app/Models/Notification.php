@@ -67,4 +67,25 @@ class Notification extends Model
     protected static function readUserNotifications($userId){
         return static::where('created_to', $userId)->where('is_seen', 0)->update(['is_seen' => 1]);
     }
+
+    protected static function deleteUserNotificationByUserId($userId){
+        $notificationIds = [];
+        $result = static::where('admin_id', 0)->where('created_by', $userId)->orWhere('created_to', $userId)->get();
+        if(is_object($result) && false == $result->isEmpty()){
+            foreach($result as $notification){
+                $notificationIds[] = $notification->id;
+                $notification->delete();
+            }
+            array_unique($notificationIds);
+        }
+        if(count($notificationIds) > 0){
+            $readNotifications = ReadNotification::whereIn('notification_id', $notificationIds)->get();
+            if(is_object($readNotifications) && false == $readNotifications->isEmpty()){
+                foreach($readNotifications as $readNotification){
+                    $readNotification->delete();
+                }
+            }
+        }
+        return;
+    }
 }

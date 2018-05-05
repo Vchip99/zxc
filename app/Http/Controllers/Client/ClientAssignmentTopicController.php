@@ -35,18 +35,18 @@ class ClientAssignmentTopicController extends ClientBaseController
         'topic' => 'required',
     ];
 
-    protected function show(){
+    protected function show($subdomainName){
         $topics = ClientAssignmentTopic::where('client_id', Auth::guard('client')->user()->id)->paginate();
-        return view('client.assignmentTopic.list', compact('topics'));
+        return view('client.assignmentTopic.list', compact('topics','subdomainName'));
     }
 
     /**
      *  create assignment topic
      */
-    protected function create(){
+    protected function create($subdomainName){
         $topic = new ClientAssignmentTopic;
         $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
-        return view('client.assignmentTopic.create', compact('topic', 'subjects'));
+        return view('client.assignmentTopic.create', compact('topic', 'subjects','subdomainName'));
     }
 
     /**
@@ -78,13 +78,13 @@ class ClientAssignmentTopicController extends ClientBaseController
     /**
      *  edit assignment subject
      */
-    protected function edit($subdomain, $id){
+    protected function edit($subdomainName, $id){
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $topic = ClientAssignmentTopic::find($id);
             if(is_object($topic)){
                 $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
-                return view('client.assignmentTopic.create', compact('topic', 'subjects'));
+                return view('client.assignmentTopic.create', compact('topic', 'subjects', 'subdomainName'));
             }
         }
         return Redirect::to('manageAssignmentTopic');

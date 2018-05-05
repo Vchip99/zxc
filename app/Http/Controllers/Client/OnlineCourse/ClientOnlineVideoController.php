@@ -40,21 +40,21 @@ class ClientOnlineVideoController extends ClientBaseController
     /**
      *  show list of course video
      */
-    protected function show(Request $request){
+    protected function show($subdomainName,Request $request){
     	$videos = ClientOnlineVideo::showVideos($request);
-    	return view('client.onlineCourse.video.list', compact('videos'));
+    	return view('client.onlineCourse.video.list', compact('videos', 'subdomainName'));
     }
 
     /**
      *  show create course video UI
      */
-    protected function create(Request $request){
+    protected function create($subdomainName,Request $request){
         $clientId = Auth::guard('client')->user()->id;
         $categories   = ClientOnlineCategory::where('client_id', $clientId)->get();
         $subCategories = new ClientOnlineSubCategory;
         $courses = new ClientOnlineCourse;
     	$video = new ClientOnlineVideo;
-    	return view('client.onlineCourse.video.create', compact('categories','subCategories','courses', 'video'));
+    	return view('client.onlineCourse.video.create', compact('categories','subCategories','courses', 'video', 'subdomainName'));
     }
 
     /**
@@ -88,7 +88,7 @@ class ClientOnlineVideoController extends ClientBaseController
     /**
      *  edit course video
      */
-    protected function edit( $subdomain , $id, Request $request){
+    protected function edit( $subdomainName , $id, Request $request){
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$video = ClientOnlineVideo::find($id);
@@ -97,7 +97,7 @@ class ClientOnlineVideoController extends ClientBaseController
                 $categories = ClientOnlineCategory::where('client_id', $video->client_id)->get();
                 $subCategories = ClientOnlineSubCategory::getOnlineSubCategoriesByCategoryId($video->category_id, $request);
                 $courses = ClientOnlineCourse::getOnlineCourseByCatIdBySubCatIdForClient($video->category_id,$video->sub_category_id);
-    			return view('client.onlineCourse.video.create', compact('categories','subCategories','courses', 'video'));
+    			return view('client.onlineCourse.video.create', compact('categories','subCategories','courses', 'video', 'subdomainName'));
     		}
     	}
     	return Redirect::to('manageOnlineVideo');

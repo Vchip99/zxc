@@ -383,6 +383,7 @@ class OnlineClientController extends Controller
                         'subdomain' => $subdomain,
                         'admin_approve' => 1,
                         'plan_id' => $planId,
+                        'photo' => '/images/user1.png',
                     ]);
 
                     if( !is_object($client)){
@@ -726,6 +727,7 @@ class OnlineClientController extends Controller
                 'subdomain' => $subdomain,
                 'admin_approve' => 1,
                 'plan_id' => $planId,
+                'photo' => '/images/user1.png',
             ]);
 
             if( !is_object($client)){

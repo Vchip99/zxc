@@ -2,6 +2,7 @@
 @section('header-css')
 	@include('layouts.questions-js-css')
 	<link href="{{asset('css/nav_footer.css?ver=1.0')}}" rel="stylesheet"/>
+	<link href="{{asset('css/chat.css?ver=1.0')}}" rel="stylesheet"/>
 	<style type="text/css">
 		.navbar-nav > li > a {
     		border-left: none !important;

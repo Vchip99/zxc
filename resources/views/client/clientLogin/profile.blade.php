@@ -163,4 +163,5 @@
        </div>
     </div>
   </div>
+  @include('footer.clientLiveChat')
 @stop

@@ -817,6 +817,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('verifyClientEmail', 'Client\ClientHomeController@verifyClientEmail');
   	// Route::get('clientforgotPassword', 'Client\ClientHomeController@clientforgotPassword');
   	// Route::post('clientforgotPassword', 'Client\ClientHomeController@clientforgotPassword');
+
   	Route::get('clientforgotPassword', 'ClientAuth\ForgotPasswordController@showLinkRequestForm');
   	Route::post('clientpassword/email', 'ClientAuth\ForgotPasswordController@sendPasswordResetLink');
   	Route::get('clientpassword/reset/{token}', 'ClientAuth\ResetPasswordController@showResetForm');
@@ -888,6 +889,12 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('updateBankDetails', 'Client\ClientBaseController@updateBankDetails');
 	Route::get('manageUserPayments', 'Client\ClientBaseController@manageUserPayments');
 	Route::post('getClientUserPayments', 'Client\ClientBaseController@getClientUserPayments');
+	Route::post('searchContact', 'Client\ClientBaseController@searchContact');
+	Route::get('allChatMessages', 'Client\ClientBaseController@allChatMessages');
+	Route::post('dashboardPrivateChat', 'Client\ClientBaseController@dashboardPrivateChat');
+	Route::post('dashboardSendMessage', 'Client\ClientBaseController@dashboardSendMessage');
+	Route::post('getContacts', 'Client\ClientBaseController@getContacts');
+
 
   	// category
   	Route::get('manageOnlineCategory', 'Client\OnlineCourse\ClientOnlineCategoryController@show');
@@ -1131,5 +1138,12 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('managePurchasedSubCategory', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@managePurchasedSubCategory');
 	Route::get('showPurchaseSubcategory/{id}', 'Client\PurchaseSubCategory\PurchaseSubCategoryController@showPurchaseSubcategory');
 
-
+	//chat
+	Route::post('clientPrivateChat', 'Client\ClientChatController@clientPrivateChat');
+	Route::post('readClientChatMessages', 'Client\ClientChatController@readClientChatMessages');
+	Route::post('sendMessage', 'Client\ClientChatController@sendMessage');
+	Route::post('showClientChatUsers', 'Client\ClientChatController@showClientChatUsers');
+	Route::post('loadClientChatUsers', 'Client\ClientChatController@loadClientChatUsers');
+	Route::post('checkOnlineUsers', 'Client\ClientChatController@checkOnlineUsers');
+	Route::post('checkDashboardOnlineUsers', 'Client\ClientChatController@checkOnlineUsers');
 });

@@ -42,19 +42,19 @@ class ClientOnlineTestSubCategoryController extends ClientBaseController
     /**
      *  show all sub category
      */
-    protected function show(Request $request){
+    protected function show($subdomainName,Request $request){
         $testSubCategories = ClientOnlineTestSubCategory::showSubCategories($request);
-        return view('client.onlineTest.subcategory.list', compact('testSubCategories'));
+        return view('client.onlineTest.subcategory.list', compact('testSubCategories', 'subdomainName'));
     }
 
     /**
      *  show create UI for sub category
      */
-    protected function create(Request $request){
+    protected function create($subdomainName,Request $request){
         $clientId = Auth::guard('client')->user()->id;
         $testCategories = ClientOnlineTestCategory::where('client_id', $clientId)->get();
         $testSubcategory = new ClientOnlineTestSubCategory;
-        return view('client.onlineTest.subcategory.create', compact('testCategories', 'testSubcategory'));
+        return view('client.onlineTest.subcategory.create', compact('testCategories', 'testSubcategory', 'subdomainName'));
     }
 
     /**
@@ -86,13 +86,13 @@ class ClientOnlineTestSubCategoryController extends ClientBaseController
     /**
      *  edit sub category
      */
-    protected function edit( $subdomain, $id){
+    protected function edit( $subdomainName, $id){
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $testSubcategory = ClientOnlineTestSubCategory::find($id);
             if(is_object($testSubcategory)){
                 $testCategories = ClientOnlineTestCategory::where('client_id', $testSubcategory->client_id)->get();
-                return view('client.onlineTest.subcategory.create', compact('testCategories', 'testSubcategory'));
+                return view('client.onlineTest.subcategory.create', compact('testCategories', 'testSubcategory', 'subdomainName'));
             }
         }
         return Redirect::to('manageOnlineTestSubCategory');

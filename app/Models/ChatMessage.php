@@ -56,7 +56,7 @@ class ChatMessage extends Model
 
             $chatusers['chat_users'] = $orderById = implode(',', $chatmessageusers);
             if(count($chatmessageusers) > 0){
-                $messageusers = User::whereIn('id', $chatmessageusers)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
+                $messageusers = User::whereIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
                 if(is_object($messageusers) && false == $messageusers->isEmpty()){
                     foreach($messageusers as $user){
                         if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
@@ -80,7 +80,7 @@ class ChatMessage extends Model
 
             array_push($chatmessageusers, $adminChatUserId);
             array_push($chatmessageusers, $loginUser->id);
-            $users = User::whereNotIn('id', $chatmessageusers)->skip(0)->take(10)->get();
+            $users = User::whereNotIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->skip(0)->take(10)->get();
 
             if(is_object($users) && false == $users->isEmpty()){
                 foreach($users as $user){
@@ -180,5 +180,26 @@ class ChatMessage extends Model
             }
         }
         return $onlineUserIds;
+    }
+
+    protected static function deleteChatMessagesByUserId($userId){
+        $chatRoomIds = [];
+        $result = static::where('sender_id', $userId)->Orwhere('receiver_id',  $userId)->get();
+        if(is_object($result) && false == $result->isEmpty()){
+            foreach($result as $message){
+                $chatRoomIds[] = $message->chat_room_id;
+                $message->delete();
+            }
+            array_unique($chatRoomIds);
+        }
+        if(count($chatRoomIds) > 0){
+            $chatRooms = ChatRoom::findMany($chatRoomIds);
+            if(is_object($chatRooms) && false == $chatRooms->isEmpty()){
+                foreach($chatRooms as $chatRoom){
+                    $chatRoom->delete();
+                }
+            }
+        }
+        return;
     }
 }

@@ -68,7 +68,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
             $userId = $loginUser->id;
             $userPurchasedCourses = ClientUserPurchasedCourse::getUserPurchasedCourses($clientId, $userId);
         }
-        return view('client.front.onlineCourses.courses', compact('courseCategories', 'courses', 'userPurchasedCourses'));
+        return view('client.front.onlineCourses.courses', compact('courseCategories', 'courses', 'userPurchasedCourses', 'subdomainName'));
     }
 
     /**
@@ -123,7 +123,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                 $userId = $loginUser->id;
                 $isCoursePurchased = ClientUserPurchasedCourse::isCoursePurchased($clientId, $userId, $courseId);
             }
-            return view('client.front.onlineCourses.course_details', compact('videos', 'courseId', 'isCourseRegistered', 'course', 'isCoursePurchased', 'loginUser'));
+            return view('client.front.onlineCourses.course_details', compact('videos', 'courseId', 'isCourseRegistered', 'course', 'isCoursePurchased', 'loginUser', 'subdomainName'));
         }
         return redirect()->back();
     }
@@ -201,7 +201,7 @@ class ClientOnlineCourseFrontController extends ClientHomeController
                         return Redirect::to('online-courses');
                     }
                 }
-                return view('client.front.onlineCourses.episode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'isCoursePurchased', 'subdomainName', 'videoCoursePrice'));
+                return view('client.front.onlineCourses.episode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'isCoursePurchased', 'subdomainName', 'videoCoursePrice', 'subdomainName'));
             }
         }
         return Redirect::to('online-courses');

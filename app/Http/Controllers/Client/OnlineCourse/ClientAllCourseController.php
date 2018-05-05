@@ -52,9 +52,9 @@ class ClientAllCourseController extends ClientBaseController
     /**
      *  show list of course category
      */
-    protected function showAll(Request $request){
+    protected function showAll($subdomainName,Request $request){
     	$categories = ClientOnlineCategory::showCategories($request);
-    	return view('client.onlineCourse.course_all', compact('categories'));
+    	return view('client.onlineCourse.course_all', compact('categories', 'subdomainName'));
     }
 
     /**

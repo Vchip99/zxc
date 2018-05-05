@@ -39,7 +39,7 @@ class PurchaseSubCategoryController extends ClientBaseController
         'topic' => 'required',
     ];
 
-    protected function show(Request $request){
+    protected function show($subdomainName,Request $request){
         $purchasedSubCategories = [];
         $testCategories = ClientOnlineTestCategory::showCategories($request);
         $testSubCategories = ClientOnlineTestSubCategory::showPayableSubCategoriesAssociatedWithQuestion();
@@ -49,13 +49,13 @@ class PurchaseSubCategoryController extends ClientBaseController
                 $purchasedSubCategories[$payableSubCategory->sub_category_id] = $payableSubCategory;
             }
         }
-        return view('client.payableSubCategory.payable', compact('testSubCategories', 'purchasedSubCategories', 'testCategories'));
+        return view('client.payableSubCategory.payable', compact('testSubCategories', 'purchasedSubCategories', 'testCategories', 'subdomainName'));
     }
 
     /**
      *  showPayableSubcategory
      */
-    protected function showPayableSubcategory($subdomain,$id,Request $request){
+    protected function showPayableSubcategory($subdomainName,$id,Request $request){
         $selectedSubCategory = ClientOnlineTestSubCategory::showPayableSubcategoryById(json_decode($id));
 
         if(!is_object($selectedSubCategory)){
@@ -67,7 +67,7 @@ class PurchaseSubCategoryController extends ClientBaseController
         $testPapers = ClientOnlineTestSubjectPaper::showPayablePapersBySubCategoryIdAssociatedWithQuestion($selectedSubCategory->id);
         $paperQuestionCount = ClientOnlineTestQuestion::getPayableQuestionsCountBySubcategoryId($selectedSubCategory->id);
         $isTestSubCategoryPurchased = false;
-        return view('client.payableSubCategory.payable_details', compact('selectedSubCategory', 'testSubCategories', 'testSubjects', 'testPapers', 'isTestSubCategoryPurchased', 'paperQuestionCount', 'testCategories'));
+        return view('client.payableSubCategory.payable_details', compact('selectedSubCategory', 'testSubCategories', 'testSubjects', 'testPapers', 'isTestSubCategoryPurchased', 'paperQuestionCount', 'testCategories', 'subdomainName'));
     }
 
     /**
@@ -323,7 +323,7 @@ class PurchaseSubCategoryController extends ClientBaseController
         return redirect('managePurchasedSubCategory');
     }
 
-    protected function managePurchasedSubCategory(Request $request){
+    protected function managePurchasedSubCategory($subdomainName,Request $request){
         $purchasedSubCategories = [];
         $testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
         $testSubCategories = ClientOnlineTestSubCategory::showPayableSubCategoriesAssociatedWithQuestion();
@@ -333,13 +333,13 @@ class PurchaseSubCategoryController extends ClientBaseController
                 $purchasedSubCategories[$payableSubCategory->sub_category_id] = $payableSubCategory;
             }
         }
-        return view('client.purchaseSubCategory.purchase', compact('testSubCategories', 'purchasedSubCategories', 'testCategories'));
+        return view('client.purchaseSubCategory.purchase', compact('testSubCategories', 'purchasedSubCategories', 'testCategories', 'subdomainName'));
     }
 
     /**
      *  showPayableSubcategory
      */
-    protected function showPurchaseSubcategory($subdomain,$id,Request $request){
+    protected function showPurchaseSubcategory($subdomainName,$id,Request $request){
         $selectedSubCategory = ClientOnlineTestSubCategory::showPayableSubcategoryById(json_decode($id));
 
         if(!is_object($selectedSubCategory)){
@@ -351,6 +351,6 @@ class PurchaseSubCategoryController extends ClientBaseController
         $testPapers = ClientOnlineTestSubjectPaper::showPayablePapersBySubCategoryIdAssociatedWithQuestion($selectedSubCategory->id);
         $paperQuestionCount = ClientOnlineTestQuestion::getPayableQuestionsCountBySubcategoryId($selectedSubCategory->id);
         $isTestSubCategoryPurchased = false;
-        return view('client.purchaseSubCategory.purchase_details', compact('selectedSubCategory', 'testSubCategories', 'testSubjects', 'testPapers', 'isTestSubCategoryPurchased', 'paperQuestionCount', 'testCategories'));
+        return view('client.purchaseSubCategory.purchase_details', compact('selectedSubCategory', 'testSubCategories', 'testSubjects', 'testPapers', 'isTestSubCategoryPurchased', 'paperQuestionCount', 'testCategories', 'subdomainName'));
     }
 }

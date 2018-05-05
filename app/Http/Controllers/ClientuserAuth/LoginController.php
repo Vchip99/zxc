@@ -11,8 +11,7 @@ use Hesto\MultiAuth\Traits\LogsoutGuard;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\Clientuser;
-use Session;
-use Redirect;
+use Session,Cache,Redirect;
 
 class LoginController extends Controller
 {
@@ -74,8 +73,9 @@ class LoginController extends Controller
      * @param \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function logout(Request $request)
+    public function logout($subdomainName,Request $request)
     {
+        Cache::forget($subdomainName.':online_user-' . $this->guard('clientuser')->user()->id);
         $this->guard()->logout();
 
         Session::flush();

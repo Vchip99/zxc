@@ -52,9 +52,9 @@ class ClientAllTestController extends ClientBaseController
     /**
      * create all
      */
-    protected function showAll(Request $request){
+    protected function showAll($subdomainName,Request $request){
     	$testCategories = ClientOnlineTestCategory::showCategories($request);
-    	return view('client.onlineTest.test_all', compact('testCategories'));
+    	return view('client.onlineTest.test_all', compact('testCategories', 'subdomainName'));
     }
 
     /**
