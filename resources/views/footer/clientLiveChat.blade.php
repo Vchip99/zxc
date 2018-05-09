@@ -346,7 +346,7 @@
             if(messages['chatroom_id']){
                 document.getElementById('send_'+receiverId).setAttribute('data-chatroom_id',messages['chatroom_id']);
             }
-            // document.getElementById('message_'+receiverId).focus();
+            document.getElementById('message_'+receiverId).focus();
         }
     });
   }

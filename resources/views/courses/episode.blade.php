@@ -110,8 +110,15 @@
   <div class="container text-center">
     <div class="row mrgn_60_top">
       <div class="col-md-9">
-        <div class="embed-responsive embed-responsive-16by9" width="854" height="480">
-          {!! $video->video_path !!}
+        <div class="embed-responsive embed-responsive-16by9" width="854" height="480" title="{!! $video->name !!}">
+          @if(false == preg_match('/courseVideos/',$video->video_path))
+            {!! $video->video_path !!}
+          @else
+            <video controls controlsList="nodownload">
+              <source src="{!! asset($video->video_path) !!}" type="video/mp4">
+              Your browser does not support HTML5 video.
+            </video>
+          @endif
         </div>
       </div>
       <div class="col-md-3">

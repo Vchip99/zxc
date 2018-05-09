@@ -10,7 +10,7 @@ use App\Models\CourseComment;
 use App\Models\CourseVideoLike;
 use App\Models\CourseSubCategory;
 use App\Models\CourseCategory;
-
+use File;
 
 class CourseVideo extends Model
 {
@@ -33,6 +33,7 @@ class CourseVideo extends Model
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
     	$videoPath = trim($request->get('video_path'));
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
+        $videoSource = InputSanitise::inputString($request->get('video_source'));
 
     	if( $isUpdate && isset($videoId)){
     		$video = static::find($videoId);
@@ -46,11 +47,36 @@ class CourseVideo extends Model
     	$video->name = $videoName;
     	$video->description = $description;
     	$video->duration = $duration;
-    	$video->video_path = $videoPath;
+        if('youtube' == $videoSource){
+    	   $video->video_path = $videoPath;
+        } else if(empty($video->id)){
+            $video->video_path = '';
+        }
     	$video->course_id = $course;
         $video->course_category_id = $categoryId;
         $video->course_sub_category_id = $subcategoryId;
     	$video->save();
+        if('system' == $videoSource && is_object($request->file('video_path')) && !empty($video->id)){
+            $originalVideoName = $request->file('video_path')->getClientOriginalName();
+            $courseVideoFolder = "courseVideos/".$course."/".$video->id;
+            if(!is_dir($courseVideoFolder)){
+                File::makeDirectory($courseVideoFolder, $mode = 0777, true, true);
+            }
+            $systemVideoPath = $courseVideoFolder ."/". $originalVideoName;
+            if(file_exists($systemVideoPath)){
+                unlink($systemVideoPath);
+            } elseif(file_exists($video->video_path)){
+                unlink($video->video_path);
+            }
+            $request->file('video_path')->move($courseVideoFolder, $originalVideoName);
+            $video->video_path = $systemVideoPath;
+            $video->save();
+        } else {
+            $courseVideoFolder = "courseVideos/".$course."/".$video->id;
+            if(is_dir($courseVideoFolder)){
+                InputSanitise::delFolder($courseVideoFolder);
+            }
+        }
     	return $video;
     }
 

@@ -41,6 +41,9 @@ class InputSanitise{
                 }
                 return rmdir($dir);
             }
+            if(is_dir($dir)){
+                return rmdir($dir);
+            }
         }
         return;
     }

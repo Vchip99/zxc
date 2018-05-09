@@ -46,6 +46,7 @@ use App\Models\PlacementProcessSubCommentLike;
 use App\Models\PlacementProcessComment;
 use App\Models\PlacementProcessSubComment;
 use App\Models\ChatMessage;
+use App\Models\PlacementExperiance;
 use Auth, DB, Cache;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -341,6 +342,7 @@ class User extends Authenticatable
         PlacementProcessSubCommentLike::deletePlacementProcessSubCommentLikesByUserId($userId);
         ChatMessage::deleteChatMessagesByUserId($userId);
         Notification::deleteUserNotificationByUserId($userId);
+        PlacementExperiance::deletePlacementExperiancesByUserId($userId);
         return;
     }
 

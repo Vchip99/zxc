@@ -29,12 +29,12 @@
                 @if('ceo@vchiptech.com' != $loginUser->email)
                   <li class="left clearfix addChat" id="{{$chatAdminId}}" data-user_name="Vchip Admin" onclick="showChat(this);" style="list-style: none;padding-left: 13px;border-bottom: 1px dotted #B3A9A9;">
                     <span class="chat-img pull-left">
-                      <img src="{{asset('images/user1.png')}}" alt="User Avatar" class="img-circle">
+                      <img src="{{asset('images/logo/logo.jpg')}}" alt="User Avatar" class="img-circle">
                     </span>
                     <div class="chat-body clearfix" style="padding-left: 60px;">
                       <div class="header">
                         <strong class="primary-font">Vchip Admin </strong>
-                          <span id="unread_{{$chatAdminId}}" style="color: red;"></span>
+                          <span id="unread_{{ $loginUser->id }}_{{$chatAdminId}}" style="color: red;"></span>
                           <span class="chat-img pull-right" style="padding-right: 30px;">
                           @if($chatAdminLive)
                             <img src="/images/online.png" id="userstatus_{{$chatAdminId}}" data-user_id="{{$chatAdminId}}" style="height:  20px; width: 20px;">
@@ -47,6 +47,7 @@
                     </div>
                   </li>
                 @endif
+                <input type="hidden" id="chat_admin_id" value="{{$chatAdminId}}">
               </div>
               <div class="panel-body">
                 <ul class="chat" id="chat_users">
@@ -317,7 +318,7 @@
               divHeader.appendChild(strongName);
 
               var spanUnread = document.createElement('span');
-              spanUnread.id = 'unread_'+obj['id'];
+              spanUnread.id = 'unread_'+current_user+'_'+obj['id'];
               spanUnread.setAttribute('style','color: red;');
               if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
                 spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
@@ -370,11 +371,11 @@
         var receiver = $(ele).attr('data-receiver_id');
         var current_user = document.getElementById('user_id').value;
         var token = "{{ csrf_token() }}";
-        if(parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML) > 0 && parseInt(document.getElementById('unread_'+receiver).innerHTML) > 0){
-          document.getElementById('msg_count_1_'+current_user).innerHTML -= parseInt(document.getElementById('unread_'+receiver).innerHTML);
+        if(parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML) > 0 && parseInt(document.getElementById('unread_'+current_user+'_'+receiver).innerHTML) > 0){
+          document.getElementById('msg_count_1_'+current_user).innerHTML -= parseInt(document.getElementById('unread_'+current_user+'_'+receiver).innerHTML);
           document.getElementById('msg_count_2_'+current_user).innerHTML = parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML);
           if(parseInt(document.getElementById('userCnt_'+current_user).innerHTML) > 0)  {
-            document.getElementById('userCnt_'+current_user).innerHTML = parseInt(document.getElementById('userCnt_'+current_user).innerHTML) - parseInt(document.getElementById('unread_'+receiver).innerHTML);
+            document.getElementById('userCnt_'+current_user).innerHTML = parseInt(document.getElementById('userCnt_'+current_user).innerHTML) - parseInt(document.getElementById('unread_'+current_user+'_'+receiver).innerHTML);
           }
 
           $.ajax({
@@ -389,12 +390,13 @@
           document.getElementById('msg_count_1_'+current_user).innerHTML = '';
           document.getElementById('msg_count_2_'+current_user).innerHTML = 0;
         }
-        document.getElementById('unread_'+receiver).innerHTML = '';
+        document.getElementById('unread_'+current_user+'_'+receiver).innerHTML = '';
       }
 
       // show chat users
       function loadChatUsers(limitStart){
           var current_user = document.getElementById('user_id').value;
+          var chatAdminId = document.getElementById('chat_admin_id').value;
           var previuosChatUsers = document.getElementById('previuos_chat_users').value;
           var token = "{{ csrf_token() }}";
           $.ajax({
@@ -444,7 +446,7 @@
                     divHeader.appendChild(strongName);
 
                     var spanUnread = document.createElement('span');
-                    spanUnread.id = 'unread_'+obj['id'];
+                    spanUnread.id = 'unread_'+current_user+'_'+obj['id'];
                     spanUnread.setAttribute('style','color: red;');
                     if(users['unreadCount'][obj.id] > 0){
                       spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
@@ -487,7 +489,16 @@
                     var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
                     socket.emit('subscribe', roomName);
                 });
+                if(chatAdminId != current_user){
+                  var roomArr = [];
+                    roomArr.push(chatAdminId);
+                    roomArr.push(current_user);
+                    var roomMembers = roomArr.sort();
+                    var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
+                    socket.emit('subscribe', roomName);
+                }
                 $('#isUserScroll').val(0);
+
               } else {
                 $('#isUserScroll').val(1);
               }
@@ -512,6 +523,7 @@
       function renderChatUsers(users){
         var current_user = document.getElementById('user_id').value;
         var chatUsers = document.getElementById('chat_users');
+        var chatAdminId = document.getElementById('chat_admin_id').value;
         chatUsers.innerHTML = '';
         document.getElementById('previuos_chat_users').value = users['chatusers']['chat_users'];
         $.each(users['chatusers']['users'],function(idx,obj){
@@ -551,7 +563,7 @@
           divHeader.appendChild(strongName);
 
           var spanUnread = document.createElement('span');
-          spanUnread.id = 'unread_'+obj['id'];
+          spanUnread.id = 'unread_'+current_user+'_'+obj['id'];
           spanUnread.setAttribute('style','color: red;');
           if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
             spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
@@ -594,6 +606,14 @@
           var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
           socket.emit('subscribe', roomName);
         });
+        if(chatAdminId != current_user){
+          var roomArr = [];
+          roomArr.push(chatAdminId);
+          roomArr.push(current_user);
+          var roomMembers = roomArr.sort();
+          var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
+          socket.emit('subscribe', roomName);
+        }
       }
 
       function messagteTime(date){
@@ -748,19 +768,22 @@
               var roomMembers = roomArr.sort();
               var roomName = 'chatmessages_'+roomArr[0]+'_'+roomArr[1];
               var userchat = $('.userchat#'+roomName);
-              if( null == document.getElementById('unread_'+data.sender) && userchat.length > 0){
+              console.log(document.getElementById('unread_'+data.sender));
+              console.log(userchat.length);
+              if( null == document.getElementById('unread_'+current_user+'_'+data.sender) && userchat.length > 0){
                 var spanUnread = document.createElement('span');
                 spanUnread.className = "hide";
-                spanUnread.id = 'unread_'+data.sender;
+                spanUnread.id = 'unread_'+current_user+'_'+data.sender;
                 spanUnread.setAttribute('style','color: red;');
                 spanUnread.value = 1;
                 userchat[0].appendChild(spanUnread);
               }
-              var unread = document.getElementById('unread_'+data.sender).innerHTML;
+              var unread = document.getElementById('unread_'+current_user+'_'+data.sender).innerHTML;
+              console.log(unread);
               if(unread == ''){
-                document.getElementById('unread_'+data.sender).innerHTML = 1;
+                document.getElementById('unread_'+current_user+'_'+data.sender).innerHTML = 1;
               } else {
-                document.getElementById('unread_'+data.sender).innerHTML = parseInt(unread)+1;;
+                document.getElementById('unread_'+current_user+'_'+data.sender).innerHTML = parseInt(unread)+1;;
               }
               var messageHeader = document.getElementById('message_header');
               if( null == document.getElementById('msg_count_1_'+data.receiver)){

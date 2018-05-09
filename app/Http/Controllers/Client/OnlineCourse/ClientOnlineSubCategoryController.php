@@ -129,16 +129,29 @@ class ClientOnlineSubCategoryController extends ClientBaseController
                 DB::connection('mysql2')->beginTransaction();
                 try
                 {
+                    $loginUser = Auth::guard('client')->user();
+                    $subdomainArr = explode('.', $loginUser->subdomain);
+                    $clientName = $subdomainArr[0];
                     if(true == is_object($courseSubcategory->courses) && false == $courseSubcategory->courses->isEmpty()){
                         foreach($courseSubcategory->courses as $course){
                             if(true == is_object($course->videos) && false == $course->videos->isEmpty()){
                                 foreach($course->videos as $video){
                                     $video->deleteCommantsAndSubComments();
+                                    if(true == preg_match('/clientCourseVideos/',$video->video_path)){
+                                        $courseVideoFolder = "clientCourseVideos/".$clientName."/".$video->course_id."/".$video->id;
+                                        if(is_dir($courseVideoFolder)){
+                                            InputSanitise::delFolder($courseVideoFolder);
+                                        }
+                                    }
                                     $video->delete();
                                 }
                             }
                             $course->deleteRegisteredOnlineCourses();
                             $course->deleteCourseImageFolder($request);
+                            $courseVideoFolder = "clientCourseVideos/".$clientName."/".$course->id;
+                            if(is_dir($courseVideoFolder)){
+                                InputSanitise::delFolder($courseVideoFolder);
+                            }
                             $course->delete();
                         }
                     }

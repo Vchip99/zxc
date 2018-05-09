@@ -66,4 +66,14 @@ class PlacementExperiance extends Model
         }
         return;
     }
+
+    protected static function deletePlacementExperiancesByUserId($userId){
+        $placementExperiances = static::where('user_id', $userId)->get();
+        if(is_object($placementExperiances) && false == $placementExperiances->isEmpty()){
+            foreach($placementExperiances as $placementExperiance){
+                $placementExperiance->delete();
+            }
+        }
+        return;
+    }
 }

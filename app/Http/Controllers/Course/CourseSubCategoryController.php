@@ -143,11 +143,21 @@ class CourseSubCategoryController extends Controller
                             if(true == is_object($course->videos) && false == $course->videos->isEmpty()){
                                 foreach($course->videos as $video){
                                     $video->deleteCommantsAndSubComments();
+                                    if(true == preg_match('/courseVideos/',$video->video_path)){
+                                        $courseVideoFolder = "courseVideos/".$video->course_id."/".$video->id;
+                                        if(is_dir($courseVideoFolder)){
+                                            InputSanitise::delFolder($courseVideoFolder);
+                                        }
+                                    }
                                     $video->delete();
                                 }
                             }
                             $course->deleteRegisteredCourses();
                             $course->deleteCourseImageFolder();
+                            $courseVideoFolder = "courseVideos/".$course->id;
+                            if(is_dir($courseVideoFolder)){
+                                InputSanitise::delFolder($courseVideoFolder);
+                            }
                             $course->delete();
                         }
                     }

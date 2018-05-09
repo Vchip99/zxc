@@ -107,10 +107,44 @@
         @if($errors->has('duration')) <p class="help-block">{{ $errors->first('duration') }}</p> @endif
       </div>
     </div>
-    <div class="form-group row">
-      <label for="" class="col-sm-2 col-form-label">Video Path</label>
+    <div class="form-group row @if ($errors->has('video_source')) has-error @endif">
+      <label for="course" class="col-sm-2 col-form-label">Video Source:</label>
       <div class="col-sm-3">
-        <input type="text" class="form-control"  name="video_path" value="{{($video->video_path)?$video->video_path:NULL}}" placeholder="Add video path with iframe" required="true">
+        @if(isset($video->id))
+          <label class="radio-inline"><input type="radio" name="video_source" value="youtube" onclick="showPath(this);"
+            @if(true == preg_match('/iframe/',$video->video_path))
+              checked=true
+            @endif
+          > You Tube/iframe</label>
+          <label class="radio-inline"><input type="radio" name="video_source" value="system" onclick="showPath(this);"
+            @if(true == preg_match('/clientCourseVideos/',$video->video_path))
+              checked=true
+            @endif
+          > System </label>
+        @else
+          <label class="radio-inline"><input type="radio" name="video_source" value="youtube" checked onclick="showPath(this);"> You Tube/iframe</label>
+          <label class="radio-inline"><input type="radio" name="video_source" value="system" onclick="showPath(this);"> System </label>
+        @endif
+        @if($errors->has('video_source')) <p class="help-block">{{ $errors->first('video_source') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row @if ($errors->has('video_path')) has-error @endif"">
+      <label for="course" class="col-sm-2 col-form-label">Video Path</label>
+      <div class="col-sm-3">
+        @if(isset($video->id))
+          @if(false == preg_match('/clientCourseVideos/',$video->video_path))
+            <input id="youtubePath" type="text" class="form-control"  name="video_path" value="{{$video->video_path}}" placeholder="Add Video Path with iframe" required="true">
+            <input id="systemPath" type="file" class="form-control hide"  name="video_path" value="" required="true">
+          @else
+            <input id="youtubePath" type="text" class="form-control hide"  name="video_path" value="" placeholder="Add Video Path with iframe" required="true">
+            <input id="systemPath" type="file" class="form-control"  name="video_path" value="" required="true">
+            <b><span class="" id="existingFileName">Existing File: {!! basename($video->video_path) !!}</span></b>
+          @endif
+        @else
+          <input id="youtubePath" type="text" class="form-control"  name="video_path" value="{{($video->video_path)?$video->video_path:NULL}}" placeholder="Add Video Path with iframe" required="true">
+          <input id="systemPath" type="file" class="form-control hide"  name="video_path" required="true">
+        @endif
+        @if($errors->has('video_path')) <p class="help-block">{{ $errors->first('video_path') }}</p> @endif
       </div>
     </div>
     <div class="form-group row @if ($errors->has('is_free')) has-error @endif">
@@ -127,15 +161,14 @@
       </div>
     </div>
     <div class="form-group row">
-        <div class="offset-sm-2 col-sm-3" title="Submit">
-          <button type="button" class="btn btn-primary" onclick="searchCourseVideo();">Submit</button>
-        </div>
+      <div class="offset-sm-2 col-sm-3" title="Submit">
+        <button id="submitBtn" type="button" class="btn btn-primary" onclick="searchCourseVideo();">Submit</button>
       </div>
+    </div>
   </div>
 </form>
 
 <script type="text/javascript">
-
   function selectSubcategory(ele){
     var id = parseInt($(ele).val());
     if( 0 < id ){
@@ -220,6 +253,30 @@
       alert('please enter name.');
     }
   }
+
+  function showPath(ele){
+    if('system' == $(ele).val()){
+      $('#systemPath').removeClass('hide');
+      $('#existingFileName').removeClass('hide');
+      $('#youtubePath').addClass('hide');
+    } else {
+      $('#youtubePath').removeClass('hide');
+      $('#systemPath').addClass('hide');
+      $('#existingFileName').addClass('hide');
+    }
+  }
+
+  $('input[type="file"]').change(function(event) {
+      var totalBytes = this.files[0].size;
+      // check file is > 500mb
+      if(totalBytes > 524288000){
+        $('#submitBtn').attr('disabled', true);
+        alert('please upload file less than 500mb');
+      } else {
+        $('#submitBtn').attr('disabled', false);
+      }
+    }
+  );
 </script>
 
 @stop

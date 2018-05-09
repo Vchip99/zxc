@@ -622,7 +622,7 @@ ul.table_list{ margin-left: -30px; }
                                   </script>
                                   <input type="hidden" name="area" value="" id="post_area_id">
                                   <input type="hidden" name="company_id" value="" id="post_company_id">
-                                  <button type="button" class="btn btn-success btn-circle text-uppercase" onclick=" confirmSubmit(this);" id="createPost" title="Share"><i class="fa fa-share"></i> Share</button>
+                                  <button type="button" class="btn btn-success btn-circle text-uppercase" onclick=" confirmSubmit(this);" id="createPostBtn" title="Share"><i class="fa fa-share"></i> Share</button>
                               </form>
                           </div>
                       </div>

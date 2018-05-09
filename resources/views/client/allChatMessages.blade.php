@@ -813,7 +813,7 @@ ul#chat_messages div{
 
   $(document).ready(function () {
     $('#contact_list li:first')[0].click()
-    // $('#sendTextMessage').focus();
+    $('#sendTextMessage').focus();
     $('.chat_messages').scroll(function() {
       if($(this).scrollTop() == 0){
         getNextchatMessages($(this).attr('id'));
@@ -1182,7 +1182,7 @@ ul#chat_messages div{
             }
         }
         $('div.chat_messages').scrollTop($('div.chat_messages')[0].scrollHeight);
-        // $('#sendTextMessage').focus();
+        $('#sendTextMessage').focus();
     });
   };
 

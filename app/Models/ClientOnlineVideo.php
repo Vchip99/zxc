@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Redirect, DB, Auth;
+use Redirect, DB, Auth,File;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientCourseComment;
@@ -35,11 +35,13 @@ class ClientOnlineVideo extends Model
     	$videoPath = trim($request->get('video_path'));
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
         $isFree = InputSanitise::inputInt($request->get('is_free'));
+        $videoSource = InputSanitise::inputString($request->get('video_source'));
+        $loginUser = Auth::guard('client')->user();
 
     	if( $isUpdate && isset($videoId)){
     		$video = static::find($videoId);
     		if(!is_object($video)){
-    			return Redirect::to('admin/manageCourseVideo');
+    			return Redirect::to('manageOnlineVideo');
     		}
     	} else {
     		$video = new static;
@@ -48,13 +50,43 @@ class ClientOnlineVideo extends Model
     	$video->name = $videoName;
     	$video->description = $description;
     	$video->duration = $duration;
-    	$video->video_path = $videoPath;
+        if('youtube' == $videoSource){
+           $video->video_path = $videoPath;
+        } else if(empty($video->id)){
+            $video->video_path = '';
+        }
     	$video->course_id = $courseId;
         $video->category_id = $categoryId;
         $video->sub_category_id = $subcategoryId;
-    	$video->client_id = Auth::guard('client')->user()->id;
+    	$video->client_id = $loginUser->id;
         $video->is_free = $isFree;
     	$video->save();
+
+
+        $subdomainArr = explode('.', $loginUser->subdomain);
+        $clientName = $subdomainArr[0];
+
+        if('system' == $videoSource && is_object($request->file('video_path')) && !empty($video->id)){
+            $originalVideoName = $request->file('video_path')->getClientOriginalName();
+            $courseVideoFolder = "clientCourseVideos"."/".$clientName."/".$courseId."/".$video->id;
+            if(!is_dir($courseVideoFolder)){
+                File::makeDirectory($courseVideoFolder, $mode = 0777, true, true);
+            }
+            $systemVideoPath = $courseVideoFolder ."/". $originalVideoName;
+            if(file_exists($systemVideoPath)){
+                unlink($systemVideoPath);
+            } elseif(file_exists($video->video_path)){
+                unlink($video->video_path);
+            }
+            $request->file('video_path')->move($courseVideoFolder, $originalVideoName);
+            $video->video_path = $systemVideoPath;
+            $video->save();
+        } else {
+            $courseVideoFolder = "clientCourseVideos"."/".$clientName."/".$courseId."/".$video->id;
+            if(is_dir($courseVideoFolder)){
+                InputSanitise::delFolder($courseVideoFolder);
+            }
+        }
     	return $video;
     }
 

@@ -118,7 +118,7 @@
     <textarea id="message_{{$loginUser->id}}" data-receiver_id="{{$loginUser->client_id}}" placeholder="Type a message..." rows="3" cols="31" name="message" onfocus="readmessagecount(this);" style="width: 268px;"></textarea>
     <div class="">
       <button class="pull-right send-msg" id="send_{{$loginUser->id}}" data-send_id="{{$loginUser->id}}" data-chatroom_id="" onclick="sendMessage(this);">Send</button>
-      <input type="hidden" id="message_limit_1" value="10">
+      <input type="hidden" id="message_limit_{{$loginUser->id}}" value="10">
       <input type="hidden" id="is_scroll_{{$loginUser->id}}" value="1">
       <input type="hidden" id="client_id" value="{{$loginUser->client_id}}">
       <input type="hidden" id="currentUserName" value="{{$loginUser->name}}">
@@ -275,7 +275,7 @@
       dataType: "json",
       data: {'_token':token,'receiver_id':receiverId, 'message_limit':messageLimit},
       success:function(messages){
-          $('#message_limit_'+receiverId).val(10);
+          $('#message_limit_'+current_user).val(10);
           var chatMessageId = document.getElementById('chatmessages_'+receiverId+'_'+current_user);
           var senderImgPath = $('.user-profile1').attr('src');
           if('' != $('#client_image').val()){
@@ -300,7 +300,7 @@
           if(messages['chatroom_id']){
               document.getElementById('send_'+current_user).setAttribute('data-chatroom_id',messages['chatroom_id']);
           }
-          // document.getElementById('message_'+current_user).focus();
+          document.getElementById('message_'+current_user).focus();
       }
     });
   }
@@ -360,14 +360,14 @@
     if(1 == document.getElementById('is_scroll_'+current_user).value){
       // add chat in to popup
       var token = "{{ csrf_token() }}";
-      var messageLimit = parseInt($('#message_limit_'+receiverId).val())+10;
+      var messageLimit = parseInt($('#message_limit_'+current_user).val())+10;
       $.ajax({
           type: "POST",
           url: '{!! URL::to("clientPrivateChat") !!}',
           dataType: "json",
           data: {'_token':token,'receiver_id':receiverId, 'message_limit':messageLimit},
           success:function(messages){
-              $('#message_limit_'+receiverId).val(messageLimit);
+              $('#message_limit_'+current_user).val(messageLimit);
               var chatMessageId = document.getElementById('chatmessages_'+roomArr[0]+'_'+roomArr[1]);
               if(messages['messages'].length > 0){
                 var senderImgPath = $('.user-profile1').attr('src');

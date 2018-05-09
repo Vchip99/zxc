@@ -34,7 +34,16 @@ class ClientOnlineVideoController extends ClientBaseController
         'video' => 'required|string',
         'description' => 'required|string',
         'duration' => 'required|integer',
-        'video_path' => 'required|string'
+        'video_path' => 'required'
+    ];
+
+    protected $updateValidateVideo = [
+        'category' => 'required|integer',
+        'subcategory' => 'required|integer',
+        'course' => 'required|integer',
+        'video' => 'required|string',
+        'description' => 'required|string',
+        'duration' => 'required|integer',
     ];
 
     /**
@@ -107,7 +116,7 @@ class ClientOnlineVideoController extends ClientBaseController
      *  update course video
      */
     protected function update($subdomain,Request $request){
-    	$v = Validator::make($request->all(), $this->validateVideo);
+    	$v = Validator::make($request->all(), $this->updateValidateVideo);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
@@ -141,6 +150,15 @@ class ClientOnlineVideoController extends ClientBaseController
                 try
                 {
                     $video->deleteCommantsAndSubComments();
+                    $loginUser = Auth::guard('client')->user();
+                    $subdomainArr = explode('.', $loginUser->subdomain);
+                    $clientName = $subdomainArr[0];
+                    if(true == preg_match('/clientCourseVideos/',$video->video_path)){
+                        $courseVideoFolder = "clientCourseVideos/".$clientName."/".$video->course_id."/".$video->id;
+                        if(is_dir($courseVideoFolder)){
+                            InputSanitise::delFolder($courseVideoFolder);
+                        }
+                    }
         			$video->delete();
                     DB::connection('mysql2')->commit();
         			return Redirect::to('manageOnlineVideo')->with('message', 'Video deleted successfully!');

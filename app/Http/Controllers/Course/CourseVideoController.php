@@ -45,7 +45,16 @@ class CourseVideoController extends Controller
         'video' => 'required|string',
         'description' => 'required|string',
         'duration' => 'required|integer',
-        'video_path' => 'required|string'
+        'video_path' => 'required'
+    ];
+
+    protected $updateValidateCourseVideo = [
+        'category' => 'required|integer',
+        'subcategory' => 'required|integer',
+        'course' => 'required|integer',
+        'video' => 'required|string',
+        'description' => 'required|string',
+        'duration' => 'required|integer'
     ];
 
     /**
@@ -72,6 +81,7 @@ class CourseVideoController extends Controller
      */
     protected function store(Request $request){
     	$v = Validator::make($request->all(), $this->validateCourseVideo);
+        // dd($v->errors());
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
@@ -134,7 +144,7 @@ class CourseVideoController extends Controller
      *  update course video
      */
     protected function update(Request $request){
-    	$v = Validator::make($request->all(), $this->validateCourseVideo);
+    	$v = Validator::make($request->all(), $this->updateValidateCourseVideo);
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
@@ -170,6 +180,12 @@ class CourseVideoController extends Controller
                 try
                 {
                     $video->deleteCommantsAndSubComments();
+                    if(true == preg_match('/courseVideos/',$video->video_path)){
+                        $courseVideoFolder = "courseVideos/".$video->course_id."/".$video->id;
+                        if(is_dir($courseVideoFolder)){
+                            InputSanitise::delFolder($courseVideoFolder);
+                        }
+                    }
         			$video->delete();
                     DB::commit();
         			return Redirect::to('admin/manageCourseVideo')->with('message', 'Video deleted successfully!');

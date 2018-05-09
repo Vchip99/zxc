@@ -19,3 +19,5 @@
 !/vendor/laravel/*
 /.env
 /storage/logs
+/public/clientCourseVideos/
+/public/courseVideos/
