@@ -125,14 +125,14 @@
             @if(1 == $i)
               <div class="add-1">
                 <div class="course-box">
-                  <a class="img-course-box" href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">
-                    <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="SSGMCE"  class="img-responsive" />
+                  <a class="img-course-box" href="http://mcoet.mauligroup.org/" target="_blank">
+                    <img src="{{ asset('images/logo/mauli.gif') }}" alt="Mauli College of Engineering Shegaon"  class="img-responsive" />
                   </a>
                   <div class="course-box-content">
-                    <h4 class="course-box-title" title="SSGMCE" data-toggle="tooltip" data-placement="bottom">
-                      <a href="http://ssgmce.org/Default.aspx?ReturnUrl=%2f" target="_blank">SSGMCE</a>
+                    <h4 class="course-box-title" title="Mauli College of Engineering Shegaon" data-toggle="tooltip" data-placement="bottom">
+                      <a href="http://mcoet.mauligroup.org/" target="_blank">Mauli College of Engineering Shegaon</a>
                     </h4>
-                    <p class="more"> SSGMCE</p>
+                    <p class="more"> Mauli College of Engineering Shegaon</p>
                   </div>
                 </div>
               </div>

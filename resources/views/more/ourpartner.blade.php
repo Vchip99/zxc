@@ -166,11 +166,11 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
             </div>
             <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
               <div class="tile">
-                    <img src="{{ asset('images/our-partner/lasthour_logo.jpg')}}" alt="Last Hours Tech"/>
+                    <img src="{{ asset('images/our-partner/ah.jpeg')}}" alt="Ah Ventures"/>
                     <div class="text">
-                      <h1 title="Last Hours Tech">Last Hours Tech</h1>
+                      <h1 title="Ah Ventures">Ah Ventures</h1>
                       <p class="animate-text">
-                        <a class="info" href="http://lasthourstech.com/" target="_blank">Learn More
+                        <a class="info" href="http://www.ahventures.in/" target="_blank">Learn More
                            <i class="fa fa-angle-right" aria-hidden="true"></i>
                         </a>
                       </p>
@@ -179,11 +179,11 @@ box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
             </div>
             <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
               <div class="tile">
-                    <img src="" alt="Pinnaculum Infotech Pvt. Ltd"/>
+                    <img src="{{ asset('images/our-partner/raj-madhav.jpeg')}}" alt="Rajmadhav Educational Consultancy"/>
                     <div class="text">
-                      <h1 title="Pinnaculum Infotech">Pinnaculum Infotech</h1>
+                      <h1 title="Rajmadhav Educational Consultancy">Rajmadhav Educational Consultancy</h1>
                       <p class="animate-text">
-                        <a class="info" href="http://pinnaculuminfotech.com/" target="_blank">Learn More
+                        <a class="info" href="https://www.facebook.com/rajmadhavestc/" target="_blank">Learn More
                            <i class="fa fa-angle-right" aria-hidden="true"></i>
                         </a>
                       </p>
