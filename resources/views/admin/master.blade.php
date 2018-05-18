@@ -10,8 +10,8 @@
   <link href="{{ asset('css/font-awesome/css/font-awesome.min.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/sidemenu/sidemenu_layout.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/sidemenu/_all-skins.css?ver=1.0')}}" rel="stylesheet"/>
-  <!-- <link href="{{ asset('css/v_main.css?ver=1.0')}}" rel="stylesheet"/>
-  <link href="{{ asset('css/jquery-confirm.min.css?ver=1.0')}}" rel="stylesheet"/> -->
+  <link href="{{ asset('css/v_main.css?ver=1.0')}}" rel="stylesheet"/>
+  <link href="{{ asset('css/jquery-confirm.min.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css?family=Hind" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Noto+Sans&subset=devanagari" rel="stylesheet">
 

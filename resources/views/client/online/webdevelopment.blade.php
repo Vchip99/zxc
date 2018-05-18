@@ -314,9 +314,8 @@ box-shadow: 0 13px 40px 0 rgba(62,68,93,.3), 0 2px 4px 0 rgba(62,68,93,.06);
             <div class="col-md-12">
                 <div class="block">
                     <h2 class="title wow fadeInDown" data-wow-delay=".3s" data-wow-duration="500ms">Price </h2>
-                    <p class="wow fadeInDown" data-wow-delay=".5s" data-wow-duration="500ms"><li>We design and developed custom Web-site at Rs. 4999. In that we also provide domain, hosting and maintenance for a year at free of cost.</li></p>
+                    <p class="wow fadeInDown" data-wow-delay=".5s" data-wow-duration="500ms"><li>We design and developed custom Web-site and Android app at Rs. 4999. In that we also provide domain, hosting and maintenance for a year at free of cost.</li></p>
                     <a href="{{ url('getWebdevelopment')}}" data-toggle="modal" class="btn btn-default btn-contact wow fadeInDown" data-wow-delay=".7s" data-wow-duration="500ms">Buy Now (Rs. 4999)</a>
-                    <p class="wow fadeInDown" data-wow-delay=".5s" data-wow-duration="500ms"><li>We also design custom app for Android and iOS at Rs. 9999.</li></p>
                 </div>
             </div>
         </div>
