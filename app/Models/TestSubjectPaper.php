@@ -51,7 +51,7 @@ class TestSubjectPaper extends Model
         if($isUpdate && isset($paperId)){
             $paper = static::find($paperId);
             if(!is_object($paper)){
-                return Redirect::to('admin/managePaper');
+                return 'false';
             }
             if(1 == $isVerificationCode){
                 if($addVerificationCodeCount > 0){

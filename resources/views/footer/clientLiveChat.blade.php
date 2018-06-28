@@ -133,9 +133,7 @@
 
   $(document).ready(function () {
     showChatUsers();
-    if(screen.availWidth <= 550){
-      $('#chat_window_1 .top-bar').click();
-    }
+    $('#chat_window_1 .top-bar').click();
     setInterval(checkOnlineUsers, 180000);
   });
   // show chat users

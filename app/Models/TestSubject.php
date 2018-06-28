@@ -31,7 +31,7 @@ class TestSubject extends Model
         if( $isUpdate && isset($subjectId)){
             $testSubject = static::find($subjectId);
             if(!is_object($testSubject)){
-                return Redirect::to('admin/manageVkitCategory');
+                return 'false';
             }
         } else{
             $testSubject = new static;

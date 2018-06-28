@@ -115,6 +115,23 @@
             </ul>
           </li>
         @endif
+        @if($adminUser->hasRole('admin'))
+          <li class="treeview">
+            <a href="#" title="Question Bank">
+              <i class="fa fa-share"></i>
+              <span>Question Bank</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Manage Category"><a href="{{ url('admin/manageQuestionBankCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
+              <li title="Manage Sub Category"><a href="{{ url('admin/manageQuestionBankSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
+              <li title="Manage Question"><a href="{{ url('admin/manageQuestionBankQuestions')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
+              <li title="Upload Excel File"><a href="{{ url('admin/uploadQuestionBankQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
+            </ul>
+          </li>
+        @endif
         @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageLiveCourse'))
           <li class="treeview">
             <a href="#" title="Live Courses">
@@ -372,7 +389,7 @@
           </li>
           <li class="treeview">
             <a href="#" title="Payable Test">
-              <i class="fa fa-files-o"></i>
+              <i class="fa fa-credit-card-alt"></i>
               <span>Payable Test</span>
               <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>

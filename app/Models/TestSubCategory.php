@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use App\Models\TestSubject;
-use DB;
+use App\Models\TestCategory;
+use DB, File;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class TestSubCategory extends Model
@@ -30,7 +31,7 @@ class TestSubCategory extends Model
         if( $isUpdate && isset($subcatId)){
             $testSubcategory = static::find($subcatId);
             if(!is_object($testSubcategory)){
-                return Redirect::to('admin/manageSubCategory');
+                return 'false';
             }
         } else{
             $testSubcategory = new static;
@@ -43,7 +44,7 @@ class TestSubCategory extends Model
 
             $subCategoryFolderPath = $subCategoryImageFolder.str_replace(' ', '_', $name);
             if(!is_dir($subCategoryFolderPath)){
-                mkdir($subCategoryFolderPath, 0755);
+                File::makeDirectory($subCategoryFolderPath, $mode = 0777, true, true);
             }
             $subCategoryImagePath = $subCategoryFolderPath ."/". $subCategoryImage;
             if(file_exists($subCategoryImagePath)){

@@ -33,7 +33,7 @@ class AdvertisementPage extends Model
         if( $isUpdate && isset($pageId)){
             $advertisementPage = static::find($pageId);
             if(!is_object($advertisementPage)){
-            	return Redirect::to('admin/manageAdvertisementPage');
+            	return 'false';
             }
         } else{
             $advertisementPage = new static;

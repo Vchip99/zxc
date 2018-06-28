@@ -26,7 +26,7 @@ class AssignmentSubject extends Model
         if( $isUpdate && isset($subjectId)){
             $subject = static::find($subjectId);
             if(!is_object($subject)){
-            	return Redirect::to('manageAssignmentSubject');
+            	return 'false';
             }
         } else{
             $subject = new static;
@@ -46,15 +46,19 @@ class AssignmentSubject extends Model
         if($lecturer > 0){
             $query = static::join('assignment_topics','assignment_topics.assignment_subject_id', '=', 'assignment_subjects.id')->where('assignment_subjects.lecturer_id', $lecturer);
         } else {
-            $query = static::join('assignment_topics','assignment_topics.assignment_subject_id', '=', 'assignment_subjects.id')->where('assignment_subjects.lecturer_id', $loginUser->id);
+            if(User::Lecturer == $loginUser->user_type){
+                $query = static::join('assignment_topics','assignment_topics.assignment_subject_id', '=', 'assignment_subjects.id')->where('assignment_subjects.lecturer_id', $loginUser->id);
+            } else {
+                $query = static::join('assignment_topics','assignment_topics.assignment_subject_id', '=', 'assignment_subjects.id');
+            }
         }
         $query->where('assignment_subjects.college_id', $loginUser->college_id);
         if($collegeDept > 0){
             $query->where('assignment_subjects.college_dept_id', $collegeDept);
-        } else {
+        } else if($loginUser->college_dept_id > 0){
             $query->where('assignment_subjects.college_dept_id', $loginUser->college_dept_id);
         }
-        return    $query->where('assignment_subjects.year', $year)->select('assignment_subjects.id','assignment_subjects.*')->groupBy('assignment_subjects.id')->get();
+        return $query->where('assignment_subjects.year', $year)->select('assignment_subjects.id','assignment_subjects.*')->groupBy('assignment_subjects.id')->get();
     }
 
     protected static function getAssignmentSubjectsOfGivenAssignmentByLecturer(Request $request){

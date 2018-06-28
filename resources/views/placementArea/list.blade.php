@@ -36,7 +36,7 @@
         @if(count($placementAreas) > 0)
           @foreach($placementAreas as $index => $placementArea)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $placementAreas->firstItem()}}</th>
             <td>{{$placementArea->name}}</td>
             <td>
               <a href="{{url('admin/placementArea')}}/{{$placementArea->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$placementArea->name}}" />

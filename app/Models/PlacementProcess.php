@@ -47,7 +47,7 @@ class PlacementProcess extends Model
         if( $isUpdate && isset($placementProcessId)){
             $placementProcess = static::find($placementProcessId);
             if(!is_object($placementProcess)){
-            	return Redirect::to('admin/managePlacementProcess');
+            	return 'false';
             }
         } else{
             $placementProcess = new static;

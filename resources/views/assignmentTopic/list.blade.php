@@ -38,7 +38,7 @@
         @if(count($topics) > 0)
           @foreach($topics as $index => $topic)
           <tr>
-            <td>{{$index + 1}}</td>
+            <td>{{$index + $topics->firstItem()}}</td>
             <td>{{$topic->name}}</td>
             <td>{{$topic->subject->name}}</td>
             <td>

@@ -34,7 +34,7 @@ class WorkshopVideo extends Model
     	if( $isUpdate && !empty($videoId)){
     		$workshopVideo = static::find($videoId);
     		if(!is_object($workshopVideo)){
-    			return Redirect::to('admin/manageWorkshopVideos');
+    			return 'false';
     		}
     	} else {
     		$workshopVideo = new static;

@@ -35,7 +35,7 @@ class DocumentsDoc extends Model
         if( $isUpdate && isset($documentId)){
             $documentsDoc = DocumentsDoc::find($documentId);
             if(!is_object($documentsDoc)){
-                return Redirect::to('admin/manageDocumentsDoc');
+                return 'false';
             }
         } else{
             $documentsDoc = new DocumentsDoc;

@@ -42,7 +42,7 @@ class ClientOnlineCourse extends Model
     	if( $isUpdate && !empty($courseId)){
     		$course = static::find($courseId);
     		if(!is_object($course)){
-    			return Redirect::to('manageOnlineCourse');
+    			return 'false';
     		}
     	} else {
     		$course = new static;

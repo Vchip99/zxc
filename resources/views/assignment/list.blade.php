@@ -85,7 +85,7 @@
         @if(count($assignments) > 0)
           @foreach($assignments as $index => $assignment)
           <tr>
-            <td>{{$index + 1}}</td>
+            <td>{{$index + $assignments->firstItem()}}</td>
             <td>{!! mb_strimwidth($assignment->question, 0, 400, "...") !!}</td>
             <td>{!! basename($assignment->attached_link) !!}</td>
             <td>{{$assignment->subject->name}}</td>

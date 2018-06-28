@@ -26,7 +26,7 @@ class Designation extends Model
         if( $isUpdate && isset($designationId)){
             $designation = static::find($designationId);
             if(!is_object($designation)){
-            	return Redirect::to('admin/manageDesignation');
+            	return 'false';
             }
         } else{
             $designation = new static;

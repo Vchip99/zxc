@@ -40,7 +40,7 @@ class CompanyDetails extends Model
         if( $isUpdate && isset($companyDetailsId)){
             $companyDetails = static::find($companyDetailsId);
             if(!is_object($companyDetails)){
-            	return Redirect::to('admin/manageCompanyDetails');
+            	return 'false';
             }
         } else{
             $companyDetails = new static;

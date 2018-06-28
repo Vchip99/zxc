@@ -32,6 +32,7 @@
           <th>Category Name</th>
           <th>Sub Category Name</th>
           <th>Subject Name</th>
+          <th>Verification Code</th>
           <th>Edit Paper</th>
           <th>Delete Paper</th>
         </tr>
@@ -40,12 +41,36 @@
         @if(count($testPapers) > 0)
           @foreach($testPapers as $index => $testPaper)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $testPapers->firstItem()}}</th>
             <td>{{$testPaper->name}}</td>
             <td>{{$testPaper->category->name}}</td>
             <td>{{$testPaper->subcategory->name}}</td>
             <td>{{$testPaper->subject->name}}</td>
-
+            <td>
+              @if(!empty($testPaper->verification_code))
+                <a data-toggle="modal" data-target="#model_{{$testPaper->id}}">Yes</a>
+                <div class="modal fade" id="model_{{$testPaper->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Verification Code</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body" style="overflow-x: auto;">
+                        {{$testPaper->verification_code}}
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              @else
+                No
+              @endif
+            </td>
             <td>
               <a href="{{url('admin/paper')}}/{{$testPaper->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testPaper->name}}" />
                 </a>

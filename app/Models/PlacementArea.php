@@ -25,7 +25,7 @@ class PlacementArea extends Model
         if( $isUpdate && isset($areaId)){
             $placementArea = static::find($areaId);
             if(!is_object($placementArea)){
-            	return Redirect::to('admin/managePlacementArea');
+            	return 'false';
             }
         } else{
             $placementArea = new static;

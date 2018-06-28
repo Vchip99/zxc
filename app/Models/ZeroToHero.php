@@ -31,7 +31,7 @@ class ZeroToHero extends Model
         if( $isUpdate && isset($heroId)){
             $hero = static::find($heroId);
             if(!is_object($hero)){
-            	return Redirect::to('admin/manageZeroToHero');
+            	return 'false';
             }
         } else{
             $hero = new static;

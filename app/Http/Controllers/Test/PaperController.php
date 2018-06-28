@@ -63,8 +63,8 @@ class PaperController extends Controller
     protected function create(){
         $allSessions = [];
         $testCategories    = TestCategory::all();
-        $testSubCategories = new TestSubCategory;
-        $testSubjects = new TestSubject;
+        $testSubCategories = [];
+        $testSubjects = [];
         $paper = new TestSubjectPaper;
     	return view('paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
     }

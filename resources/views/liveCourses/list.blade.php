@@ -37,7 +37,7 @@
         @if(count($liveCourses) > 0)
         @foreach($liveCourses as $index => $liveCourse)
         <tr>
-          <th scope="row">{{$index + 1}}</th>
+          <th scope="row">{{$index + $liveCourses->firstItem()}}</th>
           <td>{{$liveCourse->name}}</td>
           <td>@if( 1 == $liveCourse->category_id) Technology @else Science @endif</td>
           <td>

@@ -26,7 +26,7 @@ class VkitCategory extends Model
         if( $isUpdate && isset($categoryId)){
             $vkitCategory = static::find($categoryId);
             if(!is_object($vkitCategory)){
-            	return Redirect::to('admin/manageVkitCategory');
+            	return 'false';
             }
         } else{
             $vkitCategory = new static;

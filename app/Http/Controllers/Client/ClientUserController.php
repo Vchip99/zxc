@@ -35,6 +35,7 @@ use App\Models\ClientUserPurchasedTestSubCategory;
 use App\Models\PayableClientSubCategory;
 use App\Models\RegisterClientOnlineCourses;
 use App\Models\RegisterClientOnlinePaper;
+use App\Models\ClientOnlineTestQuestion;
 use App\Libraries\InputSanitise;
 
 class ClientUserController extends BaseController
@@ -205,7 +206,23 @@ class ClientUserController extends BaseController
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
-        return view('clientuser.dashboard.profile');
+        $loginUser = Auth::guard('clientuser')->user();
+        $userScores = ClientScore::where('client_user_id', $loginUser->id)->get();
+        // dd($userScores);
+        $obtainedScore = 0;
+        $totalScore = 0;
+        if(is_object($userScores) && false == $userScores->isEmpty()){
+            foreach($userScores as $userScore){
+                $obtainedScore += $userScore->test_score;
+                $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByClientId($userScore->category_id,$userScore->subcat_id,$userScore->subject_id,$userScore->paper_id,$loginUser->client_id);
+                if(is_object($questions) && false == $questions->isEmpty()){
+                    foreach($questions as $question){
+                        $totalScore += $question->positive_marks;
+                    }
+                }
+            }
+        }
+        return view('clientuser.dashboard.profile', compact('loginUser', 'obtainedScore', 'totalScore'));
     }
 
     protected function updateProfile(Request $request){

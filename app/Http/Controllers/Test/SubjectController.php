@@ -54,7 +54,7 @@ class SubjectController extends Controller
 	 */
 	protected function create(){
 		$testCategories    = TestCategory::all();
-		$testSubCategories = new TestSubCategory;
+		$testSubCategories = [];
 		$subject = new TestSubject;
 
 		return view('subject.create', compact('testCategories','testSubCategories','subject'));

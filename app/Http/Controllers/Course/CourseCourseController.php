@@ -59,7 +59,7 @@ class CourseCourseController extends Controller
      */
     protected function create(){
     	$courseCategories   = CourseCategory::all();
-		$courseSubCategories = new CourseSubCategory;
+		$courseSubCategories = [];
 		$course= new CourseCourse;
 
 		return view('courseCourse.create', compact('courseCategories','courseSubCategories','course'));

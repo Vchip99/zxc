@@ -39,7 +39,7 @@ class VkitProject extends Model
         if( $isUpdate && isset($projectId)){
             $vkitProject = static::find($projectId);
             if(!is_object($vkitProject)){
-                return Redirect::to('admin/manageVkitProject');
+                return 'false';
             }
         } else{
             $vkitProject = new static;

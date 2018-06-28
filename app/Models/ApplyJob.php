@@ -29,7 +29,7 @@ class ApplyJob extends Model
         if( $isUpdate && isset($applyJobId)){
             $applyJob = static::find($applyJobId);
             if(!is_object($applyJob)){
-            	return Redirect::to('admin/manageApplyJob');
+            	return 'false';
             }
         } else{
             $applyJob = new static;

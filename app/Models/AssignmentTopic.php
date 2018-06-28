@@ -27,7 +27,7 @@ class AssignmentTopic extends Model
         if( $isUpdate && isset($topicId)){
             $topic = static::find($topicId);
             if(!is_object($topic)){
-            	return Redirect::to('manageAssignmentTopic');
+            	return 'false';
             }
         } else {
             $topic = new static;

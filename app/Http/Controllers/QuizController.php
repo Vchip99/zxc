@@ -50,8 +50,7 @@ class QuizController extends Controller
 
         if(!empty($categoryId) && !empty($subcategoryId) && !empty($subjectId) && !empty($paperId)){
             $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
-
-            foreach($questions as $question){
+            foreach($questions->shuffle() as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
 

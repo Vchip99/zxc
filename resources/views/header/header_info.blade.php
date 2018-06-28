@@ -34,7 +34,7 @@
             </div>
           </div>
           @if(!Auth::user())
-          <div class="col-md-5  animated bounceInRight" data-animate-effect="fadeInRight">
+          <div class="col-md-5 animated" data-animate-effect="fadeInRight">
             <div class="form-wrap">
               <div class="tab">
                 <div class="tab-content">
@@ -75,7 +75,6 @@
                             </label>
                           </div>
                           <button type="submit" value="login" name="submit" class="btn btn-info btn-block" data-toggle="tooltip" title="Login">Login</button>
-                          <!-- </br> -->
                         </form>
                         <br/>
                         <div class="form-group">

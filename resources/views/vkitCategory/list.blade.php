@@ -36,7 +36,7 @@
         @if(count($vkitCategories) > 0)
           @foreach($vkitCategories as $index => $vkitCategory)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $vkitCategories->firstItem()}}</th>
             <td>{{$vkitCategory->name}}</td>
             <td>
               <a href="{{url('admin/vkitCategory')}}/{{$vkitCategory->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$vkitCategory->name}}" />

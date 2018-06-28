@@ -30,7 +30,7 @@
             <h1 class="cursive-font animated bounceInLeft">{!! $subdomain->home_content_value !!}</h1>
           </div>
           @if(!Auth::guard('clientuser')->user())
-          <div class="col-md-5  animated bounceInRight" data-animate-effect="fadeInRight">
+          <div class="col-md-5  animated " data-animate-effect="fadeInRight">
             <div class="form-wrap">
               <div class="tab">
                 <div class="tab-content">

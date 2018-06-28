@@ -48,7 +48,7 @@ class ClientOnlineTestSubjectPaper extends Model
         if( $isUpdate && isset($paperId)){
             $paper = static::find($paperId);
             if(!is_object($paper)){
-                return Redirect::to('manageOnlineTestSubjectPaper');
+                return 'false';
             }
         } else{
             $paper = new static;

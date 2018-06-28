@@ -22,19 +22,26 @@
   <div class="form-group row @if ($errors->has('category')) has-error @endif">
     <label class="col-sm-2 col-form-label">Category Name:</label>
     <div class="col-sm-3">
-      <select class="form-control" name="category" id="category" required title="Category">
-          <option value="">Select Category ...</option>
+      @if(isset($testSubcategory->id))
+        @if(count($testCategories) > 0)
+          @foreach($testCategories as $testCategory)
+            @if($testSubcategory->test_category_id == $testCategory->id)
+              <input type="text" class="form-control" name="category_text" id="category" value="{{$testCategory->name}}" readonly>
+              <input type="hidden" name="category" value="{{$testCategory->id}}">
+            @endif
+          @endforeach
+        @endif
+      @else
+        <select class="form-control" name="category" id="category" required title="Category">
+          <option value="">Select Category</option>
           @if(count($testCategories) > 0)
             @foreach($testCategories as $testCategory)
-              @if( $testSubcategory->test_category_id == $testCategory->id)
-                <option value="{{$testCategory->id}}" selected="true">{{$testCategory->name}}</option>
-              @else
-                <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
-              @endif
+              <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
             @endforeach
           @endif
         </select>
         @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
+      @endif
     </div>
   </div>
   <div class="form-group row @if ($errors->has('name')) has-error @endif">

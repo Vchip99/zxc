@@ -32,7 +32,7 @@ class AssignmentQuestion extends Model
         if( $isUpdate && isset($assignmentId)){
             $assignment = static::find($assignmentId);
             if(!is_object($assignment)){
-            	return Redirect::to('manageAssignment');
+            	return 'false';
             }
         } else {
             $assignment = new static;
@@ -96,8 +96,8 @@ class AssignmentQuestion extends Model
         }
         if(!empty($request->year)){
             $resultQuery->where('year', $request->year);
-        }else{
-            $resultQuery->where('year', $loginUser->id);
+        }else if(User::Student == $loginUser->user_type){
+            $resultQuery->where('year', $loginUser->year);
         }
 
         if(User::Lecturer == $loginUser->user_type){
@@ -116,7 +116,11 @@ class AssignmentQuestion extends Model
     }
 
     protected static function getAssignmentByTopic($topic){
-        return static::where('assignment_topic_id',$topic)->where('year', Auth::user()->id)->first();
+        if(User::Student == Auth::user()->user_type){
+            return static::where('assignment_topic_id',$topic)->where('year', Auth::user()->year)->first();
+        } else {
+            return static::where('assignment_topic_id',$topic)->first();
+        }
     }
 
     protected static function checkAssignmentIsExist(Request $request){

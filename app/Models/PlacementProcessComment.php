@@ -29,7 +29,7 @@ class PlacementProcessComment extends Model
     	if(!empty($commentId) && $commentId > 0 ){
     		$comment = static::find($commentId);
     		if(!is_object($comment)){
-    			return Redirect::to('placements');
+    			return 'false';
     		}
     	} else {
     		$comment = new static;

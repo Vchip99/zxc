@@ -24,25 +24,32 @@
   <div class="form-group row @if ($errors->has('category')) has-error @endif">
     <label class="col-sm-2 col-form-label">Category Name:</label>
     <div class="col-sm-3">
+    @if(isset($courseSubcategory->id))
+      @if(count($courseCategories) > 0)
+        @foreach($courseCategories as $courseCategory)
+          @if( $courseSubcategory->course_category_id == $courseCategory->id)
+            <input type="text" class="form-control" name="category_text" id="category" value="{{$courseCategory->name}}" readonly>
+            <input type="hidden" name="category" value="{{$courseCategory->id}}">
+          @endif
+        @endforeach
+      @endif
+    @else
       <select class="form-control" name="category" id="category" title="Category" required="true">
           <option value="">Select Category ...</option>
           @if(count($courseCategories) > 0)
             @foreach($courseCategories as $courseCategory)
-              @if( $courseSubcategory->course_category_id == $courseCategory->id)
-                <option value="{{$courseCategory->id}}" selected="true">{{$courseCategory->name}}</option>
-              @else
-                <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
-              @endif
+              <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
             @endforeach
           @endif
         </select>
-        @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
+    @endif
+      @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
     </div>
   </div>
   <div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
     <label for="name" class="col-sm-2 col-form-label">Sub Category Name:</label>
     <div class="col-sm-3">
-      @if(isset($courseSubcategory))
+      @if(isset($courseSubcategory->id))
         <input type="text" class="form-control" name="subcategory" id="subcategory" value="{{$courseSubcategory->name}}" required="true">
       @else
         <input type="text" class="form-control" name="subcategory" id="subcategory" value="" required="true">

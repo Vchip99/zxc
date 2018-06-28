@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-<div class="row">
+<div class="row"oncontextmenu="return false;" >
 	@if(count($sections) > 0)
 		@foreach($sections as $index => $section)
 			@if( isset($questions[$section->id]) && count($questions[$section->id]) > 0)

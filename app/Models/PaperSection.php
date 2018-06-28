@@ -25,7 +25,7 @@ class PaperSection extends Model
         if( $isUpdate && isset($sectionId)){
             $section = static::find($sectionId);
             if(!is_object($section)){
-            	return Redirect::to('admin/manageSection');
+            	return 'false';
             }
         } else{
             $section = new static;

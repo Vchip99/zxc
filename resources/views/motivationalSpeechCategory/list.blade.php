@@ -36,7 +36,7 @@
         @if(count($motivationalSpeechCategories) > 0)
           @foreach($motivationalSpeechCategories as $index => $motivationalSpeechCategory)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $motivationalSpeechCategories->firstItem()}}</th>
             <td>{{$motivationalSpeechCategory->name}}</td>
             <td>
               <a href="{{url('admin/motivationalSpeechCategory')}}/{{$motivationalSpeechCategory->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$motivationalSpeechCategory->name}}" />

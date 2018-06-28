@@ -37,7 +37,7 @@
         @if(count($areas) > 0)
           @foreach($areas as $index => $area)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $areas->firstItem()}}</th>
             <td>{{$area->name}}</td>
             <td>{{$area->designation->name}}</td>
             <td>

@@ -54,7 +54,7 @@ class Admin extends Authenticatable
                 $subadmin->password = bcrypt($password);
             }
             if(!is_object($subadmin)){
-                return Redirect::to('manageSubAdmin');
+                return 'false';
             }
         } else {
             $subadmin = new Admin;

@@ -32,7 +32,7 @@ class ClientOnlineTestSubject extends Model
         if( $isUpdate && isset($subjectId)){
             $testSubject = static::find($subjectId);
             if(!is_object($testSubject)){
-                return Redirect::to('manageOnlineTestSubject');
+                return 'false';
             }
         } else{
             $testSubject = new static;

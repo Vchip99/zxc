@@ -36,7 +36,7 @@
         @if(count($documentsCategories) > 0)
           @foreach($documentsCategories as $index => $documentsCategory)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $documentsCategories->firstItem()}}</th>
             <td>{{$documentsCategory->name}}</td>
             <td>
               <a href="{{url('admin/documentCategory')}}/{{$documentsCategory->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$documentsCategory->name}}" />

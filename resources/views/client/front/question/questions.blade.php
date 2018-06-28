@@ -29,7 +29,7 @@
 	</style>
 @stop
 @section('content')
-	<div class="content">
+	<div class="content" oncontextmenu="return false;">
      	<div class="container">
 			<div class="row">
 				<form class="form-horizontal" role="form" id='quiz_form' method="post" action="{{ url('quiz-result') }}">

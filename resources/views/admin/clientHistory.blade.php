@@ -227,7 +227,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = '';
-        eleIndex.setAttribute('colspan', '3');
+        eleIndex.setAttribute('colspan', '4');
         eleTr.appendChild(eleIndex);
 
         var elePlan = document.createElement('td');
@@ -248,7 +248,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = 'No result!';
-        eleIndex.setAttribute('colspan', '6');
+        eleIndex.setAttribute('colspan', '7');
         eleTr.appendChild(eleIndex);
         body.appendChild(eleTr);
       }

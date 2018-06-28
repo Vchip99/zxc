@@ -36,7 +36,7 @@
         @if(count($advertisementPages) > 0)
           @foreach($advertisementPages as $index => $advertisementPage)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $advertisementPages->firstItem()}}</th>
             <td>{{$advertisementPage->name}}</td>
             <td>
               <a href="{{url('admin/advertisementPage')}}/{{$advertisementPage->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$advertisementPage->name}}" />

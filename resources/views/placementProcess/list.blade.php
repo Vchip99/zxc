@@ -37,7 +37,7 @@
         @if(count($placementProcesses)>0)
           @foreach($placementProcesses as $index => $placementProcess)
           <tr>
-            <td scope="row">{{$index + 1}}</td>
+            <td scope="row">{{$index + $placementProcesses->firstItem()}}</td>
             <td>{{$placementProcess->area->name}}</td>
             <td>{{$placementProcess->company->name}}</td>
             <td>

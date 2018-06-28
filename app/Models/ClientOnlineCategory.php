@@ -28,7 +28,7 @@ class ClientOnlineCategory extends Model
         if( $isUpdate && isset($categoryId)){
             $category = static::find($categoryId);
             if(!is_object($category)){
-            	return Redirect::to('manageOnlineCategory');
+            	return 'false';
             }
         } else{
             $category = new static;

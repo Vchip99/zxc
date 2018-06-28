@@ -37,7 +37,7 @@
         @if(count($applyJobs)>0)
           @foreach($applyJobs as $index => $applyJob)
           <tr>
-            <td scope="row">{{$index + 1}}</td>
+            <td scope="row">{{$index + $applyJobs->firstItem()}}</td>
             <td>{{$applyJob->company}}</td>
             <td>{!! mb_strimwidth( $applyJob->job_description , 0, 400, '...') !!}</td>
             <td>

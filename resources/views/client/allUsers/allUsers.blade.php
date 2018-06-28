@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> Users Info </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> All Users </li>
+      <li><i class="fa fa-group"></i> All Users </li>
       <li class="active"> Users Info </li>
     </ol>
   </section>

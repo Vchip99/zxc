@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Manage Paper </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Online Test </li>
+      <li><i class="fa fa-files-o"></i> Online Test </li>
       <li class="active"> Manage Paper </li>
     </ol>
   </section>
@@ -25,54 +25,65 @@
   <div class="form-group row @if ($errors->has('category')) has-error @endif">
     <label class="col-sm-2 col-form-label">Category Name:</label>
     <div class="col-sm-3">
+    @if(isset($paper->id))
+      @if(count($testCategories) > 0)
+        @foreach($testCategories as $testCategory)
+          @if($paper->category_id == $testCategory->id)
+            <input type="text" class="form-control" name="category_text" value="{{$testCategory->name}}" readonly>
+            <input type="hidden" name="category" id="category" value="{{$testCategory->id}}">
+          @endif
+        @endforeach
+      @endif
+    @else
       <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
           <option value="">Select Category</option>
-          @if(count($testCategories) > 0))
+          @if(count($testCategories) > 0)
             @foreach($testCategories as $testCategory)
-              @if( isset($paper->id) && $paper->category_id == $testCategory->id)
-                <option value="{{$testCategory->id}}" selected="true">{{$testCategory->name}}</option>
-              @else
-                <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
-              @endif
+              <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
             @endforeach
           @endif
       </select>
+    @endif
       @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
     </div>
   </div>
   <div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
     <label class="col-sm-2 col-form-label">Sub Category Name:</label>
     <div class="col-sm-3">
-      <select id="subcategory" class="form-control" name="subcategory" onChange="selectSubject(this);" required title="Sub Category">
-        <option value="">Select Sub Category</option>
+      @if(isset($paper->id))
         @if(count($testSubCategories) > 0 && isset($paper->id))
           @foreach($testSubCategories as $testSubCategory)
             @if($paper->sub_category_id == $testSubCategory->id)
-                <option value="{{$testSubCategory->id}}" selected="true">{{$testSubCategory->name}}</option>
-              @else
-                <option value="{{$testSubCategory->id}}">{{$testSubCategory->name}}</option>
+                <input type="text" class="form-control" name="subcategory_text" value="{{$testSubCategory->name}}" readonly>
+                <input type="hidden" name="subcategory" id="subcategory" value="{{$testSubCategory->id}}">
             @endif
           @endforeach
         @endif
-      </select>
+      @else
+        <select id="subcategory" class="form-control" name="subcategory" onChange="selectSubject(this);" required title="Sub Category">
+          <option value="">Select Sub Category</option>
+        </select>
+      @endif
       @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
     </div>
   </div>
   <div class="form-group row @if ($errors->has('subject')) has-error @endif">
     <label class="col-sm-2 col-form-label">Subject Name:</label>
     <div class="col-sm-3">
-      <select id="subject" class="form-control" name="subject" required title="Subject">
-        <option value="">Select Subject</option>
-          @if(count($testSubjects) > 0 && isset($paper->id))
+      @if(isset($paper->id))
+        @if(count($testSubjects) > 0)
           @foreach($testSubjects as $testSubject)
             @if($paper->subject_id == $testSubject->id)
-                <option value="{{$testSubject->id}}" selected="true">{{$testSubject->name}}</option>
-              @else
-                <option value="{{$testSubject->id}}">{{$testSubject->name}}</option>
+              <input type="text" class="form-control" name="subject_text" value="{{$testSubject->name}}" readonly>
+              <input type="hidden" name="subject" id="subject" value="{{$testSubject->id}}">
             @endif
           @endforeach
         @endif
-      </select>
+      @else
+        <select id="subject" class="form-control" name="subject" required title="Subject">
+          <option value="">Select Subject</option>
+        </select>
+      @endif
       @if($errors->has('subject')) <p class="help-block">{{ $errors->first('subject') }}</p> @endif
     </div>
   </div>

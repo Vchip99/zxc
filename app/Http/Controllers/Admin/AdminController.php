@@ -122,9 +122,9 @@ class AdminController extends Controller
         $result = [];
         $total = 0;
         if($request->client_id > 0){
-            $clientPlans = ClientPlan::where('client_id', $request->client_id)->get();
+            $clientPlans = ClientPlan::where('client_id', $request->client_id)->orderBy('id', 'desc')->get();
         } else {
-            $clientPlans = ClientPlan::all();
+            $clientPlans = ClientPlan::orderBy('id', 'desc')->get();
         }
         if(is_object($clientPlans) && false == $clientPlans->isEmpty()){
             foreach($clientPlans as $clientPlan){

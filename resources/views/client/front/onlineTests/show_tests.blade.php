@@ -167,20 +167,12 @@
 					        <div class="panel-heading" role="tab" id="headingOne">
 					          <h4 class="panel-title" title="{{ $testSubject->name }}">
 					            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#subject{{$testSubject->id}}" aria-expanded="true" aria-controls="collapseOne" class="">
-					              	@if(0 == $index)
-					              		<i class="more-less glyphicon glyphicon-minus"></i>
-					              	@else
-							        	<i class="more-less glyphicon glyphicon-plus"></i>
-							        @endif
-					              {{ $testSubject->name }}
+				              		<i class="more-less glyphicon glyphicon-minus"></i>
+					              	{{ $testSubject->name }}
 					            </a>
 					          </h4>
 					        </div>
-					        @if(0 == $index)
-					        	<div id="subject{{$testSubject->id}}" class="panel-collapse panel-lg collapse in" role="tabpanel" aria-labelledby="headingOne">
-					        @else
-					        	<div id="subject{{$testSubject->id}}" class="panel-collapse panel-lg collapse " role="tabpanel" aria-labelledby="headingOne">
-					        @endif
+				        	<div id="subject{{$testSubject->id}}" class="panel-collapse panel-lg collapse in" role="tabpanel" aria-labelledby="headingOne">
 					          	<div class="panel-body">
 					            <table class="table data-lg">
 					              	<thead>
@@ -511,13 +503,13 @@
 
 			        		var h4Ele = document.createElement('h4');
 			        		h4Ele.className = 'panel-title';
-			        		h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#subject'+ subId +'" aria-expanded="true" aria-controls="collapseOne" class=""><i class="more-less glyphicon glyphicon-plus"></i>'+ obj.name + '</a>';
+			        		h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#subject'+ subId +'" aria-expanded="true" aria-controls="collapseOne" class=""><i class="more-less glyphicon glyphicon-minus"></i>'+ obj.name + '</a>';
 			        		firstMainDiv.appendChild(h4Ele);
 			        		defaultPanelDiv.appendChild(firstMainDiv);
 
 			        		var secondMainDiv = document.createElement('div');
 			        		secondMainDiv.id = 'subject'+ subId;
-			        		secondMainDiv.className = "panel-collapse collapse panel-lg";
+			        		secondMainDiv.className = "panel-collapse panel-lg collapse in";
 			        		secondMainDiv.setAttribute('role','tabpanel');
 			        		secondMainDiv.setAttribute('aria-labelledby','headingOne');
 
@@ -761,7 +753,7 @@
 
 	        		var h4Ele = document.createElement('h4');
 	        		h4Ele.className = 'panel-title';
-	        		h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
+	        		h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-minus"></i>No subjects are available.</a>';
 	        		firstMainDiv.appendChild(h4Ele);
 	        		defaultPanelDiv.appendChild(firstMainDiv);
 					mainPanelDiv.appendChild(defaultPanelDiv);
@@ -809,7 +801,7 @@
 
     		var h4Ele = document.createElement('h4');
     		h4Ele.className = 'panel-title';
-    		h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
+    		h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-minus"></i>No subjects are available.</a>';
     		firstMainDiv.appendChild(h4Ele);
     		defaultPanelDiv.appendChild(firstMainDiv);
     		mainPanelDiv.appendChild(defaultPanelDiv);

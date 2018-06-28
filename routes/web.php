@@ -147,6 +147,15 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteCategory', 'Test\CategoryController@delete');
 	Route::post('admin/isTestCategoryExist', 'Test\CategoryController@isTestCategoryExist');
 
+	// admin question bank category
+	Route::get('admin/manageQuestionBankCategory', 'QuestionBank\QuestionBankCategoryController@show');
+	Route::get('admin/createQuestionBankCategory', 'QuestionBank\QuestionBankCategoryController@create');
+	Route::post('admin/createQuestionBankCategory', 'QuestionBank\QuestionBankCategoryController@store');
+	Route::get('admin/questionBankCategory/{id}/edit', 'QuestionBank\QuestionBankCategoryController@edit');
+	Route::put('admin/updateQuestionBankCategory', 'QuestionBank\QuestionBankCategoryController@update');
+	Route::delete('admin/deleteQuestionBankCategory', 'QuestionBank\QuestionBankCategoryController@delete');
+	Route::post('admin/isQuestionBankCategoryExist', 'QuestionBank\QuestionBankCategoryController@isQuestionBankCategoryExist');
+
 	// admin test All
 	Route::get('admin/manageTestAll', 'Test\TestAllController@showAll');
 	Route::post('admin/createAllTestCategory', 'Test\TestAllController@storeCategory');
@@ -163,6 +172,18 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteSubCategory', 'Test\SubCategoryController@delete');
 	Route::post('admin/getSubCategories', [ 'as' => 'admin/getSubCategories', 'uses' => 'Test\SubCategoryController@getSubCategories' ]);
 	Route::post('admin/isTestSubCategoryExist', 'Test\SubCategoryController@isTestSubCategoryExist');
+
+	// admin question bank sub category
+	Route::get('admin/manageQuestionBankSubCategory', 'QuestionBank\QuestionBankSubCategoryController@show');
+	Route::get('admin/createQuestionBankSubCategory', 'QuestionBank\QuestionBankSubCategoryController@create');
+	Route::post('admin/createQuestionBankSubCategory', 'QuestionBank\QuestionBankSubCategoryController@store');
+	Route::get('admin/questionBankSubCategory/{id}/edit', 'QuestionBank\QuestionBankSubCategoryController@edit');
+	Route::put('admin/updateQuestionBankSubCategory', 'QuestionBank\QuestionBankSubCategoryController@update');
+	Route::delete('admin/deleteQuestionBankSubCategory', 'QuestionBank\QuestionBankSubCategoryController@delete');
+	Route::post('admin/getQuestionBankSubCategories', [ 'as' => 'admin/QuestionBankgetSubCategories', 'uses' => 'QuestionBank\QuestionBankSubCategoryController@getSubCategories' ]);
+	Route::post('admin/isQuestionBankSubCategoryExist', 'QuestionBank\QuestionBankSubCategoryController@isQuestionBankSubCategoryExist');
+	Route::post('admin/getQuestionBankSubCategories', 'QuestionBank\QuestionBankSubCategoryController@getQuestionBankSubCategories');
+
 
 	// admin payable test sub category
 	Route::get('admin/managePayableSubCategory', 'PayableTest\PayableSubCategoryController@show');
@@ -232,6 +253,20 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/associateSession', 'Test\QuestionController@associateSession');
 	Route::post('admin/updateQuestionSession', 'Test\QuestionController@updateQuestionSession');
 	Route::post('admin/uploadTestImages', 'Test\QuestionController@uploadTestImages');
+
+		// admin question bank questions.
+	Route::get('admin/manageQuestionBankQuestions', 'QuestionBank\QuestionBankQuestionController@index');
+	Route::post('admin/showQuestionBankQuestions', 'QuestionBank\QuestionBankQuestionController@show');
+	Route::get('admin/createQuestionBankQuestion', 'QuestionBank\QuestionBankQuestionController@create');
+	Route::post('admin/createQuestionBankQuestion', 'QuestionBank\QuestionBankQuestionController@store');
+	Route::get('admin/questionBankQuestion/{id}/edit', 'QuestionBank\QuestionBankQuestionController@edit');
+	Route::put('admin/updateQuestionBankQuestion', 'QuestionBank\QuestionBankQuestionController@update');
+	Route::delete('admin/deleteQuestionBankQuestion', 'QuestionBank\QuestionBankQuestionController@delete');
+	Route::post('admin/getCurrentQuestionBankQuestionCount', [ 'as' => 'admin/getCurrentQuestionBankQuestionCount','uses' => 'QuestionBank\QuestionBankQuestionController@getCurrentQuestionBankQuestionCount' ]);
+	Route::post('admin/getNextQuestionBankQuestionCount', [ 'as' => 'admin/getNextQuestionBankQuestionCount','uses' => 'QuestionBank\QuestionBankQuestionController@getNextQuestionBankQuestionCount' ]);
+	Route::get('admin/uploadQuestionBankQuestions', 'QuestionBank\QuestionBankQuestionController@uploadQuestions');
+	Route::post('admin/uploadQuestionBankQuestions', 'QuestionBank\QuestionBankQuestionController@importQuestions');
+	Route::post('admin/uploadQuestionBankImages', 'QuestionBank\QuestionBankQuestionController@uploadQuestionBankImages');
 
 	// admin payable question
 	Route::get('admin/managePayableQuestions', 'PayableTest\PayableQuestionController@index');

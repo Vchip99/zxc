@@ -31,6 +31,7 @@ use App\Models\AssignmentSubject;
 use App\Models\AssignmentTopic;
 use App\Models\DiscussionCategory;
 use App\Models\ChatMessage;
+use App\Models\Question;
 use Excel;
 use Auth,Hash,DB, Redirect,Session,Validator,Input;
 use App\Libraries\InputSanitise;
@@ -126,8 +127,21 @@ class AccountController extends Controller
         if($loginUser->college_id > 0){
             $collegeDepts = CollegeDept::where('college_id', $loginUser->college_id)->get();
         }
-
-        return view('dashboard.profile', compact('users', 'colleges', 'collegeDepts'));
+        $obtainedScore = 0;
+        $totalScore = 0;
+        $userScores = Score::where('user_id',  $loginUser->id)->get();
+        if(is_object($userScores) && false == $userScores->isEmpty()){
+            foreach($userScores as $userScore){
+                $obtainedScore += $userScore->test_score;
+                $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($userScore->category_id, $userScore->subcat_id, $userScore->subject_id, $userScore->paper_id);
+                if(is_object($questions) && false == $questions->isEmpty()){
+                    foreach($questions as $question){
+                        $totalScore += $question->positive_marks;
+                    }
+                }
+            }
+        }
+        return view('dashboard.profile', compact('users', 'colleges', 'collegeDepts', 'obtainedScore', 'totalScore', 'loginUser'));
     }
 
     protected function myCourses(){

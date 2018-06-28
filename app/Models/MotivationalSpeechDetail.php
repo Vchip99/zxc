@@ -38,7 +38,7 @@ class MotivationalSpeechDetail extends Model
     	if( $isUpdate && !empty($motivationalSpeechId)){
     		$motivationalSpeechDetails = static::find($motivationalSpeechId);
     		if(!is_object($motivationalSpeechDetails)){
-    			return Redirect::to('admin/manageMotivationalSpeechDetails');
+    			return 'false';
     		}
     	} else {
     		$motivationalSpeechDetails = new static;

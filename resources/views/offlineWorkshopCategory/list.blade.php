@@ -36,7 +36,7 @@
         @if(count($workshopCategories) > 0)
           @foreach($workshopCategories as $index => $workshopCategory)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $workshopCategories->firstItem()}}</th>
             <td>{{$workshopCategory->name}}</td>
             <td>
               <a href="{{url('admin/offlineWorkshopCategory')}}/{{$workshopCategory->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$workshopCategory->name}}" />

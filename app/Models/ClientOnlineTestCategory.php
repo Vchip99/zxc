@@ -28,7 +28,7 @@ class ClientOnlineTestCategory extends Model
         if( $isUpdate && isset($categoryId)){
             $category = static::find($categoryId);
             if(!is_object($category)){
-            	return Redirect::to('manageOnlineTestCategory');
+            	return 'false';
             }
         } else{
             $category = new static;

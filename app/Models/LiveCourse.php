@@ -39,7 +39,7 @@ class LiveCourse extends Model
     	if( $isUpdate && isset($courseId)){
     		$course = static::find($courseId);
     		if(!is_object($course)){
-    			return Redirect::to('admin/manageLiveCourse');
+    			return 'false';
     		}
     	} else {
     		$course = new static;

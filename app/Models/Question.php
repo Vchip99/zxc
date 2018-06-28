@@ -67,7 +67,7 @@ class Question extends Model
         if( $isUpdate && isset($questionId)){
             $testQuestion = Question::find($questionId);
             if(!is_object($testQuestion)){
-                return Redirect::to('admin/manageQuestions');
+                return 'false';
             }
         } else{
             $testQuestion = new static;
@@ -102,14 +102,6 @@ class Question extends Model
         $testQuestion->common_data = $commonData;
         $testQuestion->save();
         return $testQuestion;
-    }
-
-    /**
-     *  return questions by categoryId by sub categoryId
-     */
-    protected static function getQuestionsByCategoryIdBySubcatId($categoryId, $subcatId){
-
-    	return DB::table('questions')->select('id')->where('category_id', 1)->where('subcat_id', 0)->get();
     }
 
     /**

@@ -71,7 +71,7 @@ class ClientOnlineTestQuestion extends Model
         if( $isUpdate && isset($questionId)){
             $testQuestion = static::find($questionId);
             if(!is_object($testQuestion)){
-                return Redirect::to('manageOnlineTestQuestion');
+                return 'false';
             }
         } else{
             $testQuestion = new static;

@@ -29,7 +29,7 @@ class PlacementCompany extends Model
         if( $isUpdate && isset($companyId)){
             $placementCompany = static::find($companyId);
             if(!is_object($placementCompany)){
-            	return Redirect::to('admin/managePlacementCompany');
+            	return 'false';
             }
         } else{
             $placementCompany = new static;

@@ -66,25 +66,25 @@
                               <fieldset>
                                 <div class="form-group row">
                                   <label>Name:</label>
-                                  <input class="form-control" placeholder="name" name="name" type="text" value="{{Auth::user()->name}}">
+                                  <input class="form-control" placeholder="name" name="name" type="text" value="{{$loginUser->name}}">
                                 </div>
                                 <div class="form-group">
                                   <label>Email:</label>
-                                  <input class="form-control" placeholder="yourmail@example.com" name="email" type="text" value="{{Auth::user()->email}}">
+                                  <input class="form-control" placeholder="yourmail@example.com" name="email" type="text" value="{{$loginUser->email}}">
                                 </div>
                                 <div class="form-group">
                                   <label>Phone:</label>
-                                  <input class="form-control" placeholder="Mobile No." name="phone" type="text" value="{{Auth::user()->phone}}">
+                                  <input class="form-control" placeholder="Mobile No." name="phone" type="text" value="{{$loginUser->phone}}">
                                 </div>
                                 <div class="form-group @if ($errors->has('user_type')) has-error @endif">
                                   <label>Designation:</label>
                                     <select class="form-control slt mrgn_20_top" id="user" name="user_type" onChange="toggleOptions(this);" required="true">
                                       <option value="0">Select User</option>
-                                      <option value="2" @if(2 == Auth::user()->user_type) selected @endif >Student</option>
-                                      <option value="3" @if(3 == Auth::user()->user_type) selected @endif >Lecturer</option>
-                                      <option value="4" @if(4 == Auth::user()->user_type) selected @endif >HOD</option>
-                                      <option value="5" @if(5 == Auth::user()->user_type) selected @endif >Principal / Director</option>
-                                      <option value="6" @if(6 == Auth::user()->user_type) selected @endif >TNP officer</option>
+                                      <option value="2" @if(2 == $loginUser->user_type) selected @endif >Student</option>
+                                      <option value="3" @if(3 == $loginUser->user_type) selected @endif >Lecturer</option>
+                                      <option value="4" @if(4 == $loginUser->user_type) selected @endif >HOD</option>
+                                      <option value="5" @if(5 == $loginUser->user_type) selected @endif >Principal / Director</option>
+                                      <option value="6" @if(6 == $loginUser->user_type) selected @endif >TNP officer</option>
                                     </select>
                                     <p class="help-block hide" id="user_error" style="color: red;">Please select user.</p>
                                 </div>
@@ -92,41 +92,41 @@
                                   <label>College:</label>
                                     <select class="form-control  slt mrgn_20_top" id="clg" name="college" onChange="getDepartment(this);">
                                       <option value="0">Select College Name</option>
-                                      <option value="other" id="other" @if('other' == Auth::user()->college_id) selected @endif >Other</option>
+                                      <option value="other" id="other" @if('other' == $loginUser->college_id) selected @endif >Other</option>
                                       @if(count($colleges) > 0)
                                         @foreach($colleges as $college)
-                                          <option value="{{$college->id}}" @if($college->id == Auth::user()->college_id) selected @endif >{{$college->name}}</option>
+                                          <option value="{{$college->id}}" @if($college->id == $loginUser->college_id) selected @endif >{{$college->name}}</option>
                                         @endforeach
                                       @endif
                                     </select>
                                     <p class="help-block hide" id="college_error" style="color: red;">Please select college.</p>
                                 </div>
-                                <div class="form-group @if ($errors->has('department')) has-error @endif @if(5 == Auth::user()->user_type || 6 == Auth::user()->user_type) hide @endif" id="deptDiv" >
+                                <div class="form-group @if ($errors->has('department')) has-error @endif @if(5 == $loginUser->user_type || 6 == $loginUser->user_type) hide @endif" id="deptDiv" >
                                   <label>Department:</label>
                                   <select class="form-control  slt mrgn_20_top" name="department" id="dept" >
                                     <option value="0">Select Department</option>
                                     @if(count($collegeDepts) > 0)
                                       @foreach($collegeDepts as $collegeDept)
-                                        <option value="{{$collegeDept->id}}" @if($collegeDept->id == Auth::user()->college_dept_id) selected @endif >{{$collegeDept->name}}</option>
+                                        <option value="{{$collegeDept->id}}" @if($collegeDept->id == $loginUser->college_dept_id) selected @endif >{{$collegeDept->name}}</option>
                                       @endforeach
                                     @endif
                                   </select>
                                   <p class="help-block hide" id="department_error" style="color: red;">Please select department.</p>
                                 </div>
-                                  <div class="form-group @if ($errors->has('year')) has-error @endif @if(2 != Auth::user()->user_type) hide @endif" id="year" >
+                                  <div class="form-group @if ($errors->has('year')) has-error @endif @if(2 != $loginUser->user_type) hide @endif" id="year" >
                                     <label>Year:</label>
                                     <select class="form-control  slt mrgn_20_top" name="year">
                                       <option value="0">Select Year</option>
-                                      <option value="1" @if(1 == Auth::user()->year) selected @endif >First Year</option>
-                                      <option value="2" @if(2 == Auth::user()->year) selected @endif >Second Year </option>
-                                      <option value="3" @if(3 == Auth::user()->year) selected @endif >Third Year</option>
-                                      <option value="4" @if(4 == Auth::user()->year) selected @endif >Final Year</option>
+                                      <option value="1" @if(1 == $loginUser->year) selected @endif >First Year</option>
+                                      <option value="2" @if(2 == $loginUser->year) selected @endif >Second Year </option>
+                                      <option value="3" @if(3 == $loginUser->year) selected @endif >Third Year</option>
+                                      <option value="4" @if(4 == $loginUser->year) selected @endif >Final Year</option>
                                     </select>
                                     <p class="help-block hide" id="year_error" style="color: red;">Please select year.</p>
                                   </div>
-                                  <div class="form-group mrgn_20_top @if ($errors->has('rollno')) has-error @endif @if(2 != Auth::user()->user_type) hide @endif" id="rollNo">
+                                  <div class="form-group mrgn_20_top @if ($errors->has('rollno')) has-error @endif @if(2 != $loginUser->user_type) hide @endif" id="rollNo">
                                     <label>Roll No:</label>
-                                    <input type="number" class="form-control" name="roll_no" id="roll" value="{{Auth::user()->roll_no}}" placeholder="Roll No." />
+                                    <input type="number" class="form-control" name="roll_no" id="roll" value="{{$loginUser->roll_no}}" placeholder="Roll No." />
                                     <span class="help-block"></span>
                                     <p class="help-block hide" id="roll_error" style="color: red;">Please select roll no.</p>
                                   </div>
@@ -138,12 +138,12 @@
                                 <div class="form-group">
                                   <label>Photo:</label>
                                   <input class="form-control" placeholder="Mobile No." name="photo" type="file">
-                                  <label>Existing Photo:</label> {{basename(Auth::user()->photo)}}
+                                  <label>Existing Photo:</label> {{basename($loginUser->photo)}}
                                 </div>
-                                <div class="form-group @if(2 != Auth::user()->user_type) hide @endif">
+                                <div class="form-group @if(2 != $loginUser->user_type) hide @endif">
                                   <label>Resume:</label>
                                   <input class="form-control" placeholder="Mobile No." name="resume" type="file">
-                                  <label>Existing Resume:</label> {{basename(Auth::user()->resume)}}
+                                  <label>Existing Resume:</label> {{basename($loginUser->resume)}}
                                 </div>
                                 <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
                                 <button class="btn btn-info" type="submit">Submit</button>
@@ -155,8 +155,8 @@
                     </div>
                   </div>
                   <div  align="center" style="background-image: url('{{ url('images/user/profile-bg.jpg')}}');"">
-                    @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
-                      <img alt="User Pic" style="max-height: 200px !important;" src="{{Auth::user()->photo}}" id="profile-image1" class="user-prof img-responsive">
+                    @if(is_file($loginUser->photo) || (!empty($loginUser->photo) && false == preg_match('/userStorage/',$loginUser->photo)))
+                      <img alt="User Pic" style="max-height: 200px !important;" src="{{$loginUser->photo}}" id="profile-image1" class="user-prof img-responsive">
                     @else
                       <img alt="User Pic" src="{{ url('images/user/user1.png')}}" id="profile-image1" class="img-circle img-responsive">
                     @endif
@@ -167,8 +167,18 @@
                   <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
                     <div class="col-xs-12">
                       <div class="row">
+                        <div class="col-xs-5 "><b>Score</b></div>
+                        <div class="col-xs-7 pull-left">{{$obtainedScore}}/{{$totalScore}}</div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
+                    <div class="col-xs-12">
+                      <div class="row">
                         <div class="col-xs-5 "><b>Name</b></div>
-                        <div class="col-xs-7 pull-left">{{Auth::user()->name}}</div>
+                        <div class="col-xs-7 pull-left">{{$loginUser->name}}</div>
                       </div>
                     </div>
                   </div>
@@ -178,7 +188,7 @@
                     <div class="col-xs-12">
                       <div class="row">
                         <div class="col-xs-5 "><b>Email</b></div>
-                        <div class="col-xs-7 pull-left">{{Auth::user()->email}}</div>
+                        <div class="col-xs-7 pull-left">{{$loginUser->email}}</div>
                       </div>
                     </div>
                   </div>
@@ -188,7 +198,7 @@
                     <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b>Phone</b></div>
-                         <div class="col-xs-7 pull-left">{{Auth::user()->phone}}</div>
+                         <div class="col-xs-7 pull-left">{{$loginUser->phone}}</div>
                       </div>
                     </div>
                   </div>
@@ -198,53 +208,53 @@
                     <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b> Designation</b></div>
-                         <div class="col-xs-7 ">{{$users[Auth::user()->user_type]}}</div>
+                         <div class="col-xs-7 ">{{$users[$loginUser->user_type]}}</div>
                       </div>
                     </div>
                   </div>
                 </li>
-                @if(Auth::user()->college_id > 0)
+                @if($loginUser->college_id > 0)
                   <li class="list-group-item">
                     <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
                       <div class="col-xs-12">
                         <div class="row">
                            <div class="col-xs-5 "><b> College</b></div>
-                           <div class="col-xs-7 ">{{Auth::user()->college->name}}</div>
+                           <div class="col-xs-7 ">{{$loginUser->college->name}}</div>
                         </div>
                       </div>
                     </div>
                   </li>
-                  @if(Auth::user()->college_dept_id > 0)
+                  @if($loginUser->college_dept_id > 0)
                     <li class="list-group-item">
                       <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
                         <div class="col-xs-12">
                           <div class="row">
                              <div class="col-xs-5 "><b> Department</b></div>
-                             <div class="col-xs-7 ">{{Auth::user()->department->name}}</div>
+                             <div class="col-xs-7 ">{{$loginUser->department->name}}</div>
                           </div>
                         </div>
                       </div>
                     </li>
                   @endif
-                @elseif('other' == Auth::user()->college_id)
+                @elseif('other' == $loginUser->college_id)
                   <li class="list-group-item">
                     <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
                       <div class="col-xs-12">
                         <div class="row">
                            <div class="col-xs-5 "><b> Other</b></div>
-                           <div class="col-xs-7 ">{{Auth::user()->other_source}}</div>
+                           <div class="col-xs-7 ">{{$loginUser->other_source}}</div>
                         </div>
                       </div>
                     </div>
                   </li>
                 @endif
-                @if(2 == Auth::user()->user_type)
+                @if(2 == $loginUser->user_type)
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
                     <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b>Year</b></div>
-                         <div class="col-xs-7 pull-left">{{Auth::user()->year}}</div>
+                         <div class="col-xs-7 pull-left">{{$loginUser->year}}</div>
                       </div>
                     </div>
                   </div>
@@ -254,7 +264,7 @@
                     <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b>Roll No</b></div>
-                         <div class="col-xs-7 pull-left">{{Auth::user()->roll_no}}</div>
+                         <div class="col-xs-7 pull-left">{{$loginUser->roll_no}}</div>
                       </div>
                     </div>
                   </div>
@@ -307,7 +317,7 @@
                     </div>
                   </div>
                 </li>
-                @if(2 == Auth::user()->user_type)
+                @if(2 == $loginUser->user_type)
                 <li class="list-group-item" style="cursor: pointer;">
                   <div class="row toggle" id="dropdown-detail-2" data-toggle="detail-5">
                       <div class="col-xs-10">
@@ -328,8 +338,8 @@
                         </div>
                         <div class="modal-body">
                           <div class="iframe-container">
-                            @if(Auth::user()->resume)
-                              <iframe src="{{asset(Auth::user()->resume)}}" frameborder="0"></iframe>
+                            @if($loginUser->resume)
+                              <iframe src="{{asset($loginUser->resume)}}" frameborder="0"></iframe>
                             @else
                               Resume of Student is not uploaded
                             @endif

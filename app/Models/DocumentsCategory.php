@@ -25,7 +25,7 @@ class DocumentsCategory extends Model
         if( $isUpdate && isset($categoryId)){
             $documentsCategory = static::find($categoryId);
             if(!is_object($documentsCategory)){
-            	return Redirect::to('admin/manageDocumentsCategory');
+            	return 'false';
             }
         } else{
             $documentsCategory = new static;

@@ -27,7 +27,7 @@ class BankDetail extends Model
     	if(!empty($bankDetailId)){
     		$bankDetail = static::find($bankDetailId);
     		if(!is_object($bankDetail)){
-    			return redirect('manageBankDetails');
+    			return 'false';
     		}
     	} else {
     		$bankDetail = new static;

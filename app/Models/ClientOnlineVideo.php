@@ -41,7 +41,7 @@ class ClientOnlineVideo extends Model
     	if( $isUpdate && isset($videoId)){
     		$video = static::find($videoId);
     		if(!is_object($video)){
-    			return Redirect::to('manageOnlineVideo');
+    			return 'false';
     		}
     	} else {
     		$video = new static;

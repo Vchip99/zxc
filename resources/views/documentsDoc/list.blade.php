@@ -37,7 +37,7 @@
         @if(count($documentsDocs) > 0)
           @foreach($documentsDocs as $index => $documentsDoc)
           <tr>
-            <th scope="row">{{$index+1}}</th>
+            <th scope="row">{{$index + $documentsDocs->firstItem()}}</th>
             <td>{{$documentsDoc->name}}</td>
             <td>{{$documentsDoc->category->name}}</td>
             <td>

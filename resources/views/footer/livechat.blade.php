@@ -245,10 +245,11 @@
                     receiverImgPath = '/images/user1.png';
                   }
                   $.each(messages['messages'],function(idx,obj){
+                    var textMessage = obj.message.replace(/<[^>]+>/ig, '');
                     if(current_user == obj.sender_id){
-                        $('#chatmessages_'+roomArr[0]+'_'+roomArr[1]).prepend('<li class="right clearfix addChat"><span class="chat-img pull-right "><img src="'+senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+obj.message+'</p></div><div class="chat-time clearfix"><span class="pull-right">'+messagteTime(obj.created_at)+'</span></div></li>');
+                        $('#chatmessages_'+roomArr[0]+'_'+roomArr[1]).prepend('<li class="right clearfix addChat"><span class="chat-img pull-right "><img src="'+senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+textMessage+'</p></div><div class="chat-time clearfix"><span class="pull-right">'+messagteTime(obj.created_at)+'</span></div></li>');
                     } else {
-                        $('#chatmessages_'+roomArr[0]+'_'+roomArr[1]).prepend('<li class="left clearfix addChat"><span class="chat-img pull-left "><img src="'+receiverImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+obj.message+'</p></div><div class="chat-time clearfix"><span class="pull-left">'+messagteTime(obj.created_at)+'</span></div></li>');
+                        $('#chatmessages_'+roomArr[0]+'_'+roomArr[1]).prepend('<li class="left clearfix addChat"><span class="chat-img pull-left "><img src="'+receiverImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+textMessage+'</p></div><div class="chat-time clearfix"><span class="pull-left">'+messagteTime(obj.created_at)+'</span></div></li>');
                     }
                   });
                   $(chatMessageId).parent().animate({scrollTop:$(chatMessageId)[0].scrollHeight});
@@ -701,10 +702,11 @@
                         var senderImgPath = $('#currentUserImage').attr('src');
                         var receiverImgPath = $($('li#'+receiverId+' span img')[0]).attr('src');
                           $.each(messages['messages'],function(idx,obj){
+                            var textMessage = obj.message.replace(/<[^>]+>/ig, '');
                               if(current_user == obj.sender_id){
-                                  $('#chatmessages_'+roomArr[0]+'_'+roomArr[1]).prepend('<li class="right clearfix addChat"><span class="chat-img pull-right "><img src="'+senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+obj.message+'</p></div><div class="chat-time clearfix"><span class="pull-right">'+messagteTime(obj.created_at)+'</span></div></li>');
+                                  $('#chatmessages_'+roomArr[0]+'_'+roomArr[1]).prepend('<li class="right clearfix addChat"><span class="chat-img pull-right "><img src="'+senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+textMessage+'</p></div><div class="chat-time clearfix"><span class="pull-right">'+messagteTime(obj.created_at)+'</span></div></li>');
                               } else {
-                                  $('#chatmessages_'+roomArr[0]+'_'+roomArr[1]).prepend('<li class="left clearfix addChat"><span class="chat-img pull-left "><img src="'+receiverImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+obj.message+'</p></div><div class="chat-time clearfix"><span class="pull-left">'+messagteTime(obj.created_at)+'</span></div></li>');
+                                  $('#chatmessages_'+roomArr[0]+'_'+roomArr[1]).prepend('<li class="left clearfix addChat"><span class="chat-img pull-left "><img src="'+receiverImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+textMessage+'</p></div><div class="chat-time clearfix"><span class="pull-left">'+messagteTime(obj.created_at)+'</span></div></li>');
                               }
                           });
                           $(chatMessageId).parent().animate({scrollTop:100});
@@ -725,9 +727,7 @@
           showChatUsers();
           setInterval(checkOnlineUsers, 180000);
         }
-        if(screen.availWidth <= 550){
-          $('#chat_window_1 .top-bar').click();
-        }
+        $('#chat_window_1 .top-bar').click();
       });
 
       function checkOnlineUsers(){
@@ -840,16 +840,16 @@
               } else {
                 document.getElementById('userCnt_'+data.receiver).innerHTML = 1;
               }
-
+              var textMessage = data.message.replace(/<[^>]+>/ig, '');
               if(current_user ==  data.sender && userchat.length > 0){
                   var liEle = document.createElement('li');
                   liEle.className = 'right clearfix addChat';
-                  liEle.innerHTML = '<span class="chat-img pull-right "><img src="'+data.senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+data.message+'</p></div><div class="chat-time clearfix"><span class="pull-right">'+messagteTime(data.created_at)+'</span></div>';
+                  liEle.innerHTML = '<span class="chat-img pull-right "><img src="'+data.senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+textMessage+'</p></div><div class="chat-time clearfix"><span class="pull-right">'+messagteTime(data.created_at)+'</span></div>';
                   userchat[0].appendChild(liEle);
               } else if(userchat.length > 0){
                   var liEle = document.createElement('li');
                   liEle.className = 'left clearfix addChat';
-                  liEle.innerHTML = '<span class="chat-img pull-left "><img src="'+data.senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+data.message+'</p></div><div class="chat-time clearfix"><span class="pull-left">'+messagteTime(data.created_at)+'</span></div>';
+                  liEle.innerHTML = '<span class="chat-img pull-left "><img src="'+data.senderImgPath+'" alt="User Avatar" class="img-circle" /></span><div class="chat-body clearfix"><p>'+textMessage+'</p></div><div class="chat-time clearfix"><span class="pull-left">'+messagteTime(data.created_at)+'</span></div>';
                   userchat[0].appendChild(liEle);
               }
               if(userchat.length > 0){

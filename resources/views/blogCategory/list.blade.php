@@ -36,7 +36,7 @@
         @if(count($blogCategories) > 0)
         @foreach($blogCategories as $index => $blogCategory)
         <tr>
-          <th scope="row">{{$index + 1}}</th>
+          <th scope="row">{{$index + $blogCategories->firstItem()}}</th>
           <td>{{$blogCategory->name}}</td>
           <td>
             <a href="{{url('admin/blogCategory')}}/{{$blogCategory->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$blogCategory->name}}" />

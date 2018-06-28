@@ -61,7 +61,7 @@ class PurchaseSubCategoryController extends ClientBaseController
         if(!is_object($selectedSubCategory)){
             return Redirect::to('managePurchaseSubCategory');
         }
-        $testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
+        $testCategories = ClientOnlineTestCategory::showCategories($request);
         $testSubCategories = ClientOnlineTestSubCategory::showPayableSubCategoriesAssociatedWithQuestion();
         $testSubjects = ClientOnlineTestSubject::showPayableSubjectsBySubCategoryIdAssociatedWithQuestion($selectedSubCategory->id);
         $testPapers = ClientOnlineTestSubjectPaper::showPayablePapersBySubCategoryIdAssociatedWithQuestion($selectedSubCategory->id);
@@ -86,28 +86,23 @@ class PurchaseSubCategoryController extends ClientBaseController
      * edit assignment
      */
     protected function purchasePayableSubCategory($subdomain, Request $request){
-
-        $categoryId = $request->get('category');
-        $subcategoryId = $request->get('subcategory_id');
-        $subcatPrice = $request->get('subcat_price');
-        $duration = $request->get('duration');
-        $total =  $request->get('total');
-        $planPrice =  $request->get('plan_'.$subcategoryId);
+        $categoryId = json_decode($request->get('category'));
+        $subcategoryId = json_decode($request->get('subcategory_id'));
+        $subcatPrice = json_decode($request->get('subcat_price'));
+        $duration = json_decode($request->get('duration'));
+        $planType =  json_decode($request->get('plan_'.$subcategoryId));
 
         if(empty($categoryId)){
             return redirect()->back()->withErrors(['please select category.']);
         }
-        if(empty($subcatPrice)){
+        if($subcatPrice < 0){
             return redirect()->back()->withErrors(['please enter sub category price.']);
         }
         if(empty($duration)){
             return redirect()->back()->withErrors(['please enter/select duration.']);
         }
-        if(empty($planPrice)){
+        if(0 != $planType && 1 != $planType){
             return redirect()->back()->withErrors(['please select plan.']);
-        }
-        if( 0 >= $total ){
-            return redirect()->back()->withErrors(['total is 0. please select plan and duration']);
         }
         $loginUser = Auth::guard('client')->user();
         if(!is_object($loginUser)){
@@ -118,22 +113,50 @@ class PurchaseSubCategoryController extends ClientBaseController
         if(!is_object($selectedSubCategory)){
             return Redirect::to('/');
         }
-        if($planPrice == $selectedSubCategory->price){
+        if(0 == $planType ){
             // yearly
             $startDate =  date('Y-m-d');
             $endDate = date('Y-m-d', strtotime('+'.$duration.' year', strtotime($startDate)));
+            $total = $selectedSubCategory->price * $duration;
         } else {
             // monthly
             $startDate = date('Y-m-d');
             $endDate = date('Y-m-d', strtotime('+'.$duration.' month', strtotime($startDate)));
+            $total = $selectedSubCategory->monthly_price * $duration;
+        }
+        // free sub category
+        if(0 == $selectedSubCategory->price){
+            DB::connection('mysql2')->beginTransaction();
+            try
+            {
+                $paymentArray = [
+                                    'category_id' => $categoryId,
+                                    'sub_category_id' => $selectedSubCategory->id,
+                                    'admin_price' => $total,
+                                    'client_user_price' => $subcatPrice,
+                                    'payment_id' => '',
+                                    'payment_request_id' => '',
+                                    'start_date' => $startDate,
+                                    'end_date' => $endDate,
+                                    'client_image' => $selectedSubCategory->image_path,
+                                    'sub_category' => $selectedSubCategory->name,
+                                ];
+                PayableClientSubCategory::addPayableClientSubCategory($paymentArray);
+                DB::connection('mysql2')->commit();
+                return redirect('managePayableSubCategory')->with('message', 'You have purchased sub category successfully.');
+            }
+            catch(Exception $e)
+            {
+                DB::connection('mysql2')->rollback();
+                return redirect('managePayableSubCategory')->withErrors([$e->getMessage()]);
+            }
+            return redirect('managePayableSubCategory');
         }
 
         Session::put('payable_category_id', $categoryId);
         Session::put('payable_sub_category_id', $subcategoryId);
         Session::put('sub_category_price', $subcatPrice);
         Session::put('total', $total);
-        Session::put('duration', $duration);
-        Session::put('plan', $planPrice);
         Session::put('start_date', $startDate);
         Session::put('end_date', $endDate);
         Session::put('client_image', $selectedSubCategory->image_path);
@@ -202,8 +225,6 @@ class PurchaseSubCategoryController extends ClientBaseController
                     $subcategoryId = Session::get('payable_sub_category_id');
                     $subcatPrice = Session::get('sub_category_price');
                     $total = Session::get('total');
-                    $duration = Session::get('duration');
-                    $planPrice = Session::get('plan');
                     $startDate = Session::get('start_date');
                     $endDate = Session::get('end_date');
                     $clientImage = Session::get('client_image');
@@ -234,8 +255,6 @@ class PurchaseSubCategoryController extends ClientBaseController
                 Session::remove('payable_sub_category_id');
                 Session::remove('sub_category_price');
                 Session::remove('total');
-                Session::remove('duration');
-                Session::remove('plan');
                 Session::remove('start_date');
                 Session::remove('end_date');
                 Session::remove('client_image');

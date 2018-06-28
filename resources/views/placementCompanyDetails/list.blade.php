@@ -37,7 +37,7 @@
         @if(count($companyDetails)>0)
           @foreach($companyDetails as $index => $companyDetail)
           <tr>
-            <td scope="row">{{$index + 1}}</td>
+            <td scope="row">{{$index + $companyDetails->firstItem()}}</td>
             <td>{{$companyDetail->area->name}}</td>
             <td>{{$companyDetail->company->name}}</td>
             <td>

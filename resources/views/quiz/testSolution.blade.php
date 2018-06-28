@@ -39,7 +39,7 @@
 @stop
 @section('content')
 	@include('header.header_menu')
-	<div class="content">
+	<div class="content" oncontextmenu="return false;" >
      	<div class="container">
 			<div class="row">
 	    		<div class ="col-sm-9">

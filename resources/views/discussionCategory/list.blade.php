@@ -36,7 +36,7 @@
         @if(count($discussionCategories) > 0)
         @foreach($discussionCategories as $index => $discussionCategory)
         <tr>
-          <th scope="row">{{$index + 1}}</th>
+          <th scope="row">{{$index + $discussionCategories->firstItem()}}</th>
           <td>{{$discussionCategory->name}}</td>
           <td>
             <a href="{{url('admin/discussionCategory')}}/{{$discussionCategory->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$discussionCategory->name}}" />

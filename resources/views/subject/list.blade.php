@@ -38,7 +38,7 @@
         @if(count($testSubjects) > 0)
           @foreach($testSubjects as $index => $testSubject)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $testSubjects->firstItem()}}</th>
             <td>{{$testSubject->name}}</td>
             <td>{{$testSubject->category->name}}</td>
             <td>{{$testSubject->subcategory->name}}</td>

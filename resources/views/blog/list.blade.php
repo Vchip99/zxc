@@ -37,7 +37,7 @@
         @if(count($blogs) > 0)
         @foreach($blogs as $index => $blog)
         <tr>
-          <th scope="row">{{$index + 1}}</th>
+          <th scope="row">{{$index + $blogs->firstItem()}}</th>
           <td>{{$blog->title}}</td>
           <td>{{ $blog->category->name }}</td>
           <td>

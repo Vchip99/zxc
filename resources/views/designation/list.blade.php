@@ -36,7 +36,7 @@
         @if(count($designations) > 0)
           @foreach($designations as $index => $designation)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $designations->firstItem()}}</th>
             <td>{{$designation->name}}</td>
             <td>
               <a href="{{url('admin/designation')}}/{{$designation->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$designation->name}}" />

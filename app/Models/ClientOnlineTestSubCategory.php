@@ -33,7 +33,7 @@ class ClientOnlineTestSubCategory extends Model
         if( $isUpdate && isset($subcatId)){
             $testSubcategory = static::find($subcatId);
             if(!is_object($testSubcategory)){
-                return Redirect::to('manageOnlineTestSubCategory');
+                return 'false';
             }
         } else{
             $testSubcategory = new static;

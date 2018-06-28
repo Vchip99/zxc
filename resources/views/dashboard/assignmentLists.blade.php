@@ -69,7 +69,7 @@
           </tr>
           @endforeach
         @else
-          <tr><td colspan="5">No Assignment is created.</td></tr>
+          <tr><td colspan="6">No Assignment is created.</td></tr>
         @endif
       </tbody>
     </table>

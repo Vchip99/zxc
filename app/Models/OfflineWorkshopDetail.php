@@ -42,7 +42,7 @@ class OfflineWorkshopDetail extends Model
     	if( $isUpdate && !empty($workshopId)){
     		$workshopDetails = static::find($workshopId);
     		if(!is_object($workshopDetails)){
-    			return Redirect::to('admin/manageWorkshopDetails');
+    			return 'false';
     		}
     	} else {
     		$workshopDetails = new static;

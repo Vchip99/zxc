@@ -20,13 +20,6 @@
    <form action="{{url('createAssignmentSubject')}}" method="POST">
   @endif
     {{ csrf_field() }}
-    <div class="form-group row  @if ($errors->has('subject')) has-error @endif">
-      <label class="col-sm-2 col-form-label" for="subject">Subject Name:</label>
-      <div class="col-sm-3">
-        <input type="text" class="form-control" id="subject" name="subject" value="{{($subject)?$subject->name:null}}" required="true">
-        @if($errors->has('subject')) <p class="help-block">{{ $errors->first('subject') }}</p> @endif
-      </div>
-    </div>
     <div class="form-group row  @if ($errors->has('year')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="subject">Year:</label>
       <div class="col-sm-3">
@@ -38,6 +31,13 @@
           <option value="4" @if(isset($subject->year) && 4 == $subject->year)) selected="selected" @endif>Fourth Year</option>
         </select>
         @if($errors->has('year')) <p class="help-block">{{ $errors->first('year') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row  @if ($errors->has('subject')) has-error @endif">
+      <label class="col-sm-2 col-form-label" for="subject">Subject Name:</label>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" id="subject" name="subject" value="{{($subject)?$subject->name:null}}" required="true">
+        @if($errors->has('subject')) <p class="help-block">{{ $errors->first('subject') }}</p> @endif
       </div>
     </div>
     <div class="form-group row">

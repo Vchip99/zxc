@@ -98,8 +98,10 @@
                                       <div class="form-group row">
                                         <label class="col-sm-4 col-form-label">Select Plan</label>
                                         <div class="col-sm-8">
-                                          <input type="radio" name="plan_{{$testSubCategory->id}}" value="{{$testSubCategory->monthly_price}}" checked="true"  data-id="{{$testSubCategory->id}}" onclick="changeTotal(this)" required> Monthly:Rs {{$testSubCategory->monthly_price}}
-                                          <input type="radio" name="plan_{{$testSubCategory->id}}" value="{{$testSubCategory->price}}" data-id="{{$testSubCategory->id}}" onclick="changeTotal(this)" required> Yearly:Rs {{$testSubCategory->price}}
+                                          <input type="radio" name="plan_{{$testSubCategory->id}}" value="1" checked="true"  data-id="{{$testSubCategory->id}}" onclick="changeTotal(this)" required>
+                                            Monthly:Rs <span id="monthly_{{$testSubCategory->id}}">{{$testSubCategory->monthly_price}}</span>
+                                          <input type="radio" name="plan_{{$testSubCategory->id}}" value="0" data-id="{{$testSubCategory->id}}" onclick="changeTotal(this)" required>
+                                            Yearly:Rs <span id="yearly_{{$testSubCategory->id}}">{{$testSubCategory->price}}</span>
                                         </div>
                                       </div>
                                       <div class="form-group row">
@@ -147,14 +149,24 @@
     function showTotal(ele){
       var duration = $(ele).val();
       var subcat = $(ele).data('id');
-      var price = $('input[name="plan_'+subcat+'"]:checked').val();
-      document.getElementById('total_'+subcat).value = price * duration;
+      var planType = $('input[name="plan_'+subcat+'"]:checked').val();
+      if(1 == planType){
+        var price = document.getElementById('monthly_'+subcat).innerHTML;
+      } else {
+        var price = document.getElementById('yearly_'+subcat).innerHTML;
+      }
+      document.getElementById('total_'+subcat).value = parseInt(price) * parseInt(duration);
     }
     function changeTotal(ele){
-      var price = $(ele).val();
       var subcat = $(ele).data('id');
+      var planType = $(ele).val();
+      if(1 == planType){
+        var price = document.getElementById('monthly_'+subcat).innerHTML;
+      } else {
+        var price = document.getElementById('yearly_'+subcat).innerHTML;
+      }
       var duration = document.getElementById('duration_'+subcat).value;
-      document.getElementById('total_'+subcat).value = price * duration;
+      document.getElementById('total_'+subcat).value = parseInt(price) * parseInt(duration);
     }
   </script>
 @stop

@@ -33,7 +33,7 @@ class LiveVideo extends Model
     	if( $isUpdate && isset($videoId)){
     		$video = LiveVideo::find($videoId);
     		if(!is_object($video)){
-    			return Redirect::to('admin/manageLiveVideo');
+    			return 'false';
     		}
     	} else {
     		$video = new LiveVideo;

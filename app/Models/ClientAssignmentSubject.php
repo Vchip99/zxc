@@ -27,7 +27,7 @@ class ClientAssignmentSubject extends Model
         if( $isUpdate && isset($subjectId)){
             $subject = static::find($subjectId);
             if(!is_object($subject)){
-            	return Redirect::to('manageAssignmentSubject');
+            	return 'false';
             }
         } else{
             $subject = new static;

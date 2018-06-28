@@ -38,7 +38,7 @@
         @if(count($heros) > 0)
           @foreach($heros as $index => $hero)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $heros->firstItem()}}</th>
             <td>{{$hero->name}}</td>
             <td>{{$hero->designation->name}}</td>
             <td>{{$hero->area->name}}</td>

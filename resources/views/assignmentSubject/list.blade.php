@@ -38,7 +38,7 @@
         @if(count($subjects) > 0)
           @foreach($subjects as $index => $subject)
           <tr>
-            <td>{{$index + 1}}</td>
+            <td>{{$index + $subjects->firstItem()}}</td>
             <td>{{$subject->name}}</td>
             <td>
                 @if( 1 == $subject->year)

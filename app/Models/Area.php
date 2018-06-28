@@ -28,7 +28,7 @@ class Area extends Model
         if( $isUpdate && isset($areaId)){
             $area = static::find($areaId);
             if(!is_object($area)){
-            	return Redirect::to('admin/manageArea');
+            	return 'false';
             }
         } else{
             $area = new static;

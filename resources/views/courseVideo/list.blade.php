@@ -39,7 +39,7 @@
         @if(count($courseVideos) > 0)
           @foreach($courseVideos as $index => $courseVideo)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $courseVideos->firstItem()}}</th>
             <td>{{$courseVideo->name}}</td>
             <td>{{$courseVideo->category()}}</td>
             <td>{{$courseVideo->subcategory()}}</td>

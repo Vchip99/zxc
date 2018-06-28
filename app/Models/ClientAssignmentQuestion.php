@@ -32,7 +32,7 @@ class ClientAssignmentQuestion extends Model
         if( $isUpdate && isset($assignmentId)){
             $assignment = static::find($assignmentId);
             if(!is_object($assignment)){
-            	return Redirect::to('manageAssignment');
+            	return 'false';
             }
         } else {
             $assignment = new static;

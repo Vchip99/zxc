@@ -37,7 +37,7 @@
         @if(count($projects) > 0)
           @foreach($projects as $index => $project)
           <tr>
-            <th scope="row">{{$index + 1 }}</th>
+            <th scope="row">{{$index + $projects->firstItem() }}</th>
             <td>{{$project->name}}</td>
             <td>{{$project->category->name}}</td>
             <td>

@@ -35,7 +35,7 @@ class Blog extends Model
         if( $isUpdate && isset($blogId)){
             $blog = Blog::find($blogId);
             if(!is_object($blog)){
-            	return Redirect::to('admin/manageBlog');
+            	return 'false';
             }
         } else{
             $blog = new Blog;

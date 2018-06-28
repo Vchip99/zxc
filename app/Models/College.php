@@ -24,7 +24,7 @@ class College extends Model
         if( $isUpdate && isset($collegeId)){
             $college = static::find($collegeId);
             if(!is_object($college)){
-            	return Redirect::to('admin/manageCollegeInfo');
+            	return 'false';
             }
         } else{
             $college = new static;

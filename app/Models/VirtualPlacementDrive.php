@@ -35,7 +35,7 @@ class VirtualPlacementDrive extends Model
     	if( $isUpdate && !empty($placementId)){
     		$virtualPlacementDrive = static::find($placementId);
     		if(!is_object($virtualPlacementDrive)){
-    			return Redirect::to('admin/manageVirtualPlacementDrive');
+    			return 'false';
     		}
     	} else {
     		$virtualPlacementDrive = new static;

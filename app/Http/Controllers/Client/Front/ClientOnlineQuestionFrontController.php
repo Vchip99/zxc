@@ -50,7 +50,8 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             if(is_object($questions) && true == $questions->isEmpty()){
                 return Redirect::to('/');
             }
-            foreach($questions as $question){
+
+            foreach($questions->shuffle() as $question){
                 $results['questions'][$question->section_type][] = $question;
             }
 

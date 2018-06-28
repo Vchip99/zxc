@@ -26,7 +26,7 @@ class BlogCategory extends Model
         if( $isUpdate && isset($categoryId)){
             $category = static::find($categoryId);
             if(!is_object($category)){
-            	return Redirect::to('admin/manageBlogCategory');
+            	return 'false';
             }
         } else{
             $category = new static;

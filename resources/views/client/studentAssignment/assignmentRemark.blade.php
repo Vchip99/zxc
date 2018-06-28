@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> Students Assignment  </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Assignment </li>
+      <li><i class="fa fa-tasks"></i> Assignment </li>
       <li class="active"> Students Assignment </li>
     </ol>
   </section>

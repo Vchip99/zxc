@@ -94,21 +94,23 @@
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-4 black">Select Plan</label>
-                            <div class="col-sm-8 black">
-                              <input type="radio" name="plan_{{$selectedSubCategory->id}}" value="{{$selectedSubCategory->monthly_price}}" checked="true"  data-id="{{$selectedSubCategory->id}}" onclick="changeTotal(this)" required> Monthly:Rs {{$selectedSubCategory->monthly_price}}
-                              <input type="radio" name="plan_{{$selectedSubCategory->id}}" value="{{$selectedSubCategory->price}}" data-id="{{$selectedSubCategory->id}}" onclick="changeTotal(this)" required> Yearly:Rs {{$selectedSubCategory->price}}
+                            <div class="black col-sm-8">
+                              <input type="radio" name="plan_{{$selectedSubCategory->id}}" value="1" checked="true"  data-id="{{$selectedSubCategory->id}}" onclick="changeTotal(this)" required>
+                                Monthly:Rs <span id="monthly_{{$selectedSubCategory->id}}">{{$selectedSubCategory->monthly_price}}</span>
+                              <input type="radio" name="plan_{{$selectedSubCategory->id}}" value="0" data-id="{{$selectedSubCategory->id}}" onclick="changeTotal(this)" required>
+                                Yearly:Rs <span id="yearly_{{$selectedSubCategory->id}}">{{$selectedSubCategory->price}}</span>
                             </div>
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-4 black">Select Month/Year</label>
                             <div class="col-sm-8 black">
-                              <input type="number" id="duration_{{$selectedSubCategory->id}}" name="duration" value="1" min="1" data-id="{{$selectedSubCategory->id}}" onchange="showTotal(this);" required>
+                              <input type="number" id="duration_{{$selectedSubCategory->id}}" name="duration" value="1" min="1" data-id="{{$selectedSubCategory->id}}" onchange="showTotal(this);" required style="float: left;">
                             </div>
                           </div>
                           <div class="form-group row">
                             <label class="col-sm-4 black" >Total</label>
                             <div class="col-sm-8 black">
-                              <input type="text" name="total" id="total_{{$selectedSubCategory->id}}" value="{{$selectedSubCategory->monthly_price}}" required>
+                              <input type="text" name="total" id="total_{{$selectedSubCategory->id}}" value="{{$selectedSubCategory->monthly_price}}" required style="float: left;">
                             </div>
                           </div>
                       </div>
@@ -206,14 +208,24 @@
     function showTotal(ele){
       var duration = $(ele).val();
       var subcat = $(ele).data('id');
-      var price = $('input[name="plan_'+subcat+'"]:checked').val();
-      document.getElementById('total_'+subcat).value = price * duration;
+      var planType = $('input[name="plan_'+subcat+'"]:checked').val();
+      if(1 == planType){
+        var price = document.getElementById('monthly_'+subcat).innerHTML;
+      } else {
+        var price = document.getElementById('yearly_'+subcat).innerHTML;
+      }
+      document.getElementById('total_'+subcat).value = parseInt(price) * parseInt(duration);
     }
     function changeTotal(ele){
-      var price = $(ele).val();
       var subcat = $(ele).data('id');
+      var planType = $(ele).val();
+      if(1 == planType){
+        var price = document.getElementById('monthly_'+subcat).innerHTML;
+      } else {
+        var price = document.getElementById('yearly_'+subcat).innerHTML;
+      }
       var duration = document.getElementById('duration_'+subcat).value;
-      document.getElementById('total_'+subcat).value = price * duration;
+      document.getElementById('total_'+subcat).value = parseInt(price) * parseInt(duration);
     }
   </script>
   <script type="text/javascript">

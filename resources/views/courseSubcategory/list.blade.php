@@ -38,7 +38,7 @@
         @if(count($courseSubCategories) > 0)
           @foreach($courseSubCategories as $index => $courseSubCategory)
           <tr>
-            <th scope="row">{{$index + 1}}</th>
+            <th scope="row">{{$index + $courseSubCategories->firstItem()}}</th>
             <td>{{$courseSubCategory->name}}</td>
             <td>{{$courseSubCategory->category->name}}</td>
             <td>

@@ -61,25 +61,25 @@
                               <fieldset>
                                 <div class="form-group">
                                   <label>Name:</label>
-                                  <input class="form-control" placeholder="name" name="name" type="text" value="{{Auth::guard('clientuser')->user()->name}}">
+                                  <input class="form-control" placeholder="name" name="name" type="text" value="{{$loginUser->name}}">
                                 </div>
                                 <div class="form-group">
                                   <label>Email:</label>
-                                  <input class="form-control" placeholder="yourmail@example.com" name="email" type="text" value="{{Auth::guard('clientuser')->user()->email}}">
+                                  <input class="form-control" placeholder="yourmail@example.com" name="email" type="text" value="{{$loginUser->email}}">
                                 </div>
                                 <div class="form-group">
                                   <label>Phone:</label>
-                                  <input class="form-control" placeholder="Mobile No." name="phone" type="text" value="{{Auth::guard('clientuser')->user()->phone}}">
+                                  <input class="form-control" placeholder="Mobile No." name="phone" type="text" value="{{$loginUser->phone}}">
                                 </div>
                                 <div class="form-group">
                                   <label>Photo:</label>
                                   <input class="form-control" placeholder="Mobile No." name="photo" type="file">
-                                  <label>Existing Photo:</label> {{basename(Auth::guard('clientuser')->user()->photo)}}
+                                  <label>Existing Photo:</label> {{basename($loginUser->photo)}}
                                 </div>
                                 <div class="form-group">
                                   <label>Resume:</label>
                                   <input class="form-control" placeholder="Mobile No." name="resume" type="file">
-                                  <label>Existing Resume:</label> {{basename(Auth::guard('clientuser')->user()->resume)}}
+                                  <label>Existing Resume:</label> {{basename($loginUser->resume)}}
                                 </div>
                                 <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
                                 <button class="btn btn-info" type="submit">Submit</button>
@@ -91,8 +91,8 @@
                     </div>
                   </div>
                   <div  align="center" style="background-image: url('{{ url('images/user/profile-bg.jpg')}}');"">
-                    @if(!empty(Auth::guard('clientuser')->user()->photo))
-                      <img alt="User Pic" style="max-height: 200px !important;" src="{{Auth::guard('clientuser')->user()->photo}}" id="profile-image1" class="user-prof img-responsive">
+                    @if(!empty($loginUser->photo))
+                      <img alt="User Pic" style="max-height: 200px !important;" src="{{$loginUser->photo}}" id="profile-image1" class="user-prof img-responsive">
                     @else
                       <img alt="User Pic"  src="{{ url('images/user/user1.png')}}" id="profile-image1" class="user-prof img-responsive">
                     @endif
@@ -103,8 +103,18 @@
                   <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
                     <div class="col-xs-12">
                       <div class="row">
+                        <div class="col-xs-5 "><b>Score</b></div>
+                        <div class="col-xs-7 pull-left">{{$obtainedScore}}/{{$totalScore}}</div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
+                    <div class="col-xs-12">
+                      <div class="row">
                         <div class="col-xs-5 "><b>Name</b></div>
-                        <div class="col-xs-7 pull-left">{{Auth::guard('clientuser')->user()->name}}</div>
+                        <div class="col-xs-7 pull-left">{{$loginUser->name}}</div>
                       </div>
                     </div>
                   </div>
@@ -114,7 +124,7 @@
                     <div class="col-xs-12">
                       <div class="row">
                         <div class="col-xs-5 "><b>EMAIL</b></div>
-                        <div class="col-xs-7 pull-left">{{Auth::guard('clientuser')->user()->email}}</div>
+                        <div class="col-xs-7 pull-left">{{$loginUser->email}}</div>
                       </div>
                     </div>
                   </div>
@@ -124,7 +134,7 @@
                     <div class="col-xs-12">
                       <div class="row">
                          <div class="col-xs-5 "><b>PHONE</b></div>
-                         <div class="col-xs-7 pull-left">{{Auth::guard('clientuser')->user()->phone}}</div>
+                         <div class="col-xs-7 pull-left">{{$loginUser->phone}}</div>
                       </div>
                     </div>
                   </div>
@@ -205,8 +215,8 @@
                         </div>
                         <div class="modal-body">
                           <div class="iframe-container">
-                            @if(Auth::guard('clientuser')->user()->resume)
-                              <iframe src="{{asset(Auth::guard('clientuser')->user()->resume)}}" frameborder="0"></iframe>
+                            @if($loginUser->resume)
+                              <iframe src="{{asset($loginUser->resume)}}" frameborder="0"></iframe>
                             @else
                               Resume of Student is not uploaded
                             @endif

@@ -30,7 +30,7 @@ class MotivationalSpeechVideo extends Model
         if( $isUpdate && isset($videoId)){
             $video = static::find($videoId);
             if(!is_object($video)){
-            	return Redirect::to('admin/manageMotivationalSpeechvideos');
+            	return 'false';
             }
         } else{
             $video = new static;
