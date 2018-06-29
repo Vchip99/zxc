@@ -15,6 +15,9 @@ use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientNotification;
 use App\Models\ClientUserSolution;
 use App\Models\ClientOnlinePaperSection;
+use App\Models\QuestionBankCategory;
+use App\Models\QuestionBankQuestion;
+use App\Models\QuestionBankSubCategory;
 use Intervention\Image\ImageManagerStatic as Image;
 use Excel;
 
@@ -541,6 +544,155 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             return Redirect::to('manageUploadQuestions')->with('message', 'Images uploaded successfully!');
         }
         return Redirect::to('manageUploadQuestions');
+    }
+
+    /**
+     *  question bank
+     */
+    protected function manageQuestionBank($subdomainName,Request $request){
+        $clientId = Auth::guard('client')->user()->id;
+        $testCategories = ClientOnlineTestCategory::showCategories($request);
+
+        if(Session::has('client_search_selected_category')){
+            $testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId(Session::get('client_search_selected_category'), $request);
+        } else {
+            $testSubCategories = [];
+        }
+        if(Session::has('client_search_selected_category') && Session::has('client_search_selected_subcategory')){
+            $testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId(Session::get('client_search_selected_category'), Session::get('client_search_selected_subcategory'), $request);
+        } else {
+           $testSubjects = [];
+        }
+        if(Session::has('client_search_selected_category') && Session::has('client_search_selected_subcategory') && Session::has('client_search_selected_subject')){
+            $papers = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCategoryIdBySubCategoryIdBySubjectId(Session::get('client_search_selected_category'), Session::get('client_search_selected_subcategory'), Session::get('client_search_selected_subject'));
+        } else {
+           $papers = [];
+        }
+        $questions = [];
+        if(Session::has('client_search_selected_paper')){
+            $sessions = ClientOnlinePaperSection::paperSectionsByPaperId(Session::get('client_search_selected_paper'), $clientId);
+        } else {
+            $sessions = [];
+        }
+        $bankCategories = QuestionBankCategory::all();
+        if(Session::has('client_search_question_bank_category')){
+            $bankSubCategories = QuestionBankSubCategory::getSubcategoriesByCategoryId(Session::get('client_search_question_bank_category'));
+        } else {
+            $bankSubCategories = [];
+        }
+        return view('client.onlineTest.question.useQuestionBank', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName', 'bankCategories', 'bankSubCategories'));
+    }
+
+    /**
+     *  show all question
+     */
+    protected function useQuestionBank($subdomainName,Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        $subjectId = InputSanitise::inputInt($request->get('subject'));
+        $paperId = InputSanitise::inputInt($request->get('paper'));
+        $sectionType = InputSanitise::inputInt($request->get('section_type'));
+        $bankCategoryId = InputSanitise::inputInt($request->get('bank_category'));
+        $bankSubCategoryId = InputSanitise::inputInt($request->get('bank_sub_category'));
+
+        Session::put('client_search_selected_category', $categoryId);
+        Session::put('client_search_selected_subcategory', $subcategoryId);
+        Session::put('client_search_selected_subject', $subjectId);
+        Session::put('client_search_selected_paper', $paperId);
+        Session::put('client_search_selected_section', $sectionType);
+        Session::put('client_search_question_bank_category', $bankCategoryId);
+        Session::put('client_search_question_bank_subcategory', $bankSubCategoryId);
+
+        $clientId = Auth::guard('client')->user()->id;
+        $testCategories = ClientOnlineTestCategory::showCategories($request);
+        $testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($categoryId, $request);
+        $testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId($categoryId, $subcategoryId, $request);
+        $papers = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCategoryIdBySubCategoryIdBySubjectId($categoryId, $subcategoryId, $subjectId);
+        $sessions = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId);
+        $questions = QuestionBankQuestion::getQuestionsByCategoryIdBySubcategoryId($bankCategoryId,$bankSubCategoryId);
+        $bankCategories = QuestionBankCategory::all();
+        $bankSubCategories = QuestionBankSubCategory::getSubcategoriesByCategoryId($bankCategoryId);
+        return view('client.onlineTest.question.useQuestionBank', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName', 'bankCategories', 'bankSubCategories'));
+
+    }
+
+    /**
+     *  return sub categories by categoryId
+     */
+    public function getQuestionBankSubCategories(Request $request){
+        if($request->ajax()){
+            $id = InputSanitise::inputInt($request->get('id'));
+            return QuestionBankSubCategory::getSubcategoriesByCategoryId($id);
+        }
+    }
+
+    protected function exportQuestionBank(Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('selected_category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('selected_subcategory'));
+        $subjectId = InputSanitise::inputInt($request->get('selected_subject'));
+        $paperId = InputSanitise::inputInt($request->get('selected_paper'));
+        $sectionTypeId = InputSanitise::inputInt($request->get('selected_section_type'));
+        if(empty($categoryId) || empty($subcategoryId) || empty($subjectId) || empty($paperId) || empty($sectionTypeId)){
+            return Redirect::to('manageQuestionBank')->withErrors('Please select category, sub category, subject,paper and section.');
+        }
+        if(empty($request->get('selected'))){
+            return Redirect::to('manageQuestionBank')->withErrors('Please select question.');
+        }
+        $selectedQuestions = $request->get('selected');
+        if(count($selectedQuestions) > 0){
+            DB::connection('mysql2')->beginTransaction();
+            try
+            {
+                $insertedQuestionCount = 0;
+                $loginUser = Auth::guard('client')->user();
+                foreach($selectedQuestions as $selectedQuestionId){
+                    $question = QuestionBankQuestion::find($selectedQuestionId);
+                    if(is_object($question)){
+                        $testQuestion = new ClientOnlineTestQuestion;
+                        $testQuestion->name = $question->name;
+                        $testQuestion->answer1 = $question->answer1;
+                        $testQuestion->answer2 = $question->answer2;
+                        $testQuestion->answer3 = $question->answer3;
+                        $testQuestion->answer4 = $question->answer4;
+                        $testQuestion->answer5 = $question->answer5;
+                        $testQuestion->answer6 = 0;
+                        $testQuestion->category_id = $categoryId;
+                        $testQuestion->subcat_id = $subcategoryId;
+                        $testQuestion->answer = $question->answer;
+                        $testQuestion->solution = $question->solution;
+                        if(0 == $question->question_type){
+                            $testQuestion->min = $question->min;
+                            $testQuestion->max = $question->max;
+                        } else {
+                            $testQuestion->min = 0.00;
+                            $testQuestion->max = 0.00;
+                        }
+                        $testQuestion->positive_marks = $request->get('positive_'.$question->id);
+                        $testQuestion->negative_marks = $request->get('negative_'.$question->id);
+                        $testQuestion->section_type = $sectionTypeId;
+                        $testQuestion->subject_id = $subjectId;
+                        $testQuestion->paper_id = $paperId;
+                        $testQuestion->question_type = $question->question_type;
+                        $testQuestion->client_id = $loginUser->id;
+                        $testQuestion->common_data = '';
+                        $testQuestion->save();
+                        $insertedQuestionCount++;
+                    }
+                }
+                if(count($selectedQuestions) == $insertedQuestionCount){
+                    DB::connection('mysql2')->commit();
+                    return Redirect::to('manageQuestionBank')->with('message', 'You have successfully created questions.');
+                } else {
+                    DB::connection('mysql2')->rollback();
+                }
+            }
+            catch(\Exception $e)
+            {
+                DB::connection('mysql2')->rollback();
+                return Redirect::to('manageQuestionBank')->withErrors('something went wrong while transfering question.');
+            }
+        }
+        return Redirect::to('manageQuestionBank')->withErrors('something went wrong.');
     }
 
 }

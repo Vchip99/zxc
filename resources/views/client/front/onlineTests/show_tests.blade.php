@@ -293,13 +293,6 @@
 											                    	@elseif(!is_object($loginUser))
 											                    		<button class="btn-magick btn-sm btn3d" data-toggle="Please login to see result" onClick="checkLogin();"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
 											                    	@elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-											                    		<form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}">
-											                    			{{ csrf_field() }}
-											                    			<input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
-											                    			<input type="hidden" name="category_id" value="{{$testSubjectPaper->category_id}}">
-											                    			<input type="hidden" name="subcategory_id" value="{{$testSubjectPaper->sub_category_id}}">
-											                    			<input type="hidden" name="subject_id" value="{{$testSubject->id}}">
-											                    		</form>
 												                    	<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="{{$testSubjectPaper->id}}" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
 												                    @else
 												                    	<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will enabled after test given."><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
@@ -406,11 +399,7 @@
 				showUserResultBtn.innerHTML = showUserResultBtnInnerHtml;
 
 		        var showUserResultMobileBtn = document.getElementById('showUserResultMobileBtn_'+paper);
-		        showUserResultMobileBtnInnerHtml = '<form id="showUserTestResult_'+paper+'" method="POST" action="'+url+'">'+csrfToken;
-		        showUserResultMobileBtnInnerHtml += '<input type="hidden" name="paper_id" value="'+paper+'"><input type="hidden" name="category_id" value="'+category+'"><input type="hidden" name="subcategory_id" value="'+subcategory+'"><input type="hidden" name="subject_id" value="'+subject+'"></form>';
-
-		        showUserResultMobileBtnInnerHtml += '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+paper+'" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
-		        showUserResultMobileBtn.innerHTML = showUserResultMobileBtnInnerHtml;
+		        showUserResultMobileBtn.innerHTML = '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+paper+'" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
 
         	}
         });
@@ -677,9 +666,6 @@
 								    	var testUrl = "{{ url('showUserTestResult') }}";
 								    	var csrf_token = '{{ csrf_field() }}';
 									    ulDivInnerHtml += '<li id="showUserResultMobileBtn_'+obj.id+'">';
-									    ulDivInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
-									    ulDivInnerHtml += csrf_token;
-										ulDivInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.ub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.subject_id +'"></form>';
 									    ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
 									    ulDivInnerHtml += '</li>';
 									} else {

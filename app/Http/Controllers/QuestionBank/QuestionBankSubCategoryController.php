@@ -133,25 +133,11 @@ class QuestionBankSubCategoryController extends Controller
                 DB::beginTransaction();
                 try
                 {
-                    // if(true == is_object($testSubcategory->subjects) && false == $testSubcategory->subjects->isEmpty()){
-                    //     foreach($testSubcategory->subjects as $subject){
-                    //         if(true == is_object($subject->papers) && false == $subject->papers->isEmpty()){
-                    //             foreach($subject->papers as $paper){
-                    //                 if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
-                    //                     foreach($paper->questions as $question){
-                    //                         UserSolution::deleteUserSolutionsByQuestionId($question->id);
-                    //                         $question->delete();
-                    //                     }
-                    //                 }
-                    //                 Score::deleteUserScoresByPaperId($paper->id);
-                    //                 PaperSection::deletePaperSectionsByPaperId($paper->id);
-                    //                 $paper->deleteRegisteredPaper();
-                    //                 $paper->delete();
-                    //             }
-                    //         }
-                    //         $subject->delete();
-                    //     }
-                    // }
+                    if(true == is_object($testSubcategory->questions) && false == $testSubcategory->questions->isEmpty()){
+                        foreach($testSubcategory->questions as $question){
+                            $question->delete();
+                        }
+                    }
         			$testSubcategory->delete();
                     DB::commit();
                     return Redirect::to('admin/manageQuestionBankSubCategory')->with('message', 'Sub Category deleted successfully!');

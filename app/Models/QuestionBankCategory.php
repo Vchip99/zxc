@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
-use App\Models\TestSubCategory;
+use App\Models\QuestionBankSubCategory;
 use DB;
 
 class QuestionBankCategory extends Model
@@ -57,5 +57,9 @@ class QuestionBankCategory extends Model
         } else {
             return 'false';
         }
+    }
+
+    public function subcategories(){
+        return $this->hasMany(QuestionBankSubCategory::class, 'question_bank_category_id');
     }
 }

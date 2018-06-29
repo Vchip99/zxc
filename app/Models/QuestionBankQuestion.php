@@ -15,7 +15,7 @@ class QuestionBankQuestion extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', 'answer', 'category_id', 'subcat_id', 'question_type','solution'];
+    protected $fillable = ['name', 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', 'answer', 'category_id', 'subcat_id', 'question_type','solution', 'min','max'];
 
     /**
      *  add/update question
@@ -51,6 +51,8 @@ class QuestionBankQuestion extends Model
         }
         $answer = $request->get('answer');
         $question_type = $request->get('question_type');
+        $max = trim($request->get('max'));
+        $min = trim($request->get('min'));
 
         if( $isUpdate && isset($questionId)){
             $testQuestion = static::find($questionId);
@@ -69,6 +71,16 @@ class QuestionBankQuestion extends Model
         $testQuestion->category_id = $categoryId;
         $testQuestion->subcat_id = $subcategoryId;
         $testQuestion->answer = $answer;
+        if(empty($min)){
+            $testQuestion->min = 0.00;
+        } else {
+            $testQuestion->min = $min;
+        }
+        if(empty($max)){
+            $testQuestion->max = 0.00 ;
+        } else {
+            $testQuestion->max = $max ;
+        }
         $testQuestion->solution = $solution;
         $testQuestion->question_type = $question_type;
         $testQuestion->save();

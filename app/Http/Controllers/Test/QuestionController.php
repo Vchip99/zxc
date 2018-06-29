@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Models\UserSolution;
 use App\Models\PaperSection;
+use App\Models\QuestionBankCategory;
+use App\Models\QuestionBankQuestion;
+use App\Models\QuestionBankSubCategory;
 use Intervention\Image\ImageManagerStatic as Image;
 use Excel;
 
@@ -85,7 +88,8 @@ class QuestionController extends Controller
         } else {
             $paperSections = [];
         }
-    	$questions = new Question;
+    	$questions = [];
+
     	return view('question.list', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers', 'paperSections'));
     }
 
@@ -210,33 +214,33 @@ class QuestionController extends Controller
                 $nextQuestionNo = $this->getNextQuestionNo($categoryId,$subcategoryId,$subjectId,$paperId,$section_type);
                 Session::put('next_question_no', $nextQuestionNo);
 
-                $questionCount = Question::where('category_id', $categoryId)->where('subcat_id', $subcategoryId)->where('subject_id', $subjectId)->where('paper_id', $paperId)->count();
-                if(1 == $questionCount){
-                    InputSanitise::deleteCacheByString('vchip:tests*');
-                    $paper = TestSubjectPaper::find($paperId);
-                    if(is_object($paper)){
-                        $messageBody = '';
-                        $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'" target="_blank">'.$paper->name.'</a> has been added.';
-                        Notification::addNotification($notificationMessage, Notification::ADMINPAPER, $paper->id);
+                // $questionCount = Question::where('category_id', $categoryId)->where('subcat_id', $subcategoryId)->where('subject_id', $subjectId)->where('paper_id', $paperId)->count();
+                // if(1 == $questionCount){
+                //     InputSanitise::deleteCacheByString('vchip:tests*');
+                //     $paper = TestSubjectPaper::find($paperId);
+                //     if(is_object($paper)){
+                //         $messageBody = '';
+                //         $notificationMessage = 'A new test paper: <a href="'.$request->root().'/getTest/'.$subcategoryId.'/'.$subjectId.'/'.$paperId.'" target="_blank">'.$paper->name.'</a> has been added.';
+                //         Notification::addNotification($notificationMessage, Notification::ADMINPAPER, $paper->id);
 
-                        $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();
-                        $allUsers = $subscriedUsers->chunk(100);
-                        set_time_limit(0);
-                        if(count($allUsers) > 0){
-                            foreach($allUsers as $selectedUsers){
-                                $messageBody .= '<p> Dear User</p>';
-                                $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
-                                $messageBody .= '<p><b> Thanks and Regard, </b></p>';
-                                $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
-                                $messageBody .= '<b> More about us... </b><br/>';
-                                $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
-                                $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
-                                $mailSubject = 'Vchipedu added a new test paper';
-                                Mail::bcc($selectedUsers)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
-                            }
-                        }
-                    }
-                }
+                //         $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();
+                //         $allUsers = $subscriedUsers->chunk(100);
+                //         set_time_limit(0);
+                //         if(count($allUsers) > 0){
+                //             foreach($allUsers as $selectedUsers){
+                //                 $messageBody .= '<p> Dear User</p>';
+                //                 $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
+                //                 $messageBody .= '<p><b> Thanks and Regard, </b></p>';
+                //                 $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
+                //                 $messageBody .= '<b> More about us... </b><br/>';
+                //                 $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
+                //                 $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
+                //                 $mailSubject = 'Vchipedu added a new test paper';
+                //                 Mail::bcc($selectedUsers)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
+                //             }
+                //         }
+                //     }
+                // }
 
                 DB::commit();
                 return Redirect::to("admin/createQuestion")->with('message', 'Question created successfully!');
@@ -649,4 +653,138 @@ class QuestionController extends Controller
         }
         return Redirect::to('admin/uploadQuestions');
     }
+
+    /**
+     *  show questions
+     */
+    protected function showQuestionBank(){
+        $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+        if(Session::has('search_selected_category')){
+            $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin(Session::get('search_selected_category'));
+        } else {
+            $testSubCategories = [];
+        }
+        if(Session::has('search_selected_category') && Session::has('search_selected_subcategory')){
+            $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin(Session::get('search_selected_category'), Session::get('search_selected_subcategory'));
+        } else {
+           $testSubjects = [];
+        }
+        if(Session::has('search_selected_category') && Session::has('search_selected_subcategory') && Session::has('search_selected_subject')){
+            $papers = TestSubjectPaper::getSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin(Session::get('search_selected_category'), Session::get('search_selected_subcategory'), Session::get('search_selected_subject'));
+        } else {
+           $papers =[];
+        }
+        if(Session::has('search_selected_paper')){
+            $paperSections =  PaperSection::where('test_subject_paper_id', Session::get('search_selected_paper'))->get();
+        } else {
+            $paperSections = [];
+        }
+        $questions = [];
+        $bankCategories = QuestionBankCategory::all();
+        if(Session::has('search_question_bank_category')){
+            $bankSubCategories = QuestionBankSubCategory::getSubcategoriesByCategoryId(Session::get('search_question_bank_category'));
+        } else {
+            $bankSubCategories = [];
+        }
+        return view('question.useQuestionBank', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers', 'paperSections', 'bankCategories', 'bankSubCategories'));
+    }
+
+    /**
+     *  show questions
+     */
+    protected function useQuestionBank(Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
+        $subjectId = InputSanitise::inputInt($request->get('subject'));
+        $paperId = InputSanitise::inputInt($request->get('paper'));
+        $sectionTypeId = InputSanitise::inputInt($request->get('section_type'));
+        $bankCategoryId = InputSanitise::inputInt($request->get('bank_category'));
+        $bankSubCategoryId = InputSanitise::inputInt($request->get('bank_sub_category'));
+
+        Session::put('search_selected_category', $categoryId);
+        Session::put('search_selected_subcategory', $subcategoryId);
+        Session::put('search_selected_subject', $subjectId);
+        Session::put('search_selected_paper', $paperId);
+        Session::put('search_selected_section', $sectionTypeId);
+        Session::put('search_question_bank_category', $bankCategoryId);
+        Session::put('search_question_bank_subcategory', $bankSubCategoryId);
+
+        $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+        $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($categoryId);
+        $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($categoryId,$subcategoryId);
+        $papers = TestSubjectPaper::getSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin($categoryId,$subcategoryId, $subjectId);
+        $paperSections = PaperSection::where('test_subject_paper_id', $paperId)->get();
+        $questions = QuestionBankQuestion::getQuestionsByCategoryIdBySubcategoryId($bankCategoryId,$bankSubCategoryId);
+        $bankCategories = QuestionBankCategory::all();
+        $bankSubCategories = QuestionBankSubCategory::getSubcategoriesByCategoryId($bankCategoryId);
+        return view('question.useQuestionBank', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers', 'paperSections', 'bankCategories', 'bankSubCategories'));
+    }
+
+    protected function exportQuestionBank(Request $request){
+        $categoryId = InputSanitise::inputInt($request->get('selected_category'));
+        $subcategoryId = InputSanitise::inputInt($request->get('selected_subcategory'));
+        $subjectId = InputSanitise::inputInt($request->get('selected_subject'));
+        $paperId = InputSanitise::inputInt($request->get('selected_paper'));
+        $sectionTypeId = InputSanitise::inputInt($request->get('selected_section_type'));
+        if(empty($categoryId) || empty($subcategoryId) || empty($subjectId) || empty($paperId) || empty($sectionTypeId)){
+            return Redirect::to('admin/showQuestionBank')->withErrors('Please select category, sub category, subject,paper and section.');
+        }
+        if(empty($request->get('selected'))){
+            return Redirect::to('admin/showQuestionBank')->withErrors('Please select question.');
+        }
+        $selectedQuestions = $request->get('selected');
+        if(count($selectedQuestions) > 0){
+            DB::beginTransaction();
+            try
+            {
+                $insertedQuestionCount = 0;
+                foreach($selectedQuestions as $selectedQuestionId){
+                    $question = QuestionBankQuestion::find($selectedQuestionId);
+                    if(is_object($question)){
+                        $testQuestion = new Question;
+                        $testQuestion->name = $question->name;
+                        $testQuestion->answer1 = $question->answer1;
+                        $testQuestion->answer2 = $question->answer2;
+                        $testQuestion->answer3 = $question->answer3;
+                        $testQuestion->answer4 = $question->answer4;
+                        $testQuestion->answer5 = $question->answer5;
+                        $testQuestion->answer6 = 0;
+                        $testQuestion->category_id = $categoryId;
+                        $testQuestion->subcat_id = $subcategoryId;
+                        $testQuestion->answer = $question->answer;
+                        $testQuestion->solution = $question->solution;
+                        if(0 == $question->question_type){
+                            $testQuestion->min = $question->min;
+                            $testQuestion->max = $question->max;
+                        } else {
+                            $testQuestion->min = 0.00;
+                            $testQuestion->max = 0.00;
+                        }
+                        $testQuestion->positive_marks = $request->get('positive_'.$question->id);
+                        $testQuestion->negative_marks = $request->get('negative_'.$question->id);
+                        $testQuestion->section_type = $sectionTypeId;
+                        $testQuestion->subject_id = $subjectId;
+                        $testQuestion->paper_id = $paperId;
+                        $testQuestion->question_type = $question->question_type;
+                        $testQuestion->common_data = '';
+                        $testQuestion->save();
+                        $insertedQuestionCount++;
+                    }
+                }
+                if(count($selectedQuestions) == $insertedQuestionCount){
+                    DB::commit();
+                    return Redirect::to('admin/showQuestionBank')->with('message', 'You have successfully created questions.');
+                } else {
+                    DB::rollback();
+                }
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return Redirect::to('admin/showQuestionBank')->withErrors('something went wrong while transfering question.');
+            }
+        }
+        return Redirect::to('admin/showQuestionBank');
+    }
+
 }

@@ -110,6 +110,7 @@
               <li title="Manage Subject"><a href="{{ url('admin/manageSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
               <li title="Manage Paper"><a href="{{ url('admin/managePaper')}}"><i class="fa fa-circle-o"></i> Manage Paper </a></li>
               <li title="Manage Question"><a href="{{ url('admin/manageQuestions')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
+              <li title="Question Bank"><a href="{{ url('admin/showQuestionBank')}}"><i class="fa fa-circle-o"></i> Question Bank </a></li>
               <li title="Upload Excel File"><a href="{{ url('admin/uploadQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
               <li title="Associate Session to Question"><a href="{{ url('admin/associateSession')}}"><i class="fa fa-circle-o"></i> Associate Session </a></li>
             </ul>

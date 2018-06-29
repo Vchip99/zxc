@@ -180,7 +180,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/questionBankSubCategory/{id}/edit', 'QuestionBank\QuestionBankSubCategoryController@edit');
 	Route::put('admin/updateQuestionBankSubCategory', 'QuestionBank\QuestionBankSubCategoryController@update');
 	Route::delete('admin/deleteQuestionBankSubCategory', 'QuestionBank\QuestionBankSubCategoryController@delete');
-	Route::post('admin/getQuestionBankSubCategories', [ 'as' => 'admin/QuestionBankgetSubCategories', 'uses' => 'QuestionBank\QuestionBankSubCategoryController@getSubCategories' ]);
 	Route::post('admin/isQuestionBankSubCategoryExist', 'QuestionBank\QuestionBankSubCategoryController@isQuestionBankSubCategoryExist');
 	Route::post('admin/getQuestionBankSubCategories', 'QuestionBank\QuestionBankSubCategoryController@getQuestionBankSubCategories');
 
@@ -253,6 +252,10 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/associateSession', 'Test\QuestionController@associateSession');
 	Route::post('admin/updateQuestionSession', 'Test\QuestionController@updateQuestionSession');
 	Route::post('admin/uploadTestImages', 'Test\QuestionController@uploadTestImages');
+	Route::get('admin/showQuestionBank', 'Test\QuestionController@showQuestionBank');
+	Route::post('admin/useQuestionBank', 'Test\QuestionController@useQuestionBank');
+	Route::post('admin/exportQuestionBank', 'Test\QuestionController@exportQuestionBank');
+
 
 		// admin question bank questions.
 	Route::get('admin/manageQuestionBankQuestions', 'QuestionBank\QuestionBankQuestionController@index');
@@ -1038,6 +1041,11 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('manageUploadQuestions', 'Client\OnlineTest\ClientOnlineTestQuestionController@uploadQuestions');
   	Route::post('uploadQuestions', 'Client\OnlineTest\ClientOnlineTestQuestionController@importQuestions');
   	Route::post('uploadClientTestImages', 'Client\OnlineTest\ClientOnlineTestQuestionController@uploadClientTestImages');
+  	Route::get('manageQuestionBank', 'Client\OnlineTest\ClientOnlineTestQuestionController@manageQuestionBank');
+  	Route::post('useQuestionBank', 'Client\OnlineTest\ClientOnlineTestQuestionController@useQuestionBank');
+  	Route::post('getQuestionBankSubCategories', 'Client\OnlineTest\ClientOnlineTestQuestionController@getQuestionBankSubCategories');
+  	Route::post('exportQuestionBank', 'Client\OnlineTest\ClientOnlineTestQuestionController@exportQuestionBank');
+
 
   	// online courses front
 	Route::get('online-courses', 'Client\Front\ClientOnlineCourseFrontController@courses');

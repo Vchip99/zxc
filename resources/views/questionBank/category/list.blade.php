@@ -68,7 +68,7 @@
     function confirmDelete(ele){
       $.confirm({
         title: 'Confirmation',
-        content: 'If you delete this category, all associated sub categories, and questions of this category will be deleted.',
+        content: 'If you delete this category, all associated sub categories and questions of this category will be deleted.',
         type: 'red',
         typeAnimated: true,
         buttons: {

@@ -163,7 +163,6 @@
               <li><a href="#footer" title="Footer"><i class="fa fa-circle-o"></i>Footer</a></li>
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#" title="Add Section">
             <i class="fa fa-plus-square"></i> <span>Add Section</span>
@@ -259,6 +258,7 @@
             <li title="Manage Subject"><a href="{{ url('manageOnlineTestSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
             <li title="Manage Paper"><a href="{{ url('manageOnlineTestSubjectPaper')}}"><i class="fa fa-circle-o"></i> Manage Paper </a></li>
             <li title="Manage Question"><a href="{{ url('manageOnlineTestQuestion')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
+            <li title="Question Bank"><a href="{{ url('manageQuestionBank')}}"><i class="fa fa-circle-o"></i> Question Bank </a></li>
             <li title="Upload Excel File"><a href="{{ url('manageUploadQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
           </ul>
         </li>

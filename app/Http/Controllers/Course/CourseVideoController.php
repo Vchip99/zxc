@@ -96,22 +96,22 @@ class CourseVideoController extends Controller
                 $notificationMessage = 'A new course video: <a href="'.$request->root().'/episode/'.$video->id.'" target="_blank">'.$video->name.'</a> has been added.';
                 Notification::addNotification($notificationMessage, Notification::ADMINCOURSEVIDEO, $video->id);
                 DB::commit();
-                $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();
-                $allUsers = $subscriedUsers->chunk(100);
-                set_time_limit(0);
-                if(false == $allUsers->isEmpty()){
-                    foreach($allUsers as $selectedUsers){
-                        $messageBody .= '<p> Dear User</p>';
-                        $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
-                        $messageBody .= '<p><b> Thanks and Regard, </b></p>';
-                        $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
-                        $messageBody .= '<b> More about us... </b><br/>';
-                        $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
-                        $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
-                        $mailSubject = 'Vchipedu added a new course video';
-                        Mail::bcc($selectedUsers)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
-                    }
-                }
+                // $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get();
+                // $allUsers = $subscriedUsers->chunk(100);
+                // set_time_limit(0);
+                // if(false == $allUsers->isEmpty()){
+                //     foreach($allUsers as $selectedUsers){
+                //         $messageBody .= '<p> Dear User</p>';
+                //         $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
+                //         $messageBody .= '<p><b> Thanks and Regard, </b></p>';
+                //         $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
+                //         $messageBody .= '<b> More about us... </b><br/>';
+                //         $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
+                //         $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
+                //         $mailSubject = 'Vchipedu added a new course video';
+                //         Mail::bcc($selectedUsers)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
+                //     }
+                // }
             	return Redirect::to('admin/manageCourseVideo')->with('message', 'Video created successfully!');
             }
         }

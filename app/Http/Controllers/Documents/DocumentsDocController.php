@@ -92,22 +92,22 @@ class DocumentsDocController extends Controller
                 $notificationMessage = 'A new document: <a href="'.$request->root().'/documents/'.$documentsDoc->id.'" target="_blank">'.$documentsDoc->name.'</a> has been added.';
                 Notification::addNotification($notificationMessage, Notification::ADMINDOCUMENT, $documentsDoc->id);
                 DB::commit();
-                $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get()->toArray();
-                $allUsers = array_chunk($subscriedUsers, 100);
-                set_time_limit(0);
-                if(count($allUsers) > 0){
-                    foreach($allUsers as $selectedUsers){
-                        $messageBody .= '<p> Dear User</p>';
-                        $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
-                        $messageBody .= '<p><b> Thanks and Regard, </b></p>';
-                        $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
-                        $messageBody .= '<b> More about us... </b><br/>';
-                        $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
-                        $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
-                        $mailSubject = 'Vchipedu added a new document';
-                        Mail::bcc($selectedUsers)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
-                    }
-                }
+                // $subscriedUsers = User::where('admin_approve', 1)->where('verified', 1)->select('email')->get()->toArray();
+                // $allUsers = array_chunk($subscriedUsers, 100);
+                // set_time_limit(0);
+                // if(count($allUsers) > 0){
+                //     foreach($allUsers as $selectedUsers){
+                //         $messageBody .= '<p> Dear User</p>';
+                //         $messageBody .= '<p>'.$notificationMessage.' please have a look once.</p>';
+                //         $messageBody .= '<p><b> Thanks and Regard, </b></p>';
+                //         $messageBody .= '<b><a href="https://vchiptech.com"> Vchip Technology Team </a></b><br/>';
+                //         $messageBody .= '<b> More about us... </b><br/>';
+                //         $messageBody .= '<b><a href="https://vchipedu.com"> Digital Education </a></b><br/>';
+                //         $messageBody .= '<b><a href="mailto:info@vchiptech.com" target="_blank">E-mail</a></b><br/>';
+                //         $mailSubject = 'Vchipedu added a new document';
+                //         Mail::bcc($selectedUsers)->queue(new MailToSubscribedUser($messageBody, $mailSubject));
+                //     }
+                // }
 
                 return Redirect::to('admin/manageDocumentsDoc')->with('message', 'Document created successfully!');
             }

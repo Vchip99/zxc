@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use App\Models\QuestionBankCategory;
+use App\Models\QuestionBankQuestion;
 use DB, File;
 
 class QuestionBankSubCategory extends Model
@@ -65,5 +66,9 @@ class QuestionBankSubCategory extends Model
 
     protected static function getSubcategoriesByCategoryId($categoryId){
         return static::where('question_bank_category_id', $categoryId)->get();
+    }
+
+    public function questions(){
+        return $this->hasMany(QuestionBankQuestion::class, 'subcat_id');
     }
 }

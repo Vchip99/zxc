@@ -328,6 +328,21 @@
 			    </div>
 			    <label class="col-sm-4 col-form-label">Ex. 1 or 2 or 3 or 4 or 5 ( if have )</label>
 		    </div>
+		    <div class="form-group row num_ans hide">
+		    	<label class="col-sm-2 col-form-label">Enter Answer:</label>
+			    <div class="col-sm-3 ">
+			    	FROM <input class="form-control" name="min" id="min" type="text" value="@if(isset($testQuestion->id)){!! $testQuestion->min !!}@endif"/>
+			    	<div class="hide" role="alert" id="empty_min_error">
+			    		<p>Please enter from value.</p>
+					</div>
+			    </div>
+			    <div class="col-sm-3">
+			      	To <input class="form-control" name="max" id="max" type="text" value="@if(isset($testQuestion->id)){!! $testQuestion->max !!}@endif"/>
+			      	<div class="hide" role="alert" id="empty_max_error">
+			    		<p>Please enter to value.</p>
+					</div>
+			    </div>
+		    </div>
 		    <div class="form-group row">
 		    	<label class="col-sm-2 col-form-label" for="solution">Enter Solution:</label>
 			    <div class="col-sm-10">

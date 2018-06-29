@@ -340,6 +340,8 @@ class QuestionBankQuestionController extends Controller
                         'answer' => $question->right_answer,
                         'question_type' => (int) $question->question_type,
                         'solution' => $solutionStr,
+                        'min' => $question->min,
+                        'max' => $question->max,
                         'category_id' => $request->get('category'),
                         'subcat_id' =>  $request->get('subcategory'),
                         'created_at' => date('Y-m-d h:i:s'),
