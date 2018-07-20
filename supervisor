@@ -52,3 +52,5 @@ sudo supervisorctl reread
 
 0 0 * * * root /usr/bin/php /var/www/html/vchip/artisan generatebillanddeactivateplan:cron > /dev/null 2>&1
 0 0 * * * root /usr/bin/php /var/www/html/vchip/artisan deactivateclientpayablesubcategory:cron > /dev/null 2>&1
+
+

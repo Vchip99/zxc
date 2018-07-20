@@ -29,9 +29,10 @@
         <tr>
           <th>#</th>
           <th style="max-width: 800px;">Question</th>
-          <th>Subject Name</th>
-          <th>Topic Name</th>
-          <th>Edit Subject</th>
+          <th>Batch</th>
+          <th>Subject</th>
+          <th>Topic</th>
+          <th>Edit</th>
           <th>Delete Subject</th>
         </tr>
       </thead>
@@ -41,6 +42,13 @@
           <tr>
             <td>{{$index + 1}}</td>
             <td style="max-width: 800px;">{!! mb_strimwidth($assignment->question, 0, 400, "...") !!}</td>
+            <td>
+              @if(0 == $assignment->client_batch_id || empty($assignment->client_batch_id))
+                All
+              @else
+                {{$assignment->batch->name}}
+              @endif
+            </td>
             <td>{{$assignment->subject->name}}</td>
             <td>{{$assignment->topic->name}}</td>
             <td>

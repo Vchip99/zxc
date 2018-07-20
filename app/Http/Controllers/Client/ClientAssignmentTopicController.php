@@ -12,6 +12,7 @@ use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
 use App\Models\ClientAssignmentQuestion;
 use App\Models\ClientAssignmentAnswer;
+use App\Models\ClientBatch;
 
 class ClientAssignmentTopicController extends ClientBaseController
 {
@@ -44,9 +45,11 @@ class ClientAssignmentTopicController extends ClientBaseController
      *  create assignment topic
      */
     protected function create($subdomainName){
+        $loginUser = Auth::guard('client')->user();
         $topic = new ClientAssignmentTopic;
-        $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
-        return view('client.assignmentTopic.create', compact('topic', 'subjects','subdomainName'));
+        $subjects = [];
+        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
+        return view('client.assignmentTopic.create', compact('topic','subjects','subdomainName','batches'));
     }
 
     /**
@@ -83,8 +86,9 @@ class ClientAssignmentTopicController extends ClientBaseController
         if(isset($id)){
             $topic = ClientAssignmentTopic::find($id);
             if(is_object($topic)){
-                $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
-                return view('client.assignmentTopic.create', compact('topic', 'subjects', 'subdomainName'));
+                $subjects = ClientAssignmentSubject::getAssignmentSubjectsByBatchId($topic->client_batch_id);
+                $batches = ClientBatch::getBatchesByClientId($topic->client_id);
+                return view('client.assignmentTopic.create', compact('topic','subjects','subdomainName','batches'));
             }
         }
         return Redirect::to('manageAssignmentTopic');
@@ -131,11 +135,10 @@ class ClientAssignmentTopicController extends ClientBaseController
             DB::connection('mysql2')->beginTransaction();
             try
             {
-                $loginUser = Auth::guard('client')->user();
-                $assignments = ClientAssignmentQuestion::where('client_assignment_topic_id', $topic->id)->where('client_id',$loginUser->id)->get();
+                $assignments = ClientAssignmentQuestion::getClientAssignmentQuestionsByTopicIdByClientId($topic->id,$topic->client_id);
                 if(is_object($assignments) && false == $assignments->isEmpty()){
                     foreach($assignments as $assignment){
-                        $answers = ClientAssignmentAnswer::where('client_assignment_question_id', $assignment->id)->where('client_id',$loginUser->id)->get();
+                        $answers = ClientAssignmentAnswer::getClientAssignmentAnswersByAssignmentIdByClientId($assignment->id,$assignment->client_id);
                         if(is_object($answers) && false == $answers->isEmpty()){
                             foreach($answers as $answer){
                                 $dir = dirname($answer->attached_link);

@@ -1144,6 +1144,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::put('updateAssignmentSubject', 'Client\ClientAssignmentSubjectController@update');
 	Route::post('getAssignmentSubjectsByCourse', 'Client\ClientAssignmentSubjectController@getAssignmentSubjectsByCourse');
 	Route::delete('deleteAssignmentSubject', 'Client\ClientAssignmentSubjectController@delete');
+	Route::post('getAssignmentSubjectsByBatchId', 'Client\ClientAssignmentSubjectController@getAssignmentSubjectsByBatchId');
 
 	// manage assignment topic
 	Route::get('manageAssignmentTopic', 'Client\ClientAssignmentTopicController@show');
@@ -1189,4 +1190,34 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('loadClientChatUsers', 'Client\ClientChatController@loadClientChatUsers');
 	Route::post('checkOnlineUsers', 'Client\ClientChatController@checkOnlineUsers');
 	Route::post('checkDashboardOnlineUsers', 'Client\ClientChatController@checkOnlineUsers');
+
+	// Batch & Attendance
+	Route::get('manageBatch', 'Client\ClientBatchController@show');
+	Route::get('createBatch', 'Client\ClientBatchController@create');
+	Route::post('createBatch', 'Client\ClientBatchController@store');
+	Route::get('batch/{id}/edit', 'Client\ClientBatchController@edit');
+	Route::put('updateBatch', 'Client\ClientBatchController@update');
+	Route::delete('deleteBatch', 'Client\ClientBatchController@delete');
+	Route::get('associateBatchStudents', 'Client\ClientBatchController@showBatchStudents');
+	Route::post('associateBatchStudents', 'Client\ClientBatchController@associateBatchStudents');
+	Route::post('getBatchStudentsIdsbyBatchId', 'Client\ClientBatchController@getBatchStudentsIdsbyBatchId');
+	Route::post('searchClientStudent', 'Client\ClientBatchController@searchClientStudent');
+	Route::get('manageAttendance', 'Client\ClientBatchController@showAttendance');
+	Route::post('getBatchStudentAttendancebyBatchId', 'Client\ClientBatchController@getBatchStudentAttendancebyBatchId');
+	Route::post('markAttendance', 'Client\ClientBatchController@markAttendance');
+
+	// Offline Paper
+	Route::get('manageOfflinePaper', 'Client\ClientOfflinePaperController@show');
+	Route::get('createOfflinePaper', 'Client\ClientOfflinePaperController@create');
+	Route::post('createOfflinePaper', 'Client\ClientOfflinePaperController@store');
+	Route::get('offlinePaper/{id}/edit', 'Client\ClientOfflinePaperController@edit');
+	Route::put('updateOfflinePaper', 'Client\ClientOfflinePaperController@update');
+	Route::delete('deleteOfflinePaper', 'Client\ClientOfflinePaperController@delete');
+	Route::post('getOfflinePapersByBatchId', 'Client\ClientOfflinePaperController@getOfflinePapersByBatchId');
+
+	Route::get('manageOfflineExam', 'Client\ClientOfflinePaperController@manageOfflineExam');
+	Route::post('getBatchStudentsAndMarksByBatchIdByPaperId', 'Client\ClientOfflinePaperController@getBatchStudentsAndMarksByBatchIdByPaperId');
+	Route::post('assignOfflinePaperMarks', 'Client\ClientOfflinePaperController@assignOfflinePaperMarks');
+
+
 });

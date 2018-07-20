@@ -336,6 +336,19 @@ class ClientUserController extends BaseController
         }
         $assignments = ClientAssignmentQuestion::where('client_id', $clientId)->select('client_assignment_questions.*')->paginate();
         $subjects = ClientAssignmentSubject::where('client_id', $clientId)->get();
+        if($clientUser->unchecked_assignments > 0){
+            DB::connection('mysql2')->beginTransaction();
+            try
+            {
+                $clientUser->unchecked_assignments = 0;
+                $clientUser->save();
+                DB::connection('mysql2')->commit();
+            }
+            catch(\Exception $e)
+            {
+                DB::connection('mysql2')->rollback();
+            }
+        }
         return view('clientuser.dashboard.myAssignmentList', compact('assignments', 'subjects'));
     }
 

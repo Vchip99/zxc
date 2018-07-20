@@ -13,6 +13,7 @@ use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
 use App\Models\ClientAssignmentQuestion;
 use App\Models\ClientAssignmentAnswer;
+use App\Models\ClientBatch;
 
 class ClientAssignmentController extends ClientBaseController
 {
@@ -48,10 +49,13 @@ class ClientAssignmentController extends ClientBaseController
         if($subdomainName){
             InputSanitise::checkClientImagesDirForCkeditor($subdomainName);
         }
+        $loginUser = Auth::guard('client')->user();
         $topics = [];
-        $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
+        // $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
+        $subjects = [];
         $assignment = new ClientAssignmentQuestion;
-        return view('client.assignment.create', compact('subjects', 'topics', 'assignment', 'subdomainName'));
+        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
+        return view('client.assignment.create', compact('subjects', 'topics', 'assignment', 'subdomainName', 'batches'));
     }
 
     /**
@@ -72,6 +76,20 @@ class ClientAssignmentController extends ClientBaseController
         {
             $assignment = ClientAssignmentQuestion::addOrUpdateAssignment($request);
             if(is_object($assignment)){
+                if($assignment->client_batch_id > 0){
+                    $studentIds = [];
+                    $batch = ClientBatch::find($assignment->client_batch_id);
+                    if(is_object($batch)){
+                        $studentIds = explode(',', $batch->student_ids);
+                    }
+                    if(count($studentIds) > 0){
+                        $users = Clientuser::getStudentsByIds($studentIds);
+                        $this->setAssignmentCount($users);
+                    }
+                } else {
+                    $users = Clientuser::getAllStudentsByClientId($assignment->client_id);
+                    $this->setAssignmentCount($users);
+                }
                 DB::connection('mysql2')->commit();
                 return Redirect::to('manageAssignment')->with('message', 'Assignment created successfully!');
             }
@@ -97,8 +115,9 @@ class ClientAssignmentController extends ClientBaseController
 
             if(is_object($assignment)){
                 $topics = ClientAssignmentTopic::getAssignmentTopicsBySubject($assignment->client_assignment_subject_id);
-                $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
-                return view('client.assignment.create', compact('subjects', 'topics', 'assignment', 'subdomainName'));
+                $subjects = ClientAssignmentSubject::getAssignmentSubjectsByBatchId($assignment->client_batch_id);
+                $batches = ClientBatch::getBatchesByClientId($assignment->client_id);
+                return view('client.assignment.create', compact('subjects','topics','assignment','subdomainName','batches'));
             }
         }
         return Redirect::to('manageAssignment');
@@ -150,12 +169,14 @@ class ClientAssignmentController extends ClientBaseController
         $assignmentTopics = [];
         $assignmentUsers = [];
 
+        $selectedAssignmentBatch = Session::get('client_selected_assignment_batch');
         $selectedAssignmentSubject  = Session::get('client_selected_assignment_subject');
         $selectedAssignmentTopic = Session::get('client_selected_assignment_topic');
         $selectedAssignmentStudent = Session::get('client_selected_assignment_student');
-
-        $assignmentSubjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
-        $assignmentUsers = Clientuser::searchStudentForAssignment();
+        if($selectedAssignmentBatch){
+            $assignmentSubjects = ClientAssignmentSubject::getAssignmentSubjectsByBatchId($selectedAssignmentBatch);
+            $assignmentUsers = Clientuser::searchStudentForAssignment($selectedAssignmentBatch);
+        }
 
         if(!empty($selectedAssignmentSubject)){
             $assignmentTopics = ClientAssignmentTopic::getAssignmentTopicsBySubject($selectedAssignmentSubject);
@@ -164,24 +185,33 @@ class ClientAssignmentController extends ClientBaseController
             $assignment = ClientAssignmentQuestion::where('client_id', Auth::guard('client')->user()->id)
                     ->where('client_assignment_topic_id', $selectedAssignmentTopic)->first();
         }
-        return view('client.studentAssignment.studentsAssignment', compact('assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'selectedAssignmentCourse', 'selectedAssignmentSubject', 'selectedAssignmentTopic', 'selectedAssignmentStudent', 'assignment', 'subdomainName'));
+        $loginUser = Auth::guard('client')->user();
+        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
+        return view('client.studentAssignment.studentsAssignment', compact('assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'selectedAssignmentCourse', 'selectedAssignmentSubject', 'selectedAssignmentTopic', 'selectedAssignmentStudent', 'assignment', 'subdomainName', 'batches', 'selectedAssignmentBatch'));
     }
 
     protected function searchStudentForAssignment(Request $request){
-        $courseId = InputSanitise::inputInt($request->get('institute_course_id'));
-        return Clientuser::searchStudentForAssignment($courseId);
+        $batchId = InputSanitise::inputInt($request->get('batch_id'));
+        return Clientuser::searchStudentForAssignment($batchId);
     }
 
     protected function getAssignmentByTopicForStudent(Request $request){
         $results = [];
+        $batch = $request->batch;
         $assignment = ClientAssignmentQuestion::where('client_id', Auth::guard('client')->user()->id)
                     ->where('client_assignment_topic_id', $request->topic)->first();
         if(is_object($assignment)){
             $results['id'] = $assignment->id;
             $results['question'] = mb_strimwidth($assignment->question, 0, 400, "...");
+            if(0 == $assignment->client_batch_id || empty($assignment->client_batch_id)){
+                $results['batch'] = 'All';
+            } else {
+                $results['batch'] = $assignment->batch->name;
+            }
             $results['subject'] = $assignment->subject->name;
             $results['topic'] = $assignment->topic->name;
 
+            Session::set('client_selected_assignment_batch', $batch);
             Session::set('client_selected_assignment_subject', $assignment->client_assignment_subject_id);
             Session::set('client_selected_assignment_topic', $assignment->client_assignment_topic_id);
             Session::set('client_selected_assignment_student', $request->student);
@@ -248,5 +278,19 @@ class ClientAssignmentController extends ClientBaseController
             }
         }
         return Redirect::to('manageAssignment');
+    }
+
+    protected function setAssignmentCount($users){
+        if(is_object($users) && false == $users->isEmpty()){
+            foreach($users as $user){
+                if(0 == $user->unchecked_assignments || empty($user->unchecked_assignments)){
+                    $user->unchecked_assignments = 1;
+                } else {
+                    $user->unchecked_assignments++;
+                }
+                $user->save();
+            }
+        }
+        return;
     }
 }

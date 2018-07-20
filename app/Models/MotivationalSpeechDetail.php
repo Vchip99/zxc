@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Redirect, DB;
+use Redirect, DB,Cache;
 use App\Libraries\InputSanitise;
 use App\Models\MotivationalSpeechDetail;
 use App\Models\MotivationalSpeechCategory;

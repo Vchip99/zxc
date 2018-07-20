@@ -99,7 +99,7 @@
 															<div class="row answer">D.<input type="radio" value="4" class="radio1 radio1_{{$result->id}}" id="radio4_{{$result->id}}" name="{{$result->id}}" />
 																{!! $result->answer4 !!}
 															</div>
-															@if(isset( $result->answer5 ) && !empty( $result->answer5 ))
+															@if(5 == $paper->option_count)
 																<div class="row answer">E.<input type="radio" value="5" class="radio1 radio1_{{$result->id}}" id="radio5_{{$result->id}}" name="{{$result->id}}" />
 																{!! $result->answer5 !!}
 																</div>

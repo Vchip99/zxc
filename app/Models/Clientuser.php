@@ -27,6 +27,7 @@ use App\Models\ClientCourseSubCommentLike;
 use App\Models\ClientOnlineVideoLike;
 use App\Models\ClientAssignmentAnswer;
 use App\Models\ClientChatMessage;
+use App\Models\ClientBatch;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class Clientuser extends Authenticatable
@@ -39,7 +40,7 @@ class Clientuser extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id'
+        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id', 'unchecked_assignments'
     ];
 
     /**
@@ -74,8 +75,7 @@ class Clientuser extends Authenticatable
         return 'true';
     }
 
-    public function verified()
-    {
+    public function verified(){
         $this->verified = 1;
         $this->email_token = null;
         $this->save();
@@ -230,6 +230,11 @@ class Clientuser extends Authenticatable
                 ->select('id','resume','recorded_video')->first();
     }
 
+    protected static function getStudentsByIds($studentIds){
+        $clientId = Auth::guard('client')->user()->id;
+        return static::whereIn('id', $studentIds)->where('client_id', $clientId)->get();
+    }
+
     protected static function deleteAllClientUsersInfoByClientId($clientId){
         $users = static::where('client_id', $clientId)->get();
         if(is_object($users) && false == $users->isEmpty()){
@@ -281,8 +286,22 @@ class Clientuser extends Authenticatable
         return ClientNotification::where('client_id', $clientId)->where('created_to', $clientUserId)->where('is_seen', 0)->count();
     }
 
-    protected static function searchStudentForAssignment(){
-        return static::where('client_id', Auth::guard('client')->user()->id)->select('clientusers.*')->get();
+    protected static function searchStudentForAssignment($batchId=NULL){
+        // return static::where('client_id', Auth::guard('client')->user()->id)->select('clientusers.*')->get();
+        if($batchId > 0){
+            $userIds = [];
+            $clientBatch = ClientBatch::getBatchById($batchId);
+            if(is_object($clientBatch)){
+                $userIds = explode(',', $clientBatch->student_ids);
+            }
+            if(count($userIds) > 0){
+                return static::where('client_id', Auth::guard('client')->user()->id)->whereIn('id', $userIds)->select('clientusers.*')->get();
+            } else {
+                return static::where('client_id', Auth::guard('client')->user()->id)->select('clientusers.*')->get();
+            }
+        } else {
+            return static::where('client_id', Auth::guard('client')->user()->id)->select('clientusers.*')->get();
+        }
     }
 
     protected static function isInBetweenFirstTen(){
@@ -347,5 +366,14 @@ class Clientuser extends Authenticatable
         $result['unreadCount'] =  $unreadCount;
         $result['onlineUsers'] = ClientChatMessage::checkOnlineUsers($subDomainName);
         return $result;
+    }
+
+    /**
+     * search client student/user
+     */
+    protected static function searchClientStudent(Request $request){
+        $student = InputSanitise::inputString($request->get('student'));
+        $clientId = Auth::guard('client')->user()->id;
+        return static::where('name', 'like', '%'.$student.'%')->where('client_id', $clientId)->get();
     }
 }

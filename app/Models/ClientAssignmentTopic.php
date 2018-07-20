@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\ClientAssignmentSubject;
+use App\Models\ClientBatch;
 
 class ClientAssignmentTopic extends Model
 {
@@ -16,7 +17,7 @@ class ClientAssignmentTopic extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'client_assignment_subject_id', 'client_id'];
+    protected $fillable = ['name', 'client_assignment_subject_id', 'client_id', 'client_batch_id'];
 
     /**
      *  add/update course category
@@ -25,6 +26,7 @@ class ClientAssignmentTopic extends Model
         $topicName = InputSanitise::inputString($request->get('topic'));
         $subjectId   = InputSanitise::inputInt($request->get('subject'));
         $topicId   = InputSanitise::inputInt($request->get('topic_id'));
+        $clientBatchId = InputSanitise::inputInt($request->get('batch'));
 
         if( $isUpdate && isset($topicId)){
             $topic = static::find($topicId);
@@ -37,6 +39,7 @@ class ClientAssignmentTopic extends Model
         $topic->name = $topicName;
         $topic->client_assignment_subject_id = $subjectId;
         $topic->client_id = Auth::guard('client')->user()->id;
+        $topic->client_batch_id = $clientBatchId;
         $topic->save();
         return $topic;
     }
@@ -62,5 +65,17 @@ class ClientAssignmentTopic extends Model
             }
         }
         return;
+    }
+
+    public function batch(){
+        return $this->belongsTo(ClientBatch::class, 'client_batch_id');
+    }
+
+    protected static function getAssignmentTopicsBySubjectIdByClientId($subjectId,$clientId){
+        return static::where('client_assignment_subject_id', $subjectId)->where('client_id', $clientId)->get();
+    }
+
+    protected static function deleteAssignmentTopicsByBatchIdByClientId($batchId,$clientId){
+        return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->delete();
     }
 }

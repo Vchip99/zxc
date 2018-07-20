@@ -8,6 +8,7 @@ use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
+use App\Models\ClientBatch;
 
 class ClientAssignmentQuestion extends Model
 {
@@ -17,7 +18,7 @@ class ClientAssignmentQuestion extends Model
      *
      * @var array
      */
-    protected $fillable = ['question', 'client_assignment_subject_id', 'client_assignment_topic_id', 'attached_link','client_id'];
+    protected $fillable = ['question', 'client_assignment_subject_id', 'client_assignment_topic_id', 'attached_link','client_id', 'client_batch_id'];
 
     /**
      *  add/update course category
@@ -28,6 +29,7 @@ class ClientAssignmentQuestion extends Model
         $topicId   = InputSanitise::inputInt($request->get('topic'));
         $assignmentId   = InputSanitise::inputInt($request->get('assignment_id'));
         $clientId = Auth::guard('client')->user()->id;
+        $clientBatchId = InputSanitise::inputInt($request->get('batch'));
 
         if( $isUpdate && isset($assignmentId)){
             $assignment = static::find($assignmentId);
@@ -42,6 +44,7 @@ class ClientAssignmentQuestion extends Model
         $assignment->client_assignment_subject_id = $subjectId;
         $assignment->client_assignment_topic_id = $topicId;
         $assignment->client_id = $clientId;
+        $assignment->client_batch_id = $clientBatchId;
 
         if( $request->exists('attached_link')){
 	        $attachmentFolderPath = "clientAssignmentStorage/".$clientId."/topicId-".$topicId;
@@ -66,6 +69,10 @@ class ClientAssignmentQuestion extends Model
 
     public function topic(){
         return $this->belongsTo(ClientAssignmentTopic::class, 'client_assignment_topic_id');
+    }
+
+    public function batch(){
+        return $this->belongsTo(ClientBatch::class, 'client_batch_id');
     }
 
     protected static function checkAssignmentExist(Request $request){
@@ -94,5 +101,13 @@ class ClientAssignmentQuestion extends Model
             }
         }
         return;
+    }
+
+    protected static function getClientAssignmentQuestionsByTopicIdByClientId($topicId,$clientId){
+        return static::where('client_assignment_topic_id', $topicId)->where('client_id', $clientId)->get();
+    }
+
+    protected static function getClientAssignmentQuestionsByBatchIdByClientId($batchId,$clientId){
+        return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->get();
     }
 }

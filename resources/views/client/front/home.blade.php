@@ -519,7 +519,6 @@
         $(this).html(html);
       }
     });
-
     $(".morelink").click(function(){
       if($(this).hasClass("less")) {
         $(this).removeClass("less");
@@ -536,24 +535,22 @@
 </script>
 
 <script>
-$("#teacher-radiobtn").click(function(){
-$(".show_hide").show();
-});
-
-$("#student-radiobtn").click(function(){
-$(".show_hide").hide();
-});
-
+  $("#teacher-radiobtn").click(function(){
+    $(".show_hide").show();
+  });
+  $("#student-radiobtn").click(function(){
+    $(".show_hide").hide();
+  });
   $(document).ready(function(){
-        setTimeout(function() {
-          $('.alert-success').fadeOut('fast');
-        }, 2000); // <-- time in milliseconds
-    });
-window.onload = function(){
-  if (window.opener != null && false ==  window.closed) {
-    window.opener.location.reload(true);
-    window.close();
+      setTimeout(function() {
+        $('.alert-success').fadeOut('fast');
+      }, 2000); // <-- time in milliseconds
+  });
+  window.onload = function(){
+    if (null != window.opener && false ==  window.closed) {
+      window.opener.location.reload(true);
+      window.close();
+    }
   }
-}
 </script>
 @stop

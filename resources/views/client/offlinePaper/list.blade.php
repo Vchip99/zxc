@@ -2,10 +2,10 @@
 @section('module_title')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <section class="content-header">
-    <h1> Manage Subject  </h1>
+    <h1> Manage Offline Paper  </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-tasks"></i> Assignment </li>
-      <li class="active"> Manage Subject </li>
+      <li><i class="fa fa-address-book"></i> Batch </li>
+      <li class="active"> Manage  Offline Paper </li>
     </ol>
   </section>
 @stop
@@ -19,56 +19,54 @@
     </div>
   @endif
     <div class="form-group row">
-      <div id="addSubjectDiv">
-        <a id="addSubject" href="{{url('createAssignmentSubject')}}" type="button" class="btn btn-primary" style="float: right; width: 150px !important;" title="Add New Subject">Add New Subject</a>&nbsp;&nbsp;
+      <div>
+        <a href="{{url('createOfflinePaper')}}" type="button" class="btn btn-primary" style="float: right; width: 150px !important;" title="Add New Paper">Add New Paper</a>&nbsp;&nbsp;
       </div>
     </div>
   <div>
-    <table class="" id="clientAssignmentSubjectTable">
+    <table class="" id="">
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Subject</th>
+          <th>Paper</th>
+          <th>Marks</th>
           <th>Batch</th>
           <th>Edit</th>
           <th>Delete</th>
         </tr>
       </thead>
-      <tbody id="clientAssignmentSubjects">
-        @if(count($subjects) > 0)
-          @foreach($subjects as $index => $subject)
+      <tbody id="clientOfflinePapers">
+        @if(count($papers) > 0)
+          @foreach($papers as $index => $paper)
           <tr>
             <td>{{$index + 1}}</td>
-            <td>{{$subject->name}}</td>
+            <td>{{$paper->name}}</td>
+            <td>{{$paper->marks}}</td>
             <td>
-              @if(0 == $subject->client_batch_id || empty($subject->client_batch_id))
-                All
-              @else
-                {{$subject->batch->name}}
-              @endif
+              {{$paper->batch->name}}
             </td>
             <td>
-              <a href="{{url('assignmentSubject')}}/{{$subject->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$subject->name}}" />
+              <a href="{{url('offlinePaper')}}/{{$paper->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$paper->name}}" />
                 </a>
             </td>
             <td>
-            <a id="{{$subject->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$subject->name}}" />
+            <a id="{{$paper->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$paper->name}}" />
                 </a>
-                <form id="deleteSubject_{{$subject->id}}" action="{{url('deleteAssignmentSubject')}}" method="POST" style="display: none;">
+                <form id="deletePaper_{{$paper->id}}" action="{{url('deleteOfflinePaper')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
-                    <input type="hidden" name="subject_id" value="{{$subject->id}}">
+                    <input type="hidden" name="paper_id" value="{{$paper->id}}">
                 </form>
             </td>
           </tr>
           @endforeach
         @else
-          <tr><td colspan="5">No subjects are created.</td></tr>
+          <tr><td colspan="6">No papers are created.</td></tr>
         @endif
       </tbody>
     </table>
     <div style="float: right;">
-      {{ $subjects->links() }}
+      {{ $papers->links() }}
     </div>
   </div>
   </div>
@@ -77,7 +75,7 @@
     function confirmDelete(ele){
       $.confirm({
         title: 'Confirmation',
-        content: 'If you delete this subject, all associated topics, assignments and its answers will be deleted.',
+        content: 'If you delete this paper, marks of students associated with this paper will be deleted.',
         type: 'red',
         typeAnimated: true,
         buttons: {
@@ -86,7 +84,7 @@
                   btnClass: 'btn-red',
                   action: function(){
                     var id = $(ele).attr('id');
-                    formId = 'deleteSubject_'+id;
+                    formId = 'deletePaper_'+id;
                     document.getElementById(formId).submit();
                   }
               },

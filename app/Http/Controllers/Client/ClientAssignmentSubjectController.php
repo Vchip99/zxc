@@ -12,6 +12,7 @@ use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
 use App\Models\ClientAssignmentQuestion;
 use App\Models\ClientAssignmentAnswer;
+use App\Models\ClientBatch;
 
 class ClientAssignmentSubjectController extends ClientBaseController
 {
@@ -43,8 +44,10 @@ class ClientAssignmentSubjectController extends ClientBaseController
      *  create assignment subject
      */
     protected function create($subdomainName){
+        $loginUser = Auth::guard('client')->user();
         $subject = new ClientAssignmentSubject;
-        return view('client.assignmentSubject.create', compact('subject', 'subdomainName'));
+        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
+        return view('client.assignmentSubject.create', compact('subject', 'subdomainName', 'batches'));
     }
 
     /**
@@ -80,9 +83,9 @@ class ClientAssignmentSubjectController extends ClientBaseController
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $subject = ClientAssignmentSubject::find($id);
-
             if(is_object($subject)){
-                return view('client.assignmentSubject.create', compact('subject', 'subdomainName'));
+                $batches = ClientBatch::getBatchesByClientId($subject->client_id);
+                return view('client.assignmentSubject.create', compact('subject', 'subdomainName', 'batches'));
             }
         }
         return Redirect::to('manageAssignmentSubject');
@@ -124,20 +127,18 @@ class ClientAssignmentSubjectController extends ClientBaseController
 
     protected function delete(Request $request){
         $subjectId = InputSanitise::inputInt($request->get('subject_id'));
-
         $subject = ClientAssignmentSubject::find($subjectId);
         if(is_object($subject)){
             DB::connection('mysql2')->beginTransaction();
             try
             {
-                $loginUser = Auth::guard('client')->user();
-                $topics = ClientAssignmentTopic::where('client_assignment_subject_id', $subject->id)->where('client_id',$loginUser->id)->get();
+                $topics = ClientAssignmentTopic::getAssignmentTopicsBySubjectIdByClientId($subject->id,$subject->client_id);
                 if(is_object($topics) && false == $topics->isEmpty()){
                     foreach($topics as $topic){
-                        $assignments = ClientAssignmentQuestion::where('client_assignment_topic_id', $topic->id)->where('client_id',$loginUser->id)->get();
+                        $assignments = ClientAssignmentQuestion::getClientAssignmentQuestionsByTopicIdByClientId($topic->id,$topic->client_id);
                         if(is_object($assignments) && false == $assignments->isEmpty()){
                             foreach($assignments as $assignment){
-                                $answers = ClientAssignmentAnswer::where('client_assignment_question_id', $assignment->id)->where('client_id',$loginUser->id)->get();
+                                $answers = ClientAssignmentAnswer::getClientAssignmentAnswersByAssignmentIdByClientId($assignment->id,$assignment->client_id);
                                 if(is_object($answers) && false == $answers->isEmpty()){
                                     foreach($answers as $answer){
                                         $dir = dirname($answer->attached_link);
@@ -164,6 +165,11 @@ class ClientAssignmentSubjectController extends ClientBaseController
             }
         }
         return Redirect::to('manageAssignmentSubject');
+    }
+
+    protected function getAssignmentSubjectsByBatchId(Request $request){
+        $clientBatchId = InputSanitise::inputInt($request->get('batch_id'));
+        return ClientAssignmentSubject::getAssignmentSubjectsByBatchId($clientBatchId);
     }
 
 }

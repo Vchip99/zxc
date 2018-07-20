@@ -36,12 +36,12 @@ class Handler extends ExceptionHandler
      * @return void
      */
     public function report(Exception $exception)
-    {
-        if ($this->shouldReport($exception)) {
-            $requestedUri = request()->getUri();
-            // sends an email
-            $this->sendEmail($exception,$requestedUri);
-        }
+    {   dd($exception);
+        // if ($this->shouldReport($exception)) {
+        //     $requestedUri = request()->getUri();
+        //     // sends an email
+        //     $this->sendEmail($exception,$requestedUri);
+        // }
 
         parent::report($exception);
     }

@@ -289,6 +289,21 @@
             </ul>
           </li>
           <li class="treeview">
+            <a href="#" title="Batch">
+              <i class="fa fa-address-book"></i> <span>Batch</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Manage Batch"><a href="{{ url('manageBatch')}}"><i class="fa fa-circle-o"></i> Manage Batch</a></li>
+              <li title="Batch Students"><a href="{{ url('associateBatchStudents')}}"><i class="fa fa-circle-o"></i> Batch Students</a></li>
+              <li title="Manage Attendance"><a href="{{ url('manageAttendance')}}"><i class="fa fa-circle-o"></i> Manage Attendance</a></li>
+              <li title="Manage Offline Paper"><a href="{{ url('manageOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
+              <li title="Manage Offline Exam"><a href="{{ url('manageOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
+            </ul>
+          </li>
+          <li class="treeview">
             <a href="#" title="Assignment">
               <i class="fa fa-tasks"></i> <span>Assignment</span>
               <span class="pull-right-container">

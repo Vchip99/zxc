@@ -251,13 +251,17 @@
   </div>
   @if(isset($paper->id) && $paper->verification_code_count > 0)
     <div class="form-group row verification_code_count">
+    <label for="name" class="col-sm-2 col-form-label">Existing No. of Verification Code:</label>
+    <div class="col-sm-3">
+        <input type="text" class="form-control" name="verification_code_count" id="verification_code_count" value="{{$paper->verification_code_count}}" placeholder="No of Verification Code" readonly>
+    </div>
   @else
     <div class="form-group row verification_code_count hide">
-  @endif
-    <label for="name" class="col-sm-2 col-form-label">No of Verification Code:</label>
+    <label for="name" class="col-sm-2 col-form-label">No. of Verification Code:</label>
     <div class="col-sm-3">
         <input type="text" class="form-control" name="verification_code_count" id="verification_code_count" value="{{$paper->verification_code_count}}" placeholder="No of Verification Code">
     </div>
+  @endif
   </div>
   @if(isset($paper->id))
     @if($paper->verification_code_count > 0)
@@ -273,7 +277,7 @@
     @else
       <div class="form-group row add_verification_code_count hide">
     @endif
-      <label for="name" class="col-sm-2 col-form-label">Add No of Verification Code:</label>
+      <label for="name" class="col-sm-2 col-form-label">Additional No. of Verification Code:</label>
       <div class="col-sm-3">
           <input type="text" class="form-control" name="add_verification_code_count" id="add_verification_code_count" value="" placeholder="No of Verification Code">
       </div>

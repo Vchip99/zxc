@@ -91,4 +91,8 @@ class ClientAssignmentAnswer extends Model
         }
         return;
     }
+
+    protected static function getClientAssignmentAnswersByAssignmentIdByClientId($assignmentId,$clientId){
+        return static::where('client_assignment_question_id', $assignmentId)->where('client_id', $clientId)->get();
+    }
 }

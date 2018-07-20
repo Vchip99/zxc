@@ -21,6 +21,37 @@
    <form action="{{url('createAssignment')}}" method="POST" enctype="multipart/form-data">
   @endif
     {{ csrf_field() }}
+    <div class="form-group row  @if ($errors->has('batch')) has-error @endif">
+      <label class="col-sm-2 col-form-label" for="batch">Batch Name:</label>
+      <div class="col-sm-3">
+        @if(isset($assignment->id))
+          @if(0 == $assignment->client_batch_id || empty($assignment->client_batch_id))
+            <input type="text" class="form-control" name="batch_text" value="All" readonly>
+            <input type="hidden" name="batch" value="0">
+          @else
+            @if(count($batches) > 0)
+              @foreach($batches as $batch)
+                @if($batch->id == $assignment->client_batch_id)
+                  <input type="text" class="form-control" name="batch_text" value="{{$batch->name}}" readonly>
+                  <input type="hidden" name="batch" value="{{$batch->id}}">
+                @endif
+              @endforeach
+            @endif
+          @endif
+        @else
+          <select class="form-control" name="batch" id="batch" onChange="selectSubject(this);">
+            <option value="">Select Batch</option>
+            <option value="All">All</option>
+            @if(count($batches) > 0)
+              @foreach($batches as $batch)
+                <option value="{{$batch->id}}">{{$batch->name}}</option>
+              @endforeach
+            @endif
+          </select>
+        @endif
+        @if($errors->has('batch')) <p class="help-block">{{ $errors->first('batch') }}</p> @endif
+      </div>
+    </div>
     <div class="form-group row @if ($errors->has('subject')) has-error @endif">
       <label class="col-sm-2 col-form-label">Subject Name:</label>
       <div class="col-sm-3">
@@ -99,6 +130,31 @@
     </form>
   </div>
 <script type="text/javascript">
+  function selectSubject(ele){
+    var batchId = $(ele).val();
+    $.ajax({
+      method: "POST",
+      url: "{{url('getAssignmentSubjectsByBatchId')}}",
+      data: {batch_id:batchId}
+    })
+    .done(function( msg ) {
+      select = document.getElementById('subject');
+      select.innerHTML = '';
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.innerHTML = 'Select Subject';
+      select.appendChild(opt);
+      if( 0 < msg.length){
+        $.each(msg, function(idx, obj) {
+            var opt = document.createElement('option');
+            opt.value = obj.id;
+            opt.innerHTML = obj.name;
+            select.appendChild(opt);
+        });
+      }
+    });
+  }
+
   function selectTopic(ele){
     id = parseInt($(ele).val());
     if( 0 < id ){

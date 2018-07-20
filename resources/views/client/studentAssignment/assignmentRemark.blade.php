@@ -64,19 +64,29 @@
         <div class="box box-primary direct-chat direct-chat-warning">
           <div class="box-header with-border">
             <div class="form-group row ">
-              <label class="col-sm-2 col-form-label">Student Name:</label>
+              <label class="col-sm-2 col-form-label">Student:</label>
               <div class="col-sm-3">
                 {{$student->name}}
               </div>
             </div>
             <div class="form-group row ">
-              <label class="col-sm-2 col-form-label">Subject Name:</label>
+              <label class="col-sm-2 col-form-label">Batch:</label>
+              <div class="col-sm-3">
+                @if(0 == $assignment->client_batch_id || empty($assignment->client_batch_id))
+                  All
+                @else
+                  {{$assignment->batch->name}}
+                @endif
+              </div>
+            </div>
+            <div class="form-group row ">
+              <label class="col-sm-2 col-form-label">Subject:</label>
               <div class="col-sm-3">
                 {{$assignment->subject->name}}
               </div>
             </div>
             <div class="form-group row ">
-              <label class="col-sm-2 col-form-label">Topic Name:</label>
+              <label class="col-sm-2 col-form-label">Topic:</label>
               <div class="col-sm-3">
                 {{$assignment->topic->name}}
               </div>

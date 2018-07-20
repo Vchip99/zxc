@@ -28,10 +28,11 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Topic Name</th>
-          <th>Subject Name</th>
-          <th>Edit Topic</th>
-          <th>Delete Topic</th>
+          <th>Topic</th>
+          <th>Subject</th>
+          <th>Batch</th>
+          <th>Edit</th>
+          <th>Delete</th>
         </tr>
       </thead>
       <tbody id="assignmentTopics">
@@ -41,6 +42,13 @@
             <td>{{$index + 1}}</td>
             <td>{{$topic->name}}</td>
             <td>{{$topic->subject->name}}</td>
+            <td>
+              @if(0 == $topic->client_batch_id || empty($topic->client_batch_id))
+                All
+              @else
+                {{$topic->batch->name}}
+              @endif
+            </td>
             <td>
               <a href="{{url('assignmentTopic')}}/{{$topic->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$topic->name}}" />
                 </a>
