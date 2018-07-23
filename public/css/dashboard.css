@@ -215,7 +215,17 @@ only screen and (max-width: 760px),
   #clientAssignmentSubjects td:nth-of-type(2):before { content: "Subject" ; font-weight: bolder; }
   #clientAssignmentSubjects td:nth-of-type(3):before { content: "Edit";  font-weight: bolder;}
   #clientAssignmentSubjects td:nth-of-type(4):before { content: "Delete";  font-weight: bolder;}
+    /*  batches */
+  #batches td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #batches td:nth-of-type(2):before { content: "Batch" ; font-weight: bolder; }
+  #batches td:nth-of-type(3):before { content: "Edit";  font-weight: bolder;}
+  #batches td:nth-of-type(4):before { content: "Delete";  font-weight: bolder;}
 
+  /*  studentAttendance */
+  #studentAttendance td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #studentAttendance td:nth-of-type(2):before { content: "Month" ; font-weight: bolder; }
+  #studentAttendance td:nth-of-type(3):before { content: "Present Dates";  font-weight: bolder;}
+  #studentAttendance td:nth-of-type(4):before { content: "Absent Days/No. of Days";  font-weight: bolder;}
     /*  clientOfflinePapers */
   #clientOfflinePapers td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
   #clientOfflinePapers td:nth-of-type(2):before { content: "Paper" ; font-weight: bolder; }

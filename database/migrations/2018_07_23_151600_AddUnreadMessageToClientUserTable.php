@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddColumnToClientUserTable extends Migration
+class AddUnreadMessageToClientUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddColumnToClientUserTable extends Migration
     public function up()
     {
         Schema::connection('mysql2')->table('clientusers', function (Blueprint $table) {
-            $table->string('batch_ids')->nullable();
+           $table->string('unread_messages')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddColumnToClientUserTable extends Migration
     public function down()
     {
         Schema::connection('mysql2')->table('clientusers', function (Blueprint $table) {
-            $table->dropColumn('batch_ids');
+            $table->dropColumn('unread_messages')->nullable();
         });
     }
 }

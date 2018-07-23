@@ -44,7 +44,7 @@ class AddBatchToManyClientTable extends Migration
             $table->dropColumn('client_batch_id');
         });
         Schema::connection('mysql2')->table('clientusers', function (Blueprint $table) {
-            $table->integer('unchecked_assignments')->nullable();
+            $table->dropColumn('unchecked_assignments');
         });
     }
 }

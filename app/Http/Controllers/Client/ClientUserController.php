@@ -38,6 +38,8 @@ use App\Models\RegisterClientOnlinePaper;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientUserAttendance;
 use App\Models\ClientBatch;
+use App\Models\ClientOfflinePaperMark;
+use App\Models\ClientMessage;
 use App\Libraries\InputSanitise;
 
 class ClientUserController extends BaseController
@@ -890,10 +892,13 @@ class ClientUserController extends BaseController
                 $date = explode('-', $attendance->attendance_date)[2];
                 if(in_array($clientUserId, $studentIds)){
                     $attendanceCount[$month]['present_date'][] = $date;
+                    sort($attendanceCount[$month]['present_date']);
                 } else {
                     $attendanceCount[$month]['absent_date'][] = $date;
+                    sort($attendanceCount[$month]['absent_date']);
                 }
                 $attendanceCount[$month]['attendance_date'][] = $date;
+                sort($attendanceCount[$month]['attendance_date']);
             }
         }
         return $attendanceCount;
@@ -914,5 +919,78 @@ class ClientUserController extends BaseController
             11 => "November",
             12 => "December"
         ];
+    }
+
+    protected function myOfflineTestResults($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
+        $batches = [];
+        if(!empty($clientUser->batch_ids)){
+            $userBatchIds = explode(',', $clientUser->batch_ids);
+            $userFirstBatchId = $userBatchIds[0];
+            if(count($userBatchIds) > 0){
+                $batches = ClientBatch::find($userBatchIds);
+            }
+        }
+        $results = ClientOfflinePaperMark::getOfflinePaperMarksByUserIdByClientId($clientUserId,$clientId);
+        return view('clientuser.dashboard.myOfflineTestResults', compact('batches','results'));
+    }
+
+    protected function showUserOfflineTestResultsByBatchIdByUserId($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $batchId = $request->get('batch_id');
+        $offlineMarks = ClientOfflinePaperMark::getOfflinePaperMarksByBatchIdByUserIdByClientId($batchId,$clientUserId,$clientId);
+        if(is_object($offlineMarks) && false == $offlineMarks->isEmpty()){
+            foreach($offlineMarks as $offlineMark){
+                $results['scores'][] = [
+                    'id' => $offlineMark->id,
+                    'batch' => $offlineMark->batch->name,
+                    'paper' => $offlineMark->paper->name,
+                    'marks' => $offlineMark->marks,
+                    'total_marks' => $offlineMark->total_marks,
+                ];
+                $results['ranks'][$offlineMark->id] = $offlineMark->rank();
+            }
+        }
+        return $results;
+    }
+
+    protected function myMessage($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $batchIds = [];
+        $messages = [];
+        if(!empty($clientUser->batch_ids)){
+            $batchIds = explode(',', $clientUser->batch_ids);
+        }
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
+        if(count($batchIds) > 0){
+            $messages = ClientMessage::getMessagesByBatchIdsByClientId($batchIds,$clientId);
+        }
+        if($clientUser->unread_messages > 0){
+            DB::connection('mysql2')->beginTransaction();
+            try
+            {
+                $clientUser->unread_messages = 0;
+                $clientUser->save();
+                DB::connection('mysql2')->commit();
+            }
+            catch(\Exception $e)
+            {
+                DB::connection('mysql2')->rollback();
+            }
+        }
+        return view('clientuser.dashboard.myMessage', compact('messages'));
     }
 }

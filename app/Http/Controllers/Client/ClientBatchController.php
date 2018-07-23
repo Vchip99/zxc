@@ -16,6 +16,7 @@ use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
 use App\Models\ClientAssignmentQuestion;
 use App\Models\ClientAssignmentAnswer;
+use App\Models\ClientMessage;
 
 class ClientBatchController extends ClientBaseController
 {
@@ -149,6 +150,7 @@ class ClientBatchController extends ClientBaseController
                         $assignment->delete();
                     }
                 }
+                ClientMessage::deleteMessagesByBatchIdsByClientId($batch->id,$batch->client_id)
                 $batch->delete();
                 DB::connection('mysql2')->commit();
                 return Redirect::to('manageBatch')->with('message', 'Batch deleted successfully!');

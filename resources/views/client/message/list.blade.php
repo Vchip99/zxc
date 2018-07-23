@@ -2,10 +2,10 @@
 @section('module_title')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <section class="content-header">
-    <h1> Manage Batch </h1>
+    <h1> Manage Message </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-address-book"></i> Batch </li>
-      <li class="active"> Manage Batch </li>
+      <li><i class="fa fa-envelope"></i> Message </li>
+      <li class="active"> Manage Message </li>
     </ol>
   </section>
 @stop
@@ -20,7 +20,7 @@
   @endif
     <div class="form-group row">
       <div>
-        <a href="{{url('createBatch')}}" type="button" class="btn btn-primary" style="float: right; width: 150px !important;" title="Add New Batch">Add New Batch</a>&nbsp;&nbsp;
+        <a href="{{url('createMessage')}}" type="button" class="btn btn-primary" style="float: right; width: 150px !important;" title="Add New Message">Add New Message</a>&nbsp;&nbsp;
       </div>
     </div>
   <div>
@@ -28,39 +28,47 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
+          <th>Message</th>
           <th>Batch</th>
           <th>Edit</th>
           <th>Delete</th>
         </tr>
       </thead>
       <tbody id="batches">
-        @if(count($batches) > 0)
-          @foreach($batches as $index => $batch)
+        @if(count($messages) > 0)
+          @foreach($messages as $index => $message)
           <tr>
             <td>{{$index + 1}}</td>
-            <td>{{$batch->name}}</td>
+            <td>{!! mb_strimwidth($message->message, 0, 400, "...") !!}</td>
             <td>
-              <a href="{{url('batch')}}/{{$batch->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$batch->name}}" />
+              @if(0 == $message->client_batch_id || empty($message->client_batch_id))
+                All
+              @else
+                {{$message->batch->name}}
+              @endif
+            </td>
+            <td>
+              <a href="{{url('message')}}/{{$message->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$message->name}}" />
                 </a>
             </td>
             <td>
-            <a id="{{$batch->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$batch->name}}" />
+            <a id="{{$message->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$message->name}}" />
                 </a>
-                <form id="deleteBatch_{{$batch->id}}" action="{{url('deleteBatch')}}" method="POST" style="display: none;">
+                <form id="deleteMessage_{{$message->id}}" action="{{url('deleteMessage')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
-                    <input type="hidden" name="batch_id" value="{{$batch->id}}">
+                    <input type="hidden" name="message_id" value="{{$message->id}}">
                 </form>
             </td>
           </tr>
           @endforeach
         @else
-          <tr><td colspan="4">No batches are created.</td></tr>
+          <tr><td colspan="5">No messages are created.</td></tr>
         @endif
       </tbody>
     </table>
     <div style="float: right;">
-      {{ $batches->links() }}
+      {{ $messages->links() }}
     </div>
   </div>
   </div>
@@ -68,7 +76,7 @@
     function confirmDelete(ele){
       $.confirm({
         title: 'Confirmation',
-        content: 'If you delete this batch, all associated subjects, topics, assignments and its answers, attendance, offline papers will be deleted.',
+        content: 'Are you sure, you want to delete this message?',
         type: 'red',
         typeAnimated: true,
         buttons: {
@@ -77,7 +85,7 @@
                   btnClass: 'btn-red',
                   action: function(){
                     var id = $(ele).attr('id');
-                    formId = 'deleteBatch_'+id;
+                    formId = 'deleteMessage_'+id;
                     document.getElementById(formId).submit();
                   }
               },

@@ -1114,13 +1114,14 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('purchaseCourse/{courseId}', 'Client\ClientUserController@purchaseCourse');
   	Route::get('redirectCoursePayment', 'Client\ClientUserController@redirectCoursePayment');
   	Route::post('webhook', 'Client\ClientUserController@webhook');
-
   	Route::get('purchaseTestSubCategory/{subCategoryId}', 'Client\ClientUserController@purchaseTestSubCategory');
   	Route::get('redirectTestSubCategoryPayment', 'Client\ClientUserController@redirectTestSubCategoryPayment');
   	Route::post('getClientUserTestSubcategoriesBycategoryId', 'Client\ClientUserController@getClientUserTestSubcategoriesBycategoryId');
   	Route::get('myAttendance', 'Client\ClientUserController@myAttendance');
   	Route::post('getAttendance', 'Client\ClientUserController@getAttendance');
-
+  	Route::get('myOfflineTestResults', 'Client\ClientUserController@myOfflineTestResults');
+  	Route::post('showUserOfflineTestResultsByBatchIdByUserId', 'Client\ClientUserController@showUserOfflineTestResultsByBatchIdByUserId');
+  	Route::get('myMessage', 'Client\ClientUserController@myMessage');
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');
@@ -1221,5 +1222,10 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('getBatchStudentsAndMarksByBatchIdByPaperId', 'Client\ClientOfflinePaperController@getBatchStudentsAndMarksByBatchIdByPaperId');
 	Route::post('assignOfflinePaperMarks', 'Client\ClientOfflinePaperController@assignOfflinePaperMarks');
 
-
+	Route::get('manageMessage', 'Client\ClientMessageController@show');
+	Route::get('createMessage', 'Client\ClientMessageController@create');
+	Route::post('createMessage', 'Client\ClientMessageController@store');
+	Route::get('message/{id}/edit', 'Client\ClientMessageController@edit');
+	Route::put('updateMessage', 'Client\ClientMessageController@update');
+	Route::delete('deleteMessage', 'Client\ClientMessageController@delete');
 });

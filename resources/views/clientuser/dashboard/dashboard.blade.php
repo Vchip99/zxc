@@ -120,6 +120,7 @@
             <li title="My Test"><a href="{{ url('myTest')}}"><i class="fa fa-circle-o"></i> My Test</a></li>
             <li title="My Test Results"><a href="{{ url('myTestResults')}}"><i class="fa fa-circle-o"></i> My Test Results</a></li>
             <li title="More Test"><a href="{{ url('online-tests')}}" target="_blank"><i class="fa fa-circle-o"></i> More Test</a></li>
+            <li title="My Offline Test Results"><a href="{{ url('myOfflineTestResults')}}"><i class="fa fa-circle-o"></i> My Offline Test Results</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -142,6 +143,17 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="{{ url('myAttendance')}}"><i class="fa fa-circle-o"></i> My Attendance </a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="Message">
+            <i class="fa fa-envelope"></i> <span>Message</span><b style="color: red;">{{Auth::guard('clientuser')->user()->unread_messages}} </b>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="My Message"><a href="{{ url('myMessage')}}"><i class="fa fa-circle-o"></i> My Message</a></li>
           </ul>
         </li>
         <!-- <li title="Home"><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li> -->

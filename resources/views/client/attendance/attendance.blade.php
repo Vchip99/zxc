@@ -76,6 +76,7 @@
                   <tr>
                     <th>Sr. No.</th>
                     <th>Name</th>
+                    <th>Email</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -131,9 +132,9 @@
           if(result['batchUsers']){
             $.each(result['batchUsers'], function(idx, obj) {
               if(result['batchAttendance'].indexOf(String(obj.id)) > -1){
-                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="checkbox" name="students[]" id="student_'+obj.id+'" value="'+obj.id+'" checked="checked"></td></tr>';
+                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td>'+obj.email+'</td><td><input type="checkbox" name="students[]" id="student_'+obj.id+'" value="'+obj.id+'" checked="checked"></td></tr>';
               } else {
-                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="checkbox" name="students[]" id="student_'+obj.id+'" value="'+obj.id+'"></td></tr>';
+                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td>'+obj.email+'</td><td><input type="checkbox" name="students[]" id="student_'+obj.id+'" value="'+obj.id+'"></td></tr>';
               }
               if(0 == idx){
                 allUsers.value = obj.id;

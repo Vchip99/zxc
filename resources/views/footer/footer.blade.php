@@ -73,13 +73,13 @@
            <p>Office, WARJE, PUNE-411058, INDIA.</p>
            <p>Email: info@vchiptech.com</p>
            <p>Phone: 020-25235596</p>
-           <form action="{{url('subscribedUser')}}" method="POST">
+           <!-- <form action="{{url('subscribedUser')}}" method="POST">
             {{csrf_field()}}
               <div class="v_subscribe_form input-group">
                  <input class="btn btn-sm" name="email" id="subscribe_email" type="email" placeholder="Email" required>
                  <button class=" btn-info btn-sm" type="submit">Subscribe</button>
               </div>
-           </form>
+           </form> -->
          </address>
         </div>
       </div>

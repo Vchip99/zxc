@@ -58,11 +58,11 @@
         <tr>
           <th>#</th>
           <th>Month</th>
-          <th>Present Days</th>
+          <th>Present Dates</th>
           <th>Absent Days/No. of Days</th>
         </tr>
       </thead>
-      <tbody id="studentAssignment">
+      <tbody id="studentAttendance">
         @if(count($months) > 0)
           @foreach($months as $index => $month)
             <tr class="student" id="div_student_{{$month}}" >
