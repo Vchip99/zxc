@@ -40,7 +40,7 @@ class Clientuser extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id', 'unchecked_assignments'
+        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id', 'unchecked_assignments','batch_ids'
     ];
 
     /**

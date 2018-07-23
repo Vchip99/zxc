@@ -45,7 +45,8 @@
         <div class="col-lg-12" id="all-result">
           <div class="panel panel-info">
             <div class="panel-heading text-center">
-              Students
+              <span class="">Students</span>
+              <span class="pull-right">Toggle All - <input type="checkbox" onClick="toggleAll(this);"></span>
             </div>
             <div class="panel-body">
               <table  class="" id="">
@@ -82,6 +83,13 @@
     </form>
   </div>
 <script type="text/javascript">
+  function toggleAll(ele){
+    if(true == $(ele).prop('checked')){
+      $('input[id^=student_]').prop('checked', 'checked');
+    } else {
+      $('input[id^=student_]').prop('checked', '');
+    }
+  }
   function selectBatchStudent(ele){
     var batchId = parseInt($(ele).val());
     var currentToken = $('meta[name="csrf-token"]').attr('content');

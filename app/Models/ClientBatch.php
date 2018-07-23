@@ -51,7 +51,7 @@ class ClientBatch extends Model
     		$batch->student_ids = $students;
     		$batch->save();
     	}
-    	return;
+    	return $batch;
     }
 
     protected static function getBatchById($id){

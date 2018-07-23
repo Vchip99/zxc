@@ -133,6 +133,17 @@
             <li><a href="{{ url('myAssignments')}}"><i class="fa fa-circle-o"></i> My Assignments </a></li>
           </ul>
         </li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-user"></i> <span>Attendance</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{{ url('myAttendance')}}"><i class="fa fa-circle-o"></i> My Attendance </a></li>
+          </ul>
+        </li>
         <!-- <li title="Home"><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li> -->
         <!-- <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li> -->
         <li class="header">LABELS</li>

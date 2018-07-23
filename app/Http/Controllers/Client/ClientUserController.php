@@ -36,6 +36,8 @@ use App\Models\PayableClientSubCategory;
 use App\Models\RegisterClientOnlineCourses;
 use App\Models\RegisterClientOnlinePaper;
 use App\Models\ClientOnlineTestQuestion;
+use App\Models\ClientUserAttendance;
+use App\Models\ClientBatch;
 use App\Libraries\InputSanitise;
 
 class ClientUserController extends BaseController
@@ -837,5 +839,80 @@ class ClientUserController extends BaseController
             }
         }
         return Redirect::to('online-tests');
+    }
+
+    protected function myAttendance($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $batches = [];
+        $userFirstBatchId = 0;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
+        $months = $this->getMonths();
+        if(!empty($clientUser->batch_ids)){
+            $userBatchIds = explode(',', $clientUser->batch_ids);
+            $userFirstBatchId = $userBatchIds[0];
+            if(count($userBatchIds) > 0){
+                $batches = ClientBatch::find($userBatchIds);
+            }
+        }
+        $attendanceCount = $this->getAttendanceByBatchByYearByUserByClient($userFirstBatchId,date('Y'),$clientUserId,$clientId);
+        $currnetYear = date('Y');
+        return view('clientuser.dashboard.myAttendance', compact('batches','months','attendanceCount','currnetYear'));
+    }
+
+    protected function getAttendance(Request $request){
+        $year = $request->get('year');
+        $batch = $request->get('batch_id');
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $result = [];
+        $result['months'] = $this->getMonths();
+        $result['attendanceCount'] = $this->getAttendanceByBatchByYearByUserByClient($batch,$year,$clientUserId,$clientId);
+        return $result;
+    }
+
+    protected function getAttendanceByBatchByYearByUserByClient($batch,$year,$clientUserId,$clientId){
+        $attendanceCount = [];
+        if($batch > 0){
+            $allAttendance = ClientUserAttendance::where('client_batch_id','=', $batch)->whereYear('attendance_date', $year)->where('client_id', $clientId)->get();
+        } else {
+            $allAttendance = ClientUserAttendance::whereYear('attendance_date', $year)->where('client_id', $clientId)->get();
+        }
+        if(is_object($allAttendance) && false == $allAttendance->isEmpty()){
+            foreach($allAttendance as $attendance){
+                $studentIds = explode(',', $attendance->student_ids);
+                $month =(int) explode('-', $attendance->attendance_date)[1];
+                $date = explode('-', $attendance->attendance_date)[2];
+                if(in_array($clientUserId, $studentIds)){
+                    $attendanceCount[$month]['present_date'][] = $date;
+                } else {
+                    $attendanceCount[$month]['absent_date'][] = $date;
+                }
+                $attendanceCount[$month]['attendance_date'][] = $date;
+            }
+        }
+        return $attendanceCount;
+    }
+
+    protected function getMonths(){
+        return [
+            1 => "January",
+            2 => "February",
+            3 => "March",
+            4 => "April",
+            5 => "May",
+            6 => "June",
+            7 => "July",
+            8 => "August",
+            9 => "September",
+            10 => "October",
+            11 => "November",
+            12 => "December"
+        ];
     }
 }

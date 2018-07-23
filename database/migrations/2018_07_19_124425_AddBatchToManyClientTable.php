@@ -14,13 +14,13 @@ class AddBatchToManyClientTable extends Migration
     public function up()
     {
         Schema::connection('mysql2')->table('client_assignment_subjects', function (Blueprint $table) {
-            $table->integer('client_batch_id')->nullable();
+            $table->integer('client_batch_id')->default(0);
         });
         Schema::connection('mysql2')->table('client_assignment_topics', function (Blueprint $table) {
-            $table->integer('client_batch_id')->nullable();
+            $table->integer('client_batch_id')->default(0);
         });
         Schema::connection('mysql2')->table('client_assignment_questions', function (Blueprint $table) {
-            $table->integer('client_batch_id')->nullable();
+            $table->integer('client_batch_id')->default(0);
         });
         Schema::connection('mysql2')->table('clientusers', function (Blueprint $table) {
             $table->integer('unchecked_assignments')->nullable();

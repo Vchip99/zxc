@@ -173,9 +173,28 @@ class ClientBatchController extends ClientBaseController
         DB::connection('mysql2')->beginTransaction();
         try
         {
-            ClientBatch::associateBatchStudents($request);
-            DB::connection('mysql2')->commit();
-            return Redirect::to('associateBatchStudents')->with('message', 'Student associate to batch successfully!');
+            $clientBatch = ClientBatch::associateBatchStudents($request);
+            if(is_object($clientBatch)){
+                $userIds = explode(',', $clientBatch->student_ids);
+                if(count($userIds) > 0){
+                    $batchUsers = Clientuser::find($userIds);
+                    if(is_object($batchUsers) && false == $batchUsers->isEMpty()){
+                        foreach($batchUsers as $batchUser){
+                            if($batchUser->batch_ids){
+                                $userBatchIds = explode(',', $batchUser->batch_ids);
+                                if(!in_array($clientBatch->id, $userBatchIds)){
+                                    $batchUser->batch_ids .= ','.$clientBatch->id;
+                                }
+                            } else {
+                                $batchUser->batch_ids = $clientBatch->id;
+                            }
+                            $batchUser->save();
+                        }
+                    }
+                }
+                DB::connection('mysql2')->commit();
+                return Redirect::to('associateBatchStudents')->with('message', 'Student associate to batch successfully!');
+            }
         }
         catch(\Exception $e)
         {
