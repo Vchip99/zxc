@@ -150,7 +150,7 @@ class ClientBatchController extends ClientBaseController
                         $assignment->delete();
                     }
                 }
-                ClientMessage::deleteMessagesByBatchIdsByClientId($batch->id,$batch->client_id)
+                ClientMessage::deleteMessagesByBatchIdsByClientId($batch->id,$batch->client_id);
                 $batch->delete();
                 DB::connection('mysql2')->commit();
                 return Redirect::to('manageBatch')->with('message', 'Batch deleted successfully!');
@@ -175,6 +175,18 @@ class ClientBatchController extends ClientBaseController
         DB::connection('mysql2')->beginTransaction();
         try
         {
+            $batchId   = InputSanitise::inputInt($request->get('batch'));
+            $batchObj = ClientBatch::getBatchById($batchId);
+            $batchOldStudents = [];
+            if(is_object($batchObj)){
+                if(!empty($batchObj->student_ids)){
+                    $batchOldStudents = explode(',', $batchObj->student_ids);
+                } else {
+                    $batchOldStudents = [];
+                }
+            } else {
+                return Redirect::to('associateBatchStudents')->withErrors('please select batch.');
+            }
             $clientBatch = ClientBatch::associateBatchStudents($request);
             if(is_object($clientBatch)){
                 $userIds = explode(',', $clientBatch->student_ids);
@@ -185,12 +197,38 @@ class ClientBatchController extends ClientBaseController
                             if($batchUser->batch_ids){
                                 $userBatchIds = explode(',', $batchUser->batch_ids);
                                 if(!in_array($clientBatch->id, $userBatchIds)){
-                                    $batchUser->batch_ids .= ','.$clientBatch->id;
+                                    if(empty(trim($batchUser->batch_ids))){
+                                        $batchUser->batch_ids = $clientBatch->id;
+                                    } else {
+                                        $batchUser->batch_ids .= ','.$clientBatch->id;
+                                    }
                                 }
                             } else {
                                 $batchUser->batch_ids = $clientBatch->id;
                             }
                             $batchUser->save();
+                        }
+                    }
+                }
+                // remove batch id from un associated user and delete offline marks
+                if(count(array_diff($batchOldStudents, $userIds)) > 0){
+                    $studentIds = array_values(array_diff($batchOldStudents, $userIds));
+                    ClientOfflinePaperMark::deleteMarksByClientIdByBatchIdByClientUsers($clientBatch->client_id,$clientBatch->id,$studentIds);
+                    $oldBatchUsers = Clientuser::find($studentIds);
+                    if(is_object($oldBatchUsers) && false == $oldBatchUsers->isEMpty()){
+                        foreach($oldBatchUsers as $oldBatchUser){
+                            if($oldBatchUser->batch_ids){
+                                $userBatchIds = explode(',', $oldBatchUser->batch_ids);
+                                if(in_array($clientBatch->id, $userBatchIds)){
+                                    $userBatchIds = array_diff($userBatchIds, [$clientBatch->id]);
+                                    if(count($userBatchIds) > 0){
+                                        $oldBatchUser->batch_ids = implode(',', $userBatchIds);
+                                    } else {
+                                        $oldBatchUser->batch_ids = '';
+                                    }
+                                    $oldBatchUser->save();
+                                }
+                            }
                         }
                     }
                 }

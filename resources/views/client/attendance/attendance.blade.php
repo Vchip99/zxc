@@ -129,7 +129,7 @@
           users.innerHTML = '';
           var allUsers = document.getElementById('all_users');
           allUsers.value = '';
-          if(result['batchUsers']){
+          if(result['batchUsers'].length){
             $.each(result['batchUsers'], function(idx, obj) {
               if(result['batchAttendance'].indexOf(String(obj.id)) > -1){
                 users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td>'+obj.email+'</td><td><input type="checkbox" name="students[]" id="student_'+obj.id+'" value="'+obj.id+'" checked="checked"></td></tr>';
@@ -142,6 +142,8 @@
                 allUsers.value += ','+ obj.id;
               }
             });
+          } else {
+            users.innerHTML = '<tr class="student"><td colspan="4">No Result!</td></tr>';
           }
       });
     }

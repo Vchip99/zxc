@@ -124,7 +124,7 @@
       }).done(function( result ) {
           var users = document.getElementById('client_offline_paper_marks');
           users.innerHTML = '';
-          if(result['batchUsers']){
+          if(result['batchUsers'].length){
             $.each(result['batchUsers'], function(idx, obj) {
               if(result['studentMarks'][obj.id]){
                 users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="text" name="'+obj.id+'" id="student_'+obj.id+'" value="'+result['studentMarks'][obj.id].marks+'"></td><td><input type="text" name="total_marks" value="'+result['studentMarks'][obj.id].total_marks+'" readonly></td></tr>';
@@ -132,6 +132,8 @@
                 users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="text" name="'+obj.id+'" id="student_'+obj.id+'" value=""></td><td><input type="text" name="total_marks" value="'+paperMarks+'" readonly></td></tr>';
               }
             });
+          } else {
+            users.innerHTML = '<tr class="student"><td colspan="4">No Result!</td></tr>';
           }
       });
     }

@@ -318,14 +318,14 @@
             </ul>
           </li>
           <li class="treeview">
-            <a href="#" title="Message">
-              <i class="fa fa-envelope"></i> <span>Message</span>
+            <a href="#" title="Event/Message">
+              <i class="fa fa-envelope"></i> <span>Event/Message</span>
               <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
             </a>
             <ul class="treeview-menu">
-              <li title="Manage Message"><a href="{{ url('manageMessage')}}"><i class="fa fa-circle-o"></i> Manage Message</a></li>
+              <li title="Manage Event/Message"><a href="{{ url('manageMessage')}}"><i class="fa fa-circle-o"></i> Manage Event/Message</a></li>
             </ul>
           </li>
         <li class="treeview">

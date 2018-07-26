@@ -45,7 +45,11 @@ class ClientBatch extends Model
 
     protected static function associateBatchStudents(Request $request){
     	$batchId   = InputSanitise::inputInt($request->get('batch'));
-    	$students = implode(',', $request->get('students'));
+        if(!empty($request->get('students'))){
+    	   $students = implode(',', $request->get('students'));
+        } else {
+            $students = '';
+        }
     	$batch = static::find($batchId);
     	if(is_object($batch)){
     		$batch->student_ids = $students;

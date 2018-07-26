@@ -53,8 +53,20 @@
 			                          <td>{{$index + 1}}</td>
 			                          <td>{{$result->batch->name}}</td>
 			                          <td>{{$result->paper->name}}</td>
-			                          <td>{{$result->marks}} / {{$result->total_marks}}</td>
-			                          <td>{{$result->rank()}}</td>
+			                          <td>
+                                  @if('' != trim($result->marks))
+                                    {{$result->marks}} / {{$result->total_marks}}
+                                  @else
+                                    absent
+                                  @endif
+                                </td>
+			                          <td>
+                                  @if('' != trim($result->marks))
+                                    {{$result->rank()}}
+                                  @else
+                                    absent
+                                  @endif
+                                </td>
 			                        </tr>
 			                      @endforeach
 			                    @elseif(0 == count($results))
@@ -72,7 +84,6 @@
     </div>
 </div>
 <script type="text/javascript">
-
  function showResult(ele){
     var batchId = parseInt($(ele).val());
     $.ajax({
@@ -83,7 +94,6 @@
     .done(function( msg ) {
       body = document.getElementById('test-result');
       body.innerHTML = '';
-      console.log(msg);
       if( msg['scores'] && 0 < msg['scores'].length){
         $.each(msg['scores'], function(idx, obj) {
           var eleTr = document.createElement('tr');
@@ -100,7 +110,11 @@
           eleTr.appendChild(elePaper);
 
           var eleScore = document.createElement('td');
-          eleScore.innerHTML = obj.marks+'/'+obj.total_marks;
+          if(obj.marks){
+            eleScore.innerHTML = obj.marks+'/'+obj.total_marks;
+          } else {
+            eleScore.innerHTML = 'absent';
+          }
           eleTr.appendChild(eleScore);
 
           var eleRank = document.createElement('td');

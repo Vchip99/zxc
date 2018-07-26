@@ -147,13 +147,13 @@
         </li>
         <li class="treeview">
           <a href="#" title="Message">
-            <i class="fa fa-envelope"></i> <span>Message</span><b style="color: red;">{{Auth::guard('clientuser')->user()->unread_messages}} </b>
+            <i class="fa fa-envelope"></i> <span>Event/Message</span><b style="color: red;">{{Auth::guard('clientuser')->user()->unread_messages}} </b>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-            <li title="My Message"><a href="{{ url('myMessage')}}"><i class="fa fa-circle-o"></i> My Message</a></li>
+            <li title="My Event/Message"><a href="{{ url('myMessage')}}"><i class="fa fa-circle-o"></i> My Event/Message</a></li>
           </ul>
         </li>
         <!-- <li title="Home"><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li> -->

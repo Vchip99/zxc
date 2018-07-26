@@ -942,6 +942,7 @@ class ClientUserController extends BaseController
     }
 
     protected function showUserOfflineTestResultsByBatchIdByUserId($subdomainName,Request $request){
+        $results = [];
         $clientUser = Auth::guard('clientuser')->user();
         $clientUserId = $clientUser->id;
         $clientId = $clientUser->client_id;
@@ -953,10 +954,15 @@ class ClientUserController extends BaseController
                     'id' => $offlineMark->id,
                     'batch' => $offlineMark->batch->name,
                     'paper' => $offlineMark->paper->name,
-                    'marks' => $offlineMark->marks,
+                    'marks' => trim($offlineMark->marks),
                     'total_marks' => $offlineMark->total_marks,
                 ];
-                $results['ranks'][$offlineMark->id] = $offlineMark->rank();
+                if('' != trim($offlineMark->marks)){
+                    $results['ranks'][$offlineMark->id] = $offlineMark->rank();
+                } else {
+                    $results['ranks'][$offlineMark->id] = 'absent';
+                }
+
             }
         }
         return $results;

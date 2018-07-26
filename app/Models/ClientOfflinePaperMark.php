@@ -80,10 +80,14 @@ class ClientOfflinePaperMark extends Model
     }
 
     public static function getUserRankByBatchIdByPaperByClientId($clientBatchId,$paper,$clientId,$marks){
-        return static::where('client_batch_id', $clientBatchId)->where('client_offline_paper_id', $paper)->where('client_id', $clientId)->where('marks', '>', DB::raw($marks))->count();
+        return static::where('client_batch_id', $clientBatchId)->where('client_offline_paper_id', $paper)->where('client_id', $clientId)->where('marks', '!=', '')->where('marks', '>', DB::raw($marks))->count();
     }
 
     public static function getTotalRankByBatchIdByPaperByClientId($clientBatchId,$paper,$clientId){
-        return static::where('client_batch_id', $clientBatchId)->where('client_offline_paper_id', $paper)->where('client_id', $clientId)->count();
+        return static::where('client_batch_id', $clientBatchId)->where('client_offline_paper_id', $paper)->where('client_id', $clientId)->where('marks', '!=', '')->count();
+    }
+
+    protected static function deleteMarksByClientIdByBatchIdByClientUsers($clientId,$clientBatchId,$clientUserIds){
+        return static::where('client_id', $clientId)->where('client_batch_id', $clientBatchId)->whereIn('clientuser_id', $clientUserIds)->delete();
     }
 }

@@ -88,7 +88,7 @@
         data: {batch_id:batchId,year:year}
       })
       .done(function( msgs ) {
-        body = document.getElementById('studentAssignment');
+        body = document.getElementById('studentAttendance');
         body.innerHTML = '';
         console.log(msgs['months']);
         if(Object.keys(msgs['months']).length > 0){
