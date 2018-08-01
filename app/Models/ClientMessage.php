@@ -76,7 +76,7 @@ class ClientMessage extends Model
     }
 
     protected static function getMessagesByBatchIdsByClientId($batchIds,$clientId){
-    	return static::where('client_id', $clientId)->whereIn('client_batch_id', $batchIds)->orWhere('client_batch_id', 0)->orderBy('id', 'desc')->get();
+    	return static::where('client_id', $clientId)->whereIn('client_batch_id', $batchIds)->orWhere('client_batch_id', 0)->orderBy('updated_at','desc')->get();
     }
 
     protected static function deleteMessagesByBatchIdsByClientId($batchId,$clientId){

@@ -339,15 +339,15 @@ class ClientBatchController extends ClientBaseController
             $result = $this->getAttendanceByBatchByYearByClient($selectedBatch,date('Y'),$loginUser->id,$batchesCount);
 
         }
+        $attendanceStats = implode(',', $result['attendanceStats']);
         if(!empty($selectedYear)){
             $defaultDate = $selectedYear.'-'.date('m').'-'.date('d');
         } else {
             $defaultDate = date('Y-m-d');
         }
         $currnetYear = date('Y');
-        $events = $result['events'];
         $allAttendanceDates = implode(',', $result['allAttendanceDates']);
-        $calendar = \Calendar::addEvents($events)->setOptions([ //set fullcalendar options
+        $calendar = \Calendar::addEvents([])->setOptions([ //set fullcalendar options
             'header' => [
                 'left' => '',
                 'center' => 'prev title next',
@@ -355,11 +355,11 @@ class ClientBatchController extends ClientBaseController
             ],
             'defaultDate' => $defaultDate,
         ]);
-        return view('client.attendance.calendar', compact('batches', 'subdomainName', 'currnetYear','calendar','selectedYear','selectedBatch', 'allAttendanceDates','calendarYear'));
+        return view('client.attendance.calendar', compact('batches', 'subdomainName', 'currnetYear','calendar','selectedYear','selectedBatch', 'allAttendanceDates','calendarYear', 'attendanceStats'));
     }
 
     protected function getAttendanceByBatchByYearByClient($batch,$year,$clientId,$batchesCount){
-        $attendanceCount = [];
+        $attendanceStats = [];
         $result = [];
         $allAttendanceDates = [];
         if($batch > 0 && $year > 0){
@@ -370,43 +370,14 @@ class ClientBatchController extends ClientBaseController
         if(is_object($allAttendance) && false == $allAttendance->isEmpty()){
             foreach($allAttendance as $attendance){
                 $studentCount = count(explode(',',$attendance->student_ids));
-                $attendanceCount[$attendance->attendance_date]['present'] = $studentCount;
-                $attendanceCount[$attendance->attendance_date]['absent'] = $batchesCount[$attendance->client_batch_id] - $studentCount;
+                $presentCnt = $studentCount;
+                $absentCnt = $batchesCount[$attendance->client_batch_id] - $studentCount;
+                $attendanceStats[] = $attendance->attendance_date.':'.$presentCnt.'-'.$absentCnt;
                 $allAttendanceDates[] = $attendance->attendance_date;
             }
         }
-
-        $events = [];
-        foreach($attendanceCount as $date => $arr) {
-            $presentCnt = $arr['present'];
-            $absentCnt = $arr['absent'];
-
-            $events[] = \Calendar::event(
-                        'Present - '.$presentCnt,
-                        true,
-                        new \DateTime($date),
-                        new \DateTime($date.' +1 day'),
-                        null,
-                        // Add color and link on event
-                        [
-                            'color' => '#FAA732',
-                        ]
-                    );
-            $events[] = \Calendar::event(
-                        'Absent - '.$absentCnt,
-                        true,
-                        new \DateTime($date),
-                        new \DateTime($date.' +1 day'),
-                        null,
-                        // Add color and link on event
-                        [
-                            'color' => '#FAA732',
-                        ]
-                    );
-        }
-
         $result['allAttendanceDates'] = $allAttendanceDates;
-        $result['events'] = $events;
+        $result['attendanceStats'] = $attendanceStats;
         return $result;
     }
 }

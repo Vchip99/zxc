@@ -136,7 +136,7 @@
         var statsArr = stats.split(':');
         var dateStr = statsArr[0];
         var statsCountArr = statsArr[1].split('-');
-        $('.fc-bg td[data-date="' + dateStr + '"]').append('<b>Present- '+statsCountArr[0]+'<br>Absent- '+statsCountArr[1]+'<br>Total- '+statsCountArr[2]+'</b>');
+        $('.fc-bg td[data-date="' + dateStr + '"]').append('<b>&nbsp;Present - '+statsCountArr[0]+'<br>&nbsp;Absent - '+statsCountArr[1]+'<br>&nbsp;Total - '+statsCountArr[2]+'</b>');
       });
     }
   }

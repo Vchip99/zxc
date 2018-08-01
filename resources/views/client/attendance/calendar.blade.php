@@ -30,6 +30,9 @@
     .fc-day-number.fc-other-month {
        opacity: 1 !important;
     }
+    .fc td, .fc th {
+      vertical-align: inherit !important;
+    }
   </style>
 @stop
 @section('dashboard_content')
@@ -90,6 +93,7 @@
     </form>
   </div>
   <input type="hidden" id="all_attendance_dates" value="{{$allAttendanceDates}}">
+  <input type="hidden" id="attendance_stats" value="{{$attendanceStats}}">
   {!! $calendar->script() !!}
   <script src="{{ asset('js/moment.min.js')}}"></script>
   <script src="{{ asset('js/fullcalendar.min.js')}}"></script>
@@ -97,9 +101,11 @@
 $(document).ready(function(){
     showUnAttendanceDates();
     showAttendanceDates();
+    showAttendanceStats();
     $('button.fc-prev-button').on('click',function(){
       showUnAttendanceDates();
       showAttendanceDates();
+      showAttendanceStats();
       $('td.fc-day').on('click',function(ele){
         var selectedDate = $(this).data('date');
         var selectedBatch = document.getElementById('batch').value;
@@ -118,6 +124,7 @@ $(document).ready(function(){
     $('button.fc-next-button').on('click',function(){
       showUnAttendanceDates();
       showAttendanceDates();
+      showAttendanceStats();
       $('td.fc-day').on('click',function(ele){
         var selectedDate = $(this).data('date');
         var selectedBatch = document.getElementById('batch').value;
@@ -175,6 +182,17 @@ $(document).ready(function(){
     var year = document.getElementById('year').value;
     if(batchId && year){
       document.getElementById('attendanceCalendarForm').submit();
+    }
+  }
+  function showAttendanceStats(){
+    attendanceStats = document.getElementById('attendance_stats').value;
+    if(attendanceStats){
+      $.each(attendanceStats.split(','), function(idx, stats){
+        var statsArr = stats.split(':');
+        var dateStr = statsArr[0];
+        var statsCountArr = statsArr[1].split('-');
+        $('.fc-bg td[data-date="' + dateStr + '"]').append('<b>&nbsp;Present - '+statsCountArr[0]+'<br>&nbsp;Absent - '+statsCountArr[1]+'</b>');
+      });
     }
   }
 </script>

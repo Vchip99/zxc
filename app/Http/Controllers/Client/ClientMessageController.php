@@ -34,7 +34,7 @@ class ClientMessageController extends ClientBaseController
     ];
 
     protected function show($subdomainName){
-        $messages = ClientMessage::where('client_id', Auth::guard('client')->user()->id)->paginate();
+        $messages = ClientMessage::where('client_id', Auth::guard('client')->user()->id)->orderBy('id', 'desc')->paginate();
         return view('client.message.list', compact('messages','subdomainName'));
     }
 

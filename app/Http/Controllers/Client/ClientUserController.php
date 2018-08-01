@@ -915,20 +915,25 @@ class ClientUserController extends BaseController
         $allAbsentDates = [];
         $allPresentDates = [];
         $attendanceStats = [];
-        $events = [];
-        foreach($attendanceCount as $month => $arr) {
-            $presentDates = $arr['present_date'];
-            $attendanceDates = $arr['attendance_date'];
-            $noOfPresentDays = count($presentDates);
-            $noOfAttendanceDays = count($attendanceDates);
-            $noOfAbsentDays = $noOfAttendanceDays - $noOfPresentDays;
-            $firstDate = $year.'-0'.$month.'-01';
-            $attendanceStats[] = $firstDate.':'.$noOfPresentDays.'-'.$noOfAbsentDays.'-'.$noOfAttendanceDays;
-            foreach( $attendanceDates as $id => $date) {
-                if(isset($presentDates[$id])){
-                    $allPresentDates[] = $date;
+        if(count($attendanceCount) > 0){
+            foreach($attendanceCount as $month => $arr) {
+                if(isset($arr['present_date'])){
+                    $presentDates = $arr['present_date'];
                 } else {
-                    $allAbsentDates[] = $date;
+                    $presentDates = [];
+                }
+                $attendanceDates = $arr['attendance_date'];
+                $noOfPresentDays = count($presentDates);
+                $noOfAttendanceDays = count($attendanceDates);
+                $noOfAbsentDays = $noOfAttendanceDays - $noOfPresentDays;
+                $firstDate = $year.'-0'.$month.'-01';
+                $attendanceStats[] = $firstDate.':'.$noOfPresentDays.'-'.$noOfAbsentDays.'-'.$noOfAttendanceDays;
+                foreach( $attendanceDates as $id => $date) {
+                    if(isset($presentDates[$id])){
+                        $allPresentDates[] = $date;
+                    } else {
+                        $allAbsentDates[] = $date;
+                    }
                 }
             }
         }

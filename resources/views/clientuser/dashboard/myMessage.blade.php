@@ -36,11 +36,11 @@
               <div class="col-md-3">
                 <img class="img-responsive" src="{{$message->photo}}" alt="">
               </div>
-              <div class="col-md-9">{{$message->message}}</div>
+              <div class="col-md-9"><b>{{$message->updated_at}}</b> @ {{$message->message}}</div>
             </div>
           @else
             <div class="form-group row divStyle">
-              <div class="">{{$message->message}}</div>
+              <div class=""><b>{{$message->updated_at}}</b> @ {{$message->message}}</div>
             </div>
           @endif
         @endforeach
