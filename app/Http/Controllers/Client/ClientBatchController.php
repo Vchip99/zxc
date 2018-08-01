@@ -17,6 +17,8 @@ use App\Models\ClientAssignmentTopic;
 use App\Models\ClientAssignmentQuestion;
 use App\Models\ClientAssignmentAnswer;
 use App\Models\ClientMessage;
+use MaddHatter\LaravelFullcalendar\Facades\Calendar;
+use DateTime;
 
 class ClientBatchController extends ClientBaseController
 {
@@ -192,7 +194,7 @@ class ClientBatchController extends ClientBaseController
                 $userIds = explode(',', $clientBatch->student_ids);
                 if(count($userIds) > 0){
                     $batchUsers = Clientuser::find($userIds);
-                    if(is_object($batchUsers) && false == $batchUsers->isEMpty()){
+                    if(is_object($batchUsers) && false == $batchUsers->isEmpty()){
                         foreach($batchUsers as $batchUser){
                             if($batchUser->batch_ids){
                                 $userBatchIds = explode(',', $batchUser->batch_ids);
@@ -215,7 +217,7 @@ class ClientBatchController extends ClientBaseController
                     $studentIds = array_values(array_diff($batchOldStudents, $userIds));
                     ClientOfflinePaperMark::deleteMarksByClientIdByBatchIdByClientUsers($clientBatch->client_id,$clientBatch->id,$studentIds);
                     $oldBatchUsers = Clientuser::find($studentIds);
-                    if(is_object($oldBatchUsers) && false == $oldBatchUsers->isEMpty()){
+                    if(is_object($oldBatchUsers) && false == $oldBatchUsers->isEmpty()){
                         foreach($oldBatchUsers as $oldBatchUser){
                             if($oldBatchUser->batch_ids){
                                 $userBatchIds = explode(',', $oldBatchUser->batch_ids);
@@ -253,10 +255,30 @@ class ClientBatchController extends ClientBaseController
         return Clientuser::searchClientStudent($request);
     }
 
-    protected function showAttendance($subdomainName){
+    protected function showAttendance($subdomainName, Request $request){
+        // dd($request->all());
+        $attendanceDate = $request->get('attendance_date');
+        $attendanceBatch = json_decode($request->get('batch_id'));
         $loginUser = Auth::guard('client')->user();
         $batches = ClientBatch::getBatchesByClientId($loginUser->id);
-        return view('client.attendance.attendance', compact('batches', 'subdomainName'));
+        $batchUsers = [];
+        $batchAttendance = [];
+        $studentIds = '';
+        if(!empty($attendanceDate) &&  !empty($attendanceBatch)){
+            $clientBatch = ClientBatch::getBatchById($attendanceBatch);
+            if(is_object($clientBatch)){
+                $studentIds = $clientBatch->student_ids;
+                $userIds = explode(',', $clientBatch->student_ids);
+                if(count($userIds) > 0){
+                    $batchUsers = Clientuser::find($userIds);
+                }
+            }
+            $batchAttendanceObj = ClientUserAttendance::getBatchStudentAttendancebyBatchId($request);
+            if(is_object($batchAttendanceObj)){
+                $batchAttendance = explode(',', $batchAttendanceObj->student_ids);
+            }
+        }
+        return view('client.attendance.attendance', compact('batches', 'subdomainName', 'attendanceDate', 'attendanceBatch', 'batchUsers', 'batchAttendance','studentIds'));
     }
 
     protected function getBatchStudentAttendancebyBatchId(Request $request){
@@ -293,5 +315,98 @@ class ClientBatchController extends ClientBaseController
             return back()->withErrors('something went wrong.');
         }
         return Redirect::to('manageAttendance');
+    }
+
+    protected function showAttendanceCalendar($subdomainName, Request $request){
+        $loginUser = Auth::guard('client')->user();
+        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
+        $selectedYear = json_decode($request->get('year'));
+        $selectedBatch = json_decode($request->get('batch'));
+        $batchesCount = [];
+        $firstBatch = 0;
+        if(is_object($batches) && false == $batches->isEmpty()){
+            foreach($batches as $index => $batch){
+                if(0 == $index){
+                    $firstBatch = $batch->id;
+                }
+                $batchesCount[$batch->id] = count(explode(',',$batch->student_ids));
+            }
+        }
+        if(!empty($selectedYear) && !empty($selectedBatch)){
+            $result = $this->getAttendanceByBatchByYearByClient($selectedBatch,$selectedYear,$loginUser->id,$batchesCount);
+        } else {
+            $selectedBatch = $firstBatch;
+            $result = $this->getAttendanceByBatchByYearByClient($selectedBatch,date('Y'),$loginUser->id,$batchesCount);
+
+        }
+        if(!empty($selectedYear)){
+            $defaultDate = $selectedYear.'-'.date('m').'-'.date('d');
+        } else {
+            $defaultDate = date('Y-m-d');
+        }
+        $currnetYear = date('Y');
+        $events = $result['events'];
+        $allAttendanceDates = implode(',', $result['allAttendanceDates']);
+        $calendar = \Calendar::addEvents($events)->setOptions([ //set fullcalendar options
+            'header' => [
+                'left' => '',
+                'center' => 'prev title next',
+                'right' => '',
+            ],
+            'defaultDate' => $defaultDate,
+        ]);
+        return view('client.attendance.calendar', compact('batches', 'subdomainName', 'currnetYear','calendar','selectedYear','selectedBatch', 'allAttendanceDates','calendarYear'));
+    }
+
+    protected function getAttendanceByBatchByYearByClient($batch,$year,$clientId,$batchesCount){
+        $attendanceCount = [];
+        $result = [];
+        $allAttendanceDates = [];
+        if($batch > 0 && $year > 0){
+            $allAttendance = ClientUserAttendance::where('client_batch_id','=', $batch)->whereYear('attendance_date', $year)->where('client_id', $clientId)->orderBy('attendance_date')->get();
+        } else {
+            $allAttendance = ClientUserAttendance::whereYear('attendance_date', $year)->where('client_id', $clientId)->orderBy('attendance_date')->get();
+        }
+        if(is_object($allAttendance) && false == $allAttendance->isEmpty()){
+            foreach($allAttendance as $attendance){
+                $studentCount = count(explode(',',$attendance->student_ids));
+                $attendanceCount[$attendance->attendance_date]['present'] = $studentCount;
+                $attendanceCount[$attendance->attendance_date]['absent'] = $batchesCount[$attendance->client_batch_id] - $studentCount;
+                $allAttendanceDates[] = $attendance->attendance_date;
+            }
+        }
+
+        $events = [];
+        foreach($attendanceCount as $date => $arr) {
+            $presentCnt = $arr['present'];
+            $absentCnt = $arr['absent'];
+
+            $events[] = \Calendar::event(
+                        'Present - '.$presentCnt,
+                        true,
+                        new \DateTime($date),
+                        new \DateTime($date.' +1 day'),
+                        null,
+                        // Add color and link on event
+                        [
+                            'color' => '#FAA732',
+                        ]
+                    );
+            $events[] = \Calendar::event(
+                        'Absent - '.$absentCnt,
+                        true,
+                        new \DateTime($date),
+                        new \DateTime($date.' +1 day'),
+                        null,
+                        // Add color and link on event
+                        [
+                            'color' => '#FAA732',
+                        ]
+                    );
+        }
+
+        $result['allAttendanceDates'] = $allAttendanceDates;
+        $result['events'] = $events;
+        return $result;
     }
 }

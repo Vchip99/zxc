@@ -1118,7 +1118,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('redirectTestSubCategoryPayment', 'Client\ClientUserController@redirectTestSubCategoryPayment');
   	Route::post('getClientUserTestSubcategoriesBycategoryId', 'Client\ClientUserController@getClientUserTestSubcategoriesBycategoryId');
   	Route::get('myAttendance', 'Client\ClientUserController@myAttendance');
-  	Route::post('getAttendance', 'Client\ClientUserController@getAttendance');
+  	Route::get('getAttendance', 'Client\ClientUserController@myAttendance');
   	Route::get('myOfflineTestResults', 'Client\ClientUserController@myOfflineTestResults');
   	Route::post('showUserOfflineTestResultsByBatchIdByUserId', 'Client\ClientUserController@showUserOfflineTestResultsByBatchIdByUserId');
   	Route::get('myMessage', 'Client\ClientUserController@myMessage');
@@ -1208,6 +1208,8 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('manageAttendance', 'Client\ClientBatchController@showAttendance');
 	Route::post('getBatchStudentAttendancebyBatchId', 'Client\ClientBatchController@getBatchStudentAttendancebyBatchId');
 	Route::post('markAttendance', 'Client\ClientBatchController@markAttendance');
+	Route::get('manageAttendanceCalendar', 'Client\ClientBatchController@showAttendanceCalendar');
+
 
 	// Offline Paper
 	Route::get('manageOfflinePaper', 'Client\ClientOfflinePaperController@show');

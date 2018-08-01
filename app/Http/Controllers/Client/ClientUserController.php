@@ -41,6 +41,8 @@ use App\Models\ClientBatch;
 use App\Models\ClientOfflinePaperMark;
 use App\Models\ClientMessage;
 use App\Libraries\InputSanitise;
+use MaddHatter\LaravelFullcalendar\Facades\Calendar;
+use DateTime;
 
 class ClientUserController extends BaseController
 {
@@ -844,6 +846,9 @@ class ClientUserController extends BaseController
     }
 
     protected function myAttendance($subdomainName,Request $request){
+        $selectedYear = json_decode($request->get('year'));
+        $selectedBatch = json_decode($request->get('batch'));
+
         $clientUser = Auth::guard('clientuser')->user();
         $clientUserId = $clientUser->id;
         $clientId = $clientUser->client_id;
@@ -853,72 +858,84 @@ class ClientUserController extends BaseController
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
-        $months = $this->getMonths();
         if(!empty($clientUser->batch_ids)){
             $userBatchIds = explode(',', $clientUser->batch_ids);
+            sort($userBatchIds);
             $userFirstBatchId = $userBatchIds[0];
             if(count($userBatchIds) > 0){
                 $batches = ClientBatch::find($userBatchIds);
             }
         }
-        $attendanceCount = $this->getAttendanceByBatchByYearByUserByClient($userFirstBatchId,date('Y'),$clientUserId,$clientId);
+        if(!empty($selectedYear) && !empty($selectedBatch)){
+            $result = $this->getAttendanceByBatchByYearByUserByClient($selectedBatch,$selectedYear,$clientUserId,$clientId);
+            $defaultDate = $selectedYear.'-'.date('m').'-'.date('d');
+        } else {
+            $result = $this->getAttendanceByBatchByYearByUserByClient($userFirstBatchId,date('Y'),$clientUserId,$clientId);
+            $defaultDate = date('Y-m-d');
+        }
+        $attendanceStats = implode(',', $result['attendanceStats']);
+        $allPresentDates = implode(',', $result['allPresentDates']);
+        $allAbsentDates = implode(',', $result['allAbsentDates']);
         $currnetYear = date('Y');
-        return view('clientuser.dashboard.myAttendance', compact('batches','months','attendanceCount','currnetYear'));
-    }
+        $calendar = \Calendar::addEvents([])->setOptions([ //set fullcalendar options
+            'header' => [
+                'left' => '',
+                'center' => 'prev title next',
+                'right' => '',
+            ],
+            'defaultDate' => $defaultDate,
+            'eventOverlap' => false,
 
-    protected function getAttendance(Request $request){
-        $year = $request->get('year');
-        $batch = $request->get('batch_id');
-        $clientUser = Auth::guard('clientuser')->user();
-        $clientUserId = $clientUser->id;
-        $clientId = $clientUser->client_id;
-        $result = [];
-        $result['months'] = $this->getMonths();
-        $result['attendanceCount'] = $this->getAttendanceByBatchByYearByUserByClient($batch,$year,$clientUserId,$clientId);
-        return $result;
+        ]);
+        return view('clientuser.dashboard.myAttendance', compact('batches','currnetYear','calendar','selectedYear','selectedBatch', 'userFirstBatchId', 'allPresentDates', 'allAbsentDates','attendanceStats'));
     }
 
     protected function getAttendanceByBatchByYearByUserByClient($batch,$year,$clientUserId,$clientId){
         $attendanceCount = [];
-        if($batch > 0){
-            $allAttendance = ClientUserAttendance::where('client_batch_id','=', $batch)->whereYear('attendance_date', $year)->where('client_id', $clientId)->get();
+        $result = [];
+        if($batch > 0 && $year > 0){
+            $allAttendance = ClientUserAttendance::where('client_batch_id','=', $batch)->whereYear('attendance_date', $year)->where('client_id', $clientId)->orderBy('attendance_date')->get();
         } else {
-            $allAttendance = ClientUserAttendance::whereYear('attendance_date', $year)->where('client_id', $clientId)->get();
+            $allAttendance = ClientUserAttendance::whereYear('attendance_date', $year)->where('client_id', $clientId)->orderBy('attendance_date')->get();
         }
         if(is_object($allAttendance) && false == $allAttendance->isEmpty()){
             foreach($allAttendance as $attendance){
                 $studentIds = explode(',', $attendance->student_ids);
                 $month =(int) explode('-', $attendance->attendance_date)[1];
-                $date = explode('-', $attendance->attendance_date)[2];
+                // $date = explode('-', $attendance->attendance_date)[2];
                 if(in_array($clientUserId, $studentIds)){
-                    $attendanceCount[$month]['present_date'][] = $date;
-                    sort($attendanceCount[$month]['present_date']);
+                    $attendanceCount[$month]['present_date'][$attendance->id] = $attendance->attendance_date;
                 } else {
-                    $attendanceCount[$month]['absent_date'][] = $date;
-                    sort($attendanceCount[$month]['absent_date']);
+                    $attendanceCount[$month]['absent_date'][$attendance->id] = $attendance->attendance_date;
                 }
-                $attendanceCount[$month]['attendance_date'][] = $date;
-                sort($attendanceCount[$month]['attendance_date']);
+                $attendanceCount[$month]['attendance_date'][$attendance->id] = $attendance->attendance_date;
             }
         }
-        return $attendanceCount;
-    }
 
-    protected function getMonths(){
-        return [
-            1 => "January",
-            2 => "February",
-            3 => "March",
-            4 => "April",
-            5 => "May",
-            6 => "June",
-            7 => "July",
-            8 => "August",
-            9 => "September",
-            10 => "October",
-            11 => "November",
-            12 => "December"
-        ];
+        $allAbsentDates = [];
+        $allPresentDates = [];
+        $attendanceStats = [];
+        $events = [];
+        foreach($attendanceCount as $month => $arr) {
+            $presentDates = $arr['present_date'];
+            $attendanceDates = $arr['attendance_date'];
+            $noOfPresentDays = count($presentDates);
+            $noOfAttendanceDays = count($attendanceDates);
+            $noOfAbsentDays = $noOfAttendanceDays - $noOfPresentDays;
+            $firstDate = $year.'-0'.$month.'-01';
+            $attendanceStats[] = $firstDate.':'.$noOfPresentDays.'-'.$noOfAbsentDays.'-'.$noOfAttendanceDays;
+            foreach( $attendanceDates as $id => $date) {
+                if(isset($presentDates[$id])){
+                    $allPresentDates[] = $date;
+                } else {
+                    $allAbsentDates[] = $date;
+                }
+            }
+        }
+        $result['allPresentDates'] = $allPresentDates;
+        $result['allAbsentDates'] = $allAbsentDates;
+        $result['attendanceStats'] = $attendanceStats;
+        return $result;
     }
 
     protected function myOfflineTestResults($subdomainName,Request $request){
@@ -976,6 +993,8 @@ class ClientUserController extends BaseController
         $messages = [];
         if(!empty($clientUser->batch_ids)){
             $batchIds = explode(',', $clientUser->batch_ids);
+        } else {
+            $batchIds = [0];
         }
         $clientResult = InputSanitise::checkUserClient($request, $clientUser);
         if( !is_object($clientResult)){

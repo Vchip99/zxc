@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
+use App\Models\ClientBatch;
 
 class ClientUserAttendance extends Model
 {
@@ -64,5 +65,9 @@ class ClientUserAttendance extends Model
 
     protected static function deleteAttendanceByBtachIdByClientId($batchId,$clientId){
         return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->delete();
+    }
+
+    public function batch(){
+        return $this->belongsTo(ClientBatch::class, 'client_batch_id');
     }
 }

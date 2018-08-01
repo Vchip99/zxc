@@ -1,19 +1,37 @@
 @extends('clientuser.dashboard.dashboard')
 @section('dashboard_header')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ asset('css/fullcalendar.min.css?ver=1.0')}}"/>
   <style type="text/css">
   @media only screen and (max-width: 760px), (max-device-width: 1024px) and (min-device-width: 768px){
-  td {
-      padding-left: 50% !important;
+    td {
+        padding-left: 50% !important;
+    }
   }
-}
+  #mycalendar .fc-day-header{
+    background-color: white;
+    color: black;
+  }
+  .fc-day-number{
+    border-style: solid !important;
+    border-top-width: 1px !important;
+    border-right-width: 1px !important;
+    border-left-width: 1px !important;
+    border-color: white !important;
+  }
+  .fc td, .fc th {
+    vertical-align: inherit !important;
+  }
+  .fc-day-number.fc-other-month {
+     opacity: 1 !important;
+  }
   </style>
 @stop
 @section('module_title')
   <section class="content-header">
     <h1> My Attendance  </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-tasks"></i> Attendance </li>
+      <li><i class="fa fa-user"></i> Attendance </li>
       <li class="active"> My Attendance </li>
     </ol>
   </section>
@@ -27,109 +45,98 @@
         {{ Session::get('message') }}
     </div>
   @endif
-
-  <div class="form-group row">
-    <div class="col-md-3 mrgn_10_btm">
-      <select class="form-control" id="year" name="year" title="year">
-        <option value="">Select Year</option>
-        @for($i=2018;$i<=2050;$i++)
-          @if($currnetYear == $i)
-            <option value="{{$i}}" selected>{{$i}}</option>
-          @else
-            <option value="{{$i}}">{{$i}}</option>
+  <form method="GET" action="getAttendance" id="attendanceForm">
+    <!-- {{ csrf_field()}} -->
+    <div class="form-group row">
+      <div class="col-md-3 mrgn_10_btm">
+        <select class="form-control" id="year" name="year" title="year">
+          <option value="">Select Year</option>
+          @for($i=2018;$i<=2050;$i++)
+            @if($currnetYear == $i || $selectedYear == $i)
+              <option value="{{$i}}" selected>{{$i}}</option>
+            @else
+              <option value="{{$i}}">{{$i}}</option>
+            @endif
+          @endfor
+        </select>
+      </div>
+      <div class="col-md-3 mrgn_10_btm">
+       <select class="form-control" id="batch" name="batch" title="batch" onChange="getAttendance(this);">
+          <option value="">Select Batch</option>
+          @if(count($batches) > 0)
+            @foreach($batches as $batch)
+              @if($userFirstBatchId == $batch->id || $selectedBatch == $batch->id)
+                <option value="{{$batch->id}}" selected>{{$batch->name}}</option>
+              @else
+                <option value="{{$batch->id}}">{{$batch->name}}</option>
+              @endif
+            @endforeach
           @endif
-        @endfor
-      </select>
+       </select>
+      </div>
     </div>
-    <div class="col-md-3 mrgn_10_btm">
-     <select class="form-control" id="batch" name="batch" title="batch" onChange="getAttendance(this);">
-        <option value="">Select Batch</option>
-        @if(count($batches) > 0)
-          @foreach($batches as $batch)
-            <option value="{{$batch->id}}">{{$batch->name}}</option>
-          @endforeach
-        @endif
-     </select>
-    </div>
-  </div>
-  <div class="form-group row">
-    <table class="" id="clientUserAssignment">
-      <thead class="thead-inverse">
-        <tr>
-          <th>#</th>
-          <th>Month</th>
-          <th>Present Dates</th>
-          <th>Absent Days/No. of Days</th>
-        </tr>
-      </thead>
-      <tbody id="studentAttendance">
-        @if(count($months) > 0)
-          @foreach($months as $index => $month)
-            <tr class="student" id="div_student_{{$month}}" >
-              <td> {{ $index}} </td>
-              <td>{{$month}}</td>
-              <td>{{(isset($attendanceCount[$index]) && isset($attendanceCount[$index]['present_date']))?implode(',',$attendanceCount[$index]['present_date']):0}}</td>
-              <td>{{(isset($attendanceCount[$index]) && isset($attendanceCount[$index]['absent_date']))?count($attendanceCount[$index]['absent_date']):0}}/{{(isset($attendanceCount[$index]) && $attendanceCount[$index]['attendance_date'])?count($attendanceCount[$index]['attendance_date']):0}}</td>
-            </tr>
-          @endforeach
-        @endif
-      </tbody>
-    </table>
+  </form>
+  <div id="mycalendar">
+    {!! $calendar->calendar() !!}
   </div>
   </div>
+  <input type="hidden" id="present_dates" value="{{$allPresentDates}}">
+  <input type="hidden" id="absent_dates" value="{{$allAbsentDates}}">
+  <input type="hidden" id="attendance_stats" value="{{$attendanceStats}}">
+  {!! $calendar->script() !!}
+  <script src="{{ asset('js/moment.min.js')}}"></script>
+  <script src="{{ asset('js/fullcalendar.min.js')}}"></script>
 <script type="text/javascript">
+
   function getAttendance(ele){
-    batchId = parseInt($(ele).val());
+    var batchId = parseInt($(ele).val());
     var year = document.getElementById('year').value;
-    if( 0 < batchId ){
-      $.ajax({
-        method: "POST",
-        url: "{{url('getAttendance')}}",
-        data: {batch_id:batchId,year:year}
-      })
-      .done(function( msgs ) {
-        body = document.getElementById('studentAttendance');
-        body.innerHTML = '';
-        console.log(msgs['months']);
-        if(Object.keys(msgs['months']).length > 0){
-           $.each(msgs['months'], function(idx, msg) {
-            var eleTr = document.createElement('tr');
+    if(batchId && year){
+      document.getElementById('attendanceForm').submit();
+    }
+  }
+  $(document).ready(function(){
+    showPresentDates();
+    showAbsentDates();
+    showAttendanceStats();
+    $('button.fc-prev-button').on('click',function(){
+      showPresentDates();
+      showAbsentDates();
+      showAttendanceStats();
+    });
+    $('button.fc-next-button').on('click',function(){
+      showPresentDates();
+      showAbsentDates();
+      showAttendanceStats();
+    });
+  });
 
-            var eleIndex = document.createElement('td');
-            eleIndex.innerHTML = idx;
-            eleTr.appendChild(eleIndex);
-
-            var eleMonth = document.createElement('td');
-            eleMonth.innerHTML = msg;
-            eleTr.appendChild(eleMonth);
-
-            var elePresent = document.createElement('td');
-            if(msgs['attendanceCount'][idx] && msgs['attendanceCount'][idx]['present_date']){
-              elePresent.innerHTML = msgs['attendanceCount'][idx]['present_date'];
-            } else {
-              elePresent.innerHTML = 0;
-            }
-            eleTr.appendChild(elePresent);
-
-            var eleAbsent = document.createElement('td');
-            if(msgs['attendanceCount'][idx]){
-              if(msgs['attendanceCount'][idx]['absent_date'] && msgs['attendanceCount'][idx]['attendance_date']){
-                eleAbsent.innerHTML = msgs['attendanceCount'][idx]['absent_date'].length+'/'+msgs['attendanceCount'][idx]['attendance_date'].length;
-              } else if(msgs['attendanceCount'][idx]['absent_date']){
-                eleAbsent.innerHTML = msgs['attendanceCount'][idx]['absent_date'].length+'/'+0;
-              } else if(msgs['attendanceCount'][idx]['attendance_date']){
-                eleAbsent.innerHTML = 0+'/'+msgs['attendanceCount'][idx]['attendance_date'].length;
-              } else {
-                eleAbsent.innerHTML = 0+'/'+0;
-              }
-            } else {
-              eleAbsent.innerHTML = 0+'/'+0;
-            }
-            eleTr.appendChild(eleAbsent);
-
-            body.appendChild(eleTr);
-          });
-        }
+  function showPresentDates(){
+    presentDates = document.getElementById('present_dates').value;
+    if(presentDates){
+      $.each(presentDates.split(','), function(idx, date){
+        $('td.fc-day[data-date=' + date + ']').css('background-color', 'green');
+        $('td.fc-day-number[data-date=' + date + ']').css('background-color', 'green');
+      });
+    }
+  }
+  function showAbsentDates(){
+    absentDates = document.getElementById('absent_dates').value;
+    if(absentDates){
+      $.each(absentDates.split(','), function(idx, date){
+        $('td.fc-day[data-date=' + date + ']').css('background-color', 'red');
+        $('td.fc-day-number[data-date=' + date + ']').css('background-color', 'red');
+      });
+    }
+  }
+  function showAttendanceStats(){
+    attendanceStats = document.getElementById('attendance_stats').value;
+    if(attendanceStats){
+      $.each(attendanceStats.split(','), function(idx, stats){
+        var statsArr = stats.split(':');
+        var dateStr = statsArr[0];
+        var statsCountArr = statsArr[1].split('-');
+        $('.fc-bg td[data-date="' + dateStr + '"]').append('<b>Present- '+statsCountArr[0]+'<br>Absent- '+statsCountArr[1]+'<br>Total- '+statsCountArr[2]+'</b>');
       });
     }
   }

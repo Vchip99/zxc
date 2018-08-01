@@ -6,7 +6,8 @@
   @include('layouts.home-css')
   <link href="{{ asset('css/sidemenuindex.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/v_courses.css?ver=1.0')}}" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.2.7/fullcalendar.min.css"/>
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.2.7/fullcalendar.min.css"/> -->
+  <link rel="stylesheet" href="{{ asset('css/fullcalendar.min.css?ver=1.0')}}"/>
 @stop
 @section('header-js')
   @include('layouts.home-js')
@@ -165,8 +166,10 @@
 	{!! $calendar->script() !!}
   <script type="text/javascript" src="{{ asset('js/togleForFilterBy.js')}}"></script>
   <script type="text/javascript" src="{{ asset('js/read_info.js')}}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.2.7/fullcalendar.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.2.7/fullcalendar.min.js"></script> -->
+  <script src="{{ asset('js/moment.min.js')}}"></script>
+  <script src="{{ asset('js/fullcalendar.min.js')}}"></script>
   <script type="text/javascript">
 
 	function checkStartDate(date){
@@ -199,11 +202,16 @@
 	  	var startDate =  document.getElementById('start_date').value;
 	  	var selectedPage =  document.getElementById('selected_page').value;
         var spdate = new Date();
-		var sdd = spdate.getDate();
+
 		if(spdate.getMonth() > 9){
 			var smm = spdate.getMonth() + 1;
 		} else {
 			var smm = '0'+(spdate.getMonth() + 1);
+		}
+		if(spdate.getDate() > 9){
+			var sdd = spdate.getDate();
+		} else {
+			var sdd = '0'+spdate.getDate();
 		}
 		var syyyy = spdate.getFullYear();
 		var today = syyyy+'-'+smm+'-'+sdd;

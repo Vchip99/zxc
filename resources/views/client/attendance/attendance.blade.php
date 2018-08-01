@@ -36,7 +36,7 @@
           <div class="form-group">
               <div class="col-md-3">
                   <div style="margin-bottom: 10px">
-                    <input type="text"  class="form-control" name="attendance_date" id="attendance_date" >
+                    <input type="text"  class="form-control" name="attendance_date" id="attendance_date" value="{{$attendanceDate}}" >
                   </div>
               </div>
               <div class="col-md-3">
@@ -45,7 +45,11 @@
                           <option value="">Select Batch</option>
                           @if(count($batches) > 0)
                               @foreach($batches as $batch)
+                                @if($attendanceBatch == $batch->id)
+                                  <option value="{{$batch->id}}" selected>{{$batch->name}}</option>
+                                @else
                                   <option value="{{$batch->id}}">{{$batch->name}}</option>
+                                @endif
                               @endforeach
                           @endif
                       </select>
@@ -81,11 +85,27 @@
                   </tr>
                 </thead>
                 <tbody id="client_batch_users" class="">
+                  @if(count($batchUsers) > 0)
+                    @foreach($batchUsers as $index => $user)
+                      <tr>
+                        <td>{{ $index + 1}}</td>
+                        <td> {{$user->name}}</td>
+                        <td> {{$user->email}}</td>
+                        <td>
+                          @if(in_array($user->id, $batchAttendance))
+                            <input type="checkbox" name="students[]" id="student_{{$user->id}}" value="{{$user->id}}" checked="checked">
+                          @else
+                            <input type="checkbox" name="students[]" id="student_{{$user->id}}" value="{{$user->id}}">
+                          @endif
+                          </td>
+                      </tr>
+                    @endforeach
+                  @endif
                 </tbody>
               </table>
             </div>
           </div>
-          <input type="hidden" name="all_users" id="all_users">
+          <input type="hidden" name="all_users" id="all_users" value="{{$studentIds}}">
           <div class="form-group">
             <div class="col-md-12">
               <button type="submit" class="btn btn-primary" style="float: right;width: 90px !important;">Submit</button>
