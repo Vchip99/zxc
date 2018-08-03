@@ -1062,7 +1062,14 @@ class ClientUserController extends BaseController
             $user = Clientuser::addEmail($request);
             if(is_object($user)){
                 DB::connection('mysql2')->commit();
-                return Redirect::to('profile')->with('message', 'Email added successfully!');
+                if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
+                    // send mail
+                    $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
+                    Mail::to($user->email)->send($clientUserEmail);
+                    return Redirect::to('profile')->with('message', 'Verification email sent successfully. please check email and verify.');
+                } else {
+                    return Redirect::to('profile')->with('message', 'Email added successfully!');
+                }
             }
         }
         catch(\Exception $e)

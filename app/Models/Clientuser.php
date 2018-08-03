@@ -378,7 +378,6 @@ class Clientuser extends Authenticatable
     protected static function addEmail(Request $request){
         $user = Auth::guard('clientuser')->user();
         $user->email = $request->get('email');
-        $user->verified = 1;
         $user->password = bcrypt($request->get('password'));
         $user->save();
         return $user;
