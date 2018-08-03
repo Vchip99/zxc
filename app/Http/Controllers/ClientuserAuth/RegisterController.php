@@ -81,7 +81,7 @@ class RegisterController extends Controller
         if('mobile' == $data['signup_type']){
             $numberVerified = 1;
             $email = '';
-            $phone = '';
+            $phone = $data['phone'];
             $emailToken = '';
         } else {
             $numberVerified = 0;
