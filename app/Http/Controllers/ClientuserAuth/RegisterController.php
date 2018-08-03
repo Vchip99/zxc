@@ -4,7 +4,7 @@ namespace App\Http\Controllers\ClientuserAuth;
 
 use App\Models\Clientuser;
 use App\Models\Client;
-use Validator, Redirect,DB,Mail;
+use Validator, Redirect,DB,Mail,Cache;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Auth;
@@ -55,13 +55,19 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'name' => 'required|max:255',
-            'phone' => 'required|regex:/[0-9]{10}/',
-            'email' => 'required|max:255',
-            'password' => 'required',
-            'confirm_password' => 'required|same:password'
-        ]);
+        if('mobile' == $data['signup_type']){
+            return Validator::make($data, [
+                'name' => 'required|max:255',
+                'phone' => 'required'
+            ]);
+        } else {
+            return Validator::make($data, [
+                'name' => 'required|max:255',
+                'email' => 'required|max:255',
+                'password' => 'required',
+                'confirm_password' => 'required|same:password'
+            ]);
+        }
     }
 
     /**
@@ -72,6 +78,11 @@ class RegisterController extends Controller
      */
     protected function create(array $data,$clientId)
     {
+        if('mobile' == $data['signup_type']){
+            $numberVerified = 1;
+        } else {
+            $numberVerified = 0;
+        }
         $clientUser = Clientuser::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -80,6 +91,7 @@ class RegisterController extends Controller
             'client_approve' => 1,
             'password' => bcrypt($data['password']),
             'email_token' => str_random(60),
+            'number_verified' => $numberVerified,
         ]);
         return $clientUser;
     }
@@ -106,6 +118,21 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
+        if('mobile' == $request->get('signup_type')){
+            $userOtp = $request->get('user_otp');
+            $userPhone = $request->get('phone');
+            $mobile = Cache::get('mobile-'.$userPhone);
+            $serverOtp = Cache::get($mobile);
+            if($userOtp != $serverOtp){
+                return Redirect::to('/')->withErrors('Entered otp is wrong.');
+            } else {
+                if(Cache::has($mobile) && Cache::has('mobile-'.$userPhone)){
+                    Cache::forget($mobile);
+                    Cache::forget('mobile-'.$userPhone);
+                }
+            }
+        }
+
         // Laravel validation
         $validator = $this->validator($request->all());
         if ($validator->fails())
@@ -128,21 +155,33 @@ class RegisterController extends Controller
             Mail::to($client->email)->send(new ClientUnAuthorisedUser($data));
             return Redirect::to('/')->withErrors('Try after some time');
         }
-
-        $checkEmail = Clientuser::where('email', $request->get('email'))->where('client_id', $client->id)->first();
-        if(is_object($checkEmail)){
-            return Redirect::to('/')->withErrors('The email id '.$request->get('email').' is already exist.');
+        if(!empty($request->get('email'))){
+            $checkEmail = Clientuser::where('email', $request->get('email'))->where('client_id', $client->id)->first();
+            if(is_object($checkEmail)){
+                return Redirect::to('/')->withErrors('The email id '.$request->get('email').' is already exist.');
+            }
         }
 
         DB::connection('mysql2')->beginTransaction();
         try
         {
             $user = $this->create($request->all(),$client->id);
-            // After creating the user send an email with the random token generated in the create method above
-            $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
-            Mail::to($user->email)->send($clientUserEmail);
-
-            $client = Clientuser::getClientByClientUserEmail($request, $user->email);
+            if(1 == $user->number_verified){
+                // un approve number if have same number to other users with same client
+                $otherUsers = Clientuser::where('phone', $user->phone)->where('client_id', $client->id)->where('id','!=', $user->id)->get();
+                if(is_object($otherUsers) && false == $otherUsers->isEmpty()){
+                    foreach($otherUsers as $otherUser){
+                        $otherUser->number_verified = 0;
+                        $otherUser->save();
+                    }
+                }
+            }
+            if(!empty($user->email)){
+                // After creating the user send an email with the random token generated in the create method above
+                $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
+                Mail::to($user->email)->send($clientUserEmail);
+            }
+            // $client = Clientuser::getClientByClientUserEmail($request, $user->email);
             if(is_object($client)){
                 $data = [
                     'name' => $user->name,
@@ -151,7 +190,11 @@ class RegisterController extends Controller
                 Mail::to($client->email)->send(new NewClientUserRegistration($data));
             }
             DB::connection('mysql2')->commit();
-            return redirect('/')->with('message', 'Verify your email for your account activation.');
+            if('mobile' == $request->get('signup_type')){
+                return redirect('/')->with('message', 'Please sign up using mobile.');
+            } else {
+                return redirect('/')->with('message', 'Verify your email for your account activation.');
+            }
         }
         catch(Exception $e)
         {

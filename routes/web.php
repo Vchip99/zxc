@@ -855,6 +855,8 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('verifyClientEmail', 'Client\ClientHomeController@verifyClientEmail');
   	// Route::get('clientforgotPassword', 'Client\ClientHomeController@clientforgotPassword');
   	// Route::post('clientforgotPassword', 'Client\ClientHomeController@clientforgotPassword');
+  	Route::post('sendClientUserSignUpOtp', 'Client\ClientHomeController@sendClientUserSignUpOtp');
+  	Route::post('sendClientUserSignInOtp', 'Client\ClientHomeController@sendClientUserSignInOtp');
 
   	Route::get('clientforgotPassword', 'ClientAuth\ForgotPasswordController@showLinkRequestForm');
   	Route::post('clientpassword/email', 'ClientAuth\ForgotPasswordController@sendPasswordResetLink');
@@ -899,9 +901,13 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('myprofile', 'Client\ClientUsersInfoController@profile');
 	Route::put('updateClientProfile', 'Client\ClientUsersInfoController@updateClientProfile');
 	Route::put('updateClientPassword', 'Client\ClientUsersInfoController@updateClientPassword');
+	Route::get('manageSettings', 'Client\ClientUsersInfoController@manageSettings');
+	Route::post('toggleNonVerifiedEmailStatus', 'Client\ClientUsersInfoController@toggleNonVerifiedEmailStatus');
+
 
   	// register client user
   	Route::post('/register', 'ClientuserAuth\RegisterController@register');
+  	// Route::post('/registerByMobile', 'ClientuserAuth\RegisterController@registerByMobile');
   	Route::post('/login', 'ClientuserAuth\LoginController@login');
   	Route::post('clientUserLogin', 'ClientuserAuth\LoginController@clientUserLogin');
 	Route::post('/logout', 'ClientuserAuth\LoginController@logout');
@@ -932,7 +938,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('dashboardPrivateChat', 'Client\ClientBaseController@dashboardPrivateChat');
 	Route::post('dashboardSendMessage', 'Client\ClientBaseController@dashboardSendMessage');
 	Route::post('getContacts', 'Client\ClientBaseController@getContacts');
-
 
   	// category
   	Route::get('manageOnlineCategory', 'Client\OnlineCourse\ClientOnlineCategoryController@show');
@@ -1122,6 +1127,13 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('myOfflineTestResults', 'Client\ClientUserController@myOfflineTestResults');
   	Route::post('showUserOfflineTestResultsByBatchIdByUserId', 'Client\ClientUserController@showUserOfflineTestResultsByBatchIdByUserId');
   	Route::get('myMessage', 'Client\ClientUserController@myMessage');
+  	Route::post('addEmail', 'Client\ClientUserController@addEmail');
+  	Route::post('verifyEmail', 'Client\ClientUserController@verifyEmail');
+  	Route::put('updatePassword', 'Client\ClientUserController@updatePassword');
+  	Route::post('sendClientUserOtp', 'Client\ClientUserController@sendClientUserOtp');
+  	Route::post('updateMobile', 'Client\ClientUserController@updateMobile');
+  	Route::post('verifyMobile', 'Client\ClientUserController@verifyMobile');
+
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');

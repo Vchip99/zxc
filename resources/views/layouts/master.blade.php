@@ -50,7 +50,7 @@
   $(document).ready(function(){
     setTimeout(function() {
       $('.alert-success').fadeOut('fast');
-    }, 10000);
+    }, 50000);
   });
 
 </script>

@@ -37,15 +37,15 @@
                   <div class="tab-content-inner active" data-content="signup">
                     @if(count($errors) > 0)
                       <div class="alert alert-danger">
-                          <ul>
-                              @foreach ($errors->all() as $error)
-                                @if('verify_email' == $error)
-                                  <li><a href="{{ url('verifyAccount')}}">Click here to resend verification email</a></li>
-                                @else
-                                  <li>{{ $error }}</li>
-                                @endif
-                              @endforeach
-                          </ul>
+                        <ul>
+                          @foreach ($errors->all() as $error)
+                            @if('verify_email' == $error)
+                              <li><a href="{{ url('verifyAccount')}}">Click here to resend verification email</a></li>
+                            @else
+                              <li>{{ $error }}</li>
+                            @endif
+                          @endforeach
+                        </ul>
                       </div>
                     @endif
                     <ul class=" nav-tabs v_login_reg text-center">
@@ -54,23 +54,30 @@
                     </ul>
                     <div class="tab-content">
                       <div id="home" class="tab-pane fade in active">
+                        <div class="form-group" style="color: white;">
+                          <input type="radio" name="signin_type" id="signinRadioEmail" value="email" checked onClick="toggleSignIn(this.value);">Using Email-id/User-id
+                          <input type="radio" name="signin_type" value="mobile" onClick="toggleSignIn(this.value);">Using Mobile
+                        </div>
                         <form id="loginForm" method="post" action="{{ url('login') }}">
-                            {!! csrf_field() !!}
-                          <div class="form-group">
-                            <input name="email" type="email" class="form-control" placeholder="vchip@gmail.com" autocomplete="off" required>
+                          {!! csrf_field() !!}
+                          <div class="form-group signInEmail">
+                            <input name="email" type="email" id="signInEmail" class="form-control" placeholder="vchip@gmail.com" autocomplete="off">
                             <span class="help-block"></span>
                           </div>
-                          <div class="form-group">
-                            <input name="password" type="password" class="form-control" placeholder="password" data-type="password" autocomplete="off" required >
+                          <div class="form-group signInEmail">
+                            <input name="password" type="password" id="signInPassword" class="form-control" placeholder="password" data-type="password" autocomplete="off" >
                             <span class="help-block"></span>
                           </div>
-                          <div id="loginErrorMsg" class="alert alert-error hide">Wrong username or password</div>
-                          <div class="checkbox">
-                            <label style="color: white;">
-                              <input type="checkbox" name="remember" id="remember"> Remember login
-                            </label>
+                          <div class="form-group hide signInMobile">
+                            <input type="phone" class="form-control" name="mobile" id="signInPhone" value="" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" />
+                            <span class="help-block"></span>
                           </div>
-                          <button type="submit" value="login" name="submit" class="btn btn-info btn-block" title="Login">Login</button>
+                          <div class="form-group hide" id="signInOtpDiv">
+                            <input name="login_otp" id="login_otp" type="text" class="form-control" placeholder="Enter OTP" >
+                            <span class="help-block"></span>
+                          </div>
+                          <button type="submit" id="loginBtn" name="submit" class="btn btn-info btn-block signInEmail" title="Login">Login</button>
+                          <button title="Send Otp" id="sendSignInOtpBtn" class="btn btn-info btn-block hide signInMobile" onclick="event.preventDefault(); sendSignInOtp();" >Send OTP</button></br>
                           </br>
                         </form>
                         <div>
@@ -85,28 +92,36 @@
                       <div id="menu1" class="tab-pane fade">
                         <form id="registerUser" method="post" action="{{ url('register')}}">
                           {{ csrf_field() }}
+                          <div class="form-group" style="color: white;">
+                            <input type="radio" name="signup_type" id="signupRadioEmail" value="email" checked onClick="toggleSignUp(this.value);">Using Email-id/User-id
+                            <input type="radio" name="signup_type" value="mobile" onClick="toggleSignUp(this.value);">Using Mobile
+                          </div>
                           <div class="form-group">
                             <input id="name" type="text" class="form-control" name="name" value="" placeholder="User Name" autocomplete="off" required/>
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input type="phone" class="form-control" name="phone" value="" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" required/>
+                            <input type="phone" class="form-control" name="phone" id="signUpPhone" value="" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" />
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input name="email" type="email" class="form-control" autocomplete="off" placeholder="vchip@gmail.com" required>
+                            <input name="email" type="text" class="form-control signUpEmail" autocomplete="off" placeholder="Email-id/User-id" >
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input name="password" type="password" class="form-control" data-type="password" autocomplete="off" placeholder="password" required>
+                            <input name="password" type="password" class="form-control signUpEmail" data-type="password" autocomplete="off" placeholder="password" >
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input id="confirm_password" name="confirm_password" type="password" class="form-control" data-type="password" autocomplete="off" placeholder="confirm password" required>
+                            <input id="confirm_password" name="confirm_password" type="password" class="form-control signUpEmail" data-type="password" autocomplete="off" placeholder="confirm password" >
                             <span class="help-block"></span>
                           </div>
-                          </br>
-                          <button title="Register"  id="register" class="btn btn-info btn-block" onclick="event.preventDefault(); confirmSubmit();" >Register</button></br>
+                          <button title="Send Otp" id="sendSignUpOtpBtn" class="btn btn-info btn-block hide signUpMobile" onclick="event.preventDefault(); sendSignUpOtp();" >Send OTP</button></br>
+                          <div class="form-group hide" id="signUpOtpDiv">
+                            <input name="user_otp" type="text" class="form-control" placeholder="Enter OTP" >
+                            <span class="help-block"></span>
+                          </div>
+                          <button title="Register"  id="register" class="btn btn-info btn-block signUpEmail" onclick="event.preventDefault(); confirmSubmit();" >Register</button></br>
                         </form>
                         <div>
                           <a title="alredy member" data-toggle="tab" href="#home">Already member?</a>
@@ -125,11 +140,95 @@
   </div>
 <script type="text/javascript">
    $(function() {
-     $('.multiselect').multiselect();
+    $('#signinRadioEmail').click();
+    $('#signupRadioEmail').click();
+    $('.multiselect').multiselect();
    });
   function confirmSubmit(){
     document.getElementById('register').setAttribute("disabled",true);
     document.getElementById('registerUser').submit();
+  }
+  function toggleSignUp(value){
+    if('email' == value){
+      $('.signUpEmail').prop('required', true);
+      $('.signUpEmail').removeClass('hide');
+      $('.signUpMobile').prop('required', false);
+      $('.signUpMobile').addClass('hide');
+      $('#signUpPhone').prop('required', false);
+    } else {
+      $('.signUpEmail').prop('required', false);
+      $('.signUpEmail').addClass('hide');
+      $('.signUpMobile').prop('required', true);
+      $('.signUpMobile').removeClass('hide');
+      $('#signUpPhone').prop('required', true);
+    }
+  }
+  function toggleSignIn(value){
+    if('email' == value){
+      $('.signInEmail').removeClass('hide');
+      $('.signInMobile').addClass('hide');
+      $('#sendSignInOtpBtn').addClass('hide');
+      $('#signInPassword').prop('required', true);
+      $('#signInEmail').prop('required', true);
+      $('#signInPassword').val('');
+      $('#signInEmail').val('');
+      $('#signInPhone').val('');
+    } else {
+      $('.signInEmail').addClass('hide');
+      $('.signInMobile').removeClass('hide');
+      $('#sendSignInOtpBtn').removeClass('hide');
+      $('#signInPassword').val('');
+      $('#signInEmail').val('');
+      $('#signInPassword').prop('required', false);
+      $('#signInEmail').prop('required', false);
+      $('#signInPhone').val('');
+    }
+  }
+  function sendSignInOtp(){
+    var mobile = $('#signInPhone').val();
+    if(mobile){
+      $.ajax({
+        method: "POST",
+        url: "{{url('sendClientUserSignInOtp')}}",
+        data: {mobile:mobile}
+      })
+      .done(function( result ) {
+        if('success' == result['status']){
+          $('#signInOtpDiv').removeClass('hide');
+          $('#loginBtn').removeClass('hide');
+          $('#sendSignInOtpBtn').addClass('hide');
+          $('#signInPhone').prop('readonly', true);
+          $('#signInPassword').val('');
+          $('#signInEmail').val('');
+          $('#login_otp').prop('required', true);
+        } else {
+          alert(result['message']);
+        }
+      });
+    } else {
+      alert('enter mobile no.');
+    }
+  }
+  function sendSignUpOtp(){
+    var mobile = $('#signUpPhone').val();
+    if(mobile){
+    $('#signUpOtpDiv').removeClass('hide');
+    $('#register').removeClass('hide');
+    $('#sendSignUpOtpBtn').addClass('hide');
+    $('#signUpPhone').prop('readonly', true);
+    $('#name').prop('readonly', true);
+
+      $.ajax({
+        method: "POST",
+        url: "{{url('sendClientUserSignUpOtp')}}",
+        data: {mobile:mobile}
+      })
+      .done(function( msg ) {
+        // console.log(msg);
+      });
+    } else {
+      alert('enter mobile no.');
+    }
   }
 </script>
 <style type="text/css">

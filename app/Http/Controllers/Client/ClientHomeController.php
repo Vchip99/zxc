@@ -125,4 +125,60 @@ class ClientHomeController extends Controller
         }
         return redirect()->back()->withErrors(['Please enter email id.']);
     }
+
+    protected function sendClientUserSignUpOtp(Request $request){
+        $mobile = $request->get('mobile');
+        return InputSanitise::sendOtp($mobile);
+    }
+    protected function sendClientUserSignInOtp(Request $request){
+        $mobile = $request->get('mobile');
+        $result = [];
+        if(!empty($mobile)){
+            $client = Client::where('subdomain', $request->getHost())->first();
+            if(is_object($client)){
+                $clientUsers = Clientuser::where('phone','=', $mobile)->whereNotNull('phone')->where('client_id', $client->id)->get();
+                if(is_object($clientUsers) && $clientUsers->count() > 0){
+                    if(1 == $clientUsers->count()){
+                        if(is_object($clientUsers[0]) && 0 == $clientUsers[0]->number_verified){
+                            $result['status'] = 'error';
+                            $result['message'] = 'Your mobile no is not verified.Please login with Email-Id and Password or contact at info@vchiptech.com';
+                        } else {
+                            $result['status'] = 'success';
+                            InputSanitise::sendOtp($mobile);
+                        }
+                    } else {
+                        $unVerifiedCount = 0;
+                        $verifiedCount = 0;
+                        foreach($clientUsers as $clientUser){
+                            if(0 == $clientUser->number_verified){
+                                $unVerifiedCount++;
+                            } else {
+                                $verifiedCount++;
+                            }
+                        }
+                        if(1 == $verifiedCount){
+                            $result['status'] = 'success';
+                            InputSanitise::sendOtp($mobile);
+                        } else {
+                            if($verifiedCount > 0){
+                                $result['status'] = 'error';
+                                $result['message'] = $verifiedCount.' users have this no. and all users are verified this no.so can not login.';
+                            } else {
+                                $result['status'] = 'error';
+                                $result['message'] = 'Your mobile no is not verified.Please login with Email-Id and Password or contact at info@vchiptech.com';
+                            }
+                        }
+                    }
+                } else {
+                    $result['status'] = 'error';
+                    $result['message'] = 'Entered mobile no. does not exists in our records.';
+                }
+            }
+        } else {
+            $result['status'] = 'error';
+            $result['message'] = 'Please enter mobile no';
+        }
+        return $result;
+    }
+
 }

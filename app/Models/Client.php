@@ -50,7 +50,7 @@ class Client extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'subdomain', 'admin_approve','remember_token', 'photo', 'plan_id'
+        'name', 'email', 'password','phone', 'subdomain', 'admin_approve','remember_token', 'photo', 'plan_id','allow_non_verified_email'
     ];
 
     /**
@@ -224,5 +224,18 @@ class Client extends Authenticatable
     public function unreadChatMessagesCount(){
         $clientId = Auth::guard('client')->user()->id;
         return ClientChatMessage::where('receiver_id', $clientId)->where('client_id', $clientId)->where('is_read', 0)->count();
+    }
+    protected static function toggleNonVerifiedEmailStatus(){
+        $client = Auth::guard('client')->user();
+        if(is_object($client)){
+            if(1 == $client->allow_non_verified_email){
+                $client->allow_non_verified_email = 0;
+            } else if(0 == $client->allow_non_verified_email) {
+                $client->allow_non_verified_email = 1;
+            }
+            $client->save();
+            return $client->allow_non_verified_email;
+        }
+        return;
     }
 }

@@ -263,72 +263,72 @@
           </ul>
         </li>
         <li class="treeview">
-            <a href="#" title="Users Info">
-              <i class="fa fa-group"></i> <span>Users Info</span>
-              <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
-            </a>
-            <ul class="treeview-menu">
-              <li title="Show All Users "><a href="{{ url('allUsers')}}"><i class="fa fa-circle-o"></i> All Users </a></li>
-              <li title="Show Users Test Results"><a href="{{ url('userTestResults')}}"><i class="fa fa-circle-o"></i> User Test Results </a></li>
-              <li title="Show User Courses"><a href="{{ url('userCourses')}}"><i class="fa fa-circle-o"></i> User Courses </a></li>
-              <li title="Show User Placement"><a href="{{ url('userPlacement')}}"><i class="fa fa-circle-o"></i> User Placement </a></li>
-              <li title="Show User Video"><a href="{{ url('userVideo')}}"><i class="fa fa-circle-o"></i> User Video </a></li>
-            </ul>
-          </li>
-          <li class="treeview">
-            <a href="#" title="All Test Results">
-              <i class="fa fa-trophy"></i> <span>All Test Results</span>
-              <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
-            </a>
-            <ul class="treeview-menu">
-              <li title="Show All Test Results"><a href="{{ url('allTestResults')}}"><i class="fa fa-circle-o"></i> All Test Results </a></li>
-            </ul>
-          </li>
-          <li class="treeview">
-            <a href="#" title="Batch">
-              <i class="fa fa-address-book"></i> <span>Batch</span>
-              <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
-            </a>
-            <ul class="treeview-menu">
-              <li title="Manage Batch"><a href="{{ url('manageBatch')}}"><i class="fa fa-circle-o"></i> Manage Batch</a></li>
-              <li title="Batch Students"><a href="{{ url('associateBatchStudents')}}"><i class="fa fa-circle-o"></i> Batch Students</a></li>
-              <!-- <li title="Manage Attendance"><a href="{{ url('manageAttendance')}}"><i class="fa fa-circle-o"></i> Manage Attendance</a></li> -->
-              <li title="Attendance Calendar"><a href="{{ url('manageAttendanceCalendar')}}"><i class="fa fa-circle-o"></i> Attendance Calendar</a></li>
-              <li title="Manage Offline Paper"><a href="{{ url('manageOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
-              <li title="Manage Offline Exam"><a href="{{ url('manageOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
-            </ul>
-          </li>
-          <li class="treeview">
-            <a href="#" title="Assignment">
-              <i class="fa fa-tasks"></i> <span>Assignment</span>
-              <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
-            </a>
-            <ul class="treeview-menu">
-              <li title="Manage Subject"><a href="{{ url('manageAssignmentSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject</a></li>
-              <li title="Manage Topic"><a href="{{ url('manageAssignmentTopic')}}"><i class="fa fa-circle-o"></i> Manage Topic</a></li>
-              <li title="Manage Assignment"><a href="{{ url('manageAssignment')}}"><i class="fa fa-circle-o"></i> Manage Assignment</a></li>
-              <li title="Students Assignment"><a href="{{ url('studentsAssignment')}}"><i class="fa fa-circle-o"></i>Students Assignment</a></li>
-            </ul>
-          </li>
-          <li class="treeview">
-            <a href="#" title="Event/Message">
-              <i class="fa fa-envelope"></i> <span>Event/Message</span>
-              <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
-            </a>
-            <ul class="treeview-menu">
-              <li title="Manage Event/Message"><a href="{{ url('manageMessage')}}"><i class="fa fa-circle-o"></i> Manage Event/Message</a></li>
-            </ul>
-          </li>
+          <a href="#" title="Users Info">
+            <i class="fa fa-group"></i> <span>Users Info</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Show All Users "><a href="{{ url('allUsers')}}"><i class="fa fa-circle-o"></i> All Users </a></li>
+            <li title="Show Users Test Results"><a href="{{ url('userTestResults')}}"><i class="fa fa-circle-o"></i> User Test Results </a></li>
+            <li title="Show User Courses"><a href="{{ url('userCourses')}}"><i class="fa fa-circle-o"></i> User Courses </a></li>
+            <li title="Show User Placement"><a href="{{ url('userPlacement')}}"><i class="fa fa-circle-o"></i> User Placement </a></li>
+            <li title="Show User Video"><a href="{{ url('userVideo')}}"><i class="fa fa-circle-o"></i> User Video </a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="All Test Results">
+            <i class="fa fa-trophy"></i> <span>All Test Results</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Show All Test Results"><a href="{{ url('allTestResults')}}"><i class="fa fa-circle-o"></i> All Test Results </a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="Batch">
+            <i class="fa fa-address-book"></i> <span>Batch</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Manage Batch"><a href="{{ url('manageBatch')}}"><i class="fa fa-circle-o"></i> Manage Batch</a></li>
+            <li title="Batch Students"><a href="{{ url('associateBatchStudents')}}"><i class="fa fa-circle-o"></i> Batch Students</a></li>
+            <!-- <li title="Manage Attendance"><a href="{{ url('manageAttendance')}}"><i class="fa fa-circle-o"></i> Manage Attendance</a></li> -->
+            <li title="Attendance Calendar"><a href="{{ url('manageAttendanceCalendar')}}"><i class="fa fa-circle-o"></i> Attendance Calendar</a></li>
+            <li title="Manage Offline Paper"><a href="{{ url('manageOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
+            <li title="Manage Offline Exam"><a href="{{ url('manageOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="Assignment">
+            <i class="fa fa-tasks"></i> <span>Assignment</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Manage Subject"><a href="{{ url('manageAssignmentSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject</a></li>
+            <li title="Manage Topic"><a href="{{ url('manageAssignmentTopic')}}"><i class="fa fa-circle-o"></i> Manage Topic</a></li>
+            <li title="Manage Assignment"><a href="{{ url('manageAssignment')}}"><i class="fa fa-circle-o"></i> Manage Assignment</a></li>
+            <li title="Students Assignment"><a href="{{ url('studentsAssignment')}}"><i class="fa fa-circle-o"></i>Students Assignment</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="Event/Message">
+            <i class="fa fa-envelope"></i> <span>Event/Message</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Manage Event/Message"><a href="{{ url('manageMessage')}}"><i class="fa fa-circle-o"></i> Manage Event/Message</a></li>
+          </ul>
+        </li>
         <li class="treeview">
           <a href="#" title="Plans & Billing">
             <i class="fa fa-inr"></i> <span>Plans & Billing</span>
@@ -354,6 +354,17 @@
           <ul class="treeview-menu">
             <li title="Payable SubCategory"><a href="{{ url('managePayableSubCategory')}}"><i class="fa fa-circle-o"></i> Payable SubCategory </a></li>
             <li title="Purchased SubCategory"><a href="{{ url('managePurchasedSubCategory')}}"><i class="fa fa-circle-o"></i> Purchased SubCategory </a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="Settings">
+            <i class="fa fa-cog"></i> <span>Settings</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Manage Settings"><a href="{{ url('manageSettings')}}"><i class="fa fa-circle-o"></i> Manage Settings</a></li>
           </ul>
         </li>
         <li class="header">LABELS</li>
@@ -383,7 +394,7 @@
   $(document).ready(function(){
         setTimeout(function() {
           $('.alert-success').fadeOut('fast');
-        }, 10000); // <-- time in milliseconds
+        }, 50000); // <-- time in milliseconds
     });
 </script>
 </body>

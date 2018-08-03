@@ -239,27 +239,36 @@ class ClientUsersInfoController extends BaseController
     }
 
     protected function updateUserVideo(Request $request){
-        $studentId = InputSanitise::inputInt($request->get('student_id'));
-        $student = Clientuser::getStudentById($studentId);
-        if(is_object($student)){
-
-            $dom = new \DOMDocument;
-            $dom->loadHTML($request->recorded_video);
-            $iframes = $dom->getElementsByTagName('iframe');
-            foreach ($iframes as $iframe) {
-                $url =  '?enablejsapi=1';
-                if (strpos($iframe->getAttribute('src'), $url) === false) {
-                    $iframe->setAttribute('src', $iframe->getAttribute('src').$url);
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $studentId = InputSanitise::inputInt($request->get('student_id'));
+            $student = Clientuser::getStudentById($studentId);
+            if(is_object($student)){
+                $dom = new \DOMDocument;
+                $dom->loadHTML($request->recorded_video);
+                $iframes = $dom->getElementsByTagName('iframe');
+                foreach ($iframes as $iframe) {
+                    $url =  '?enablejsapi=1';
+                    if (strpos($iframe->getAttribute('src'), $url) === false) {
+                        $iframe->setAttribute('src', $iframe->getAttribute('src').$url);
+                    }
                 }
-            }
-            $html = $dom->saveHTML();
-            $body = explode('<body>', $html);
-            $body = explode('</body>', $body[1]);
+                $html = $dom->saveHTML();
+                $body = explode('<body>', $html);
+                $body = explode('</body>', $body[1]);
 
-            $student->recorded_video = $body[0];
-            $student->save();
-            Session::set('client_selected_user', $studentId);
-            return Redirect::to('userVideo')->with('message', 'User updated successfully.');
+                $student->recorded_video = $body[0];
+                $student->save();
+                DB::connection('mysql2')->commit();
+                Session::set('client_selected_user', $studentId);
+                return Redirect::to('userVideo')->with('message', 'User updated successfully.');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return Redirect::to('userVideo');
         }
         return Redirect::to('userVideo');
     }
@@ -327,11 +336,35 @@ class ClientUsersInfoController extends BaseController
     }
 
     protected function changeClientUserCourseStatus(Request $request){
-        return ClientUserPurchasedCourse::changeClientUserCourseStatus($request);
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $status = ClientUserPurchasedCourse::changeClientUserCourseStatus($request);
+            DB::connection('mysql2')->commit();
+            return $status;
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return;
+        }
+        return;
     }
 
     protected function changeClientUserTestSubCategoryStatus(Request $request){
-        return ClientUserPurchasedTestSubCategory::changeClientUserTestSubCategoryStatus($request);
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $status = ClientUserPurchasedTestSubCategory::changeClientUserTestSubCategoryStatus($request);
+            DB::connection('mysql2')->commit();
+            return $status;
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return;
+        }
+        return;
     }
 
     protected function profile($subdomainName){
@@ -339,8 +372,19 @@ class ClientUsersInfoController extends BaseController
     }
 
     protected function updateClientProfile(Request $request){
-        Client::updateClientProfile($request);
-        return Redirect::to('myprofile')->with('message', 'Client profile updated successfully!');
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            Client::updateClientProfile($request);
+            DB::connection('mysql2')->commit();
+            return Redirect::to('myprofile')->with('message', 'Client profile updated successfully!');
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return redirect('myprofile');
     }
 
     protected function updateClientPassword( Request $request){
@@ -349,7 +393,7 @@ class ClientUsersInfoController extends BaseController
         {
             return redirect()->back()->withErrors($v->errors());
         }
-        DB::beginTransaction();
+        DB::connection('mysql2')->beginTransaction();
         try
         {
             $oldPassword = $request->get('old_password');
@@ -368,11 +412,31 @@ class ClientUsersInfoController extends BaseController
         }
         catch(\Exception $e)
         {
-            DB::rollback();
+            DB::connection('mysql2')->rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }
 
         return redirect('/');
+    }
+
+    protected function manageSettings($subdomainName){
+        return view('client.clientLogin.settings', compact('subdomainName'));
+    }
+
+    protected function toggleNonVerifiedEmailStatus(){
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $status = Client::toggleNonVerifiedEmailStatus();
+            DB::connection('mysql2')->commit();
+            return $status;
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return;
+        }
+        return;
     }
 
 }

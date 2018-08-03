@@ -79,4 +79,23 @@ class InputSanitise{
         return ;
     }
 
+    public static function sendOtp($mobile)
+    {
+        $mobileNo = '91'.$mobile;
+        $otp = rand(100000, 999999);
+        $userMessage = 'Your OTP: '.$otp;
+        Cache::put($mobile, $otp, 10);
+        Cache::put('mobile-'.$mobile, $mobile, 10);
+        $message = rawurlencode($userMessage);
+
+        $smsUrl = 'http://api.bizztel.com/composeapi/?userid=info@vchiptech.com&pwd=vchipsms&route=1&senderid=VCHIPP&destination='.$mobileNo.'&message='.$message;
+
+        // Send the GET request with cURL
+        $ch = curl_init($smsUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return $response;
+    }
+
 }

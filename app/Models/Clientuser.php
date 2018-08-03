@@ -40,7 +40,7 @@ class Clientuser extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id', 'unchecked_assignments','batch_ids'
+        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id', 'unchecked_assignments','batch_ids','number_verified'
     ];
 
     /**
@@ -184,8 +184,6 @@ class Clientuser extends Authenticatable
     protected static function updateUser(Request $request){
         $user = Auth::guard('clientuser')->user();
         $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->phone;
 
         $client = Client::find($user->client_id);
         $userStoragePath = "clientUserStorage/".str_replace(' ', '_', $client->name)."/".$user->id;
@@ -375,5 +373,54 @@ class Clientuser extends Authenticatable
         $student = InputSanitise::inputString($request->get('student'));
         $clientId = Auth::guard('client')->user()->id;
         return static::where('name', 'like', '%'.$student.'%')->where('client_id', $clientId)->get();
+    }
+
+    protected static function addEmail(Request $request){
+        $user = Auth::guard('clientuser')->user();
+        $user->email = $request->get('email');
+        $user->verified = 1;
+        $user->password = bcrypt($request->get('password'));
+        $user->save();
+        return $user;
+    }
+
+    protected static function verifyEmail(Request $request){
+        $user = Auth::guard('clientuser')->user();
+        $user->verified = 1;
+        $user->save();
+        return $user;
+    }
+    protected static function updateMobile(Request $request){
+        $userMobile = $request->get('phone');
+        $user = Auth::guard('clientuser')->user();
+        $user->phone = $userMobile;
+        $user->number_verified = 1;
+        $user->save();
+
+        // un approve number if have same number to other users with same client
+        $otherUsers = Clientuser::where('phone', $user->phone)->where('client_id', $user->client_id)->where('id','!=', $user->id)->get();
+        if(is_object($otherUsers) && false == $otherUsers->isEmpty()){
+            foreach($otherUsers as $otherUser){
+                $otherUser->number_verified = 0;
+                $otherUser->save();
+            }
+        }
+        return;
+    }
+    protected static function verifyMobile(Request $request){
+        $userMobile = $request->get('phone');
+        $user = Auth::guard('clientuser')->user();
+        $user->number_verified = 1;
+        $user->save();
+
+        // un approve number if have same number to other users with same client
+        $otherUsers = Clientuser::where('phone', $user->phone)->where('client_id', $user->client_id)->where('id','!=', $user->id)->get();
+        if(is_object($otherUsers) && false == $otherUsers->isEmpty()){
+            foreach($otherUsers as $otherUser){
+                $otherUser->number_verified = 0;
+                $otherUser->save();
+            }
+        }
+        return;
     }
 }

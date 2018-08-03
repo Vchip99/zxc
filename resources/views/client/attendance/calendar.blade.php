@@ -1,6 +1,5 @@
 @extends('client.dashboard')
 @section('module_title')
-  <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <link rel="stylesheet" href="{{ asset('css/fullcalendar.min.css?ver=1.0')}}"/>
   <section class="content-header">
     <h1> Attendance Calendar</h1>
@@ -21,17 +20,8 @@
       border-left-width: 1px !important;
       border-color: white !important;
     }
-
-    .fc-content-skeleton td[rowspan='2']{
-      border-right-width: 1px !important;
-      border-left-width: 1px !important;
-      border-color: white !important;
-    }
-    .fc-day-number.fc-other-month {
-       opacity: 1 !important;
-    }
     .fc td, .fc th {
-      vertical-align: inherit !important;
+      vertical-align: bottom !important;
     }
   </style>
 @stop
@@ -82,6 +72,7 @@
             @endif
          </select>
         </div>
+        <div class="col-md-3 mrgn_10_btm"><b>P-Present, A-Absent</b></div>
       </div>
     </form>
     <div id="mycalendar">
@@ -162,14 +153,11 @@ $(document).ready(function(){
     if(allAttendanceDates){
       $.each(allAttendanceDates.split(','), function(idx, date){
         $('td.fc-day[data-date=' + date + ']').css('background-color', 'green');
-        $('td.fc-day-number[data-date=' + date + ']').css('background-color', 'green');
       });
     }
   }
   function showUnAttendanceDates(){
     $('td.fc-day').css('background-color', 'red');
-    $('td.fc-day-number').css('background-color', 'red');
-    $('td[rowspan=2]').css('background-color', 'red');
   }
 
   function confirmation(selectedDate,selectedBatch){
@@ -191,7 +179,7 @@ $(document).ready(function(){
         var statsArr = stats.split(':');
         var dateStr = statsArr[0];
         var statsCountArr = statsArr[1].split('-');
-        $('.fc-bg td[data-date="' + dateStr + '"]').append('<b>&nbsp;Present - '+statsCountArr[0]+'<br>&nbsp;Absent - '+statsCountArr[1]+'</b>');
+        $('.fc-bg td[data-date="' + dateStr + '"]').append('<b>&nbsp;P-'+statsCountArr[0]+'<br>&nbsp;A-'+statsCountArr[1]+'</b>');
       });
     }
   }

@@ -12,7 +12,7 @@ use App\Models\Client;
 use App\Models\User;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
-use Session,Cache;
+use Session,Cache,Redirect;
 
 trait AuthenticatesUsers
 {
@@ -36,6 +36,26 @@ trait AuthenticatesUsers
      */
     public function login(Request $request)
     {
+        $userMobile = $request->get('mobile');
+        $loginOtp = $request->get('login_otp');
+        if(!empty($request->route()->getParameter('client')) && !empty($userMobile) && !empty($loginOtp)){
+            $serverOtp = Cache::get($userMobile);
+            if($loginOtp == $serverOtp){
+                $client = Client::where('subdomain', $request->getHost())->first();
+                $cluentUser = Clientuser::where('number_verified', 1)->where('phone','=', $userMobile)->whereNotNull('phone')->where('client_id', $client->id)->first();
+                if(!is_object($cluentUser)){
+                    return Redirect::to('/')->withErrors('User does not exists.');
+                }
+                Auth::guard('clientuser')->login($cluentUser);
+                if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
+                    Cache::forget($userMobile);
+                    Cache::forget('mobile-'.$userMobile);
+                }
+                return redirect()->back()->with('message', 'Welcome '. $cluentUser->name);
+            } else {
+                return redirect()->back()->withErrors('Entered otp is wrong.');
+            }
+        }
         $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -79,6 +99,11 @@ trait AuthenticatesUsers
                 if($this->guard('clientuser')->attempt($credentials, $request->has('remember'))) {
                     $clientUser = Auth::guard('clientuser')->user();
                     if(0 == $clientUser->verified || 0 == $clientUser->client_approve){
+                        if(0 == $clientUser->verified){
+                            if(1 == $clientUser->client->allow_non_verified_email){
+                                return $this->sendLoginResponse($request);
+                            }
+                        }
                         $this->guard('clientuser')->logout();
                         Session::flush();
                         Session::regenerate();

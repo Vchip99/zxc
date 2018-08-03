@@ -63,6 +63,7 @@
                   <tr>
                     <th>Sr. No.</th>
                     <th>Name</th>
+                    <th>Email</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -72,6 +73,7 @@
                       <tr class="student" id="div_student_{{$student->id}}" >
                         <td> {{ $index + 1 }} </td>
                         <td>{{$student->name}}</td>
+                        <td>{{$student->email}}</td>
                         <td>
                             <input type="checkbox" name="students[]" id="student_{{$student->id}}" value="{{$student->id}}">
                         </td>

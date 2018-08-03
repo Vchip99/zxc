@@ -12,7 +12,7 @@ use App\Mail\PaymentReceived;
 use App\Models\ClientHomePage;
 use App\Models\Client;
 use Illuminate\Http\Request;
-use View,DB,Session,Redirect, Auth,Validator,Cache,LRedis;
+use View,DB,Session,Redirect, Auth,Validator,Cache,LRedis,Hash;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientOnlineTestSubjectPaper;
@@ -61,6 +61,22 @@ class ClientUserController extends BaseController
             view::share('client', $client);
         }
     }
+
+    /**
+     * Define your validation rules in a property in
+     * the controller to reuse the rules.
+     */
+    protected $validateAddEmail = [
+        'email' => 'required|max:255',
+        'password' => 'required',
+        'confirm_password' => 'required|same:password'
+    ];
+
+    protected $validateUpdatePassword = [
+        'old_password' => 'required',
+        'password' => 'required|different:old_password',
+        'confirm_password' => 'required|same:password',
+    ];
 
     protected function showClientUserDashBoard(Request $request){
         return view('clientuser.dashboard.dashboard');
@@ -1022,5 +1038,144 @@ class ClientUserController extends BaseController
             }
         }
         return view('clientuser.dashboard.myMessage', compact('messages'));
+    }
+
+    protected function addEmail($subdomainName,Request $request){
+        $v = Validator::make($request->all(), $this->validateAddEmail);
+        if ($v->fails())
+        {
+            return redirect()->back()->withErrors($v->errors());
+        }
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        if(!empty($request->get('email'))){
+            $checkEmail = Clientuser::where('email', $request->get('email'))->where('client_id', $clientId)->where('id', '!=', $clientUserId)->first();
+            if(is_object($checkEmail)){
+                return Redirect::to('profile')->withErrors('The email id '.$request->get('email').' is already exist.');
+            }
+        }
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $user = Clientuser::addEmail($request);
+            if(is_object($user)){
+                DB::connection('mysql2')->commit();
+                return Redirect::to('profile')->with('message', 'Email added successfully!');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('profile');
+    }
+
+    protected function verifyEmail($subdomainName,Request $request){
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $user = Clientuser::verifyEmail($request);
+            if(is_object($user)){
+                DB::connection('mysql2')->commit();
+                return Redirect::to('profile')->with('message', 'Email verified successfully!');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('profile');
+    }
+
+    protected function updatePassword( Request $request){
+        $v = Validator::make($request->all(), $this->validateUpdatePassword);
+        if ($v->fails())
+        {
+            return redirect()->back()->withErrors($v->errors());
+        }
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $oldPassword = $request->get('old_password');
+            $newPassword = $request->get('password');
+            $user = Auth::guard('clientuser')->user();
+            $hashedPassword = $user->password;
+            if(Hash::check($oldPassword, $hashedPassword)){
+                $user->password = bcrypt($newPassword);
+                $user->save();
+                DB::connection('mysql2')->commit();
+                Auth::logout();
+                return Redirect::to('/')->with('message', 'Password updated successfully. please login with new password.');
+            } else {
+                return redirect()->back()->withErrors('please enter correct old password.');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+
+        return redirect('/');
+    }
+
+    protected function sendClientUserOtp(Request $request){
+        $mobile = $request->get('mobile');
+        return InputSanitise::sendOtp($mobile);
+    }
+
+    protected function updateMobile(Request $request){
+        $userMobile = $request->get('phone');
+        $userOtp = $request->get('user_otp');
+        $serverOtp = Cache::get($userMobile);
+        if($serverOtp == $userOtp){
+            DB::connection('mysql2')->beginTransaction();
+            try
+            {
+                Clientuser::updateMobile($request);
+                DB::connection('mysql2')->commit();
+                if(Cache::has($userMobile) && Cache::has('mobile')){
+                    Cache::forget($userMobile);
+                    Cache::forget('mobile');
+                }
+                return Redirect::to('profile')->with('message', 'Mobile number updated successfully.');
+            }
+            catch(\Exception $e)
+            {
+                DB::connection('mysql2')->rollback();
+                return redirect()->back()->withErrors('something went wrong.');
+            }
+        } else {
+            return Redirect::to('profile')->withErrors('Entered wrong otp.');
+        }
+    }
+
+    protected function verifyMobile(Request $request){
+        $userMobile = $request->get('phone');
+        $userOtp = $request->get('user_otp');
+        $serverOtp = Cache::get($userMobile);
+        if($serverOtp == $userOtp){
+            DB::connection('mysql2')->beginTransaction();
+            try
+            {
+                Clientuser::verifyMobile($request);
+                DB::connection('mysql2')->commit();
+                if(Cache::has($userMobile) && Cache::has('mobile')){
+                    Cache::forget($userMobile);
+                    Cache::forget('mobile');
+                }
+                return Redirect::to('profile')->with('message', 'Mobile number verified successfully.');
+            }
+            catch(\Exception $e)
+            {
+                DB::connection('mysql2')->rollback();
+                return redirect()->back()->withErrors('something went wrong.');
+            }
+        } else {
+            return Redirect::to('profile')->withErrors('Entered wrong otp.');
+        }
     }
 }
