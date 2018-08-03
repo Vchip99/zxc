@@ -384,12 +384,6 @@ class Clientuser extends Authenticatable
         return $user;
     }
 
-    protected static function verifyEmail(Request $request){
-        $user = Auth::guard('clientuser')->user();
-        $user->verified = 1;
-        $user->save();
-        return $user;
-    }
     protected static function updateMobile(Request $request){
         $userMobile = $request->get('phone');
         $user = Auth::guard('clientuser')->user();

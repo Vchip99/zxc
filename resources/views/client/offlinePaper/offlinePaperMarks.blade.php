@@ -29,7 +29,10 @@
     @endif
    <form action="{{url('assignOfflinePaperMarks')}}" method="POST">
     {{ csrf_field() }}
-      <div class="row" >
+      <div class="row">
+        <b>Note: For absent student, keep mark as empty.</b>
+      </div><br/>
+      <div class="row">
         <div class="form-group">
             <div class="col-md-3">
                 <div style="margin-bottom: 10px">

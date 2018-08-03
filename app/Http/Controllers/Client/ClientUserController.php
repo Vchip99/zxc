@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PaymentGatewayErrors;
 use App\Mail\PaymentReceived;
+use App\Mail\ClientUserEmailVerification;
 use App\Models\ClientHomePage;
 use App\Models\Client;
 use Illuminate\Http\Request;
@@ -1073,19 +1074,12 @@ class ClientUserController extends BaseController
     }
 
     protected function verifyEmail($subdomainName,Request $request){
-        DB::connection('mysql2')->beginTransaction();
-        try
-        {
-            $user = Clientuser::verifyEmail($request);
-            if(is_object($user)){
-                DB::connection('mysql2')->commit();
-                return Redirect::to('profile')->with('message', 'Email verified successfully!');
-            }
-        }
-        catch(\Exception $e)
-        {
-            DB::connection('mysql2')->rollback();
-            return redirect()->back()->withErrors('something went wrong.');
+        $user = Auth::guard('clientuser')->user();
+        if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
+            // After creating the user send an email with the random token generated in the create method above
+            $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
+            Mail::to($user->email)->send($clientUserEmail);
+            return Redirect::to('profile')->with('message', 'Verification email sent successfully. please check email and verify.');
         }
         return Redirect::to('profile');
     }

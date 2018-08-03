@@ -80,17 +80,23 @@ class RegisterController extends Controller
     {
         if('mobile' == $data['signup_type']){
             $numberVerified = 1;
+            $email = '';
+            $phone = '';
+            $emailToken = '';
         } else {
             $numberVerified = 0;
+            $email = $data['email'];
+            $phone = $data['phone'];
+            $emailToken = str_random(60);
         }
         $clientUser = Clientuser::create([
             'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'],
+            'email' => $email,
+            'phone' => $phone,
             'client_id' => $clientId,
             'client_approve' => 1,
             'password' => bcrypt($data['password']),
-            'email_token' => str_random(60),
+            'email_token' => $emailToken,
             'number_verified' => $numberVerified,
         ]);
         return $clientUser;
@@ -176,7 +182,7 @@ class RegisterController extends Controller
                     }
                 }
             }
-            if(!empty($user->email)){
+            if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
                 // After creating the user send an email with the random token generated in the create method above
                 $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
                 Mail::to($user->email)->send($clientUserEmail);
@@ -193,7 +199,11 @@ class RegisterController extends Controller
             if('mobile' == $request->get('signup_type')){
                 return redirect('/')->with('message', 'Please sign up using mobile.');
             } else {
-                return redirect('/')->with('message', 'Verify your email for your account activation.');
+                if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
+                    return redirect('/')->with('message', 'Verify your email for your account activation.');
+                } else {
+                    return redirect('/')->with('message', 'Please login using User Id.');
+                }
             }
         }
         catch(Exception $e)

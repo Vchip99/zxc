@@ -55,13 +55,13 @@
                     <div class="tab-content">
                       <div id="home" class="tab-pane fade in active">
                         <div class="form-group" style="color: white;">
-                          <input type="radio" name="signin_type" id="signinRadioEmail" value="email" checked onClick="toggleSignIn(this.value);">Using Email-id/User-id
-                          <input type="radio" name="signin_type" value="mobile" onClick="toggleSignIn(this.value);">Using Mobile
+                          <input type="radio" name="signin_type" id="signinRadioEmail" value="email" checked onClick="toggleSignIn(this.value);">Email-id/User-id
+                          <input type="radio" name="signin_type" value="mobile" onClick="toggleSignIn(this.value);">Mobile
                         </div>
                         <form id="loginForm" method="post" action="{{ url('login') }}">
                           {!! csrf_field() !!}
                           <div class="form-group signInEmail">
-                            <input name="email" type="email" id="signInEmail" class="form-control" placeholder="vchip@gmail.com" autocomplete="off">
+                            <input name="email" type="text" id="signInEmail" class="form-control" placeholder="vchip@gmail.com" autocomplete="off">
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group signInEmail">
@@ -93,11 +93,11 @@
                         <form id="registerUser" method="post" action="{{ url('register')}}">
                           {{ csrf_field() }}
                           <div class="form-group" style="color: white;">
-                            <input type="radio" name="signup_type" id="signupRadioEmail" value="email" checked onClick="toggleSignUp(this.value);">Using Email-id/User-id
-                            <input type="radio" name="signup_type" value="mobile" onClick="toggleSignUp(this.value);">Using Mobile
+                            <input type="radio" name="signup_type" id="signupRadioEmail" value="email" checked onClick="toggleSignUp(this.value);">Email-id/User-id
+                            <input type="radio" name="signup_type" value="mobile" onClick="toggleSignUp(this.value);">Mobile
                           </div>
                           <div class="form-group">
-                            <input id="name" type="text" class="form-control" name="name" value="" placeholder="User Name" autocomplete="off" required/>
+                            <input id="signUpNameInput" type="text" class="form-control" name="name" value="" placeholder="User Name" autocomplete="off" required/>
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
@@ -105,15 +105,15 @@
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input name="email" type="text" class="form-control signUpEmail" autocomplete="off" placeholder="Email-id/User-id" >
+                            <input id="signUpEmailInput" name="email" type="text" class="form-control signUpEmail" autocomplete="off" placeholder="Email-id/User-id" >
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input name="password" type="password" class="form-control signUpEmail" data-type="password" autocomplete="off" placeholder="password" >
+                            <input id="signUpPassword" name="password" type="password" class="form-control signUpEmail" data-type="password" autocomplete="off" placeholder="password" >
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input id="confirm_password" name="confirm_password" type="password" class="form-control signUpEmail" data-type="password" autocomplete="off" placeholder="confirm password" >
+                            <input id="signUpConfirmPassword" name="confirm_password" type="password" class="form-control signUpEmail" data-type="password" autocomplete="off" placeholder="confirm password" >
                             <span class="help-block"></span>
                           </div>
                           <button title="Send Otp" id="sendSignUpOtpBtn" class="btn btn-info btn-block hide signUpMobile" onclick="event.preventDefault(); sendSignUpOtp();" >Send OTP</button></br>
@@ -162,6 +162,7 @@
       $('.signUpMobile').removeClass('hide');
       $('#signUpPhone').prop('required', true);
     }
+    emptySignUpForm();
   }
   function toggleSignIn(value){
     if('email' == value){
@@ -229,6 +230,13 @@
     } else {
       alert('enter mobile no.');
     }
+  }
+  function emptySignUpForm(){
+    $('#signUpNameInput').val('');
+    $('#signUpPhone').val('');
+    $('#signUpEmailInput').val('');
+    $('#signUpPassword').val('');
+    $('#signUpConfirmPassword').val('');
   }
 </script>
 <style type="text/css">

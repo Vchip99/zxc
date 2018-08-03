@@ -69,14 +69,6 @@
                                   <label>Name:</label>
                                   <input class="form-control" placeholder="name" name="name" type="text" value="{{$loginUser->name}}">
                                 </div>
-                                <!-- <div class="form-group">
-                                  <label>Email:</label>
-                                  <input class="form-control" placeholder="yourmail@example.com" name="email" type="text" value="{{$loginUser->email}}">
-                                </div>
-                                <div class="form-group">
-                                  <label>Phone:</label>
-                                  <input class="form-control" placeholder="Mobile No." name="phone" type="text" value="{{$loginUser->phone}}">
-                                </div> -->
                                 <div class="form-group">
                                   <label>Photo:</label>
                                   <input class="form-control" placeholder="Mobile No." name="photo" type="file">
@@ -129,11 +121,11 @@
                   <div class="row toggle" id="dropdown-detail-2" data-toggle="detail-2">
                     <div class="col-xs-12">
                       <div class="row">
-                        <div class="col-xs-5 "><b>Email</b></div>
+                        <div class="col-xs-5 "><b>Email Id/User Id</b></div>
                         <div class="col-xs-7 pull-left">
                           @if(!empty($loginUser->email))
                             {{$loginUser->email}}
-                            @if(0 == $loginUser->verified)
+                            @if(0 == $loginUser->verified && filter_var($loginUser->email, FILTER_VALIDATE_EMAIL))
                               <a href="#verifyEmail" data-toggle="modal" style="float: right;">Please Verify</a>
                               <div id="verifyEmail" class="modal fade" role="dialog">
                                 <div class="modal-dialog modal-sm">
