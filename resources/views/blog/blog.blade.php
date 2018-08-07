@@ -73,7 +73,6 @@ color: #b6b6b6;
   <section id="" class="v_container v_bg_grey">
     <div class="container ">
         <div class="row">
-
           <div class="col-sm-3 col-sm-push-9 ">
             <h4 class="v_h4_subtitle "> Sort By</h4>
             <div class="dropdown mrgn_20_top_btm" id="cat">
@@ -185,8 +184,13 @@ color: #b6b6b6;
                           <span class="date"><i class="fa fa-calendar-o"></i><span> {{ $blog->created_at->format('M d , Y') }}</span></span>
                         </figcaption>
                       </div>
-                      <div class="panel-body mrgn_10_top_btm more">
-                        {!! $blog->content !!}
+                      <div class="panel-body mrgn_10_top_btm">
+                        @if(strlen($blog->content) > 400)
+                          {!!  substr($blog->content, 0, 400) !!} ...
+                          <p class="link"><a href="{{url('blogComment')}}/{{$blog->id}}" target="_blank"> Read More</a></p>
+                        @else
+                          {!! $blog->content !!}
+                        @endif
                       </div>
                       <div class="panel-footer row">
                         <div class="col-xs-12">
@@ -281,39 +285,6 @@ color: #b6b6b6;
 @section('footer')
 @include('footer.footer')
   <script type="text/javascript">
-
-// $(document).ready(function() {
-  var showChar = 400;
-      var ellipsestext = "...";
-      var moretext = "Read more";
-      var lesstext = "less";
-      $('.more').each(function() {
-        var content = $(this).html();
-
-        if(content.length > showChar) {
-
-          var c = content.substr(0, showChar);
-          var h = content.substr(0, content.length);
-          var html = '<div class="zxc">'+ c + '<span style="color:#01bafd; margin-left:5px;">' + ellipsestext+ '</span><br /><a href="" class="morelink" style="color:#01bafd";>' + moretext + '</a></div><div class="zxc1" style="display:none;">'+ h + '<br /><a href="" class="morelink1" style="color:#01bafd";>' + lesstext + '</a></div>';
-
-          $(this).html(html);
-        }
-
-      });
-
-      $(".morelink").click(function(){
-        $(this).closest('.zxc').toggle();
-        $(this).closest('.zxc').siblings('.zxc1').toggle();
-        return false;
-      });
-      $(".morelink1").click(function(){
-        $(this).closest('.zxc1').toggle();
-        $(this).closest('.zxc1').siblings('.zxc').toggle();
-        return false;
-      });
-// });
-
-
 function showBlogs(ele){
   var categoryId = parseInt($(ele).val());
   if( 0 < categoryId ){
@@ -355,13 +326,19 @@ function showBlogs(ele){
           panelDiv.className = 'panel-heading row';
           var panelHeadingDiv = document.createElement('div');
           var url = "{{url('blogComment')}}/"+obj.id;
-          panelHeadingDiv.innerHTML = '<p class="ellipsed"> <a class="uppercase" href="'+url+'" target="_blank">'+ obj.title +'</a></p><figcaption class="blog-by"><span><img src="images/user1.png" class="img-circle" alt="User Image"></span><span class="username">'+ obj.author+'</span><span class="date"><i class="fa fa-calendar-o"></i><span> '+ new Date(obj.created_at).getDate() +'/'+ new Date(obj.created_at).getMonth() +'/'+ new Date(obj.created_at).getFullYear()+'</span></span></figcaption>';
+          panelHeadingDiv.innerHTML = '<p class="ellipsed"> <a class="uppercase" href="'+url+'" target="_blank">'+ obj.title +'</a></p><figcaption class="blog-by"><span><img src="images/user1.png" class="img-circle" alt="User Image"></span><span class="username">'+ obj.author+'</span><span class="date"><i class="fa fa-calendar-o"></i><span> '+ new Date(obj.created_at).getDate() +'/'+ (new Date(obj.created_at).getMonth()+1) +'/'+ new Date(obj.created_at).getFullYear()+'</span></span></figcaption>';
           panelDiv.appendChild(panelHeadingDiv);
           mainDiv.appendChild(panelDiv);
 
           var panelContentDiv = document.createElement('div');
-          panelContentDiv.className = 'panel-body mrgn_10_top_btm more';
-          panelContentDiv.innerHTML = obj.content;
+          panelContentDiv.className = 'panel-body mrgn_10_top_btm';
+          if(obj.content.length > 400){
+            var newText = obj.content.substring(0, 400)+' ...';
+            newText += '<p class="link"><a href="'+url+'" target="_blank"> Read More</a></p>';
+            panelContentDiv.innerHTML = newText;
+          } else {
+            panelContentDiv.innerHTML = obj.content;
+          }
           mainDiv.appendChild(panelContentDiv);
 
           var panelFooterDiv = document.createElement('div');
@@ -379,37 +356,6 @@ function showBlogs(ele){
         paginationUl.appendChild(paginationLi);
         blogs.appendChild(paginationUl);
       }
-
-      var showChar = 400;
-      var ellipsestext = "...";
-      var moretext = "Read more";
-      var lesstext = "less";
-      $('.more').each(function() {
-        var content = $(this).html();
-
-        if(content.length > showChar) {
-
-          var c = content.substr(0, showChar);
-          var h = content.substr(0, content.length);
-          var html = '<div class="zxc">'+ c + '<span style="color:#01bafd; margin-left:5px;">' + ellipsestext+ '</span><br /><a href="" class="morelink" style="color:#01bafd";>' + moretext + '</a></div><div class="zxc1" style="display:none;">'+ h + '<br /><a href="" class="morelink1" style="color:#01bafd";>' + lesstext + '</a></div>';
-
-          $(this).html(html);
-        }
-
-      });
-
-      $(".morelink").click(function(){
-        $(this).closest('.zxc').toggle();
-        $(this).closest('.zxc').siblings('.zxc1').toggle();
-        return false;
-      });
-      $(".morelink1").click(function(){
-        $(this).closest('.zxc1').toggle();
-        $(this).closest('.zxc1').siblings('.zxc').toggle();
-        return false;
-      });
-
-
     });
   }
 }

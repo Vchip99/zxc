@@ -50,12 +50,8 @@
                               {{ csrf_field() }}
                               <fieldset>
                                 <div class="form-group">
-                                  <label>Email:</label>
-                                  <input class="form-control" placeholder="yourmail@example.com" name="email" type="text" value="{{Auth::guard('client')->user()->email}}">
-                                </div>
-                                <div class="form-group">
                                   <label>Phone:</label>
-                                  <input class="form-control" placeholder="Mobile No." name="phone" type="text" value="{{Auth::guard('client')->user()->phone}}">
+                                  <input class="form-control" name="phone" type="text" value="{{Auth::guard('client')->user()->phone}}" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" required>
                                 </div>
                                 <div class="form-group">
                                   <label>Photo:</label>
@@ -136,15 +132,15 @@
                               <fieldset>
                                 <div class="form-group">
                                   <label>Old Password:</label>
-                                  <input class="form-control" type="password" name="old_password" placeholder="Enter Old Password" />
+                                  <input class="form-control" type="password" name="old_password" placeholder="Enter Old Password" required/>
                                 </div>
                                 <div class="form-group">
                                   <label>New Password:</label>
-                                  <input class="form-control" type="password" name="password" placeholder="Enter New Password" />
+                                  <input class="form-control" type="password" name="password" placeholder="Enter New Password" required/>
                                 </div>
                                 <div class="form-group">
                                   <label>Confirm New Password:</label>
-                                  <input class="form-control" type="password" name="password_confirmation" placeholder="Confirm New Password" />
+                                  <input class="form-control" type="password" name="password_confirmation" placeholder="Confirm New Password" required/>
                                 </div>
                                 <button class="btn btn-info" type="submit">Submit</button>
                                 <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>

@@ -453,12 +453,23 @@ class ClientUserController extends BaseController
         Session::put('client_course', $clientCourse->name);
         Session::save();
         $loginUser = Auth::guard('clientuser')->user();
+        if(!empty($loginUser->email) && filter_var($loginUser->email, FILTER_VALIDATE_EMAIL)){
+            $email = $loginUser->email;
+        } else {
+            $email = 'vchipdesigng8@gmail.com';
+        }
+
+        if(1 == preg_match('/^[0-9]{10}+$/', $loginUser->phone)){
+            $phone = $loginUser->phone;
+        } else {
+            $phone = '7722078597';
+        }
         $purchasePostFields = [
                                 'purpose' => 'purchase '. $clientCourse->name,
                                 'amount'  =>   $clientCourse->price,
                                 'buyer_name' => $loginUser->name,
-                                'email'  => $loginUser->email,
-                                'phone'  => $loginUser->phone,
+                                'email'  => $email,
+                                'phone'  => $phone,
                                 'send_email' => 'True',
                                 'send_sms' => 'False',
                                 'redirect_url' => url('redirectCoursePayment'),
@@ -496,15 +507,26 @@ class ClientUserController extends BaseController
 
         $response = curl_exec($curl);
         $err = curl_error($curl);
-
         curl_close($curl);
 
         if ($err) {
-          $instamojoErrors = (string)$err;
+          $instamojoErrors .= (string)$err;
         } else {
             $result = json_decode($response);
-            header("Location: $result->longurl");
-            exit();
+            if(is_object($result) && !empty($result->longurl)){
+                header("Location: $result->longurl");
+                exit();
+            } else {
+                if(is_object($result) && false == $result->success){
+                    $instamojoErrors .= (string)$result->message;
+                    if(!empty($instamojoErrors)){
+                        Mail::to('vchipdesigng8@gmail.com')->send(new PaymentGatewayErrors($instamojoErrors));
+                    }
+                    return Redirect::to('online-courses')->withErrors([$result->message]);
+                } else {
+                    return Redirect::to('online-courses')->withErrors(['some thing went wrong. please try after some time.']);
+                }
+            }
         }
         if(!empty($instamojoErrors)){
             Mail::to('vchipdesigng8@gmail.com')->send(new PaymentGatewayErrors($instamojoErrors));
@@ -681,12 +703,24 @@ class ClientUserController extends BaseController
         Session::put('client_test_category_id', $categoryId);
         Session::put('client_test_sub_category', $subCategory->name);
         Session::save();
+        if(!empty($loginUser->email) && filter_var($loginUser->email, FILTER_VALIDATE_EMAIL)){
+            $email = $loginUser->email;
+        } else {
+            $email = 'vchipdesigng8@gmail.com';
+        }
+
+        if(1 == preg_match('/^[0-9]{10}+$/', $loginUser->phone)){
+            $phone = $loginUser->phone;
+        } else {
+            $phone = '7722078597';
+        }
+
         $purchasePostFields = [
                                 'purpose' => 'purchase '. $subCategory->name,
                                 'amount'  =>   $price,
                                 'buyer_name' => $loginUser->name,
-                                'email'  => $loginUser->email,
-                                'phone'  => $loginUser->phone,
+                                'email'  => $email,
+                                'phone'  => $phone,
                                 'send_email' => 'True',
                                 'send_sms' => 'False',
                                 'redirect_url' => url('redirectTestSubCategoryPayment'),
@@ -883,6 +917,7 @@ class ClientUserController extends BaseController
                 $batches = ClientBatch::find($userBatchIds);
             }
         }
+
         if(!empty($selectedYear) && !empty($selectedBatch)){
             $result = $this->getAttendanceByBatchByYearByUserByClient($selectedBatch,$selectedYear,$clientUserId,$clientId);
             $defaultDate = $selectedYear.'-'.date('m').'-'.date('d');
@@ -912,23 +947,21 @@ class ClientUserController extends BaseController
         $result = [];
         if($batch > 0 && $year > 0){
             $allAttendance = ClientUserAttendance::where('client_batch_id','=', $batch)->whereYear('attendance_date', $year)->where('client_id', $clientId)->orderBy('attendance_date')->get();
-        } else {
-            $allAttendance = ClientUserAttendance::whereYear('attendance_date', $year)->where('client_id', $clientId)->orderBy('attendance_date')->get();
-        }
-        if(is_object($allAttendance) && false == $allAttendance->isEmpty()){
-            foreach($allAttendance as $attendance){
-                $studentIds = explode(',', $attendance->student_ids);
-                $month =(int) explode('-', $attendance->attendance_date)[1];
-                // $date = explode('-', $attendance->attendance_date)[2];
-                if(in_array($clientUserId, $studentIds)){
-                    $attendanceCount[$month]['present_date'][$attendance->id] = $attendance->attendance_date;
-                } else {
-                    $attendanceCount[$month]['absent_date'][$attendance->id] = $attendance->attendance_date;
+
+            if(is_object($allAttendance) && false == $allAttendance->isEmpty()){
+                foreach($allAttendance as $attendance){
+                    $studentIds = explode(',', $attendance->student_ids);
+                    $month =(int) explode('-', $attendance->attendance_date)[1];
+                    // $date = explode('-', $attendance->attendance_date)[2];
+                    if(in_array($clientUserId, $studentIds)){
+                        $attendanceCount[$month]['present_date'][$attendance->id] = $attendance->attendance_date;
+                    } else {
+                        $attendanceCount[$month]['absent_date'][$attendance->id] = $attendance->attendance_date;
+                    }
+                    $attendanceCount[$month]['attendance_date'][$attendance->id] = $attendance->attendance_date;
                 }
-                $attendanceCount[$month]['attendance_date'][$attendance->id] = $attendance->attendance_date;
             }
         }
-
         $allAbsentDates = [];
         $allPresentDates = [];
         $attendanceStats = [];

@@ -407,7 +407,7 @@ border-radius: 0px!important
     </div>
 </section>
   <footer class="blog-footer ">
-    <p>Blog  by <a href="http://vchiptech.com/">Vishes Agrawal</a>.</p>
+    <p>Designed  by <a href="http://vchiptech.com/">Vchip Technology</a>.</p>
     <p>
       <a href="#">Back to top</a>
     </p>

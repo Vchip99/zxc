@@ -143,7 +143,7 @@
                                               <label>Email-id/User-id:</label>
                                               <input class="form-control" type="text" name="email" value="{{$loginUser->email}}" readonly required/>
                                             </div>
-                                            <button class="btn btn-info" type="submit">Verify</button>
+                                            <button class="btn btn-info" type="submit">Send</button>
                                           </fieldset>
                                         </form>
                                       </div>

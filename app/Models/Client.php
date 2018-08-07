@@ -172,12 +172,10 @@ class Client extends Authenticatable
 
     protected static function updateClientProfile(Request $request){
         $dbUserImagePath = '';
-        $email = $request->get('email');
         $phone = $request->get('phone');
 
         $client = static::find(Auth::guard('client')->user()->id);
         if(is_object($client)){
-            $client->email = $email;
             $client->phone = $phone;
             $userStoragePath = "client_images/".str_replace(' ', '_', $client->name)."/client";
             if(!is_dir($userStoragePath)){
