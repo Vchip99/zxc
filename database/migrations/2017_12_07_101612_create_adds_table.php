@@ -20,6 +20,7 @@ class CreateAddsTable extends Migration
             $table->string('tag_line');
             $table->string('website_url');
             $table->string('email');
+            $table->string('phone');
             $table->integer('show_page_id');
             $table->date('start_date');
             $table->date('end_date');

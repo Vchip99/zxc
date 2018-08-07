@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddUnreadMessageToClientUserTable extends Migration
+class AddColumnToAddTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddUnreadMessageToClientUserTable extends Migration
      */
     public function up()
     {
-        Schema::connection('mysql2')->table('clientusers', function (Blueprint $table) {
-           $table->string('unread_messages')->nullable();
+        Schema::table('adds', function (Blueprint $table) {
+           $table->tinyInteger('is_payment_done')->default(0);
         });
     }
 
@@ -25,8 +25,8 @@ class AddUnreadMessageToClientUserTable extends Migration
      */
     public function down()
     {
-        Schema::connection('mysql2')->table('clientusers', function (Blueprint $table) {
-            $table->dropColumn('unread_messages');
+        Schema::table('adds', function (Blueprint $table) {
+           $table->dropColumn('is_payment_done');
         });
     }
 }

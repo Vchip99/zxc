@@ -544,7 +544,7 @@
   $(document).ready(function(){
       setTimeout(function() {
         $('.alert-success').fadeOut('fast');
-      }, 2000); // <-- time in milliseconds
+      },50000); // <-- time in milliseconds
   });
   window.onload = function(){
     if (null != window.opener && false ==  window.closed) {

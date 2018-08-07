@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
-use DB, Auth, Cache;
+use DB, Auth, Cache,Mail;
 use App\Models\RegisterClientOnlinePaper;
 use App\Models\RegisterClientOnlineCourses;
 use App\Models\ClientScore;
@@ -29,6 +29,7 @@ use App\Models\ClientAssignmentAnswer;
 use App\Models\ClientChatMessage;
 use App\Models\ClientBatch;
 use Intervention\Image\ImageManagerStatic as Image;
+use App\Mail\ClientUserEmailVerification;
 
 class Clientuser extends Authenticatable
 {
@@ -412,6 +413,67 @@ class Clientuser extends Authenticatable
             foreach($otherUsers as $otherUser){
                 $otherUser->number_verified = 0;
                 $otherUser->save();
+            }
+        }
+        return;
+    }
+
+    protected static function addMobileUser(Request $request,$clientId){
+        $numberVerified = 1;
+        $email = '';
+        $phone = InputSanitise::inputString($request->get('phone'));
+        $emailToken = '';
+        $password = '';
+        $name = InputSanitise::inputString($request->get('name'));
+
+        $clientUser = static::create([
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'client_id' => $clientId,
+            'client_approve' => 1,
+            'password' => bcrypt($password),
+            'email_token' => $emailToken,
+            'number_verified' => $numberVerified,
+        ]);
+        // un approve number if have same number to other users with same client
+        $otherUsers = static::where('phone', $clientUser->phone)->where('client_id', $clientId)->where('id','!=', $clientUser->id)->get();
+        if(is_object($otherUsers) && false == $otherUsers->isEmpty()){
+            foreach($otherUsers as $otherUser){
+                $otherUser->number_verified = 0;
+                $otherUser->save();
+            }
+        }
+        return $clientUser;
+    }
+
+    protected static function addEmailUser(Request $request,$clientId){
+        $insertArr = [];
+        $allInputs = $request->except('_token');
+
+        if(count($allInputs) > 0){
+            foreach($allInputs as $index => $value){
+                $indexArr = explode('_', $index);
+                $insertArr[$indexArr[1]][$indexArr[0]] = $value;
+            }
+        }
+
+        if(count($insertArr) > 0){
+            foreach($insertArr as $insertData){
+                $user = new static;
+                $user->name = $insertData['name'];
+                $user->email = $insertData['email'];
+                $user->phone = '';
+                $user->password = bcrypt($insertData['password']);
+                $user->client_id = $clientId;
+                $user->verified = 0;
+                $user->client_approve = 1;
+                $user->email_token = str_random(60);
+                $user->save();
+                if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
+                    $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
+                    Mail::to($user->email)->send($clientUserEmail);
+                }
             }
         }
         return;

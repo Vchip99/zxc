@@ -1140,7 +1140,7 @@ class ClientUserController extends BaseController
                 DB::connection('mysql2')->commit();
                 if(Cache::has($userMobile) && Cache::has('mobile')){
                     Cache::forget($userMobile);
-                    Cache::forget('mobile');
+                    Cache::forget('mobile-'.$userMobile);
                 }
                 return Redirect::to('profile')->with('message', 'Mobile number updated successfully.');
             }
@@ -1166,7 +1166,7 @@ class ClientUserController extends BaseController
                 DB::connection('mysql2')->commit();
                 if(Cache::has($userMobile) && Cache::has('mobile')){
                     Cache::forget($userMobile);
-                    Cache::forget('mobile');
+                    Cache::forget('mobile-'.$userMobile);
                 }
                 return Redirect::to('profile')->with('message', 'Mobile number verified successfully.');
             }

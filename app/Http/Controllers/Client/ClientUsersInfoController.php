@@ -439,4 +439,51 @@ class ClientUsersInfoController extends BaseController
         return;
     }
 
+    protected function addUsers($subdomainName,Request $request){
+        return view('client.allUsers.addUsers', compact('subdomainName'));
+    }
+
+    protected function addMobileUser($subdomainName,Request $request){
+        $userMobile = $request->get('phone');
+        $userOtp = $request->get('user_otp');
+        $serverOtp = Cache::get($userMobile);
+        if($serverOtp == $userOtp){
+            DB::connection('mysql2')->beginTransaction();
+            try
+            {
+                $clientId = Auth::guard('client')->user()->id;
+                Clientuser::addMobileUser($request,$clientId);
+                DB::connection('mysql2')->commit();
+                if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
+                    Cache::forget($userMobile);
+                    Cache::forget('mobile-'.$userMobile);
+                }
+                return Redirect::to('addUsers')->with('message', 'Mobile user added successfully.');
+            }
+            catch(\Exception $e)
+            {
+                DB::connection('mysql2')->rollback();
+                return redirect()->back()->withErrors('something went wrong.');
+            }
+        } else {
+            return Redirect::to('addUsers')->withErrors('Entered wrong otp.');
+        }
+    }
+
+    protected function addEmailUser($subdomainName,Request $request){
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $clientId = Auth::guard('client')->user()->id;
+            Clientuser::addEmailUser($request,$clientId);
+            DB::connection('mysql2')->commit();
+            return Redirect::to('addUsers')->with('message', 'Email user added successfully.');
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('addUsers');
+    }
 }

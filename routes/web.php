@@ -903,6 +903,9 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::put('updateClientPassword', 'Client\ClientUsersInfoController@updateClientPassword');
 	Route::get('manageSettings', 'Client\ClientUsersInfoController@manageSettings');
 	Route::post('toggleNonVerifiedEmailStatus', 'Client\ClientUsersInfoController@toggleNonVerifiedEmailStatus');
+	Route::get('addUsers', 'Client\ClientUsersInfoController@addUsers');
+	Route::post('addMobileUser', 'Client\ClientUsersInfoController@addMobileUser');
+	Route::post('addEmailUser', 'Client\ClientUsersInfoController@addEmailUser');
 
 
   	// register client user

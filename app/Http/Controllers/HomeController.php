@@ -370,10 +370,10 @@ class HomeController extends Controller
 
     protected function createAd(Request $request){
         if(!empty($request->get('page'))){
-            $data = Add::where('show_page_id', $request->get('page'))->get();
+            $data = Add::where('show_page_id', $request->get('page'))->where('is_payment_done', 1)->get();
             $selectedPage = $request->get('page');
         } else {
-            $data = Add::all();
+            $data = Add::where('is_payment_done', 1)->get();
             $selectedPage = '';
         }
         $events = [];
@@ -428,6 +428,7 @@ class HomeController extends Controller
     protected function checkStartDate(Request $request){
         $date = $request->get('date');
         return DB::table('adds')
+            ->where('is_payment_done', 1)
             ->where('show_page_id', $request->get('selected_page'))
             ->whereRaw('"'.$date.'" between `start_date` and `End_date`')
             ->count();
@@ -438,6 +439,7 @@ class HomeController extends Controller
         $endDate = $request->get('end_date');
         $pageId = $request->get('selected_page');
         $results = DB::table("adds")
+        ->where('is_payment_done', 1)
         ->where('show_page_id', $request->get('selected_page'))
         ->where(function ($query) use ($startDate,$endDate) {
             $query->Where(function ($query) use ($startDate) {
@@ -581,6 +583,11 @@ class HomeController extends Controller
                                         'status' => $status
                                     ];
                     AdvertisementPayment::addPayment($paymentArray);
+                    $addObj = Add::find($adId);
+                    if(is_object($addObj)){
+                        $addObj->is_payment_done = 1;
+                        $addObj->save();
+                    }
                     DB::commit();
                 }
                 catch(Exception $e)

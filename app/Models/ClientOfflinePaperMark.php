@@ -41,7 +41,11 @@ class ClientOfflinePaperMark extends Model
      			$student->client_batch_id = $clientBatchId;
      			$student->client_offline_paper_id = $paperId;
      			$student->clientuser_id = $studentId;
-     			$student->marks = (double)$studentMark;
+                if(empty($studentMark)){
+     			    $student->marks = '';
+                } else {
+                    $student->marks = (double)$studentMark;
+                }
      			$student->total_marks = $totalMarks;
      			$student->client_id = $loginUser->id;
      			$student->save();

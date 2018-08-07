@@ -14,7 +14,7 @@ class Add extends Model
      *
      * @var array
      */
-    protected $fillable = ['company', 'logo', 'tag_line', 'website_url', 'email', 'phone', 'show_page_id', 'start_date', 'end_date'];
+    protected $fillable = ['company', 'logo', 'tag_line', 'website_url', 'email', 'phone', 'show_page_id', 'start_date', 'end_date','is_payment_done'];
 
     /**
      *  create/update virtualPlacementDrive
@@ -60,6 +60,7 @@ class Add extends Model
 
     protected static function getAdds($url,$date){
         return DB::table('adds')->join('advertisement_pages', 'advertisement_pages.id', '=', 'adds.show_page_id')
+            ->where('adds.is_payment_done', 1)
             ->where('advertisement_pages.url', $url)
             ->whereRaw('"'.$date.'" between `start_date` and `end_date`')
             ->select('adds.*')

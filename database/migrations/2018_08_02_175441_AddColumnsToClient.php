@@ -29,10 +29,10 @@ class AddColumnsToClient extends Migration
     public function down()
     {
         Schema::connection('mysql2')->table('clients', function (Blueprint $table) {
-            $table->dropColumn('allow_non_verified_email')->nullable();
+            $table->dropColumn('allow_non_verified_email');
         });
         Schema::connection('mysql2')->table('clientusers', function (Blueprint $table) {
-            $table->dropColumn('number_verified')->nullable();
+            $table->dropColumn('number_verified');
         });
     }
 }

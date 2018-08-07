@@ -72,11 +72,12 @@
                             <input type="phone" class="form-control" name="mobile" id="signInPhone" value="" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" />
                             <span class="help-block"></span>
                           </div>
+                          <label class="hide" style="color: white;" id="signInOtpMessage">Otp sent successfully.</label>
                           <div class="form-group hide" id="signInOtpDiv">
                             <input name="login_otp" id="login_otp" type="text" class="form-control" placeholder="Enter OTP" >
                             <span class="help-block"></span>
                           </div>
-                          <button type="submit" id="loginBtn" name="submit" class="btn btn-info btn-block signInEmail" title="Login">Login</button>
+                          <button type="submit" id="loginBtn" name="submit" class="btn btn-info btn-block signInEmail" title="Login" onClick="this.form.submit(); this.disabled=true;">Login</button>
                           <button title="Send Otp" id="sendSignInOtpBtn" class="btn btn-info btn-block hide signInMobile" onclick="event.preventDefault(); sendSignInOtp();" >Send OTP</button></br>
                           </br>
                         </form>
@@ -116,12 +117,14 @@
                             <input id="signUpConfirmPassword" name="confirm_password" type="password" class="form-control signUpEmail" data-type="password" autocomplete="off" placeholder="confirm password" >
                             <span class="help-block"></span>
                           </div>
+                          <label class="hide" style="color: white;" id="signUpOtpMessage">Otp sent successfully.</label>
                           <button title="Send Otp" id="sendSignUpOtpBtn" class="btn btn-info btn-block hide signUpMobile" onclick="event.preventDefault(); sendSignUpOtp();" >Send OTP</button></br>
                           <div class="form-group hide" id="signUpOtpDiv">
                             <input name="user_otp" type="text" class="form-control" placeholder="Enter OTP" >
                             <span class="help-block"></span>
                           </div>
-                          <button title="Register"  id="register" class="btn btn-info btn-block signUpEmail" onclick="event.preventDefault(); confirmSubmit();" >Register</button></br>
+                          <!-- <button title="Register"  id="register" class="btn btn-info btn-block signUpEmail" onclick="event.preventDefault(); confirmSubmit();" >Register</button></br> -->
+                          <button title="Register"  id="register" class="btn btn-info btn-block signUpEmail" onClick="this.form.submit(); this.disabled=true;">Register</button>
                         </form>
                         <div>
                           <a title="alredy member" data-toggle="tab" href="#home">Already member?</a>
@@ -195,19 +198,34 @@
       })
       .done(function( result ) {
         if('success' == result['status']){
-          $('#signInOtpDiv').removeClass('hide');
-          $('#loginBtn').removeClass('hide');
-          $('#sendSignInOtpBtn').addClass('hide');
-          $('#signInPhone').prop('readonly', true);
-          $('#signInPassword').val('');
-          $('#signInEmail').val('');
-          $('#login_otp').prop('required', true);
+          var resultObj = JSON.parse(result['message']);
+          if('000' == resultObj.ErrorCode && 'Success' == resultObj.ErrorMessage){
+            $('#signInOtpDiv').removeClass('hide');
+            $('#loginBtn').removeClass('hide');
+            $('#sendSignInOtpBtn').addClass('hide');
+            $('#signInPhone').prop('readonly', true);
+            $('#signInPassword').val('');
+            $('#signInEmail').val('');
+            $('#login_otp').prop('required', true);
+            $('#signInOtpMessage').removeClass('hide');
+          } else {
+            $.confirm({
+              title: 'Alert',
+              content: resultObj.ErrorMessage
+            });
+          }
         } else {
-          alert(result['message']);
+          $.confirm({
+            title: 'Alert',
+            content: result['message']
+          });
         }
       });
     } else {
-      alert('enter mobile no.');
+      $.confirm({
+        title: 'Alert',
+        content: 'Enter mobile no.'
+      });
     }
   }
   function sendSignUpOtp(){
@@ -216,19 +234,30 @@
     $('#signUpOtpDiv').removeClass('hide');
     $('#register').removeClass('hide');
     $('#sendSignUpOtpBtn').addClass('hide');
+    $('#signUpOtpMessage').removeClass('hide');
     $('#signUpPhone').prop('readonly', true);
-    $('#name').prop('readonly', true);
-
+    $('#signUpNameInput').prop('readonly', true);
       $.ajax({
         method: "POST",
         url: "{{url('sendClientUserSignUpOtp')}}",
         data: {mobile:mobile}
       })
-      .done(function( msg ) {
-        // console.log(msg);
+      .done(function( result ) {
+        var resultObj = JSON.parse(result);
+        if('000' == resultObj.ErrorCode && 'Success' == resultObj.ErrorMessage){
+          $('#signUpOtpMessage').removeClass('hide');
+        } else {
+          $.confirm({
+            title: 'Alert',
+            content: 'Something went wrong while sending otp.'
+          });
+        }
       });
     } else {
-      alert('enter mobile no.');
+      $.confirm({
+        title: 'Alert',
+        content: 'Enter mobile no.'
+      });
     }
   }
   function emptySignUpForm(){

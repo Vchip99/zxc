@@ -2,10 +2,10 @@
 @section('module_title')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <section class="content-header">
-    <h1> Users Info </h1>
+    <h1> All Users </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-group"></i> All Users </li>
-      <li class="active"> Users Info </li>
+      <li><i class="fa fa-group"></i> Users Info </li>
+      <li class="active"> All Users </li>
     </ol>
   </section>
   <style type="text/css">
@@ -93,12 +93,13 @@
                     </tbody>
                 </table>
               </div>
-              @php
-                $indexCount = 1;
-              @endphp
+
               <div id="courses_tests">
                 @if(count($clientusers) > 0)
                   @foreach($clientusers as  $clientuser)
+                  @php
+                    $indexCount = 1;
+                  @endphp
                     <div class="modal" id="courseModal_{{ $clientuser->id }}" role="dialog" style="display: none;">
                       <div class="modal-dialog">
                         <div class="modal-content">
@@ -309,7 +310,7 @@
         subcategoryModelInnerHTML +='<div class="modal-body"><table class="" id="client_user_'+obj.id+'"><thead><tr><th>Sr. No.</th><th>Sub Category</th><th>Approve Status</th></tr></thead><tbody id="" class="">';
         if( 0 < msg['testSubCategories'].length){
           $.each(msg['testSubCategories'], function(idx, obj) {
-            var index = idx + 1;
+            index = idx + 1;
             subcategoryModelInnerHTML +='<tr><td>'+ index +'</td><td>'+obj.name+'</td><td>';
             if(undefined !== msg['userPurchasedTestSubCategories'][userId] && msg['userPurchasedTestSubCategories'][userId].length > 0 && true == msg['userPurchasedTestSubCategories'][userId].indexOf(obj.id) > -1){
               subcategoryModelInnerHTML +='<input type="checkbox" value="" data-client_user_id="'+ userId +'" data-client_id="'+obj.client_id+'" data-test_category_id="'+obj.category_id+'" data-test_sub_category_id="'+obj.id+'" onclick="changeTestSubCategoryStatus(this);" checked="checked">';
@@ -321,7 +322,7 @@
         }
         if( 0 < msg['clientPurchasedSubCategories'].length){
           $.each(msg['clientPurchasedSubCategories'], function(idx, obj) {
-            var index = idx + 1;
+            index++;
             subcategoryModelInnerHTML +='<tr><td>'+ index +'</td><td>'+obj.name+'</td><td>';
             if(undefined !== msg['userPurchasedTestSubCategories'][userId] && msg['userPurchasedTestSubCategories'][userId].length > 0 && true == msg['userPurchasedTestSubCategories'][userId].indexOf(obj.id) > -1){
               subcategoryModelInnerHTML +='<input type="checkbox" value="" data-client_user_id="'+ userId +'" data-client_id="'+msg['purchasedPayableSubCategories'][obj.id].client_id+'" data-test_category_id="'+msg['purchasedPayableSubCategories'][obj.id].category_id+'" data-test_sub_category_id="'+obj.id+'" onclick="changeTestSubCategoryStatus(this);" checked="checked">';
@@ -389,7 +390,6 @@
               }
           }
         });
-
     }
   }
 

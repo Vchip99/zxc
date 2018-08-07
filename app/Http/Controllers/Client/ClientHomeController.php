@@ -16,6 +16,7 @@ use App\Models\Clientuser;
 use App\Models\Client;
 use App\Models\ClientChatMessage;
 use App\Mail\ClientUserEmailVerification;
+use App\Mail\UnAuthorisedUser;
 use App\Libraries\InputSanitise;
 
 class ClientHomeController extends Controller
@@ -142,9 +143,14 @@ class ClientHomeController extends Controller
                         if(is_object($clientUsers[0]) && 0 == $clientUsers[0]->number_verified){
                             $result['status'] = 'error';
                             $result['message'] = 'Your mobile no is not verified.Please login with Email-Id and Password or contact at info@vchiptech.com';
+                            $data['phone'] = $mobile;
+                            $data['client'] = $client->name;
+
+                            // send mail to info@vchiptech.com
+                            Mail::to('info@vchiptech.com')->send(new UnAuthorisedUser($data));
                         } else {
                             $result['status'] = 'success';
-                            InputSanitise::sendOtp($mobile);
+                            $result['message'] = InputSanitise::sendOtp($mobile);
                         }
                     } else {
                         $unVerifiedCount = 0;
@@ -158,7 +164,7 @@ class ClientHomeController extends Controller
                         }
                         if(1 == $verifiedCount){
                             $result['status'] = 'success';
-                            InputSanitise::sendOtp($mobile);
+                            $result['message'] = InputSanitise::sendOtp($mobile);
                         } else {
                             if($verifiedCount > 0){
                                 $result['status'] = 'error';
@@ -166,6 +172,11 @@ class ClientHomeController extends Controller
                             } else {
                                 $result['status'] = 'error';
                                 $result['message'] = 'Your mobile no is not verified.Please login with Email-Id and Password or contact at info@vchiptech.com';
+                                $data['phone'] = $mobile;
+                                $data['client'] = $client->name;
+
+                                // send mail to info@vchiptech.com
+                                Mail::to('info@vchiptech.com')->send(new UnAuthorisedUser($data));
                             }
                         }
                     }
