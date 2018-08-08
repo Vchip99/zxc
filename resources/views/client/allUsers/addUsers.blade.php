@@ -12,6 +12,15 @@
     sup {
       color: red;
     }
+    .cust-btn{
+      width: 200px !important;
+    }
+    .cust-btn1{
+      width: 110px !important;
+    }
+    .cust-btn2{
+      width: 90px !important;
+    }
   </style>
 @stop
 @section('dashboard_content')
@@ -32,13 +41,49 @@
           </ul>
       </div>
     @endif
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Download Excel File:</label>
+      <div class="col-sm-3">
+        <a class="btn btn-primary cust-btn" href="{{asset('Download Add Users File.xlsx')}}" download data-toggle="tooltip" data-placement="bottom">Download Add Users File</a>
+      </div>
+      <div class="col-sm-3">
+        <button id="submitButton" type="submit" class="btn btn-primary cust-btn1" data-toggle="modal" data-target="#modelAddUsers">Upload Users</button>
+      </div>
+      <div class="modal fade" id="modelAddUsers" >
+        <div class="modal-dialog" role="document" >
+          <div class="modal-content" >
+            <div class="modal-header">
+              <h5 class="modal-title model-title">Add Users</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="uploadClientUsersForm" action="{{url('uploadClientUsers')}}" method="POST" enctype="multipart/form-data">
+              {{csrf_field()}}
+              <div class="modal-body">
+                <div class="form-group row">
+                  <label class="col-sm-3 col-form-label">Add Users:</label>
+                  <div class="col-sm-3">
+                    <input type="file" class="model-input" id="upload_users" name="users" required="true">
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-primary cust-btn1" data-dismiss="modal" onclick="uploadUsers();">Add Users</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="form-group">
       <label class="col-sm-2 col-form-label" for="name"></label>
       <input type="radio" name="signup_type" id="signupRadioEmail" value="email" checked onClick="toggleSignUp(this.value);">Email-id/User-id
       <input type="radio" name="signup_type" value="mobile" onClick="toggleSignUp(this.value);">Mobile
     </div>
     <div id="signUpEmailDiv">
-      <form action="{{url('addEmailUser')}}" method="POST">
+      <form action="{{url('addEmailUser')}}" method="POST" id="addEmailUser">
         {{ csrf_field() }}
         <div id="allUsers">
           <div class="form-group row" id="1">
@@ -56,8 +101,8 @@
         </div>
         <div class="form-group row">
           <div class="offset-sm-2 col-sm-3">
-            <button id="register" type="submit" class="btn btn-primary" style="width: 90px !important;" onClick="this.form.submit(); this.disabled=true;">Submit</button>
-            <button id="addUser" class="btn btn-primary" style="width: 90px !important;" onclick="event.preventDefault(); addNewUser();" >Add User</button>
+            <button id="addUser" class="btn btn-primary cust-btn2" onclick="event.preventDefault(); addNewUser();" >Add User</button>
+            <button id="register" type="submit" class="btn btn-primary cust-btn2">Submit</button>
           </div>
         </div>
       </form>
@@ -88,14 +133,20 @@
         </div>
         <div class="form-group row">
           <div class="offset-sm-2 col-sm-3">
-            <button title="Send Otp" id="sendSignUpOtpBtn" class="btn btn-primary  signUpMobile" onclick="event.preventDefault(); sendSignUpOtp();" style="width: 90px !important;">Send OTP</button>
-            <button id="registerMobile" type="submit" class="btn btn-primary hide" style="width: 90px !important;">Submit</button>
+            <button title="Send Otp" id="sendSignUpOtpBtn" class="btn btn-primary signUpMobile cust-btn2" onclick="event.preventDefault(); sendSignUpOtp();">Send OTP</button>
+            <button id="registerMobile" type="submit" class="btn btn-primary hide cust-btn2">Submit</button>
           </div>
         </div>
       </form>
     </div>
   </div>
 <script type="text/javascript">
+  $('#addEmailUser').on('submit', function() {
+    if(false == $('#addEmailUser').get(0).checkValidity()) {
+      return false;
+    }
+    $('#register').prop('disabled', true);
+  });
   function toggleSignUp(value){
     if('email' == value){
       $('#signUpEmailDiv').removeClass('hide');
@@ -178,7 +229,7 @@
 
     var thirdDiv = document.createElement('div');
     thirdDiv.className = 'col-sm-3';
-    thirdDiv.innerHTML = '<input type="password" class="form-control" name="password_'+latestCount+'" value="" placeholder="Email Id/User Id" required>';
+    thirdDiv.innerHTML = '<input type="password" class="form-control" name="password_'+latestCount+'" value="" placeholder="Password" required>';
     eleDiv.appendChild(thirdDiv);
 
     var eleImg = document.createElement('img');
@@ -193,6 +244,14 @@
       var child = document.getElementById(childDiv);
       var parent = document.getElementById(parentDiv);
       parent.removeChild(child);
+    }
+  }
+  function uploadUsers(){
+    if(document.getElementById('upload_users').value.length > 0){
+      document.getElementById('uploadClientUsersForm').submit();
+    } else {
+      alert('please add a users file.');
+          return false;
     }
   }
 </script>

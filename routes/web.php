@@ -906,7 +906,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('addUsers', 'Client\ClientUsersInfoController@addUsers');
 	Route::post('addMobileUser', 'Client\ClientUsersInfoController@addMobileUser');
 	Route::post('addEmailUser', 'Client\ClientUsersInfoController@addEmailUser');
-
+	Route::post('uploadClientUsers', 'Client\ClientUsersInfoController@uploadClientUsers');
 
   	// register client user
   	Route::post('/register', 'ClientuserAuth\RegisterController@register');

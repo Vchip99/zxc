@@ -475,14 +475,94 @@ class ClientUsersInfoController extends BaseController
         try
         {
             $clientId = Auth::guard('client')->user()->id;
-            Clientuser::addEmailUser($request,$clientId);
-            DB::connection('mysql2')->commit();
-            return Redirect::to('addUsers')->with('message', 'Email user added successfully.');
+            $result = Clientuser::addEmailUser($request,$clientId);
+            if('true' == $result['status']){
+                DB::connection('mysql2')->commit();
+                if(isset($result['duplicate_email']) && count($result['duplicate_email']) > 0){
+                    $emailStr = implode(',', $result['duplicate_email']);
+                    return Redirect::to('addUsers')->withErrors('Following Email id/User id user are not added-'.$emailStr);
+                } else {
+                    return Redirect::to('addUsers')->with('message', 'Email user added successfully.');
+                }
+            }
         }
         catch(\Exception $e)
         {
             DB::connection('mysql2')->rollback();
             return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('addUsers');
+    }
+
+    protected function uploadClientUsers($subdomain, Request $request){
+        if($request->hasFile('users')){
+            $path = $request->file('users')->getRealPath();
+            $users = \Excel::selectSheetsByIndex(0)->load($path, function($reader) {
+                            $reader->formatDates(false);
+                        })->get();
+            $loginUser = Auth::guard('client')->user();
+
+            if($users->count()){
+                $allUsers = [];
+                foreach ($users as $key => $user) {
+                    if(!empty($user->name) && !empty($user->emailuser_id) && !empty($user->password)){
+                        $allUsers[] = [
+                            'name' => $user->name,
+                            'phone' => ($user->phone)?$user->phone:'',
+                            'email' => $user->emailuser_id,
+                            'password' => $user->password,
+                            'client_id' => $loginUser->id,
+                            'client_approve' => 1,
+                            'created_at' => date('Y-m-d H:i:s'),
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ];
+                    }
+                }
+                if(count($allUsers) > 0){
+                    DB::connection('mysql2')->beginTransaction();
+                    try
+                    {
+                        $result = [];
+                        foreach($allUsers as $insertData){
+                            $existingUser = Clientuser::where('email',$insertData['email'])->where('client_id',$insertData['client_id'])->first();
+                            if(!is_object($existingUser)){
+                                $user = new Clientuser;
+                                $user->name = $insertData['name'];
+                                $user->email = $insertData['email'];
+                                $user->phone = $insertData['phone'];
+                                $user->password = bcrypt($insertData['password']);
+                                $user->client_id = $insertData['client_id'];
+                                $user->verified = 0;
+                                $user->client_approve = $insertData['client_approve'];
+                                if(filter_var($insertData['email'], FILTER_VALIDATE_EMAIL)){
+                                    $user->email_token = str_random(60);
+                                } else {
+                                    $user->email_token = '';
+                                }
+                                $user->save();
+                                if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
+                                    $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
+                                    Mail::to($user->email)->send($clientUserEmail);
+                                }
+                            } else {
+                                $result['duplicate_email'][] = $insertData['email'];
+                            }
+                        }
+                        DB::connection('mysql2')->commit();
+                        if(isset($result['duplicate_email']) && count($result['duplicate_email']) > 0){
+                            $emailStr = implode(',', $result['duplicate_email']);
+                            return Redirect::to('addUsers')->withErrors('Following Email id/User id user are not added-'.$emailStr);
+                        } else {
+                            return Redirect::to('addUsers')->with('message', 'Users added successfully!');
+                        }
+                    }
+                    catch(\Exception $e)
+                    {
+                        DB::connection('mysql2')->rollback();
+                        return redirect()->back()->withErrors('something went wrong while upload users.');
+                    }
+                }
+            }
         }
         return Redirect::to('addUsers');
     }

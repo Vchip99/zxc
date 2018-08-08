@@ -450,32 +450,41 @@ class Clientuser extends Authenticatable
     protected static function addEmailUser(Request $request,$clientId){
         $insertArr = [];
         $allInputs = $request->except('_token');
-
+        $result = [];
         if(count($allInputs) > 0){
             foreach($allInputs as $index => $value){
-                $indexArr = explode('_', $index);
-                $insertArr[$indexArr[1]][$indexArr[0]] = $value;
-            }
-        }
-
-        if(count($insertArr) > 0){
-            foreach($insertArr as $insertData){
-                $user = new static;
-                $user->name = $insertData['name'];
-                $user->email = $insertData['email'];
-                $user->phone = '';
-                $user->password = bcrypt($insertData['password']);
-                $user->client_id = $clientId;
-                $user->verified = 0;
-                $user->client_approve = 1;
-                $user->email_token = str_random(60);
-                $user->save();
-                if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
-                    $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
-                    Mail::to($user->email)->send($clientUserEmail);
+                if(!empty($value)){
+                    $indexArr = explode('_', $index);
+                    $insertArr[$indexArr[1]][$indexArr[0]] = $value;
                 }
             }
         }
-        return;
+        if(count($insertArr) > 0){
+            foreach($insertArr as $insertData){
+                $existingUser = static::where('email',$insertData['email'])->where('client_id',$clientId)->first();
+                if(!is_object($existingUser)){
+                    $user = new static;
+                    $user->name = $insertData['name'];
+                    $user->email = $insertData['email'];
+                    $user->phone = '';
+                    $user->password = bcrypt($insertData['password']);
+                    $user->client_id = $clientId;
+                    $user->verified = 0;
+                    $user->client_approve = 1;
+                    $user->email_token = str_random(60);
+                    $user->save();
+                    if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
+                        $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
+                        Mail::to($user->email)->send($clientUserEmail);
+                    }
+                } else {
+                    $result['duplicate_email'][] = $insertData['email'];
+                }
+            }
+            $result['status'] = 'true';
+        } else {
+            $result['status'] = 'false';
+        }
+        return $result;
     }
 }
