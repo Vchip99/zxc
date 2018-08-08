@@ -49,6 +49,7 @@
       <div class="col-sm-3">
         <button id="submitButton" type="submit" class="btn btn-primary cust-btn1" data-toggle="modal" data-target="#modelAddUsers">Upload Users</button>
       </div>
+
       <div class="modal fade" id="modelAddUsers" >
         <div class="modal-dialog" role="document" >
           <div class="modal-content" >
@@ -77,6 +78,7 @@
         </div>
       </div>
     </div>
+    <hr>
     <div class="form-group">
       <label class="col-sm-2 col-form-label" for="name"></label>
       <input type="radio" name="signup_type" id="signupRadioEmail" value="email" checked onClick="toggleSignUp(this.value);">Email-id/User-id
