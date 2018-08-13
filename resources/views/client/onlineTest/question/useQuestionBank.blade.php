@@ -27,270 +27,279 @@
 		padding-left: 0px !important;
 		padding-right: 0px !important;
 	}
+	#all-result .panel-body {
+	    height: 600px;
+	    overflow: scroll;
+	}
   </style>
 @stop
 @section('dashboard_content')
 	&nbsp;
 	<div class="container ">
-	@if(Session::has('message'))
-		<div class="alert alert-success" id="message">
-			<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-		  	{{ Session::get('message') }}
-		</div>
-	@endif
-	@if (count($errors) > 0)
-	  <div class="alert alert-danger">
-	      <ul>
-	          @foreach ($errors->all() as $error)
-	              <li>{{ $error }}</li>
-	          @endforeach
-	      </ul>
-	  </div>
-	@endif
-	@php
-		if(Session::has('client_search_selected_category')){
-			$clientSearchSelectedCategoryId = Session::get('client_search_selected_category');
-		} else {
-			$clientSearchSelectedCategoryId = 0;
-		}
-		if(Session::has('client_search_selected_subcategory')){
-			$clientSearchSelectedSubcategoryId = Session::get('client_search_selected_subcategory');
-		} else {
-			$clientSearchSelectedSubcategoryId = 0;
-		}
-		if(Session::has('client_search_selected_subject')){
-			$clientSearchSelectedSubjectId = Session::get('client_search_selected_subject');
-		} else {
-			$clientSearchSelectedSubjectId = 0;
-		}
-		if(Session::has('client_search_selected_paper')){
-			$clientSearchSelectedPaperId = Session::get('client_search_selected_paper');
-		} else {
-			$clientSearchSelectedPaperId = 0;
-		}
-		if(Session::has('client_search_selected_section')){
-			$clientSearchSelectedSectionId = Session::get('client_search_selected_section');
-		} else {
-			$clientSearchSelectedSectionId = 0;
-		}
-		if(Session::has('client_search_question_bank_category')){
-			$searchSelectedBankCategoryId = Session::get('client_search_question_bank_category');
-		} else {
-			$searchSelectedBankCategoryId = 0;
-		}
-		if(Session::has('client_search_question_bank_subcategory')){
-			$searchSelectedBankSubcategoryId = Session::get('client_search_question_bank_subcategory');
-		} else {
-			$searchSelectedBankSubcategoryId = 0;
-		}
-	@endphp
-  	<input type="hidden" name="messahe_status" id="messahe_status" value="@if(Session::has('message')) 1 @else 0 @endif">
-	<form id="questionForm" action="{{url('useQuestionBank')}}" method="POST">
-		{{csrf_field()}}
-		<div  class="admin_div">
-			<div class="form-group row @if ($errors->has('category')) has-error @endif">
-			    <label class="col-sm-2 col-form-label">Category Name:</label>
-			    <div class="col-sm-3">
-			      <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-			          <option value="">Select Category</option>
-			          @if(count($testCategories) > 0)
-			            @foreach($testCategories as $testCategory)
-				            @if( $testCategory->id == $clientSearchSelectedCategoryId )
-				                <option value="{{$testCategory->id}}" selected="true" readonly="true">{{$testCategory->name}}</option>
-				            @else
-				                <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
-				            @endif
-			            @endforeach
-			          @endif
-			      </select>
-			      @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
-			    </div>
-		  	</div>
-		  	<div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
-			    <label class="col-sm-2 col-form-label">Sub Category Name:</label>
-			    <div class="col-sm-3">
-			      <select id="subcategory" class="form-control" name="subcategory" onChange="selectSubject(this);" required title="Sub Category">
-			        <option value="">Select Sub Category</option>
-			        @if(count($testSubCategories) > 0)
-			        	@foreach($testSubCategories as $testSubCategory)
-				            @if($clientSearchSelectedSubcategoryId == $testSubCategory->id)
-				                <option value="{{$testSubCategory->id}}" selected="true">{{$testSubCategory->name}}</option>
-			              	@else
-				                <option value="{{$testSubCategory->id}}">{{$testSubCategory->name}}</option>
-				            @endif
-			          	@endforeach
-			        @endif
-			      </select>
-			      @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
-			    </div>
-		  	</div>
-		 	<div class="form-group row @if ($errors->has('subject')) has-error @endif">
-		    	<label class="col-sm-2 col-form-label">Subject Name:</label>
-			    <div class="col-sm-3">
-			      	<select id="subject" class="form-control" name="subject" onChange="selectPaper(this);" required title="Subject">
-			        	<option value="">Select Subject</option>
-			          	@if(count($testSubjects) > 0 )
-			          		@foreach($testSubjects as $testSubject)
-			          			@if($clientSearchSelectedSubjectId == $testSubject->id)
-	            					<option value="{{$testSubject->id}}" selected="true">{{$testSubject->name}}</option>
-	            				@else
-	            					<option value="{{$testSubject->id}}">{{$testSubject->name}}</option>
-	            				@endif
-			          		@endforeach
-			        	@endif
-			      	</select>
-			      	@if($errors->has('subject')) <p class="help-block">{{ $errors->first('subject') }}</p> @endif
-			    </div>
-		    </div>
-		    <div class="form-group row @if ($errors->has('paper')) has-error @endif">
-			    <label for="name" class="col-sm-2 col-form-label">Paper Name:</label>
-			    <div class="col-sm-3">
-			    	<select id="paper" class="form-control" name="paper" required title="Paper" onChange="selectSection(this);" >
-			    		<option value="">Select Paper</option>
-			    		@if(count($papers) > 0)
-				          @foreach($papers as $paper)
-				            @if($paper->id == $clientSearchSelectedPaperId)
-				                <option value="{{$paper->id}}" selected="true">{{$paper->name}}</option>
-				              @else
-				                <option value="{{$paper->id}}">{{$paper->name}}</option>
-				            @endif
-				          @endforeach
-				        @endif
-			    	</select>
-			    	@if($errors->has('paper')) <p class="help-block">{{ $errors->first('paper') }}</p> @endif
-			    </div>
-		  	</div>
-		  	<div class="form-group row">
-		    	<label class="col-sm-2 col-form-label">Section Name:</label>
-			    <div class="col-sm-3">
-			      	<select id="section_type" class="form-control" name="section_type" required title="Section">
-			    		<option value="">Select Section</option>
-				        @if(count($sessions) > 0)
-				          	@foreach($sessions as $session)
-				            	@if($session->id == $clientSearchSelectedSectionId)
-				                	<option value="{{$session->id}}" selected="true">{{$session->name}}</option>
-					              @else
-					                <option value="{{$session->id}}">{{$session->name}}</option>
+		@if(Session::has('message'))
+			<div class="alert alert-success" id="message">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+			  	{{ Session::get('message') }}
+			</div>
+		@endif
+		@if (count($errors) > 0)
+		  <div class="alert alert-danger">
+		      <ul>
+		          @foreach ($errors->all() as $error)
+		              <li>{{ $error }}</li>
+		          @endforeach
+		      </ul>
+		  </div>
+		@endif
+		@php
+			if(Session::has('client_search_selected_category')){
+				$clientSearchSelectedCategoryId = Session::get('client_search_selected_category');
+			} else {
+				$clientSearchSelectedCategoryId = 0;
+			}
+			if(Session::has('client_search_selected_subcategory')){
+				$clientSearchSelectedSubcategoryId = Session::get('client_search_selected_subcategory');
+			} else {
+				$clientSearchSelectedSubcategoryId = 0;
+			}
+			if(Session::has('client_search_selected_subject')){
+				$clientSearchSelectedSubjectId = Session::get('client_search_selected_subject');
+			} else {
+				$clientSearchSelectedSubjectId = 0;
+			}
+			if(Session::has('client_search_selected_paper')){
+				$clientSearchSelectedPaperId = Session::get('client_search_selected_paper');
+			} else {
+				$clientSearchSelectedPaperId = 0;
+			}
+			if(Session::has('client_search_selected_section')){
+				$clientSearchSelectedSectionId = Session::get('client_search_selected_section');
+			} else {
+				$clientSearchSelectedSectionId = 0;
+			}
+			if(Session::has('client_search_question_bank_category')){
+				$searchSelectedBankCategoryId = Session::get('client_search_question_bank_category');
+			} else {
+				$searchSelectedBankCategoryId = 0;
+			}
+			if(Session::has('client_search_question_bank_subcategory')){
+				$searchSelectedBankSubcategoryId = Session::get('client_search_question_bank_subcategory');
+			} else {
+				$searchSelectedBankSubcategoryId = 0;
+			}
+		@endphp
+	  	<input type="hidden" name="messahe_status" id="messahe_status" value="@if(Session::has('message')) 1 @else 0 @endif">
+		<form id="questionForm" action="{{url('useQuestionBank')}}" method="POST">
+			{{csrf_field()}}
+			<div  class="admin_div">
+				<div class="form-group row @if ($errors->has('category')) has-error @endif">
+				    <label class="col-sm-2 col-form-label">Category Name:</label>
+				    <div class="col-sm-3">
+				      <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
+				          <option value="">Select Category</option>
+				          @if(count($testCategories) > 0)
+				            @foreach($testCategories as $testCategory)
+					            @if( $testCategory->id == $clientSearchSelectedCategoryId )
+					                <option value="{{$testCategory->id}}" selected="true" readonly="true">{{$testCategory->name}}</option>
+					            @else
+					                <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
+					            @endif
+				            @endforeach
+				          @endif
+				      </select>
+				      @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
+				    </div>
+			  	</div>
+			  	<div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
+				    <label class="col-sm-2 col-form-label">Sub Category Name:</label>
+				    <div class="col-sm-3">
+				      <select id="subcategory" class="form-control" name="subcategory" onChange="selectSubject(this);" required title="Sub Category">
+				        <option value="">Select Sub Category</option>
+				        @if(count($testSubCategories) > 0)
+				        	@foreach($testSubCategories as $testSubCategory)
+					            @if($clientSearchSelectedSubcategoryId == $testSubCategory->id)
+					                <option value="{{$testSubCategory->id}}" selected="true">{{$testSubCategory->name}}</option>
+				              	@else
+					                <option value="{{$testSubCategory->id}}">{{$testSubCategory->name}}</option>
 					            @endif
 				          	@endforeach
 				        @endif
-			    	</select>
+				      </select>
+				      @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
+				    </div>
+			  	</div>
+			 	<div class="form-group row @if ($errors->has('subject')) has-error @endif">
+			    	<label class="col-sm-2 col-form-label">Subject Name:</label>
+				    <div class="col-sm-3">
+				      	<select id="subject" class="form-control" name="subject" onChange="selectPaper(this);" required title="Subject">
+				        	<option value="">Select Subject</option>
+				          	@if(count($testSubjects) > 0 )
+				          		@foreach($testSubjects as $testSubject)
+				          			@if($clientSearchSelectedSubjectId == $testSubject->id)
+		            					<option value="{{$testSubject->id}}" selected="true">{{$testSubject->name}}</option>
+		            				@else
+		            					<option value="{{$testSubject->id}}">{{$testSubject->name}}</option>
+		            				@endif
+				          		@endforeach
+				        	@endif
+				      	</select>
+				      	@if($errors->has('subject')) <p class="help-block">{{ $errors->first('subject') }}</p> @endif
+				    </div>
 			    </div>
-		    </div>
-		    <div class="form-group row">
-			    <div class="col-sm-3">
-			      <select id="bank_category" class="form-control" name="bank_category" onChange="selectBankSubcategory(this);" required title="Bank Category">
-			          <option value="">Question Bank Category</option>
-			          @if(count($bankCategories) > 0)
-			            @foreach($bankCategories as $bankCategory)
-			            	@if($searchSelectedBankCategoryId == $bankCategory->id)
-			                	<option value="{{$bankCategory->id}}" selected>{{$bankCategory->name}}</option>
-			                @else
-			                	<option value="{{$bankCategory->id}}">{{$bankCategory->name}}</option>
-			                @endif
-			            @endforeach
-			          @endif
-			      </select>
+			    <div class="form-group row @if ($errors->has('paper')) has-error @endif">
+				    <label for="name" class="col-sm-2 col-form-label">Paper Name:</label>
+				    <div class="col-sm-3">
+				    	<select id="paper" class="form-control" name="paper" required title="Paper" onChange="selectSection(this);" >
+				    		<option value="">Select Paper</option>
+				    		@if(count($papers) > 0)
+					          @foreach($papers as $paper)
+					            @if($paper->id == $clientSearchSelectedPaperId)
+					                <option value="{{$paper->id}}" selected="true">{{$paper->name}}</option>
+					              @else
+					                <option value="{{$paper->id}}">{{$paper->name}}</option>
+					            @endif
+					          @endforeach
+					        @endif
+				    	</select>
+				    	@if($errors->has('paper')) <p class="help-block">{{ $errors->first('paper') }}</p> @endif
+				    </div>
+			  	</div>
+			  	<div class="form-group row">
+			    	<label class="col-sm-2 col-form-label">Section Name:</label>
+				    <div class="col-sm-3">
+				      	<select id="section_type" class="form-control" name="section_type" required title="Section">
+				    		<option value="">Select Section</option>
+					        @if(count($sessions) > 0)
+					          	@foreach($sessions as $session)
+					            	@if($session->id == $clientSearchSelectedSectionId)
+					                	<option value="{{$session->id}}" selected="true">{{$session->name}}</option>
+						              @else
+						                <option value="{{$session->id}}">{{$session->name}}</option>
+						            @endif
+					          	@endforeach
+					        @endif
+				    	</select>
+				    </div>
 			    </div>
-			    <div class="col-sm-3">
-			      <select id="bank_sub_category" class="form-control" name="bank_sub_category" required title="Bank Sub Category">
-			          <option value="">Question Bank Sub Category</option>
-			          @if(count($bankSubCategories) > 0)
-			            @foreach($bankSubCategories as $bankSubCategory)
-			            	@if($searchSelectedBankSubcategoryId == $bankSubCategory->id)
-			                	<option value="{{$bankSubCategory->id}}" selected>{{$bankSubCategory->name}}</option>
-			                @else
-			                	<option value="{{$bankSubCategory->id}}">{{$bankSubCategory->name}}</option>
-			                @endif
-			            @endforeach
-			          @endif
-			      </select>
-			    </div>
-			    <div class="col-sm-2">
-					<button type="submit" class="form-control btn btn-primary" > Submit</button>
-			    </div>
-		  	</div>
-		</div>
-	</form>
-	<form id="questionBankForm" action="{{url('exportQuestionBank')}}" method="POST">
-		{{csrf_field()}}
-		<div class="admin_div" style="overflow: auto;">
-		    <table class="table ">
-		      	<thead class="thead-inverse">
-			        <tr>
-			          	<th class="row-id">#</th>
-			          	<th class="row-que">Question</th>
-			          	<th class="row-opt">Positive Mark</th>
-			          	<th class="row-opt">Negative Mark</th>
-			          	<th class="row-opt">Selected</th>
-			        </tr>
-		      	</thead>
-		      	<tbody>
-		      		@if(count($questions) > 0)
-				        @foreach($questions as $index => $question)
-				        	@if(isset($question->id))
+			    <hr>
+			    <div class="form-group row">
+				    <div class="col-sm-3">
+				      <select id="bank_category" class="form-control" name="bank_category" onChange="selectBankSubcategory(this);" required title="Bank Category">
+				          <option value="">Question Bank Category</option>
+				          @if(count($bankCategories) > 0)
+				            @foreach($bankCategories as $bankCategory)
+				            	@if($searchSelectedBankCategoryId == $bankCategory->id)
+				                	<option value="{{$bankCategory->id}}" selected>{{$bankCategory->name}}</option>
+				                @else
+				                	<option value="{{$bankCategory->id}}">{{$bankCategory->name}}</option>
+				                @endif
+				            @endforeach
+				          @endif
+				      </select>
+				    </div>
+				    <div class="col-sm-3">
+				      <select id="bank_sub_category" class="form-control" name="bank_sub_category" required title="Bank Sub Category">
+				          <option value="">Question Bank Sub Category</option>
+				          @if(count($bankSubCategories) > 0)
+				            @foreach($bankSubCategories as $bankSubCategory)
+				            	@if($searchSelectedBankSubcategoryId == $bankSubCategory->id)
+				                	<option value="{{$bankSubCategory->id}}" selected>{{$bankSubCategory->name}}</option>
+				                @else
+				                	<option value="{{$bankSubCategory->id}}">{{$bankSubCategory->name}}</option>
+				                @endif
+				            @endforeach
+				          @endif
+				      </select>
+				    </div>
+				    <div class="col-sm-2">
+						<button type="submit" class="form-control btn btn-primary" > Submit</button>
+				    </div>
+			  	</div>
+			</div>
+		</form>
+		<form id="questionBankForm" action="{{url('exportQuestionBank')}}" method="POST">
+			{{csrf_field()}}
+			<div class="admin_div" id="all-result">
+		    	<div class="panel panel-info">
+		            <div class="panel-body">
+		            	<table class="table ">
+					      	<thead class="thead-inverse">
 						        <tr>
-						          	<th scope="row">{{$index + 1}}</th>
-						          	<td>
-						          		{!! $question->name !!}
-						          		<div id='question{{$question->id}}' >
-											@if( 1 == $question->question_type )
-												<div class="row answer">A.<input type="radio" class="radio1" disabled/>
-													{!! $question->answer1 !!}
-												</div>
-												<div class="row answer">B.<input type="radio" class="radio1" disabled/>
-													{!! $question->answer2 !!}
-												</div>
-												<div class="row answer">C.<input type="radio" class="radio1" disabled/>
-													{!! $question->answer3 !!}
-												</div>
-												<div class="row answer">D.<input type="radio" class="radio1" disabled/>
-													{!! $question->answer4 !!}
-												</div>
-												<div class="row answer">E.<input type="radio" class="radio1" disabled/>
-													{!! $question->answer5 !!}
-												</div>
-											@endif
-											@if(1 == $question->question_type)
-												Answer:{!! $question->answer !!}
-											@else
-												<br>
-												Answer:{{$question->min}} - {{$question->max}}
-											@endif
-										</div>
-					          		</td>
-						          	<td>
-						            	<input type="text" class="form-control" id="positive_{{$question->id}}" name="positive_{{$question->id}}" value="">
-						          	</td>
-						          	<td>
-						            	<input type="text" class="form-control" id="negative_{{$question->id}}" name="negative_{{$question->id}}" value="">
-						          	</td>
-						          	<td>
-						          		<input type="checkbox" name="selected[]" value="{{$question->id}}" onClick="checkValues(this);">
-						          	</td>
+						          	<th class="row-id">#</th>
+						          	<th class="row-que">Question</th>
+						          	<th class="row-opt">Positive Mark</th>
+						          	<th class="row-opt">Negative Mark</th>
+						          	<th class="row-opt">Selected</th>
 						        </tr>
-						    @endif
-				        @endforeach
-				        <input type="hidden" name="selected_category" id="selected_category" value="">
-				        <input type="hidden" name="selected_subcategory" id="selected_subcategory" value="">
-				        <input type="hidden" name="selected_subject" id="selected_subject" value="">
-				        <input type="hidden" name="selected_paper" id="selected_paper" value="">
-				        <input type="hidden" name="selected_section_type" id="selected_section_type" value="">
-		    		@else
-		    			<tr><td colspan="3">No questions are created.</td></tr>
-		    			<input type="hidden" name="selected_category" id="selected_category" value="">
-				        <input type="hidden" name="selected_subcategory" id="selected_subcategory" value="">
-				        <input type="hidden" name="selected_subject" id="selected_subject" value="">
-				        <input type="hidden" name="selected_paper" id="selected_paper" value="">
-				        <input type="hidden" name="selected_section_type" id="selected_section_type" value="">
-		    		@endif
-		      	</tbody>
-		    </table>
-	  	</div>
-	  	<div class="">
-		    <button type="submit" class="form-control btn btn-primary" style="float: right;width: 130px;" > Transfer Selected</button>
-		</div>
-	</form>
+					      	</thead>
+					      	<tbody>
+					      		@if(count($questions) > 0)
+							        @foreach($questions as $index => $question)
+							        	@if(isset($question->id))
+									        <tr>
+									          	<th scope="row">{{$index + 1}}</th>
+									          	<td>
+									          		{!! $question->name !!}
+									          		<div id='question{{$question->id}}'>
+														@if( 1 == $question->question_type )
+															<div class="row answer">A.<input type="radio" class="radio1" disabled/>
+																{!! $question->answer1 !!}
+															</div>
+															<div class="row answer">B.<input type="radio" class="radio1" disabled/>
+																{!! $question->answer2 !!}
+															</div>
+															<div class="row answer">C.<input type="radio" class="radio1" disabled/>
+																{!! $question->answer3 !!}
+															</div>
+															<div class="row answer">D.<input type="radio" class="radio1" disabled/>
+																{!! $question->answer4 !!}
+															</div>
+															<div class="row answer">E.<input type="radio" class="radio1" disabled/>
+																{!! $question->answer5 !!}
+															</div>
+														@endif
+														@if(1 == $question->question_type)
+															Answer:{!! $question->answer !!}
+														@else
+															<br>
+															Answer:{{$question->min}} - {{$question->max}}
+														@endif
+													</div>
+								          		</td>
+									          	<td>
+									            	<input type="text" class="form-control" id="positive_{{$question->id}}" name="positive_{{$question->id}}" value="">
+									          	</td>
+									          	<td>
+									            	<input type="text" class="form-control" id="negative_{{$question->id}}" name="negative_{{$question->id}}" value="">
+									          	</td>
+									          	<td>
+									          		<input type="checkbox" name="selected[]" value="{{$question->id}}" onClick="checkValues(this);">
+									          	</td>
+									        </tr>
+									    @endif
+							        @endforeach
+							        <input type="hidden" name="selected_category" id="selected_category" value="">
+							        <input type="hidden" name="selected_subcategory" id="selected_subcategory" value="">
+							        <input type="hidden" name="selected_subject" id="selected_subject" value="">
+							        <input type="hidden" name="selected_paper" id="selected_paper" value="">
+							        <input type="hidden" name="selected_section_type" id="selected_section_type" value="">
+					    		@else
+					    			<tr><td colspan="3">No questions are created.</td></tr>
+					    			<input type="hidden" name="selected_category" id="selected_category" value="">
+							        <input type="hidden" name="selected_subcategory" id="selected_subcategory" value="">
+							        <input type="hidden" name="selected_subject" id="selected_subject" value="">
+							        <input type="hidden" name="selected_paper" id="selected_paper" value="">
+							        <input type="hidden" name="selected_section_type" id="selected_section_type" value="">
+					    		@endif
+					      	</tbody>
+					    </table>
+		            </div>
+		        </div>
+	        </div>
+	        <div class="">
+			    <button type="submit" class="form-control btn btn-primary" style="float: right;width: 130px;" > Transfer Selected</button>
+			</div>
+		</form>
   	</div>
 <script type="text/javascript">
 	$(document).ready(function(){

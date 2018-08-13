@@ -99,4 +99,22 @@ class InputSanitise{
         return $response;
     }
 
+    public static function sendOfflineDueSms($mobile, $userName, $batchName, $clientName)
+    {
+        $mobileNo = '91'.$mobile;
+        $otp = rand(100000, 999999);
+        $userMessage = 'Dear '.$userName.', Today is your due date for payment of batch- '.$batchName.'. Thanks '.$clientName;
+        $message = rawurlencode($userMessage);
+
+        // $smsUrl = 'http://api.bizztel.com/composeapi/?userid=info@vchiptech.com&pwd=vchipsms&route=1&senderid=VCHIPP&destination='.$mobileNo.'&message='.$message;
+        $smsUrl = 'http://5.189.153.48:8080/vendorsms/pushsms.aspx?user=vchip99&password=vchip&msisdn='.$mobileNo.'&sid=VCHIPP&msg='.$message.'&fl=0&gwid=2';
+
+        // Send the GET request with cURL
+        $ch = curl_init($smsUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return $response;
+    }
+
 }

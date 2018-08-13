@@ -346,6 +346,20 @@
           </ul>
         </li>
         <li class="treeview">
+          <a href="#" title="Offline Payments">
+            <i class="fa fa-money" aria-hidden="true"></i> <span>Offline Payments</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Manage Offline Payments"><a href="{{ url('manageOfflinePayments')}}"><i class="fa fa-circle-o"></i>Manage Offline Payments </a></li>
+            <li title="Batch Payments"><a href="{{ url('batchPayments')}}"><i class="fa fa-circle-o"></i>Batch Payments </a></li>
+            <li title="Due Payments"><a href="{{ url('duePayments')}}"><i class="fa fa-circle-o"></i>Due Payments </a></li>
+            <li title="Uploaded Transactions"><a href="{{ url('userUploadedTransactions')}}"><i class="fa fa-circle-o"></i>Uploaded Transactions</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
           <a href="#" title="Market Palce">
             <i class="fa fa-shopping-cart"></i> <span>Market Palce</span>
             <span class="pull-right-container">

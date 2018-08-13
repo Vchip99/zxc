@@ -41,6 +41,8 @@ use App\Models\ClientUserAttendance;
 use App\Models\ClientBatch;
 use App\Models\ClientOfflinePaperMark;
 use App\Models\ClientMessage;
+use App\Models\ClientOfflinePayment;
+use App\Models\ClientUploadTransaction;
 use App\Libraries\InputSanitise;
 use MaddHatter\LaravelFullcalendar\Facades\Calendar;
 use DateTime;
@@ -77,6 +79,12 @@ class ClientUserController extends BaseController
         'old_password' => 'required',
         'password' => 'required|different:old_password',
         'confirm_password' => 'required|same:password',
+    ];
+
+    protected $validateUpload = [
+        'batch' => 'required',
+        'comment' => 'required',
+        'photo' => 'required'
     ];
 
     protected function showClientUserDashBoard(Request $request){
@@ -231,7 +239,6 @@ class ClientUserController extends BaseController
         }
         $loginUser = Auth::guard('clientuser')->user();
         $userScores = ClientScore::where('client_user_id', $loginUser->id)->get();
-        // dd($userScores);
         $obtainedScore = 0;
         $totalScore = 0;
         if(is_object($userScores) && false == $userScores->isEmpty()){
@@ -1211,5 +1218,111 @@ class ClientUserController extends BaseController
         } else {
             return Redirect::to('profile')->withErrors('Entered wrong otp.');
         }
+    }
+
+    protected function myOfflinePayments($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
+        $batches = [];
+        if(!empty($clientUser->batch_ids)){
+            $userBatchIds = explode(',', $clientUser->batch_ids);
+            $userFirstBatchId = $userBatchIds[0];
+            if(count($userBatchIds) > 0){
+                $batches = ClientBatch::find($userBatchIds);
+            }
+        }
+        $payments = ClientOfflinePayment::where('client_id',$clientId)->where('clientuser_id', $clientUserId)->orderBy('id', 'desc')->get();
+        return view('clientuser.dashboard.myOfflinePayments', compact('batches','payments'));
+    }
+
+    protected function getOfflinePaymentsByBatchIdByUserId(Request $request){
+        $batchId = $request->get('batch_id');
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $result = [];
+        $payments = ClientOfflinePayment::where('client_id',$clientId)->where('clientuser_id', $clientUserId)->where('client_batch_id', $batchId)->orderBy('id', 'desc')->get();
+        if(is_object($payments) && false == $payments->isEmpty()){
+            foreach($payments as $payment){
+                $result[] = [
+                    'batch' => $payment->batch->name,
+                    'date' => date('Y-m-d',strtotime($payment->created_at)),
+                    'amount' => $payment->amount,
+                ];
+            }
+        }
+        return $result;
+    }
+
+    protected function myOnlinePayments($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
+        $userPurchasedCourses = ClientUserPurchasedCourse::getClientUserPurchasedCourses($clientId, $clientUserId);
+        $userPurchasedSubCategories = ClientUserPurchasedTestSubCategory::getClientUserPurchasedTestSubCategories($clientId, $clientUserId);
+        return view('clientuser.dashboard.myOnlinePayments', compact('userPurchasedCourses','userPurchasedSubCategories'));
+    }
+
+    protected function uploadedTransactions($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
+        $transactions = ClientUploadTransaction::where('client_id',$clientId)->where('clientuser_id', $clientUserId)->orderBy('id', 'desc')->get();
+        return view('clientuser.dashboard.uploadTransactionList', compact('transactions'));
+    }
+
+    protected function createUploadTransaction($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
+        $batches = [];
+        if(!empty($clientUser->batch_ids)){
+            $userBatchIds = explode(',', $clientUser->batch_ids);
+            $userFirstBatchId = $userBatchIds[0];
+            if(count($userBatchIds) > 0){
+                $batches = ClientBatch::find($userBatchIds);
+            }
+        }
+        return view('clientuser.dashboard.uploadTransactionCreate', compact('batches'));
+    }
+
+    protected function storeUploadTransaction($subdomainName,Request $request){
+        $v = Validator::make($request->all(), $this->validateUpload);
+        if ($v->fails())
+        {
+            return redirect()->back()->withErrors($v->errors());
+        }
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $transaction = ClientUploadTransaction::addUploadTransaction($request);
+            if(is_object($transaction)){
+                DB::connection('mysql2')->commit();
+                return Redirect::to('uploadedTransactions')->with('message', 'Upload Transaction successfully!');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return redirect()->back()->withErrors('something went wrong while creating upload transaction.');
+        }
+        return Redirect::to('uploadedTransactions');
     }
 }

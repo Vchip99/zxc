@@ -6,10 +6,10 @@
 @stop
 @section('module_title')
   <section class="content-header">
-    <h1> My Offline Test Results </h1>
+    <h1> My Offline Payments </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-files-o"></i> Online Test</li>
-      <li class="active"> My Offline Test Results </li>
+      <li><i class="fa fa-files-o"></i> Payments</li>
+      <li class="active"> My Offline Payments </li>
     </ol>
   </section>
 @stop
@@ -20,7 +20,7 @@
 	        <div class="row">
 	          	<div class="mrgn_20_btm">
 	              	<div class="col-sm-4 mrgn_10_btm">
-		                <select id="batch" class="form-control" name="batch" onChange="showResult(this);" title="Batch">
+		                <select id="batch" class="form-control" name="batch" onChange="showPayments(this);" title="Batch">
 		                  	<option value="">Select Batch</option>
 		                  	@if(count($batches) > 0)
 			                    @foreach($batches as $batch)
@@ -33,45 +33,42 @@
 	          	<div class="col-lg-12" id="all-result">
 		            <div class="panel panel-info">
 		              	<div class="panel-heading text-center">
-		               		RESULT
+		               		Payments
 	              		</div>
 		              	<div class="panel-body">
 			                <table  class="" id="dataTables-example">
 			                  <thead>
 			                    <tr>
 			                      <th>Sr. No.</th>
-			                      <th>Batch</th>
-			                      <th>Paper</th>
-			                      <th>Marks</th>
-			                      <th>Rank</th>
+                            <th>Batch</th>
+                            <th>Date</th>
+			                      <th>Payment</th>
 			                    </tr>
 			                  </thead>
-			                  <tbody  id="test-result">
-			                    @if(count($results) > 0)
-			                      @foreach($results as $index => $result)
-			                        <tr class="">
+			                  <tbody  id="payments">
+			                    @if(count($payments) > 0)
+                            @php
+                              $total = 0;
+                            @endphp
+			                      @foreach($payments as $index => $payment)
+			                        <tr>
 			                          <td>{{$index + 1}}</td>
-			                          <td>{{$result->batch->name}}</td>
-			                          <td>{{$result->paper->name}}</td>
-			                          <td>
-                                  @if('' != trim($result->marks))
-                                    {{$result->marks}} / {{$result->total_marks}}
-                                  @else
-                                    absent
-                                  @endif
-                                </td>
-			                          <td>
-                                  @if('' != trim($result->marks))
-                                    {{$result->rank()}}
-                                  @else
-                                    absent
-                                  @endif
-                                </td>
+			                          <td>{{$payment->batch->name}}</td>
+                                <td>{{date('Y-m-d',strtotime($payment->created_at))}}</td>
+                                <td>{{$payment->amount}}</td>
 			                        </tr>
+                              @php
+                                $total += $payment->amount;
+                              @endphp
 			                      @endforeach
-			                    @elseif(0 == count($results))
-			                      <tr class="">
-			                        <td colspan="5">No result.</td>
+                            <tr>
+                              <td colspan="2"></td>
+                              <td>Total</td>
+                              <td>{{$total}}</td>
+                            </tr>
+			                    @elseif(0 == count($payments))
+			                      <tr>
+			                        <td colspan="4">No Payments.</td>
 			                      </tr>
 			                    @endif
 			                  </tbody>
@@ -84,18 +81,19 @@
     </div>
 </div>
 <script type="text/javascript">
- function showResult(ele){
+ function showPayments(ele){
     var batchId = parseInt($(ele).val());
     $.ajax({
       method: "POST",
-      url: "{{url('showUserOfflineTestResultsByBatchIdByUserId')}}",
+      url: "{{url('getOfflinePaymentsByBatchIdByUserId')}}",
       data: {batch_id:batchId}
     })
-    .done(function( msg ) {
-      body = document.getElementById('test-result');
+    .done(function( result ) {
+      body = document.getElementById('payments');
       body.innerHTML = '';
-      if( msg['scores'] && 0 < msg['scores'].length){
-        $.each(msg['scores'], function(idx, obj) {
+      var total=0;
+      if( result.length){
+        $.each(result, function(idx, obj) {
           var eleTr = document.createElement('tr');
           var eleIndex = document.createElement('td');
           eleIndex.innerHTML = idx + 1;
@@ -105,28 +103,35 @@
           eleBatch.innerHTML = obj.batch;
           eleTr.appendChild(eleBatch);
 
-          var elePaper = document.createElement('td');
-          elePaper.innerHTML = obj.paper;
-          eleTr.appendChild(elePaper);
+          var eleDate = document.createElement('td');
+          eleDate.innerHTML = obj.date;
+          eleTr.appendChild(eleDate);
 
-          var eleScore = document.createElement('td');
-          if(obj.marks){
-            eleScore.innerHTML = obj.marks+'/'+obj.total_marks;
-          } else {
-            eleScore.innerHTML = 'absent';
-          }
-          eleTr.appendChild(eleScore);
-
-          var eleRank = document.createElement('td');
-          eleRank.innerHTML = msg['ranks'][obj.id];
-          eleTr.appendChild(eleRank);
+          var eleAmount = document.createElement('td');
+          eleAmount.innerHTML = obj.amount;
+          eleTr.appendChild(eleAmount);
+          total += parseInt(obj.amount);
           body.appendChild(eleTr);
         });
+        var eleTr = document.createElement('tr');
+        var eleIndex = document.createElement('td');
+        eleIndex.setAttribute('colspan', '2');
+        eleTr.appendChild(eleIndex);
+
+        var eleTotal = document.createElement('td');
+        eleTotal.innerHTML = 'Total';
+        eleTr.appendChild(eleTotal);
+
+        var eleAmount = document.createElement('td');
+        eleAmount.innerHTML = total;
+        eleTr.appendChild(eleAmount);
+
+        body.appendChild(eleTr);
       } else {
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = 'No result!';
-        eleIndex.setAttribute('colspan', '5');
+        eleIndex.setAttribute('colspan', '4');
         eleTr.appendChild(eleIndex);
         body.appendChild(eleTr);
       }

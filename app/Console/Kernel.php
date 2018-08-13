@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         Commands\SignupUnRegisteredClient::class,
         Commands\GenerateBillAndDeActivatePlan::class,
         Commands\DeActivateClientPayableSubCategory::class,
+        Commands\SendOfflineDueSms::class,
     ];
 
     /**
@@ -35,6 +36,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('signupunregisteredclient:command');
         $schedule->command('generatebillanddeactivateplan:cron');
         $schedule->command('deactivateclientpayablesubcategory:cron');
+        $schedule->command('sendofflineduesms:cron');
     }
 
     /**

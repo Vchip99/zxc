@@ -81,7 +81,7 @@ class ClientMessage extends Model
 
     protected static function deleteMessagesByBatchIdsByClientId($batchId,$clientId){
         $results = static::where('client_id', $clientId)->where('client_batch_id', $batchId)->get();
-        if(is_object($results) && false == $results->isEMpty()){
+        if(is_object($results) && false == $results->isEmpty()){
             foreach($results as $result){
                 $dir = dirname($result->photo);
                 InputSanitise::delFolder($dir);

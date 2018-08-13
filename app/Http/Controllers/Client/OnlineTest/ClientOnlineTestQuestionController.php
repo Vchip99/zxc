@@ -661,8 +661,8 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                         $testQuestion->answer = $question->answer;
                         $testQuestion->solution = $question->solution;
                         if(0 == $question->question_type){
-                            $testQuestion->min = $question->min;
-                            $testQuestion->max = $question->max;
+                            $testQuestion->min = (!empty($question->min))?$question->min:0.00;
+                            $testQuestion->max = (!empty($question->max))?$question->min:0.00;
                         } else {
                             $testQuestion->min = 0.00;
                             $testQuestion->max = 0.00;

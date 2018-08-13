@@ -17,6 +17,8 @@ use App\Models\ClientAssignmentTopic;
 use App\Models\ClientAssignmentQuestion;
 use App\Models\ClientAssignmentAnswer;
 use App\Models\ClientMessage;
+use App\Models\ClientOfflinePayment;
+use App\Models\ClientUploadTransaction;
 use MaddHatter\LaravelFullcalendar\Facades\Calendar;
 use DateTime;
 
@@ -153,6 +155,8 @@ class ClientBatchController extends ClientBaseController
                     }
                 }
                 ClientMessage::deleteMessagesByBatchIdsByClientId($batch->id,$batch->client_id);
+                ClientOfflinePayment::deleteClientOfflinePaymentByBatchIdsByClientId($batch->id,$batch->client_id);
+                ClientUploadTransaction::deleteClientUploadTransactionByBatchIdsByClientId($batch->id,$batch->client_id);
                 $batch->delete();
                 DB::connection('mysql2')->commit();
                 return Redirect::to('manageBatch')->with('message', 'Batch deleted successfully!');
@@ -379,5 +383,18 @@ class ClientBatchController extends ClientBaseController
         $result['allAttendanceDates'] = $allAttendanceDates;
         $result['attendanceStats'] = $attendanceStats;
         return $result;
+    }
+
+    protected function getBatchUsersByBatchId(Request $request){
+        $batchId   = InputSanitise::inputInt(json_decode($request->get('batch_id')));
+        $clientBatch = ClientBatch::getBatchById($batchId);
+        $batchUsers = [];
+        if(is_object($clientBatch)){
+            $userIds = explode(',', $clientBatch->student_ids);
+            if(count($userIds) > 0){
+                $batchUsers = Clientuser::find($userIds);
+            }
+        }
+        return $batchUsers;
     }
 }

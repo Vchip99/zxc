@@ -27,6 +27,10 @@
 		padding-left: 0px !important;
 		padding-right: 0px !important;
 	}
+	#all-result .panel-body {
+	    height: 600px;
+	    overflow: scroll;
+	}
   </style>
 @stop
 @section('admin_content')
@@ -214,78 +218,82 @@
 		</form>
 		<form id="questionBankForm" action="{{url('admin/exportQuestionBank')}}" method="POST">
 			{{csrf_field()}}
-			<div class="admin_div" style="overflow: auto;">
-			    <table class="table ">
-			      	<thead class="thead-inverse">
-				        <tr>
-				          	<th class="row-id">#</th>
-				          	<th class="row-que">Question</th>
-				          	<th class="row-opt">Positive Mark</th>
-				          	<th class="row-opt">Negative Mark</th>
-				          	<th class="row-opt">Selected</th>
-				        </tr>
-			      	</thead>
-			      	<tbody>
-			      		@if(count($questions) > 0)
-					        @foreach($questions as $index => $question)
-					        	@if(isset($question->id))
-							        <tr>
-							          	<th scope="row">{{$index + 1}}</th>
-							          	<td>
-							          		<div class="col-sm-2" >
-							          			{!! $question->name !!}
-												@if( 1 == $question->question_type )
-													<div class="row answer">A.<input type="radio" class="radio1" disabled/>
-														{!! $question->answer1 !!}
+			<div class="admin_div" id="all-result">
+				<div class="panel panel-info">
+		            <div class="panel-body">
+					    <table class="table ">
+					      	<thead class="thead-inverse">
+						        <tr>
+						          	<th class="row-id">#</th>
+						          	<th class="row-que">Question</th>
+						          	<th class="row-opt">Positive Mark</th>
+						          	<th class="row-opt">Negative Mark</th>
+						          	<th class="row-opt">Selected</th>
+						        </tr>
+					      	</thead>
+					      	<tbody>
+					      		@if(count($questions) > 0)
+							        @foreach($questions as $index => $question)
+							        	@if(isset($question->id))
+									        <tr>
+									          	<th scope="row">{{$index + 1}}</th>
+									          	<td>
+									          			{!! $question->name !!}
+									          		<div >
+														@if( 1 == $question->question_type )
+															<div class="row answer">A.<input type="radio" class="radio1" disabled/>
+																{!! $question->answer1 !!}
+															</div>
+															<div class="row answer">B.<input type="radio" class="radio1" disabled/>
+																{!! $question->answer2 !!}
+															</div>
+															<div class="row answer">C.<input type="radio" class="radio1" disabled/>
+																{!! $question->answer3 !!}
+															</div>
+															<div class="row answer">D.<input type="radio" class="radio1" disabled/>
+																{!! $question->answer4 !!}
+															</div>
+															<div class="row answer">E.<input type="radio" class="radio1" disabled/>
+																{!! $question->answer5 !!}
+															</div>
+														@endif
+														@if(1 == $question->question_type)
+															Answer:{!! $question->answer !!}
+														@else
+															<br>
+															Answer:{{$question->min}} - {{$question->max}}
+														@endif
 													</div>
-													<div class="row answer">B.<input type="radio" class="radio1" disabled/>
-														{!! $question->answer2 !!}
-													</div>
-													<div class="row answer">C.<input type="radio" class="radio1" disabled/>
-														{!! $question->answer3 !!}
-													</div>
-													<div class="row answer">D.<input type="radio" class="radio1" disabled/>
-														{!! $question->answer4 !!}
-													</div>
-													<div class="row answer">E.<input type="radio" class="radio1" disabled/>
-														{!! $question->answer5 !!}
-													</div>
-												@endif
-												@if(1 == $question->question_type)
-													Answer:{!! $question->answer !!}
-												@else
-													<br>
-													Answer:{{$question->min}} - {{$question->max}}
-												@endif
-											</div>
-						          		</td>
-							          	<td>
-							            	<input type="text" class="form-control" id="positive_{{$question->id}}" name="positive_{{$question->id}}" value="">
-							          	</td>
-							          	<td>
-							            	<input type="text" class="form-control" id="negative_{{$question->id}}" name="negative_{{$question->id}}" value="">
-							          	</td>
-							          	<td>
-							          		<input type="checkbox" name="selected[]" value="{{$question->id}}" onClick="checkValues(this);">
-							          	</td>
-							        </tr>
-							    @endif
-					        @endforeach
-					        <input type="hidden" name="selected_category" id="selected_category" value="">
-					        <input type="hidden" name="selected_subcategory" id="selected_subcategory" value="">
-					        <input type="hidden" name="selected_subject" id="selected_subject" value="">
-					        <input type="hidden" name="selected_paper" id="selected_paper" value="">
-					        <input type="hidden" name="selected_section_type" id="selected_section_type" value="">
-			    		@else
-			    			<tr><td colspan="3">No questions are created.</td></tr>
-			    			<input type="hidden" name="selected_category" id="selected_category" value="">
-					        <input type="hidden" name="selected_subcategory" id="selected_subcategory" value="">
-					        <input type="hidden" name="selected_subject" id="selected_subject" value="">
-					        <input type="hidden" name="selected_paper" id="selected_paper" value="">
-					        <input type="hidden" name="selected_section_type" id="selected_section_type" value="">
-			    		@endif
-			      	</tbody>
-			    </table>
+								          		</td>
+									          	<td>
+									            	<input type="text" class="form-control" id="positive_{{$question->id}}" name="positive_{{$question->id}}" value="">
+									          	</td>
+									          	<td>
+									            	<input type="text" class="form-control" id="negative_{{$question->id}}" name="negative_{{$question->id}}" value="">
+									          	</td>
+									          	<td>
+									          		<input type="checkbox" name="selected[]" value="{{$question->id}}" onClick="checkValues(this);">
+									          	</td>
+									        </tr>
+									    @endif
+							        @endforeach
+							        <input type="hidden" name="selected_category" id="selected_category" value="">
+							        <input type="hidden" name="selected_subcategory" id="selected_subcategory" value="">
+							        <input type="hidden" name="selected_subject" id="selected_subject" value="">
+							        <input type="hidden" name="selected_paper" id="selected_paper" value="">
+							        <input type="hidden" name="selected_section_type" id="selected_section_type" value="">
+					    		@else
+					    			<tr><td colspan="3">No questions are created.</td></tr>
+					    			<input type="hidden" name="selected_category" id="selected_category" value="">
+							        <input type="hidden" name="selected_subcategory" id="selected_subcategory" value="">
+							        <input type="hidden" name="selected_subject" id="selected_subject" value="">
+							        <input type="hidden" name="selected_paper" id="selected_paper" value="">
+							        <input type="hidden" name="selected_section_type" id="selected_section_type" value="">
+					    		@endif
+					      	</tbody>
+					    </table>
+					</div>
+				</div>
 		  	</div>
 		  	<div class="">
 			    <button type="submit" class="form-control btn btn-primary" style="float: right;width: 130px;" > Transfer Selected</button>

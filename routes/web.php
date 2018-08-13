@@ -1136,7 +1136,12 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('sendClientUserOtp', 'Client\ClientUserController@sendClientUserOtp');
   	Route::post('updateMobile', 'Client\ClientUserController@updateMobile');
   	Route::post('verifyMobile', 'Client\ClientUserController@verifyMobile');
-
+  	Route::get('myOfflinePayments', 'Client\ClientUserController@myOfflinePayments');
+  	Route::post('getOfflinePaymentsByBatchIdByUserId', 'Client\ClientUserController@getOfflinePaymentsByBatchIdByUserId');
+  	Route::get('myOnlinePayments', 'Client\ClientUserController@myOnlinePayments');
+  	Route::get('uploadedTransactions', 'Client\ClientUserController@uploadedTransactions');
+  	Route::get('createUploadTransaction', 'Client\ClientUserController@createUploadTransaction');
+  	Route::post('createUploadTransaction', 'Client\ClientUserController@storeUploadTransaction');
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');
@@ -1224,7 +1229,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('getBatchStudentAttendancebyBatchId', 'Client\ClientBatchController@getBatchStudentAttendancebyBatchId');
 	Route::post('markAttendance', 'Client\ClientBatchController@markAttendance');
 	Route::get('manageAttendanceCalendar', 'Client\ClientBatchController@showAttendanceCalendar');
-
+	Route::post('getBatchUsersByBatchId', 'Client\ClientBatchController@getBatchUsersByBatchId');
 
 	// Offline Paper
 	Route::get('manageOfflinePaper', 'Client\ClientOfflinePaperController@show');
@@ -1234,15 +1239,29 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::put('updateOfflinePaper', 'Client\ClientOfflinePaperController@update');
 	Route::delete('deleteOfflinePaper', 'Client\ClientOfflinePaperController@delete');
 	Route::post('getOfflinePapersByBatchId', 'Client\ClientOfflinePaperController@getOfflinePapersByBatchId');
-
 	Route::get('manageOfflineExam', 'Client\ClientOfflinePaperController@manageOfflineExam');
 	Route::post('getBatchStudentsAndMarksByBatchIdByPaperId', 'Client\ClientOfflinePaperController@getBatchStudentsAndMarksByBatchIdByPaperId');
 	Route::post('assignOfflinePaperMarks', 'Client\ClientOfflinePaperController@assignOfflinePaperMarks');
 
+	// client message
 	Route::get('manageMessage', 'Client\ClientMessageController@show');
 	Route::get('createMessage', 'Client\ClientMessageController@create');
 	Route::post('createMessage', 'Client\ClientMessageController@store');
 	Route::get('message/{id}/edit', 'Client\ClientMessageController@edit');
 	Route::put('updateMessage', 'Client\ClientMessageController@update');
 	Route::delete('deleteMessage', 'Client\ClientMessageController@delete');
+
+	// client offline payment
+	Route::get('manageOfflinePayments', 'Client\ClientOfflinePaymentController@show');
+	Route::get('createOfflinePayment', 'Client\ClientOfflinePaymentController@create');
+	Route::post('createOfflinePayment', 'Client\ClientOfflinePaymentController@store');
+	Route::get('offlinePayment/{id}/edit', 'Client\ClientOfflinePaymentController@edit');
+	Route::put('updateOfflinePayment', 'Client\ClientOfflinePaymentController@update');
+	Route::delete('deleteOfflinePayment', 'Client\ClientOfflinePaymentController@delete');
+	Route::get('batchPayments', 'Client\ClientOfflinePaymentController@batchPayments');
+	Route::post('getTotalPaidByBatchIdByUserId', 'Client\ClientOfflinePaymentController@getTotalPaidByBatchIdByUserId');
+	Route::get('duePayments', 'Client\ClientOfflinePaymentController@duePayments');
+	Route::post('getDueStudentsByBatchIdByDueDate', 'Client\ClientOfflinePaymentController@getDueStudentsByBatchIdByDueDate');
+	Route::get('userUploadedTransactions', 'Client\ClientOfflinePaymentController@userUploadedTransactions');
+
 });

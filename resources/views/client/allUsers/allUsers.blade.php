@@ -93,7 +93,6 @@
                     </tbody>
                 </table>
               </div>
-
               <div id="courses_tests">
                 @if(count($clientusers) > 0)
                   @foreach($clientusers as  $clientuser)

@@ -156,6 +156,19 @@
             <li title="My Event/Message"><a href="{{ url('myMessage')}}"><i class="fa fa-circle-o"></i> My Event/Message</a></li>
           </ul>
         </li>
+        <li class="treeview">
+          <a href="#" title="Message">
+            <i class="fa fa-inr"></i> <span>Payments</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="My Offline Payments"><a href="{{ url('myOfflinePayments')}}"><i class="fa fa-circle-o"></i>My Offline Payments</a></li>
+            <li title="My Online Payments"><a href="{{ url('myOnlinePayments')}}"><i class="fa fa-circle-o"></i>My Online Payments</a></li>
+            <li title="Uploaded Transactions"><a href="{{ url('uploadedTransactions')}}"><i class="fa fa-circle-o"></i>Uploaded Transactions</a></li>
+          </ul>
+        </li>
         <!-- <li title="Home"><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li> -->
         <!-- <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li> -->
         <li class="header">LABELS</li>
