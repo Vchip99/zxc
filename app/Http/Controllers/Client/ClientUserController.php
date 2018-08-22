@@ -1394,35 +1394,7 @@ class ClientUserController extends BaseController
                 }
             }
         }
-        if(2 == $clientUser->user_type){
-            $classes = ClientClass::where('client_id', $clientId )->where('clientuser_id', $clientUserId )->get();
-            if(is_object($classes) && false == $classes->isEmpty()){
-                foreach($classes as $class){
-                    $calendarData[$class->date]['classes'][] = [
-                        'subject' => $class->subject,
-                        'topic' => $class->topic,
-                        'from' => $class->from_time,
-                        'to' => $class->to_time,
-                        'batch' => $allBatches[$class->client_batch_id]
-                    ];
-                }
-            }
-        } else if(1 == $clientUser->user_type){
-            if(count($userBatches) > 0){
-                $classes = ClientClass::where('client_id', $clientId )->whereIn('client_batch_id', $userBatches )->get();
-                if(is_object($classes) && false == $classes->isEmpty()){
-                    foreach($classes as $class){
-                        $calendarData[$class->date]['classes'][] = [
-                            'subject' => $class->subject,
-                            'topic' => $class->topic,
-                            'from' => $class->from_time,
-                            'to' => $class->to_time,
-                            'batch' => $allBatches[$class->client_batch_id]
-                        ];
-                    }
-                }
-            }
-        }
+
         if(2 == $clientUser->user_type){
             $exams = ClientExam::where('client_id', $clientId )->get();
             if(is_object($exams) && false == $exams->isEmpty()){
@@ -1537,13 +1509,50 @@ class ClientUserController extends BaseController
             }
         }
 
+        if(2 == $clientUser->user_type){
+            $classes = ClientClass::where('client_id', $clientId )->where('clientuser_id', $clientUserId )->get();
+            if(is_object($classes) && false == $classes->isEmpty()){
+                foreach($classes as $class){
+                    if(!isset($results[$class->date])){
+                        $results[$class->date] = [
+                            'start' => $class->date,
+                            'color' => '#e6004e',
+                        ];
+                    }
+                    $calendarData[$class->date]['classes'][] = [
+                        'subject' => $class->subject,
+                        'topic' => $class->topic,
+                        'from' => $class->from_time,
+                        'to' => $class->to_time,
+                        'batch' => $allBatches[$class->client_batch_id]
+                    ];
+                }
+            }
+        } else if(1 == $clientUser->user_type){
+            if(count($userBatches) > 0){
+                $classes = ClientClass::where('client_id', $clientId )->whereIn('client_batch_id', $userBatches )->get();
+                if(is_object($classes) && false == $classes->isEmpty()){
+                    foreach($classes as $class){
+                        if(!isset($results[$class->date])){
+                            $results[$class->date] = [
+                                'start' => $class->date,
+                                'color' => '#e6004e',
+                            ];
+                        }
+                        $calendarData[$class->date]['classes'][] = [
+                            'subject' => $class->subject,
+                            'topic' => $class->topic,
+                            'from' => $class->from_time,
+                            'to' => $class->to_time,
+                            'batch' => $allBatches[$class->client_batch_id]
+                        ];
+                    }
+                }
+            }
+        }
+
         if(count($results) > 0){
             foreach($results as $result){
-                $finalResults[] = [
-                        'start' => $result['start'],
-                        'color' => $result['color'],
-                        'rendering' => 'background',
-                    ];
                 if(empty($dayColours)){
                     $dayColours = $result['start'].':'.$result['color'];
                 } else {

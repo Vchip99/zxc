@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> Batch Schedules </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-calendar"></i> Calendar Management </li>
+      <li><i class="fa fa-calendar"></i> Syllabus Management </li>
       <li class="active"> Batch Schedules </li>
     </ol>
   </section>
@@ -61,6 +61,7 @@
           <li>Red Color - Exam Schedule</li>
           <li>Green Color - Holiday</li>
           <li>Blue Color - Notice</li>
+          <li>Pink Color - Classes</li>
         </ol>
       </li>
     </ul>

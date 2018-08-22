@@ -183,18 +183,6 @@ class ClientClassController extends ClientBaseController
                 ];
             }
         }
-        $classes = ClientClass::where('client_id', $clientId )->get();
-        if(is_object($classes) && false == $classes->isEmpty()){
-            foreach($classes as $class){
-                $calendarData[$class->date]['classes'][] = [
-                    'subject' => $class->subject,
-                    'topic' => $class->topic,
-                    'from' => $class->from_time,
-                    'to' => $class->to_time,
-                    'batch' => $allBatches[$class->client_batch_id]
-                ];
-            }
-        }
         $exams = ClientExam::where('client_id', $clientId )->get();
         if(is_object($exams) && false == $exams->isEmpty()){
             foreach($exams as $exam){
@@ -244,14 +232,27 @@ class ClientClassController extends ClientBaseController
                 ];
             }
         }
+        $classes = ClientClass::where('client_id', $clientId )->get();
+        if(is_object($classes) && false == $classes->isEmpty()){
+            foreach($classes as $class){
+                if(!isset($results[$class->date])){
+                    $results[$class->date] = [
+                        'start' => $class->date,
+                        'color' => '#e6004e',
+                    ];
+                }
+                $calendarData[$class->date]['classes'][] = [
+                    'subject' => $class->subject,
+                    'topic' => $class->topic,
+                    'from' => $class->from_time,
+                    'to' => $class->to_time,
+                    'batch' => $allBatches[$class->client_batch_id]
+                ];
+            }
+        }
 
         if(count($results) > 0){
             foreach($results as $result){
-                $finalResults[] = [
-                        'start' => $result['start'],
-                        'color' => $result['color'],
-                        'rendering' => 'background',
-                    ];
                 if(empty($dayColours)){
                     $dayColours = $result['start'].':'.$result['color'];
                 } else {

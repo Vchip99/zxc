@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> Manage Holidays </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-calendar"></i> Calendar Management </li>
+      <li><i class="fa fa-calendar"></i> Syllabus Management </li>
       <li class="active"> Manage Holidays </li>
     </ol>
   </section>

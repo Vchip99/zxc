@@ -56,6 +56,7 @@
           <li>Red Color - Exam Schedule</li>
           <li>Green Color - Holiday</li>
           <li>Blue Color - Notice</li>
+          <li>Pink Color - Classes</li>
         </ol>
       </li>
     </ul>

@@ -291,8 +291,8 @@
           </ul>
         </li>
         <li class="treeview">
-          <a href="#" title="Calendar Management">
-            <i class="fa fa-calendar"></i> <span>Calendar Management</span>
+          <a href="#" title="Syllabus Management">
+            <i class="fa fa-calendar"></i> <span>Syllabus Management</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
