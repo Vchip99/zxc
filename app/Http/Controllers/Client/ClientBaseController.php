@@ -43,8 +43,9 @@ class ClientBaseController extends BaseController
      */
     public function __construct(Request $request)
     {
-        $this->middleware('client');
+        // $this->middleware('client');
         $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
+
         if(is_object($subdomain)){
             view::share('subdomain', $subdomain);
             $client = Client::where('subdomain', $subdomain->subdomain)->first();

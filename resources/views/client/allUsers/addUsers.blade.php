@@ -90,13 +90,16 @@
         <div id="allUsers">
           <div class="form-group row" id="1">
             <label class="col-sm-2 col-form-label" >User Details <sup>*<sup></label>
-            <div class="col-sm-3">
-              <input type="text" class="form-control" name="name_1" value="" placeholder="User Name" required>
+            <div class="col-sm-2">
+              <input type="text" class="form-control" id="name_1" name="name_1" value="" placeholder="User Name" required>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
+              <input type="text" class="form-control" name="phone_1" value="" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}">
+            </div>
+            <div class="col-sm-2">
               <input type="text" class="form-control" name="email_1" value="" placeholder="Email Id/User Id" required>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
               <input type="password" class="form-control" name="password_1" value="" placeholder="Password" required>
             </div>
           </div>
@@ -127,7 +130,7 @@
         <div class="form-group row hide" id="signUpOtpDiv">
           <label class="col-sm-2 col-form-label">Enter OTP <sup>*<sup></label>
           <div class="col-sm-3">
-            <input name="user_otp" type="text" class="form-control" placeholder="Enter OTP" required>
+            <input id="user_otp" name="user_otp" type="text" class="form-control" placeholder="Enter OTP" required>
           </div>
           <div class="col-sm-3">
             <label class="hide" style="color: white;" id="signUpOtpMessage">Otp sent successfully.</label>
@@ -181,6 +184,7 @@
         var resultObj = JSON.parse(result);
         if('000' == resultObj.ErrorCode && 'Success' == resultObj.ErrorMessage){
           $('#signUpOtpMessage').removeClass('hide');
+          $('#user_otp').focus();
         } else {
           $.confirm({
             title: 'Alert',
@@ -208,7 +212,7 @@
 
   function addNewUser(){
     var allUsers = document.getElementById('allUsers');
-    var latestCount = ($('#allUsers input').length/3) + 1;
+    var latestCount = ($('#allUsers input').length/4) + 1;
     var deletePath = "{{ asset('images/delete3.png')}}";
 
     var eleDiv = document.createElement('div');
@@ -220,17 +224,22 @@
     eleDiv.appendChild(eleLabel);
 
     var firstDiv = document.createElement('div');
-    firstDiv.className = 'col-sm-3';
-    firstDiv.innerHTML = '<input type="text" class="form-control" name="name_'+latestCount+'" value="" placeholder="User Name" required>';
+    firstDiv.className = 'col-sm-2';
+    firstDiv.innerHTML = '<input type="text" class="form-control" id="name_'+latestCount+'" name="name_'+latestCount+'" value="" placeholder="User Name" required>';
     eleDiv.appendChild(firstDiv);
 
+    var phoneDiv = document.createElement('div');
+    phoneDiv.className = 'col-sm-2';
+    phoneDiv.innerHTML = '<input type="text" class="form-control" name="phone_'+latestCount+'" value="" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}">';
+    eleDiv.appendChild(phoneDiv);
+
     var secondDiv = document.createElement('div');
-    secondDiv.className = 'col-sm-3';
+    secondDiv.className = 'col-sm-2';
     secondDiv.innerHTML = '<input type="text" class="form-control" name="email_'+latestCount+'" value="" placeholder="Email Id/User Id" required>';
     eleDiv.appendChild(secondDiv);
 
     var thirdDiv = document.createElement('div');
-    thirdDiv.className = 'col-sm-3';
+    thirdDiv.className = 'col-sm-2';
     thirdDiv.innerHTML = '<input type="password" class="form-control" name="password_'+latestCount+'" value="" placeholder="Password" required>';
     eleDiv.appendChild(thirdDiv);
 
@@ -240,6 +249,7 @@
     eleImg.setAttribute("onclick", 'removeElement(\'allUsers\','+latestCount+')');
     eleDiv.appendChild(eleImg);
     allUsers.appendChild(eleDiv);
+    $('#name_'+latestCount).focus();
   }
   function removeElement(parentDiv, childDiv){
     if (document.getElementById(childDiv)){

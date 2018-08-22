@@ -38,7 +38,6 @@ use App\Models\UserBasedAuthentication;
 use App\Models\VirtualPlacementDrive;
 use App\Models\Add;
 use App\Models\AdvertisementPage;
-use MaddHatter\LaravelFullcalendar\Facades\Calendar;
 use DateTime;
 use App\Models\AdvertisementPayment;
 use App\Models\WebdevelopmentPayment;
@@ -369,33 +368,8 @@ class HomeController extends Controller
     }
 
     protected function createAd(Request $request){
-        if(!empty($request->get('page'))){
-            $data = Add::where('show_page_id', $request->get('page'))->where('is_payment_done', 1)->get();
-            $selectedPage = $request->get('page');
-        } else {
-            $data = Add::where('is_payment_done', 1)->get();
-            $selectedPage = '';
-        }
-        $events = [];
-        if($data->count()) {
-            foreach ($data as $key => $value) {
-                $events[] = \Calendar::event(
-                    $value->company,
-                    true,
-                    new \DateTime($value->start_date),
-                    new \DateTime($value->end_date.' +1 day'),
-                    null,
-                    // Add color and link on event
-                    [
-                        'color' => '#f05050',
-                        // 'url' => 'pass here url and any route',
-                    ]
-                );
-            }
-        }
         $subPageArr = [];
         $advertisementPages = [];
-        $calendar = \Calendar::addEvents($events);
         $subPages = AdvertisementPage::where('parent_page', '>', 0)->get();
         if(is_object($subPages) && false == $subPages->isEmpty()){
             foreach($subPages as $subPage){
@@ -422,7 +396,7 @@ class HomeController extends Controller
             }
         }
 
-        return view('createAdd.createAdd', compact('calendar', 'selectedPage', 'advertisementPages'));
+        return view('createAdd.createAdd', compact('advertisementPages'));
     }
 
     protected function checkStartDate(Request $request){
@@ -650,5 +624,27 @@ class HomeController extends Controller
             // send email
             mail($to, $subject, $message, $headers);
         }
+    }
+
+    protected function showAddCalendar(Request $request){
+        $data = '';
+        if((int)$request->get('page') > 0){
+            $data = Add::where('show_page_id', $request->get('page'))->where('is_payment_done', 1)->get();
+        } else {
+            $data = Add::where('is_payment_done', 1)->get();
+        }
+        $events = [];
+        if(is_object($data) && $data->count()) {
+            foreach ($data as $key => $value) {
+                $events[] = array(
+                    "title" => $value->company,
+                    "start" => $value->start_date,
+                    "end" =>   date('Y-m-d', strtotime("+1 day", strtotime($value->end_date))),
+                    "color" => "#f05050",
+                );
+            }
+
+        }
+        return $events;
     }
 }

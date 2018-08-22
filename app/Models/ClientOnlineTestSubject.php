@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
+use App\Models\Clientuser;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubjectPaper;
@@ -18,7 +19,7 @@ class ClientOnlineTestSubject extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'sub_category_id', 'client_id'];
+    protected $fillable = ['name', 'category_id', 'sub_category_id', 'client_id','created_by'];
 
     /**
      *  add/update subject
@@ -28,7 +29,9 @@ class ClientOnlineTestSubject extends Model
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
         $subjectName = InputSanitise::inputString($request->get('name'));
         $subjectId = InputSanitise::inputInt($request->get('subject_id'));
-
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
         if( $isUpdate && isset($subjectId)){
             $testSubject = static::find($subjectId);
             if(!is_object($testSubject)){
@@ -40,7 +43,8 @@ class ClientOnlineTestSubject extends Model
         $testSubject->name = $subjectName;
         $testSubject->category_id = $categoryId;
         $testSubject->sub_category_id = $subcategoryId;
-        $testSubject->client_id = Auth::guard('client')->user()->id;
+        $testSubject->client_id = $clientId;
+        $testSubject->created_by = $createdBy;
         $testSubject->save();
         return $testSubject;
     }
@@ -56,7 +60,7 @@ class ClientOnlineTestSubject extends Model
         if( $isUpdate && isset($subjectId)){
             $testSubject = static::find($subjectId);
             if(!is_object($testSubject)){
-                return Redirect::to('admin/managePayableSubject');
+                return 'false';
             }
         } else{
             $testSubject = new static;
@@ -190,7 +194,8 @@ class ClientOnlineTestSubject extends Model
     }
 
     protected static function isClientTestSubjectExist(Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $categoryId = InputSanitise::inputInt($request->get('category'));
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
         $subjectName = InputSanitise::inputString($request->get('subject'));
@@ -227,5 +232,15 @@ class ClientOnlineTestSubject extends Model
 
     protected static function getPayableSubjectsBySubcatId($subcategoryId){
         return static::where('client_id', 0)->where('category_id', 0)->where('sub_category_id', $subcategoryId)->select('client_online_test_subjects.*')->get();
+    }
+
+    protected static function assignClientTestSubjectsToClientByClientIdByTeacherId($clientId,$teacherId){
+        $subjects = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($subjects) && false == $subjects->isEmpty()){
+            foreach($subjects as $subject){
+                $subject->created_by = 0;
+                $subject->save();
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
+use App\Models\Clientuser;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineTestSubCategory;
 
@@ -17,7 +18,7 @@ class ClientOnlineTestCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'client_id'];
+    protected $fillable = ['name', 'client_id', 'created_by'];
 
     /**
      *  add/update test category
@@ -25,6 +26,10 @@ class ClientOnlineTestCategory extends Model
     protected static function addOrUpdateCategory( Request $request, $isUpdate=false){
         $categoryName = InputSanitise::inputString($request->get('category'));
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
+
         if( $isUpdate && isset($categoryId)){
             $category = static::find($categoryId);
             if(!is_object($category)){
@@ -34,7 +39,8 @@ class ClientOnlineTestCategory extends Model
             $category = new static;
         }
         $category->name = $categoryName;
-        $category->client_id = Auth::guard('client')->user()->id;
+        $category->client_id = $clientId;
+        $category->created_by = $createdBy;
         $category->save();
         return $category;
     }
@@ -163,7 +169,8 @@ class ClientOnlineTestCategory extends Model
     }
 
     protected static function isClientTestCategoryExist(Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $categoryName = InputSanitise::inputString($request->get('category'));
         $categoryId   = InputSanitise::inputInt($request->get('category_id'));
         $result = static::where('client_id', $clientId)->where('name', '=',$categoryName);
@@ -175,6 +182,16 @@ class ClientOnlineTestCategory extends Model
             return 'true';
         } else {
             return 'false';
+        }
+    }
+
+    protected static function assignClientTestCategoriesToClientByClientIdByTeacherId($clientId,$teacherId){
+        $categories = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($categories) && false == $categories->isEmpty()){
+            foreach($categories as $category){
+                $category->created_by = 0;
+                $category->save();
+            }
         }
     }
 }

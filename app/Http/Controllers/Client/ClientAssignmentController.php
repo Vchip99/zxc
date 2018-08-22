@@ -25,7 +25,7 @@ class ClientAssignmentController extends ClientBaseController
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
     /**
@@ -37,25 +37,51 @@ class ClientAssignmentController extends ClientBaseController
         'topic' => 'required',
     ];
 
-    protected function show($subdomainName){
-        $assignments = ClientAssignmentQuestion::where('client_id', Auth::guard('client')->user()->id)->paginate();
-        return view('client.assignment.list', compact('assignments', 'subdomainName'));
+    protected function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $assignments = ClientAssignmentQuestion::where('client_id', $clientId)->paginate();
+        return view('client.assignment.list', compact('assignments', 'subdomainName','loginUser'));
     }
 
     /**
      *  create assignment
      */
-    protected function create($subdomainName){
+    protected function create($subdomainName,Request $request){
         if($subdomainName){
             InputSanitise::checkClientImagesDirForCkeditor($subdomainName);
         }
-        $loginUser = Auth::guard('client')->user();
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $topics = [];
-        // $subjects = ClientAssignmentSubject::getAssignmentSubjectsByClient();
         $subjects = [];
         $assignment = new ClientAssignmentQuestion;
-        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
-        return view('client.assignment.create', compact('subjects', 'topics', 'assignment', 'subdomainName', 'batches'));
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        return view('client.assignment.create', compact('subjects', 'topics', 'assignment', 'subdomainName', 'batches','loginUser'));
     }
 
     /**
@@ -105,19 +131,30 @@ class ClientAssignmentController extends ClientBaseController
     /**
      * edit assignment
      */
-    protected function edit($subdomainName, $id){
+    protected function edit($subdomainName,Request $request,$id){
         if($subdomainName){
             InputSanitise::checkClientImagesDirForCkeditor($subdomainName);
+        }
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
         }
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $assignment = ClientAssignmentQuestion::find($id);
-
             if(is_object($assignment)){
                 $topics = ClientAssignmentTopic::getAssignmentTopicsBySubject($assignment->client_assignment_subject_id);
                 $subjects = ClientAssignmentSubject::getAssignmentSubjectsByBatchId($assignment->client_batch_id);
                 $batches = ClientBatch::getBatchesByClientId($assignment->client_id);
-                return view('client.assignment.create', compact('subjects','topics','assignment','subdomainName','batches'));
+                return view('client.assignment.create', compact('subjects','topics','assignment','subdomainName','batches','loginUser'));
             }
         }
         return Redirect::to('manageAssignment');
@@ -163,11 +200,25 @@ class ClientAssignmentController extends ClientBaseController
         return ClientAssignmentSubject::getAssignmentSubjectsByCourse($request->institute_course_id);
     }
 
-    protected function studentsAssignment($subdomainName){
+    protected function studentsAssignment($subdomainName,Request $request){
         $assignment = '';
         $assignmentSubjects = [];
         $assignmentTopics = [];
         $assignmentUsers = [];
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
 
         $selectedAssignmentBatch = Session::get('client_selected_assignment_batch');
         $selectedAssignmentSubject  = Session::get('client_selected_assignment_subject');
@@ -182,12 +233,11 @@ class ClientAssignmentController extends ClientBaseController
             $assignmentTopics = ClientAssignmentTopic::getAssignmentTopicsBySubject($selectedAssignmentSubject);
         }
         if(!empty($selectedAssignmentTopic)){
-            $assignment = ClientAssignmentQuestion::where('client_id', Auth::guard('client')->user()->id)
+            $assignment = ClientAssignmentQuestion::where('client_id', $clientId)
                     ->where('client_assignment_topic_id', $selectedAssignmentTopic)->first();
         }
-        $loginUser = Auth::guard('client')->user();
-        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
-        return view('client.studentAssignment.studentsAssignment', compact('assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'selectedAssignmentCourse', 'selectedAssignmentSubject', 'selectedAssignmentTopic', 'selectedAssignmentStudent', 'assignment', 'subdomainName', 'batches', 'selectedAssignmentBatch'));
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        return view('client.studentAssignment.studentsAssignment', compact('assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'selectedAssignmentSubject', 'selectedAssignmentTopic', 'selectedAssignmentStudent', 'assignment', 'subdomainName', 'batches', 'selectedAssignmentBatch','loginUser'));
     }
 
     protected function searchStudentForAssignment(Request $request){
@@ -198,7 +248,9 @@ class ClientAssignmentController extends ClientBaseController
     protected function getAssignmentByTopicForStudent(Request $request){
         $results = [];
         $batch = $request->batch;
-        $assignment = ClientAssignmentQuestion::where('client_id', Auth::guard('client')->user()->id)
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $assignment = ClientAssignmentQuestion::where('client_id', $clientId)
                     ->where('client_assignment_topic_id', $request->topic)->first();
         if(is_object($assignment)){
             $results['id'] = $assignment->id;
@@ -219,13 +271,25 @@ class ClientAssignmentController extends ClientBaseController
         return $results;
     }
 
-    protected function assignmentRemark($subdomainName, $id, $studentId){
+    protected function assignmentRemark($subdomainName,Request $request, $id, $studentId){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
         $id = InputSanitise::inputInt(json_decode($id));
         $studentId = InputSanitise::inputInt(json_decode($studentId));
         $assignment = ClientAssignmentQuestion::find($id);
         $student = Clientuser::find($studentId);
         $answers = ClientAssignmentAnswer::where('client_id', $student->client_id)->where('student_id', $student->id)->where('client_assignment_question_id', $assignment->id)->get();
-        return view('client.studentAssignment.assignmentRemark', compact('assignment', 'answers','student', 'subdomainName'));
+        return view('client.studentAssignment.assignmentRemark', compact('assignment', 'answers','student', 'subdomainName','loginUser'));
     }
 
     protected function createAssignmentRemark(Request $request){
@@ -256,7 +320,16 @@ class ClientAssignmentController extends ClientBaseController
             DB::connection('mysql2')->beginTransaction();
             try
             {
-                $answers = ClientAssignmentAnswer::where('client_assignment_question_id', $assignment->id)->where('client_id',Auth::guard('client')->user()->id)->get();
+                $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                if($assignment->created_by > 0 && $loginUser->id != $assignment->created_by){
+                    return Redirect::to('studentsAssignment');
+                }
+                if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                    return Redirect::to('studentsAssignment');
+                }
+                $resultArr = InputSanitise::getClientIdAndCretedBy();
+                $clientId = $resultArr[0];
+                $answers = ClientAssignmentAnswer::where('client_assignment_question_id', $assignment->id)->where('client_id',$clientId)->get();
                 if(is_object($answers) && false == $answers->isEmpty()){
                     foreach($answers as $answer){
                         $dir = dirname($answer->attached_link);

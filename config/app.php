@@ -171,7 +171,6 @@ return [
         GeniusTS\Roles\RolesServiceProvider::class,
         Hesto\MultiAuth\MultiAuthServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-        MaddHatter\LaravelFullcalendar\ServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
         /*
@@ -234,7 +233,6 @@ return [
         'Ntrust' => Klaravel\Ntrust\NtrustFacade::class,
         'auth.password.tokens' => Illuminate\Auth\Passwords\TokenRepositoryInterface::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-        'Calendar' => MaddHatter\LaravelFullcalendar\Facades\Calendar::class,
         'Image' => Intervention\Image\ImageManagerStatic::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
     ],

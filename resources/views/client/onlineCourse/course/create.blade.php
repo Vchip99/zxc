@@ -1,5 +1,4 @@
-@extends('client.dashboard')
-  &nbsp;
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
   @section('module_title')
   <section class="content-header">
     <h1> Manage Course </h1>

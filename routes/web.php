@@ -317,8 +317,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('createAd/{page?}', 'HomeController@createAd');
 	Route::post('checkStartDate', 'HomeController@checkStartDate');
 	Route::post('checkDateSlot', 'HomeController@checkDateSlot');
-	Route::post('showCalendar', 'HomeController@showCalendar');
-	Route::get('getAllEvents', 'HomeController@getAllEvents');
+	Route::post('showAddCalendar', 'HomeController@showAddCalendar');
 
 	// online courses front
 	Route::get('courses', 'CourseController@courses');
@@ -1142,6 +1141,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('uploadedTransactions', 'Client\ClientUserController@uploadedTransactions');
   	Route::get('createUploadTransaction', 'Client\ClientUserController@createUploadTransaction');
   	Route::post('createUploadTransaction', 'Client\ClientUserController@storeUploadTransaction');
+  	Route::get('myCalendar', 'Client\ClientUserController@myCalendar');
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');
@@ -1264,4 +1264,46 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('getDueStudentsByBatchIdByDueDate', 'Client\ClientOfflinePaymentController@getDueStudentsByBatchIdByDueDate');
 	Route::get('userUploadedTransactions', 'Client\ClientOfflinePaymentController@userUploadedTransactions');
 
+	// client teachers
+	Route::get('addTeachers', 'Client\ClientTeacherController@addTeacher');
+	Route::post('addEmailTeachers', 'Client\ClientTeacherController@addEmailTeacher');
+	Route::post('addMobileTeacher', 'Client\ClientTeacherController@addMobileTeacher');
+	Route::post('uploadClientTeachers', 'Client\ClientTeacherController@uploadClientTeachers');
+	Route::get('allTeachers', 'Client\ClientTeacherController@allTeacher');
+	Route::post('changeClientTeacherModuleStatus', 'Client\ClientTeacherController@changeClientTeacherModuleStatus');
+	Route::delete('deleteClientTeacher', 'Client\ClientTeacherController@deleteClientTeacher');
+
+	// client class
+	Route::get('manageClasses', 'Client\ClientClassController@show');
+	Route::get('createClientClass', 'Client\ClientClassController@create');
+	Route::post('createClientClass', 'Client\ClientClassController@store');
+	Route::get('class/{id}/edit', 'Client\ClientClassController@edit');
+	Route::put('updateClientClass', 'Client\ClientClassController@update');
+	Route::delete('deleteClass', 'Client\ClientClassController@delete');
+	Route::get('manageSchedules', 'Client\ClientClassController@manageSchedules');
+
+
+	// client exam
+	Route::get('manageExams', 'Client\ClientExamController@show');
+	Route::get('createClientExam', 'Client\ClientExamController@create');
+	Route::post('createClientExam', 'Client\ClientExamController@store');
+	Route::get('exam/{id}/edit', 'Client\ClientExamController@edit');
+	Route::put('updateClientExam', 'Client\ClientExamController@update');
+	Route::delete('deleteExam', 'Client\ClientExamController@delete');
+
+	// client holiday
+	Route::get('manageHolidays', 'Client\ClientHolidayController@show');
+	Route::get('createClientHoliday', 'Client\ClientHolidayController@create');
+	Route::post('createClientHoliday', 'Client\ClientHolidayController@store');
+	Route::get('holiday/{id}/edit', 'Client\ClientHolidayController@edit');
+	Route::put('updateClientHoliday', 'Client\ClientHolidayController@update');
+	Route::delete('deleteHoliday', 'Client\ClientHolidayController@delete');
+
+	// client notice
+	Route::get('manageNotices', 'Client\ClientNoticeController@show');
+	Route::get('createClientNotice', 'Client\ClientNoticeController@create');
+	Route::post('createClientNotice', 'Client\ClientNoticeController@store');
+	Route::get('notice/{id}/edit', 'Client\ClientNoticeController@edit');
+	Route::put('updateClientNotice', 'Client\ClientNoticeController@update');
+	Route::delete('deleteNotice', 'Client\ClientNoticeController@delete');
 });

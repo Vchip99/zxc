@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <section class="content-header">
     <h1> Placement </h1>
@@ -14,6 +14,11 @@
     </div>
   @endif
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
+  <style type="text/css">
+    .btn-primary {
+      width: 370px !important;
+    }
+  </style>
 @stop
 @section('dashboard_content')
 	<div class="content-wrapper v-container tab-content" >

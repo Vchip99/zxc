@@ -83,11 +83,11 @@ class Client extends Authenticatable
     }
 
     public function userCount(){
-        return Clientuser::where('client_id', Auth::guard('client')->user()->id)->count();
+        return Clientuser::where('client_id', Auth::guard('client')->user()->id)->where('user_type', Clientuser::Student)->count();
     }
 
     public function userCountByClientId($clientId){
-        return Clientuser::where('client_id', $clientId)->count();
+        return Clientuser::where('client_id', $clientId)->where('user_type', Clientuser::Student)->count();
     }
 
 

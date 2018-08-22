@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <section class="content-header">
@@ -46,17 +46,19 @@
               {{$paper->batch->name}}
             </td>
             <td>
-              <a href="{{url('offlinePaper')}}/{{$paper->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$paper->name}}" />
-                </a>
+              @if(($paper->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $paper->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $paper->client_id))
+                <a href="{{url('offlinePaper')}}/{{$paper->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$paper->name}}" /></a>
+              @endif
             </td>
             <td>
-            <a id="{{$paper->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$paper->name}}" />
-                </a>
+              @if(($paper->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $paper->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $paper->client_id))
+                <a id="{{$paper->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$paper->name}}" /></a>
                 <form id="deletePaper_{{$paper->id}}" action="{{url('deleteOfflinePaper')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="paper_id" value="{{$paper->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach

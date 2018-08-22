@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth,File;
 use App\Libraries\InputSanitise;
+use App\Models\Clientuser;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientCourseComment;
 use App\Models\ClientOnlineVideoLike;
@@ -20,12 +21,12 @@ class ClientOnlineVideo extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'description', 'duration', 'video_path','course_id', 'client_id', 'is_free', 'category_id', 'sub_category_id'];
+    protected $fillable = ['name', 'description', 'duration', 'video_path','course_id', 'client_id', 'is_free', 'category_id', 'sub_category_id','created_by'];
 
     /**
      *  create/update video
      */
-    protected static function addOrUpdateVideo(Request $request, $isUpdate = false){
+    protected static function addOrUpdateVideo($subdomainName,Request $request, $isUpdate = false){
     	$videoName = InputSanitise::inputString($request->get('video'));
     	$description = InputSanitise::inputString($request->get('description'));
     	$duration = InputSanitise::inputInt($request->get('duration'));
@@ -36,7 +37,9 @@ class ClientOnlineVideo extends Model
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
         $isFree = InputSanitise::inputInt($request->get('is_free'));
         $videoSource = InputSanitise::inputString($request->get('video_source'));
-        $loginUser = Auth::guard('client')->user();
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
 
     	if( $isUpdate && isset($videoId)){
     		$video = static::find($videoId);
@@ -58,13 +61,13 @@ class ClientOnlineVideo extends Model
     	$video->course_id = $courseId;
         $video->category_id = $categoryId;
         $video->sub_category_id = $subcategoryId;
-    	$video->client_id = $loginUser->id;
+    	$video->client_id = $clientId;
         $video->is_free = $isFree;
+        $video->created_by = $createdBy;
     	$video->save();
 
 
-        $subdomainArr = explode('.', $loginUser->subdomain);
-        $clientName = $subdomainArr[0];
+        $clientName = $subdomainName;
 
         if('system' == $videoSource && is_object($request->file('video_path')) && !empty($video->id)){
             $originalVideoName = $request->file('video_path')->getClientOriginalName();
@@ -223,7 +226,8 @@ class ClientOnlineVideo extends Model
     }
 
     protected static function isClientCourseVideoExist(Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $courseId = InputSanitise::inputInt($request->get('course'));
         $videoId = InputSanitise::inputInt($request->get('video_id'));
         $videoName = InputSanitise::inputString($request->get('video'));
@@ -236,6 +240,16 @@ class ClientOnlineVideo extends Model
             return 'true';
         } else {
             return 'false';
+        }
+    }
+
+    protected static function assignClientOnlineVideosToClientByClientIdByTeacherId($clientId,$teacherId){
+        $videos = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($videos) && false == $videos->isEmpty()){
+            foreach($videos as $video){
+                $video->created_by = 0;
+                $video->save();
+            }
         }
     }
 }

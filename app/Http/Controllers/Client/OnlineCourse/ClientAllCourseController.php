@@ -18,8 +18,8 @@ class ClientAllCourseController extends ClientBaseController
      *  check admin have permission or not, if not redirect to home
      */
 	public function __construct(Request $request) {
+
         parent::__construct($request);
-        $this->middleware('client');
     }
 
 	/**
@@ -53,14 +53,26 @@ class ClientAllCourseController extends ClientBaseController
      *  show list of course category
      */
     protected function showAll($subdomainName,Request $request){
-    	$categories = ClientOnlineCategory::showCategories($request);
-    	return view('client.onlineCourse.course_all', compact('categories', 'subdomainName'));
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $categories = ClientOnlineCategory::showCategories($request);
+    	return view('client.onlineCourse.course_all', compact('categories', 'subdomainName','loginUser'));
     }
 
     /**
      *  store course category
      */
-    protected function storeCategory($subdomain,Request $request){
+    protected function storeCategory($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateCategory);
         if ($v->fails())
         {
@@ -86,7 +98,7 @@ class ClientAllCourseController extends ClientBaseController
     /**
      *  store sub category
      */
-    protected function storeSubCategory($subdomain,Request $request){
+    protected function storeSubCategory($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateSubcategory);
         if ($v->fails())
         {
@@ -112,7 +124,7 @@ class ClientAllCourseController extends ClientBaseController
      /**
      *  store course
      */
-    protected function storeCourse($subdomain, Request $request){
+    protected function storeCourse($subdomainName, Request $request){
         $v = Validator::make($request->all(), $this->validateCourse);
         if ($v->fails())
         {
@@ -121,7 +133,7 @@ class ClientAllCourseController extends ClientBaseController
         DB::connection('mysql2')->beginTransaction();
         try
         {
-            $course = ClientOnlineCourse::addOrUpdateCourse($request);
+            $course = ClientOnlineCourse::addOrUpdateCourse($subdomainName,$request);
             if(is_object($course)){
                 DB::connection('mysql2')->commit();
                 return Redirect::to('manageAllCourse')->with('message', 'Course created successfully!');

@@ -4,7 +4,7 @@ namespace App\Libraries;
 use Illuminate\Http\Request;
 use App\Models\ClientHomePage;
 use App\Models\Client;
-use DB, Cache, File,LRedis;
+use DB, Cache, File,LRedis,Auth;
 
 class InputSanitise{
 
@@ -30,6 +30,39 @@ class InputSanitise{
         	return false;
         }
         return $subdomain;
+    }
+
+    public static function getCurrentGuard(){
+        if(Auth::guard('admin')->check()){
+            return "admin";
+        }elseif(Auth::guard('web')->check()){
+            return "user";
+        }elseif(Auth::guard('client')->check()){
+            return "client";
+        }elseif(Auth::guard('clientuser')->check()){
+            return "clientuser";
+        }
+        return false;
+    }
+
+    public static function getClientIdAndCretedBy(){
+        if('client' == static::getCurrentGuard()){
+            $clientId = Auth::guard('client')->user()->id;
+            $createdBy = 0;
+        } else {
+            $clientUser = Auth::guard('clientuser')->user();
+            $clientId = $clientUser->client_id;
+            $createdBy = $clientUser->id;
+        }
+        return [$clientId,$createdBy];
+    }
+
+    public static function getLoginUserByGuardForClient(){
+        if('client' == static::getCurrentGuard()){
+            return Auth::guard('client')->user();
+        } elseif('clientuser' == static::getCurrentGuard()){
+            return Auth::guard('clientuser')->user();
+        }
     }
 
     public static function delFolder($dir) {
@@ -79,8 +112,7 @@ class InputSanitise{
         return ;
     }
 
-    public static function sendOtp($mobile)
-    {
+    public static function sendOtp($mobile){
         $mobileNo = '91'.$mobile;
         $otp = rand(100000, 999999);
         $userMessage = 'Your OTP: '.$otp;
@@ -99,8 +131,7 @@ class InputSanitise{
         return $response;
     }
 
-    public static function sendOfflineDueSms($mobile, $userName, $batchName, $clientName)
-    {
+    public static function sendOfflineDueSms($mobile, $userName, $batchName, $clientName){
         $mobileNo = '91'.$mobile;
         $otp = rand(100000, 999999);
         $userMessage = 'Dear '.$userName.', Today is your due date for payment of batch- '.$batchName.'. Thanks '.$clientName;

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
+use App\Models\Clientuser;
 
 class ClientOnlinePaperSection extends Model
 {
@@ -15,7 +16,7 @@ class ClientOnlinePaperSection extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'duration', 'category_id', 'sub_category_id', 'subject_id', 'paper_id','client_id'];
+    protected $fillable = ['name', 'duration', 'category_id', 'sub_category_id', 'subject_id', 'paper_id','client_id','created_by'];
 
     protected static function paperSectionsByPaperId($paperId, $clientId=NULL, $request=NULL){
         if($clientId > 0){
@@ -58,5 +59,15 @@ class ClientOnlinePaperSection extends Model
             }
         }
         return;
+    }
+
+    protected static function assignClientTestPaperSectionsToClientByClientIdByTeacherId($clientId,$teacherId){
+        $paperSections = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($paperSections) && false == $paperSections->isEmpty()){
+            foreach($paperSections as $paperSection){
+                $paperSection->created_by = 0;
+                $paperSection->save();
+            }
+        }
     }
 }

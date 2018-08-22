@@ -21,7 +21,7 @@ class ClientOnlineTestSubjectController extends ClientBaseController
      */
 	public function __construct(Request $request) {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
 	/**
@@ -38,19 +38,44 @@ class ClientOnlineTestSubjectController extends ClientBaseController
      *	show all subjects
      */
 	public function show($subdomainName,Request $request){
+		if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
 		$testSubjects = ClientOnlineTestSubject::showSubjects($request);
-		return view('client.onlineTest.subject.list', compact('testSubjects', 'subdomainName'));
+		return view('client.onlineTest.subject.list', compact('testSubjects', 'subdomainName','loginUser'));
 	}
 
 	/**
 	 *	show create UI for subject
 	 */
 	protected function create($subdomainName,Request $request){
-		$clientId = Auth::guard('client')->user()->id;
+		if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
 		$testCategories    = ClientOnlineTestCategory::where('client_id', $clientId)->get();
 		$testSubCategories = new ClientOnlineTestSubCategory;
 		$subject = new ClientOnlineTestSubject;
-		return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject', 'subdomainName'));
+		return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject', 'subdomainName','loginUser'));
 	}
 
 	/**
@@ -84,13 +109,25 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 	 *	edit subject
 	 */
 	protected function edit( $subdomainName, $id, Request $request){
+		if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
 		$id = InputSanitise::inputInt(json_decode($id));
 		if(isset($id)){
 			$subject = ClientOnlineTestSubject::find($id);
 			if(is_object($subject)){
 				$testCategories    = ClientOnlineTestCategory:: showCategories($request);
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($subject->category_id, $request);
-				return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject', 'subdomainName'));
+				return view('client.onlineTest.subject.create', compact('testCategories','testSubCategories','subject', 'subdomainName','loginUser'));
 			}
 		}
 		return Redirect::to('manageOnlineTestSubject');
@@ -136,6 +173,13 @@ class ClientOnlineTestSubjectController extends ClientBaseController
 				DB::connection('mysql2')->beginTransaction();
 		        try
 		        {
+		        	$loginUser = InputSanitise::getLoginUserByGuardForClient();
+                    if($testSubject->created_by > 0 && $loginUser->id != $testSubject->created_by){
+                        return Redirect::to('manageOnlineTestSubject');
+                    }
+                    if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                        return Redirect::to('manageOnlineTestSubject');
+                    }
 		        	if(true == is_object($testSubject->papers) && false == $testSubject->papers->isEmpty()){
 		        		foreach($testSubject->papers as $paper){
 		        			if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){

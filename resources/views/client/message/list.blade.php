@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <section class="content-header">
@@ -48,17 +48,21 @@
               @endif
             </td>
             <td>
-              <a href="{{url('message')}}/{{$message->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$message->name}}" />
+              @if(($message->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $message->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $message->client_id))
+                <a href="{{url('message')}}/{{$message->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$message->name}}" />
                 </a>
+              @endif
             </td>
             <td>
-            <a id="{{$message->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$message->name}}" />
+              @if(($message->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $message->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $message->client_id))
+                <a id="{{$message->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$message->name}}" />
                 </a>
                 <form id="deleteMessage_{{$message->id}}" action="{{url('deleteMessage')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="message_id" value="{{$message->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach

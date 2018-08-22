@@ -2,19 +2,18 @@
 @section('dashboard_header')
   <link rel="stylesheet" href="{{ asset('css/fullcalendar.min.css?ver=1.0')}}"/>
   <style type="text/css">
-  #mycalendar .fc-day-header{
+  #calendar .fc-day-header{
     background-color: white;
     color: black;
   }
-  .fc-day-number{
-    border-style: solid !important;
-    border-top-width: 1px !important;
-    border-right-width: 1px !important;
-    border-left-width: 1px !important;
-    border-color: white !important;
-  }
   .fc td, .fc th {
     vertical-align: bottom !important;
+  }
+  .fc-toolbar .fc-center h2{
+    font-size: 15px;
+  }
+  .fc-view-container{
+    border: 1px solid;
   }
   </style>
 @stop
@@ -68,14 +67,13 @@
       <div class="col-md-3 mrgn_10_btm"><b>P-Present, A-Absent, T-Total</b></div>
     </div>
   </form>
-  <div id="mycalendar">
-    {!! $calendar->calendar() !!}
+  <div id="calendar">
   </div>
   </div>
   <input type="hidden" id="present_dates" value="{{$allPresentDates}}">
   <input type="hidden" id="absent_dates" value="{{$allAbsentDates}}">
   <input type="hidden" id="attendance_stats" value="{{$attendanceStats}}">
-  {!! $calendar->script() !!}
+  <input type="hidden" id="default_date" value="{{$defaultDate}}">
   <script src="{{ asset('js/moment.min.js')}}"></script>
   <script src="{{ asset('js/fullcalendar.min.js')}}"></script>
 <script type="text/javascript">
@@ -88,6 +86,15 @@
     }
   }
   $(document).ready(function(){
+    var defaultDate = document.getElementById('default_date').value;
+    $('#calendar').fullCalendar({
+      header: {
+        left: '',
+        center: 'prev title next',
+        right: ''
+      },
+      defaultDate:defaultDate,
+    });
     showPresentDates();
     showAbsentDates();
     showAttendanceStats();

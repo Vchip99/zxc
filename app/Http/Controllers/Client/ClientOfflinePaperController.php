@@ -23,7 +23,7 @@ class ClientOfflinePaperController extends ClientBaseController
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
     /**
@@ -36,19 +36,46 @@ class ClientOfflinePaperController extends ClientBaseController
         'marks' => 'required',
     ];
 
-    protected function show($subdomainName){
-        $papers = ClientOfflinePaper::where('client_id', Auth::guard('client')->user()->id)->paginate();
-        return view('client.offlinePaper.list', compact('papers','subdomainName'));
+    protected function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $papers = ClientOfflinePaper::where('client_id', $clientId)->paginate();
+        return view('client.offlinePaper.list', compact('papers','subdomainName','loginUser'));
     }
 
     /**
      *  create offline paper
      */
-    protected function create($subdomainName){
-        $loginUser = Auth::guard('client')->user();
+    protected function create($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $paper = new ClientOfflinePaper;
-        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
-        return view('client.offlinePaper.create', compact('paper', 'subdomainName', 'batches'));
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        return view('client.offlinePaper.create', compact('paper', 'subdomainName', 'batches','loginUser'));
     }
 
     /**
@@ -81,13 +108,25 @@ class ClientOfflinePaperController extends ClientBaseController
     /**
      *  edit offline paper
      */
-    protected function edit($subdomainName, $id){
+    protected function edit($subdomainName,Request $request,$id){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $paper = ClientOfflinePaper::find($id);
             if(is_object($paper)){
                 $batches = ClientBatch::getBatchesByClientId($paper->client_id);
-                return view('client.offlinePaper.create', compact('paper', 'subdomainName', 'batches'));
+                return view('client.offlinePaper.create', compact('paper', 'subdomainName', 'batches','loginUser'));
             }
         }
         return Redirect::to('manageOfflinePaper');
@@ -130,6 +169,13 @@ class ClientOfflinePaperController extends ClientBaseController
             DB::connection('mysql2')->beginTransaction();
             try
             {
+                $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                if($paper->created_by > 0 && $loginUser->id != $paper->created_by){
+                    return Redirect::to('manageOfflinePaper');
+                }
+                if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                    return Redirect::to('manageOfflinePaper');
+                }
                 ClientOfflinePaperMark::deleteClientOfflinePaperMarkByBatchIdByPaperIdByClientId($paper->client_batch_id,$paper->id,$paper->client_id);
                 $paper->delete();
                 DB::connection('mysql2')->commit();
@@ -149,11 +195,24 @@ class ClientOfflinePaperController extends ClientBaseController
         return ClientOfflinePaper::getOfflinePapersByBatchId($clientBatchId);
     }
 
-    protected function manageOfflineExam($subdomainName){
-        $loginUser = Auth::guard('client')->user();
+    protected function manageOfflineExam($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $papers = [];
-        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
-        return view('client.offlinePaper.offlinePaperMarks', compact('papers', 'subdomainName', 'batches'));
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        return view('client.offlinePaper.offlinePaperMarks', compact('papers', 'subdomainName', 'batches','loginUser'));
     }
 
     protected function getBatchStudentsAndMarksByBatchIdByPaperId(Request $request){

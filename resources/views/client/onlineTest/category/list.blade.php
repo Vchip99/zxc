@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <section class="content-header">
     <h1> Manage Category </h1>
@@ -19,6 +19,7 @@
   @endif
     <div class="form-group row">
       <div id="addCategoryDiv">
+        <b>Note: * means Category have purchased sub category.</b>
         <a id="addCategory" href="{{url('createOnlineTestCategory')}}" type="button" class="btn btn-primary" style="float: right;" title="Add New Category">Add New Category</a>&nbsp;&nbsp;
       </div>
     </div>
@@ -27,9 +28,9 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Category Name</th>
-          <th>Edit Category</th>
-          <th>Delete Category</th>
+          <th>Category </th>
+          <th>Edit </th>
+          <th>Delete </th>
         </tr>
       </thead>
       <tbody>
@@ -43,25 +44,25 @@
               <td>{{$testCategory->name}}</td>
             @endif
             <td>
-              <a href="{{url('onlinetestcategory')}}/{{$testCategory->id}}/edit"
-                    ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testCategory->name}}" />
-                </a>
+              @if(($testCategory->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $testCategory->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $testCategory->client_id))
+                <a href="{{url('onlinetestcategory')}}/{{$testCategory->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testCategory->name}}" /></a>
+              @endif
             </td>
             <td>
-            @if(in_array($testCategory->id, $isPurchasedSubCategories))
-              <a id="{{$testCategory->id}}" onclick="confirmDelete(this, true);">
-            @else
-              <a id="{{$testCategory->id}}" onclick="confirmDelete(this, false);">
-            @endif
-
-              <img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testCategory->name}}" />
-            </a>
+              @if(($testCategory->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $testCategory->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $testCategory->client_id))
+                @if(in_array($testCategory->id, $isPurchasedSubCategories))
+                  <a id="{{$testCategory->id}}" onclick="confirmDelete(this, true);">
+                @else
+                  <a id="{{$testCategory->id}}" onclick="confirmDelete(this, false);">
+                @endif
+                  <img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testCategory->name}}" />
+                </a>
                 <form id="deleteCategory_{{$testCategory->id}}" action="{{url('deleteOnlineTestCategory')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="category_id" value="{{$testCategory->id}}">
                 </form>
-
+              @endif
             </td>
           </tr>
           @endforeach
@@ -70,7 +71,6 @@
         @endif
       </tbody>
     </table>
-    <p><b>Note: * means Category have purchased sub category.</b> </p>
   </div>
   </div>
 <script type="text/javascript">

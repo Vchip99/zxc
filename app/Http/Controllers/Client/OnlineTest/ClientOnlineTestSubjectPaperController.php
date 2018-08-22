@@ -22,7 +22,7 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
      */
     public function __construct(Request $request) {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
     /**
@@ -42,21 +42,46 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
      * show all test paper
      */
     public function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
     	$testPapers = ClientOnlineTestSubjectPaper::showPaper($request);
-    	return view('client.onlineTest.paper.list', compact('testPapers', 'subdomainName'));
+    	return view('client.onlineTest.paper.list', compact('testPapers', 'subdomainName','loginUser'));
     }
 
     /**
      *  show create UI for paper
      */
     protected function create($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
         $allSessions = [];
-        $clientId = Auth::guard('client')->user()->id;
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
     	$testCategories    = ClientOnlineTestCategory::where('client_id', $clientId)->get();
 		$testSubCategories = new ClientOnlineTestSubCategory;
 		$testSubjects = new ClientOnlineTestSubject;
 		$paper = new ClientOnlineTestSubjectPaper;
-    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions', 'subdomainName'));
+    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions', 'subdomainName','loginUser'));
     }
 
     /**
@@ -90,6 +115,20 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
      *  edit paper
      */
     protected function edit($subdomainName, $id, Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$paper = ClientOnlineTestSubjectPaper::find($id);
@@ -97,9 +136,9 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     			$testCategories    = ClientOnlineTestCategory::showCategories($request);
 				$testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($paper->category_id, $request);
 				$testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId($paper->category_id, $paper->sub_category_id, $request);
-                $allSessions = ClientOnlinePaperSection::paperSectionsByPaperId($paper->id, Auth::guard('client')->user()->id);
+                $allSessions = ClientOnlinePaperSection::paperSectionsByPaperId($paper->id, $clientId);
 
-		    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions', 'subdomainName'));
+		    	return view('client.onlineTest.paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions', 'subdomainName','loginUser'));
     		}
     	}
 		return Redirect::to('manageOnlineTestSubjectPaper');
@@ -145,6 +184,13 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
                 DB::connection('mysql2')->beginTransaction();
                 try
                 {
+                    $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                    if($paper->created_by > 0 && $loginUser->id != $paper->created_by){
+                        return Redirect::to('manageOnlineTestSubjectPaper');
+                    }
+                    if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                        return Redirect::to('manageOnlineTestSubjectPaper');
+                    }
                     if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
                         foreach($paper->questions as $question){
                             ClientUserSolution::deleteClientUserSolutionsByQuestionId($question->id);
@@ -188,7 +234,9 @@ class ClientOnlineTestSubjectPaperController extends ClientBaseController
     }
 
     protected function paperSectionsByPaperId(Request $request){
-        return ClientOnlinePaperSection::paperSectionsByPaperId($request->paper_id, Auth::guard('client')->user()->id);
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        return ClientOnlinePaperSection::paperSectionsByPaperId($request->paper_id, $clientId);
     }
 
     protected function isClientTestPaperExist(Request $request){

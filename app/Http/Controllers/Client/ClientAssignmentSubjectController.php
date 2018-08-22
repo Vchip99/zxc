@@ -24,7 +24,7 @@ class ClientAssignmentSubjectController extends ClientBaseController
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
     /**
@@ -35,19 +35,46 @@ class ClientAssignmentSubjectController extends ClientBaseController
         'subject' => 'required',
     ];
 
-    protected function show($subdomainName){
-        $subjects = ClientAssignmentSubject::where('client_id', Auth::guard('client')->user()->id)->paginate();
-        return view('client.assignmentSubject.list', compact('subjects','subdomainName'));
+    protected function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $subjects = ClientAssignmentSubject::where('client_id', $clientId)->paginate();
+        return view('client.assignmentSubject.list', compact('subjects','subdomainName','loginUser'));
     }
 
     /**
      *  create assignment subject
      */
-    protected function create($subdomainName){
-        $loginUser = Auth::guard('client')->user();
+    protected function create($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $subject = new ClientAssignmentSubject;
-        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
-        return view('client.assignmentSubject.create', compact('subject', 'subdomainName', 'batches'));
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        return view('client.assignmentSubject.create', compact('subject', 'subdomainName', 'batches','loginUser'));
     }
 
     /**
@@ -79,13 +106,25 @@ class ClientAssignmentSubjectController extends ClientBaseController
     /**
      *  edit assignment subject
      */
-    protected function edit($subdomainName, $id){
+    protected function edit($subdomainName,Request $request,$id){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $subject = ClientAssignmentSubject::find($id);
             if(is_object($subject)){
                 $batches = ClientBatch::getBatchesByClientId($subject->client_id);
-                return view('client.assignmentSubject.create', compact('subject', 'subdomainName', 'batches'));
+                return view('client.assignmentSubject.create', compact('subject','subdomainName','batches','loginUser'));
             }
         }
         return Redirect::to('manageAssignmentSubject');
@@ -132,6 +171,13 @@ class ClientAssignmentSubjectController extends ClientBaseController
             DB::connection('mysql2')->beginTransaction();
             try
             {
+                $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                if($subject->created_by > 0 && $loginUser->id != $subject->created_by){
+                    return Redirect::to('manageAssignmentSubject');
+                }
+                if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                    return Redirect::to('manageAssignmentSubject');
+                }
                 $topics = ClientAssignmentTopic::getAssignmentTopicsBySubjectIdByClientId($subject->id,$subject->client_id);
                 if(is_object($topics) && false == $topics->isEmpty()){
                     foreach($topics as $topic){

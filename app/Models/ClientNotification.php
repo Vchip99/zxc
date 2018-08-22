@@ -27,9 +27,11 @@ class ClientNotification extends Model
     protected $fillable = ['message', 'client_id', 'notification_module','created_module_id', 'created_by', 'created_to', 'is_seen', 'created_at'];
 
     protected static function addNotification($notificationMessage, $notificationModule, $createdModuleId){
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
     	$notification = new static;
     	$notification->message = $notificationMessage;
-    	$notification->client_id = Auth::guard('client')->user()->id;
+    	$notification->client_id = $clientId;
         $notification->notification_module = $notificationModule;
         $notification->created_module_id = $createdModuleId;
     	$notification->created_by = 0;

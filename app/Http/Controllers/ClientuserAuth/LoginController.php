@@ -87,7 +87,7 @@ class LoginController extends Controller
 
     public function clientUserLogin(Request $request){
         if($this->guard('clientuser')->attempt($this->credentials($request))){
-            // if free plan and user is not in first 20 user then dont allow to login
+            // if free plan and user is not in first 10 user then dont allow to login
             $clientUser = Auth::guard('clientuser')->user();
             if(1 == $clientUser->client->plan_id){
                 if( 'false' == $clientUser::isInBetweenFirstTen()){

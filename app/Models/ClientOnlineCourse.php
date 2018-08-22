@@ -10,6 +10,7 @@ use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineSubCategory;
 use App\Models\RegisterClientOnlineCourses;
 use App\Models\ClientOnlineVideo;
+use App\Models\Clientuser;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class ClientOnlineCourse extends Model
@@ -20,12 +21,12 @@ class ClientOnlineCourse extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path', 'release_date', 'client_id'];
+    protected $fillable = ['name', 'category_id', 'sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path', 'release_date', 'client_id','created_by'];
 
     /**
      *  create/update course
      */
-    protected static function addOrUpdateCourse(Request $request, $isUpdate = false){
+    protected static function addOrUpdateCourse($subdomainName,Request $request, $isUpdate = false){
     	$categoryId = InputSanitise::inputInt($request->get('category'));
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
         $courseName = InputSanitise::inputString($request->get('course'));
@@ -37,7 +38,10 @@ class ClientOnlineCourse extends Model
         $certified = InputSanitise::inputString($request->get('certified'));
         $release_date = trim(strip_tags($request->get('release_date')));
         $courseId = InputSanitise::inputString($request->get('course_id'));
-        $loginUser = Auth::guard('client')->user();
+
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
 
     	if( $isUpdate && !empty($courseId)){
     		$course = static::find($courseId);
@@ -56,8 +60,7 @@ class ClientOnlineCourse extends Model
     	$course->difficulty_level = $difficultyLevel;
         $course->author_introduction = $authorIntroduction;
         $course->certified = $certified;
-        $subdomainArr = explode('.', $loginUser->subdomain);
-        $clientName = $subdomainArr[0];
+        $clientName = $subdomainName;
 
         if($request->exists('author_image')){
             $authorImage = $request->file('author_image')->getClientOriginalName();
@@ -108,7 +111,8 @@ class ClientOnlineCourse extends Model
         }
 
     	$course->release_date = $release_date;
-    	$course->client_id = $loginUser->id;
+    	$course->client_id = $clientId;
+        $course->created_by = $createdBy;
     	$course->save();
     	return $course;
 
@@ -228,7 +232,7 @@ class ClientOnlineCourse extends Model
                 ->get();
     }
 
-      /**
+    /**
      *  get registered online courses for user
      */
     protected static function getRegisteredOnlineCourseByCatIdBySubCatId($categoryId,$subcategoryId,$userId){
@@ -259,7 +263,9 @@ class ClientOnlineCourse extends Model
     }
 
     public function deleteRegisteredOnlineCourses(){
-        $registeredOnlineCourses = RegisterClientOnlineCourses::where('client_online_course_id', $this->id)->where('client_id', Auth::guard('client')->user()->id)->get();
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $registeredOnlineCourses = RegisterClientOnlineCourses::where('client_online_course_id', $this->id)->where('client_id', $clientId)->get();
         if(is_object($registeredOnlineCourses) && false == $registeredOnlineCourses->isEmpty()){
             foreach($registeredOnlineCourses as $registeredOnlineCourse){
                 $registeredOnlineCourse->delete();
@@ -282,8 +288,9 @@ class ClientOnlineCourse extends Model
     }
 
     protected function getOnlineCourseByCatIdBySubCatIdForClient($categoryId,$subCategoryId){
-        $client = Auth::guard('client')->user();
-        return static::where('client_id', $client->id)->where('category_id', $categoryId)->where('sub_category_id', $subCategoryId)->get();
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        return static::where('client_id', $clientId)->where('category_id', $categoryId)->where('sub_category_id', $subCategoryId)->get();
     }
 
     protected static function deleteClientOnlineCoursesByClientId($clientId){
@@ -296,7 +303,8 @@ class ClientOnlineCourse extends Model
     }
 
     protected static function isClientOnlineCourseExist(Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $categoryId = InputSanitise::inputInt($request->get('category'));
         $subCategoryId = InputSanitise::inputInt($request->get('subcategory'));
         $courseName = InputSanitise::inputString($request->get('course'));
@@ -310,6 +318,16 @@ class ClientOnlineCourse extends Model
             return 'true';
         } else {
             return 'false';
+        }
+    }
+
+    protected static function assignClientOnlineCoursesToClientByClientIdByTeacherId($clientId,$teacherId){
+        $courses = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($courses) && false == $courses->isEmpty()){
+            foreach($courses as $course){
+                $course->created_by = 0;
+                $course->save();
+            }
         }
     }
 }

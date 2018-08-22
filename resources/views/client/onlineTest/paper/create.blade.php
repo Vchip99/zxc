@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <section class="content-header">
     <h1> Manage Paper </h1>
@@ -194,7 +194,7 @@
               <td class="col-sm-3 duration">
                 <input type="text" class="form-control" name="duration_{{$session->id}}" value="{{$session->duration}}">
               </td>
-              <td class=""><button type="button" onClick="addSessions();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
+              <td class=""><button type="button" onClick="addSessions(event);"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
               @if($index > 0)
                 <td class=""><button onClick="removeElement('all_session',{{$session->id}});"> <i class="fa fa-minus-circle" aria-hidden="true"></i></button></td>
               @endif
@@ -204,7 +204,7 @@
           <tr id="tr_1">
             <td class="col-sm-3"><input type="text" class="form-control" name="session_1" value="Section_1" required="true"></td>
             <td class="col-sm-3 duration"><input type="text" class="form-control " name="duration_1" value=""></td>
-            <td class=""><button type="button" onClick="addSessions();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
+            <td class=""><button type="button" onClick="addSessions(event);"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
             @if(isset($paper))
               <td class=""><input type="hidden" name="new_1" value="new"></td>
             @else
@@ -264,8 +264,8 @@
 </form>
 <input type="hidden" id="selected_time_out" name="selected_time_out" value="{{$paper->time_out_by}}">
 <script type="text/javascript">
-  function addSessions(){
-    // event.preventDefault();
+  function addSessions(event){
+    event.preventDefault();
     var allSession = document.getElementById('all_session');
     var count = parseInt(document.getElementById('all_session_count').value) + 1;
 
@@ -314,7 +314,7 @@
     var fifthTd = document.createElement('td');
 
     var fifthButton = document.createElement('button');
-    fifthButton.setAttribute("onClick", "removeElement('all_session',"+count+");");
+    fifthButton.setAttribute("onClick", "removeElement(event,'all_session',"+count+");");
     fifthButton.innerHTML = '<i class="fa fa-minus-circle" aria-hidden="true"></i>';
     fifthTd.appendChild(fifthButton);
     if(document.getElementById('paper_id')){
@@ -336,8 +336,8 @@
     document.getElementById('all_session_count').value = count;
   }
 
-  function removeElement(parent,childId){
-      // event.preventDefault();
+  function removeElement(event,parent,childId){
+      event.preventDefault();
       var childTr = document.getElementById('tr_'+childId);
       var childBr = document.getElementById('br_'+childId);
       var parent = document.getElementById(parent);

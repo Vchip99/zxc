@@ -6,10 +6,10 @@
 @stop
 @section('module_title')
   <section class="content-header">
-    <h1> My Offline Payments </h1>
+    <h1> My Online Payments </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-files-o"></i> Payments</li>
-      <li class="active"> My Offline Payments </li>
+      <li class="active"> My Online Payments </li>
     </ol>
   </section>
 @stop

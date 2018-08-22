@@ -43,8 +43,11 @@ use App\Models\ClientOfflinePaperMark;
 use App\Models\ClientMessage;
 use App\Models\ClientOfflinePayment;
 use App\Models\ClientUploadTransaction;
+use App\Models\ClientClass;
+use App\Models\ClientHoliday;
+use App\Models\ClientExam;
+use App\Models\ClientNotice;
 use App\Libraries\InputSanitise;
-use MaddHatter\LaravelFullcalendar\Facades\Calendar;
 use DateTime;
 
 class ClientUserController extends BaseController
@@ -471,6 +474,15 @@ class ClientUserController extends BaseController
         } else {
             $phone = '7722078597';
         }
+        $client = $loginUser->client;
+        if('local' == \Config::get('app.env')){
+            $redirectUrl = url('redirectCoursePayment');
+            $webhookUrl = url('webhook');
+        } else {
+            $redirectUrl = 'https://'.trim($client->subdomain).'/redirectCoursePayment';
+            $webhookUrl = 'https://'.trim($client->subdomain).'/webhook';
+        }
+
         $purchasePostFields = [
                                 'purpose' => 'purchase '. $clientCourse->name,
                                 'amount'  =>   $clientCourse->price,
@@ -479,8 +491,8 @@ class ClientUserController extends BaseController
                                 'phone'  => $phone,
                                 'send_email' => 'True',
                                 'send_sms' => 'False',
-                                'redirect_url' => url('redirectCoursePayment'),
-                                'webhook'   => url('webhook'),
+                                'redirect_url' => $redirectUrl,
+                                'webhook'   => $webhookUrl,
                                 'allow_repeated_payments' => 'False'
                             ];
 
@@ -721,7 +733,14 @@ class ClientUserController extends BaseController
         } else {
             $phone = '7722078597';
         }
-
+        $client = $loginUser->client;
+        if('local' == \Config::get('app.env')){
+            $redirectUrl = url('redirectTestSubCategoryPayment');
+            $webhookUrl = url('webhook');
+        } else {
+            $redirectUrl = 'https://'.trim($client->subdomain).'/redirectTestSubCategoryPayment';
+            $webhookUrl = 'https://'.trim($client->subdomain).'/webhook';
+        }
         $purchasePostFields = [
                                 'purpose' => 'purchase '. $subCategory->name,
                                 'amount'  =>   $price,
@@ -730,8 +749,8 @@ class ClientUserController extends BaseController
                                 'phone'  => $phone,
                                 'send_email' => 'True',
                                 'send_sms' => 'False',
-                                'redirect_url' => url('redirectTestSubCategoryPayment'),
-                                'webhook'   => url('webhook'),
+                                'redirect_url' => $redirectUrl,
+                                'webhook'   => $webhookUrl,
                                 'allow_repeated_payments' => 'False'
                             ];
 
@@ -936,17 +955,7 @@ class ClientUserController extends BaseController
         $allPresentDates = implode(',', $result['allPresentDates']);
         $allAbsentDates = implode(',', $result['allAbsentDates']);
         $currnetYear = date('Y');
-        $calendar = \Calendar::addEvents([])->setOptions([ //set fullcalendar options
-            'header' => [
-                'left' => '',
-                'center' => 'prev title next',
-                'right' => '',
-            ],
-            'defaultDate' => $defaultDate,
-            'eventOverlap' => false,
-
-        ]);
-        return view('clientuser.dashboard.myAttendance', compact('batches','currnetYear','calendar','selectedYear','selectedBatch', 'userFirstBatchId', 'allPresentDates', 'allAbsentDates','attendanceStats'));
+        return view('clientuser.dashboard.myAttendance', compact('batches','currnetYear','selectedYear','selectedBatch', 'userFirstBatchId', 'allPresentDates', 'allAbsentDates','attendanceStats','defaultDate'));
     }
 
     protected function getAttendanceByBatchByYearByUserByClient($batch,$year,$clientUserId,$clientId){
@@ -1324,5 +1333,224 @@ class ClientUserController extends BaseController
             return redirect()->back()->withErrors('something went wrong while creating upload transaction.');
         }
         return Redirect::to('uploadedTransactions');
+    }
+
+    protected function myCalendar(){
+        $results = [];
+        $calendarData = [];
+        $allBatches = [];
+        $dayColours = '';
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $userBatches = [];
+        if(1 == $clientUser->user_type){
+            if(!empty($clientUser->batch_ids)){
+                $userBatches = explode(',', $clientUser->batch_ids);
+                array_push($userBatches, '0');
+            } else {
+                $userBatches = [0];
+            }
+        }
+        $batches = ClientBatch::where('client_id', $clientId)->get();
+        if(is_object($batches) && false == $batches->isEmpty()){
+            $allBatches[0] = 'All';
+            foreach($batches as $batch){
+                $allBatches[$batch->id] = $batch->name;
+            }
+        }
+        if(2 == $clientUser->user_type){
+            $emergencyNotices = ClientNotice::where('client_id', $clientId)->where('is_emergency', 1)->get();
+            if(is_object($emergencyNotices) && false == $emergencyNotices->isEmpty()){
+                foreach($emergencyNotices as $notice){
+                    if(!isset($results[$notice->date])){
+                        $results[$notice->date] = [
+                            'start' => $notice->date,
+                            'color' => 'yellow',
+                        ];
+                    }
+                    $calendarData[$notice->date]['emergency_notices'][] = [
+                        'title' => $notice->notice,
+                        'batch' => $allBatches[$notice->client_batch_id]
+                    ];
+                }
+            }
+        } else if(1 == $clientUser->user_type){
+            if(count($userBatches) > 0){
+                $emergencyNotices = ClientNotice::where('client_id', $clientId)->where('is_emergency', 1)->whereIn('client_batch_id', $userBatches )->get();
+                if(is_object($emergencyNotices) && false == $emergencyNotices->isEmpty()){
+                    foreach($emergencyNotices as $notice){
+                        if(!isset($results[$notice->date])){
+                            $results[$notice->date] = [
+                                'start' => $notice->date,
+                                'color' => 'yellow',
+                            ];
+                        }
+                        $calendarData[$notice->date]['emergency_notices'][] = [
+                            'title' => $notice->notice,
+                            'batch' => $allBatches[$notice->client_batch_id]
+                        ];
+                    }
+                }
+            }
+        }
+        if(2 == $clientUser->user_type){
+            $classes = ClientClass::where('client_id', $clientId )->where('clientuser_id', $clientUserId )->get();
+            if(is_object($classes) && false == $classes->isEmpty()){
+                foreach($classes as $class){
+                    $calendarData[$class->date]['classes'][] = [
+                        'subject' => $class->subject,
+                        'topic' => $class->topic,
+                        'from' => $class->from_time,
+                        'to' => $class->to_time,
+                        'batch' => $allBatches[$class->client_batch_id]
+                    ];
+                }
+            }
+        } else if(1 == $clientUser->user_type){
+            if(count($userBatches) > 0){
+                $classes = ClientClass::where('client_id', $clientId )->whereIn('client_batch_id', $userBatches )->get();
+                if(is_object($classes) && false == $classes->isEmpty()){
+                    foreach($classes as $class){
+                        $calendarData[$class->date]['classes'][] = [
+                            'subject' => $class->subject,
+                            'topic' => $class->topic,
+                            'from' => $class->from_time,
+                            'to' => $class->to_time,
+                            'batch' => $allBatches[$class->client_batch_id]
+                        ];
+                    }
+                }
+            }
+        }
+        if(2 == $clientUser->user_type){
+            $exams = ClientExam::where('client_id', $clientId )->get();
+            if(is_object($exams) && false == $exams->isEmpty()){
+                foreach($exams as $exam){
+                    if(!isset($results[$exam->date])){
+                        $results[$exam->date] = [
+                            'start' => $exam->date,
+                            'color' => 'red',
+                        ];
+                    }
+                    $calendarData[$exam->date]['exams'][] = [
+                        'title' => $exam->name,
+                        'subject' => $exam->subject,
+                        'topic' => $exam->topic,
+                        'from' => $exam->from_time,
+                        'to' => $exam->to_time,
+                        'batch' => $allBatches[$exam->client_batch_id]
+                    ];
+                }
+            }
+        } else if(1 == $clientUser->user_type){
+            if(count($userBatches) > 0){
+                $exams = ClientExam::where('client_id', $clientId )->whereIn('client_batch_id', $userBatches )->get();
+                if(is_object($exams) && false == $exams->isEmpty()){
+                    foreach($exams as $exam){
+                        if(!isset($results[$exam->date])){
+                            $results[$exam->date] = [
+                                'start' => $exam->date,
+                                'color' => 'red',
+                            ];
+                        }
+                        $calendarData[$exam->date]['exams'][] = [
+                            'title' => $exam->name,
+                            'subject' => $exam->subject,
+                            'topic' => $exam->topic,
+                            'from' => $exam->from_time,
+                            'to' => $exam->to_time,
+                            'batch' => $allBatches[$exam->client_batch_id]
+                        ];
+                    }
+                }
+            }
+        }
+        if(2 == $clientUser->user_type){
+            $holidays = ClientHoliday::where('client_id', $clientId )->get();
+            if(is_object($holidays) && false == $holidays->isEmpty()){
+                foreach($holidays as $holiday){
+                    if(!isset($results[$holiday->date])){
+                        $results[$holiday->date] = [
+                            'start' => $holiday->date,
+                            'color' => 'green',
+                        ];
+                    }
+                    $calendarData[$holiday->date]['holiday'][] = [
+                        'title' => ($holiday->note)?:'Holiday',
+                        'batch' => $allBatches[$holiday->client_batch_id]
+                    ];
+                }
+            }
+        } else if(1 == $clientUser->user_type){
+            if(count($userBatches) > 0){
+                $holidays = ClientHoliday::where('client_id', $clientId )->whereIn('client_batch_id', $userBatches )->get();
+                if(is_object($holidays) && false == $holidays->isEmpty()){
+                    foreach($holidays as $holiday){
+                        if(!isset($results[$holiday->date])){
+                            $results[$holiday->date] = [
+                                'start' => $holiday->date,
+                                'color' => 'green',
+                            ];
+                        }
+                        $calendarData[$holiday->date]['holiday'][] = [
+                            'title' => ($holiday->note)?:'Holiday',
+                            'batch' => $allBatches[$holiday->client_batch_id]
+                        ];
+                    }
+                }
+            }
+        }
+        if(2 == $clientUser->user_type){
+            $notices = ClientNotice::where('client_id', $clientId)->where('is_emergency', 0)->get();
+            if(is_object($notices) && false == $notices->isEmpty()){
+                foreach($notices as $notice){
+                    if(!isset($results[$notice->date])){
+                        $results[$notice->date] = [
+                            'start' => $notice->date,
+                            'color' => 'blue',
+                        ];
+                    }
+                    $calendarData[$notice->date]['notices'][] = [
+                        'title' => $notice->notice,
+                        'batch' => $allBatches[$notice->client_batch_id]
+                    ];
+                }
+            }
+        } else if(1 == $clientUser->user_type){
+            if(count($userBatches) > 0){
+                $notices = ClientNotice::where('client_id', $clientId)->where('is_emergency', 0)->whereIn('client_batch_id', $userBatches )->get();
+                if(is_object($notices) && false == $notices->isEmpty()){
+                    foreach($notices as $notice){
+                        if(!isset($results[$notice->date])){
+                            $results[$notice->date] = [
+                                'start' => $notice->date,
+                                'color' => 'blue',
+                            ];
+                        }
+                        $calendarData[$notice->date]['notices'][] = [
+                            'title' => $notice->notice,
+                            'batch' => $allBatches[$notice->client_batch_id]
+                        ];
+                    }
+                }
+            }
+        }
+
+        if(count($results) > 0){
+            foreach($results as $result){
+                $finalResults[] = [
+                        'start' => $result['start'],
+                        'color' => $result['color'],
+                        'rendering' => 'background',
+                    ];
+                if(empty($dayColours)){
+                    $dayColours = $result['start'].':'.$result['color'];
+                } else {
+                    $dayColours .= ','.$result['start'].':'.$result['color'];
+                }
+            }
+        }
+        return view('clientuser.dashboard.myCalendar', compact('clientUser','dayColours','calendarData'));
     }
 }

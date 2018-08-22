@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <section class="content-header">
     <h1> Manage Question </h1>
@@ -162,8 +162,8 @@
 		        <tr>
 		          	<th>#</th>
 		          	<th style="max-width: 200px;">Question</th>
-		          	<th>Edit Question</th>
-		          	<th>Delete Question</th>
+		          	<th>Edit </th>
+		          	<th>Delete </th>
 		        </tr>
 	      	</thead>
 	      	<tbody>
@@ -174,15 +174,19 @@
 				          <th scope="row">{{$index + 1}}</th>
 				          <td style="max-width: 200px;">{!! $question->name !!}</td>
 				          <td>
-				            <a href="{{url('onlinetestquestion')}}/{{$question->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit Question" /></a>
+				          	@if(($question->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $question->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $question->client_id))
+				            	<a href="{{url('onlinetestquestion')}}/{{$question->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit Question" /></a>
+				            @endif
 				          </td>
 				          <td>
-				          	<a id="{{$question->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete Question" />
-				              <form id="deleteQuestion_{{$question->id}}" action="{{url('deleteOnlineTestQuestion')}}" method="POST" style="display: none;">
+				          	@if(($question->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $question->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $question->client_id))
+				          		<a id="{{$question->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete Question" />
+				              	<form id="deleteQuestion_{{$question->id}}" action="{{url('deleteOnlineTestQuestion')}}" method="POST" style="display: none;">
 				                  {{ csrf_field() }}
 				                  {{ method_field('DELETE') }}
 				                  <input type="hidden" name="question_id" value="{{$question->id}}">
-				              </form>
+				              	</form>
+				            @endif
 				          </td>
 				        </tr>
 				    @endif

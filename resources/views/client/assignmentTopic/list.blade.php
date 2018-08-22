@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <section class="content-header">
@@ -50,17 +50,19 @@
               @endif
             </td>
             <td>
-              <a href="{{url('assignmentTopic')}}/{{$topic->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$topic->name}}" />
-                </a>
+              @if(($topic->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $topic->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $topic->client_id))
+                <a href="{{url('assignmentTopic')}}/{{$topic->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$topic->name}}" /></a>
+              @endif
             </td>
             <td>
-            <a id="{{$topic->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$topic->name}}" />
-                </a>
+              @if(($topic->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $topic->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $topic->client_id))
+                <a id="{{$topic->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$topic->name}}" /></a>
                 <form id="deleteTopic_{{$topic->id}}" action="{{url('deleteAssignmentTopic')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="topic_id" value="{{$topic->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach

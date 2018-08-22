@@ -309,7 +309,7 @@
 			var id = $(ele).val();
 			if(!$('#positive_'+id).val() || !$('#negative_'+id).val()){
 				$(ele).prop('checked', false);
-				alert('Please Enter Positive Mark/Min and Negative Mark/Max');
+				alert('Please Enter Positive Mark and Negative Mark');
 			} else {
 				$('#positive_'+id).prop('required', true);
 				$('#negative_'+id).prop('required', true);

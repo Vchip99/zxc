@@ -16,7 +16,7 @@ class ClientUserAttendance extends Model
      *
      * @var array
      */
-    protected $fillable = ['attendance_date', 'client_batch_id', 'student_ids', 'client_id'];
+    protected $fillable = ['attendance_date', 'client_batch_id', 'student_ids', 'client_id','created_by'];
 
     /**
      *  add/update attendance
@@ -36,6 +36,9 @@ class ClientUserAttendance extends Model
         }
 
         $markAttendance = InputSanitise::inputInt($request->get('mark_attendance'));
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
 
         $attendance = static::where('attendance_date', $date)->where('client_batch_id', $batchId)->first();
         if(!is_object($attendance)){
@@ -43,7 +46,8 @@ class ClientUserAttendance extends Model
         }
         $attendance->attendance_date = $date;
         $attendance->client_batch_id = $batchId;
-        $attendance->client_id = Auth::guard('client')->user()->id;
+        $attendance->client_id = $clientId;
+        $attendance->created_by = $createdBy;
         if(1 == $markAttendance){
         	$attendance->student_ids = implode(',',$students);
         } else {
@@ -69,5 +73,15 @@ class ClientUserAttendance extends Model
 
     public function batch(){
         return $this->belongsTo(ClientBatch::class, 'client_batch_id');
+    }
+
+    protected static function assignClientUserAttendanceToClientByClientIdByTeacherId($clientId,$teacherId){
+        $attendances = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($attendances) && false == $attendances->isEmpty()){
+            foreach($attendances as $attendance){
+                $attendance->created_by = 0;
+                $attendance->save();
+            }
+        }
     }
 }

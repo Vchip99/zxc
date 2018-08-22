@@ -1,5 +1,4 @@
-@extends('client.dashboard')
-  &nbsp;
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
   @section('module_title')
   <section class="content-header">
     <h1> Manage Course </h1>
@@ -27,11 +26,11 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Course Name</th>
-          <th>Category Name</th>
-          <th>Sub Category Name</th>
-          <th>Edit Course</th>
-          <th>Delete Course</th>
+          <th>Course </th>
+          <th>Category </th>
+          <th>Sub Category </th>
+          <th>Edit </th>
+          <th>Delete </th>
         </tr>
       </thead>
       <tbody>
@@ -43,18 +42,19 @@
             <td>{{$course->category}}</td>
             <td>{{$course->subcategory}}</td>
             <td>
-              <a href="{{url('onlinecourse')}}/{{$course->id}}/edit"
-                    ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$course->name}}" />
-                </a>
+              @if(($course->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $course->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $course->client_id))
+                <a href="{{url('onlinecourse')}}/{{$course->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$course->name}}" /></a>
+              @endif
             </td>
             <td>
-            <a id="{{$course->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$course->name}}" />
-                </a>
+              @if(($course->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $course->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $course->client_id))
+                <a id="{{$course->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$course->name}}" /></a>
                 <form id="deleteCourse_{{$course->id}}" action="{{url('deleteOnlineCourse')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="course_id" value="{{$course->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach

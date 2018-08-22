@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth,Cache;
 use App\Libraries\InputSanitise;
+use App\Models\Clientuser;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubjectPaper;
@@ -18,7 +19,7 @@ class ClientOnlineTestQuestion extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', 'answer6', 'answer', 'category_id', 'subcat_id', 'section_type', 'question_type','solution', 'positive_marks', 'negative_marks', 'min', 'max', 'subject_id', 'paper_id', 'client_id', 'common_data'];
+    protected $fillable = ['name', 'answer1', 'answer2', 'answer3', 'answer4', 'answer5', 'answer6', 'answer', 'category_id', 'subcat_id', 'section_type', 'question_type','solution', 'positive_marks', 'negative_marks', 'min', 'max', 'subject_id', 'paper_id', 'client_id', 'common_data','created_by'];
 
     /**
      *  add/update question
@@ -29,6 +30,9 @@ class ClientOnlineTestQuestion extends Model
         $questionId = InputSanitise::inputInt($request->get('question_id'));
         $subjectId = InputSanitise::inputInt($request->get('subject'));
         $paperId = InputSanitise::inputInt($request->get('paper'));
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
         $ans1 = '';
         $ans2 = '';
         $ans3 = '';
@@ -103,8 +107,9 @@ class ClientOnlineTestQuestion extends Model
         $testQuestion->subject_id = $subjectId;
         $testQuestion->paper_id = $paperId;
         $testQuestion->question_type = $question_type;
-        $testQuestion->client_id = Auth::guard('client')->user()->id;
+        $testQuestion->client_id = $clientId;
         $testQuestion->common_data = $commonData;
+        $testQuestion->created_by = $createdBy;
         $testQuestion->save();
         return $testQuestion;
     }
@@ -159,7 +164,7 @@ class ClientOnlineTestQuestion extends Model
         if( $isUpdate && isset($questionId)){
             $testQuestion = static::find($questionId);
             if(!is_object($testQuestion)){
-                return Redirect::to('admin/managePayableQuestions');
+                return 'false';
             }
         } else{
             $testQuestion = new static;
@@ -193,18 +198,21 @@ class ClientOnlineTestQuestion extends Model
         $testQuestion->question_type = $question_type;
         $testQuestion->client_id = 0;
         $testQuestion->common_data = $commonData;
+        $testQuestion->created_by = 0;
         $testQuestion->save();
         return $testQuestion;
     }
 
     protected static function getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type){
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
     	return DB::connection('mysql2')->table('client_online_test_questions')
                     ->where('category_id', $categoryId)
                     ->where('subcat_id', $subcategoryId)
                     ->where('subject_id', $subjectId)
                     ->where('paper_id', $paperId)
                     ->where('section_type', $section_type)
-                    ->where('client_id', Auth::guard('client')->user()->id)
+                    ->where('client_id', $clientId)
                     ->get();
     }
 
@@ -247,13 +255,15 @@ class ClientOnlineTestQuestion extends Model
      */
 
     protected static function getClientQuestionNoByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type){
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         return DB::connection('mysql2')->table('client_online_test_questions')
             ->where('category_id', $categoryId)
             ->where('subcat_id', $subcategoryId)
             ->where('subject_id', $subjectId)
             ->where('paper_id', $paperId)
             ->where('section_type', $section_type)
-            ->where('client_id', Auth::guard('client')->user()->id)
+            ->where('client_id', $clientId)
             ->count();
     }
 
@@ -301,6 +311,8 @@ class ClientOnlineTestQuestion extends Model
     }
 
     protected static function getClientCurrentQuestionNoByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId){
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         return DB::connection('mysql2')->table('client_online_test_questions')
             ->where('category_id', $categoryId)
             ->where('subcat_id', $subcategoryId)
@@ -308,7 +320,7 @@ class ClientOnlineTestQuestion extends Model
             ->where('paper_id', $paperId)
             ->where('section_type', $section_type)
             ->where('id', '<=', $questionId)
-            ->where('client_id', Auth::guard('client')->user()->id)
+            ->where('client_id', $clientId)
             ->count();
     }
 
@@ -325,13 +337,15 @@ class ClientOnlineTestQuestion extends Model
     }
 
     protected static function getClientPrevQuestionByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId){
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $query = DB::connection('mysql2')->table('client_online_test_questions')
             ->where('category_id', $categoryId)
             ->where('subcat_id', $subcategoryId)
             ->where('subject_id', $subjectId)
             ->where('paper_id', $paperId)
             ->where('section_type', $section_type)
-            ->where('client_id', Auth::guard('client')->user()->id);
+            ->where('client_id', $clientId);
             if($questionId > 0){
                 $query->where('id', '<', $questionId);
             }
@@ -353,13 +367,15 @@ class ClientOnlineTestQuestion extends Model
     }
 
     protected static function getClientNextQuestionByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$section_type,$questionId){
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $query = DB::connection('mysql2')->table('client_online_test_questions')
             ->where('category_id', $categoryId)
             ->where('subcat_id', $subcategoryId)
             ->where('subject_id', $subjectId)
             ->where('paper_id', $paperId)
             ->where('section_type', $section_type)
-            ->where('client_id', Auth::guard('client')->user()->id);
+            ->where('client_id', $clientId);
             if($questionId > 0){
                 $query->where('id', '>', $questionId);
             }
@@ -404,5 +420,15 @@ class ClientOnlineTestQuestion extends Model
      */
     public function paper(){
         return $this->belongsTo(ClientOnlineTestSubjectPaper::class, 'paper_id');
+    }
+
+    protected static function assignClientTestQuestionsToClientByClientIdByTeacherId($clientId,$teacherId){
+        $questions = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($questions) && false == $questions->isEmpty()){
+            foreach($questions as $question){
+                $question->created_by = 0;
+                $question->save();
+            }
+        }
     }
 }

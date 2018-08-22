@@ -10,10 +10,15 @@
   <link rel="stylesheet" href="{{ asset('css/fullcalendar.min.css?ver=1.0')}}"/>
 @stop
 @section('header-js')
-  @include('layouts.home-js')
-  <script src="{{asset('js/moment-with-locales.min.js?ver=1.0')}}" type="text/javascript"></script>
-    <script src="{{asset('js/bootstrap-datetimepicker.min.js?ver=1.0')}}" type="text/javascript"></script>
-    <link href="{{asset('css/bootstrap-datetimepicker.min.css?ver=1.0')}}" rel="stylesheet"/>
+  	@include('layouts.home-js')
+  	<script src="{{asset('js/moment-with-locales.min.js?ver=1.0')}}" type="text/javascript"></script>
+	<script src="{{asset('js/bootstrap-datetimepicker.min.js?ver=1.0')}}" type="text/javascript"></script>
+	<link href="{{asset('css/bootstrap-datetimepicker.min.css?ver=1.0')}}" rel="stylesheet"/>
+	<style type="text/css">
+		.fc-toolbar .fc-center h2{
+	      font-size: 15px;
+	    }
+	</style>
 @stop
 @section('content')
 	@include('header.header_menu')
@@ -61,11 +66,11 @@
 			    			@if(count($advertisementPages) > 0)
 			    				@foreach($advertisementPages as $advertisementPage)
 			    					@if($advertisementPage['parent_page'] > 0)
-			    					<option value="{{$advertisementPage['id']}}" @if($advertisementPage['id'] == $selectedPage) selected="true" @endif >
+			    					<option value="{{$advertisementPage['id']}}">
 			    							{!! $advertisementPage['name'] !!}
 			    					</option>
 			    					@else
-			    					<option value="{{$advertisementPage['id']}}" @if($advertisementPage['id'] == $selectedPage) selected="true" @endif style="font-weight: bold;">
+			    					<option value="{{$advertisementPage['id']}}" style="font-weight: bold;">
 			    							{!! $advertisementPage['name'] !!}
 			    					</option>
 			    					@endif
@@ -146,14 +151,10 @@
 			      	</div>
 		    	</div>
 		    </form>
-		    <form action="{{url('createAd')}}" method="GET" id="selectedPageForm">
-		    	<input type="hidden" id="hidden_selected_page" name="page" value="{{ $selectedPage }}" />
-		    </form>
 	  	</div>
 	  	</div>
 	  	<div class="col-md-7">
-	  		<div id="mycalendar">
-	  			{!! $calendar->calendar() !!}
+	  		<div id="calendar">
     		</div>
 	  	</div>
     </div>
@@ -163,7 +164,6 @@
 @stop
 @section('footer')
 	@include('footer.footer')
-	{!! $calendar->script() !!}
   <script type="text/javascript" src="{{ asset('js/togleForFilterBy.js')}}"></script>
   <script type="text/javascript" src="{{ asset('js/read_info.js')}}"></script>
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
@@ -171,6 +171,22 @@
   <script src="{{ asset('js/moment.min.js')}}"></script>
   <script src="{{ asset('js/fullcalendar.min.js')}}"></script>
   <script type="text/javascript">
+  	$(document).ready(function(){
+  		var selectedPage =  parseInt(document.getElementById('selected_page').value);
+  		if(!selectedPage){
+  			selectedPage = 0;
+  		}
+  		var allEvents = renderCalender(selectedPage);
+  		$('#calendar').fullCalendar({
+		    header: {
+		      left: '',
+		      center: 'prev title next',
+		      right: ''
+		    },
+		    eventLimit: true,
+			events:allEvents
+	  	});
+	});
 
 	function checkStartDate(date){
   		var selectedPage =  document.getElementById('selected_page').value;
@@ -248,8 +264,30 @@
 
   	function showCalendar(ele){
 	    var selectedPage = parseInt($(ele).val());
-	    document.getElementById('hidden_selected_page').value = selectedPage;
-	    document.getElementById('selectedPageForm').submit();
+	    renderCalender(selectedPage);
+  	}
+  	function renderCalender(selectedPage){
+  		$.ajax({
+            method: "POST",
+          	url: "{{url('showAddCalendar')}}",
+          	data: {page:selectedPage}
+        }).done(function(response) {
+            //remove old data
+            $('#calendar').fullCalendar('removeEvents');
+
+            //Getting new event json data
+            $("#calendar").fullCalendar('addEventSource', response);
+
+            //Updating new events
+            // $('#calendar').fullCalendar('rerenderEvents');
+
+            // // //getting latest Events
+            // $('#fullCalendar').fullCalendar( 'refetchEvents' );
+
+            // //getting latest Resources
+            // $('#calendar').fullCalendar( 'refetchResources' );
+
+        });
   	}
   </script>
 @stop

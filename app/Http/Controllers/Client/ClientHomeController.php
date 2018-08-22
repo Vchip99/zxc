@@ -83,7 +83,7 @@ class ClientHomeController extends Controller
                 return view('client.front.home', compact('subdomain', 'defaultCourse', 'defaultTest', 'onlineCourses', 'onlineTestSubcategories', 'testimonials', 'clientTeam', 'clientCustomers', 'subdomainName'));
             } else {
                 if('local' == \Config::get('app.env')){
-                    return Redirect::away('https://localvchip.com');
+                    return Redirect::away('http://localvchip.com');
                 } else {
                     return Redirect::away('https://vchipedu.com/');
                 }

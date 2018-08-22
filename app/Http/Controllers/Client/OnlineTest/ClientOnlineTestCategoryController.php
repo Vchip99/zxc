@@ -21,7 +21,7 @@ class ClientOnlineTestCategoryController extends ClientBaseController
      */
     public function __construct(Request $request) {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
     /**
@@ -36,29 +36,55 @@ class ClientOnlineTestCategoryController extends ClientBaseController
      * show all category
      */
     protected function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $isPurchasedSubCategories = [];
     	$testCategories = ClientOnlineTestCategory::showCategories($request);
-        $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId(Auth::guard('client')->user()->id);
+        $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId($clientId);
         if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
             foreach($payableSubCategories as $payableSubCategory){
                 $isPurchasedSubCategories[] = $payableSubCategory->category_id;
             }
         }
-    	return view('client.onlineTest.category.list', compact('testCategories', 'isPurchasedSubCategories', 'subdomainName'));
+    	return view('client.onlineTest.category.list', compact('testCategories', 'isPurchasedSubCategories', 'subdomainName','loginUser'));
     }
 
     /**
      * show UI for create category
      */
-    protected function create($subdomainName){
+    protected function create($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
     	$testCategory = new ClientOnlineTestCategory;
-    	return view('client.onlineTest.category.create', compact('testCategory', 'subdomainName'));
+    	return view('client.onlineTest.category.create', compact('testCategory', 'subdomainName','loginUser'));
     }
 
     /**
      *  store category
      */
-    protected function store($subdomain,Request $request){
+    protected function store($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateCreateCategory);
         if ($v->fails())
         {
@@ -84,12 +110,24 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     /**
      * edit category
      */
-    protected function edit($subdomainName, $id){
+    protected function edit($subdomainName, $id,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
     	$catId = InputSanitise::inputInt(json_decode($id));
     	if(isset($catId)){
     		$testCategory = ClientOnlineTestCategory::find($catId);
     		if(is_object($testCategory)){
-                return view('client.onlineTest.category.create', compact('testCategory', 'subdomainName'));
+                return view('client.onlineTest.category.create', compact('testCategory', 'subdomainName','loginUser'));
     		}
     	}
 		return Redirect::to('manageOnlineTestCategory');
@@ -98,7 +136,7 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     /**
      * update category
      */
-    protected function update($subdomain,Request $request){
+    protected function update($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateCreateCategory);
         if ($v->fails())
         {
@@ -127,7 +165,7 @@ class ClientOnlineTestCategoryController extends ClientBaseController
     /**
      * delete category
      */
-    protected function delete($subdomain,Request $request){
+    protected function delete($subdomainName,Request $request){
     	$catId = InputSanitise::inputInt($request->get('category_id'));
     	if(isset($catId)){
     		$category = ClientOnlineTestCategory::find($catId);
@@ -135,6 +173,13 @@ class ClientOnlineTestCategoryController extends ClientBaseController
                 DB::connection('mysql2')->beginTransaction();
                 try
                 {
+                    $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                    if($category->created_by > 0 && $loginUser->id != $category->created_by){
+                        return Redirect::to('manageOnlineTestCategory');
+                    }
+                    if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                        return Redirect::to('manageOnlineTestCategory');
+                    }
                     if(true == is_object($category->subcategories) && false == $category->subcategories->isEmpty()){
                         foreach($category->subcategories as $testSubcategory){
                             if(true == is_object($testSubcategory->subjects) && false == $testSubcategory->subjects->isEmpty()){
@@ -168,8 +213,9 @@ class ClientOnlineTestCategoryController extends ClientBaseController
                             }
                         }
                     }
-                    $client = Auth::guard('client')->user();
-                    $purchasedSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdByCategoryId($client->id, $catId);
+                    $resultArr = InputSanitise::getClientIdAndCretedBy();
+                    $clientId = $resultArr[0];
+                    $purchasedSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdByCategoryId($clientId, $catId);
                     if(is_object($purchasedSubCategories) && false == $purchasedSubCategories->isEmpty()){
                         foreach($purchasedSubCategories as $purchasedSubCategory){
                             $purchasedSubCategory->end_date = date('Y-m-d');

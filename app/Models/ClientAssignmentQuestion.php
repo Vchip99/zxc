@@ -18,7 +18,7 @@ class ClientAssignmentQuestion extends Model
      *
      * @var array
      */
-    protected $fillable = ['question', 'client_assignment_subject_id', 'client_assignment_topic_id', 'attached_link','client_id', 'client_batch_id'];
+    protected $fillable = ['question', 'client_assignment_subject_id', 'client_assignment_topic_id', 'attached_link','client_id', 'client_batch_id','created_by'];
 
     /**
      *  add/update course category
@@ -28,8 +28,10 @@ class ClientAssignmentQuestion extends Model
         $subjectId   = InputSanitise::inputInt($request->get('subject'));
         $topicId   = InputSanitise::inputInt($request->get('topic'));
         $assignmentId   = InputSanitise::inputInt($request->get('assignment_id'));
-        $clientId = Auth::guard('client')->user()->id;
         $clientBatchId = InputSanitise::inputInt($request->get('batch'));
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
 
         if( $isUpdate && isset($assignmentId)){
             $assignment = static::find($assignmentId);
@@ -45,6 +47,7 @@ class ClientAssignmentQuestion extends Model
         $assignment->client_assignment_topic_id = $topicId;
         $assignment->client_id = $clientId;
         $assignment->client_batch_id = $clientBatchId;
+        $assignment->created_by = $createdBy;
 
         if( $request->exists('attached_link')){
 	        $attachmentFolderPath = "clientAssignmentStorage/".$clientId."/topicId-".$topicId;
@@ -77,9 +80,11 @@ class ClientAssignmentQuestion extends Model
 
     protected static function checkAssignmentExist(Request $request){
     	$result = [];
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
     	$query = static::where('client_assignment_subject_id', $request->subject_id)
     			->where('client_assignment_topic_id', $request->topic_id)
-    			->where('client_id', Auth::guard('client')->user()->id)
+    			->where('client_id', $clientId)
     			->first();
     	if(is_object($query)){
     		$result['status'] = 'true';
@@ -109,5 +114,15 @@ class ClientAssignmentQuestion extends Model
 
     protected static function getClientAssignmentQuestionsByBatchIdByClientId($batchId,$clientId){
         return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->get();
+    }
+
+    protected static function assignClientAssignmentQuestionsToClientByClientIdByTeacherId($clientId,$teacherId){
+        $questions = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($questions) && false == $questions->isEmpty()){
+            foreach($questions as $question){
+                $question->created_by = 0;
+                $question->save();
+            }
+        }
     }
 }

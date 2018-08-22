@@ -19,7 +19,7 @@
   <link href="{{ asset('css/jquery-confirm.min.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/nav_footer.css?ver=1.0')}}" rel="stylesheet"/>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+  <script src="{{ asset('js/socket.io.js') }}"></script>
   <script src="{{asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
   <script src="{{ asset('js/jquery.min.js?ver=1.0')}}"></script>
   <script src="{{ asset('js/bootstrap.min.js?ver=1.0')}}"></script>

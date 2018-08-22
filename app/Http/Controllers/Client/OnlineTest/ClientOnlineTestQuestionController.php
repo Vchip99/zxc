@@ -28,7 +28,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
      */
     public function __construct(Request $request) {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
 	/**
@@ -56,7 +56,20 @@ class ClientOnlineTestQuestionController extends ClientBaseController
      *  show questions associated with subject and paper
      */
     protected function index($subdomainName,Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $testCategories = ClientOnlineTestCategory::showCategories($request);
 
         if(Session::has('client_search_selected_category')){
@@ -82,13 +95,26 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             $sessions = [];
         }
 
-    	return view('client.onlineTest.question.list', compact('instituteCourses', 'testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName'));
+    	return view('client.onlineTest.question.list', compact('instituteCourses', 'testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName','loginUser'));
     }
 
     /**
      *  show all question associated with subject and paper
      */
     protected function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+
         $categoryId = InputSanitise::inputInt($request->get('category'));
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
     	$subjectId = InputSanitise::inputInt($request->get('subject'));
@@ -107,7 +133,8 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             Session::put('client_search_selected_paper', $paperId);
             Session::put('client_search_selected_section', $sectionType);
 
-            $clientId = Auth::guard('client')->user()->id;
+            $resultArr = InputSanitise::getClientIdAndCretedBy();
+            $clientId = $resultArr[0];
 
             $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId,$paperId,$sectionType);
             $testCategories = ClientOnlineTestCategory::showCategories($request);
@@ -115,7 +142,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             $testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId(Session::get('client_search_selected_category'), Session::get('client_search_selected_subcategory'), $request);
             $papers = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCategoryIdBySubCategoryIdBySubjectId(Session::get('client_search_selected_category'), Session::get('client_search_selected_subcategory'), Session::get('client_search_selected_subject'));
             $sessions = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId);
-    		return view('client.onlineTest.question.list', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName'));
+    		return view('client.onlineTest.question.list', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName','loginUser'));
     	} else {
     		return Redirect::to('manageOnlineTestQuestion');
     	}
@@ -129,7 +156,20 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             InputSanitise::checkClientImagesDirForCkeditor($subdomainName);
         }
 
-        $clientId = Auth::guard('client')->user()->id;
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $testCategories = ClientOnlineTestCategory::showCategories($request);
 
         if(Session::has('client_selected_category')){
@@ -159,7 +199,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         $nextQuestionId = 'new';
         $nextQuestionNo = $this->getNextQuestionNo(Session::get('client_selected_category'), Session::get('client_selected_subcategory'), Session::get('client_selected_subject'),Session::get('client_selected_paper'),Session::get('client_selected_section'));
         Session::put('client_next_question_no', $nextQuestionNo);
-		return view('client.onlineTest.question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'sessions', 'subdomainName'));
+		return view('client.onlineTest.question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'sessions', 'subdomainName','loginUser'));
     }
 
     /**
@@ -199,8 +239,9 @@ class ClientOnlineTestQuestionController extends ClientBaseController
 
                 $nextQuestionNo = $this->getNextQuestionNo($categoryId,$subcategoryId,$subjectId,$paperId,$section_type);
                 Session::put('client_next_question_no', $nextQuestionNo);
-
-                $questionCount = ClientOnlineTestQuestion::where('category_id', $categoryId)->where('subcat_id', $subcategoryId)->where('subject_id', $subjectId)->where('paper_id', $paperId)->where('client_id', Auth::guard('client')->user()->id)->count();
+                $resultArr = InputSanitise::getClientIdAndCretedBy();
+                $clientId = $resultArr[0];
+                $questionCount = ClientOnlineTestQuestion::where('category_id', $categoryId)->where('subcat_id', $subcategoryId)->where('subject_id', $subjectId)->where('paper_id', $paperId)->where('client_id', $clientId)->count();
                 if(1 == $questionCount){
                     $paper = ClientOnlineTestSubjectPaper::find($paperId);
                     if(is_object($paper)){
@@ -228,6 +269,18 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         if($subdomainName){
             InputSanitise::checkClientImagesDirForCkeditor($subdomainName);
         }
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$testQuestion = ClientOnlineTestQuestion::find($id);
@@ -250,7 +303,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                 $nextQuestionNo = $this->getNextQuestionNo($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type);
                 Session::put('client_next_question_no', $nextQuestionNo);
                 $sessions = ClientOnlinePaperSection::paperSectionsByPaperId($testQuestion->paper_id, $testQuestion->client_id);
-                return view('client.onlineTest.question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'currentQuestionNo', 'sessions', 'subdomainName'));
+                return view('client.onlineTest.question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'currentQuestionNo', 'sessions', 'subdomainName','loginUser'));
     		}
     	}
 		return Redirect::to('manageOnlineTestQuestion');
@@ -402,12 +455,24 @@ class ClientOnlineTestQuestionController extends ClientBaseController
      *  show questions associated with subject and paper
      */
     protected function uploadQuestions($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
         $testCategories = ClientOnlineTestCategory::showCategories($request);
         $testSubCategories = [];
         $testSubjects = [];
         $papers = [];
 
-        return view('client.onlineTest.question.uploadQuestions', compact('testCategories', 'testSubCategories', 'testSubjects', 'papers', 'subdomainName'));
+        return view('client.onlineTest.question.uploadQuestions', compact('testCategories', 'testSubCategories', 'testSubjects', 'papers', 'subdomainName','loginUser'));
     }
 
     protected function importQuestions($subdomain, Request $request){
@@ -416,7 +481,9 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             $questions = \Excel::selectSheetsByIndex(0)->load($path, function($reader) {
                             $reader->formatDates(false);
                         })->get();
-            $loginUser = Auth::guard('client')->user();
+            $resultArr = InputSanitise::getClientIdAndCretedBy();
+            $clientId = $resultArr[0];
+            $createdBy = $resultArr[1];
             if($questions->count()){
                 foreach ($questions as $key => $question) {
                     preg_match_all('/image\[(.*)\]/', $question->question, $questionMatches);
@@ -503,7 +570,8 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                         'subject_id' => $request->get('subject'),
                         'paper_id' => $request->get('paper'),
                         'section_type' => $request->get('section_type'),
-                        'client_id' => $loginUser->id
+                        'client_id' => $clientId,
+                        'created_by' => $createdBy,
                     ];
                 }
                 if(!empty($allQuestions)){
@@ -550,7 +618,20 @@ class ClientOnlineTestQuestionController extends ClientBaseController
      *  question bank
      */
     protected function manageQuestionBank($subdomainName,Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $testCategories = ClientOnlineTestCategory::showCategories($request);
 
         if(Session::has('client_search_selected_category')){
@@ -580,7 +661,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         } else {
             $bankSubCategories = [];
         }
-        return view('client.onlineTest.question.useQuestionBank', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName', 'bankCategories', 'bankSubCategories'));
+        return view('client.onlineTest.question.useQuestionBank', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName', 'bankCategories', 'bankSubCategories','loginUser'));
     }
 
     /**
@@ -603,7 +684,20 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         Session::put('client_search_question_bank_category', $bankCategoryId);
         Session::put('client_search_question_bank_subcategory', $bankSubCategoryId);
 
-        $clientId = Auth::guard('client')->user()->id;
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $testCategories = ClientOnlineTestCategory::showCategories($request);
         $testSubCategories = ClientOnlineTestSubCategory::getOnlineTestSubcategoriesByCategoryId($categoryId, $request);
         $testSubjects = ClientOnlineTestSubject::getOnlineSubjectsByCatIdBySubcatId($categoryId, $subcategoryId, $request);
@@ -612,7 +706,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         $questions = QuestionBankQuestion::getQuestionsByCategoryIdBySubcategoryId($bankCategoryId,$bankSubCategoryId);
         $bankCategories = QuestionBankCategory::all();
         $bankSubCategories = QuestionBankSubCategory::getSubcategoriesByCategoryId($bankCategoryId);
-        return view('client.onlineTest.question.useQuestionBank', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName', 'bankCategories', 'bankSubCategories'));
+        return view('client.onlineTest.question.useQuestionBank', compact('testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName', 'bankCategories', 'bankSubCategories','loginUser'));
 
     }
 
@@ -644,7 +738,9 @@ class ClientOnlineTestQuestionController extends ClientBaseController
             try
             {
                 $insertedQuestionCount = 0;
-                $loginUser = Auth::guard('client')->user();
+                $resultArr = InputSanitise::getClientIdAndCretedBy();
+                $clientId = $resultArr[0];
+                $createdBy = $resultArr[1];
                 foreach($selectedQuestions as $selectedQuestionId){
                     $question = QuestionBankQuestion::find($selectedQuestionId);
                     if(is_object($question)){
@@ -673,8 +769,9 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                         $testQuestion->subject_id = $subjectId;
                         $testQuestion->paper_id = $paperId;
                         $testQuestion->question_type = $question->question_type;
-                        $testQuestion->client_id = $loginUser->id;
+                        $testQuestion->client_id = $clientId;
                         $testQuestion->common_data = '';
+                        $testQuestion->created_by = $createdBy;
                         $testQuestion->save();
                         $insertedQuestionCount++;
                     }

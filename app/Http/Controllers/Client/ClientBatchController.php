@@ -19,7 +19,6 @@ use App\Models\ClientAssignmentAnswer;
 use App\Models\ClientMessage;
 use App\Models\ClientOfflinePayment;
 use App\Models\ClientUploadTransaction;
-use MaddHatter\LaravelFullcalendar\Facades\Calendar;
 use DateTime;
 
 class ClientBatchController extends ClientBaseController
@@ -32,7 +31,7 @@ class ClientBatchController extends ClientBaseController
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
     /**
@@ -43,17 +42,43 @@ class ClientBatchController extends ClientBaseController
         'name' => 'required',
     ];
 
-    protected function show($subdomainName){
-        $batches = ClientBatch::where('client_id', Auth::guard('client')->user()->id)->paginate();
-        return view('client.batch.list', compact('batches','subdomainName'));
+    protected function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $batches = ClientBatch::where('client_id', $clientId)->paginate();
+        return view('client.batch.list', compact('batches','subdomainName','loginUser'));
     }
 
     /**
      *  create batch
      */
-    protected function create($subdomainName){
+    protected function create($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
         $batch = new ClientBatch;
-        return view('client.batch.create', compact('batch', 'subdomainName'));
+        return view('client.batch.create', compact('batch', 'subdomainName','loginUser'));
     }
 
     /**
@@ -85,12 +110,24 @@ class ClientBatchController extends ClientBaseController
     /**
      *  edit batch
      */
-    protected function edit($subdomainName, $id){
+    protected function edit($subdomainName,Request $request,$id){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $batch = ClientBatch::find($id);
             if(is_object($batch)){
-                return view('client.batch.create', compact('batch', 'subdomainName'));
+                return view('client.batch.create', compact('batch', 'subdomainName','loginUser'));
             }
         }
         return Redirect::to('manageBatch');
@@ -133,6 +170,13 @@ class ClientBatchController extends ClientBaseController
             DB::connection('mysql2')->beginTransaction();
             try
             {
+                $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                if($batch->created_by > 0 && $loginUser->id != $batch->created_by){
+                    return Redirect::to('manageBatch');
+                }
+                if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                    return Redirect::to('manageBatch');
+                }
                 ClientUserAttendance::deleteAttendanceByBtachIdByClientId($batch->id,$batch->client_id);
                 ClientOfflinePaper::deleteOfflinePaperseByBtachIdByClientId($batch->id,$batch->client_id);
                 ClientOfflinePaperMark::deleteClientOfflinePaperMarkByBatchIdByClientId($batch->id,$batch->client_id);
@@ -157,6 +201,25 @@ class ClientBatchController extends ClientBaseController
                 ClientMessage::deleteMessagesByBatchIdsByClientId($batch->id,$batch->client_id);
                 ClientOfflinePayment::deleteClientOfflinePaymentByBatchIdsByClientId($batch->id,$batch->client_id);
                 ClientUploadTransaction::deleteClientUploadTransactionByBatchIdsByClientId($batch->id,$batch->client_id);
+                // remove batch from users
+                $allUsers = Clientuser::getAllStudentsByClientId($batch->client_id);
+                if(is_object($allUsers) && false == $allUsers->isEmpty()){
+                    foreach($allUsers as $user){
+                        if($user->batch_ids){
+                            $userBatchIds = explode(',', $user->batch_ids);
+                            if(in_array($batch->id, $userBatchIds)){
+                                $userBatchIds = array_diff($userBatchIds, [$batch->id]);
+                                if(count($userBatchIds) > 0){
+                                    sort($userBatchIds);
+                                    $user->batch_ids = implode(',', $userBatchIds);
+                                } else {
+                                    $user->batch_ids = '';
+                                }
+                                $user->save();
+                            }
+                        }
+                    }
+                }
                 $batch->delete();
                 DB::connection('mysql2')->commit();
                 return Redirect::to('manageBatch')->with('message', 'Batch deleted successfully!');
@@ -170,11 +233,24 @@ class ClientBatchController extends ClientBaseController
         return Redirect::to('manageBatch');
     }
 
-    protected function showBatchStudents($subdomainName){
-        $loginUser = Auth::guard('client')->user();
-        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
-        $students = Clientuser::getAllStudentsByClientId($loginUser->id);
-        return view('client.batch.batch_student', compact('batches', 'students', 'subdomainName'));
+    protected function showBatchStudents($subdomainName, Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        $students = Clientuser::getAllStudentsByClientId($clientId);
+        return view('client.batch.batch_student', compact('batches', 'students', 'subdomainName','loginUser'));
     }
 
     protected function associateBatchStudents($subdomainName, Request $request){
@@ -228,6 +304,7 @@ class ClientBatchController extends ClientBaseController
                                 if(in_array($clientBatch->id, $userBatchIds)){
                                     $userBatchIds = array_diff($userBatchIds, [$clientBatch->id]);
                                     if(count($userBatchIds) > 0){
+                                        sort($userBatchIds);
                                         $oldBatchUser->batch_ids = implode(',', $userBatchIds);
                                     } else {
                                         $oldBatchUser->batch_ids = '';
@@ -260,11 +337,23 @@ class ClientBatchController extends ClientBaseController
     }
 
     protected function showAttendance($subdomainName, Request $request){
-        // dd($request->all());
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $attendanceDate = $request->get('attendance_date');
         $attendanceBatch = json_decode($request->get('batch_id'));
-        $loginUser = Auth::guard('client')->user();
-        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
+        $batches = ClientBatch::getBatchesByClientId($clientId);
         $batchUsers = [];
         $batchAttendance = [];
         $studentIds = '';
@@ -282,7 +371,7 @@ class ClientBatchController extends ClientBaseController
                 $batchAttendance = explode(',', $batchAttendanceObj->student_ids);
             }
         }
-        return view('client.attendance.attendance', compact('batches', 'subdomainName', 'attendanceDate', 'attendanceBatch', 'batchUsers', 'batchAttendance','studentIds'));
+        return view('client.attendance.attendance', compact('batches', 'subdomainName', 'attendanceDate', 'attendanceBatch', 'batchUsers', 'batchAttendance','studentIds','loginUser'));
     }
 
     protected function getBatchStudentAttendancebyBatchId(Request $request){
@@ -322,8 +411,21 @@ class ClientBatchController extends ClientBaseController
     }
 
     protected function showAttendanceCalendar($subdomainName, Request $request){
-        $loginUser = Auth::guard('client')->user();
-        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $batches = ClientBatch::getBatchesByClientId($clientId);
         $selectedYear = json_decode($request->get('year'));
         $selectedBatch = json_decode($request->get('batch'));
         $batchesCount = [];
@@ -337,10 +439,10 @@ class ClientBatchController extends ClientBaseController
             }
         }
         if(!empty($selectedYear) && !empty($selectedBatch)){
-            $result = $this->getAttendanceByBatchByYearByClient($selectedBatch,$selectedYear,$loginUser->id,$batchesCount);
+            $result = $this->getAttendanceByBatchByYearByClient($selectedBatch,$selectedYear,$clientId,$batchesCount);
         } else {
             $selectedBatch = $firstBatch;
-            $result = $this->getAttendanceByBatchByYearByClient($selectedBatch,date('Y'),$loginUser->id,$batchesCount);
+            $result = $this->getAttendanceByBatchByYearByClient($selectedBatch,date('Y'),$clientId,$batchesCount);
 
         }
         $attendanceStats = implode(',', $result['attendanceStats']);
@@ -351,15 +453,7 @@ class ClientBatchController extends ClientBaseController
         }
         $currnetYear = date('Y');
         $allAttendanceDates = implode(',', $result['allAttendanceDates']);
-        $calendar = \Calendar::addEvents([])->setOptions([ //set fullcalendar options
-            'header' => [
-                'left' => '',
-                'center' => 'prev title next',
-                'right' => '',
-            ],
-            'defaultDate' => $defaultDate,
-        ]);
-        return view('client.attendance.calendar', compact('batches', 'subdomainName', 'currnetYear','calendar','selectedYear','selectedBatch', 'allAttendanceDates','calendarYear', 'attendanceStats'));
+        return view('client.attendance.calendar', compact('batches', 'subdomainName', 'currnetYear','selectedYear','selectedBatch', 'allAttendanceDates','attendanceStats','loginUser','defaultDate'));
     }
 
     protected function getAttendanceByBatchByYearByClient($batch,$year,$clientId,$batchesCount){

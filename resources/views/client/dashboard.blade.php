@@ -6,7 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   <title>Dashboard</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+  <script src="{{ asset('js/socket.io.js') }}"></script>
   <link href="{{ asset('css/bootstrap.min.css?ver=1.0')}}" rel="stylesheet">
   <link href="{{ asset('css/font-awesome/css/font-awesome.min.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/sidemenu/sidemenu_layout.css?ver=1.0')}}" rel="stylesheet"/>
@@ -276,6 +276,33 @@
             <li title="Show User Courses"><a href="{{ url('userCourses')}}"><i class="fa fa-circle-o"></i> User Courses </a></li>
             <li title="Show User Placement"><a href="{{ url('userPlacement')}}"><i class="fa fa-circle-o"></i> User Placement </a></li>
             <li title="Show User Video"><a href="{{ url('userVideo')}}"><i class="fa fa-circle-o"></i> User Video </a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="Teachers Info">
+            <i class="fa fa-graduation-cap"></i> <span>Teachers Info</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Add Teachers "><a href="{{ url('addTeachers')}}"><i class="fa fa-circle-o"></i> Add Teachers </a></li>
+            <li title="All Teachers "><a href="{{ url('allTeachers')}}"><i class="fa fa-circle-o"></i> All Teachers </a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="Calendar Management">
+            <i class="fa fa-calendar"></i> <span>Calendar Management</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Manage Classes"><a href="{{ url('manageClasses')}}"><i class="fa fa-circle-o"></i> Manage Classes </a></li>
+            <li title="Manage Exams"><a href="{{ url('manageExams')}}"><i class="fa fa-circle-o"></i> Manage Exams </a></li>
+            <li title="Manage Holidays"><a href="{{ url('manageHolidays')}}"><i class="fa fa-circle-o"></i> Manage Holidays </a></li>
+            <li title="Manage Notices"><a href="{{ url('manageNotices')}}"><i class="fa fa-circle-o"></i> Manage Notices </a></li>
+            <li title="Batch Schedules"><a href="{{ url('manageSchedules')}}"><i class="fa fa-circle-o"></i> Batch Schedules </a></li>
           </ul>
         </li>
         <li class="treeview">

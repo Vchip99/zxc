@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <section class="content-header">
@@ -52,17 +52,19 @@
             <td>{{$assignment->subject->name}}</td>
             <td>{{$assignment->topic->name}}</td>
             <td>
-              <a href="{{url('assignment')}}/{{$assignment->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$assignment->name}}" />
-                </a>
+              @if(($assignment->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $assignment->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $assignment->client_id))
+                <a href="{{url('assignment')}}/{{$assignment->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$assignment->name}}" /></a>
+              @endif
             </td>
             <td>
-            <a id="{{$assignment->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$assignment->name}}" />
-                </a>
+              @if(($assignment->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $assignment->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $assignment->client_id))
+                <a id="{{$assignment->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$assignment->name}}" /></a>
                 <form id="delete_{{$assignment->id}}" action="{{url('deleteAssignment')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="assignment_id" value="{{$assignment->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach

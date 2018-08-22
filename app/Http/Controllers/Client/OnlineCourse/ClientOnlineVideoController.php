@@ -20,7 +20,7 @@ class ClientOnlineVideoController extends ClientBaseController
      */
     public function __construct(Request $request) {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
     /**
@@ -50,26 +50,51 @@ class ClientOnlineVideoController extends ClientBaseController
      *  show list of course video
      */
     protected function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
     	$videos = ClientOnlineVideo::showVideos($request);
-    	return view('client.onlineCourse.video.list', compact('videos', 'subdomainName'));
+    	return view('client.onlineCourse.video.list', compact('videos', 'subdomainName','loginUser'));
     }
 
     /**
      *  show create course video UI
      */
     protected function create($subdomainName,Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $categories   = ClientOnlineCategory::where('client_id', $clientId)->get();
         $subCategories = new ClientOnlineSubCategory;
         $courses = new ClientOnlineCourse;
     	$video = new ClientOnlineVideo;
-    	return view('client.onlineCourse.video.create', compact('categories','subCategories','courses', 'video', 'subdomainName'));
+    	return view('client.onlineCourse.video.create', compact('categories','subCategories','courses', 'video', 'subdomainName','loginUser'));
     }
 
     /**
      *  store course video
      */
-    protected function store($subdomain,Request $request){
+    protected function store($subdomainName,Request $request){
     	$v = Validator::make($request->all(), $this->validateVideo);
         if ($v->fails())
         {
@@ -78,7 +103,7 @@ class ClientOnlineVideoController extends ClientBaseController
         DB::connection('mysql2')->beginTransaction();
         try
         {
-        	$video = ClientOnlineVideo::addOrUpdateVideo($request);
+        	$video = ClientOnlineVideo::addOrUpdateVideo($subdomainName,$request);
             if(is_object($video)){
                 $notificationMessage = 'A new course video: <a href="'.$request->root().'/episode/'.$video->id.'" target="_blank">'.$video->name.'</a> has been added.';
                 ClientNotification::addNotification($notificationMessage, ClientNotification::CLIENTCOURSEVIDEO, $video->id);
@@ -98,6 +123,18 @@ class ClientOnlineVideoController extends ClientBaseController
      *  edit course video
      */
     protected function edit( $subdomainName , $id, Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$video = ClientOnlineVideo::find($id);
@@ -106,7 +143,7 @@ class ClientOnlineVideoController extends ClientBaseController
                 $categories = ClientOnlineCategory::where('client_id', $video->client_id)->get();
                 $subCategories = ClientOnlineSubCategory::getOnlineSubCategoriesByCategoryId($video->category_id, $request);
                 $courses = ClientOnlineCourse::getOnlineCourseByCatIdBySubCatIdForClient($video->category_id,$video->sub_category_id);
-    			return view('client.onlineCourse.video.create', compact('categories','subCategories','courses', 'video', 'subdomainName'));
+    			return view('client.onlineCourse.video.create', compact('categories','subCategories','courses', 'video', 'subdomainName','loginUser'));
     		}
     	}
     	return Redirect::to('manageOnlineVideo');
@@ -115,7 +152,7 @@ class ClientOnlineVideoController extends ClientBaseController
     /**
      *  update course video
      */
-    protected function update($subdomain,Request $request){
+    protected function update($subdomainName,Request $request){
     	$v = Validator::make($request->all(), $this->updateValidateVideo);
         if ($v->fails())
         {
@@ -124,7 +161,7 @@ class ClientOnlineVideoController extends ClientBaseController
         DB::connection('mysql2')->beginTransaction();
         try
         {
-        	$video = ClientOnlineVideo::addOrUpdateVideo($request, true);
+        	$video = ClientOnlineVideo::addOrUpdateVideo($subdomainName,$request, true);
             if(is_object($video)){
                 DB::connection('mysql2')->commit();
             	return Redirect::to('manageOnlineVideo')->with('message', 'Video updated successfully!');
@@ -141,7 +178,7 @@ class ClientOnlineVideoController extends ClientBaseController
     /**
      *  delete course video
      */
-    protected function delete($subdomain,Request $request){
+    protected function delete($subdomainName,Request $request){
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
     	if(isset($videoId)){
     		$video = ClientOnlineVideo::find($videoId);
@@ -149,10 +186,15 @@ class ClientOnlineVideoController extends ClientBaseController
                 DB::connection('mysql2')->beginTransaction();
                 try
                 {
+                    $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                    if($video->created_by > 0 && $loginUser->id != $video->created_by){
+                        return Redirect::to('manageOnlineVideo');
+                    }
+                    if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                        return Redirect::to('manageOnlineVideo');
+                    }
+                    $clientName = $subdomainName;
                     $video->deleteCommantsAndSubComments();
-                    $loginUser = Auth::guard('client')->user();
-                    $subdomainArr = explode('.', $loginUser->subdomain);
-                    $clientName = $subdomainArr[0];
                     if(true == preg_match('/clientCourseVideos/',$video->video_path)){
                         $courseVideoFolder = "clientCourseVideos/".$clientName."/".$video->course_id."/".$video->id;
                         if(is_dir($courseVideoFolder)){

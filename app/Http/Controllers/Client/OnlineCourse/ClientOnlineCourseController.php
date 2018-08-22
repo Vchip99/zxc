@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Client\OnlineCourse;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Client\ClientBaseController;
-use Redirect;
-use Validator, Session, Auth, DB;
+use Redirect,Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Models\ClientOnlineCourse;
 use App\Models\ClientOnlineCategory;
@@ -18,7 +17,7 @@ class ClientOnlineCourseController extends ClientBaseController
      */
 	public function __construct(Request $request) {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
     /**
@@ -56,26 +55,50 @@ class ClientOnlineCourseController extends ClientBaseController
      *  show list of courses
      */
     protected function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
     	$courses = ClientOnlineCourse::showCourses($request);
-    	return view('client.onlineCourse.course.list', compact('courses', 'subdomainName'));
+    	return view('client.onlineCourse.course.list', compact('courses', 'subdomainName','loginUser'));
     }
 
     /**
      *  show create course UI
      */
     protected function create($subdomainName,Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $categories   = ClientOnlineCategory::where('client_id', $clientId)->get();
 		$subCategories = new ClientOnlineSubCategory;
 		$course= new ClientOnlineCourse;
-
-		return view('client.onlineCourse.course.create', compact('categories','subCategories','course', 'subdomainName'));
+		return view('client.onlineCourse.course.create', compact('categories','subCategories','course', 'subdomainName','loginUser'));
     }
 
     /**
      *  store course
      */
-    protected function store($subdomain, Request $request){
+    protected function store($subdomainName, Request $request){
         $v = Validator::make($request->all(), $this->validateCourse);
         if ($v->fails())
         {
@@ -84,7 +107,7 @@ class ClientOnlineCourseController extends ClientBaseController
         DB::connection('mysql2')->beginTransaction();
         try
         {
-            $course = ClientOnlineCourse::addOrUpdateCourse($request);
+            $course = ClientOnlineCourse::addOrUpdateCourse($subdomainName,$request);
             if(is_object($course)){
                 DB::connection('mysql2')->commit();
             	return Redirect::to('manageOnlineCourse')->with('message', 'Course created successfully!');
@@ -102,13 +125,25 @@ class ClientOnlineCourseController extends ClientBaseController
      *  edit course
      */
     protected function edit($subdomainName, $id, Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
     	$id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$course = ClientOnlineCourse::find($id);
     		if(is_object($course)){
     			$categories   = ClientOnlineCategory::showCategories($request);
 				$subCategories = ClientOnlineSubCategory::getOnlineSubCategoriesByCategoryId($course->category_id, $request);
-				return view('client.onlineCourse.course.create', compact('instituteCourses','categories','subCategories','course', 'subdomainName'));
+				return view('client.onlineCourse.course.create', compact('instituteCourses','categories','subCategories','course', 'subdomainName','loginUser'));
     		}
     	}
     }
@@ -116,7 +151,7 @@ class ClientOnlineCourseController extends ClientBaseController
     /**
      *  update course
      */
-    protected function update($subdomain,Request $request){
+    protected function update($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateUpdateCourse);
         if ($v->fails())
         {
@@ -125,7 +160,7 @@ class ClientOnlineCourseController extends ClientBaseController
         DB::connection('mysql2')->beginTransaction();
         try
         {
-            $course = ClientOnlineCourse::addOrUpdateCourse($request, true);
+            $course = ClientOnlineCourse::addOrUpdateCourse($subdomainName,$request, true);
             if(is_object($course)){
                 DB::connection('mysql2')->commit();
             	return Redirect::to('manageOnlineCourse')->with('message', 'Course updated successfully!');
@@ -142,7 +177,7 @@ class ClientOnlineCourseController extends ClientBaseController
     /**
      *  delete course
      */
-    protected function delete($subdomain,Request $request){
+    protected function delete($subdomainName,Request $request){
     	$courseId = InputSanitise::inputInt($request->get('course_id'));
     	if(isset($courseId)){
     		$course = ClientOnlineCourse::find($courseId);
@@ -150,9 +185,14 @@ class ClientOnlineCourseController extends ClientBaseController
                 DB::connection('mysql2')->beginTransaction();
                 try
                 {
-                    $loginUser = Auth::guard('client')->user();
-                    $subdomainArr = explode('.', $loginUser->subdomain);
-                    $clientName = $subdomainArr[0];
+                    $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                    if($course->created_by > 0 && $loginUser->id != $course->created_by){
+                        return Redirect::to('manageOnlineCourse');
+                    }
+                    if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                        return Redirect::to('manageOnlineCourse');
+                    }
+                    $clientName = $subdomainName;
                     if(true == is_object($course->videos) && false == $course->videos->isEmpty()){
                         foreach($course->videos as $video){
                             $video->deleteCommantsAndSubComments();

@@ -17,9 +17,9 @@ class RedirectIfNotClientuser
 	 */
 	public function handle($request, Closure $next, $guard = 'clientuser')
 	{
-	    if (!Auth::guard($guard)->check()) {
-	        return redirect('clientuser/login');
-	    }
+	    // if (!Auth::guard($guard)->check()) {
+	    //     return redirect('clientuser/login');
+	    // }
 
 	    return $next($request);
 	}

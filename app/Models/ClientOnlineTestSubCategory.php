@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth,File;
 use App\Libraries\InputSanitise;
+use App\Models\Clientuser;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubject;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -19,17 +20,19 @@ class ClientOnlineTestSubCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id','client_id', 'image_path', 'price', 'monthly_price'];
+    protected $fillable = ['name', 'category_id','client_id', 'image_path', 'price', 'monthly_price','created_by'];
 
     /**
      *  add/update sub category
      */
-    protected static function addOrUpdateSubCategory( Request $request, $isUpdate=false){
+    protected static function addOrUpdateSubCategory($subdomainName,Request $request, $isUpdate=false){
         $subcatId = InputSanitise::inputInt($request->get('subcat_id'));
         $catId = InputSanitise::inputInt($request->get('category'));
         $name = InputSanitise::inputString($request->get('name'));
         $price = InputSanitise::inputString($request->get('price'));
-        $loginUser = Auth::guard('client')->user();
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
         if( $isUpdate && isset($subcatId)){
             $testSubcategory = static::find($subcatId);
             if(!is_object($testSubcategory)){
@@ -40,12 +43,12 @@ class ClientOnlineTestSubCategory extends Model
         }
         $testSubcategory->name = $name;
         $testSubcategory->category_id = $catId;
-        $testSubcategory->client_id = $loginUser->id;
+        $testSubcategory->client_id = $clientId;
         $testSubcategory->price = $price;
         $testSubcategory->monthly_price = '';
+        $testSubcategory->created_by = $createdBy;
 
-        $subdomainArr = explode('.', $loginUser->subdomain);
-        $clientName = $subdomainArr[0];
+        $clientName = $subdomainName;
 
         if($request->exists('image_path')){
             $subCategoryImage = $request->file('image_path')->getClientOriginalName();
@@ -137,13 +140,8 @@ class ClientOnlineTestSubCategory extends Model
     }
 
     protected static function getOnlineTestSubcategoriesByCategoryId($id, Request $request){
-        $loginClient = Auth::guard('client')->user();
-        $loginUser = Auth::guard('clientuser')->user();
-        if(is_object($loginClient)){
-            $clientId = $loginClient->id;
-        } else if(is_object($loginUser)){
-            $clientId = $loginUser->client_id;
-        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         if($clientId > 0 && $id > 0){
             return DB::connection('mysql2')->table('client_online_test_sub_categories')
                     ->where('category_id', $id)
@@ -372,7 +370,8 @@ class ClientOnlineTestSubCategory extends Model
     }
 
     protected static function isClientTestSubCategoryExist(Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $categoryId = InputSanitise::inputInt($request->get('category'));
         $subCategoryId = InputSanitise::inputInt($request->get('subcategory_id'));
         $subCategoryName = InputSanitise::inputString($request->get('subcategory'));
@@ -400,6 +399,16 @@ class ClientOnlineTestSubCategory extends Model
             return 'true';
         } else {
             return 'false';
+        }
+    }
+
+    protected static function assignClientTestSubCategoriesToClientByClientIdByTeacherId($clientId,$teacherId){
+        $subcategories = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($subcategories) && false == $subcategories->isEmpty()){
+            foreach($subcategories as $subcategory){
+                $subcategory->created_by = 0;
+                $subcategory->save();
+            }
         }
     }
 }

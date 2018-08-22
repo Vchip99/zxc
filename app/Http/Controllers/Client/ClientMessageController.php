@@ -21,7 +21,7 @@ class ClientMessageController extends ClientBaseController
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
     /**
@@ -33,25 +33,52 @@ class ClientMessageController extends ClientBaseController
         'batch' => 'required',
     ];
 
-    protected function show($subdomainName){
-        $messages = ClientMessage::where('client_id', Auth::guard('client')->user()->id)->orderBy('id', 'desc')->paginate();
-        return view('client.message.list', compact('messages','subdomainName'));
+    protected function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $messages = ClientMessage::where('client_id', $clientId)->orderBy('id', 'desc')->paginate();
+        return view('client.message.list', compact('messages','subdomainName','loginUser'));
     }
 
     /**
      *  create message
      */
-    protected function create($subdomainName){
-        $loginUser = Auth::guard('client')->user();
+    protected function create($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $message = new ClientMessage;
-        $batches = ClientBatch::getBatchesByClientId($loginUser->id);
-        return view('client.message.create', compact('message','batches', 'subdomainName'));
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        return view('client.message.create', compact('message','batches', 'subdomainName','loginUser'));
     }
 
     /**
      *  store message
      */
-    protected function store(Request $request){
+    protected function store($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateMessage);
         if ($v->fails())
         {
@@ -60,7 +87,7 @@ class ClientMessageController extends ClientBaseController
         DB::connection('mysql2')->beginTransaction();
         try
         {
-            $message = ClientMessage::addOrUpdateClientMessage($request);
+            $message = ClientMessage::addOrUpdateClientMessage($subdomainName,$request);
             if(is_object($message)){
                 if($message->client_batch_id > 0){
                     $studentIds = [];
@@ -91,13 +118,27 @@ class ClientMessageController extends ClientBaseController
     /**
      *  edit message
      */
-    protected function edit($subdomainName, $id){
+    protected function edit($subdomainName,Request $request, $id){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $message = ClientMessage::find($id);
             if(is_object($message)){
                 $batches = ClientBatch::getBatchesByClientId($message->client_id);
-                return view('client.message.create', compact('message','batches', 'subdomainName'));
+                return view('client.message.create', compact('message','batches', 'subdomainName','loginUser'));
             }
         }
         return Redirect::to('manageMessage');
@@ -106,13 +147,13 @@ class ClientMessageController extends ClientBaseController
     /**
      *  update message
      */
-    protected function update(Request $request){
+    protected function update($subdomainName,Request $request){
         $messageId = InputSanitise::inputInt($request->get('message_id'));
         if(isset($messageId)){
             DB::connection('mysql2')->beginTransaction();
             try
             {
-                $message = ClientMessage::addOrUpdateClientMessage($request, true);
+                $message = ClientMessage::addOrUpdateClientMessage($subdomainName,$request, true);
                 if(is_object($message)){
                     DB::connection('mysql2')->commit();
                     return Redirect::to('manageMessage')->with('message', 'Message updated successfully!');
@@ -134,6 +175,13 @@ class ClientMessageController extends ClientBaseController
             DB::connection('mysql2')->beginTransaction();
             try
             {
+                $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                if($message->created_by > 0 && $loginUser->id != $message->created_by){
+                    return Redirect::to('manageMessage');
+                }
+                if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                    return Redirect::to('manageMessage');
+                }
                 $dir = dirname($message->photo);
                 InputSanitise::delFolder($dir);
                 $message->delete();

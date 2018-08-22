@@ -15,7 +15,7 @@ class ClientBatch extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'client_id', 'student_ids'];
+    protected $fillable = ['name', 'client_id', 'student_ids','created_by'];
 
     /**
      *  add/update batch
@@ -23,7 +23,9 @@ class ClientBatch extends Model
     protected static function addOrUpdateClientBatch( Request $request, $isUpdate=false){
         $batchName = InputSanitise::inputString($request->get('name'));
         $batchId   = InputSanitise::inputInt($request->get('batch_id'));
-
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
         if( $isUpdate && isset($batchId)){
             $batch = static::find($batchId);
             if(!is_object($batch)){
@@ -33,8 +35,9 @@ class ClientBatch extends Model
             $batch = new static;
         }
         $batch->name = $batchName;
-        $batch->client_id = Auth::guard('client')->user()->id;
+        $batch->client_id = $clientId;
         $batch->student_ids = ' ';
+        $batch->created_by = $createdBy;
         $batch->save();
         return $batch;
     }
@@ -50,9 +53,13 @@ class ClientBatch extends Model
         } else {
             $students = '';
         }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
     	$batch = static::find($batchId);
     	if(is_object($batch)){
     		$batch->student_ids = $students;
+            $batch->created_by = $createdBy;
     		$batch->save();
     	}
     	return $batch;
@@ -60,6 +67,16 @@ class ClientBatch extends Model
 
     protected static function getBatchById($id){
     	return static::find($id);
+    }
+
+    protected static function assignClientBatchesToClientByClientIdByTeacherId($clientId,$teacherId){
+        $batches = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($batches) && false == $batches->isEmpty()){
+            foreach($batches as $batch){
+                $batch->created_by = 0;
+                $batch->save();
+            }
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <link href="{{ asset('css/dashboard.css?ver=1.0')}}" rel="stylesheet"/>
   <section class="content-header">
@@ -8,18 +8,18 @@
       <li class="active"> User Video Url </li>
     </ol>
   </section>
-  @if(Session::has('message'))
-    <div class="alert alert-success" id="message">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        {{ Session::get('message') }}
-    </div>
-  @endif
 @stop
 @section('dashboard_content')
   <div class="content-wrapper v-container tab-content" >
     <div id="student-rcd" class="">
       <div class="top mrgn_40_btm">
         <div class="container">
+          @if(Session::has('message'))
+            <div class="alert alert-success" id="message">
+              <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                {{ Session::get('message') }}
+            </div>
+          @endif
           <div class="row">
             <div class="col-md-3 mrgn_10_btm" id="student">
               <select class="form-control" id="selected_student" name="student" onChange="showResult();">

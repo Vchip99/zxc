@@ -16,7 +16,7 @@ class ClientOfflinePaper extends Model
      *
      * @var array
      */
-    protected $fillable = ['client_batch_id','name','marks','client_id' ];
+    protected $fillable = ['client_batch_id','name','marks','client_id','created_by' ];
 
     /**
      *  add/update offline paper
@@ -27,6 +27,9 @@ class ClientOfflinePaper extends Model
         $paperId   = InputSanitise::inputInt($request->get('paper_id'));
         $clientBatchId = InputSanitise::inputInt($request->get('batch'));
         $marks  = InputSanitise::inputString($request->get('marks'));
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
         if( $isUpdate && isset($paperId)){
             $paper = static::find($paperId);
             if(!is_object($paper)){
@@ -36,19 +39,21 @@ class ClientOfflinePaper extends Model
             $paper = new static;
         }
         $paper->name = $paperName;
-        $paper->client_id = Auth::guard('client')->user()->id;
+        $paper->client_id = $clientId;
         $paper->client_batch_id = $clientBatchId;
         $paper->marks = $marks;
+        $paper->created_by = $createdBy;
         $paper->save();
         return $paper;
     }
 
     protected static function getOfflinePapersByBatchId($clientBatchId){
-        $loginClient = Auth::guard('client')->user();
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         if($clientBatchId > 0){
-            return static::where('client_id', $loginClient->id)->where('client_batch_id', $clientBatchId)->get();
+            return static::where('client_id', $clientId)->where('client_batch_id', $clientBatchId)->get();
         } else {
-            return static::where('client_id', $loginClient->id)->where('client_batch_id','<=',$clientBatchId)->get();
+            return static::where('client_id', $clientId)->where('client_batch_id','<=',$clientBatchId)->get();
         }
     }
 
@@ -58,5 +63,15 @@ class ClientOfflinePaper extends Model
 
     protected static function deleteOfflinePaperseByBtachIdByClientId($batchId,$clientId){
         return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->delete();
+    }
+
+    protected static function assignClientOfflinePapersToClientByClientIdByTeacherId($clientId,$teacherId){
+        $papers = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($papers) && false == $papers->isEmpty()){
+            foreach($papers as $paper){
+                $paper->created_by = 0;
+                $paper->save();
+            }
+        }
     }
 }

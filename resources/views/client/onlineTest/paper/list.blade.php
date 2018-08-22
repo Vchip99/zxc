@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <section class="content-header">
     <h1> Manage Paper </h1>
@@ -28,12 +28,12 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Paper Name</th>
-          <th>Category Name</th>
-          <th>Sub Category Name</th>
-          <th>Subject Name</th>
-          <th>Edit Paper</th>
-          <th>Delete Paper</th>
+          <th>Paper </th>
+          <th>Category </th>
+          <th>Sub Category </th>
+          <th>Subject </th>
+          <th>Edit </th>
+          <th>Delete </th>
         </tr>
       </thead>
       <tbody>
@@ -46,17 +46,19 @@
             <td>{{$testPaper->subcategory->name}}</td>
             <td>{{$testPaper->subject->name}}</td>
             <td>
-              <a href="{{url('onlinetestsubjectpaper')}}/{{$testPaper->id}}/edit"
-                    ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testPaper->name}}" />
-                </a>
+              @if(($testPaper->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $testPaper->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $testPaper->client_id))
+                <a href="{{url('onlinetestsubjectpaper')}}/{{$testPaper->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testPaper->name}}" /></a>
+              @endif
             </td>
             <td>
+              @if(($testPaper->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $testPaper->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $testPaper->client_id))
                 <a id="{{$testPaper->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testPaper->name}}" />
                 <form id="deletePaper_{{$testPaper->id}}" action="{{url('deleteOnlineTestSubjectPaper')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="paper_id" value="{{$testPaper->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach

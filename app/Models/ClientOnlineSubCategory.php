@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
+use App\Models\Clientuser;
 use App\Models\ClientOnlineCategory;
 use App\Models\ClientOnlineCourse;
 
@@ -17,7 +18,7 @@ class ClientOnlineSubCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'client_id'];
+    protected $fillable = ['name', 'category_id', 'client_id','created_by'];
 
     /**
      *  create/update course sub category
@@ -27,6 +28,9 @@ class ClientOnlineSubCategory extends Model
     	$categoryId = InputSanitise::inputInt($request->get('category'));
     	$subCategoryId = InputSanitise::inputInt($request->get('subCategory_id'));
     	$subCategoryName = InputSanitise::inputString($request->get('subcategory'));
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
 
         if( $isUpdate && isset($subCategoryId)){
             $subcategory = static::find($subCategoryId);
@@ -38,7 +42,8 @@ class ClientOnlineSubCategory extends Model
         }
         $subcategory->name = $subCategoryName;
 		$subcategory->category_id = $categoryId;
-		$subcategory->client_id = Auth::guard('client')->user()->id;
+		$subcategory->client_id = $clientId;
+        $subcategory->created_by = $createdBy;
 		$subcategory->save();
 
         return $subcategory;
@@ -115,7 +120,8 @@ class ClientOnlineSubCategory extends Model
     }
 
     protected static function isClientCourseSubCategoryExist(Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $categoryId = InputSanitise::inputInt($request->get('category'));
         $subCategoryId = InputSanitise::inputInt($request->get('subcategory_id'));
         $subCategoryName = InputSanitise::inputString($request->get('subcategory'));
@@ -128,6 +134,16 @@ class ClientOnlineSubCategory extends Model
             return 'true';
         } else {
             return 'false';
+        }
+    }
+
+    protected static function assignClientOnlineSubCategoriesToClientByClientIdByTeacherId($clientId,$teacherId){
+        $subcategories = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($subcategories) && false == $subcategories->isEmpty()){
+            foreach($subcategories as $subcategory){
+                $subcategory->created_by = 0;
+                $subcategory->save();
+            }
         }
     }
 }

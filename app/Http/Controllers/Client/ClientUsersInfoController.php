@@ -62,7 +62,7 @@ class ClientUsersInfoController extends BaseController
         $purchasedPayableSubCategories = [];
         $clientPurchasedSubCategories = [];
         $clientId = Auth::guard('client')->user()->id;
-        $clientusers = Clientuser::where('client_id', $clientId)->get();
+        $clientusers = Clientuser::getAllStudentsByClientId($clientId);
         $courses = ClientOnlineCourse::getCourseAssocaitedWithVideos();
         $userPurchasedCourses = ClientUserPurchasedCourse::getClientUserCourses($clientId);
         $userPurchasedTestSubCategories = ClientUserPurchasedTestSubCategory::getClientUserTestSubCategories($clientId);
@@ -119,7 +119,21 @@ class ClientUsersInfoController extends BaseController
         return $approveStatus;
     }
 
-    protected function userTestResults($subdomainName,$id=NULL){
+    protected function userTestResults($subdomainName,Request $request,$id=NULL){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $results = [];
         $students = [];
         $collegeDepts = [];
@@ -137,11 +151,11 @@ class ClientUsersInfoController extends BaseController
             $results = ClientScore::where('client_user_id', $id)->get();
             Session::set('client_selected_user', $id);
         } else {
-            $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
+            $students = Clientuser::getAllStudentsByClientId($clientId);
         }
 
         $barchartLimits = range(100, 0, 10);
-        return view('client.allUsers.userTestResults', compact('students', 'results', 'selectedStudent','barchartLimits', 'subdomainName'));
+        return view('client.allUsers.userTestResults', compact('students', 'results', 'selectedStudent','barchartLimits', 'subdomainName','loginUser'));
     }
 
     protected function showUserTestResults(Request $request){
@@ -164,7 +178,22 @@ class ClientUsersInfoController extends BaseController
         return $result;
     }
 
-    protected function userCourses($subdomainName,$id=NULL){
+    protected function userCourses($subdomainName,Request $request,$id=NULL){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+
         $students = [];
         $courses = [];
         $selectedStudent = '';
@@ -181,9 +210,9 @@ class ClientUsersInfoController extends BaseController
             $courses = ClientOnlineCourse::getRegisteredOnlineCoursesByUserId($id);
             Session::set('client_selected_user', $id);
         } else {
-            $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
+            $students = Clientuser::getAllStudentsByClientId($clientId);
         }
-        return view('client.allUsers.userCourses', compact('students', 'courses', 'selectedStudent', 'subdomainName'));
+        return view('client.allUsers.userCourses', compact('students', 'courses', 'selectedStudent', 'subdomainName','loginUser'));
     }
 
     protected function showUserCourses(Request $request){
@@ -192,7 +221,21 @@ class ClientUsersInfoController extends BaseController
         return ClientOnlineCourse::getRegisteredOnlineCoursesByUserId($studentId);
     }
 
-    protected function userPlacement($subdomainName,$id=NULL){
+    protected function userPlacement($subdomainName,Request $request,$id=NULL){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $students = [];
         $collegeDepts = [];
         $selectedStudent = '';
@@ -207,9 +250,9 @@ class ClientUsersInfoController extends BaseController
             $students = Clientuser::getAllStudentsByClientId($selectedStudent->client_id);
             Session::set('client_selected_user', $id);
         } else {
-            $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
+            $students = Clientuser::getAllStudentsByClientId($clientId);
         }
-        return view('client.allUsers.userPlacement', compact('students', 'selectedStudent', 'subdomainName'));
+        return view('client.allUsers.userPlacement', compact('students', 'selectedStudent', 'subdomainName','loginUser'));
     }
 
     protected function getStudentById(Request $request){
@@ -218,7 +261,21 @@ class ClientUsersInfoController extends BaseController
         return Clientuser::getStudentById($studentId);
     }
 
-    protected function userVideo($subdomainName,$id=NULL){
+    protected function userVideo($subdomainName,Request $request,$id=NULL){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $students = [];
         $collegeDepts = [];
         $selectedStudent = '';
@@ -233,9 +290,9 @@ class ClientUsersInfoController extends BaseController
             $students = Clientuser::getAllStudentsByClientId($selectedStudent->client_id);
             Session::set('client_selected_user', $id);
         } else {
-            $students = Clientuser::getAllStudentsByClientId(Auth::guard('client')->user()->id);
+            $students = Clientuser::getAllStudentsByClientId($clientId);
         }
-        return view('client.allUsers.userVideo', compact('students', 'selectedStudent', 'subdomainName'));
+        return view('client.allUsers.userVideo', compact('students', 'selectedStudent', 'subdomainName','loginUser'));
     }
 
     protected function updateUserVideo(Request $request){
@@ -274,9 +331,23 @@ class ClientUsersInfoController extends BaseController
     }
 
     protected function allTestResults($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $scores =[];
-        $categories = ClientOnlineTestCategory::where('client_id', Auth::guard('client')->user()->id)->get();
-        return view('client.allUsers.allTestResults', compact('scores', 'categories', 'subdomainName'));
+        $categories = ClientOnlineTestCategory::where('client_id', $clientId)->get();
+        return view('client.allUsers.allTestResults', compact('scores', 'categories', 'subdomainName','loginUser'));
     }
 
     protected function getAllTestResults(Request $request){
@@ -452,7 +523,7 @@ class ClientUsersInfoController extends BaseController
             try
             {
                 $clientId = Auth::guard('client')->user()->id;
-                Clientuser::addMobileUser($request,$clientId);
+                Clientuser::addMobileUser($request,$clientId,Clientuser::Student);
                 DB::connection('mysql2')->commit();
                 if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
                     Cache::forget($userMobile);
@@ -475,7 +546,7 @@ class ClientUsersInfoController extends BaseController
         try
         {
             $clientId = Auth::guard('client')->user()->id;
-            $result = Clientuser::addEmailUser($request,$clientId);
+            $result = Clientuser::addEmailUser($request,$clientId,Clientuser::Student);
             if('true' == $result['status']){
                 DB::connection('mysql2')->commit();
                 if(isset($result['duplicate_email']) && count($result['duplicate_email']) > 0){
@@ -539,6 +610,7 @@ class ClientUsersInfoController extends BaseController
                                 } else {
                                     $user->email_token = '';
                                 }
+                                $user->user_type = Clientuser::Student;
                                 $user->save();
                                 if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
                                     $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));

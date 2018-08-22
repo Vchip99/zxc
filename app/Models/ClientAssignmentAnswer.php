@@ -19,7 +19,7 @@ class ClientAssignmentAnswer extends Model
      *
      * @var array
      */
-    protected $fillable = ['answer','client_assignment_question_id', 'student_id', 'client_id', 'attached_link','is_student_created'];
+    protected $fillable = ['answer','client_assignment_question_id', 'student_id', 'client_id', 'attached_link','is_student_created','created_by'];
 
     /**
      *  add assignment answer
@@ -29,16 +29,24 @@ class ClientAssignmentAnswer extends Model
         $questionId   = InputSanitise::inputInt($request->get('assignment_question_id'));
         $studentId   = InputSanitise::inputInt($request->get('student_id'));
         $clientId   = InputSanitise::inputInt($request->get('client_id'));
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $createdBy = $resultArr[1];
 
         $assignmentAnswer = new static;
         $assignmentAnswer->answer = $answer?:'';
         $assignmentAnswer->client_assignment_question_id = $questionId;
         $assignmentAnswer->student_id = $studentId;
         $assignmentAnswer->client_id = $clientId;
+        $assignmentAnswer->created_by = $createdBy;
         if(is_object(Auth::guard('client')->user())){
             $assignmentAnswer->is_student_created = 0;
         } else {
-            $assignmentAnswer->is_student_created = 1;
+            $user = Auth::guard('clientuser')->user();
+            if(is_object($user) && 2 == $user->user_type){
+                $assignmentAnswer->is_student_created = 0;
+            } else {
+                $assignmentAnswer->is_student_created = 1;
+            }
         }
 
         if($request->exists('attached_link')){
@@ -62,8 +70,12 @@ class ClientAssignmentAnswer extends Model
         return $this->belongsTo(Clientuser::class, 'student_id');
     }
 
-    public function teacher(){
+    public function client(){
         return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function teacher(){
+        return $this->belongsTo(Clientuser::class, 'created_by','id');
     }
 
     protected static function deleteClientAssignmentAnswerByClientId($clientId){
@@ -94,5 +106,15 @@ class ClientAssignmentAnswer extends Model
 
     protected static function getClientAssignmentAnswersByAssignmentIdByClientId($assignmentId,$clientId){
         return static::where('client_assignment_question_id', $assignmentId)->where('client_id', $clientId)->get();
+    }
+
+    protected static function assignClientAssignmentAnswersToClientByClientIdByTeacherId($clientId,$teacherId){
+        $answers = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($answers) && false == $answers->isEmpty()){
+            foreach($answers as $answer){
+                $answer->created_by = 0;
+                $answer->save();
+            }
+        }
     }
 }

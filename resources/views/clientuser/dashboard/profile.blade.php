@@ -1,7 +1,7 @@
-@extends('clientuser.dashboard.dashboard')
+@extends((2==$loginUser->user_type)?'clientuser.dashboard.teacher_dashboard':'clientuser.dashboard.dashboard')
 @section('module_title')
   <section class="content-header">
-    <h1> Profile </h1>
+    <h1> Profile</h1>
   </section>
   <style type="text/css">
     @media screen and (max-width: 320px) {
@@ -89,7 +89,7 @@
                     </div>
                   </div>
                   <div  align="center" style="background-image: url('{{ url('images/user/profile-bg.jpg')}}');"">
-                    @if(!empty($loginUser->photo))
+                    @if(!empty($loginUser->photo) && is_file($loginUser->photo))
                       <img alt="User Pic" style="max-height: 200px !important;" src="{{$loginUser->photo}}" id="profile-image1" class="user-prof img-responsive">
                     @else
                       <img alt="User Pic"  src="{{ url('images/user/user1.png')}}" id="profile-image1" class="user-prof img-responsive">

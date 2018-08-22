@@ -42,9 +42,9 @@ trait AuthenticatesUsers
             $serverOtp = Cache::get($userMobile);
             if($loginOtp == $serverOtp){
                 $client = Client::where('subdomain', $request->getHost())->first();
-                $cluentUser = Clientuser::where('number_verified', 1)->where('phone','=', $userMobile)->whereNotNull('phone')->where('client_id', $client->id)->first();
+                $cluentUser = Clientuser::where('number_verified', 1)->where('phone','=', $userMobile)->whereNotNull('phone')->where('client_id', $client->id)->where('client_approve', 1)->first();
                 if(!is_object($cluentUser)){
-                    return Redirect::to('/')->withErrors('User does not exists.');
+                    return Redirect::to('/')->withErrors('User does not exists or not client approve.');
                 }
                 Auth::guard('clientuser')->login($cluentUser);
                 if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
@@ -98,7 +98,15 @@ trait AuthenticatesUsers
             } else {
                 if($this->guard('clientuser')->attempt($credentials, $request->has('remember'))) {
                     $clientUser = Auth::guard('clientuser')->user();
-                    if(0 == $clientUser->verified || 0 == $clientUser->client_approve){
+                    if(0 == $clientUser->client_approve){
+                        $this->guard('clientuser')->logout();
+                        Session::flush();
+                        Session::regenerate();
+                        if (! $lockedOut) {
+                            $this->incrementLoginAttempts($request);
+                        }
+                        return $this->sendFailedLoginResponse($request, 'true');
+                    } elseif(0 == $clientUser->verified){
                         if(0 == $clientUser->verified){
                             if(1 == $clientUser->client->allow_non_verified_email){
                                 return $this->sendLoginResponse($request);
@@ -246,37 +254,36 @@ trait AuthenticatesUsers
     protected function sendFailedLoginResponse(Request $request, $notVirified = false)
     {
         if( 'true' == $notVirified ){
-
             $errorMessage = Lang::get('auth.failed');
             if(empty($request->route()->getParameter('client'))){
-                $userNotVerify = User::where('email', $request->email)->where('verified', 0)->first();
-                if(is_object($userNotVerify)){
-                    $errorMessage = 'Please verify your account and then login';
-                    return redirect()->back()->withErrors([$errorMessage, 'verify_email']);
+                $adminNotapprove = User::where('email', $request->email)->where('admin_approve', 0)->first();
+                if(is_object($adminNotapprove)){
+                    $errorMessage = 'Your account is not approve. you can contact at info@vchiptech.com to approve your account.';
                 } else {
-                    $adminNotapprove = User::where('email', $request->email)->where('verified', 1)->where('admin_approve', 0)->first();
-                    if(is_object($adminNotapprove)){
-                        $errorMessage = 'Your account is not approve. you can contact at info@vchiptech.com to approve your account.';
+                    $userNotVerify = User::where('email', $request->email)->where('verified', 0)->where('admin_approve', 1)->first();
+                    if(is_object($userNotVerify)){
+                        $errorMessage = 'Please verify your account and then login';
+                        return redirect()->back()->withErrors([$errorMessage, 'verify_email']);
                     }
-                    return redirect()->back()->withErrors([$errorMessage]);
                 }
+                return redirect()->back()->withErrors([$errorMessage]);
             } else {
                 $client = Client::where('subdomain', $request->getHost())->first();
-                $userNotVerify = Clientuser::where('email', $request->email)->where('client_id', $client->id)->where('verified', 0)->first();
-                if(is_object($userNotVerify)){
-                    $errorMessage = 'Please verify your account and then login';
-                    return redirect()->back()->withErrors([$errorMessage, 'verify_email']);
-                } else {
-                    $adminNotapprove = Clientuser::where('email', $request->email)->where('client_id', $client->id)->where('verified', 1)->where('client_approve', 0)->first();
-                    if(is_object($adminNotapprove)){
-                        if(is_object($client)){
-                            $errorMessage = 'Your account is not approve. you can contact at '.$client->email.' to approve your account.';
-                        }
+                $adminNotapprove = Clientuser::where('email', $request->email)->where('client_id', $client->id)->where('client_approve', 0)->first();
+                if(is_object($adminNotapprove)){
+                    if(is_object($client)){
+                        $errorMessage = 'Your account is not approve. you can contact at '.$client->email.' to approve your account.';
+                        return redirect()->back()->withErrors([$errorMessage]);
                     }
-                    return redirect()->back()->withErrors([$errorMessage]);
+                } else {
+                    $userNotVerify = Clientuser::where('email', $request->email)->where('client_id', $client->id)->where('verified', 0)->where('client_approve', 1)->first();
+                    if(is_object($userNotVerify)){
+                        $errorMessage = 'Please verify your account and then login';
+                        return redirect()->back()->withErrors([$errorMessage, 'verify_email']);
+                    }
                 }
+                return redirect()->back()->withErrors([$errorMessage]);
             }
-
         } else {
             return redirect()->back()
                 ->withInput($request->only($this->username(), 'remember'))

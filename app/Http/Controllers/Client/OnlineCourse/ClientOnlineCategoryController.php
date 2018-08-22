@@ -17,7 +17,7 @@ class ClientOnlineCategoryController extends ClientBaseController
      */
 	public function __construct(Request $request) {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
 	/**
@@ -32,22 +32,46 @@ class ClientOnlineCategoryController extends ClientBaseController
      *  show list of course category
      */
     protected function show($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
     	$categories = ClientOnlineCategory::showCategories($request);
-    	return view('client.onlineCourse.category.list', compact('categories', 'subdomainName'));
+    	return view('client.onlineCourse.category.list', compact('categories', 'subdomainName','loginUser'));
     }
 
     /**
      *  show create course category UI
      */
-    protected function create($subdomainName){
+    protected function create($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
 		$category = new ClientOnlineCategory;
-		return view('client.onlineCourse.category.create', compact('category', 'subdomainName'));
+		return view('client.onlineCourse.category.create', compact('category', 'subdomainName','loginUser'));
     }
 
     /**
      *  store course category
      */
-    protected function store($subdomain,Request $request){
+    protected function store($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateCategory);
         if ($v->fails())
         {
@@ -73,12 +97,24 @@ class ClientOnlineCategoryController extends ClientBaseController
     /**
      *  edit course category
      */
-    protected function edit($subdomainName, $id){
+    protected function edit($subdomainName, $id,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
         $id = InputSanitise::inputInt(json_decode($id));
     	if(isset($id)){
     		$category = ClientOnlineCategory::find($id);
     		if(is_object($category)){
-    			return view('client.onlineCourse.category.create', compact('category', 'subdomainName'));
+    			return view('client.onlineCourse.category.create', compact('category', 'subdomainName','loginUser'));
     		}
     	}
     	return Redirect::to('manageOnlineCategory');
@@ -87,7 +123,7 @@ class ClientOnlineCategoryController extends ClientBaseController
     /**
      *  update course category
      */
-    protected function update($subdomain,Request $request){
+    protected function update($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateCategory);
         if ($v->fails())
         {
@@ -116,17 +152,22 @@ class ClientOnlineCategoryController extends ClientBaseController
     /**
      *  delete course category
      */
-    protected function delete($subdomain,Request $request){
+    protected function delete($subdomainName,Request $request){
     	$categoryId = InputSanitise::inputInt($request->get('category_id'));
     	if(isset($categoryId)){
     		$courseCategory = ClientOnlineCategory::find($categoryId);
     		if(is_object($courseCategory)){
+                $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                if($courseCategory->created_by > 0 && $loginUser->id != $courseCategory->created_by){
+                    return Redirect::to('manageOnlineCategory');
+                }
+                if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                    return Redirect::to('manageOnlineCategory');
+                }
                 DB::connection('mysql2')->beginTransaction();
                 try
                 {
-                    $loginUser = Auth::guard('client')->user();
-                    $subdomainArr = explode('.', $loginUser->subdomain);
-                    $clientName = $subdomainArr[0];
+                    $clientName = $subdomainName;
                     if(is_object($courseCategory->subcategories) && false == $courseCategory->subcategories->isEmpty()){
                         foreach($courseCategory->subcategories as $courseSubcategory){
                             if(true == is_object($courseSubcategory->courses) && false == $courseSubcategory->courses->isEmpty()){

@@ -1,4 +1,4 @@
-@extends('client.dashboard')
+@extends((!empty($loginUser->subdomain))?'client.dashboard':'clientuser.dashboard.teacher_dashboard')
 @section('module_title')
   <section class="content-header">
     <h1> Manage Sub Category </h1>
@@ -27,10 +27,10 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Sub Category Name</th>
-          <th>Category Name</th>
-          <th>Edit Sub Category</th>
-          <th>Delete Sub Category</th>
+          <th>Sub Category</th>
+          <th>Category </th>
+          <th>Edit </th>
+          <th>Delete </th>
         </tr>
       </thead>
       <tbody>
@@ -41,17 +41,19 @@
             <td>{{$testSubCategory->name}}</td>
             <td>{{$testSubCategory->category->name}}</td>
             <td>
-              <a href="{{url('onlinetestsubcategory')}}/{{$testSubCategory->id}}/edit"
-                    ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testSubCategory->name}}" />
-                </a>
+              @if(($testSubCategory->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $testSubCategory->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $testSubCategory->client_id))
+                <a href="{{url('onlinetestsubcategory')}}/{{$testSubCategory->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testSubCategory->name}}" /></a>
+              @endif
             </td>
             <td>
+              @if(($testSubCategory->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $testSubCategory->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $testSubCategory->client_id))
                 <a id="{{$testSubCategory->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testSubCategory->name}}" />
                 <form id="deleteSubCategory_{{$testSubCategory->id}}" action="{{url('deleteOnlineTestSubCategory')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="subcat_id" value="{{$testSubCategory->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach

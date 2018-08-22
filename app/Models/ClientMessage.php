@@ -17,16 +17,18 @@ class ClientMessage extends Model
      *
      * @var array
      */
-    protected $fillable = ['client_batch_id','photo','message','client_id'];
+    protected $fillable = ['client_batch_id','photo','message','client_id','created_by'];
 
     /**
      *  add/update client message
      */
-    protected static function addOrUpdateClientMessage( Request $request, $isUpdate=false){
-        $messageString = InputSanitise::inputString($request->get('message'));
+    protected static function addOrUpdateClientMessage($subdomainName, Request $request, $isUpdate=false){
+        $messageString = $request->get('message');
         $batchId   = InputSanitise::inputInt($request->get('batch'));
         $messageId   = InputSanitise::inputInt($request->get('message_id'));
-        $loginUser = Auth::guard('client')->user();
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
 
         if( $isUpdate && isset($messageId)){
             $message = static::find($messageId);
@@ -37,12 +39,12 @@ class ClientMessage extends Model
             $message = new static;
         }
         $message->message = $messageString;
-        $message->client_id = $loginUser->id;
+        $message->client_id = $clientId;
         $message->client_batch_id = $batchId;
+        $message->created_by = $createdBy;
         $message->save();
 
-     	$subdomainArr = explode('.', $loginUser->subdomain);
-        $clientName = $subdomainArr[0];
+        $clientName = $subdomainName;
 
         if($request->exists('photo') && !empty($request->file('photo'))){
             $messageImage = $request->file('photo')->getClientOriginalName();
@@ -86,6 +88,16 @@ class ClientMessage extends Model
                 $dir = dirname($result->photo);
                 InputSanitise::delFolder($dir);
                 $result->delete();
+            }
+        }
+    }
+
+    protected static function assignClientMessagesToClientByClientIdByTeacherId($clientId,$teacherId){
+        $messages = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($messages) && false == $messages->isEmpty()){
+            foreach($messages as $message){
+                $message->created_by = 0;
+                $message->save();
             }
         }
     }

@@ -41,7 +41,7 @@ class Clientuser extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id', 'unchecked_assignments','batch_ids','number_verified'
+        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id', 'unchecked_assignments','batch_ids','number_verified','user_type','assigned_modules'
     ];
 
     /**
@@ -52,6 +52,18 @@ class Clientuser extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    const Student = 1;
+    const Teacher = 2;
+    const Parents = 3;
+
+    const CourseModule = 1;
+    const TestModule = 2;
+    const UserInfoModule = 3;
+    const AllTestResultModule = 4;
+    const BatchModule = 5;
+    const AssignmentModule = 6;
+    const EventModule = 7;
 
     /**
      * Send the password reset notification.
@@ -93,8 +105,9 @@ class Clientuser extends Authenticatable
     protected static function searchUsers($request){
         $results = [];
         $courseId = InputSanitise::inputInt($request->get('course_id'));
-        $clientId = Auth::guard('client')->user()->id;
-        $result = static::where('client_id', $clientId);
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $result = static::where('client_id', $clientId)->where('user_type', self::Student);
 
         if(!empty($request->get('student'))){
             $result->where('name', 'LIKE', '%'.$request->get('student').'%');
@@ -126,7 +139,7 @@ class Clientuser extends Authenticatable
         $clientId = InputSanitise::inputInt($request->client_id);
         $userId = InputSanitise::inputInt($request->client_user_id);
 
-        $student = static::where('id',$userId)->where('client_id',$clientId)->first();
+        $student = static::where('id',$userId)->where('client_id',$clientId)->where('user_type', self::Student)->first();
         if(is_object($student)){
             $student->deleteOtherInfoByUserId($userId,$clientId);
             $student->deleteUserStorageFolder();
@@ -164,7 +177,7 @@ class Clientuser extends Authenticatable
         $clientId = InputSanitise::inputInt($request->client_id);
         $userId = InputSanitise::inputInt($request->client_user_id);
 
-        $student = static::where('id',$userId)->where('client_id',$clientId)->first();
+        $student = static::where('id',$userId)->where('client_id',$clientId)->where('user_type', self::Student)->first();
         if(is_object($student)){
             if( 1 == $student->client_approve){
                 $student->client_approve = 0;
@@ -178,8 +191,7 @@ class Clientuser extends Authenticatable
     }
 
     protected static function getAllStudentsByClientId($clientId){
-        return static::where('client_id', $clientId)
-                ->select('clientusers.*')->get();
+        return static::where('client_id', $clientId)->select('clientusers.*')->where('user_type', self::Student)->get();
     }
 
     protected static function updateUser(Request $request){
@@ -226,12 +238,13 @@ class Clientuser extends Authenticatable
 
     protected static function getStudentById($studentId){
         return static::where('id', $studentId)
-                ->select('id','resume','recorded_video')->first();
+                ->select('id','resume','recorded_video')->where('user_type', self::Student)->first();
     }
 
     protected static function getStudentsByIds($studentIds){
-        $clientId = Auth::guard('client')->user()->id;
-        return static::whereIn('id', $studentIds)->where('client_id', $clientId)->get();
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        return static::whereIn('id', $studentIds)->where('client_id', $clientId)->where('user_type', self::Student)->get();
     }
 
     protected static function deleteAllClientUsersInfoByClientId($clientId){
@@ -286,7 +299,8 @@ class Clientuser extends Authenticatable
     }
 
     protected static function searchStudentForAssignment($batchId=NULL){
-        // return static::where('client_id', Auth::guard('client')->user()->id)->select('clientusers.*')->get();
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         if($batchId > 0){
             $userIds = [];
             $clientBatch = ClientBatch::getBatchById($batchId);
@@ -294,12 +308,12 @@ class Clientuser extends Authenticatable
                 $userIds = explode(',', $clientBatch->student_ids);
             }
             if(count($userIds) > 0){
-                return static::where('client_id', Auth::guard('client')->user()->id)->whereIn('id', $userIds)->select('clientusers.*')->get();
+                return static::where('client_id', $clientId)->whereIn('id', $userIds)->where('user_type', self::Student)->select('clientusers.*')->get();
             } else {
-                return static::where('client_id', Auth::guard('client')->user()->id)->select('clientusers.*')->get();
+                return static::where('client_id', $clientId)->where('user_type', self::Student)->select('clientusers.*')->get();
             }
         } else {
-            return static::where('client_id', Auth::guard('client')->user()->id)->select('clientusers.*')->get();
+            return static::where('client_id', $clientId)->where('user_type', self::Student)->select('clientusers.*')->get();
         }
     }
 
@@ -331,9 +345,15 @@ class Clientuser extends Authenticatable
     protected static function searchContact($subDomainName,Request $request){
         $chatusers = [];
         $unreadCount = [];
-        $currentUserId = Auth::guard('client')->user()->id;
+        $loginUser = Auth::guard('client')->user();
+        $currentUserId = $loginUser->id;
+        $client = $loginUser->client;
         $contact = InputSanitise::inputString($request->contact);
-        $users = static::where('name', 'LIKE', '%'.$contact.'%')->where('client_id', $currentUserId)->where('verified',1)->where('client_approve',1)->get();
+        if( 1 == $client->allow_non_verified_email){
+            $users = static::where('name', 'LIKE', '%'.$contact.'%')->where('client_id', $currentUserId)->where('client_approve',1)->get();
+        } else {
+            $users = static::where('name', 'LIKE', '%'.$contact.'%')->where('client_id', $currentUserId)->where('verified',1)->where('client_approve',1)->get();
+        }
         if(is_object($users) && false == $users->isEmpty()){
             foreach($users as $user){
                 if(is_file($user->photo) && true == preg_match('/clientUserStorage/',$user->photo)){
@@ -373,7 +393,7 @@ class Clientuser extends Authenticatable
     protected static function searchClientStudent(Request $request){
         $student = InputSanitise::inputString($request->get('student'));
         $clientId = Auth::guard('client')->user()->id;
-        return static::where('name', 'like', '%'.$student.'%')->where('client_id', $clientId)->get();
+        return static::where('name', 'like', '%'.$student.'%')->where('client_id', $clientId)->where('user_type', self::Student)->get();
     }
 
     protected static function addEmail(Request $request){
@@ -392,7 +412,7 @@ class Clientuser extends Authenticatable
         $user->save();
 
         // un approve number if have same number to other users with same client
-        $otherUsers = Clientuser::where('phone', $user->phone)->where('client_id', $user->client_id)->where('id','!=', $user->id)->get();
+        $otherUsers = static::where('phone', $user->phone)->where('client_id', $user->client_id)->where('id','!=', $user->id)->get();
         if(is_object($otherUsers) && false == $otherUsers->isEmpty()){
             foreach($otherUsers as $otherUser){
                 $otherUser->number_verified = 0;
@@ -408,7 +428,7 @@ class Clientuser extends Authenticatable
         $user->save();
 
         // un approve number if have same number to other users with same client
-        $otherUsers = Clientuser::where('phone', $user->phone)->where('client_id', $user->client_id)->where('id','!=', $user->id)->get();
+        $otherUsers = static::where('phone', $user->phone)->where('client_id', $user->client_id)->where('id','!=', $user->id)->get();
         if(is_object($otherUsers) && false == $otherUsers->isEmpty()){
             foreach($otherUsers as $otherUser){
                 $otherUser->number_verified = 0;
@@ -418,7 +438,7 @@ class Clientuser extends Authenticatable
         return;
     }
 
-    protected static function addMobileUser(Request $request,$clientId){
+    protected static function addMobileUser(Request $request,$clientId,$userType){
         $numberVerified = 1;
         $email = '';
         $phone = InputSanitise::inputString($request->get('phone'));
@@ -435,6 +455,7 @@ class Clientuser extends Authenticatable
             'password' => bcrypt($password),
             'email_token' => $emailToken,
             'number_verified' => $numberVerified,
+            'user_type' => $userType,
         ]);
         // un approve number if have same number to other users with same client
         $otherUsers = static::where('phone', $clientUser->phone)->where('client_id', $clientId)->where('id','!=', $clientUser->id)->get();
@@ -447,7 +468,7 @@ class Clientuser extends Authenticatable
         return $clientUser;
     }
 
-    protected static function addEmailUser(Request $request,$clientId){
+    protected static function addEmailUser(Request $request,$clientId,$userType){
         $insertArr = [];
         $allInputs = $request->except('_token');
         $result = [];
@@ -466,12 +487,17 @@ class Clientuser extends Authenticatable
                     $user = new static;
                     $user->name = $insertData['name'];
                     $user->email = $insertData['email'];
-                    $user->phone = '';
+                    $user->phone = (!empty($insertData['phone']))?$insertData['phone']:'';
                     $user->password = bcrypt($insertData['password']);
                     $user->client_id = $clientId;
                     $user->verified = 0;
                     $user->client_approve = 1;
-                    $user->email_token = str_random(60);
+                    if(!empty($insertData['email']) && filter_var($insertData['email'], FILTER_VALIDATE_EMAIL)){
+                        $user->email_token = str_random(60);
+                    } else {
+                        $user->email_token = '';
+                    }
+                    $user->user_type = $userType;
                     $user->save();
                     if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
                         $clientUserEmail = new ClientUserEmailVerification(new Clientuser(['email_token' => $user->email_token, 'name' => $user->name]));
@@ -486,5 +512,37 @@ class Clientuser extends Authenticatable
             $result['status'] = 'false';
         }
         return $result;
+    }
+
+    protected static function getTeachersByClientId($clientId){
+        return static::where('client_id', $clientId)->where('user_type', self::Teacher)->get();
+    }
+
+    protected static function changeClientTeacherModuleStatus(Request $request){
+        $clientId = InputSanitise::inputInt($request->client_id);
+        $userId = InputSanitise::inputInt($request->client_user_id);
+        $moduleId = InputSanitise::inputInt($request->module_id);
+        $moduleStatus = $request->module_status;
+
+        $teacher = static::where('id',$userId)->where('client_id',$clientId)->where('user_type', self::Teacher)->first();
+        if(is_object($teacher)){
+            if(!empty($teacher->assigned_modules)){
+                $assignedModules = explode(',', $teacher->assigned_modules);
+                if('true' == $moduleStatus){
+                    array_push($assignedModules, $moduleId);
+                    sort($assignedModules);
+                    $teacher->assigned_modules = implode(',', $assignedModules);
+                } else {
+                    $assignedModules = array_diff($assignedModules, [$moduleId]);
+                    sort($assignedModules);
+                    $teacher->assigned_modules = implode(',', $assignedModules);
+                }
+            } else {
+                $teacher->assigned_modules = $moduleId;
+            }
+            $teacher->save();
+            return 'true';
+        }
+        return 'false';
     }
 }

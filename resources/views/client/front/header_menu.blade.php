@@ -14,7 +14,7 @@
         <div class="pull-right dropdown " >
           @if(is_object(Auth::guard('clientuser')->user()))
             <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User">
-            @if(!empty(Auth::guard('clientuser')->user()->photo))
+            @if(!empty(Auth::guard('clientuser')->user()->photo) && is_file(Auth::guard('clientuser')->user()->photo))
               <img src="{{ asset(Auth::guard('clientuser')->user()->photo) }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
             @else
               <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
@@ -28,7 +28,7 @@
             <ul class="dropdown-menu user-dropdown ">
               <li>
                 <a href="{{ url('profile')}}" title="Dashbord" target="_blank">
-                  @if(!empty(Auth::guard('clientuser')->user()->photo))
+                  @if(!empty(Auth::guard('clientuser')->user()->photo) && is_file(Auth::guard('clientuser')->user()->photo))
                     <img src="{{ asset(Auth::guard('clientuser')->user()->photo) }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
                   @else
                     <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
@@ -36,6 +36,7 @@
                   {{Auth::guard('clientuser')->user()->name}}
                 </a>
               </li>
+              @if(1 == Auth::guard('clientuser')->user()->user_type)
               <li role="separator" class="divider"></li>
               <li>
                 <a href="{{ url('myNotifications')}}" data-toggle="tooltip" title="My Notifications" target="_blank"><i class="fa fa-star" aria-hidden="true"></i> My Notifications : <b style="color: red;">{{Auth::guard('clientuser')->user()->userNotificationCount()}}</b></a>
@@ -43,6 +44,7 @@
               <li>
                 <a href="{{ url('clientMessages')}}" data-toggle="tooltip" title="Admin Messages" target="_blank"><i class="fa fa-star" aria-hidden="true"></i> Admin Messages : <b style="color: red;">{{Auth::guard('clientuser')->user()->adminNotificationCount()}}</b></a>
               </li>
+              @endif
               <li role="separator" class="divider"></li>
               <li><a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" title="Logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
                 <form id="logout-form" action="{{ url('logout') }}" method="POST" style="display: none;">

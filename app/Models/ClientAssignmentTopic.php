@@ -17,7 +17,7 @@ class ClientAssignmentTopic extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'client_assignment_subject_id', 'client_id', 'client_batch_id'];
+    protected $fillable = ['name', 'client_assignment_subject_id', 'client_id', 'client_batch_id','created_by'];
 
     /**
      *  add/update course category
@@ -27,6 +27,9 @@ class ClientAssignmentTopic extends Model
         $subjectId   = InputSanitise::inputInt($request->get('subject'));
         $topicId   = InputSanitise::inputInt($request->get('topic_id'));
         $clientBatchId = InputSanitise::inputInt($request->get('batch'));
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
 
         if( $isUpdate && isset($topicId)){
             $topic = static::find($topicId);
@@ -38,8 +41,9 @@ class ClientAssignmentTopic extends Model
         }
         $topic->name = $topicName;
         $topic->client_assignment_subject_id = $subjectId;
-        $topic->client_id = Auth::guard('client')->user()->id;
+        $topic->client_id = $clientId;
         $topic->client_batch_id = $clientBatchId;
+        $topic->created_by = $createdBy;
         $topic->save();
         return $topic;
     }
@@ -77,5 +81,15 @@ class ClientAssignmentTopic extends Model
 
     protected static function deleteAssignmentTopicsByBatchIdByClientId($batchId,$clientId){
         return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->delete();
+    }
+
+    protected static function assignClientAssignmentTopicsToClientByClientIdByTeacherId($clientId,$teacherId){
+        $topics = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($topics) && false == $topics->isEmpty()){
+            foreach($topics as $topic){
+                $topic->created_by = 0;
+                $topic->save();
+            }
+        }
     }
 }

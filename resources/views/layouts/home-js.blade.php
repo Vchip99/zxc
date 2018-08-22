@@ -1,5 +1,5 @@
 <!-- JavaScript -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script src="{{ asset('js/socket.io.js') }}"></script>
 <script src="{{asset('js/jquery.min.js?ver=1.0')}}"></script>
 <script src="{{asset('js/bootstrap.min.js?ver=1.0')}}"></script>
 <script src="{{asset('js/slideanim.js?ver=1.0')}}"></script>

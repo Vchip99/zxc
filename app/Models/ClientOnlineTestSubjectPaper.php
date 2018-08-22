@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
+use App\Models\Clientuser;
 use App\Models\ClientOnlineTestCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\ClientOnlineTestSubject;
@@ -21,7 +22,7 @@ class ClientOnlineTestSubjectPaper extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'sub_category_id', 'subject_id', 'date_to_active', 'time','client_id', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'is_free', 'allowed_unauthorised_user'];
+    protected $fillable = ['name', 'category_id', 'sub_category_id', 'subject_id', 'date_to_active', 'time','client_id', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'is_free', 'allowed_unauthorised_user','created_by'];
 
     /**
      *  add/update paper
@@ -44,6 +45,9 @@ class ClientOnlineTestSubjectPaper extends Model
         $isFree = InputSanitise::inputInt($request->get('is_free'));
         $unauthorisedUser = InputSanitise::inputInt($request->get('allowed_unauthorised_user'));
         $timeOutBy = $request->get('time_out_by');
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
 
         if( $isUpdate && isset($paperId)){
             $paper = static::find($paperId);
@@ -61,12 +65,13 @@ class ClientOnlineTestSubjectPaper extends Model
         $paper->subject_id = $subjectId;
         $paper->date_to_active =  $dateToActive;
         $paper->time = $time;
-        $paper->client_id = $loginUser->id;
+        $paper->client_id = $clientId;
         $paper->date_to_inactive = $dateToInactive;
         $paper->show_calculator = $showCalculator;
         $paper->show_solution = $showSolution;
         $paper->option_count = $optionCount;
         $paper->time_out_by = $timeOutBy;
+        $paper->created_by = $createdBy;
         $subCat = ClientOnlineTestSubCategory::find($subcatId);
         if(is_object($subCat) && $subCat->price <=0){
             $paper->is_free = 1;
@@ -91,7 +96,7 @@ class ClientOnlineTestSubjectPaper extends Model
             }
 
             if(count($updatePaperSessions) > 0){
-                $allSessions = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $loginUser->id);
+                $allSessions = ClientOnlinePaperSection::paperSectionsByPaperId($paperId, $clientId);
                 if(is_object($allSessions) && false == $allSessions->isEmpty()){
                     // update or delete
                     foreach($allSessions as $paperSession){
@@ -104,7 +109,8 @@ class ClientOnlineTestSubjectPaper extends Model
                                     $paperSession->sub_category_id =$subcatId;
                                     $paperSession->subject_id = $subjectId;
                                     $paperSession->paper_id = $paperId;
-                                    $paperSession->client_id = $loginUser->id;
+                                    $paperSession->client_id = $clientId;
+                                    $paperSession->created_by = $createdBy;
                                     $paperSession->save();
                                 } else {
                                     $paperSession->delete();
@@ -124,7 +130,8 @@ class ClientOnlineTestSubjectPaper extends Model
                             $paperSession->sub_category_id =$subcatId;
                             $paperSession->subject_id = $subjectId;
                             $paperSession->paper_id = $paperId;
-                            $paperSession->client_id = $loginUser->id;
+                            $paperSession->client_id = $clientId;
+                            $paperSession->created_by = $createdBy;
                             $paperSession->save();
                         }
                     }
@@ -144,7 +151,8 @@ class ClientOnlineTestSubjectPaper extends Model
                                     'sub_category_id' => $subcatId,
                                     'subject_id' => $subjectId,
                                     'paper_id' => $paper->id,
-                                    'client_id' => $loginUser->id
+                                    'client_id' => $clientId,
+                                    'created_by' => $createdBy,
                                 ];
                     }
                 }
@@ -199,6 +207,7 @@ class ClientOnlineTestSubjectPaper extends Model
         $paper->show_solution = $showSolution;
         $paper->option_count = $optionCount;
         $paper->time_out_by = $timeOutBy;
+        $paper->created_by = 0;
         $subCat = ClientOnlineTestSubCategory::find($subcatId);
         if(is_object($subCat) && $subCat->price <=0){
             $paper->is_free = 1;
@@ -237,6 +246,7 @@ class ClientOnlineTestSubjectPaper extends Model
                                     $paperSession->subject_id = $subjectId;
                                     $paperSession->paper_id = $paperId;
                                     $paperSession->client_id = 0;
+                                    $paperSession->created_by = 0;
                                     $paperSession->save();
                                 } else {
                                     $paperSession->delete();
@@ -257,6 +267,7 @@ class ClientOnlineTestSubjectPaper extends Model
                             $paperSession->subject_id = $subjectId;
                             $paperSession->paper_id = $paperId;
                             $paperSession->client_id = 0;
+                            $paperSession->created_by = 0;
                             $paperSession->save();
                         }
                     }
@@ -276,7 +287,8 @@ class ClientOnlineTestSubjectPaper extends Model
                                     'sub_category_id' => $subcatId,
                                     'subject_id' => $subjectId,
                                     'paper_id' => $paper->id,
-                                    'client_id' => 0
+                                    'client_id' => 0,
+                                    'created_by' => 0
                                 ];
                     }
                 }
@@ -320,9 +332,11 @@ class ClientOnlineTestSubjectPaper extends Model
     }
 
     protected static function getOnlinePapersBySubjectId($subjectId){
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         return DB::connection('mysql2')->table('client_online_test_subject_papers')
                     ->where('subject_id', $subjectId)
-                    ->where('client_id', Auth::guard('client')->user()->id)
+                    ->where('client_id', $clientId)
                     ->get();
     }
 
@@ -507,7 +521,8 @@ class ClientOnlineTestSubjectPaper extends Model
     }
 
     protected static function getOnlineSubjectPapersByCategoryIdBySubCategoryIdBySubjectId($categoryId, $subcategoryId, $subjectId){
-
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         return DB::connection('mysql2')->table('client_online_test_subject_papers')
                     ->join('client_online_test_categories', 'client_online_test_categories.id', '=', 'client_online_test_subject_papers.category_id' )
                     ->join('client_online_test_sub_categories', 'client_online_test_sub_categories.id', '=', 'client_online_test_subject_papers.sub_category_id' )
@@ -519,7 +534,7 @@ class ClientOnlineTestSubjectPaper extends Model
                     ->where('client_online_test_subject_papers.category_id', $categoryId)
                     ->where('client_online_test_subject_papers.sub_category_id', $subcategoryId)
                     ->where('client_online_test_subject_papers.subject_id', $subjectId)
-                    ->where('clients.id', Auth::guard('client')->user()->id)
+                    ->where('clients.id', $clientId)
                     ->select('client_online_test_subject_papers.*')
                     ->get();
     }
@@ -544,7 +559,9 @@ class ClientOnlineTestSubjectPaper extends Model
     }
 
     public function deleteRegisteredPaper(){
-        $registeredPapers = RegisterClientOnlinePaper::where('client_paper_id', $this->id)->where('client_id', Auth::guard('client')->user()->id)->get();
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $registeredPapers = RegisterClientOnlinePaper::where('client_paper_id', $this->id)->where('client_id', $clientId)->get();
         if(is_object($registeredPapers) && false == $registeredPapers->isEmpty()){
             foreach($registeredPapers as $registeredPaper){
                 $registeredPaper->delete();
@@ -576,7 +593,8 @@ class ClientOnlineTestSubjectPaper extends Model
     }
 
     protected static function isClientTestPaperExist(Request $request){
-        $clientId = Auth::guard('client')->user()->id;
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         $categoryId = InputSanitise::inputInt($request->get('category'));
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
         $subjectId = InputSanitise::inputInt($request->get('subject'));
@@ -611,5 +629,15 @@ class ClientOnlineTestSubjectPaper extends Model
             return 'false';
         }
         return 'false';
+    }
+
+    protected static function assignClientTestPapersToClientByClientIdByTeacherId($clientId,$teacherId){
+        $papers = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($papers) && false == $papers->isEmpty()){
+            foreach($papers as $paper){
+                $paper->created_by = 0;
+                $paper->save();
+            }
+        }
     }
 }

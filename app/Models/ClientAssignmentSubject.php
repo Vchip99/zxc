@@ -16,7 +16,7 @@ class ClientAssignmentSubject extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'client_id' ,'client_batch_id'];
+    protected $fillable = ['name', 'client_id' ,'client_batch_id','created_by'];
 
     /**
      *  add/update assignment subject
@@ -26,7 +26,9 @@ class ClientAssignmentSubject extends Model
         $subjectName = InputSanitise::inputString($request->get('subject'));
         $subjectId   = InputSanitise::inputInt($request->get('subject_id'));
         $clientBatchId = InputSanitise::inputInt($request->get('batch'));
-
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $createdBy = $resultArr[1];
         if( $isUpdate && isset($subjectId)){
             $subject = static::find($subjectId);
             if(!is_object($subject)){
@@ -36,8 +38,9 @@ class ClientAssignmentSubject extends Model
             $subject = new static;
         }
         $subject->name = $subjectName;
-        $subject->client_id = Auth::guard('client')->user()->id;
+        $subject->client_id = $clientId;
         $subject->client_batch_id = $clientBatchId;
+        $subject->created_by = $createdBy;
         $subject->save();
         return $subject;
     }
@@ -66,15 +69,26 @@ class ClientAssignmentSubject extends Model
     }
 
     protected static function getAssignmentSubjectsByBatchId($clientBatchId){
-        $loginClient = Auth::guard('client')->user();
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
         if($clientBatchId > 0){
-            return static::where('client_id', $loginClient->id)->where('client_batch_id', $clientBatchId)->get();
+            return static::where('client_id', $clientId)->where('client_batch_id', $clientBatchId)->get();
         } else {
-            return static::where('client_id', $loginClient->id)->where('client_batch_id','<=',0)->get();
+            return static::where('client_id', $clientId)->where('client_batch_id','<=',0)->get();
         }
     }
 
     protected static function deleteAssignmentSubjectsByBatchIdByClientId($clientBatchId,$clientId){
         return static::where('client_batch_id', $clientBatchId)->where('client_id', $clientId)->delete();
+    }
+
+    protected static function assignClientAssignmentSubjectsToClientByClientIdByTeacherId($clientId,$teacherId){
+        $subjects = static::where('client_id', $clientId)->where('created_by', $teacherId)->get();
+        if(is_object($subjects) && false == $subjects->isEmpty()){
+            foreach($subjects as $subject){
+                $subject->created_by = 0;
+                $subject->save();
+            }
+        }
     }
 }

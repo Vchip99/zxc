@@ -19,7 +19,7 @@ class ClientAllTestController extends ClientBaseController
      */
     public function __construct(Request $request) {
         parent::__construct($request);
-        $this->middleware('client');
+        // $this->middleware('client');
     }
 
     /**
@@ -53,14 +53,26 @@ class ClientAllTestController extends ClientBaseController
      * create all
      */
     protected function showAll($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
     	$testCategories = ClientOnlineTestCategory::showCategories($request);
-    	return view('client.onlineTest.test_all', compact('testCategories', 'subdomainName'));
+    	return view('client.onlineTest.test_all', compact('testCategories', 'subdomainName','loginUser'));
     }
 
     /**
      *  store category
      */
-    protected function storeCategory($subdomain,Request $request){
+    protected function storeCategory($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateCreateCategory);
         if ($v->fails())
         {
@@ -86,7 +98,7 @@ class ClientAllTestController extends ClientBaseController
     /**
      *  store sub category
      */
-    protected function storeSubCategory($subdomain,Request $request){
+    protected function storeSubCategory($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateCreateSubcategory);
         if ($v->fails())
         {
@@ -95,7 +107,7 @@ class ClientAllTestController extends ClientBaseController
         DB::connection('mysql2')->beginTransaction();
         try
         {
-            $subcategory = ClientOnlineTestSubCategory::addOrUpdateSubCategory($request);
+            $subcategory = ClientOnlineTestSubCategory::addOrUpdateSubCategory($subdomainName,$request);
             if(is_object($subcategory)){
                 DB::connection('mysql2')->commit();
                 return Redirect::to('manageAllTest')->with('message', 'Sub Category created successfully!');
@@ -112,7 +124,7 @@ class ClientAllTestController extends ClientBaseController
     /**
      *  store subject
      */
-    protected function storeSubject($subdomain,Request $request){
+    protected function storeSubject($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validateCreateSubject);
 
         if ($v->fails())
@@ -139,7 +151,7 @@ class ClientAllTestController extends ClientBaseController
     /**
      *  store paper
      */
-    protected function storePaper($subdomain,Request $request){
+    protected function storePaper($subdomainName,Request $request){
         $v = Validator::make($request->all(), $this->validatePaper);
         if ($v->fails())
         {

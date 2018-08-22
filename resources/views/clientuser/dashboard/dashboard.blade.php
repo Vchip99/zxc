@@ -67,7 +67,7 @@
       <div class="user-panel">
         <div class="pull-left image">
           <a href="{{ url('profile')}}">
-          @if(!empty(Auth::guard('clientuser')->user()->photo))
+          @if(!empty(Auth::guard('clientuser')->user()->photo) && is_file(Auth::guard('clientuser')->user()->photo))
             <img src="{{ asset(Auth::guard('clientuser')->user()->photo)}}" class="img-circle" alt="User Image" >
           @else
             <img src="{{ asset('images/user1.png')}}" class="img-circle" alt="User Image">
@@ -157,6 +157,17 @@
           </ul>
         </li>
         <li class="treeview">
+          <a href="#" title="Calendar">
+            <i class="fa fa-calendar"></i> <span>Calendar</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="My Calendar"><a href="{{ url('myCalendar')}}"><i class="fa fa-circle-o"></i> My Calendar</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
           <a href="#" title="Message">
             <i class="fa fa-inr"></i> <span>Payments</span>
             <span class="pull-right-container">
@@ -169,8 +180,6 @@
             <li title="Uploaded Transactions"><a href="{{ url('uploadedTransactions')}}"><i class="fa fa-circle-o"></i>Uploaded Transactions</a></li>
           </ul>
         </li>
-        <!-- <li title="Home"><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li> -->
-        <!-- <li title="Home"><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li> -->
         <li class="header">LABELS</li>
         <li title="Logout">
           <a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
