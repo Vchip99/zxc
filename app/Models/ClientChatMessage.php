@@ -127,11 +127,12 @@ class ClientChatMessage extends Model
         // $chatusers['chat_users'] = $orderById = implode(',', $chatmessageusers);
         $orderById = implode(',', $chatmessageusers);
         if(count($chatmessageusers) > 0){
-            if( 1 == $loginUser->allow_non_verified_email){
-                $messageusers = Clientuser::whereIn('id', $chatmessageusers)->where('client_id', $clientId)->where('client_approve',1)->whereNotNull('email')->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
-            } else {
-                $messageusers = Clientuser::whereIn('id', $chatmessageusers)->where('client_id', $clientId)->where('verified',1)->where('client_approve',1)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
-            }
+            // if( 1 == $loginUser->allow_non_verified_email){
+            //     $messageusers = Clientuser::whereIn('id', $chatmessageusers)->where('client_id', $clientId)->where('client_approve',1)->whereNotNull('email')->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
+            // } else {
+            //     $messageusers = Clientuser::whereIn('id', $chatmessageusers)->where('client_id', $clientId)->where('verified',1)->where('client_approve',1)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
+            // }
+            $messageusers = Clientuser::whereIn('id', $chatmessageusers)->where('client_id', $clientId)->where('client_approve',1)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
             if(is_object($messageusers) && false == $messageusers->isEmpty()){
                 foreach($messageusers as $user){
                     if(is_file($user->photo) && true == preg_match('/clientUserStorage/',$user->photo)){
@@ -153,12 +154,12 @@ class ClientChatMessage extends Model
             }
             $chatmessageusers = array_unique($chatmessageusers);
         }
-        if( 1 == $loginUser->allow_non_verified_email){
-            $users = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->whereNotNull('email')->where('client_approve',1)->skip(0)->take(10)->get();
-        } else {
-            $users = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->where('verified',1)->where('client_approve',1)->skip(0)->take(10)->get();
-        }
-
+        // if( 1 == $loginUser->allow_non_verified_email){
+        //     $users = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->whereNotNull('email')->where('client_approve',1)->skip(0)->take(10)->get();
+        // } else {
+        //     $users = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->where('verified',1)->where('client_approve',1)->skip(0)->take(10)->get();
+        // }
+        $users = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->where('client_approve',1)->skip(0)->take(10)->get();
         if(is_object($users) && false == $users->isEmpty()){
             foreach($users as $user){
                 if(is_file($user->photo) && true == preg_match('/clientUserStorage/',$user->photo)){
@@ -180,27 +181,27 @@ class ClientChatMessage extends Model
             $chatmessageusers = array_unique($chatmessageusers);
         }
 
-        $mobileUsers = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->whereNotNull('phone')->where('number_verified',1)->where('client_approve',1)->get();
+        // $mobileUsers = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->whereNotNull('phone')->where('number_verified',1)->where('client_approve',1)->get();
 
-        if(is_object($mobileUsers) && false == $mobileUsers->isEmpty()){
-            foreach($mobileUsers as $mobileUser){
-                if(is_file($mobileUser->photo) && true == preg_match('/clientUserStorage/',$mobileUser->photo)){
-                    $isImageExist = 'system';
-                } else if(!empty($mobileUser->photo) && false == preg_match('/clientUserStorage/',$mobileUser->photo)){
-                    $isImageExist = 'other';
-                } else {
-                    $isImageExist = 'false';
-                }
-                $chatusers['users'][] = [
-                    'id' => $mobileUser->id,
-                    'name' => $mobileUser->name,
-                    'photo' => $mobileUser->photo,
-                    'image_exist' => $isImageExist,
-                    'chat_room_id' => $mobileUser->chatroomid(),
-                ];
-            }
-            $chatmessageusers = array_unique($chatmessageusers);
-        }
+        // if(is_object($mobileUsers) && false == $mobileUsers->isEmpty()){
+        //     foreach($mobileUsers as $mobileUser){
+        //         if(is_file($mobileUser->photo) && true == preg_match('/clientUserStorage/',$mobileUser->photo)){
+        //             $isImageExist = 'system';
+        //         } else if(!empty($mobileUser->photo) && false == preg_match('/clientUserStorage/',$mobileUser->photo)){
+        //             $isImageExist = 'other';
+        //         } else {
+        //             $isImageExist = 'false';
+        //         }
+        //         $chatusers['users'][] = [
+        //             'id' => $mobileUser->id,
+        //             'name' => $mobileUser->name,
+        //             'photo' => $mobileUser->photo,
+        //             'image_exist' => $isImageExist,
+        //             'chat_room_id' => $mobileUser->chatroomid(),
+        //         ];
+        //     }
+        //     $chatmessageusers = array_unique($chatmessageusers);
+        // }
         $chatusers['chat_users'] = implode(',', $chatmessageusers);
         $userResult['chatusers'] = $chatusers;
 

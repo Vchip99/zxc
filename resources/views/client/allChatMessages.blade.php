@@ -1216,6 +1216,11 @@ ul#chat_messages div{
                           liEle.className = 'contact';
                       }
                       liEle.id = obj['id'];
+                      if(!previuosChatUsers){
+                        document.getElementById('previuos_chat_users').value = obj['id'];
+                      } else {
+                        document.getElementById('previuos_chat_users').value += ','+obj['id'];
+                      }
                       liEle.setAttribute('data-user_name', obj['name']);
                       liEle.setAttribute('onclick', 'showChat(this);');
 

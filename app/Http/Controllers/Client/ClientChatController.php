@@ -36,13 +36,13 @@ class ClientChatController extends Controller
         $loginUser = Auth::guard('client')->user();
         $clientId = $loginUser->id;
         $skipUsers = explode(',', $request->get('previuos_chat_users'));
-        // $users = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->skip($limitStart)->take(10)->get();
+        $users = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->where('client_approve',1)->skip($limitStart)->take(10)->get();
 
-        if( 1 == $loginUser->allow_non_verified_email){
-            $users = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->whereNotNull('email')->where('client_approve',1)->skip($limitStart)->take(20)->get();
-        } else {
-            $users = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->where('verified',1)->where('client_approve',1)->skip($limitStart)->take(20)->get();
-        }
+        // if( 1 == $loginUser->allow_non_verified_email){
+        //     $users = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->whereNotNull('email')->where('client_approve',1)->skip($limitStart)->take(20)->get();
+        // } else {
+        //     $users = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->where('verified',1)->where('client_approve',1)->skip($limitStart)->take(20)->get();
+        // }
 
         if(is_object($users) && false == $users->isEmpty()){
             foreach($users as $user){
@@ -62,25 +62,25 @@ class ClientChatController extends Controller
                 ];
             }
         }
-        $mobileUsers = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->whereNotNull('phone')->where('number_verified',1)->where('client_approve',1)->get();
-        if(is_object($mobileUsers) && false == $mobileUsers->isEmpty()){
-            foreach($mobileUsers as $mobileUser){
-                if(is_file($mobileUser->photo) && true == preg_match('/clientUserStorage/',$mobileUser->photo)){
-                    $isImageExist = 'system';
-                } else if(!empty($mobileUser->photo) && false == preg_match('/clientUserStorage/',$mobileUser->photo)){
-                    $isImageExist = 'other';
-                } else {
-                    $isImageExist = 'false';
-                }
-                $chatusers[] = [
-                    'id' => $mobileUser->id,
-                    'name' => $mobileUser->name,
-                    'photo' => $mobileUser->photo,
-                    'image_exist' => $isImageExist,
-                    'chat_room_id' => $mobileUser->chatroomid(),
-                ];
-            }
-        }
+        // $mobileUsers = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->whereNotNull('phone')->where('number_verified',1)->where('client_approve',1)->get();
+        // if(is_object($mobileUsers) && false == $mobileUsers->isEmpty()){
+        //     foreach($mobileUsers as $mobileUser){
+        //         if(is_file($mobileUser->photo) && true == preg_match('/clientUserStorage/',$mobileUser->photo)){
+        //             $isImageExist = 'system';
+        //         } else if(!empty($mobileUser->photo) && false == preg_match('/clientUserStorage/',$mobileUser->photo)){
+        //             $isImageExist = 'other';
+        //         } else {
+        //             $isImageExist = 'false';
+        //         }
+        //         $chatusers[] = [
+        //             'id' => $mobileUser->id,
+        //             'name' => $mobileUser->name,
+        //             'photo' => $mobileUser->photo,
+        //             'image_exist' => $isImageExist,
+        //             'chat_room_id' => $mobileUser->chatroomid(),
+        //         ];
+        //     }
+        // }
         $result['chatusers'] = $chatusers;
         $result['unreadCount'] = ClientChatMessage::where('receiver_id',  $clientId)->where('client_id', $clientId)->where('is_read', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
         $result['onlineUsers'] = ClientChatMessage::checkOnlineUsers($subdomainName);
