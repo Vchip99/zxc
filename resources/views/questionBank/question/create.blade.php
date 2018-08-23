@@ -74,6 +74,18 @@
 			@endif
 	  		<li title="ADD MCQ"><a class="btn active" id="mcq_ques">ADD MCQ</a></li>
 	  		<li title="ADD NUMERICAL"><a class="btn" id="num_ques">ADD NUMERICAL</a></li>
+	  		@if($prevQuestionId > 0)
+	  			<li title="Prev Question"><a class="btn" id="prev_ques" href="{{url('admin/questionBankQuestion')}}/{{$prevQuestionId}}/edit">Prev Question</a></li>
+	  		@else
+	  			<li title="No Prev Question"><a class="btn" id="prev_ques">No Prev Question</a></li>
+	  		@endif
+	  		@if($nextQuestionId > 0)
+		  		<li title="Next Question"><a class="btn" id="next_ques" href="{{url('admin/questionBankQuestion')}}/{{$nextQuestionId}}/edit">Next Question</a></li>
+	  		@elseif(( $prevQuestionId > 0 || null == $prevQuestionId ) && null == $nextQuestionId )
+	  			<li title="Add Question"><a class="btn" id="next_ques" href="{{url('admin/createQuestionBankQuestion')}}">Add Question </a></li>
+	  		@else
+	  			<li title="No Next Question"><a class="btn" id="next_ques">No Next Question</a></li>
+	  		@endif
 		</ul>
 
 		@if(isset($testQuestion->id))

@@ -9,7 +9,6 @@
   </section>
 @stop
 @section('admin_content')
-	&nbsp;
 	<div class="container ">
 	@if(Session::has('message'))
 		<div class="alert alert-success" id="message">

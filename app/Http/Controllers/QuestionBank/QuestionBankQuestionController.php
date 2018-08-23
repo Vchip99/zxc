@@ -97,9 +97,11 @@ class QuestionBankQuestionController extends Controller
             $testSubCategories = [];
         }
 		$testQuestion = new QuestionBankQuestion;
+        $prevQuestionId = Session::get('selected_bank_prev_question');
+        $nextQuestionId = 'new';
         $nextQuestionNo = $this->getNextQuestionNo(Session::get('selected_question_bank_category'),Session::get('selected_question_bank_subcategory'));
         Session::put('question_bank_next_question_no', $nextQuestionNo);
-		return view('questionBank.question.create', compact('testCategories', 'testSubCategories', 'testQuestion'));
+		return view('questionBank.question.create', compact('testCategories', 'testSubCategories', 'testQuestion','prevQuestionId', 'nextQuestionId'));
     }
 
     /**
@@ -123,6 +125,7 @@ class QuestionBankQuestionController extends Controller
                 Session::put('selected_question_bank_category', $categoryId);
                 Session::put('selected_question_bank_subcategory', $subcategoryId);
                 Session::put('selected_question_bank_question_type', $question_type);
+                Session::put('selected_bank_prev_question', $testQuestion->id);
 
                 $nextQuestionNo = $this->getNextQuestionNo($categoryId,$subcategoryId);
                 Session::put('question_bank_next_question_no', $nextQuestionNo);
@@ -149,12 +152,17 @@ class QuestionBankQuestionController extends Controller
                 $testCategories = QuestionBankCategory::all();
                 $testSubCategories = QuestionBankSubCategory::getSubcategoriesByCategoryId($testQuestion->category_id);
                 $currentQuestionNo = $this->getCurrentQuestionNo($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->id);
+
+                $prevQuestionId = $this->getPrevQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->id);
+                $nextQuestionId = $this->getNextQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->id);
+
+                Session::put('selected_bank_prev_question', $testQuestion->id);
                 Session::put('selected_question_bank_category', $testQuestion->category_id);
                 Session::put('selected_question_bank_subcategory', $testQuestion->subcat_id);
                 Session::put('selected_question_bank_question_type', $testQuestion->question_type);
                 $nextQuestionNo = $this->getNextQuestionNo($testQuestion->category_id,$testQuestion->subcat_id);
                 Session::put('question_bank_next_question_no', $nextQuestionNo);
-                return view('questionBank.question.create', compact('testCategories', 'testSubCategories', 'testQuestion', 'currentQuestionNo'));
+                return view('questionBank.question.create', compact('testCategories', 'testSubCategories', 'testQuestion', 'currentQuestionNo','prevQuestionId', 'nextQuestionId'));
     		}
     	}
 		return Redirect::to('admin/manageQuestionBankQuestions');
@@ -387,5 +395,21 @@ class QuestionBankQuestionController extends Controller
             return Redirect::to('admin/uploadQuestionBankQuestions')->with('message', 'Images uploaded successfully!');
         }
         return Redirect::to('admin/uploadQuestionBankQuestions');
+    }
+
+    protected function getPrevQuestionIdWithQuestionId($categoryId,$subcategoryId,$questionId){
+         $testQuestion = QuestionBankQuestion::getPrevQuestionByCategoryIdBySubcategoryId($categoryId,$subcategoryId,$questionId);
+        if(is_object($testQuestion)){
+            return $testQuestion->id;
+        }
+        return;
+    }
+
+    protected function getNextQuestionIdWithQuestionId($categoryId,$subcategoryId,$questionId){
+        $testQuestion = QuestionBankQuestion::getNextQuestionByCategoryIdBySubcategoryId($categoryId,$subcategoryId,$questionId);
+        if(is_object($testQuestion)){
+            return $testQuestion->id;
+        }
+        return;
     }
 }

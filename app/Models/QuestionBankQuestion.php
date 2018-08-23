@@ -105,4 +105,24 @@ class QuestionBankQuestion extends Model
     protected static function getCurrentQuestionNoByCategoryIdBySubcategoryId($categoryId,$subcategoryId,$questionId){
         return static::where('category_id', $categoryId)->where('subcat_id', $subcategoryId)->where('id', '<=', $questionId)->count();
     }
+
+    protected static function getPrevQuestionByCategoryIdBySubcategoryId($categoryId,$subcategoryId,$questionId){
+        $query = DB::table('question_bank_questions')
+            ->where('category_id', $categoryId)
+            ->where('subcat_id', $subcategoryId);
+            if($questionId > 0){
+                $query->where('id', '<', $questionId);
+            }
+        return $query->orderBy('id','desc')->first();
+    }
+
+    protected static function getNextQuestionByCategoryIdBySubcategoryId($categoryId,$subcategoryId,$questionId){
+        $query = DB::table('question_bank_questions')
+            ->where('category_id', $categoryId)
+            ->where('subcat_id', $subcategoryId);
+            if($questionId > 0){
+                $query->where('id', '>', $questionId);
+            }
+        return $query->first();
+    }
 }

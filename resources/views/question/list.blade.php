@@ -9,7 +9,6 @@
   </section>
 @stop
 @section('admin_content')
-	&nbsp;
 	<div class="container ">
 	@if(Session::has('message'))
 		<div class="alert alert-success" id="message">
@@ -145,10 +144,10 @@
 		</form>
 	</div>
 	<div class="form-group row ">
-	      <div id="addQuestionDiv">
-	        <a id="addQuestion" href="{{url('admin/createQuestion')}}" type="button" class="btn btn-primary" style="float: right; margin-right: 12px;" title="Add New Question">Add New Question</a>&nbsp;&nbsp;
-	      </div>
-	    </div>
+      <div id="addQuestionDiv">
+        <a id="addQuestion" href="{{url('admin/createQuestion')}}" type="button" class="btn btn-primary" style="float: right; margin-right: 12px;" title="Add New Question">Add New Question</a>&nbsp;&nbsp;
+      </div>
+    </div>
 	<div>
 	    <table class="table admin_table">
 	      	<thead class="thead-inverse">

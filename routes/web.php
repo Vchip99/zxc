@@ -290,7 +290,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	// verify account
 	Route::get('verifyAccount', 'HomeController@verifyAccount');
 	Route::post('verifyEmail', 'HomeController@verifyEmail');
-	Route::post('subscribedUser', 'HomeController@subscribedUser');
+	// Route::post('subscribedUser', 'HomeController@subscribedUser');
 	Route::get('register/verifySubscriedUser/{token}', 'HomeController@verifySubscriedUser');
 
 	// home
