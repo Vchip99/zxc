@@ -46,8 +46,8 @@
 <div class="wrapper">
   <header class="main-header">
     <a href="{{ url('/')}}" class="logo">
-      <span class="logo-mini"><b> V</b>EDU</span>
-      <span class="logo-lg"><b>Vchip</b>Technology</span>
+      <span class="logo-mini"><b> Home</b></span>
+      <span class="logo-lg"><b>Home</b></span>
     </a>
     <nav class="navbar navbar-static-top">
       <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
@@ -81,7 +81,7 @@
         </div>
       </div>
       <ul class="sidebar-menu">
-        <li class="header">Vchip Technology</li>
+        <li class="header">Dashboard</li>
         <li class="treeview ">
           <a href="#">
             <i class="fa fa-star"></i><span>Notifications </span><b style="color: red;">{{Auth::guard('clientuser')->user()->userNotificationCount()}}</b>
@@ -180,7 +180,7 @@
             <li title="Uploaded Transactions"><a href="{{ url('uploadedTransactions')}}"><i class="fa fa-circle-o"></i>Uploaded Transactions</a></li>
           </ul>
         </li>
-        <li class="header">LABELS</li>
+        <li class="header">Logout</li>
         <li title="Logout">
           <a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="fa fa-sign-out" aria-hidden="true"></i> <span>Logout </span>

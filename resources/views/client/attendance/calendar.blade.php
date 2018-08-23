@@ -110,7 +110,7 @@ $(document).ready(function(){
           confirmation(selectedDate,selectedBatch);
         }
       });
-      $('td.fc-day-number').on('click',function(ele){
+      $('td.fc-day-top').on('click',function(ele){
         var selectedDate = $(this).data('date');
         var selectedBatch = document.getElementById('batch').value;
         if(selectedDate && selectedBatch){
@@ -129,7 +129,7 @@ $(document).ready(function(){
           confirmation(selectedDate,selectedBatch);
         }
       });
-      $('td.fc-day-number').on('click',function(ele){
+      $('td.fc-day-top').on('click',function(ele){
         var selectedDate = $(this).data('date');
         var selectedBatch = document.getElementById('batch').value;
         if(selectedDate && selectedBatch){
@@ -145,7 +145,7 @@ $(document).ready(function(){
         confirmation(selectedDate,selectedBatch);
       }
     });
-    $('td.fc-day-number').on('click',function(ele){
+    $('td.fc-day-top').on('click',function(ele){
       var selectedDate = $(this).data('date');
       var selectedBatch = document.getElementById('batch').value;
       if(selectedDate && selectedBatch){

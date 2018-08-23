@@ -755,13 +755,13 @@ ul.table_list{ margin-left: -30px; }
               <div class="add-1">
                 <div class="course-box">
                   <a class="img-course-box" href="http://mcoet.mauligroup.org/" target="_blank">
-                    <img src="{{ asset('images/logo/mauli.gif') }}" alt="Mauli College of Engineering Shegaon"  class="img-responsive" />
+                    <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="Mauli College of Engineering Shegaon"  class="img-responsive" />
                   </a>
                   <div class="course-box-content">
                     <h4 class="course-box-title" title="Mauli College of Engineering Shegaon" data-toggle="tooltip" data-placement="bottom">
-                      <a href="http://mcoet.mauligroup.org/" target="_blank">Mauli College of Engineering Shegaon</a>
+                      <a href="http://www.ssgmce.org/" target="_blank">Shri Sant Gajanan Maharaj College of Engineering</a>
                     </h4>
-                    <p class="more"> Mauli College of Engineering Shegaon</p>
+                    <p class="more"> Shri Sant Gajanan Maharaj College of Engineering</p>
                   </div>
                 </div>
               </div>

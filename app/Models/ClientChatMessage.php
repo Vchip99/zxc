@@ -103,8 +103,12 @@ class ClientChatMessage extends Model
 
 	protected static function showClientChatUsers($subdomainName){
         $chatusers = [];
+        $userResult = [];
         $chatmessageusers = [];
         $loginUser = Auth::guard('client')->user();
+        if(!is_object($loginUser)){
+            return $userResult;
+        }
 		$clientId = $loginUser->id;
 
         $result = static::where('sender_id', $clientId)->Orwhere('receiver_id',  $clientId)->orderBy('id', 'desc')->get();
@@ -117,9 +121,11 @@ class ClientChatMessage extends Model
                     $chatmessageusers[] = $message->receiver_id;
                 }
             }
+            $chatmessageusers = array_unique($chatmessageusers);
         }
 
-        $chatusers['chat_users'] = $orderById = implode(',', $chatmessageusers);
+        // $chatusers['chat_users'] = $orderById = implode(',', $chatmessageusers);
+        $orderById = implode(',', $chatmessageusers);
         if(count($chatmessageusers) > 0){
             if( 1 == $loginUser->allow_non_verified_email){
                 $messageusers = Clientuser::whereIn('id', $chatmessageusers)->where('client_id', $clientId)->where('client_approve',1)->whereNotNull('email')->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
@@ -142,8 +148,10 @@ class ClientChatMessage extends Model
                         'image_exist' => $isImageExist,
                         'chat_room_id' => $user->chatroomid(),
                     ];
+                    $chatmessageusers[] = $user->id;
                 }
             }
+            $chatmessageusers = array_unique($chatmessageusers);
         }
         if( 1 == $loginUser->allow_non_verified_email){
             $users = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->whereNotNull('email')->where('client_approve',1)->skip(0)->take(10)->get();
@@ -167,7 +175,9 @@ class ClientChatMessage extends Model
                     'image_exist' => $isImageExist,
                     'chat_room_id' => $user->chatroomid(),
                 ];
+                $chatmessageusers[] = $user->id;
             }
+            $chatmessageusers = array_unique($chatmessageusers);
         }
 
         $mobileUsers = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->whereNotNull('phone')->where('number_verified',1)->where('client_approve',1)->get();
@@ -189,8 +199,9 @@ class ClientChatMessage extends Model
                     'chat_room_id' => $mobileUser->chatroomid(),
                 ];
             }
+            $chatmessageusers = array_unique($chatmessageusers);
         }
-
+        $chatusers['chat_users'] = implode(',', $chatmessageusers);
         $userResult['chatusers'] = $chatusers;
 
         $messageResult = static::where('receiver_id',  $clientId)->where('client_id', $clientId)->where('is_read', 0)->where('created_by_client', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();

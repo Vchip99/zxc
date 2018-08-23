@@ -347,9 +347,9 @@ class Clientuser extends Authenticatable
         $unreadCount = [];
         $loginUser = Auth::guard('client')->user();
         $currentUserId = $loginUser->id;
-        $client = $loginUser->client;
+        // $client = $loginUser->client;
         $contact = InputSanitise::inputString($request->contact);
-        if( 1 == $client->allow_non_verified_email){
+        if( 1 == $loginUser->allow_non_verified_email){
             $users = static::where('name', 'LIKE', '%'.$contact.'%')->where('client_id', $currentUserId)->where('client_approve',1)->get();
         } else {
             $users = static::where('name', 'LIKE', '%'.$contact.'%')->where('client_id', $currentUserId)->where('verified',1)->where('client_approve',1)->get();

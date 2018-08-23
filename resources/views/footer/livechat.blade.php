@@ -282,85 +282,87 @@
             var current_user = document.getElementById('user_id').value;
             var chatUsers = document.getElementById('chat_users');
             chatUsers.innerHTML = '';
-            $.each(users['users'],function(idx,obj){
-              var liEle = document.createElement('li');
-              if(document.getElementById('user_id').value == obj['id']){
-                  liEle.className = 'left clearfix addChat';
-              } else {
-                  liEle.className = 'left clearfix addChat';
-              }
-              liEle.id = obj['id'];
-              liEle.setAttribute('data-user_name', obj['name']);
-              liEle.setAttribute('onclick', 'showChat(this);');
+            if(users['users']){
+              $.each(users['users'],function(idx,obj){
+                var liEle = document.createElement('li');
+                if(document.getElementById('user_id').value == obj['id']){
+                    liEle.className = 'left clearfix addChat';
+                } else {
+                    liEle.className = 'left clearfix addChat';
+                }
+                liEle.id = obj['id'];
+                liEle.setAttribute('data-user_name', obj['name']);
+                liEle.setAttribute('onclick', 'showChat(this);');
 
-              var spanImage = document.createElement('span');
-              spanImage.className = 'chat-img pull-left';
-              if(obj['photo']){
-                if(obj['photo'].indexOf("userStorage") !== -1){
-                    var userImagePath = window.location.protocol+'//'+window.location.host+"/"+obj['photo'];
+                var spanImage = document.createElement('span');
+                spanImage.className = 'chat-img pull-left';
+                if(obj['photo']){
+                  if(obj['photo'].indexOf("userStorage") !== -1){
+                      var userImagePath = window.location.protocol+'//'+window.location.host+"/"+obj['photo'];
+                    } else {
+                      var userImagePath = obj['photo'];
+                    }
+                } else {
+                  var userImagePath = "/images/user1.png";
+                }
+                spanImage.innerHTML = '<img src="'+userImagePath+'" alt="User Avatar" class="img-circle" />';
+                liEle.appendChild(spanImage);
+
+                var divChatBody = document.createElement('div');
+                divChatBody.className = 'chat-body clearfix';
+
+                var divHeader = document.createElement('div');
+                divHeader.className = 'header';
+
+                var strongName = document.createElement('strong');
+                strongName.className = 'primary-font';
+                strongName.innerHTML = obj['name'] + ' ';
+                divHeader.appendChild(strongName);
+
+                var spanUnread = document.createElement('span');
+                spanUnread.id = 'unread_'+current_user+'_'+obj['id'];
+                spanUnread.setAttribute('style','color: red;');
+                if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
+                  spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
+                  if(parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML) > 0){
+                    document.getElementById('msg_count_1_'+current_user).innerHTML = parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML)+parseInt(users['unreadCount'][obj.id]);
                   } else {
-                    var userImagePath = obj['photo'];
+                    document.getElementById('msg_count_1_'+current_user).innerHTML = 0+parseInt(users['unreadCount'][obj.id]);
                   }
-              } else {
-                var userImagePath = "/images/user1.png";
-              }
-              spanImage.innerHTML = '<img src="'+userImagePath+'" alt="User Avatar" class="img-circle" />';
-              liEle.appendChild(spanImage);
-
-              var divChatBody = document.createElement('div');
-              divChatBody.className = 'chat-body clearfix';
-
-              var divHeader = document.createElement('div');
-              divHeader.className = 'header';
-
-              var strongName = document.createElement('strong');
-              strongName.className = 'primary-font';
-              strongName.innerHTML = obj['name'] + ' ';
-              divHeader.appendChild(strongName);
-
-              var spanUnread = document.createElement('span');
-              spanUnread.id = 'unread_'+current_user+'_'+obj['id'];
-              spanUnread.setAttribute('style','color: red;');
-              if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
-                spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
-                if(parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML) > 0){
-                  document.getElementById('msg_count_1_'+current_user).innerHTML = parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML)+parseInt(users['unreadCount'][obj.id]);
-                } else {
-                  document.getElementById('msg_count_1_'+current_user).innerHTML = 0+parseInt(users['unreadCount'][obj.id]);
+                  document.getElementById('msg_count_2_'+current_user).innerHTML = parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML);
+                  if(parseInt(document.getElementById('userCnt_'+current_user).innerHTML) > 0)  {
+                    document.getElementById('userCnt_'+current_user).innerHTML = parseInt(document.getElementById('userCnt_'+current_user).innerHTML) + parseInt(users['unreadCount'][obj.id]);
+                  } else {
+                    document.getElementById('userCnt_'+current_user).innerHTML = 0 + parseInt(users['unreadCount'][obj.id]);
+                  }
                 }
-                document.getElementById('msg_count_2_'+current_user).innerHTML = parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML);
-                if(parseInt(document.getElementById('userCnt_'+current_user).innerHTML) > 0)  {
-                  document.getElementById('userCnt_'+current_user).innerHTML = parseInt(document.getElementById('userCnt_'+current_user).innerHTML) + parseInt(users['unreadCount'][obj.id]);
+                divHeader.appendChild(spanUnread);
+
+                var spanStatus = document.createElement('span');
+                spanStatus.className = 'chat-img pull-right';
+                if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
+                    spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
                 } else {
-                  document.getElementById('userCnt_'+current_user).innerHTML = 0 + parseInt(users['unreadCount'][obj.id]);
+                    spanStatus.innerHTML += '<img src="/images/offline.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
                 }
-              }
-              divHeader.appendChild(spanUnread);
+                divHeader.appendChild(spanStatus);
+                divChatBody.appendChild(divHeader);
 
-              var spanStatus = document.createElement('span');
-              spanStatus.className = 'chat-img pull-right';
-              if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
-                  spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
-              } else {
-                  spanStatus.innerHTML += '<img src="/images/offline.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
-              }
-              divHeader.appendChild(spanStatus);
-              divChatBody.appendChild(divHeader);
+                var pEle = document.createElement('p');
+                var collegeStr = obj['college'];
+                pEle.innerHTML = collegeStr.substring(0, 15);
+                divChatBody.appendChild(pEle);
+                liEle.appendChild(divChatBody);
+                chatUsers.appendChild(liEle);
 
-              var pEle = document.createElement('p');
-              var collegeStr = obj['college'];
-              pEle.innerHTML = collegeStr.substring(0, 15);
-              divChatBody.appendChild(pEle);
-              liEle.appendChild(divChatBody);
-              chatUsers.appendChild(liEle);
-
-              var roomArr = [];
-              roomArr.push(obj['id']);
-              roomArr.push(current_user);
-              var roomMembers = roomArr.sort();
-              var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
-              socket.emit('subscribe', roomName);
-            });
+                var roomArr = [];
+                roomArr.push(obj['id']);
+                roomArr.push(current_user);
+                var roomMembers = roomArr.sort();
+                var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
+                socket.emit('subscribe', roomName);
+              });
+            }
           });
         } else if('' == contact){
           showChatUsers();
@@ -406,7 +408,7 @@
             dataType: "json",
             data: {'_token':token, 'limit_start':limitStart, 'previuos_chat_users':previuosChatUsers},
             success:function(users){
-              if(users['chatusers'].length > 0){
+              if(users['chatusers'] && users['chatusers'].length > 0){
                 // renderChatUsers(users)
                 var chatUsers = document.getElementById('chat_users');
                 $.each(users['chatusers'],function(idx,obj){
@@ -417,6 +419,11 @@
                         liEle.className = 'left clearfix addChat';
                     }
                     liEle.id = obj['id'];
+                    if(!previuosChatUsers){
+                      document.getElementById('previuos_chat_users').value = obj['id'];
+                    } else {
+                      document.getElementById('previuos_chat_users').value += ','+obj['id'];
+                    }
                     liEle.setAttribute('data-user_name', obj['name']);
                     liEle.setAttribute('onclick', 'showChat(this);');
 
@@ -499,7 +506,6 @@
                     socket.emit('subscribe', roomName);
                 }
                 $('#isUserScroll').val(0);
-
               } else {
                 $('#isUserScroll').val(1);
               }
@@ -526,87 +532,89 @@
         var chatUsers = document.getElementById('chat_users');
         var chatAdminId = document.getElementById('chat_admin_id').value;
         chatUsers.innerHTML = '';
-        document.getElementById('previuos_chat_users').value = users['chatusers']['chat_users'];
-        $.each(users['chatusers']['users'],function(idx,obj){
-          var liEle = document.createElement('li');
-          if(document.getElementById('user_id').value == obj['id']){
-              liEle.className = 'left clearfix addChat hide';
-          } else {
-              liEle.className = 'left clearfix addChat';
-          }
-          liEle.id = obj['id'];
-          liEle.setAttribute('data-user_name', obj['name']);
-          liEle.setAttribute('onclick', 'showChat(this);');
+        if(users['chatusers']){
+          document.getElementById('previuos_chat_users').value = users['chatusers']['chat_users'];
+          $.each(users['chatusers']['users'],function(idx,obj){
+            var liEle = document.createElement('li');
+            if(document.getElementById('user_id').value == obj['id']){
+                liEle.className = 'left clearfix addChat hide';
+            } else {
+                liEle.className = 'left clearfix addChat';
+            }
+            liEle.id = obj['id'];
+            liEle.setAttribute('data-user_name', obj['name']);
+            liEle.setAttribute('onclick', 'showChat(this);');
 
-          var spanImage = document.createElement('span');
-          spanImage.className = 'chat-img pull-left';
-          if(obj['photo']){
-            if(obj['photo'].indexOf("userStorage") !== -1){
-                var userImagePath = window.location.protocol+'//'+window.location.host+"/"+obj['photo'];
+            var spanImage = document.createElement('span');
+            spanImage.className = 'chat-img pull-left';
+            if(obj['photo']){
+              if(obj['photo'].indexOf("userStorage") !== -1){
+                  var userImagePath = window.location.protocol+'//'+window.location.host+"/"+obj['photo'];
+                } else {
+                  var userImagePath = obj['photo'];
+                }
+            } else {
+              var userImagePath = "/images/user1.png";
+            }
+            spanImage.innerHTML = '<img src="'+userImagePath+'" alt="User Avatar" class="img-circle" />';
+            liEle.appendChild(spanImage);
+
+            var divChatBody = document.createElement('div');
+            divChatBody.className = 'chat-body clearfix';
+
+            var divHeader = document.createElement('div');
+            divHeader.className = 'header';
+
+            var strongName = document.createElement('strong');
+            strongName.className = 'primary-font';
+            strongName.innerHTML = obj['name'] + ' ';
+            divHeader.appendChild(strongName);
+
+            var spanUnread = document.createElement('span');
+            spanUnread.id = 'unread_'+current_user+'_'+obj['id'];
+            spanUnread.setAttribute('style','color: red;');
+            if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
+              spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
+              if(parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML) > 0){
+                document.getElementById('msg_count_1_'+current_user).innerHTML = parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML)+parseInt(users['unreadCount'][obj.id]);
               } else {
-                var userImagePath = obj['photo'];
+                document.getElementById('msg_count_1_'+current_user).innerHTML = 0+parseInt(users['unreadCount'][obj.id]);
               }
-          } else {
-            var userImagePath = "/images/user1.png";
-          }
-          spanImage.innerHTML = '<img src="'+userImagePath+'" alt="User Avatar" class="img-circle" />';
-          liEle.appendChild(spanImage);
-
-          var divChatBody = document.createElement('div');
-          divChatBody.className = 'chat-body clearfix';
-
-          var divHeader = document.createElement('div');
-          divHeader.className = 'header';
-
-          var strongName = document.createElement('strong');
-          strongName.className = 'primary-font';
-          strongName.innerHTML = obj['name'] + ' ';
-          divHeader.appendChild(strongName);
-
-          var spanUnread = document.createElement('span');
-          spanUnread.id = 'unread_'+current_user+'_'+obj['id'];
-          spanUnread.setAttribute('style','color: red;');
-          if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
-            spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
-            if(parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML) > 0){
-              document.getElementById('msg_count_1_'+current_user).innerHTML = parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML)+parseInt(users['unreadCount'][obj.id]);
-            } else {
-              document.getElementById('msg_count_1_'+current_user).innerHTML = 0+parseInt(users['unreadCount'][obj.id]);
+              document.getElementById('msg_count_2_'+current_user).innerHTML = parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML);
+              if(parseInt(document.getElementById('userCnt_'+current_user).innerHTML) > 0)  {
+                document.getElementById('userCnt_'+current_user).innerHTML = parseInt(document.getElementById('userCnt_'+current_user).innerHTML) + parseInt(users['unreadCount'][obj.id]);
+              } else {
+                document.getElementById('userCnt_'+current_user).innerHTML = 0 + parseInt(users['unreadCount'][obj.id]);
+              }
             }
-            document.getElementById('msg_count_2_'+current_user).innerHTML = parseInt(document.getElementById('msg_count_1_'+current_user).innerHTML);
-            if(parseInt(document.getElementById('userCnt_'+current_user).innerHTML) > 0)  {
-              document.getElementById('userCnt_'+current_user).innerHTML = parseInt(document.getElementById('userCnt_'+current_user).innerHTML) + parseInt(users['unreadCount'][obj.id]);
+            divHeader.appendChild(spanUnread);
+
+            var spanStatus = document.createElement('span');
+            spanStatus.className = 'chat-img pull-right';
+            if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
+                spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
+
             } else {
-              document.getElementById('userCnt_'+current_user).innerHTML = 0 + parseInt(users['unreadCount'][obj.id]);
+                spanStatus.innerHTML += '<img src="/images/offline.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
             }
-          }
-          divHeader.appendChild(spanUnread);
+            divHeader.appendChild(spanStatus);
+            divChatBody.appendChild(divHeader);
 
-          var spanStatus = document.createElement('span');
-          spanStatus.className = 'chat-img pull-right';
-          if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
-              spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
+            var pEle = document.createElement('p');
+            var collegeStr = obj['college'];
+            pEle.innerHTML = collegeStr.substring(0, 15);
+            divChatBody.appendChild(pEle);
+            liEle.appendChild(divChatBody);
+            chatUsers.appendChild(liEle);
 
-          } else {
-              spanStatus.innerHTML += '<img src="/images/offline.png" id="userstatus_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
-          }
-          divHeader.appendChild(spanStatus);
-          divChatBody.appendChild(divHeader);
-
-          var pEle = document.createElement('p');
-          var collegeStr = obj['college'];
-          pEle.innerHTML = collegeStr.substring(0, 15);
-          divChatBody.appendChild(pEle);
-          liEle.appendChild(divChatBody);
-          chatUsers.appendChild(liEle);
-
-          var roomArr = [];
-          roomArr.push(obj['id']);
-          roomArr.push(current_user);
-          var roomMembers = roomArr.sort();
-          var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
-          socket.emit('subscribe', roomName);
-        });
+            var roomArr = [];
+            roomArr.push(obj['id']);
+            roomArr.push(current_user);
+            var roomMembers = roomArr.sort();
+            var roomName = 'private_'+roomArr[0]+'_'+roomArr[1];
+            socket.emit('subscribe', roomName);
+          });
+        }
         if(chatAdminId != current_user){
           var roomArr = [];
           roomArr.push(chatAdminId);

@@ -153,73 +153,75 @@
     var current_user = document.getElementById('user_id').value;
     var chatUsers = document.getElementById('chat_users');
     chatUsers.innerHTML = '';
-    document.getElementById('previuos_chat_users').value = users['chatusers']['chat_users'];
-    $.each(users['chatusers']['users'],function(idx,obj){
-      var liEle = document.createElement('li');
-      liEle.className = 'left clearfix addChat';
-      liEle.id = obj['id'];
-      liEle.setAttribute('data-user_name', obj['name']);
-      liEle.setAttribute('onclick', 'showChat(this);');
+    if(users['chatusers']){
+      document.getElementById('previuos_chat_users').value = users['chatusers']['chat_users'];
+      $.each(users['chatusers']['users'],function(idx,obj){
+        var liEle = document.createElement('li');
+        liEle.className = 'left clearfix addChat';
+        liEle.id = obj['id'];
+        liEle.setAttribute('data-user_name', obj['name']);
+        liEle.setAttribute('onclick', 'showChat(this);');
 
-      var spanImage = document.createElement('span');
-      spanImage.className = 'chat-img pull-left';
-      if(obj['photo']){
-        if(obj['photo'].indexOf("clientUserStorage") !== -1){
-            var userImagePath = window.location.protocol+'//'+window.location.host+"/"+obj['photo'];
-          } else {
-            var userImagePath = obj['photo'];
-          }
-      } else {
-        var userImagePath = "/images/user1.png";
-      }
-      spanImage.innerHTML = '<img src="'+userImagePath+'" alt="User Avatar" class="img-circle" />';
-      liEle.appendChild(spanImage);
-
-      var divChatBody = document.createElement('div');
-      divChatBody.className = 'chat-body clearfix';
-
-      var divHeader = document.createElement('div');
-      divHeader.className = 'header';
-
-      var strongName = document.createElement('strong');
-      strongName.className = 'primary-font';
-      var nameStr = obj['name'];
-      strongName.innerHTML = nameStr.substring(0, 15);;
-      divHeader.appendChild(strongName);
-
-      var spanUnread = document.createElement('span');
-      spanUnread.id = 'unread_'+subdomain+'_'+obj['id'];
-      spanUnread.setAttribute('style','color: red;');
-      if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
-        spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
-        if(parseInt(document.getElementById('msg_count_'+subdomain).innerHTML) > 0){
-          document.getElementById('msg_count_'+subdomain).innerHTML = parseInt(document.getElementById('msg_count_'+subdomain).innerHTML)+parseInt(users['unreadCount'][obj.id]);
+        var spanImage = document.createElement('span');
+        spanImage.className = 'chat-img pull-left';
+        if(obj['photo']){
+          if(obj['photo'].indexOf("clientUserStorage") !== -1){
+              var userImagePath = window.location.protocol+'//'+window.location.host+"/"+obj['photo'];
+            } else {
+              var userImagePath = obj['photo'];
+            }
         } else {
-          document.getElementById('msg_count_'+subdomain).innerHTML = 0+parseInt(users['unreadCount'][obj.id]);
+          var userImagePath = "/images/user1.png";
         }
-      }
-      divHeader.appendChild(spanUnread);
+        spanImage.innerHTML = '<img src="'+userImagePath+'" alt="User Avatar" class="img-circle" />';
+        liEle.appendChild(spanImage);
 
-      var spanStatus = document.createElement('span');
-      spanStatus.className = 'chat-img pull-right';
-      if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
-          spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+subdomain+'_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
+        var divChatBody = document.createElement('div');
+        divChatBody.className = 'chat-body clearfix';
 
-      } else {
-          spanStatus.innerHTML += '<img src="/images/offline.png" id="userstatus_'+subdomain+'_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
-      }
-      divHeader.appendChild(spanStatus);
-      divChatBody.appendChild(divHeader);
-      liEle.appendChild(divChatBody);
-      chatUsers.appendChild(liEle);
+        var divHeader = document.createElement('div');
+        divHeader.className = 'header';
 
-      // create/ join chat room
-      var roomArr = [];
-      roomArr.push(current_user);
-      roomArr.push(obj['id']);
-      var roomName = 'private_'+subdomain+'_'+roomArr[0]+'_'+roomArr[1];
-      socket.emit('clientSubscribe', roomName);
-    });
+        var strongName = document.createElement('strong');
+        strongName.className = 'primary-font';
+        var nameStr = obj['name'];
+        strongName.innerHTML = nameStr.substring(0, 15);;
+        divHeader.appendChild(strongName);
+
+        var spanUnread = document.createElement('span');
+        spanUnread.id = 'unread_'+subdomain+'_'+obj['id'];
+        spanUnread.setAttribute('style','color: red;');
+        if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
+          spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
+          if(parseInt(document.getElementById('msg_count_'+subdomain).innerHTML) > 0){
+            document.getElementById('msg_count_'+subdomain).innerHTML = parseInt(document.getElementById('msg_count_'+subdomain).innerHTML)+parseInt(users['unreadCount'][obj.id]);
+          } else {
+            document.getElementById('msg_count_'+subdomain).innerHTML = 0+parseInt(users['unreadCount'][obj.id]);
+          }
+        }
+        divHeader.appendChild(spanUnread);
+
+        var spanStatus = document.createElement('span');
+        spanStatus.className = 'chat-img pull-right';
+        if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
+            spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+subdomain+'_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
+
+        } else {
+            spanStatus.innerHTML += '<img src="/images/offline.png" id="userstatus_'+subdomain+'_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
+        }
+        divHeader.appendChild(spanStatus);
+        divChatBody.appendChild(divHeader);
+        liEle.appendChild(divChatBody);
+        chatUsers.appendChild(liEle);
+
+        // create/ join chat room
+        var roomArr = [];
+        roomArr.push(current_user);
+        roomArr.push(obj['id']);
+        var roomName = 'private_'+subdomain+'_'+roomArr[0]+'_'+roomArr[1];
+        socket.emit('clientSubscribe', roomName);
+      });
+    }
   }
   // up & down chat users list
   $(document).on('click', '#chat_window_1 .top-bar', function (e) {
@@ -569,13 +571,18 @@
       dataType: "json",
       data: {'_token':token, 'limit_start':limitStart, 'previuos_chat_users':previuosChatUsers},
       success:function(users){
-        if(users['chatusers'].length > 0){
+        if(users['chatusers'] && users['chatusers'].length > 0){
           var current_user = document.getElementById('user_id').value;
           var chatUsers = document.getElementById('chat_users');
           $.each(users['chatusers'],function(idx,obj){
               var liEle = document.createElement('li');
               liEle.className = 'left clearfix addChat';
               liEle.id = obj['id'];
+              if(!previuosChatUsers){
+                document.getElementById('previuos_chat_users').value = obj['id'];
+              } else {
+                document.getElementById('previuos_chat_users').value += ','+obj['id'];
+              }
               liEle.setAttribute('data-user_name', obj['name']);
               liEle.setAttribute('onclick', 'showChat(this);');
 
@@ -657,72 +664,74 @@
         var current_user = document.getElementById('user_id').value;
         var chatUsers = document.getElementById('chat_users');
         chatUsers.innerHTML = '';
-        $.each(users['users'],function(idx,obj){
-          var liEle = document.createElement('li');
-          liEle.className = 'left clearfix addChat';
-          liEle.id = obj['id'];
-          liEle.setAttribute('data-user_name', obj['name']);
-          liEle.setAttribute('onclick', 'showChat(this);');
+        if(users['users']){
+          $.each(users['users'],function(idx,obj){
+            var liEle = document.createElement('li');
+            liEle.className = 'left clearfix addChat';
+            liEle.id = obj['id'];
+            liEle.setAttribute('data-user_name', obj['name']);
+            liEle.setAttribute('onclick', 'showChat(this);');
 
-          var spanImage = document.createElement('span');
-          spanImage.className = 'chat-img pull-left';
-          if(obj['photo']){
-            if(obj['photo'].indexOf("clientUserStorage") !== -1){
-                var userImagePath = window.location.protocol+'//'+window.location.host+"/"+obj['photo'];
-              } else {
-                var userImagePath = obj['photo'];
-              }
-          } else {
-            var userImagePath = "/images/user1.png";
-          }
-          spanImage.innerHTML = '<img src="'+userImagePath+'" alt="User Avatar" class="img-circle" />';
-          liEle.appendChild(spanImage);
-
-          var divChatBody = document.createElement('div');
-          divChatBody.className = 'chat-body clearfix';
-
-          var divHeader = document.createElement('div');
-          divHeader.className = 'header';
-
-          var strongName = document.createElement('strong');
-          strongName.className = 'primary-font';
-          var nameStr = obj['name'];
-          strongName.innerHTML = nameStr.substring(0, 15);;
-          divHeader.appendChild(strongName);
-
-          var spanUnread = document.createElement('span');
-          spanUnread.id = 'unread_'+subdomain+'_'+obj['id'];
-          spanUnread.setAttribute('style','color: red;');
-          if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
-            spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
-            if(parseInt(document.getElementById('msg_count_'+subdomain).innerHTML) > 0){
-              document.getElementById('msg_count_'+subdomain).innerHTML = parseInt(document.getElementById('msg_count_'+subdomain).innerHTML)+parseInt(users['unreadCount'][obj.id]);
+            var spanImage = document.createElement('span');
+            spanImage.className = 'chat-img pull-left';
+            if(obj['photo']){
+              if(obj['photo'].indexOf("clientUserStorage") !== -1){
+                  var userImagePath = window.location.protocol+'//'+window.location.host+"/"+obj['photo'];
+                } else {
+                  var userImagePath = obj['photo'];
+                }
             } else {
-              document.getElementById('msg_count_'+subdomain).innerHTML = 0+parseInt(users['unreadCount'][obj.id]);
+              var userImagePath = "/images/user1.png";
             }
-          }
-          divHeader.appendChild(spanUnread);
+            spanImage.innerHTML = '<img src="'+userImagePath+'" alt="User Avatar" class="img-circle" />';
+            liEle.appendChild(spanImage);
 
-          var spanStatus = document.createElement('span');
-          spanStatus.className = 'chat-img pull-right';
-          if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
-              spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+subdomain+'_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
+            var divChatBody = document.createElement('div');
+            divChatBody.className = 'chat-body clearfix';
 
-          } else {
-              spanStatus.innerHTML += '<img src="/images/offline.png" id="userstatus_'+subdomain+'_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
-          }
-          divHeader.appendChild(spanStatus);
-          divChatBody.appendChild(divHeader);
-          liEle.appendChild(divChatBody);
-          chatUsers.appendChild(liEle);
+            var divHeader = document.createElement('div');
+            divHeader.className = 'header';
 
-          // create/ join chat room
-          var roomArr = [];
-          roomArr.push(current_user);
-          roomArr.push(obj['id']);
-          var roomName = 'private_'+subdomain+'_'+roomArr[0]+'_'+roomArr[1];
-          socket.emit('clientSubscribe', roomName);
-        });
+            var strongName = document.createElement('strong');
+            strongName.className = 'primary-font';
+            var nameStr = obj['name'];
+            strongName.innerHTML = nameStr.substring(0, 15);;
+            divHeader.appendChild(strongName);
+
+            var spanUnread = document.createElement('span');
+            spanUnread.id = 'unread_'+subdomain+'_'+obj['id'];
+            spanUnread.setAttribute('style','color: red;');
+            if(users['unreadCount'] && users['unreadCount'][obj.id] > 0){
+              spanUnread.innerHTML = ' ' + users['unreadCount'][obj.id];
+              if(parseInt(document.getElementById('msg_count_'+subdomain).innerHTML) > 0){
+                document.getElementById('msg_count_'+subdomain).innerHTML = parseInt(document.getElementById('msg_count_'+subdomain).innerHTML)+parseInt(users['unreadCount'][obj.id]);
+              } else {
+                document.getElementById('msg_count_'+subdomain).innerHTML = 0+parseInt(users['unreadCount'][obj.id]);
+              }
+            }
+            divHeader.appendChild(spanUnread);
+
+            var spanStatus = document.createElement('span');
+            spanStatus.className = 'chat-img pull-right';
+            if(users['onlineUsers'] && users['onlineUsers'][obj['id']]){
+                spanStatus.innerHTML += '<img src="/images/online.png" id="userstatus_'+subdomain+'_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
+
+            } else {
+                spanStatus.innerHTML += '<img src="/images/offline.png" id="userstatus_'+subdomain+'_'+obj['id']+'" data-user_id="'+obj['id']+'" style="height:  20px; width: 20px;" />';
+            }
+            divHeader.appendChild(spanStatus);
+            divChatBody.appendChild(divHeader);
+            liEle.appendChild(divChatBody);
+            chatUsers.appendChild(liEle);
+
+            // create/ join chat room
+            var roomArr = [];
+            roomArr.push(current_user);
+            roomArr.push(obj['id']);
+            var roomName = 'private_'+subdomain+'_'+roomArr[0]+'_'+roomArr[1];
+            socket.emit('clientSubscribe', roomName);
+          });
+        }
       });
     } else if('' == contact){
       document.getElementById('msg_count_'+subdomain).innerHTML = 0;

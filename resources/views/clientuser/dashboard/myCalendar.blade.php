@@ -30,6 +30,11 @@
     width: 100%;
     border-collapse: collapse;
   }
+  .btn-yellow{  background: yellow;}
+  .btn-red{  background: red;}
+  .btn-green{  background: green;}
+  .btn-blue{  background: blue;}
+  .btn-pink{  background: #e6004e;}
   </style>
 @stop
 @section('module_title')
@@ -50,14 +55,7 @@
       </div>
     @endif
     <ul>
-      <li>Color code as per below priority:
-        <ol>
-          <li>Yellow Color - Emergency Notice</li>
-          <li>Red Color - Exam Schedule</li>
-          <li>Green Color - Holiday</li>
-          <li>Blue Color - Notice</li>
-          <li>Pink Color - Classes</li>
-        </ol>
+      <li>Color code as per below priority:<button type="button" class="btn btn-yellow"></button> - Emergency Notice, <button type="button" class="btn btn-red"></button> - Exam Schedule, <button type="button" class="btn btn-green"></button> - Holiday, <button type="button" class="btn btn-blue"></button> - Notice, <button type="button" class="btn btn-pink"></button> - Classes
       </li>
     </ul>
     <div id="calendar">
@@ -207,6 +205,10 @@
 
   function dayClick(){
     $('td.fc-day').on('click',function(ele){
+      var selectedDate = $(this).data('date');
+      $('#modal_'+selectedDate).modal();
+    });
+    $('td.fc-day-top').on('click',function(ele){
       var selectedDate = $(this).data('date');
       $('#modal_'+selectedDate).modal();
     });

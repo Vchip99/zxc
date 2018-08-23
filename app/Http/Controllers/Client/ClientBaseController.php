@@ -61,6 +61,9 @@ class ClientBaseController extends BaseController
 
     protected function manageClientHome($subdomainName){
         $loginUser = Auth::guard('client')->user();
+        if(!is_object($loginUser)){
+            return Redirect::to('myprofile');
+        }
         $onlineCourses = ClientOnlineCourse::getCurrentCoursesByClient($loginUser->subdomain);
         $defaultCourse = ClientOnlineCourse::where('name', 'How to use course')->first();
         $defaultTest = ClientOnlineCourse::where('name', 'How to use test')->first();

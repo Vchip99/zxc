@@ -1341,6 +1341,9 @@ class ClientUserController extends BaseController
         $allBatches = [];
         $dayColours = '';
         $clientUser = Auth::guard('clientuser')->user();
+        if(!is_object($clientUser)){
+            return Redirect::to('/');
+        }
         $clientUserId = $clientUser->id;
         $clientId = $clientUser->client_id;
         $userBatches = [];

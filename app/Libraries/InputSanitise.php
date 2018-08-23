@@ -85,9 +85,9 @@ class InputSanitise{
         $subdomainObj = self::checkDomain($request);
         if(is_object($subdomainObj) && $subdomainObj->client_id != $user->client_id){
             if('local' == \Config::get('app.env')){
-                return 'http://'.$user->client->subdomain;
+                return 'http://'.$subdomainObj->subdomain;
             } else {
-                return 'https://'.$user->client->subdomain;;
+                return 'https://'.$subdomainObj->subdomain;
             }
         }
         return $subdomainObj;

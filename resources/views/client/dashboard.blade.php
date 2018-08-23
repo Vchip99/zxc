@@ -44,8 +44,8 @@
 <div class="wrapper">
   <header class="main-header">
     <a href="" class="logo">
-      <span class="logo-mini"><b> V</b>EDU</span>
-      <span class="logo-lg"><b>Vchip</b>Technology</span>
+      <span class="logo-mini"><b></b></span>
+      <span class="logo-lg"><b></b></span>
     </a>
     <nav class="navbar navbar-static-top">
       <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
@@ -227,7 +227,7 @@
                 @endif
             </ul>
         </li>
-        <li class="header">Vchip TECHNOLOGY</li>
+        <li class="header">Dashboard</li>
         <li class="treeview ">
           <a href="#" title="Online Courses">
             <i class="fa fa-dashboard"></i> <span>Online Courses</span>
@@ -409,7 +409,7 @@
             <li title="Manage Settings"><a href="{{ url('manageSettings')}}"><i class="fa fa-circle-o"></i> Manage Settings</a></li>
           </ul>
         </li>
-        <li class="header">LABELS</li>
+        <li class="header">Logout</li>
         <li title="Logout">
           <a href="{{ url('client/logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="fa fa-sign-out" aria-hidden="true"></i> <span>Logout </span>
