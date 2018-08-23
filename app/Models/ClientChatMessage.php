@@ -159,7 +159,7 @@ class ClientChatMessage extends Model
         // } else {
         //     $users = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->where('verified',1)->where('client_approve',1)->skip(0)->take(10)->get();
         // }
-        $users = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->where('client_approve',1)->skip(0)->take(10)->get();
+        $users = Clientuser::whereNotIn('id', $chatmessageusers)->where('client_id', $clientId)->where('client_approve',1)->take(10)->get();
         if(is_object($users) && false == $users->isEmpty()){
             foreach($users as $user){
                 if(is_file($user->photo) && true == preg_match('/clientUserStorage/',$user->photo)){

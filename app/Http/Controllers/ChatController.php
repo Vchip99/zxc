@@ -38,7 +38,7 @@ class chatController extends Controller
         } else {
             $skipUsers = explode(',', $request->get('previuos_chat_users'));
             array_push($skipUsers, $loginUser->id);
-            $users = User::whereNotIn('id', $skipUsers)->skip($limitStart)->take(10)->get();
+            $users = User::whereNotIn('id', $skipUsers)->take(10)->get();
 
             if(is_object($users) && false == $users->isEmpty()){
                 foreach($users as $user){

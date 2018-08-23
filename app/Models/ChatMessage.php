@@ -80,7 +80,7 @@ class ChatMessage extends Model
 
             array_push($chatmessageusers, $adminChatUserId);
             array_push($chatmessageusers, $loginUser->id);
-            $users = User::whereNotIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->skip(0)->take(10)->get();
+            $users = User::whereNotIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->take(10)->get();
 
             if(is_object($users) && false == $users->isEmpty()){
                 foreach($users as $user){

@@ -36,7 +36,7 @@ class ClientChatController extends Controller
         $loginUser = Auth::guard('client')->user();
         $clientId = $loginUser->id;
         $skipUsers = explode(',', $request->get('previuos_chat_users'));
-        $users = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->where('client_approve',1)->skip($limitStart)->take(10)->get();
+        $users = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->where('client_approve',1)->take(10)->get();
 
         // if( 1 == $loginUser->allow_non_verified_email){
         //     $users = Clientuser::whereNotIn('id', $skipUsers)->where('client_id', $clientId)->whereNotNull('email')->where('client_approve',1)->skip($limitStart)->take(20)->get();

@@ -197,7 +197,7 @@ class RegisterController extends Controller
             }
             DB::connection('mysql2')->commit();
             if('mobile' == $request->get('signup_type')){
-                return redirect('/')->with('message', 'Please sign up using mobile.');
+                return redirect('/')->with('message', 'Please sign in using mobile.');
             } else {
                 if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
                     return redirect('/')->with('message', 'Verify your email for your account activation.');
