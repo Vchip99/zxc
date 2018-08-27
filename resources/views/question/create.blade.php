@@ -87,7 +87,7 @@
 		{{csrf_field()}}
 		<div class="container admin_div">
 			<div class="form-group row @if ($errors->has('category')) has-error @endif">
-			    <label class="col-sm-2 col-form-label">Category Name:</label>
+			    <label class="col-sm-2 col-form-label">Category:</label>
 			    <div class="col-sm-3">
 			    @if(count($testCategories) > 0 && isset($testQuestion->id))
 			    	@foreach($testCategories as $testCategory)
@@ -113,7 +113,7 @@
 			    <input type="hidden" id="selected_category_id" name="selected_category_id" value="{{$selectedCategoryId}}">
 		  	</div>
 		  	<div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
-			    <label class="col-sm-2 col-form-label">Sub Category Name:</label>
+			    <label class="col-sm-2 col-form-label">Sub Category:</label>
 			    <div class="col-sm-3">
 		        	@if(count($testSubCategories) > 0 && isset($testQuestion->id))
 			        	@foreach($testSubCategories as $testSubCategory)
@@ -139,7 +139,7 @@
 			    <input type="hidden" id="selected_subcategory_id" name="selected_subcategory_id" value="{{$selectedSubCategoryId}}">
 		  	</div>
 			<div class="form-group row @if ($errors->has('subject')) has-error @endif">
-		    	<label class="col-sm-2 col-form-label">Select Subject:</label>
+		    	<label class="col-sm-2 col-form-label"> Subject:</label>
 			    <div class="col-sm-3" >
 	          		@if(count($testSubjects) > 0 && isset($testQuestion->id) )
 	          			@foreach($testSubjects as $testSubject)
@@ -165,7 +165,7 @@
 	          	<input type="hidden" id="selected_subject_id" name="selected_subject_id" value="{{$selectedSubjectId}}">
 		    </div>
 		    <div class="form-group row @if ($errors->has('paper')) has-error @endif">
-		    	<label class="col-sm-2 col-form-label">Select Paper:</label>
+		    	<label class="col-sm-2 col-form-label"> Paper:</label>
 			    <div class="col-sm-3">
 	    			@if(count($papers) > 0 && isset($testQuestion->id))
 	    				@foreach($papers as $paper)
@@ -192,7 +192,7 @@
 			    <input type="hidden" id="selected_paper_id" name="selected_paper_id" value="{{$selectedPaperId}}">
 		    </div>
 		    <div class="form-group row @if ($errors->has('section_type')) has-error @endif">
-		    	<label class="col-sm-2 col-form-label">Select Section:</label>
+		    	<label class="col-sm-2 col-form-label"> Section:</label>
 			    <div class="col-sm-3">
 			    	@if(isset($testQuestion->id))
 			    		@if(count($paperSections)>0)

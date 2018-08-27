@@ -40,11 +40,20 @@ class Controller extends BaseController
             }
         });
         view::share('chatAdminId', $chatAdminId);
+
         if(Cache::has('vchip:chatAdminLive')){
             $chatAdminLive = Cache::get('vchip:chatAdminLive');
         } else {
             $chatAdminLive = false;
         }
         view::share('chatAdminLive', $chatAdminLive);
+
+        // $testForCompanies = Cache::remember('vchip:testForCompanies',10, function() {
+        //     return TestCategory::getCompanyTestCategoriesAssociatedWithQuestion();
+        // });
+        $testForCompany = TestSubjectPaper::getFirstCompanyTestPaperAssociatedWithQuestion();
+        // dd(\DB::getQueryLog());
+        // dd($testForCompany);
+        view::share('testForCompany', $testForCompany);
     }
 }

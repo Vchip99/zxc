@@ -1,4 +1,15 @@
 <nav class=" navbar-lower navbar navbar-default  shrink navbar-fixed-top" style=" z-index: 1030; ">
+
+    <div class="row" id="companyTest" style="background-color: white; padding-right: 100px;">
+      <div align="right">
+        @if(is_object($testForCompany))
+            <a href="{{ url('companyTest')}}/{{$testForCompany->id}}" class="btn " style="border-radius: 5px !important;">{{$testForCompany->name}}</a>
+        @else
+            <a href="{{ url('companyTest')}}" class="btn " style="border-radius: 5px !important;">Mock Test</a>
+        @endif
+          <!-- <a href="{{ url('mockInterview')}}" class="btn " style="border-radius: 5px !important;">Mock Interview</a> -->
+      </div>
+    </div>
   <div class="container">
       <div class="pull-left" >
         <a class="navbar-brand pull-left" href="{{ url('/')}}">

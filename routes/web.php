@@ -838,6 +838,28 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateAdvertisementPage', 'AdvertisementPage\AdvertisementPageController@update');
 	Route::delete('admin/deleteAdvertisementPage', 'AdvertisementPage\AdvertisementPageController@delete');
 
+	// company test
+	Route::get('companyTest/{id?}', 'CompanyTestController@index');
+	Route::get('mockInterview', 'CompanyTestController@mockInterview');
+
+
+	// Skills
+	Route::get('admin/manageSkill', 'Admin\SkillController@show');
+	Route::get('admin/createSkill', 'Admin\SkillController@create');
+	Route::post('admin/createSkill', 'Admin\SkillController@store');
+	Route::get('admin/skill/{id}/edit', 'Admin\SkillController@edit');
+	Route::put('admin/updateSkill', 'Admin\SkillController@update');
+	Route::delete('admin/deleteSkill', 'Admin\SkillController@delete');
+	Route::post('admin/isSkillExist', 'Admin\SkillController@isSkillExist');
+
+	// UserData
+	Route::get('admin/manageUserData', 'Admin\UserDataController@show');
+	Route::get('admin/createUserData', 'Admin\UserDataController@create');
+	Route::post('admin/createUserData', 'Admin\UserDataController@store');
+	Route::get('admin/userData/{id}/edit', 'Admin\UserDataController@edit');
+	Route::put('admin/updateUserData', 'Admin\UserDataController@update');
+	Route::delete('admin/deleteUserData', 'Admin\UserDataController@delete');
+
 });
 
 Route::group(['domain' => '{client}.localvchip.com'], function () {

@@ -27,9 +27,10 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Category Name</th>
-          <th>Edit Category</th>
-          <th>Delete Category</th>
+          <th>Category </th>
+          <th>Category For</th>
+          <th>Edit </th>
+          <th>Delete </th>
         </tr>
       </thead>
       <tbody>
@@ -38,6 +39,13 @@
           <tr>
             <th scope="row">{{$index + $testCategories->firstItem()}}</th>
             <td>{{$testCategory->name}}</td>
+            <td>
+              @if(1 == $testCategory->category_for)
+                Vchip Edu
+              @else
+                Other Company
+              @endif
+            </td>
             <td>
               <a href="{{url('admin/category')}}/{{$testCategory->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testCategory->name}}" />
                 </a>

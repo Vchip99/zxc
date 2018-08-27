@@ -19,6 +19,18 @@
    <form action="{{url('admin/createCategory')}}" method="POST" id="submitForm">
   @endif
     {{ csrf_field() }}
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label" for="">Category For:</label>
+      <div class="col-sm-3">
+        @if(isset($testCategory->id))
+          Vchip Edu <input type="radio" name="category_for" value="1" @if(1 == $testCategory->category_for)checked="checked" @endif>
+          Other Company <input type="radio" name="category_for" value="0" @if(0 == $testCategory->category_for)checked="" @endif>
+        @else
+          Vchip Edu <input type="radio" name="category_for" value="1" checked>
+          Other Company <input type="radio" name="category_for" value="0">
+        @endif
+      </div>
+    </div>
     <div class="form-group row  @if ($errors->has('category')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="category">Category Name:</label>
       <div class="col-sm-3">
@@ -27,7 +39,6 @@
         <span class="hide" id="categoryError" style="color: white;">Given name is already exist.Please enter another name.</span>
       </div>
     </div>
-
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
         <button type="button" class="btn btn-primary" onclick="searchCategory();">Submit</button>

@@ -370,4 +370,54 @@ class TestSubjectPaper extends Model
         }
         return 'false';
     }
+
+    protected static function getFirstCompanyTestPaperAssociatedWithQuestion(){
+        return DB::table('test_subject_papers')
+            ->join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+            ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+            ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+            ->join('questions', function($join){
+                $join->on('questions.category_id', '=', 'test_categories.id');
+                $join->on('questions.subcat_id', '=', 'test_sub_categories.id');
+                $join->on('questions.subject_id', '=', 'test_subjects.id');
+                $join->on('questions.paper_id', '=', 'test_subject_papers.id');
+            })
+            ->where('category_for', 0)
+            ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
+            ->select('test_subject_papers.id','test_subject_papers.name')
+            ->groupBy('test_subject_papers.id')->first();
+    }
+    protected static function getAllCompanyTestPaperAssociatedWithQuestion(){
+        return DB::table('test_subject_papers')
+            ->join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+            ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+            ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+            ->join('questions', function($join){
+                $join->on('questions.category_id', '=', 'test_categories.id');
+                $join->on('questions.subcat_id', '=', 'test_sub_categories.id');
+                $join->on('questions.subject_id', '=', 'test_subjects.id');
+                $join->on('questions.paper_id', '=', 'test_subject_papers.id');
+            })
+            ->where('category_for', 0)
+            ->select('test_subject_papers.id','test_subject_papers.name','test_subject_papers.date_to_active','test_subject_papers.date_to_inactive')
+            ->groupBy('test_subject_papers.id')->get();
+    }
+
+    protected static function getTestPaperAssociatedWithQuestionById($id){
+        return DB::table('test_subject_papers')
+            ->join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+            ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+            ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+            ->join('questions', function($join){
+                $join->on('questions.category_id', '=', 'test_categories.id');
+                $join->on('questions.subcat_id', '=', 'test_sub_categories.id');
+                $join->on('questions.subject_id', '=', 'test_subjects.id');
+                $join->on('questions.paper_id', '=', 'test_subject_papers.id');
+            })
+            ->where('category_for', 0)
+            ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
+            ->where('test_subject_papers.id', $id)
+            ->select('test_subject_papers.id','test_subject_papers.*')
+            ->groupBy('test_subject_papers.id')->first();
+    }
 }

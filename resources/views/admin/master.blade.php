@@ -253,6 +253,8 @@
                 <li title="Show User video"><a href="{{ url('admin/userVideo')}}"><i class="fa fa-circle-o"></i> User Video </a></li>
               @endif
                 <li title="Show Un Approve Users"><a href="{{ url('admin/unapproveUsers')}}"><i class="fa fa-circle-o"></i> Un Approve Users </a></li>
+                <li title="Manage Skills"><a href="{{ url('admin/manageSkill')}}"><i class="fa fa-circle-o"></i> Manage Skills </a></li>
+                <li title="User Data"><a href="{{ url('admin/manageUserData')}}"><i class="fa fa-circle-o"></i> Manage User Data </a></li>
             </ul>
           </li>
           <li class="treeview">

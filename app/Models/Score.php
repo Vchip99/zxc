@@ -8,6 +8,7 @@ use Auth, DB;
 use App\Models\TestSubject;
 use App\Models\TestSubjectPaper;
 use App\Models\Question;
+use App\Models\User;
 
 class Score extends Model
 {
@@ -77,7 +78,7 @@ class Score extends Model
                 ->where('scores.paper_id', $paperId)
                 ->where('scores.subject_id', $subjectId)
                 ->where('scores.test_score', '>', DB::raw($testScore));
-        if('all' != $userCollegeId){
+        if('all' != $userCollegeId && $userCollegeId > 0){
             $result->where('users.college_id', $userCollegeId);
         }
         return $result->count();
@@ -106,7 +107,7 @@ class Score extends Model
                 ->where('scores.subcat_id', $subcategoryId)
                 ->where('scores.paper_id', $paperId)
                 ->where('scores.subject_id', $subjectId);
-        if('all' != $userCollegeId){
+        if('all' != $userCollegeId && $userCollegeId > 0){
             $result->where('users.college_id', $userCollegeId);
         }
         return $result->count();
@@ -231,5 +232,10 @@ class Score extends Model
             $result->where('scores.paper_id', $paperId);
         }
         return $result->select('scores.*')->orderBy('test_score', 'desc')->get();
+    }
+
+    protected static function getAllCompanyTestResults(){
+        return static::join('test_categories', 'test_categories.id','=', 'scores.category_id')
+            ->where('test_categories.category_for',0)->get();
     }
 }

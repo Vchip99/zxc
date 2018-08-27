@@ -337,7 +337,6 @@ class TestController extends Controller
     protected function checkVerificationCode(Request $request){
     	$paperId = $request->get('paper_id');
         $checkVerificationCode = $request->get('verification_code');
-        // return $request->all();
         DB::beginTransaction();
         try
         {

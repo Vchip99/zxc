@@ -497,4 +497,8 @@ class User extends Authenticatable
         $result['onlineUsers'] = ChatMessage::checkOnlineUsers();
         return $result;
     }
+
+    protected static function collegeUser(){
+        return static::where('user_type', self::Student)->where('admin_approve', 1)->get();
+    }
 }

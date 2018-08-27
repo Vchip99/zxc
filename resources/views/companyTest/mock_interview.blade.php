@@ -5,7 +5,7 @@
 @section('header-css')
   @include('layouts.home-css')
   <link href="{{ asset('css/sidemenuindex.css?ver=1.0')}}" rel="stylesheet"/>
-<style type="text/css">
+<!-- <style type="text/css">
   #vchip-header {
     background: #4d4d4d;
   }
@@ -230,6 +230,90 @@
       overflow: hidden !important;
       text-overflow: ellipsis;
   }
+</style> -->
+<style>
+.memberinfotop{
+  margin-top: 100px;
+
+
+}
+.memberinfo{
+  margin:10px;
+}
+.image{
+  height:150px;
+  width:150px;
+}
+.topcontent{
+  padding-top:20px;
+}
+.content{
+  /*padding-top: 20px;*/
+
+
+}
+
+.button{
+  float:right;
+
+}
+.button1{
+  float:left;
+}
+@media only screen and (max-width: 418px){
+  body{
+    font-size: 13px;
+  }
+}
+@media only screen and (max-width: 386px){
+  body{
+    font-size: 12px;
+  }
+}
+@media only screen and (max-width: 375px){
+  body{
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1190px) {
+  .navbar-header {
+      float: none;
+  }
+  .navbar-left,.navbar-right {
+      float: none !important;
+  }
+  .navbar-toggle {
+      display: block;
+  }
+  .navbar-collapse {
+      border-top: 1px solid transparent;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+      min-height: 410px;
+  }
+  .navbar-fixed-top {
+      top: 0;
+      border-width: 0 0 1px;
+  }
+  .navbar-collapse.collapse {
+      display: none!important;
+  }
+  .navbar-nav {
+      float: none!important;
+      margin-top: 7.5px;
+  }
+  .navbar-nav>li {
+      float: none;
+  }
+  .navbar-nav>li>a {
+      padding-top: 10px;
+      padding-bottom: 10px;
+  }
+  .collapse.in{
+      display:block !important;
+  }
+}
+
 </style>
 @stop
 @section('header-js')
@@ -256,76 +340,96 @@
       <div class="col-sm-3 hidden-div">
         <h4 class="v_h4_subtitle"> Sort By</h4>
         <div class="mrgn_20_top_btm" >
-          <select class="form-control" id="designation" name="designation" required title="Designation"  onChange="selectArea();">
-            <option value="">Select Designation</option>
-            @if(count($designations) > 0)
-              @foreach($designations as $designation)
-                <option value="{{$designation->id}}">{{$designation->name}}</option>
+          <select class="form-control" id="skill" name="skill" required title="Skill"  onChange="selectArea();">
+            <option value="">Select Skill</option>
+            @if(count($allSkills) > 0)
+              @foreach($allSkills as $skill)
+                <option value="{{$skill->id}}">{{$skill->name}}</option>
               @endforeach
             @endif
           </select>
         </div>
-        <div class="dropdown mrgn_20_top_btm">
-            <select class="form-control" id="area" name="area" required title="Area" onChange="selectHeros()">
-              <option value="">Select Area</option>
-            </select>
-        </div>
-        <h4 class="v_h4_subtitle mrgn_20_top_btm"> Filter By</h4>
-        <div class="panel"></div>
-        <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Others"> Others</p>
-        <div class="panel">
-          <div class="checkbox">
-            <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Latest</label>
-          </div>
-        </div>
       </div>
-      <div class="col-sm-9 col-sm-push-3 data">
-        <div class="row info" id="addHeros">
-          @if(count($heros) > 0)
-            @foreach($heros as $hero)
-              <div class="col-md-4 col-sm-6  " title="{{$hero->name}}">
-              <div class="thumbnail" >
-                <div class="vid">
-                  {!! $hero->url !!}
-                </div>
-              @if($id == $hero->id)
-                <b  style="align-content: center;" class="block-with-text">  {{$hero->name}} <span style="color: red;">[new]</span></b>
-              @else
-               <b  style="align-content: center;" class="block-with-text">  {{$hero->name}} </b>
-              @endif
+      <div class="col-sm-9 col-sm-push-3">
+        @if(count($userDatas) > 0)
+          @foreach($userDatas as $userData)
+          <div style="border:1px solid black;">
+            <div class="row memberinfo" >
+              <div class="col-md-4 ">
+                <br/>
+                @if(!empty($testUsers[$userData->user_id]->photo) && is_file($testUsers[$userData->user_id]->photo))
+                  <img class="image img-circle" src="{{ asset($testUsers[$userData->user_id]->photo)}}" alt="user image">
+                @else
+                  <img class="image img-circle" src="{{ asset('images/user/user1.png')}}" alt="user image">
+                @endif
+                <br/><br/>
+                @if(!empty($userData->resume) && is_file($userData->resume))
+                <div style="padding-left: 30px;"><a href="{{asset($userData->resume)}}" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>
+                @endif
+                <br/>
+                @if(!empty($userData->youtube))
+                <div style="padding-left: 30px;"><a href="#student_{{$userData->id}}" data-toggle="modal" ><button type="button"  class="btn btn-primary">Interview Video</button></a></div>
+                <div id="student_{{$userData->id}}" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button class="close" data-dismiss="modal">×</button>
+                          <h2  class="modal-title">Interview Video</h2>
+                        </div>
+                        <div class="modal-body">
+                          <div class="iframe-container">
+                            {!! $userData->youtube !!}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                @endif
+                <br/>
               </div>
+              <div class="col-md-8 topcontent">
+                <h4><strong>{{ $testUsers[$userData->user_id]->name }}</strong></h4>
+                <p><strong>Experience:</strong>5YR 4 Month</p>
+                <p><strong>Company Name:</strong>{{$userData->company}}</p>
+                <p><strong>Education:</strong>{{$userData->education}}</p>
+                <p><strong>Skills:</strong>#JAVE #Android #HTML #JS #JAVE #Android #HTML #JS #JAVE #Android #HTML #JS #JAVE #Android #HTML #JS #JAVE #Android #HTML #JS</p>
+                <p class="bottom">
+                    <a class="btn btn-primary btn-twitter btn-sm" href="https://twitter.com/">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-danger btn-sm" rel="publisher"
+                       href="https://plus.google.com/">
+                        <i class="fa fa-google-plus"></i>
+                    </a>
+                    <a class="btn btn-primary btn-sm" rel="publisher"
+                       href="https://www.facebook.com/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-warning btn-sm" rel="publisher" href="https://youtube.com/">
+                        <i class="fa fa-youtube"></i>
+                    </a>
+                </p>
               </div>
-            @endforeach
-          @else
-            No heros are available.
-          @endif
-        </div>
+            </div>
+          </div>
+          <br>
+          @endforeach
+        @else
+          No Data
+        @endif
       </div>
       <div class="col-sm-3 col-sm-pull-9">
         <div class="hidden-div1">
           <h4 class="v_h4_subtitle"> Sort By</h4>
           <div class="mrgn_20_top_btm" >
-            <select class="form-control" id="designation1" name="designation" required title="Designation"  onChange="selectAreaNew();">
-              <option value="">Select Designation</option>
-              @if(count($designations) > 0)
-                @foreach($designations as $designation)
-                  <option value="{{$designation->id}}">{{$designation->name}}</option>
+            <select class="form-control" id="skill1" name="skill" required title="Skill"  onChange="selectAreaNew();">
+              <option value="">Select Skill</option>
+              @if(count($allSkills) > 0)
+                @foreach($allSkills as $skill)
+                  <option value="{{$skill->id}}">{{$skill->name}}</option>
                 @endforeach
               @endif
             </select>
-          </div>
-          <div class="dropdown mrgn_20_top_btm">
-              <select class="form-control" id="area1" name="area" required title="Area" onChange="selectHerosNew()">
-                <option value="">Select Area</option>
-              </select>
-          </div>
-          <h4 class="v_h4_subtitle mrgn_20_top_btm"> Filter By</h4>
-          <div class="panel"></div>
-          <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" data-toggle="tooltip" title="Others"> Others</p>
-          <div class="panel">
-            <div class="checkbox">
-              <label><input class="search" type="checkbox" value="1" data-filter="latest" onclick="searchCourse();">Latest</label>
-            </div>
           </div>
         </div>
         <div class="advertisement-area" style="padding-right: 5px;">

@@ -15,7 +15,7 @@ class TestCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['name','category_for'];
 
     /**
      *  add/update test category
@@ -23,6 +23,7 @@ class TestCategory extends Model
     protected static function addOrUpdateCategory( Request $request, $isUpdate=false){
         $categoryName = InputSanitise::inputString($request->get('category'));
         $categoryId = InputSanitise::inputInt($request->get('category_id'));
+        $categoryFor = InputSanitise::inputInt($request->get('category_for'));
         if( $isUpdate && isset($categoryId)){
             $category = static::find($categoryId);
             if(!is_object($category)){
@@ -32,6 +33,7 @@ class TestCategory extends Model
             $category = new static;
         }
         $category->name = $categoryName;
+        $category->category_for = $categoryFor;
         $category->save();
         return $category;
     }
@@ -60,7 +62,16 @@ class TestCategory extends Model
         return DB::table('test_categories')
                 ->join('test_subject_papers', 'test_subject_papers.test_category_id', 'test_categories.id')
                 ->join('questions', 'questions.category_id', 'test_categories.id')
+                ->where('category_for', 1)
                 ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
+                ->select('test_categories.id', 'test_categories.name')->groupBy('test_categories.id')->get();
+    }
+
+    protected static function getCompanyCategoriesAssociatedWithQuestion(){
+        return DB::table('test_categories')
+                ->join('test_subject_papers', 'test_subject_papers.test_category_id', 'test_categories.id')
+                ->join('questions', 'questions.category_id', 'test_categories.id')
+                ->where('category_for', 0)
                 ->select('test_categories.id', 'test_categories.name')->groupBy('test_categories.id')->get();
     }
 

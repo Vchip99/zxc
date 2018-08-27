@@ -44,7 +44,6 @@ class ClientHomeController extends Controller
     }
 
     protected function clientHome($subdomainName,Request $request){
-
         if('local' == \Config::get('app.env')){
             $onlineClientUrl = 'online.localvchip.com';
         } else {
