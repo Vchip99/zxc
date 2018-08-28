@@ -79,7 +79,6 @@ class CompanyTestController extends Controller
 			}
 			sort($completedPaperIds);
 		}
-		// dd($selectedUserResults);
 		$userSkills = [];
 		$completedPapers = [];
 		$allSkills = Skill::all();
@@ -91,7 +90,6 @@ class CompanyTestController extends Controller
 		if(count($completedPaperIds) > 0){
 			$completedPapers = TestSubjectPaper::whereIn('id',$completedPaperIds)->orderBy('id', 'desc')->get();
 		}
-		// dd($selectedUserResults[17]);
 		return view('companyTest.show_tests', compact('companyPaper','currentDate','alreadyGivenPapers','registeredPaperIds','allTestPapers','testScores','testUsers','testPaperNames','selectedUserResults','userSkills','completedPapers'));
 	}
 
@@ -110,8 +108,10 @@ class CompanyTestController extends Controller
 		return $registeredPaperIds;
     }
 
-    protected function mockInterview(){
+    protected function mockInterview(Request $request){
     	$testUserIds = [];
+    	$testUsers = [];
+    	$userSkills = [];
     	$userDatas = UserData::all();
     	if(is_object($userDatas) && false == $userDatas->isEmpty()){
 			foreach($userDatas as $userData){
@@ -128,10 +128,84 @@ class CompanyTestController extends Controller
 				}
 			}
 		}
-    	// dd($userDatas);
     	$allSkills = Skill::all();
-    	$ads = [];
-    	return view('companyTest.mock_interview', compact('userDatas','allSkills','testUsers','ads'));
+    	if(is_object($allSkills) && false == $allSkills->isEmpty()){
+			foreach($allSkills as $allSkill){
+				$userSkills[$allSkill->id] = $allSkill;
+			}
+		}
+    	$date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+    	return view('companyTest.mock_interview', compact('userDatas','userSkills','testUsers','ads'));
+    }
+
+    protected function getSelectedStudentBySkillId(Request $request){
+    	$testUserIds = [];
+    	$testUsers = [];
+    	$userSkills = [];
+    	$results = [];
+        $skillId = $request->get('skill_id');
+        $userDatas = UserData::getSelectedStudentBySkillId($skillId);
+        if(is_object($userDatas) && false == $userDatas->isEmpty()){
+			foreach($userDatas as $userData){
+				if(!isset($testUserIds[$userData->user_id])){
+					$testUserIds[$userData->user_id] = $userData->user_id;
+				}
+			}
+		}
+		if(count($testUserIds) > 0){
+			$users = User::find($testUserIds);
+			if(is_object($users) && false == $users->isEmpty()){
+				foreach($users as $user){
+					$testUsers[$user->id] = $user;
+				}
+			}
+		}
+    	$allSkills = Skill::all();
+    	if(is_object($allSkills) && false == $allSkills->isEmpty()){
+			foreach($allSkills as $allSkill){
+				$userSkills[$allSkill->id] = $allSkill;
+			}
+		}
+
+        if(is_object($userDatas) && false == $userDatas->isEmpty()){
+        	foreach($userDatas as $userData){
+        		$strSkills = '';
+        		if(!empty($testUsers[$userData->user_id]->photo) && is_file($testUsers[$userData->user_id]->photo)){
+        			$results[$userData->id]['is_file_photo'] =  true;
+        			$results[$userData->id]['photo'] =  asset($testUsers[$userData->user_id]->photo);
+        		} else {
+        			$results[$userData->id]['is_file_photo'] =  false;
+        			$results[$userData->id]['photo'] =  asset('images/user/user1.png');
+        		}
+        		if(!empty($userData->resume) && is_file($userData->resume)){
+					$results[$userData->id]['is_file_resume'] =  true;
+        			$results[$userData->id]['resume'] =  asset($userData->resume);
+        		} else {
+        			$results[$userData->id]['is_file_resume'] =  false;
+        		}
+        		if(!empty($userData->youtube)){
+        			$results[$userData->id]['youtube'] =  $userData->youtube;
+        		}
+        		$results[$userData->id]['name'] = $testUsers[$userData->user_id]->name;
+        		$expArr = explode(',',$userData->experiance);
+                $skillArr = explode(',',$userData->skill_ids);
+
+                $results[$userData->id]['experience'] = $expArr[0].' yr '.$expArr[1].' month';
+                $results[$userData->id]['company'] = $userData->company;
+                $results[$userData->id]['education'] = $userData->education;
+                if(count($skillArr) > 0){
+                    foreach($skillArr as $skill){
+                    	$strSkills .= ' #'.$userSkills[$skill]->name;
+                  	}
+              	 	$results[$userData->id]['skill'] = $strSkills;
+                }
+                $results[$userData->id]['twitter'] = $userData->twitter;
+                $results[$userData->id]['google'] = $userData->google;
+                $results[$userData->id]['facebook'] = $userData->facebook;
+        	}
+        }
+        return $results;
     }
 
 }

@@ -232,88 +232,86 @@
   }
 </style> -->
 <style>
-.memberinfotop{
-  margin-top: 100px;
+    .memberinfotop{
+      margin-top: 100px;
+    }
+    .memberinfo{
+      margin:10px;
+    }
+    .image{
+      height:150px;
+      width:150px;
+    }
+    .topcontent{
+      padding-top:20px;
+    }
+    .content{
+      /*padding-top: 20px;*/
+    }
 
+    .button{
+      float:right;
 
-}
-.memberinfo{
-  margin:10px;
-}
-.image{
-  height:150px;
-  width:150px;
-}
-.topcontent{
-  padding-top:20px;
-}
-.content{
-  /*padding-top: 20px;*/
+    }
+    .button1{
+      float:left;
+    }
+    @media only screen and (max-width: 418px){
+      body{
+        font-size: 13px;
+      }
+    }
+    @media only screen and (max-width: 386px){
+      body{
+        font-size: 12px;
+      }
+    }
+    @media only screen and (max-width: 375px){
+      body{
+        font-size: 11px;
+      }
+    }
 
-
-}
-
-.button{
-  float:right;
-
-}
-.button1{
-  float:left;
-}
-@media only screen and (max-width: 418px){
-  body{
-    font-size: 13px;
-  }
-}
-@media only screen and (max-width: 386px){
-  body{
-    font-size: 12px;
-  }
-}
-@media only screen and (max-width: 375px){
-  body{
-    font-size: 11px;
-  }
-}
-
-@media (max-width: 1190px) {
-  .navbar-header {
-      float: none;
-  }
-  .navbar-left,.navbar-right {
-      float: none !important;
-  }
-  .navbar-toggle {
-      display: block;
-  }
-  .navbar-collapse {
-      border-top: 1px solid transparent;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-      min-height: 410px;
-  }
-  .navbar-fixed-top {
-      top: 0;
-      border-width: 0 0 1px;
-  }
-  .navbar-collapse.collapse {
-      display: none!important;
-  }
-  .navbar-nav {
-      float: none!important;
-      margin-top: 7.5px;
-  }
-  .navbar-nav>li {
-      float: none;
-  }
-  .navbar-nav>li>a {
-      padding-top: 10px;
-      padding-bottom: 10px;
-  }
-  .collapse.in{
-      display:block !important;
-  }
-}
-
+    @media (max-width: 1190px) {
+      .navbar-header {
+          float: none;
+      }
+      .navbar-left,.navbar-right {
+          float: none !important;
+      }
+      .navbar-toggle {
+          display: block;
+      }
+      .navbar-collapse {
+          border-top: 1px solid transparent;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+          min-height: 410px;
+      }
+      .navbar-fixed-top {
+          top: 0;
+          border-width: 0 0 1px;
+      }
+      .navbar-collapse.collapse {
+          display: none!important;
+      }
+      .navbar-nav {
+          float: none!important;
+          margin-top: 7.5px;
+      }
+      .navbar-nav>li {
+          float: none;
+      }
+      .navbar-nav>li>a {
+          padding-top: 10px;
+          padding-bottom: 10px;
+      }
+      .collapse.in{
+          display:block !important;
+      }
+    }
+    .iframe-container iframe{
+      width: 100% !important;
+    }
 </style>
 @stop
 @section('header-js')
@@ -333,373 +331,298 @@
         </div>
     </div>
   </section>
-<!-- Start course section -->
-<section id="sidemenuindex" class="v_container">
-  <div class="container ">
-    <div class="row">
-      <div class="col-sm-3 hidden-div">
-        <h4 class="v_h4_subtitle"> Sort By</h4>
-        <div class="mrgn_20_top_btm" >
-          <select class="form-control" id="skill" name="skill" required title="Skill"  onChange="selectArea();">
-            <option value="">Select Skill</option>
-            @if(count($allSkills) > 0)
-              @foreach($allSkills as $skill)
-                <option value="{{$skill->id}}">{{$skill->name}}</option>
-              @endforeach
-            @endif
-          </select>
-        </div>
-      </div>
-      <div class="col-sm-9 col-sm-push-3">
-        @if(count($userDatas) > 0)
-          @foreach($userDatas as $userData)
-          <div style="border:1px solid black;">
-            <div class="row memberinfo" >
-              <div class="col-md-4 ">
-                <br/>
-                @if(!empty($testUsers[$userData->user_id]->photo) && is_file($testUsers[$userData->user_id]->photo))
-                  <img class="image img-circle" src="{{ asset($testUsers[$userData->user_id]->photo)}}" alt="user image">
-                @else
-                  <img class="image img-circle" src="{{ asset('images/user/user1.png')}}" alt="user image">
-                @endif
-                <br/><br/>
-                @if(!empty($userData->resume) && is_file($userData->resume))
-                <div style="padding-left: 30px;"><a href="{{asset($userData->resume)}}" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>
-                @endif
-                <br/>
-                @if(!empty($userData->youtube))
-                <div style="padding-left: 30px;"><a href="#student_{{$userData->id}}" data-toggle="modal" ><button type="button"  class="btn btn-primary">Interview Video</button></a></div>
-                <div id="student_{{$userData->id}}" class="modal fade" role="dialog">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <button class="close" data-dismiss="modal">×</button>
-                          <h2  class="modal-title">Interview Video</h2>
-                        </div>
-                        <div class="modal-body">
-                          <div class="iframe-container">
-                            {!! $userData->youtube !!}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                @endif
-                <br/>
-              </div>
-              <div class="col-md-8 topcontent">
-                <h4><strong>{{ $testUsers[$userData->user_id]->name }}</strong></h4>
-                <p><strong>Experience:</strong>5YR 4 Month</p>
-                <p><strong>Company Name:</strong>{{$userData->company}}</p>
-                <p><strong>Education:</strong>{{$userData->education}}</p>
-                <p><strong>Skills:</strong>#JAVE #Android #HTML #JS #JAVE #Android #HTML #JS #JAVE #Android #HTML #JS #JAVE #Android #HTML #JS #JAVE #Android #HTML #JS</p>
-                <p class="bottom">
-                    <a class="btn btn-primary btn-twitter btn-sm" href="https://twitter.com/">
-                        <i class="fa fa-twitter"></i>
-                    </a>
-                    <a class="btn btn-danger btn-sm" rel="publisher"
-                       href="https://plus.google.com/">
-                        <i class="fa fa-google-plus"></i>
-                    </a>
-                    <a class="btn btn-primary btn-sm" rel="publisher"
-                       href="https://www.facebook.com/">
-                        <i class="fa fa-facebook"></i>
-                    </a>
-                    <a class="btn btn-warning btn-sm" rel="publisher" href="https://youtube.com/">
-                        <i class="fa fa-youtube"></i>
-                    </a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <br>
-          @endforeach
-        @else
-          No Data
-        @endif
-      </div>
-      <div class="col-sm-3 col-sm-pull-9">
-        <div class="hidden-div1">
+  <!-- Start course section -->
+  <section id="sidemenuindex" class="v_container">
+    <div class="container ">
+      <div class="row">
+        <div class="col-sm-3 hidden-div">
           <h4 class="v_h4_subtitle"> Sort By</h4>
           <div class="mrgn_20_top_btm" >
-            <select class="form-control" id="skill1" name="skill" required title="Skill"  onChange="selectAreaNew();">
+            <select class="form-control" id="skill" name="skill" required title="Skill"  onChange="selectUsers();">
               <option value="">Select Skill</option>
-              @if(count($allSkills) > 0)
-                @foreach($allSkills as $skill)
+              @if(count($userSkills) > 0)
+                @foreach($userSkills as $skill)
                   <option value="{{$skill->id}}">{{$skill->name}}</option>
                 @endforeach
               @endif
             </select>
           </div>
         </div>
-        <div class="advertisement-area" style="padding-right: 5px;">
-          <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
-        </div>
-        <br/>
-        @if(count($ads) > 0)
-          @foreach($ads as $ad)
-            <div class="add-1">
-              <div class="course-box">
-                <a class="img-course-box" href="{{ $ad->website_url }}" target="_blank">
-                  <img src="{{asset($ad->logo)}}" alt="{{ $ad->company }}"  class="img-responsive" />
-                </a>
-                <div class="course-box-content">
-                  <h4 class="course-box-title" title="{{ $ad->company }}" data-toggle="tooltip" data-placement="bottom">
-                    <a href="{{ $ad->website_url }}" target="_blank">{{ $ad->company }}</a>
-                  </h4>
-                  <p class="more"> {{ $ad->tag_line }}</p>
+        <div class="col-sm-9 col-sm-push-3" id="allUsers">
+          @if(count($userDatas) > 0)
+            @foreach($userDatas as $userData)
+            <div style="border:1px solid black;">
+              <div class="row memberinfo" >
+                <div class="col-md-4 ">
+                  <br/>
+                  @if(!empty($testUsers[$userData->user_id]->photo) && is_file($testUsers[$userData->user_id]->photo))
+                    <img class="image img-circle" src="{{ asset($testUsers[$userData->user_id]->photo)}}" alt="user image">
+                  @else
+                    <img class="image img-circle" src="{{ asset('images/user/user1.png')}}" alt="user image">
+                  @endif
+                  <br/><br/>
+                  @if(!empty($userData->resume) && is_file($userData->resume))
+                  <div style="padding-left: 30px;"><a href="{{asset($userData->resume)}}" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>
+                  @endif
+                  <br/>
+                  @if(!empty($userData->youtube))
+                    <div style="padding-left: 30px;"><a href="#student_{{$userData->id}}" data-toggle="modal" ><button type="button"  class="btn btn-primary">Interview Video</button></a></div>
+                    <div id="student_{{$userData->id}}" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <button class="close" data-dismiss="modal" id="close_{{$userData->id}}">×</button>
+                              <h2  class="modal-title">Interview Video</h2>
+                            </div>
+                            <div class="modal-body">
+                              <div class="iframe-container" id="iframe_{{$userData->id}}">
+                                {!! $userData->youtube !!}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  @endif
+                  <br/>
+                </div>
+                <div class="col-md-8 topcontent">
+                  @php
+                    $expArr = explode(',',$userData->experiance);
+                    $skillArr = explode(',',$userData->skill_ids);
+                  @endphp
+                  <h4><strong>{{ $testUsers[$userData->user_id]->name }}</strong></h4>
+                  <p><strong>Experience:</strong>{{$expArr[0]}} yr {{$expArr[1]}} month</p>
+                  <p><strong>Company Name:</strong>{{$userData->company}}</p>
+                  <p><strong>Education:</strong>{{$userData->education}}</p>
+                  <p><strong>Skills:</strong>
+                    @if(count($skillArr) > 0)
+                      @foreach($skillArr as $skill)
+                        #{{$userSkills[$skill]->name}}
+                      @endforeach
+                    @endif
+                  </p>
+                  <p class="bottom">
+                    @if(!empty($userData->twitter))
+                      <a class="btn btn-primary btn-twitter btn-sm" target="_blank" href="{{$userData->twitter}}">
+                          <i class="fa fa-twitter"></i>
+                      </a>
+                    @endif
+                    @if(!empty($userData->google))
+                      <a class="btn btn-danger btn-sm" rel="publisher" target="_blank" href="{{$userData->google}}">
+                          <i class="fa fa-google-plus"></i>
+                      </a>
+                    @endif
+                    @if(!empty($userData->facebook))
+                      <a class="btn btn-primary btn-sm" rel="publisher" target="_blank" href="{{$userData->facebook}}">
+                          <i class="fa fa-facebook"></i>
+                      </a>
+                    @endif
+                  </p>
                 </div>
               </div>
             </div>
-          @endforeach
-        @endif
-        @if(count($ads) < 3)
-          @for($i = count($ads)+1; $i <=3; $i++)
-            @if(1 == $i)
+            <br>
+            @endforeach
+          @else
+            No Data
+          @endif
+        </div>
+        <div class="col-sm-3 col-sm-pull-9">
+          <div class="hidden-div1">
+            <h4 class="v_h4_subtitle"> Sort By</h4>
+            <div class="mrgn_20_top_btm" >
+              <select class="form-control" id="skill1" name="skill" required title="Skill"  onChange="selectUsersNew();">
+                <option value="">Select Skill</option>
+                @if(count($userSkills) > 0)
+                  @foreach($userSkills as $skill)
+                    <option value="{{$skill->id}}">{{$skill->name}}</option>
+                  @endforeach
+                @endif
+              </select>
+            </div>
+          </div>
+          <div class="advertisement-area" style="padding-right: 5px;">
+            <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
+          </div>
+          <br/>
+          @if(count($ads) > 0)
+            @foreach($ads as $ad)
               <div class="add-1">
                 <div class="course-box">
-                  <a class="img-course-box" href="http://mcoet.mauligroup.org/" target="_blank">
-                    <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="Mauli College of Engineering Shegaon"  class="img-responsive" />
+                  <a class="img-course-box" href="{{ $ad->website_url }}" target="_blank">
+                    <img src="{{asset($ad->logo)}}" alt="{{ $ad->company }}"  class="img-responsive" />
                   </a>
                   <div class="course-box-content">
-                    <h4 class="course-box-title" title="Mauli College of Engineering Shegaon" data-toggle="tooltip" data-placement="bottom">
-                      <a href="http://www.ssgmce.org/" target="_blank">Shri Sant Gajanan Maharaj College of Engineering</a>
+                    <h4 class="course-box-title" title="{{ $ad->company }}" data-toggle="tooltip" data-placement="bottom">
+                      <a href="{{ $ad->website_url }}" target="_blank">{{ $ad->company }}</a>
                     </h4>
-                    <p class="more"> Shri Sant Gajanan Maharaj College of Engineering</p>
+                    <p class="more"> {{ $ad->tag_line }}</p>
                   </div>
                 </div>
               </div>
-            @elseif(2 == $i)
-              <div class="add-1">
-                <div class="course-box">
-                  <a class="img-course-box" href="http://ghrcema.raisoni.net/" target="_blank">
-                    <img src="{{ asset('images/logo/ghrcema_logo.png') }}" alt="G H RISONI"  class="img-responsive" />
-                  </a>
-                  <div class="course-box-content">
-                    <h4 class="course-box-title" title="G H RISONI" data-toggle="tooltip" data-placement="bottom">
-                      <a href="http://ghrcema.raisoni.net/" target="_blank">G H RISONI</a>
-                    </h4>
-                    <p class="more"> G H RISONI</p>
+            @endforeach
+          @endif
+          @if(count($ads) < 3)
+            @for($i = count($ads)+1; $i <=3; $i++)
+              @if(1 == $i)
+                <div class="add-1">
+                  <div class="course-box">
+                    <a class="img-course-box" href="http://mcoet.mauligroup.org/" target="_blank">
+                      <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="Mauli College of Engineering Shegaon"  class="img-responsive" />
+                    </a>
+                    <div class="course-box-content">
+                      <h4 class="course-box-title" title="Mauli College of Engineering Shegaon" data-toggle="tooltip" data-placement="bottom">
+                        <a href="http://www.ssgmce.org/" target="_blank">Shri Sant Gajanan Maharaj College of Engineering</a>
+                      </h4>
+                      <p class="more"> Shri Sant Gajanan Maharaj College of Engineering</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            @elseif(3 == $i)
-              <div class="add-1">
-                <div class="course-box">
-                  <a class="img-course-box" href="http://hvpmcoet.in/" target="_blank">
-                    <img src="{{ asset('images/logo/hvpm.jpg') }}" alt="HVPM"  class="img-responsive" />
-                  </a>
-                  <div class="course-box-content">
-                    <h4 class="course-box-title" title="HVPM" data-toggle="tooltip" data-placement="bottom">
-                      <a href="http://hvpmcoet.in/" target="_blank">HVPM College of Engineer And Technology</a>
-                    </h4>
-                    <p class="more"> HVPM College of Engineer And Technology</p>
+              @elseif(2 == $i)
+                <div class="add-1">
+                  <div class="course-box">
+                    <a class="img-course-box" href="http://ghrcema.raisoni.net/" target="_blank">
+                      <img src="{{ asset('images/logo/ghrcema_logo.png') }}" alt="G H RISONI"  class="img-responsive" />
+                    </a>
+                    <div class="course-box-content">
+                      <h4 class="course-box-title" title="G H RISONI" data-toggle="tooltip" data-placement="bottom">
+                        <a href="http://ghrcema.raisoni.net/" target="_blank">G H RISONI</a>
+                      </h4>
+                      <p class="more"> G H RISONI</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            @endif
-          @endfor
-        @endif
+              @elseif(3 == $i)
+                <div class="add-1">
+                  <div class="course-box">
+                    <a class="img-course-box" href="http://hvpmcoet.in/" target="_blank">
+                      <img src="{{ asset('images/logo/hvpm.jpg') }}" alt="HVPM"  class="img-responsive" />
+                    </a>
+                    <div class="course-box-content">
+                      <h4 class="course-box-title" title="HVPM" data-toggle="tooltip" data-placement="bottom">
+                        <a href="http://hvpmcoet.in/" target="_blank">HVPM College of Engineer And Technology</a>
+                      </h4>
+                      <p class="more"> HVPM College of Engineer And Technology</p>
+                    </div>
+                  </div>
+                </div>
+              @endif
+            @endfor
+          @endif
+        </div>
       </div>
     </div>
-  </div>
-</section>
-
+  </section>
 @stop
 @section('footer')
 	@include('footer.footer')
   <script type="text/javascript" src="{{ asset('js/togleForFilterBy.js')}}"></script>
   <script type="text/javascript" src="{{ asset('js/read_info.js')}}"></script>
   <script type="text/javascript">
-  function selectArea(){
-    var designationId = parseInt(document.getElementById('designation').value);
-    if( 0 < designationId ){
+
+  function selectUsers(){
+    var skillId = parseInt(document.getElementById('skill').value);
+    if( 0 < skillId ){
       $.ajax({
           method: "POST",
-          url: "{{url('getAreasByDesignation')}}",
-          data: {designation_id:designationId}
+          url: "{{url('getSelectedStudentBySkillId')}}",
+          data: {skill_id:skillId}
       })
       .done(function( msg ) {
-        select = document.getElementById('area');
-        select.innerHTML = '';
-        var opt = document.createElement('option');
-        opt.value = '0';
-        opt.innerHTML = 'Select Area';
-        select.appendChild(opt);
-        if( 0 < msg.length){
-          $.each(msg, function(idx, obj) {
-              var opt = document.createElement('option');
-              opt.value = obj.id;
-              opt.innerHTML = obj.name;
-              select.appendChild(opt);
-          });
-        }
+        renderData(msg);
       });
     }
   }
 
-  function selectAreaNew(){
-    var designationId = parseInt(document.getElementById('designation1').value);
-    if( 0 < designationId ){
+  function selectUsersNew(){
+    var skillId = parseInt(document.getElementById('skill1').value);
+    if( 0 < skillId ){
       $.ajax({
           method: "POST",
-          url: "{{url('getAreasByDesignation')}}",
-          data: {designation_id:designationId}
+          url: "{{url('getSelectedStudentBySkillId')}}",
+          data: {skill_id:skillId}
       })
       .done(function( msg ) {
-        select = document.getElementById('area1');
-        select.innerHTML = '';
-        var opt = document.createElement('option');
-        opt.value = '0';
-        opt.innerHTML = 'Select Area';
-        select.appendChild(opt);
-        if( 0 < msg.length){
-          $.each(msg, function(idx, obj) {
-              var opt = document.createElement('option');
-              opt.value = obj.id;
-              opt.innerHTML = obj.name;
-              select.appendChild(opt);
-          });
-        }
+        renderData(msg);
       });
     }
   }
 
-  function selectHeros(){
-    var designationId = parseInt(document.getElementById('designation').value);
-    var areaId = parseInt(document.getElementById('area').value);
-    if( 0 < designationId ){
-      $.ajax({
-          method: "POST",
-          url: "{{url('getHeroByDesignationByArea')}}",
-          data: {designation_id:designationId, area_id:areaId}
-      })
-      .done(function( msg ) {
-        divHeros = document.getElementById('addHeros');
-        divHeros.innerHTML = '';
-        if(undefined !== msg && 0 < msg.length) {
-          $.each(msg, function(idx, obj) {
-              var firstDiv = document.createElement('div');
-              firstDiv.className = 'col-md-4 col-sm-6 video-container';
+  function renderData(msg){
+    divUsers = document.getElementById('allUsers');
+    divUsers.innerHTML = '';
+    if(Object.keys(msg).length) {
+      $.each(msg, function(id, data) {
+          var firstDiv = document.createElement('div');
+          firstDiv.setAttribute('style', 'border:1px solid black;');
 
-              var secondDiv = document.createElement('div');
-              secondDiv.className = 'vid';
-              secondDiv.innerHTML = obj.url;
-              firstDiv.appendChild(secondDiv);
+          var secondDiv = document.createElement('div');
+          secondDiv.className = 'row memberinfo';
 
-              var eleB = document.createElement('b');
-              eleB.setAttribute('style', 'align-content: center;');
-              eleB.innerHTML = obj.name;
-              firstDiv.appendChild(eleB);
-              divHeros.appendChild(firstDiv);
-          });
-        }
-      });
-    }
-  }
-
-  function selectHerosNew(){
-    var designationId = parseInt(document.getElementById('designation1').value);
-    var areaId = parseInt(document.getElementById('area1').value);
-    if( 0 < designationId ){
-      $.ajax({
-          method: "POST",
-          url: "{{url('getHeroByDesignationByArea')}}",
-          data: {designation_id:designationId, area_id:areaId}
-      })
-      .done(function( msg ) {
-        divHeros = document.getElementById('addHeros');
-        divHeros.innerHTML = '';
-        if(undefined !== msg && 0 < msg.length) {
-          $.each(msg, function(idx, obj) {
-              var firstDiv = document.createElement('div');
-              firstDiv.className = 'col-md-4 col-sm-6 video-container';
-
-              var secondDiv = document.createElement('div');
-              secondDiv.className = 'vid';
-              secondDiv.innerHTML = obj.url;
-              firstDiv.appendChild(secondDiv);
-
-              var eleB = document.createElement('b');
-              eleB.setAttribute('style', 'align-content: center;');
-              eleB.innerHTML = obj.name;
-              firstDiv.appendChild(eleB);
-              divHeros.appendChild(firstDiv);
-          });
-        }
-      });
-    }
-  }
-
- function searchCourse(){
-    var searches = document.getElementsByClassName('search');
-    var arrDifficulty = [];
-    var arrCertified = [];
-    var arrFees = [];
-    var arr = [];
-    var startingsoon = 0;
-    var latest = 0;
-    $.each(searches, function(ind, obj){
-      if(true == $(obj).is(':checked')){
-        var filter = $(obj).data('filter');
-        var filterVal = $(obj).val();
-        if(false == (arr.indexOf(filter) > -1)){
-          if('latest' == filter) {
-            latest = filterVal;
-            arr.push(filterVal);
+          var thirdDiv = document.createElement('div');
+          thirdDiv.className = 'col-md-4';
+          thirdDivInnerHtml = '<br/>';
+          if(data['is_file_photo']){
+            thirdDivInnerHtml += '<img class="image img-circle" src="'+ data['photo'] +'" alt="user image"><br/><br/>';
+          } else {
+            thirdDivInnerHtml += '<img class="image img-circle" src="'+ data['photo'] +'" alt="user image"><br/><br/>';
           }
-        }
-      }
-    });
-    if(arr instanceof Array ){
-      var designationId = parseInt(document.getElementById('designation').value);
-      var areaId = parseInt(document.getElementById('area').value);
-      var arrJson = {'latest' : latest, 'designationId' : designationId, 'areaId' : areaId };
-      $.ajax({
-        method: "POST",
-        url: "{{url('getHerosBySearchArray')}}",
-        data: {arr:JSON.stringify(arrJson)}
-      })
-      .done(function( msg ) {
-        divHeros = document.getElementById('addHeros');
-        divHeros.innerHTML = '';
-        if(undefined !== msg && 0 < msg.length) {
-          $.each(msg, function(idx, obj) {
-              var firstDiv = document.createElement('div');
-              firstDiv.className = 'col-md-4 col-sm-6 video-container';
+          if(data['is_file_resume']){
+            thirdDivInnerHtml += '<div style="padding-left: 30px;"><a href="'+ data['resume'] +'" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>';
+          }
+          thirdDivInnerHtml += '<br/>';
+          if(data['youtube']){
+            thirdDivInnerHtml += '<div style="padding-left: 30px;"><a href="#student_'+id+'" data-toggle="modal" ><button type="button"  class="btn btn-primary">Interview Video</button></a></div><div id="student_'+id+'" class="modal fade" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal" id="close_'+id+'">×</button><h2  class="modal-title">Interview Video</h2></div><div class="modal-body"><div class="iframe-container"  id="iframe_'+id+'">'+data['youtube']+'</div></div></div></div></div>';
+          }
+          thirdDivInnerHtml += '<br/>';
+          thirdDiv.innerHTML = thirdDivInnerHtml;
+          secondDiv.appendChild(thirdDiv);
 
-              var secondDiv = document.createElement('div');
-              secondDiv.className = 'vid';
-              secondDiv.innerHTML = obj.url;
-              firstDiv.appendChild(secondDiv);
-
-              var eleB = document.createElement('b');
-              eleB.setAttribute('style', 'align-content: center;');
-              eleB.innerHTML = obj.name;
-              firstDiv.appendChild(eleB);
-              divHeros.appendChild(firstDiv);
-          });
-        }
+          var fourthDiv = document.createElement('div');
+          fourthDiv.className = 'col-md-8 topcontent';
+          fourthDivInnerHtml = '';
+          fourthDivInnerHtml += '<h4><strong>'+data['name']+'</strong></h4><p><strong>Experience:</strong>'+data['experience']+'</p><p><strong>Company Name:</strong>'+data['company']+'</p><p><strong>Education:</strong>'+data['education']+'</p><p><strong>Skills:</strong>'+data['skill']+'</p>';
+          fourthDivInnerHtml += '<p class="bottom">';
+          if(data['twitter']){
+            fourthDivInnerHtml += '<a class="btn btn-primary btn-twitter btn-sm" target="_blank" href="'+data['twitter']+'"><i class="fa fa-twitter"></i></a>';
+          }
+          if(data['google']){
+            fourthDivInnerHtml += ' <a class="btn btn-danger btn-sm" rel="publisher" target="_blank" href="'+data['google']+'"><i class="fa fa-google-plus"></i></a>';
+          }
+          if(data['facebook']){
+            fourthDivInnerHtml += ' <a class="btn btn-primary btn-sm" rel="publisher" target="_blank" href="'+data['facebook']+'"><i class="fa fa-facebook"></i></a>';
+          }
+          fourthDivInnerHtml += '</p>';
+          fourthDiv.innerHTML = fourthDivInnerHtml;
+          secondDiv.appendChild(fourthDiv);
+          firstDiv.appendChild(secondDiv);
+          divUsers.appendChild(firstDiv);
+          var brEle = document.createElement('br');
+          divUsers.appendChild(brEle);
       });
+    } else {
+      divUsers.innerHTML = 'No Result!';
     }
   }
 
-  $(".toggle").slideUp();
-  $(".trigger").click(function(){
-    $(this).next(".toggle").slideToggle("slow");
-  });
-
-  var acc = document.getElementsByClassName("accordion");
-  var i;
-  for (i = 0; i < acc.length; i++) {
-    acc[i].onclick = function() {
-      this.classList.toggle("active");
-      var panel = this.nextElementSibling;
-      if (panel.style.maxHeight){
-        panel.style.maxHeight = null;
-      } else {
-        panel.style.maxHeight = panel.scrollHeight + "px";
+  window.onclick = function(event) {
+    var modelId = $(event.target).attr('id');
+    if(undefined != modelId){
+      var id = modelId.split('_')[1];
+      if(id > 0) {
+        toggleVideo('hide', id);
       }
+    }
+  }
+
+  function toggleVideo(state, id) {
+    // if state == 'hide', hide. Else: show video
+    var div = document.getElementById("iframe_"+id);
+
+    if(div.getElementsByTagName("iframe").length > 0){
+      var iframe = div.getElementsByTagName("iframe")[0].contentWindow;
+      func = (state == 'hide' ) ? 'pauseVideo' : 'playVideo';
+      iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
     }
   }
   </script>

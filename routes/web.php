@@ -841,7 +841,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	// company test
 	Route::get('companyTest/{id?}', 'CompanyTestController@index');
 	Route::get('mockInterview', 'CompanyTestController@mockInterview');
-
+	Route::post('getSelectedStudentBySkillId', 'CompanyTestController@getSelectedStudentBySkillId');
 
 	// Skills
 	Route::get('admin/manageSkill', 'Admin\SkillController@show');
@@ -859,6 +859,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/userData/{id}/edit', 'Admin\UserDataController@edit');
 	Route::put('admin/updateUserData', 'Admin\UserDataController@update');
 	Route::delete('admin/deleteUserData', 'Admin\UserDataController@delete');
+
+
 
 });
 

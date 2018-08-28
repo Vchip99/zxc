@@ -824,3 +824,13 @@ color: #fff;
     right: -100px;
     z-index: 2000;
   }
+@media screen and (max-width: 483px) {
+  #companyTest{
+    padding-right: 0px !important;
+  }
+}
+@media screen and (max-width: 400px) {
+  #companyTest a{
+    font-size: 12px;
+  }
+}

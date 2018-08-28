@@ -3,11 +3,12 @@
     <div class="row" id="companyTest" style="background-color: white; padding-right: 100px;">
       <div align="right">
         @if(is_object($testForCompany))
-            <a href="{{ url('companyTest')}}/{{$testForCompany->id}}" class="btn " style="border-radius: 5px !important;">{{$testForCompany->name}}</a>
+            <a href="{{ url('companyTest')}}/{{$testForCompany->id}}" class="btn " style="border-radius: 0px !important;border-right: 1px solid black;border-left: 1px solid black;">{{$testForCompany->name}}</a>
         @else
-            <a href="{{ url('companyTest')}}" class="btn " style="border-radius: 5px !important;">Mock Test</a>
+            <a href="{{ url('companyTest')}}" class="btn " style="border-radius: 0px !important;border-right: 1px solid black;border-left: 1px solid black;">Mock Test </a>
         @endif
-          <!-- <a href="{{ url('mockInterview')}}" class="btn " style="border-radius: 5px !important;">Mock Interview</a> -->
+          <a href="{{ url('mockInterview')}}" class="btn " style="border-radius: 0px !important;border-right: 1px solid black;">Mock Interview</a>
+          <a href="{{ url('placements')}}" class="btn " style="border-radius: 0px !important;border-right: 1px solid black;">Placement</a>
       </div>
     </div>
   <div class="container">
@@ -138,19 +139,20 @@
              </div>
             </ul>
           </li>
-         <li><a href="{{ url('placements') }}" title="Placement">placement</a></li>
+          <li><a href="{{url('blog')}}" title="Blog">Blog</a></li>
           <li><a href="{{url('heros')}}" title="Zero To Hero">Z To H</a></li>
-           <li class="dropdown">
+          <li><a href="{{url('discussion')}}" title="Discussion">Discussion</a></li>
+          <!-- <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Discussion">Discussion <span class="caret"></span>
             </a>
             <ul class="dropdown-menu" role="menu">
               <div class="navbar-content">
                 <li><a href="{{url('discussion')}}" title="Discussion forum">Discussion forum</a></li>
-                <!-- <li><a href="{{url('liveVideo')}}" title="Live video discussion">Live video discussion</a></li> -->
+                <li><a href="{{url('liveVideo')}}" title="Live video discussion">Live video discussion</a></li>
                 <li><a href="{{url('blog')}}" title="Blog">Blog</a></li>
               </div>
             </ul>
-          </li>
+          </li> -->
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="About">About <span class="caret"></span>
             </a>

@@ -61,7 +61,13 @@ class UserData extends Model
         $userData->twitter = $twitter;
         $userData->skype = $skype;
         $userData->google = $google;
-        $userData->youtube = $youtube;
+        if(!empty($youtube) && preg_match('/src="(.*)" frameborder/', $youtube, $matches)){
+            if(!empty($matches[1]) && false == strpos($request->get('youtube'),'?enablejsapi=1')){
+                $userData->youtube = str_replace($matches[1], $matches[1].'?enablejsapi=1', $youtube);
+            } else if(!empty($matches[1]) && true == strpos($request->get('youtube'),'?enablejsapi=1')){
+                $userData->youtube = $youtube;
+            }
+        }
 
         $userStoragePath = "userStorage/".$userId;
         if(!is_dir($userStoragePath)){
@@ -85,5 +91,9 @@ class UserData extends Model
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    protected static function getSelectedStudentBySkillId($skillId){
+        return static::whereRaw("find_in_set($skillId , skill_ids)")->get();
     }
 }

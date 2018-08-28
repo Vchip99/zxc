@@ -162,6 +162,31 @@
 		    height: 120px;
 		    border-radius: 50%;
 		}
+		/*.iframe-container iframe{
+	      width: 100% !important;
+	    }*/
+	    .iframe-container {
+		    padding-bottom: 60%;
+		    padding-top: 30px;
+		    height: 0;
+		    overflow: hidden;
+		}
+	    .iframe-container iframe{
+		    position: absolute;
+		    top: 0;
+		    left: 0;
+		    width: 100%;
+		    height: 100%;
+	  	}
+	  	.modal-backdrop {
+		  position: fixed;
+		  top: 0;
+		  right: 0;
+		  bottom: 0;
+		  left: 0;
+		  z-index: -1;
+		  background-color: #000000;
+		}
   	</style>
 @stop
 @section('header-js')
@@ -489,10 +514,26 @@
 			                                    </ul>
 			                                    <div>
 			                                    	@if(!empty($paperResult->youtube))
-			                                        	<a class="btn btn-primary" target="_blank" href="{{$paperResult->youtube}}"><i class="fa fa-youtube"></i></a>
+			                                        	<a class="btn btn-warning btn-sm" rel="publisher"  href="#student_{{$paperResult->id}}" data-toggle="modal" ><i class="fa fa-youtube"></i></a>
+								                      	<!-- <div id="student_{{$paperResult->id}}" class="modal fade" role="dialog">
+									                        <div class="modal-dialog model-sm">
+									                            <div class="modal-content">
+									                              	<div class="modal-header">
+									                                	<button class="close" data-dismiss="modal">×</button>
+								                                		<h2  class="modal-title">Interview</h2>
+									                              	</div>
+									                              	<div class="modal-body">
+									                                	<div class="iframe-container">
+									                                  		{{$paperResult->youtube}}
+								                                		</div>
+									                              	</div>
+									                            </div>
+									                        </div>
+									                    </div> -->
 			                                        @endif
 			                                        @if(!empty($paperResult->resume) && is_file($paperResult->resume))
-			                                        	<a class="btn btn-primary" href="{{asset($paperResult->resume)}}" download><i class="fa fa-download"></i></a>
+			                                        	<!-- <a class="btn btn-primary" href="#resume_{{$paperResult->id}}" data-toggle="modal"><i class="fa fa-download"></i></a> -->
+			                                        	<a data-path="{{asset($paperResult->resume)}}" class="btn btn-primary" data-toggle="modal" data-target="#resume_{{$paperResult->id}}" > <i class="fa fa-book" aria-hidden="true"></i> </a>
 			                                        @endif
 			                                    </div>
 			                                </div>
@@ -504,6 +545,48 @@
 			        @endforeach
 	            @endif
 	        </div>
+	        @endforeach
+	    @endif
+	    @if(is_object($completedPapers) && false == $completedPapers->isEmpty())
+        	@foreach($completedPapers as $completedPaper)
+	        	@if( isset($selectedUserResults[$completedPaper->id]) && count($selectedUserResults[$completedPaper->id]) > 0)
+	        		@foreach($selectedUserResults[$completedPaper->id] as $paperResult)
+                    	@if(!empty($paperResult->youtube))
+	                      	<div id="student_{{$paperResult->id}}" class="modal fade" role="dialog">
+		                        <div class="modal-dialog model-sm">
+		                            <div class="modal-content">
+		                              	<div class="modal-header">
+		                                	<button class="close" data-dismiss="modal">×</button>
+	                                		<h2  class="modal-title">Interview</h2>
+		                              	</div>
+		                              	<div class="modal-body">
+		                                	<div class="iframe-container">
+		                                  		{!! $paperResult->youtube !!}
+	                                		</div>
+		                              	</div>
+		                            </div>
+		                        </div>
+		                    </div>
+                        @endif
+                        @if(!empty($paperResult->resume) && is_file($paperResult->resume))
+                        	<div id="resume_{{$paperResult->id}}" class="modal fade" role="dialog">
+		                        <div class="modal-dialog">
+		                            <div class="modal-content">
+		                              	<div class="modal-header">
+		                                	<button class="close" data-dismiss="modal">×</button>
+	                                		<h2  class="modal-title">Resume</h2>
+		                              	</div>
+		                              	<div class="modal-body">
+		                                	<div class="iframe-container">
+		                                  		<iframe src="{{asset($paperResult->resume)}}" frameborder="0"></iframe>
+	                                		</div>
+		                              	</div>
+		                            </div>
+		                        </div>
+		                    </div>
+                        @endif
+			        @endforeach
+	            @endif
 	        @endforeach
 	    @endif
 	</section>

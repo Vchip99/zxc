@@ -105,7 +105,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content" style="border-radius: 0px;">
         <div class="modal-header" style=" padding: 5px 10px; font-weight: bolder; text-align: center;">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="collegeModalClose" >×</button>
           <h4 class="modal-title" id="myModalLabel">College</h4>
         </div>
         <div class="modal-body" style="padding: 0px; ">
@@ -121,7 +121,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content" style="border-radius: 0px;">
         <div class="modal-header" style=" padding: 5px 10px; font-weight: bolder; text-align: center;">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="instituteModalClose">×</button>
           <h4 class="modal-title" id="myModalLabel">Private Institute</h4>
         </div>
         <div class="modal-body" style="padding: 0px; ">
@@ -135,9 +135,9 @@
 <script type="text/javascript">
   window.onclick = function(event) {
     var modelId = $(event.target).attr('id');
-    if('collegeModal' == modelId){
+    if('collegeModal' == modelId || 'collegeModalClose' == modelId){
       toggleVideo('hide', 'collegeVideo');
-    } else if('instituteModal' == modelId){
+    } else if('instituteModal' == modelId || 'instituteModalClose' == modelId){
       toggleVideo('hide', 'instituteVideo');
     }
   }
