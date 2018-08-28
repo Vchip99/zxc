@@ -859,7 +859,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/userData/{id}/edit', 'Admin\UserDataController@edit');
 	Route::put('admin/updateUserData', 'Admin\UserDataController@update');
 	Route::delete('admin/deleteUserData', 'Admin\UserDataController@delete');
-
+	Route::post('admin/verifyUserByEmailIdByPaperId', 'Admin\UserDataController@verifyUserByEmailIdByPaperId');
 
 
 });

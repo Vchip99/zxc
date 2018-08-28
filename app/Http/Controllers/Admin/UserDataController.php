@@ -65,14 +65,13 @@ class UserDataController extends Controller
         $testSubCategories = [];
         $testSubjects = [];
         $papers = [];
-        $users = User::collegeUser();
-        $years = range(0, 12);
+        $years = range(0, 30);
         $months = range(0, 12);
         $skills = Skill::all();
         $expArr = [];
         $skillArr = [];
         $user = new User;
-    	return view('userData.create', compact('userData','testCategories','testSubCategories','testSubjects','papers','users','years','months','skills','expArr','skillArr', 'user'));
+    	return view('userData.create', compact('userData','testCategories','testSubCategories','testSubjects','papers','years','months','skills','expArr','skillArr', 'user'));
     }
 
     /**
@@ -115,7 +114,7 @@ class UserDataController extends Controller
                 $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($userData->category_id,$userData->sub_category_id);
                 $papers = TestSubjectPaper::getSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin($userData->category_id,$userData->sub_category_id,$userData->subject_id);
                 $user = User::find($userData->user_id);
-                $years = range(0, 12);
+                $years = range(0, 30);
                 $months = range(0, 12);
                 $skills = Skill::all();
                 $expArr = explode(',',$userData->experiance);
@@ -181,5 +180,9 @@ class UserDataController extends Controller
             }
         }
 		return Redirect::to('admin/manageUserData');
+    }
+
+    protected function verifyUserByEmailIdByPaperId(Request $request){
+        return User::verifyUserByEmailIdByPaperId($request->get('email'),$request->get('paper'));
     }
 }

@@ -451,7 +451,6 @@ class User extends Authenticatable
         }
     }
 
-
     public function unreadChatMessagesCount(){
         return ChatMessage::where('receiver_id', Auth::user()->id)->where('is_read', 0)->count();
     }
@@ -500,5 +499,9 @@ class User extends Authenticatable
 
     protected static function collegeUser(){
         return static::where('user_type', self::Student)->where('admin_approve', 1)->get();
+    }
+
+    protected static function verifyUserByEmailIdByPaperId($email,$paper){
+        return static::join('scores', 'scores.user_id', '=', 'users.id')->where('users.email', $email)->where('users.user_type', self::Student)->where('users.admin_approve', 1)->where('scores.paper_id', $paper)->select('users.*')->first();
     }
 }

@@ -431,8 +431,33 @@
 			@endforeach
       	@endif
 	</section>
+	<section>
+		<div class="container exam-panel" id="all-result">
+		    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+		      	<div class="panel panel-default">
+		        	<div class="panel-heading" role="tab" id="headingOne">
+		          		<h4 class="panel-title">
+				            <a role="button" data-toggle="collapse" data-parent="#accordion" href="" aria-expanded="true" aria-controls="">
+				              	Features
+				            </a>
+		          		</h4>
+		        	</div>
+			        <div id="" >
+			          	<div class="panel-body">
+			          		<ol>
+			          			<li>On every alternative week-end, we conduct Online Virtual placement drive.</li>
+			          			<li>At first, on every Saturday, we conduct online aptitude test according to pattern of most of companies.</li>
+			          			<li>On Sunday, we conduct interview of selected students on skype.</li>
+			          			<li>Record these interviews and put on our platform, so our partner companies will go through it. If they like the performance then they can directly call for second round.</li>
+			          		</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 	<section class="container" id="members" style="padding: 0 10px;"><br/>
-        <h2>Previous Results</h2>
+        <h2>Mock Interviews</h2>
         @if(is_object($completedPapers) && false == $completedPapers->isEmpty())
         	@foreach($completedPapers as $completedPaper)
 	        <h4>{{$completedPaper->name}} on {{date('Y-m-d h:i a',strtotime($completedPaper->date_to_active))}}</h4>
@@ -448,7 +473,7 @@
 			                    <div class="mainflip">
 			                        <div class="frontside" style="width: 350px;">
 			                            <div class="card">
-			                                <div class="card-body text-center">
+			                                <div class="card-body text-center"><br/>
 			                                    <p>
 				                                    @if(!empty($testUsers[$paperResult->user_id]->photo) && is_file($testUsers[$paperResult->user_id]->photo))
 				                                    	<img class="" src="{{ asset($testUsers[$paperResult->user_id]->photo)}}" alt="user image">
@@ -590,6 +615,7 @@
 	        @endforeach
 	    @endif
 	</section>
+	<br>
 @stop
 @section('footer')
 	@include('footer.footer')

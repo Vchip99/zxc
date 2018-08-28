@@ -748,11 +748,11 @@ margin-right: 10px;
             <div class="row our_customer">
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                   <div class="tile">
-                        <img src="{{ asset('images/logo/mauli.gif') }}" alt="Mauli College of Engineering Shegaon"/>
+                        <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="Shri Sant Gajanan Maharaj College of Engineering"/>
                         <div class="text">
-                          <h1 title="Mauli College of Engineering Shegaon">Mauli College of Engineering Shegaon</h1>
+                          <h1 title="Shri Sant Gajanan Maharaj College of Engineering">Shri Sant Gajanan Maharaj College of Engineering</h1>
                           <p class="animate-text">
-                            <a href="http://mcoet.mauligroup.org/" target="_blank" class="btn-link">Learn More
+                            <a href="http://www.ssgmce.org/" target="_blank" class="btn-link">Learn More
                                <i class="fa fa-angle-right" aria-hidden="true"></i>
                             </a>
                           </p>

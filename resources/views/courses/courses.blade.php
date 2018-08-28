@@ -199,7 +199,7 @@
                     <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="Mauli College of Engineering Shegaon"  class="img-responsive" />
                   </a>
                   <div class="course-box-content">
-                    <h4 class="course-box-title" title="Mauli College of Engineering Shegaon" data-toggle="tooltip" data-placement="bottom">
+                    <h4 class="course-box-title" title="Shri Sant Gajanan Maharaj College of Engineering" data-toggle="tooltip" data-placement="bottom">
                       <a href="http://www.ssgmce.org/" target="_blank">Shri Sant Gajanan Maharaj College of Engineering</a>
                     </h4>
                     <p class="more"> Shri Sant Gajanan Maharaj College of Engineering</p>

@@ -105,21 +105,19 @@
 		    <div class="form-group row @if ($errors->has('user')) has-error @endif">
 		    	<label class="col-sm-2 col-form-label">User:</label>
 			    <div class="col-sm-3">
-	    			@if(is_object($user) > 0 && isset($userData->id))
-			            @if($userData->user_id == $user->id)
-			                <input class="form-control" type="text" name="user_text" value="{{$user->name}}" readonly="true">
-			                <input class="form-control" type="hidden" name="user" value="{{$userData->user_id}}">
-			            @endif
-    			   	@else
-				      	<select id="user" class="form-control" name="user" required title="user">
-				    		<option value="">Select User</option>
-					       		@foreach($users as $user)
-					                <option value="{{$user->id}}">{{$user->name}}</option>
-					          	@endforeach
-					        @if($errors->has('user')) <p class="help-block">{{ $errors->first('user') }}</p> @endif
-				    	</select>
-			        @endif
+			        @if(is_object($user) > 0 && isset($userData->id))
+				        <input class="form-control" type="text" id="email" name="email" value="{{$user->email}}" readonly>
+				        <input class="form-control" type="hidden" id="user" name="user" value="{{$user->id}}" required>
+				    @else
+				    	<input class="form-control" type="text" id="email" name="email" value="" placeholder="Enter Email" required>
+				        <input class="form-control" type="hidden" id="user" name="user" value="" required>
+				    @endif
 			    </div>
+			    @if(is_object($user) > 0 && !isset($userData->id))
+			    <div class="col-sm-3">
+			    	<button type="button" onClick="verifyUser();">Verify User</button>
+			    </div>
+			    @endif
 		    </div>
 		    <div class="form-group row ">
 		    	<label class="col-sm-2 col-form-label">Experiance:</label>
@@ -301,6 +299,27 @@
 		            });
 	            }
           	});
+    	}
+  	}
+
+  	function verifyUser(){
+  		var email = document.getElementById('email').value;
+  		var paper = document.getElementById('paper').value;
+	    if(email && paper){
+	      $.ajax({
+	              method: "POST",
+	              url: "{{url('admin/verifyUserByEmailIdByPaperId')}}",
+	              data: {email:email,paper:paper}
+	          })
+	          .done(function( user ) {
+	          	if(user){
+	          		document.getElementById('user').value = user.id;
+	          	} else {
+	          		document.getElementById('email').value = '';
+	          		document.getElementById('user').value = '';
+	          		alert('Entered email id does not given selected paper.');
+	          	}
+	        });
     	}
   	}
 
