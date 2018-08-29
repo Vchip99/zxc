@@ -68,10 +68,10 @@
                                   <label>Name:</label>
                                   <input class="form-control" placeholder="name" name="name" type="text" value="{{$loginUser->name}}">
                                 </div>
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                   <label>Email:</label>
                                   <input class="form-control" placeholder="yourmail@example.com" name="email" type="text" value="{{$loginUser->email}}">
-                                </div>
+                                </div> -->
                                 <div class="form-group">
                                   <label>Phone:</label>
                                   <input class="form-control" placeholder="Mobile No." name="phone" type="text" value="{{$loginUser->phone}}">

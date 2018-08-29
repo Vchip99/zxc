@@ -225,7 +225,7 @@ class User extends Authenticatable
     protected static function updateUser(Request $request){
         $user = Auth::user();
         $user->name = $request->name;
-        $user->email = $request->email;
+        // $user->email = $request->email;
         $user->phone = $request->phone;
         $user->user_type = $request->user_type;
         if(self::Student == $request->user_type){
