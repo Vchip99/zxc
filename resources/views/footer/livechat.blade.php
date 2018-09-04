@@ -154,7 +154,7 @@
       // show user chat messages
       function showChat(ele){
           var receiverId = $(ele).attr('id');
-          var receiverName = $(ele).data('user_name');
+          var receiverName = $(ele).data('user_name').substring(0,20);
           var current_user = document.getElementById('user_id').value;
           var roomArr = [];
           roomArr.push(receiverId);
@@ -450,7 +450,8 @@
 
                     var strongName = document.createElement('strong');
                     strongName.className = 'primary-font';
-                    strongName.innerHTML = obj['name'];
+                    var nameStr = obj['name'];
+                    strongName.innerHTML = nameStr.substring(0, 20);
                     divHeader.appendChild(strongName);
 
                     var spanUnread = document.createElement('span');
@@ -567,7 +568,8 @@
 
             var strongName = document.createElement('strong');
             strongName.className = 'primary-font';
-            strongName.innerHTML = obj['name'] + ' ';
+            var nameStr = obj['name'];
+            strongName.innerHTML = nameStr.substring(0, 20);
             divHeader.appendChild(strongName);
 
             var spanUnread = document.createElement('span');
