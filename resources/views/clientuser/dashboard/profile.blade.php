@@ -33,24 +33,25 @@
     <div id="profile" class="tab-pane active">
       <div class="container">
         <div class="row">
+          @if(count($errors) > 0)
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                      <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+          @endif
+          @if(Session::has('message'))
+            <div class="alert alert-success" id="message">
+              <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                {{ Session::get('message') }}
+            </div>
+          @endif
+          @if(!Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
           <div class="col-md-7 col-md-offset-2">
             <div class="panel panel-default">
               <div class="panel-heading">
-                @if(count($errors) > 0)
-                  <div class="alert alert-danger">
-                      <ul>
-                          @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                          @endforeach
-                      </ul>
-                  </div>
-                @endif
-                @if(Session::has('message'))
-                  <div class="alert alert-success" id="message">
-                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                      {{ Session::get('message') }}
-                  </div>
-                @endif
                 <a class="btn-top pull-right"  href="#edit-all" class="btn btn-primary btn-success pull-right" data-toggle="modal" style="position: absolute;"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit All</a>
                   <div id="edit-all" class="modal fade" role="dialog">
                     <div class="modal-dialog modal-sm">
@@ -222,6 +223,7 @@
                                             <div class="form-group hide" id="verifyOtpDiv">
                                               <label>Otp:</label>
                                               <input name="user_otp" type="text" class="form-control" placeholder="Enter OTP" required>
+                                              <label class="hide" id="verifyOtpMessage">Otp sent successfully.</label>
                                             </div>
                                             <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
                                             <button class="btn btn-info hide" type="submit" id="verifySubmit">Submit</button>
@@ -257,6 +259,7 @@
                                         <div class="form-group hide" id="otpDiv">
                                           <label>Otp:</label>
                                           <input name="user_otp" type="text" class="form-control" placeholder="Enter OTP" required>
+                                          <label class="hide" id="addOtpMessage">Otp sent successfully.</label>
                                         </div>
                                         <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
                                         <button class="btn btn-info hide" type="submit" id="submit">Submit</button>
@@ -365,6 +368,7 @@
               </ul>
             </div>
           </div>
+          @endif
         </div>
        </div>
     </div>
@@ -372,26 +376,51 @@
 <script type="text/javascript">
   function sendClientUserOtp(){
     var mobile = $('#phone').val();
-    if(mobile){
+    if(mobile && 10 == mobile.length ){
       $.ajax({
         method: "POST",
         url: "{{url('sendClientUserOtp')}}",
         data: {mobile:mobile}
       })
       .done(function( result ) {
+        console.log(result);
         $('#otpDiv').removeClass('hide');
         $('#sendOtpBtn').addClass('hide');
         $('#submit').removeClass('hide');
         $('#phone').prop('readonly', true);
+
+        var resultObj = JSON.parse(JSON.stringify(result));
+        if('success' == resultObj.status){
+          var jsonMessage = JSON.parse(resultObj.message);
+          if('000' == jsonMessage.ErrorCode && 'Success' == jsonMessage.ErrorMessage){
+            $('#addOtpMessage').removeClass('hide');
+          } else {
+            $.confirm({
+              title: 'Alert',
+              content: 'Something wrong in otp result.'
+            });
+          }
+        } else {
+          $('#sendOtpBtn').removeClass('hide');
+          $('#submit').addClass('hide');
+          $('#otpDiv').addClass('hide');
+          $('#phone').prop('readonly', false);
+          $.confirm({
+            title: 'Alert',
+            content: resultObj.message
+          });
+        }
       });
-    } else {
+    } else if(!mobile) {
       alert('enter mobile no.');
+    } else if(mobile.length < 10){
+      alert('Enter 10 digit mobile no.');
     }
   }
 
   function verifyClientUserOtp(){
     var mobile = $('#verifyPhone').val();
-    if(mobile){
+    if(mobile && 10 == mobile.length ){
       $.ajax({
         method: "POST",
         url: "{{url('sendClientUserOtp')}}",
@@ -401,9 +430,31 @@
         $('#verifyOtpDiv').removeClass('hide');
         $('#verifyOtpBtn').addClass('hide');
         $('#verifySubmit').removeClass('hide');
+        var resultObj = JSON.parse(JSON.stringify(result));
+        if('success' == resultObj.status){
+          var jsonMessage = JSON.parse(resultObj.message);
+          if('000' == jsonMessage.ErrorCode && 'Success' == jsonMessage.ErrorMessage){
+            $('#verifyOtpMessage').removeClass('hide');
+          } else {
+            $.confirm({
+              title: 'Alert',
+              content: 'Something wrong in otp result.'
+            });
+          }
+        } else {
+          $('#verifyOtpBtn').removeClass('hide');
+          $('#verifySubmit').addClass('hide');
+          $('#verifyOtpDiv').addClass('hide');
+          $.confirm({
+            title: 'Alert',
+            content: resultObj.message
+          });
+        }
       });
-    } else {
+    } else if(!mobile) {
       alert('enter mobile no.');
+    } else if(mobile.length < 10){
+      alert('Enter 10 digit mobile no.');
     }
   }
 </script>

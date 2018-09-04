@@ -197,9 +197,10 @@
 }
 .popup-box .popup-messages  .chat li.left .chat-body p{
   background: pink;
-    border-radius: 10px;
-    padding: 5px;
-    width: 180px;
+  border-radius: 10px;
+  padding: 5px;
+  width: 180px;
+  overflow-x: auto;
 }
 .popup-box .popup-messages  .chat li.right .chat-body
 {
@@ -207,10 +208,11 @@
 }
 .popup-box .popup-messages  .chat li.right .chat-body p{
   background: lightblue;
-    border-radius: 10px;
-    padding: 5px;
-    width: 180px;
-    float: right;
+  border-radius: 10px;
+  padding: 5px;
+  width: 180px;
+  float: right;
+  overflow-x: auto;
 }
 .popup-box .popup-messages .chat li.left .chat-time{
     margin-left: 40px;

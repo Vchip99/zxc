@@ -25,7 +25,7 @@
     {{ csrf_field() }}
     <div class="form-group row  @if ($errors->has('batch')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="batch">Batch:</label>
-      <div class="col-md-3">
+      <div class="col-md-3" >
         <div style="margin-bottom: 10px">
           @if(isset($notice->id))
             @if(0 == $notice->client_batch_id)
@@ -70,9 +70,10 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label" for="note">Notice:</label>
       <div class="col-sm-3">
-        <textarea type="text" class="form-control" id="notice" name="notice" placeholder="notice" required>{{($notice->notice)?$notice->notice:null}}</textarea>
+        <textarea type="text" class="form-control" id="notice" name="notice" placeholder="notice" rows="5" required>{{($notice->notice)?$notice->notice:null}}</textarea>
         @if($errors->has('notice')) <p class="help-block">{{ $errors->first('notice') }}</p> @endif
       </div>
+      <div class="col-sm-6">* Only first 120 alphabets/letters will be send as sms if setting is on</div>
     </div>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label" for="is_emergency">Emergency Notice:</label>

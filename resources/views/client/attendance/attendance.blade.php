@@ -142,7 +142,7 @@
     if(batchId){
       $.ajax({
           method:'POST',
-          url: "{{url('getBatchStudentAttendancebyBatchId')}}",
+          url: "{{url('getBatchStudentAttendanceByBatchId')}}",
           data:{_token:currentToken,batch_id:batchId, attendance_date:date}
       }).done(function( result ) {
           var users = document.getElementById('client_batch_users');

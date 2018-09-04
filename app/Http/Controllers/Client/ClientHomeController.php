@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use Auth, Redirect, View, DB,Mail,Cache;
+use Auth, Redirect, View, DB,Mail,Cache,Session;
 use Illuminate\Http\RedirectResponse;
 use App\Models\ClientHomePage;
 use App\Models\ClientOnlineCourse;
@@ -28,7 +28,6 @@ class ClientHomeController extends Controller
      */
     public function __construct(Request $request)
     {
-
         $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
         if(is_object($subdomain)){
             view::share('subdomain', $subdomain);
@@ -128,8 +127,10 @@ class ClientHomeController extends Controller
 
     protected function sendClientUserSignUpOtp(Request $request){
         $mobile = $request->get('mobile');
-        return InputSanitise::sendOtp($mobile);
+        // return InputSanitise::sendOtp($mobile);
+        return InputSanitise::checkMobileAndSendOpt($request,$mobile);
     }
+
     protected function sendClientUserSignInOtp(Request $request){
         $mobile = $request->get('mobile');
         $result = [];
@@ -191,4 +192,53 @@ class ClientHomeController extends Controller
         return $result;
     }
 
+    protected function parentLogin(){
+        return view('client.front.parentLogin');
+    }
+
+    protected function sendClientUserParentSignInOtp(Request $request){
+        $mobile = $request->get('mobile');
+        $result = [];
+        if(!empty($mobile)){
+            $client = Client::where('subdomain', $request->getHost())->first();
+            if(is_object($client)){
+                $parent = Clientuser::where('parent_phone','=', $mobile)->whereNotNull('parent_phone')->where('client_id', $client->id)->first();
+                if(is_object($parent)){
+                    $result['status'] = 'success';
+                    $result['message'] = InputSanitise::sendOtp($mobile);
+                } else {
+                    $result['status'] = 'error';
+                    $result['message'] = 'Entered mobile no. does not exists in our records.';
+                }
+            }
+        } else {
+            $result['status'] = 'error';
+            $result['message'] = 'Please enter mobile no';
+        }
+        return $result;
+    }
+
+    protected function loginParent(Request $request){
+        $userMobile = $request->get('mobile');
+        $loginOtp = $request->get('login_otp');
+        if(!empty($request->route()->getParameter('client')) && !empty($userMobile) && !empty($loginOtp)){
+            $serverOtp = Cache::get($userMobile);
+            if($loginOtp == $serverOtp){
+                $client = Client::where('subdomain', $request->getHost())->first();
+                $cluentUser = Clientuser::where('parent_phone','=', $userMobile)->whereNotNull('parent_phone')->where('client_id', $client->id)->where('client_approve', 1)->first();
+                if(!is_object($cluentUser)){
+                    return Redirect::to('/')->withErrors('User does not exists or not client approve.');
+                }
+                Auth::guard('clientuser')->login($cluentUser);
+                if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
+                    Cache::forget($userMobile);
+                    Cache::forget('mobile-'.$userMobile);
+                    Session::put('parent_'.$userMobile, $userMobile);
+                }
+                return Redirect::to('profile')->with('message', 'Welcome '. $cluentUser->parent_name);
+            } else {
+                return redirect()->back()->withErrors('Entered otp is wrong.');
+            }
+        }
+    }
 }

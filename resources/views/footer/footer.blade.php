@@ -40,7 +40,6 @@
           <h3 class="hidden-1">Education</h3>
           <ul >
              <li><a href="{{ url('courses')}}">Online Courses</a></li>
-             <!-- <li><a href="{{ url('liveCourse') }}">Live Course</a></li> -->
              <li class=""></li>
              <li><a href="{{ url('online-tests') }}">Online Test Series</a></li>
              <li class=""></li>
@@ -71,15 +70,7 @@
            <p>Address: 3rd Floor,Sr No 132/2A/3</p>
            <p>Shrinivas,Labhade Park,Near BSNL</p>
            <p>Office, WARJE, PUNE-411058, INDIA.</p>
-           <p>Email: info@vchiptech.com</p>
            <p>Phone: 020-25235596</p>
-           <!-- <form action="{{url('subscribedUser')}}" method="POST">
-            {{csrf_field()}}
-              <div class="v_subscribe_form input-group">
-                 <input class="btn btn-sm" name="email" id="subscribe_email" type="email" placeholder="Email" required>
-                 <button class=" btn-info btn-sm" type="submit">Subscribe</button>
-              </div>
-           </form> -->
          </address>
         </div>
       </div>

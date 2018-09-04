@@ -116,6 +116,7 @@ class ClientAssignmentController extends ClientBaseController
                     $users = Clientuser::getAllStudentsByClientId($assignment->client_id);
                     $this->setAssignmentCount($users);
                 }
+                $this->sendAssignmentMessage($assignment);
                 DB::connection('mysql2')->commit();
                 return Redirect::to('manageAssignment')->with('message', 'Assignment created successfully!');
             }
@@ -363,6 +364,33 @@ class ClientAssignmentController extends ClientBaseController
                 }
                 $user->save();
             }
+        }
+        return;
+    }
+
+    protected function sendAssignmentMessage($assignment){
+        if('client' == InputSanitise::getCurrentGuard()){
+            $client = Auth::guard('client')->user();
+            $sendSmsStatus = $client->assignment_sms;
+        } else {
+            $clientUser = Auth::guard('clientuser')->user();
+            $client = $clientUser->client;
+            $sendSmsStatus = $client->assignment_sms;
+        }
+        if(Client::None != $sendSmsStatus){
+            $allBatchStudents = [];
+            if($assignment->client_batch_id > 0){
+                $clientBatch = ClientBatch::where('client_id',$assignment->client_id)->where('id',$assignment->client_batch_id)->first();
+                if(is_object($clientBatch)){
+                    if(!empty($clientBatch->student_ids)){
+                        $allBatchStudents = explode(',', $clientBatch->student_ids);
+                    }
+                }
+                $batchName = $clientBatch->name;
+            } else {
+                $batchName = 'All';
+            }
+            InputSanitise::sendAssignmentSms($allBatchStudents,$sendSmsStatus,$assignment->client_batch_id,$batchName,$assignment->topic->name,$client->name,$client->id);
         }
         return;
     }

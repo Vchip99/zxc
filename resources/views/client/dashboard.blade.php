@@ -355,6 +355,7 @@
           </a>
           <ul class="treeview-menu">
             <li title="Manage Event/Message"><a href="{{ url('manageMessage')}}"><i class="fa fa-circle-o"></i> Manage Event/Message</a></li>
+            <li title="Individual Message"><a href="{{ url('manageIndividualMessage')}}"><i class="fa fa-circle-o"></i> Individual Message</a></li>
           </ul>
         </li>
         <li class="treeview">

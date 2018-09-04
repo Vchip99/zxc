@@ -47,6 +47,7 @@ use App\Models\ClientClass;
 use App\Models\ClientHoliday;
 use App\Models\ClientExam;
 use App\Models\ClientNotice;
+use App\Models\ClientIndividualMessage;
 use App\Libraries\InputSanitise;
 use DateTime;
 
@@ -236,11 +237,14 @@ class ClientUserController extends BaseController
     }
 
     protected function profile(Request $request){
+        $loginUser = Auth::guard('clientuser')->user();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        }
         $clientResult = InputSanitise::checkUserClient($request, Auth::guard('clientuser')->user());
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
-        $loginUser = Auth::guard('clientuser')->user();
         $userScores = ClientScore::where('client_user_id', $loginUser->id)->get();
         $obtainedScore = 0;
         $totalScore = 0;
@@ -1174,7 +1178,8 @@ class ClientUserController extends BaseController
 
     protected function sendClientUserOtp(Request $request){
         $mobile = $request->get('mobile');
-        return InputSanitise::sendOtp($mobile);
+        // return InputSanitise::sendOtp($mobile);
+        return InputSanitise::checkMobileAndSendOpt($request,$mobile);
     }
 
     protected function updateMobile(Request $request){
@@ -1564,5 +1569,70 @@ class ClientUserController extends BaseController
             }
         }
         return view('clientuser.dashboard.myCalendar', compact('clientUser','dayColours','calendarData'));
+    }
+
+    protected function myParent(){
+        $loginUser = Auth::guard('clientuser')->user();
+        return view('clientuser.dashboard.myParent',compact('loginUser'));
+    }
+
+    protected function sendClientUserParentAddOtp(Request $request){
+        $mobile = $request->get('mobile');
+        return InputSanitise::checkMobileAndSendOpt($request,$mobile);
+    }
+
+    protected function addParent(Request $request){
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            $user = Clientuser::addParent($request);
+            if(is_object($user)){
+                DB::connection('mysql2')->commit();
+                return Redirect::to('myParent')->with('message', 'Parent Updated successfully.');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('myParent');
+    }
+
+    protected function myIndividualMessage(Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $userBatches = [];
+        $myMessages = [];
+        $batchNames = [];
+        if(!empty($clientUser->batch_ids)){
+            $userBatches = explode(',', $clientUser->batch_ids);
+            $batches = ClientBatch::getBatchesByClientIdByBatchIds($clientId,$userBatches);
+            if(is_object($batches) && false == $batches->isEmpty()){
+                foreach($batches as $batche){
+                    $batchNames[$batche->id] = $batche->name;
+                }
+            }
+        }
+        if(count($userBatches) > 0){
+            $individualMessages = ClientIndividualMessage::getIndividualMessagesByClientIdByBatchIds($clientId,$userBatches);
+            if(is_object($individualMessages) && false == $individualMessages->isEmpty()){
+                foreach($individualMessages as $individualMessage){
+                    if(!empty($individualMessage->messages)){
+                        $allMessages = explode(',', $individualMessage->messages);
+                        if(count($allMessages) > 0){
+                            foreach($allMessages as $userMessages){
+                                $arrMsg = explode(':', $userMessages);
+                                if($clientUserId == $arrMsg[0]){
+                                    $myMessages[] = [ 'message' => $arrMsg[1],'batch' => $batchNames[$individualMessage->client_batch_id], 'date' => date('Y-m-d h:i:s a',strtotime($individualMessage->created_at))];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return view('clientuser.dashboard.myIndividualMessage', compact('myMessages'));
     }
 }

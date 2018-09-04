@@ -2,10 +2,8 @@
 
 
 Route::group(['domain' => 'localvchip.com'], function () {
-
 	Route::get('/', 'HomeController@home');
 	Route::get('/home', 'HomeController@home');
-
 	// chat
 	Route::post('sendMessage', 'ChatController@sendMessage');
 	Route::post('privateChat', 'ChatController@privateChat');
@@ -860,8 +858,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateUserData', 'Admin\UserDataController@update');
 	Route::delete('admin/deleteUserData', 'Admin\UserDataController@delete');
 	Route::post('admin/verifyUserByEmailIdByPaperId', 'Admin\UserDataController@verifyUserByEmailIdByPaperId');
-
-
 });
 
 Route::group(['domain' => '{client}.localvchip.com'], function () {
@@ -880,11 +876,14 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	// Route::post('clientforgotPassword', 'Client\ClientHomeController@clientforgotPassword');
   	Route::post('sendClientUserSignUpOtp', 'Client\ClientHomeController@sendClientUserSignUpOtp');
   	Route::post('sendClientUserSignInOtp', 'Client\ClientHomeController@sendClientUserSignInOtp');
+  	Route::post('sendClientUserParentSignInOtp', 'Client\ClientHomeController@sendClientUserParentSignInOtp');
 
   	Route::get('clientforgotPassword', 'ClientAuth\ForgotPasswordController@showLinkRequestForm');
   	Route::post('clientpassword/email', 'ClientAuth\ForgotPasswordController@sendPasswordResetLink');
   	Route::get('clientpassword/reset/{token}', 'ClientAuth\ResetPasswordController@showResetForm');
   	Route::post('client/password/reset', 'ClientAuth\ResetPasswordController@reset');
+  	Route::get('parentLogin', 'Client\ClientHomeController@parentLogin');
+  	Route::post('parentLogin', 'Client\ClientHomeController@loginParent');
 
   	// online client
   	Route::get('digitaleducation', 'Client\OnlineClientController@digitaleducation');
@@ -930,6 +929,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('addMobileUser', 'Client\ClientUsersInfoController@addMobileUser');
 	Route::post('addEmailUser', 'Client\ClientUsersInfoController@addEmailUser');
 	Route::post('uploadClientUsers', 'Client\ClientUsersInfoController@uploadClientUsers');
+	Route::post('changeClientSetting', 'Client\ClientUsersInfoController@changeClientSetting');
 
   	// register client user
   	Route::post('/register', 'ClientuserAuth\RegisterController@register');
@@ -1166,6 +1166,10 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('createUploadTransaction', 'Client\ClientUserController@createUploadTransaction');
   	Route::post('createUploadTransaction', 'Client\ClientUserController@storeUploadTransaction');
   	Route::get('myCalendar', 'Client\ClientUserController@myCalendar');
+  	Route::get('myParent', 'Client\ClientUserController@myParent');
+  	Route::post('sendClientUserParentAddOtp', 'Client\ClientUserController@sendClientUserParentAddOtp');
+  	Route::post('addParent', 'Client\ClientUserController@addParent');
+  	Route::get('myIndividualMessage', 'Client\ClientUserController@myIndividualMessage');
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');
@@ -1250,10 +1254,11 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('getBatchStudentsIdsbyBatchId', 'Client\ClientBatchController@getBatchStudentsIdsbyBatchId');
 	Route::post('searchClientStudent', 'Client\ClientBatchController@searchClientStudent');
 	Route::get('manageAttendance', 'Client\ClientBatchController@showAttendance');
-	Route::post('getBatchStudentAttendancebyBatchId', 'Client\ClientBatchController@getBatchStudentAttendancebyBatchId');
+	Route::post('getBatchStudentAttendanceByBatchId', 'Client\ClientBatchController@getBatchStudentAttendanceByBatchId');
 	Route::post('markAttendance', 'Client\ClientBatchController@markAttendance');
 	Route::get('manageAttendanceCalendar', 'Client\ClientBatchController@showAttendanceCalendar');
 	Route::post('getBatchUsersByBatchId', 'Client\ClientBatchController@getBatchUsersByBatchId');
+	Route::post('getBatchStudentsByBatchId', 'Client\ClientBatchController@getBatchStudentsByBatchId');
 
 	// Offline Paper
 	Route::get('manageOfflinePaper', 'Client\ClientOfflinePaperController@show');
@@ -1330,4 +1335,13 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('notice/{id}/edit', 'Client\ClientNoticeController@edit');
 	Route::put('updateClientNotice', 'Client\ClientNoticeController@update');
 	Route::delete('deleteNotice', 'Client\ClientNoticeController@delete');
+
+	// individual message
+	Route::get('manageIndividualMessage', 'Client\ClientIndividualMessageController@show');
+	Route::get('createIndividualMessage', 'Client\ClientIndividualMessageController@create');
+	Route::post('createIndividualMessage', 'Client\ClientIndividualMessageController@store');
+	Route::get('individualMessage/{id}/edit', 'Client\ClientIndividualMessageController@edit');
+	Route::delete('deleteIndividualMessage', 'Client\ClientIndividualMessageController@delete');
+	Route::post('getIndividualMessagesByDate', 'Client\ClientIndividualMessageController@getIndividualMessagesByDate');
+
 });

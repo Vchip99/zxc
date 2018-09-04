@@ -15,10 +15,10 @@
 @stop
 @section('module_title')
   <section class="content-header">
-    <h1> My Message  </h1>
+    <h1> My Individual Message  </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-envelope"></i> Message </li>
-      <li class="active"> My Message </li>
+      <li class="active"> My Individual Message </li>
     </ol>
   </section>
 @stop
@@ -29,23 +29,14 @@
       <div class="col-lg-12" id="my-message">
         <div class="panel panel-info">
           <div class="panel-heading text-center">
-            My Messages
+            Individual Messages
           </div>
           <div class="panel-body">
-            @if(count($messages) > 0)
-              @foreach($messages as $message)
-                @if(!empty($message->photo))
-                  <div class="form-group row">
-                    <div class="col-md-3">
-                      <img class="img-responsive" src="{{$message->photo}}" alt="">
-                    </div>
-                    <div class="col-md-9"><b>{{date('Y-m-d h:i:s a', strtotime($message->updated_at))}}</b> @ {{$message->message}}</div>
-                  </div>
-                @else
-                  <div class="form-group row">
-                    <div class=""><b>{{date('Y-m-d h:i:s a', strtotime($message->updated_at))}}</b> @ {{$message->message}}</div>
-                  </div>
-                @endif
+            @if(count($myMessages) > 0)
+              @foreach($myMessages as $message)
+                <div class="form-group row divStyle">
+                  <div class=""><b>{{$message['date']}}-[{{$message['batch']}}]</b> @ {{$message['message']}}</div>
+                </div>
               @endforeach
             @endif
           </div>

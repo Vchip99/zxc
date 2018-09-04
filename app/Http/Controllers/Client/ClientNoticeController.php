@@ -65,6 +65,7 @@ class ClientNoticeController extends ClientBaseController
             $notice = ClientNotice::addOrUpdateClientNotice($request);
             if(is_object($notice)){
                 DB::connection('mysql2')->commit();
+                $this->sendNotice($notice);
                 return Redirect::to('manageNotices')->with('message', 'Notice created successfully!');
             }
         }
@@ -108,6 +109,7 @@ class ClientNoticeController extends ClientBaseController
                 $notice = ClientNotice::addOrUpdateClientNotice($request, true);
                 if(is_object($notice)){
                     DB::connection('mysql2')->commit();
+                    $this->sendNotice($notice);
                     return Redirect::to('manageNotices')->with('message', 'Notice updated successfully!');
                 }
             }
@@ -141,5 +143,29 @@ class ClientNoticeController extends ClientBaseController
             }
         }
         return Redirect::to('manageNotices');
+    }
+
+    protected function sendNotice($notice){
+        $client = Auth::guard('client')->user();
+        if(1 == $notice->is_emergency){
+            $sendSmsStatus = $client->notice_sms;
+        } else {
+            $sendSmsStatus = $client->emergency_notice_sms;
+        }
+        if(Client::None != $sendSmsStatus){
+            $allBatchStudents = [];
+            if($notice->client_batch_id > 0){
+                $clientBatch = ClientBatch::where('client_id',$notice->client_id)->where('id',$notice->client_batch_id)->first();
+                if(is_object($clientBatch)){
+                    if(!empty($clientBatch->student_ids)){
+                        $allBatchStudents = explode(',', $clientBatch->student_ids);
+                    }
+                }
+                $batchName = $clientBatch->name;
+            } else {
+                $batchName = 'All';
+            }
+            InputSanitise::sendNoticeSms($allBatchStudents,$sendSmsStatus,$notice->client_batch_id,$batchName,$notice->notice,$notice->is_emergency,$client->name,$client->id);
+        }
     }
 }

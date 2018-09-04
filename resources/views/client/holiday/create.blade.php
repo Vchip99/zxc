@@ -73,6 +73,7 @@
         <textarea type="text" class="form-control" id="note" name="note" placeholder="note">{{($holiday->note)?$holiday->note:null}}</textarea>
         @if($errors->has('note')) <p class="help-block">{{ $errors->first('note') }}</p> @endif
       </div>
+      <div class="col-sm-6">* Only first 120 alphabets/letters will be send as sms if setting is on</div>
     </div>
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">

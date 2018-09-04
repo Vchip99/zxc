@@ -491,7 +491,8 @@ class ClientUsersInfoController extends BaseController
     }
 
     protected function manageSettings($subdomainName){
-        return view('client.clientLogin.settings', compact('subdomainName'));
+        $loginUser = Auth::guard('client')->user();
+        return view('client.clientLogin.settings', compact('subdomainName','loginUser'));
     }
 
     protected function toggleNonVerifiedEmailStatus(){
@@ -565,7 +566,7 @@ class ClientUsersInfoController extends BaseController
         return Redirect::to('addUsers');
     }
 
-    protected function uploadClientUsers($subdomain, Request $request){
+    protected function uploadClientUsers($subdomainName, Request $request){
         if($request->hasFile('users')){
             $path = $request->file('users')->getRealPath();
             $users = \Excel::selectSheetsByIndex(0)->load($path, function($reader) {
@@ -637,5 +638,21 @@ class ClientUsersInfoController extends BaseController
             }
         }
         return Redirect::to('addUsers');
+    }
+
+    protected function changeClientSetting($subdomainName,Request $request){
+        DB::connection('mysql2')->beginTransaction();
+        try
+        {
+            Client::changeClientSetting($request);
+            DB::connection('mysql2')->commit();
+            return 'true';
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql2')->rollback();
+            return 'false';
+        }
+        return 'false';
     }
 }

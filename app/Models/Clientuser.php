@@ -41,7 +41,7 @@ class Clientuser extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id', 'unchecked_assignments','batch_ids','number_verified','user_type','assigned_modules'
+        'name', 'email', 'password','phone', 'client_id', 'verified', 'client_approve', 'email_token', 'remember_token', 'photo','resume','recorded_video', 'google_provider_id', ' facebook_provider_id', 'unchecked_assignments','batch_ids','number_verified','user_type','assigned_modules','parent_name','parent_phone'
     ];
 
     /**
@@ -191,7 +191,7 @@ class Clientuser extends Authenticatable
     }
 
     protected static function getAllStudentsByClientId($clientId){
-        return static::where('client_id', $clientId)->select('clientusers.*')->where('user_type', self::Student)->get();
+        return static::where('client_id', $clientId)->where('user_type', self::Student)->select('clientusers.*')->get();
     }
 
     protected static function updateUser(Request $request){
@@ -544,5 +544,23 @@ class Clientuser extends Authenticatable
             return 'true';
         }
         return 'false';
+    }
+
+    protected static function addParent($request){
+        $parentName = $request->get('name');
+        $parentMobile = $request->get('phone');
+        $user = Auth::guard('clientuser')->user();
+        $user->parent_name = $parentName;
+        $user->parent_phone = $parentMobile;
+        $user->save();
+        return $user;
+    }
+
+    protected static function getClientApproveStudentsByClientIdForSms($clientId){
+        return static::where('client_id', $clientId)->where('client_approve', 1)->where('number_verified', 1)->where('user_type', self::Student)->select('id','name','phone','parent_phone')->get();
+    }
+
+    protected static function getClientApproveStudentsByClientIdByIdsForSms($clientId,$ids){
+        return static::where('client_id', $clientId)->whereIn('id',$ids)->where('client_approve', 1)->where('number_verified', 1)->where('user_type', self::Student)->select('id','name','phone','parent_phone')->get();
     }
 }

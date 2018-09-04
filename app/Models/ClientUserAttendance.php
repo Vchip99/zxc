@@ -40,7 +40,7 @@ class ClientUserAttendance extends Model
         $clientId = $resultArr[0];
         $createdBy = $resultArr[1];
 
-        $attendance = static::where('attendance_date', $date)->where('client_batch_id', $batchId)->first();
+        $attendance = static::where('attendance_date', $date)->where('client_batch_id', $batchId)->where('client_id', $clientId)->first();
         if(!is_object($attendance)){
             $attendance = new static;
         }
@@ -61,7 +61,7 @@ class ClientUserAttendance extends Model
         return $attendance;
     }
 
-    protected static function getBatchStudentAttendancebyBatchId(Request $request){
+    protected static function getBatchStudentAttendanceByBatchId(Request $request){
     	$date = InputSanitise::inputString($request->get('attendance_date'));
         $batchId   = InputSanitise::inputInt($request->get('batch_id'));
     	return static::where('attendance_date', $date)->where('client_batch_id', $batchId)->first();

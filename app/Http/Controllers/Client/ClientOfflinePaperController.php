@@ -241,9 +241,40 @@ class ClientOfflinePaperController extends ClientBaseController
         DB::connection('mysql2')->beginTransaction();
         try
         {
-            ClientOfflinePaperMark::assignOfflinePaperMarks($request);
-            DB::connection('mysql2')->commit();
-            return Redirect::to('manageOfflineExam')->with('message', 'Assign marks to student successfully!');
+            $result = ClientOfflinePaperMark::assignOfflinePaperMarks($request);
+            if('true' == $result){
+                DB::connection('mysql2')->commit();
+                if('client' == InputSanitise::getCurrentGuard()){
+                    $client = Auth::guard('client')->user();
+                    $sendSmsStatus = $client->offline_exam_sms;
+                } else {
+                    $clientUser = Auth::guard('clientuser')->user();
+                    $client = $clientUser->client;
+                    $sendSmsStatus = $client->offline_exam_sms;
+                }
+                if(Client::None != $sendSmsStatus){
+                    $presentStudentsMark = [];
+                    $paperId   = InputSanitise::inputInt($request->get('paper'));
+                    $clientBatchId = InputSanitise::inputInt($request->get('batch'));
+                    $totalMarks   = InputSanitise::inputInt($request->get('total_marks'));
+                    $studentMarks = $request->except('_token','paper','batch','total_marks');
+                    if(count($studentMarks) > 0){
+                        foreach($studentMarks as $studentId => $studentMark){
+                            if(!empty($studentMark)){
+                                $presentStudentsMark[$studentId] = $studentMark;
+                            }
+                        }
+                    }
+                    if(count($presentStudentsMark) > 0){
+                        $clientBatch = ClientBatch::find($clientBatchId);
+                        $paper = ClientOfflinePaper::find($paperId);
+                        if(is_object($clientBatch) && is_object($paper)){
+                            InputSanitise::sendOfflinePaperMarkSms($presentStudentsMark,$sendSmsStatus,$clientBatch->id,$clientBatch->name,$paper->name,$totalMarks,$client->name,$client->id);
+                        }
+                    }
+                }
+                return Redirect::to('manageOfflineExam')->with('message', 'Assign marks to student successfully!');
+            }
         }
         catch(\Exception $e)
         {

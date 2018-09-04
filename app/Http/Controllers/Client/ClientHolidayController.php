@@ -64,6 +64,7 @@ class ClientHolidayController extends ClientBaseController
             $holiday = ClientHoliday::addOrUpdateClientHoliday($request);
             if(is_object($holiday)){
                 DB::connection('mysql2')->commit();
+                $this->sendHolidayMessage($holiday);
                 return Redirect::to('manageHolidays')->with('message', 'Holiday created successfully!');
             }
         }
@@ -107,6 +108,7 @@ class ClientHolidayController extends ClientBaseController
                 $holiday = ClientHoliday::addOrUpdateClientHoliday($request, true);
                 if(is_object($holiday)){
                     DB::connection('mysql2')->commit();
+                    $this->sendHolidayMessage($holiday);
                     return Redirect::to('manageHolidays')->with('message', 'Holiday updated successfully!');
                 }
             }
@@ -140,5 +142,25 @@ class ClientHolidayController extends ClientBaseController
             }
         }
         return Redirect::to('manageHolidays');
+    }
+
+    protected function sendHolidayMessage($holiday){
+        $client = Auth::guard('client')->user();
+        $sendSmsStatus = $client->holiday_sms;
+        if(Client::None != $sendSmsStatus){
+            $allBatchStudents = [];
+            if($holiday->client_batch_id > 0){
+                $clientBatch = ClientBatch::where('client_id',$holiday->client_id)->where('id',$holiday->client_batch_id)->first();
+                if(is_object($clientBatch)){
+                    if(!empty($clientBatch->student_ids)){
+                        $allBatchStudents = explode(',', $clientBatch->student_ids);
+                    }
+                }
+                $batchName = $clientBatch->name;
+            } else {
+                $batchName = 'All';
+            }
+            InputSanitise::sendHolidaySms($allBatchStudents,$sendSmsStatus,$holiday->client_batch_id,$batchName,$holiday->note,$client->name,$client->id);
+        }
     }
 }

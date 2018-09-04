@@ -69,6 +69,7 @@ class ClientExamController extends ClientBaseController
             $clientExam = ClientExam::addOrUpdateClientExam($request);
             if(is_object($clientExam)){
                 DB::connection('mysql2')->commit();
+                $this->sendExam($clientExam,false);
                 return Redirect::to('manageExams')->with('message', 'Exam created successfully!');
             }
         }
@@ -112,6 +113,7 @@ class ClientExamController extends ClientBaseController
                 $clientExam = ClientExam::addOrUpdateClientExam($request, true);
                 if(is_object($clientExam)){
                     DB::connection('mysql2')->commit();
+                    $this->sendExam($clientExam,true);
                     return Redirect::to('manageExams')->with('message', 'Exam updated successfully!');
                 }
             }
@@ -145,5 +147,26 @@ class ClientExamController extends ClientBaseController
             }
         }
         return Redirect::to('manageExams');
+    }
+
+    protected function sendExam($clientExam,$isUpdate){
+        $client = Auth::guard('client')->user();
+        $sendSmsStatus = $client->exam_sms;
+        if(Client::None != $sendSmsStatus){
+            $allBatchStudents = [];
+            if($clientExam->client_batch_id > 0){
+                $clientBatch = ClientBatch::where('client_id',$clientExam->client_id)->where('id',$clientExam->client_batch_id)->first();
+                if(is_object($clientBatch)){
+                    if(!empty($clientBatch->student_ids)){
+                        $allBatchStudents = explode(',', $clientBatch->student_ids);
+                    }
+                }
+                $batchName = $clientBatch->name;
+            } else {
+                $batchName = 'All';
+            }
+            InputSanitise::sendExamSms($allBatchStudents,$sendSmsStatus,$clientExam->client_batch_id,$batchName,$clientExam->name,$clientExam->date,$clientExam->from_time,$clientExam->to_time,$client->name,$client->id, $isUpdate);
+        }
+        return;
     }
 }

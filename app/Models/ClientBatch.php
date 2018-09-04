@@ -46,6 +46,10 @@ class ClientBatch extends Model
     	return static::where('client_id', $clientId)->get();
     }
 
+    protected static function getBatchesByClientIdByBatchIds($clientId,$batchIds){
+        return static::where('client_id', $clientId)->whereIn('id',$batchIds)->get();
+    }
+
     protected static function associateBatchStudents(Request $request){
     	$batchId   = InputSanitise::inputInt($request->get('batch'));
         if(!empty($request->get('students'))){

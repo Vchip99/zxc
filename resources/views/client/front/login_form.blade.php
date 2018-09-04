@@ -82,12 +82,16 @@
                           </br>
                         </form>
                         <div>
+                        @if(1 == $client->login_using || 3 == $client->login_using)
                         <div class="form-group">
                             <a href="{{ url('/auth/facebook') }}" class="btn btn-info btn-block" style="color: white; background-color: #3B5998; border-color: #3B5998;"><i class="fa fa-facebook"></i> Login</a>
                         </div>
+                        @endif
+                        @if(2 == $client->login_using || 3 == $client->login_using)
                         <div class="form-group">
                             <a href="{{ url('/auth/google') }}" class="btn btn-info btn-block" style="color: white;background-color: #DD4B39; border-color: #DD4B39;"><i class="fa fa-google"></i> Login</a>
                         </div>
+                        @endif
                         <a href="{{ url('forgotPassword')}}" title="Forgot Password">Forgot Password?</a></div>
                       </div>
                       <div id="menu1" class="tab-pane fade">
@@ -190,7 +194,7 @@
   }
   function sendSignInOtp(){
     var mobile = $('#signInPhone').val();
-    if(mobile){
+    if(mobile && 10 == mobile.length ){
       $.ajax({
         method: "POST",
         url: "{{url('sendClientUserSignInOtp')}}",
@@ -209,28 +213,35 @@
             $('#login_otp').prop('required', true);
             $('#signInOtpMessage').removeClass('hide');
           } else {
+            $('#signInPhone').val('');
             $.confirm({
               title: 'Alert',
               content: resultObj.ErrorMessage
             });
           }
         } else {
+          $('#signInPhone').val('');
           $.confirm({
             title: 'Alert',
             content: result['message']
           });
         }
       });
-    } else {
+    } else if(!mobile) {
       $.confirm({
         title: 'Alert',
         content: 'Enter mobile no.'
+      });
+    } else if(mobile.length < 10){
+      $.confirm({
+        title: 'Alert',
+        content: 'Enter 10 digit mobile no.'
       });
     }
   }
   function sendSignUpOtp(){
     var mobile = $('#signUpPhone').val();
-    if(mobile){
+    if(mobile && 10 == mobile.length ){
     $('#signUpOtpDiv').removeClass('hide');
     $('#register').removeClass('hide');
     $('#sendSignUpOtpBtn').addClass('hide');
@@ -243,20 +254,45 @@
         data: {mobile:mobile}
       })
       .done(function( result ) {
-        var resultObj = JSON.parse(result);
-        if('000' == resultObj.ErrorCode && 'Success' == resultObj.ErrorMessage){
-          $('#signUpOtpMessage').removeClass('hide');
+        var resultObj = JSON.parse(JSON.stringify(result));
+        if('success' == resultObj.status){
+          var jsonMessage = JSON.parse(resultObj.message);
+          if('000' == jsonMessage.ErrorCode && 'Success' == jsonMessage.ErrorMessage){
+            $('#signUpOtpMessage').removeClass('hide');
+          } else {
+            $('#sendSignUpOtpBtn').removeClass('hide');
+            $('#registerMobile').addClass('hide');
+            $('#signUpOtpDiv').addClass('hide');
+            $('#signUpPhone').prop('readonly', false);
+            $('#signUpNameInput').prop('readonly', false);
+            $('#signUpOtpMessage').addClass('hide');
+            $.confirm({
+              title: 'Alert',
+              content: 'Something wrong in otp result.'
+            });
+          }
         } else {
+          $('#sendSignUpOtpBtn').removeClass('hide');
+          $('#registerMobile').addClass('hide');
+          $('#signUpOtpDiv').addClass('hide');
+          $('#signUpPhone').prop('readonly', false);
+          $('#signUpNameInput').prop('readonly', false);
+          $('#signUpOtpMessage').addClass('hide');
           $.confirm({
             title: 'Alert',
-            content: 'Something went wrong while sending otp.'
+            content: resultObj.message
           });
         }
       });
-    } else {
+    } else if(!mobile) {
       $.confirm({
         title: 'Alert',
         content: 'Enter mobile no.'
+      });
+    } else if(mobile.length < 10){
+      $.confirm({
+        title: 'Alert',
+        content: 'Enter 10 digit mobile no.'
       });
     }
   }

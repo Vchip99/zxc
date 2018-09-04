@@ -12,6 +12,7 @@
             <li title="Courses"><a href="{{ url('online-courses') }}" >Courses</a></li>
             <li title="Test Series"><a href="{{ url('online-tests') }}" >Test Series</a></li>
             <li title="Admin Log in"><a href="{{ url('client/login') }}" >Admin Log in</a></li>
+            <li title="Parent Log in"><a href="{{ url('parentLogin') }}" >Parent Log in</a></li>
           </ul>
         </div>
         <div class="col-lg-6 col-md-6 col-sm-6">

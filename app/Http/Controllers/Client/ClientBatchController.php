@@ -273,7 +273,7 @@ class ClientBatchController extends ClientBaseController
             if(is_object($clientBatch)){
                 $userIds = explode(',', $clientBatch->student_ids);
                 if(count($userIds) > 0){
-                    $batchUsers = Clientuser::find($userIds);
+                    $batchUsers = Clientuser::whereIn('id',$userIds)->where('client_approve', 1)->get();
                     if(is_object($batchUsers) && false == $batchUsers->isEmpty()){
                         foreach($batchUsers as $batchUser){
                             if($batchUser->batch_ids){
@@ -363,10 +363,10 @@ class ClientBatchController extends ClientBaseController
                 $studentIds = $clientBatch->student_ids;
                 $userIds = explode(',', $clientBatch->student_ids);
                 if(count($userIds) > 0){
-                    $batchUsers = Clientuser::find($userIds);
+                    $batchUsers = Clientuser::whereIn('id',$userIds)->where('client_approve', 1)->get();
                 }
             }
-            $batchAttendanceObj = ClientUserAttendance::getBatchStudentAttendancebyBatchId($request);
+            $batchAttendanceObj = ClientUserAttendance::getBatchStudentAttendanceByBatchId($request);
             if(is_object($batchAttendanceObj)){
                 $batchAttendance = explode(',', $batchAttendanceObj->student_ids);
             }
@@ -374,7 +374,7 @@ class ClientBatchController extends ClientBaseController
         return view('client.attendance.attendance', compact('batches', 'subdomainName', 'attendanceDate', 'attendanceBatch', 'batchUsers', 'batchAttendance','studentIds','loginUser'));
     }
 
-    protected function getBatchStudentAttendancebyBatchId(Request $request){
+    protected function getBatchStudentAttendanceByBatchId(Request $request){
         $batchId   = InputSanitise::inputInt($request->get('batch_id'));
         $clientBatch = ClientBatch::getBatchById($batchId);
         $result = [];
@@ -382,11 +382,11 @@ class ClientBatchController extends ClientBaseController
         if(is_object($clientBatch)){
             $userIds = explode(',', $clientBatch->student_ids);
             if(count($userIds) > 0){
-                $batchUsers = Clientuser::find($userIds);
+                $batchUsers = Clientuser::whereIn('id',$userIds)->where('client_approve', 1)->get();
             }
         }
         $result['batchUsers'] = $batchUsers;
-        $batchAttendance = ClientUserAttendance::getBatchStudentAttendancebyBatchId($request);
+        $batchAttendance = ClientUserAttendance::getBatchStudentAttendanceByBatchId($request);
         $result['batchAttendance'] = [];
         if(is_object($batchAttendance)){
             $result['batchAttendance'] = explode(',', $batchAttendance->student_ids);
@@ -394,20 +394,62 @@ class ClientBatchController extends ClientBaseController
         return $result;
     }
 
+    protected function getBatchStudentsByBatchId(Request $request){
+        $batchId   = InputSanitise::inputInt($request->get('batch_id'));
+        $clientBatch = ClientBatch::getBatchById($batchId);
+        $batchUsers = [];
+        if(is_object($clientBatch)){
+            $userIds = explode(',', $clientBatch->student_ids);
+            if(count($userIds) > 0){
+                $batchUsers = Clientuser::whereIn('id',$userIds)->where('client_approve', 1)->select('id','name','email')->get();
+            }
+        }
+        return $batchUsers;
+    }
+
     protected function markAttendance($subdomainName, Request $request){
         DB::connection('mysql2')->beginTransaction();
         try
         {
-            ClientUserAttendance::addOrUpdateClientUserAttendance($request);
-            DB::connection('mysql2')->commit();
-            return Redirect::to('manageAttendance')->with('message', 'Attendance mark successfully!');
+            $attendance = ClientUserAttendance::addOrUpdateClientUserAttendance($request);
+            if(is_object($attendance)){
+                DB::connection('mysql2')->commit();
+                if('client' == InputSanitise::getCurrentGuard()){
+                    $client = Auth::guard('client')->user();
+                    $sendSmsStatus = $client->absent_sms;
+                } else {
+                    $clientUser = Auth::guard('clientuser')->user();
+                    $client = $clientUser->client;
+                    $sendSmsStatus = $client->absent_sms;
+                }
+                if(Client::None != $sendSmsStatus){
+                    $clientBatch = ClientBatch::where('client_id',$attendance->client_id)->where('id',$attendance->client_batch_id)->first();
+                    if(is_object($clientBatch)){
+                        if(!empty($clientBatch->student_ids)){
+                            $allBatchStudents = explode(',', $clientBatch->student_ids);
+                        } else {
+                            $allBatchStudents = [];
+                        }
+                        if(!empty($attendance->student_ids)){
+                            $presentStudents = explode(',', $attendance->student_ids);
+                        } else {
+                            $presentStudents = [];
+                        }
+                        $absentStudents = array_diff($allBatchStudents, $presentStudents);
+                        if(count($absentStudents) > 0){
+                            InputSanitise::sendAbsentSms($absentStudents,$sendSmsStatus,$clientBatch->name,$attendance->attendance_date,$client->name,$client->id);
+                        }
+                    }
+                }
+                return Redirect::to('manageAttendanceCalendar')->with('message', 'Attendance mark successfully!');
+            }
         }
         catch(\Exception $e)
         {
             DB::connection('mysql2')->rollback();
             return back()->withErrors('something went wrong.');
         }
-        return Redirect::to('manageAttendance');
+        return Redirect::to('manageAttendanceCalendar');
     }
 
     protected function showAttendanceCalendar($subdomainName, Request $request){
@@ -467,9 +509,17 @@ class ClientBatchController extends ClientBaseController
         }
         if(is_object($allAttendance) && false == $allAttendance->isEmpty()){
             foreach($allAttendance as $attendance){
-                $studentCount = count(explode(',',$attendance->student_ids));
+                if(!empty($attendance->student_ids)){
+                    $studentCount = count(explode(',',$attendance->student_ids));
+                } else {
+                    $studentCount = 0;
+                }
                 $presentCnt = $studentCount;
-                $absentCnt = $batchesCount[$attendance->client_batch_id] - $studentCount;
+                if((int) $batchesCount[$attendance->client_batch_id] > (int) $studentCount){
+                    $absentCnt = (int) $batchesCount[$attendance->client_batch_id] - (int) $studentCount;
+                } else {
+                    $absentCnt = (int) $studentCount - (int) $batchesCount[$attendance->client_batch_id];
+                }
                 $attendanceStats[] = $attendance->attendance_date.':'.$presentCnt.'-'.$absentCnt;
                 $allAttendanceDates[] = $attendance->attendance_date;
             }
@@ -486,7 +536,7 @@ class ClientBatchController extends ClientBaseController
         if(is_object($clientBatch)){
             $userIds = explode(',', $clientBatch->student_ids);
             if(count($userIds) > 0){
-                $batchUsers = Clientuser::find($userIds);
+                $batchUsers = Clientuser::whereIn('id',$userIds)->where('client_approve', 1)->get();
             }
         }
         return $batchUsers;

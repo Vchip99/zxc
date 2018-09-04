@@ -50,7 +50,7 @@ class Client extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'subdomain', 'admin_approve','remember_token', 'photo', 'plan_id','allow_non_verified_email'
+        'name', 'email', 'password','phone', 'subdomain', 'admin_approve','remember_token', 'photo', 'plan_id','allow_non_verified_email','absent_sms','exam_sms','offline_exam_sms','notice_sms','emergency_notice_sms','holiday_sms','assignment_sms','lecture_sms','individual_sms','login_using'
     ];
 
     /**
@@ -61,6 +61,14 @@ class Client extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    const Student = 1;
+    const Parents = 2;
+    const Both    = 3;
+    const None    = 4;
+
+    const Facebook = 1;
+    const Google   = 2;
 
     /**
      * Send the password reset notification.
@@ -233,6 +241,17 @@ class Client extends Authenticatable
             }
             $client->save();
             return $client->allow_non_verified_email;
+        }
+        return;
+    }
+
+    protected static function changeClientSetting(Request $request){
+        $column = $request->get('column');
+        $value = $request->get('value');
+        $client = Auth::guard('client')->user();
+        if(is_object($client)){
+            $client->$column = $value;
+            $client->save();
         }
         return;
     }

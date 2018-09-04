@@ -74,6 +74,7 @@ class ClientClassController extends ClientBaseController
             $clientClass = ClientClass::addOrUpdateClientClass($request);
             if(is_object($clientClass)){
                 DB::connection('mysql2')->commit();
+                $this->sendLectureMessage($clientClass);
                 return Redirect::to('manageClasses')->with('message', 'Class created successfully!');
             }
         }
@@ -120,6 +121,7 @@ class ClientClassController extends ClientBaseController
                 $clientClass = ClientClass::addOrUpdateClientClass($request, true);
                 if(is_object($clientClass)){
                     DB::connection('mysql2')->commit();
+                    $this->sendLectureMessage($clientClass);
                     return Redirect::to('manageClasses')->with('message', 'Class updated successfully!');
                 }
             }
@@ -261,5 +263,21 @@ class ClientClassController extends ClientBaseController
             }
         }
         return view('client.class.scheduleCalendar', compact('subdomainName','dayColours','calendarData'));
+    }
+
+    protected function sendLectureMessage($lecture){
+        $client = Auth::guard('client')->user();
+        $sendSmsStatus = $client->lecture_sms;
+        if(1 == $sendSmsStatus){
+            if($lecture->client_batch_id > 0){
+                $clientBatch = ClientBatch::where('client_id',$lecture->client_id)->where('id',$lecture->client_batch_id)->first();
+                $batchName = $clientBatch->name;
+            } else {
+                $batchName = 'All';
+            }
+            $lecturer = $lecture->user;
+            InputSanitise::sendLectureSms($lecture,$batchName,$lecturer,$client->name);
+        }
+        return;
     }
 }

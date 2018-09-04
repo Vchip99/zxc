@@ -45,10 +45,12 @@
 <body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
 <div class="wrapper">
   <header class="main-header">
+    @if(!Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
     <a href="{{ url('/')}}" class="logo">
       <span class="logo-mini"><b> Home</b></span>
       <span class="logo-lg"><b>Home</b></span>
     </a>
+    @endif
     <nav class="navbar navbar-static-top">
       <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
         <span class="sr-only">Toggle navigation</span>
@@ -75,13 +77,22 @@
           </a>
         </div>
         <div class="pull-left info">
-          <p><a href="{{ url('profile')}}">{{ ucfirst(Auth::guard('clientuser')->user()->name)}}</a></p>
+          <p>
+            <a href="{{ url('profile')}}">
+            @if(Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
+              {{ ucfirst(Auth::guard('clientuser')->user()->parent_name)}}
+            @else
+              {{ ucfirst(Auth::guard('clientuser')->user()->name)}}
+            @endif
+            </a>
+          </p>
           <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
           <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::guard('clientuser')->user()))?Auth::guard('clientuser')->user()->id: NULL }}"/>
         </div>
       </div>
       <ul class="sidebar-menu">
         <li class="header">Dashboard</li>
+        @if(!Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
         <li class="treeview ">
           <a href="#">
             <i class="fa fa-star"></i><span>Notifications </span><b style="color: red;">{{Auth::guard('clientuser')->user()->userNotificationCount()}}</b>
@@ -94,6 +105,7 @@
             <li><a href="{{ url('clientMessages')}}"><i class="fa fa-circle-o"></i> Admin Messages : <b style="color: red;">{{Auth::guard('clientuser')->user()->adminNotificationCount()}} </b></a></li>
           </ul>
         </li>
+        @endif
         <li class="treeview ">
           <a href="#" title="Online Courses">
             <i class="fa fa-dashboard"></i> <span>Online Courses</span>
@@ -102,10 +114,14 @@
             </span>
           </a>
           <ul class="treeview-menu">
+            @if(!Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
             <li title="My Online Courses"><a href="{{ url('myCourses')}}"><i class="fa fa-circle-o"></i> My Online Courses</a></li>
+            @endif
             <li title="My Course Results"><a href="{{ url('myCourseResults')}}"><i class="fa fa-circle-o"></i> My Course Results</a></li>
             <li title="My Certificate"><a href="{{ url('myCertificate')}}"><i class="fa fa-circle-o"></i> My Certificate</a></li>
+            @if(!Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
             <li title="More Courses"><a href="{{ url('online-courses')}}" target="_blank"><i class="fa fa-circle-o"></i> More Courses</a></li>
+            @endif
           </ul>
         </li>
         <li class="treeview">
@@ -117,9 +133,13 @@
             </span>
           </a>
           <ul class="treeview-menu">
+            @if(!Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
             <li title="My Test"><a href="{{ url('myTest')}}"><i class="fa fa-circle-o"></i> My Test</a></li>
+            @endif
             <li title="My Test Results"><a href="{{ url('myTestResults')}}"><i class="fa fa-circle-o"></i> My Test Results</a></li>
+            @if(!Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
             <li title="More Test"><a href="{{ url('online-tests')}}" target="_blank"><i class="fa fa-circle-o"></i> More Test</a></li>
+            @endif
             <li title="My Offline Test Results"><a href="{{ url('myOfflineTestResults')}}"><i class="fa fa-circle-o"></i> My Offline Test Results</a></li>
           </ul>
         </li>
@@ -154,6 +174,7 @@
           </a>
           <ul class="treeview-menu">
             <li title="My Event/Message"><a href="{{ url('myMessage')}}"><i class="fa fa-circle-o"></i> My Event/Message</a></li>
+            <li title="My Individual Message"><a href="{{ url('myIndividualMessage')}}"><i class="fa fa-circle-o"></i> My Individual Message</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -180,6 +201,19 @@
             <li title="Uploaded Transactions"><a href="{{ url('uploadedTransactions')}}"><i class="fa fa-circle-o"></i>Uploaded Transactions</a></li>
           </ul>
         </li>
+        @if(!Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
+        <li class="treeview">
+          <a href="#" title="My Parent">
+            <i class="fa fa-graduation-cap"></i> <span>My Parent</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="My Parent"><a href="{{ url('myParent')}}"><i class="fa fa-circle-o"></i> My Parent</a></li>
+          </ul>
+        </li>
+        @endif
         <li class="header">Logout</li>
         <li title="Logout">
           <a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
