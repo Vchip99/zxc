@@ -398,33 +398,33 @@
 			@foreach($testScores as $testPaperId => $paperScores)
 				@if(count($paperScores) > 0)
 		          	<div class="modal resultModels" id="paper_{{$testPaperId}}" role="dialog" style="display: none;">
-		                <div class="modal-dialog modal-sm">
-		                  <div class="modal-content">
-		                    <div class="modal-header">
-		                      	<button type="button" class="close" data-dismiss="modal">×</button>
-		                      	<h4 class="modal-title">Result of {{$testPaperNames[$testPaperId]}}</h4>
-			                      <table id="">
-			                        <thead>
-			                          <tr>
-			                            <th>#</th>
-			                            <th>User</th>
-			                            <th>Score</th>
-			                            <th>Rank</th>
-			                          </tr>
-			                        </thead>
-			                        <tbody>
-			                        @foreach($paperScores as $index => $paperScore)
-			                        	<tr>
-			                        		<td>{{$index + 1}}</td>
-			                        		<td>{{$testUsers[$paperScore['user']]->name}}</td>
-			                        		<td>{{$paperScore['test_score']}}</td>
-			                        		<td>{{$paperScore['rank']}}</td>
-			                        	</tr>
-			                        @endforeach
-			                        </tbody>
-			                      </table>
-		                    </div>
-		                  </div>
+		                <div class="modal-dialog modal-lg">
+		                  	<div class="modal-content">
+			                    <div class="modal-header">
+			                      	<button type="button" class="close" data-dismiss="modal">×</button>
+			                      	<h4 class="modal-title">Result of {{$testPaperNames[$testPaperId]}}</h4>
+				                    <table id="" width="100%">
+				                        <thead>
+				                        	<tr>
+				                            	<th>#</th>
+				                            	<th>User</th>
+				                            	<th>Score</th>
+				                            	<th>Rank</th>
+				                          	</tr>
+				                        </thead>
+				                        <tbody>
+				                        @foreach($paperScores as $index => $paperScore)
+				                        	<tr>
+				                        		<td>{{$index + 1}}</td>
+				                        		<td>{{$testUsers[$paperScore['user']]->name}}</td>
+				                        		<td>{{$paperScore['test_score']}}</td>
+				                        		<td>{{$paperScore['rank']}}</td>
+				                        	</tr>
+				                        @endforeach
+				                        </tbody>
+				                    </table>
+			                    </div>
+		                  	</div>
 		                </div>
 		      		</div>
 			    @endif
@@ -540,24 +540,8 @@
 			                                    <div>
 			                                    	@if(!empty($paperResult->youtube))
 			                                        	<a class="btn btn-warning btn-sm" rel="publisher"  href="#student_{{$paperResult->id}}" data-toggle="modal" ><i class="fa fa-youtube"></i></a>
-								                      	<!-- <div id="student_{{$paperResult->id}}" class="modal fade" role="dialog">
-									                        <div class="modal-dialog model-sm">
-									                            <div class="modal-content">
-									                              	<div class="modal-header">
-									                                	<button class="close" data-dismiss="modal">×</button>
-								                                		<h2  class="modal-title">Interview</h2>
-									                              	</div>
-									                              	<div class="modal-body">
-									                                	<div class="iframe-container">
-									                                  		{{$paperResult->youtube}}
-								                                		</div>
-									                              	</div>
-									                            </div>
-									                        </div>
-									                    </div> -->
 			                                        @endif
 			                                        @if(!empty($paperResult->resume) && is_file($paperResult->resume))
-			                                        	<!-- <a class="btn btn-primary" href="#resume_{{$paperResult->id}}" data-toggle="modal"><i class="fa fa-download"></i></a> -->
 			                                        	<a data-path="{{asset($paperResult->resume)}}" class="btn btn-primary" data-toggle="modal" data-target="#resume_{{$paperResult->id}}" > <i class="fa fa-book" aria-hidden="true"></i> </a>
 			                                        @endif
 			                                    </div>

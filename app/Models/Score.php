@@ -236,6 +236,6 @@ class Score extends Model
 
     protected static function getAllCompanyTestResults(){
         return static::join('test_categories', 'test_categories.id','=', 'scores.category_id')
-            ->where('test_categories.category_for',0)->get();
+            ->where('test_categories.category_for',0)->orderBy('test_score', 'desc')->get();
     }
 }
