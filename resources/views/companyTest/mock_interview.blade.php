@@ -5,232 +5,6 @@
 @section('header-css')
   @include('layouts.home-css')
   <link href="{{ asset('css/sidemenuindex.css?ver=1.0')}}" rel="stylesheet"/>
-<!-- <style type="text/css">
-  #vchip-header {
-    background: #4d4d4d;
-  }
-  @media screen and (max-width: 992px) {
-    #vchip-header.vchip-cover {
-      height: inherit !important;
-      padding: 48px 0 !important;
-    }
-  }
-  @media screen and (max-width: 480px) {
-    #vchip-header .text-left {
-      text-align: center !important;
-    }
-
-  }
-  @media screen and (max-width: 480px) {
-    #vchip-header .btn {
-      display: block;
-      width: 100%;
-    }
-  }
-  .header-text  {
-    margin-top: 112px
-    margin-bottom: 48px;
-  }
-  @media screen and (max-width: 768px) {
-    .header-text {
-      margin-top: 0;
-      text-align: center;
-    }
-    .header-text  {
-      margin-top: 0;
-      text-align: center;
-    }
-  }
-  .header-text h1 {
-    margin-bottom: 0px;
-    font-size: 80px;
-    font-weight: 300;
-    color: #fff;
-    font-family: "Kaushan Script", cursive !important;
-  }
-  @media screen and (max-width: 768px) {
-    .header-text h1 {
-      font-size: 34px;
-      line-height: 1.2;
-      margin-bottom: 10px;
-    }
-  }
-  #vchip-header
-  {
-    background-size: cover;
-    background-position: top center;
-    background-repeat: no-repeat;
-    position: relative;
-  }
-  .vchip-cover {
-    height: 900px;
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    position: relative;
-    float: left;
-    width: 100%;
-  }
-  .vchip-cover a {
-    color: #01bafd;
-    text-decoration:none;
-  }
-  .vchip-cover a:hover {
-    color: white;
-  }
-  .vchip-cover .overlay {
-    z-index: 1;
-    position: absolute;
-    bottom: 0;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.5);
-  }
-  .vchip-cover > .vchip-container {
-    position: relative;
-    z-index: 10;
-  }
-  @media screen and (max-width: 768px) {
-    .vchip-cover {
-      height: 600px;
-    }
-  }
-  .vchip-cover p {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 20px !important;
-    font-weight: 300;
-  }
-  .vchip-cover > .vchip-container {
-    position: relative;
-    z-index: 10;
-  }
-  .vchip-container {
-    max-width: 1100px;
-    position: relative;
-    margin: 0 auto;
-    padding-left: 15px;
-    padding-right: 15px;
-    margin-top: 300px;  }
-    @media screen and (max-width: 768px) {
-      .vchip-container {margin-top: 0px;}
-    }
-    .video-form{
-      padding:30px 40px;
-      background: rgba(0, 0, 0, 0.5);
-      margin-left: 30px;
-      margin-right: 30px;
-    }
-    .form-group{
-      border-radius: 0px;
-    }
-    .reg-btn{
-      line-height: 30px;
-      width: 100%;
-    }
-  select {
-    background: transparent;
-    border: medium none;
-    color: #000;
-    padding: 5px;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
-    width: 70%; /* set width as per you needed */
-  }
-  select option:hover,
-  select option:focus,
-  select option:active,
-  select option:checked
-  {
-      background: linear-gradient(#01bafd,#01bafd);
-      background-color:#01bafd !important; /* for IE */
-  }
-  option:not(:checked) {
-    background-color: #fff;
-  }
-  @media screen and (max-width: 768px) {
-
-  }
-  .vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; }
-  .vid iframe, .vid object,.vid embed {position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
-  .video-mobile-headline{display: none; margin:0px;}
-  @media only screen and (max-device-width: 800px), only screen and (device-width: 1024px) and (device-height: 600px), only screen and (width: 1280px) and (orientation: landscape), only screen and (device-width: 800px), only screen and (max-width: 767px) {
-    .video-container{ margin-bottom: 25px;}
-    .flex-video { padding-top: 0;}
-  }
-
-  .img-course-box {
-    width: 100%;
-    height:150px;
-    border-top-left-radius:2px;
-    border-top-right-radius:2px;
-    display:block;
-    overflow: hidden;
-    border-bottom: 2px dotted #ddd;
-  }
-  .img-course-box img{
-    width: 100%;
-    height: 100%;
-    transition: all .25s ease;
-  }
-  .course-box-content p{color: grey;}
-  .add-view {
-      border-top: 1px solid #D4D4D4;
-      text-align:center;
-      background-color: #eee;
-    }
-    .add-view a {
-      text-decoration: none !important;
-      padding:10px;
-      text-transform: uppercase;
-      cursor: pointer;
-    }
-  @media (min-width: 995px) and (max-width: 1600px) {
-    .hidden-div {
-      display: none !important;
-    }
-  }
-   .hidden-div {
-   right: 0%;
-      width: 100%;
-    }
-  @media (max-width: 995px) {
-    .hidden-div1 {
-      display: none !important;
-    }
-  }
-  @media (min-width: 768px) and (max-width: 995px) {
-
-    .col-sm-pull-9 {
-      right: 0%;
-      width: 100%;
-    }
-      .col-sm-push-3 {
-      left:  0%;
-      width: 100%;
-    }
-     .add-1, .add-2{width:50%;
-      float: left;
-    position: relative;
-    min-height: 1px;
-    padding-right: 15px;
-    padding-left: 15px;}
-  }
-  @media (min-width: 568px) and (max-width: 766px) {
-    .add-1, .add-2{width:50%;
-      float: left;
-    position: relative;
-    min-height: 1px;
-    padding-right: 15px;
-    padding-left: 15px;}
-  }
-  .block-with-text {
-      display: inline-block;
-      width: 180px;
-      white-space: nowrap;
-      overflow: hidden !important;
-      text-overflow: ellipsis;
-  }
-</style> -->
 <style>
     .memberinfotop{
       margin-top: 100px;
@@ -312,6 +86,8 @@
     .iframe-container iframe{
       width: 100% !important;
     }
+    .vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; }
+    .vid iframe, .vid object,.vid embed {position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
 </style>
 @stop
 @section('header-js')
@@ -353,39 +129,12 @@
             @foreach($userDatas as $userData)
             <div style="border:1px solid black;">
               <div class="row memberinfo" >
-                <div class="col-md-4 ">
-                  <br/>
-                  @if(!empty($testUsers[$userData->user_id]->photo) && is_file($testUsers[$userData->user_id]->photo))
-                    <img class="image img-circle" src="{{ asset($testUsers[$userData->user_id]->photo)}}" alt="user image">
-                  @else
-                    <img class="image img-circle" src="{{ asset('images/user/user1.png')}}" alt="user image">
-                  @endif
-                  <br/><br/>
-                  @if(!empty($userData->resume) && is_file($userData->resume))
-                  <div style="padding-left: 30px;"><a href="{{asset($userData->resume)}}" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>
-                  @endif
-                  <br/>
-                  @if(!empty($userData->youtube))
-                    <div style="padding-left: 30px;"><a href="#student_{{$userData->id}}" data-toggle="modal" ><button type="button"  class="btn btn-primary">Interview Video</button></a></div>
-                    <div id="student_{{$userData->id}}" class="modal fade" role="dialog">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <button class="close" data-dismiss="modal" id="close_{{$userData->id}}">×</button>
-                              <h2  class="modal-title">Interview Video</h2>
-                            </div>
-                            <div class="modal-body">
-                              <div class="iframe-container" id="iframe_{{$userData->id}}">
-                                {!! $userData->youtube !!}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                    </div>
-                  @endif
-                  <br/>
+                <div class="col-md-5 ">
+                  <div class="vid">
+                    {!! $userData->youtube !!}
+                  </div>
                 </div>
-                <div class="col-md-8 topcontent">
+                <div class="col-md-7">
                   @php
                     $expArr = explode(',',$userData->experiance);
                     $skillArr = explode(',',$userData->skill_ids);
@@ -418,6 +167,9 @@
                       </a>
                     @endif
                   </p>
+                  @if(!empty($userData->resume) && is_file($userData->resume))
+                  <div style="padding-left: 10px;"><a href="{{asset($userData->resume)}}" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>
+                  @endif
                 </div>
               </div>
             </div>
