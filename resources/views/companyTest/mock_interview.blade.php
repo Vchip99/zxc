@@ -312,26 +312,16 @@
           secondDiv.className = 'row memberinfo';
 
           var thirdDiv = document.createElement('div');
-          thirdDiv.className = 'col-md-4';
-          thirdDivInnerHtml = '<br/>';
-          if(data['is_file_photo']){
-            thirdDivInnerHtml += '<img class="image img-circle" src="'+ data['photo'] +'" alt="user image"><br/><br/>';
-          } else {
-            thirdDivInnerHtml += '<img class="image img-circle" src="'+ data['photo'] +'" alt="user image"><br/><br/>';
-          }
-          if(data['is_file_resume']){
-            thirdDivInnerHtml += '<div style="padding-left: 30px;"><a href="'+ data['resume'] +'" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>';
-          }
-          thirdDivInnerHtml += '<br/>';
+          thirdDiv.className = 'col-md-5';
           if(data['youtube']){
-            thirdDivInnerHtml += '<div style="padding-left: 30px;"><a href="#student_'+id+'" data-toggle="modal" ><button type="button"  class="btn btn-primary">Interview Video</button></a></div><div id="student_'+id+'" class="modal fade" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal" id="close_'+id+'">×</button><h2  class="modal-title">Interview Video</h2></div><div class="modal-body"><div class="iframe-container"  id="iframe_'+id+'">'+data['youtube']+'</div></div></div></div></div>';
+            thirdDiv.innerHTML = '<div class="vid">'+data['youtube']+'</div>';
+          } else {
+            thirdDiv.innerHTML = '<div class="vid"></div>';
           }
-          thirdDivInnerHtml += '<br/>';
-          thirdDiv.innerHTML = thirdDivInnerHtml;
           secondDiv.appendChild(thirdDiv);
 
           var fourthDiv = document.createElement('div');
-          fourthDiv.className = 'col-md-8 topcontent';
+          fourthDiv.className = 'col-md-7 topcontent';
           fourthDivInnerHtml = '';
           fourthDivInnerHtml += '<h4><strong>'+data['name']+'</strong></h4><p><strong>Experience:</strong>'+data['experience']+'</p><p><strong>Company Name:</strong>'+data['company']+'</p><p><strong>Education:</strong>'+data['education']+'</p><p><strong>Skills:</strong>'+data['skill']+'</p>';
           fourthDivInnerHtml += '<p class="bottom">';
@@ -345,6 +335,9 @@
             fourthDivInnerHtml += ' <a class="btn btn-primary btn-sm" rel="publisher" target="_blank" href="'+data['facebook']+'"><i class="fa fa-facebook"></i></a>';
           }
           fourthDivInnerHtml += '</p>';
+          if(data['is_file_resume']){
+            fourthDivInnerHtml += '<div style="padding-left: 30px;"><a href="'+ data['resume'] +'" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>';
+          }
           fourthDiv.innerHTML = fourthDivInnerHtml;
           secondDiv.appendChild(fourthDiv);
           firstDiv.appendChild(secondDiv);

@@ -44,13 +44,13 @@
       <div class="form-group row">
         <label class="col-sm-2 col-form-label" for="category">No of Sms:</label>
         <div class="col-sm-3">
-          <input type="number" id="sms_count" name="sms_count" value="1000" min="1000" step="1000" class="form-control" onchange="showTotal(this);" required>
+          <input type="number" id="sms_count" name="sms_count" min="0" value="" class="form-control" required>
         </div>
       </div>
       <div class="form-group row">
         <label class="col-sm-2 col-form-label">Total</label>
         <div class="col-sm-3">
-          <input type="text" name="total" class="form-control" id="total" value="150" readonly="true" required>
+          <input type="number" name="total" class="form-control" min="0" id="total" value="" required>
         </div>
       </div>
       <div class="form-group row">
@@ -60,11 +60,4 @@
       </div>
     </form>
   </div>
-<script type="text/javascript">
-  function showTotal(ele){
-    var smsCount = $(ele).val();
-    var price = 150;
-    document.getElementById('total').value = parseInt(price) * parseInt(smsCount/1000);
-  }
-</script>
 @stop

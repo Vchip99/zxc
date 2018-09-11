@@ -135,7 +135,7 @@
                 </div>
               </div>
               <div id="dynamic-modal-{{$document->id}}" class="modal fade" role="dialog">
-                <div class="modal-dialog">
+                <div class="modal-dialog" style="width: 100%; padding-right: 20px;">
                   <div class="modal-content"  style="background-color: white;">
                     <div class="modal-header">
                       <button class="close" data-dismiss="modal">×</button>

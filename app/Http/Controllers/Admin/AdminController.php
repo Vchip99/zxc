@@ -186,38 +186,35 @@ class AdminController extends Controller
         $smsCount = $request->get('sms_count');
         $total = $request->get('total');
         $clientId = $request->get('client');
-        if(!empty($smsCount) && !empty($total)){
-            if(!(($total/150) == ($smsCount/1000))){
-                return redirect()->back()->withErrors('something went wrong in sms calculation.');
-            } else {
-                $client = Client::find($clientId);
-                if(is_object($client)){
-                    DB::connection('mysql2')->beginTransaction();
-                    try
-                    {
-                        $startDate = date('Y-m-d');
-                        $endDate = '2050-01-01';
-                        $smsArray = [
-                                        'client_id' => $client->id,
-                                        'total' => $total,
-                                        'payment_id' => ' ',
-                                        'payment_request_id' => ' ',
-                                        'purcahsed_sms' => $smsCount,
-                                        'start_date' => $startDate,
-                                        'end_date' => $endDate,
-                                    ];
-                        PayableClientSubCategory::addClientPurchasedSms($smsArray);
-                        $client->debit_sms_count = ($client->debit_sms_count + $smsCount) - $client->credit_sms_count;
-                        $client->credit_sms_count = 0;
-                        $client->save();
-                        DB::connection('mysql2')->commit();
-                        return redirect('admin/manageClientPaidSms')->with('message', 'Sms purcahsed for client successfully.');
-                    }
-                    catch(Exception $e)
-                    {
-                        DB::connection('mysql2')->rollback();
-                        return redirect('admin/manageClientPaidSms')->withErrors([$e->getMessage()]);
-                    }
+
+        if($smsCount > 0 ){
+            $client = Client::find($clientId);
+            if(is_object($client)){
+                DB::connection('mysql2')->beginTransaction();
+                try
+                {
+                    $startDate = date('Y-m-d');
+                    $endDate = '2050-01-01';
+                    $smsArray = [
+                                    'client_id' => $client->id,
+                                    'total' => $total,
+                                    'payment_id' => ' ',
+                                    'payment_request_id' => ' ',
+                                    'purcahsed_sms' => $smsCount,
+                                    'start_date' => $startDate,
+                                    'end_date' => $endDate,
+                                ];
+                    PayableClientSubCategory::addClientPurchasedSms($smsArray);
+                    $client->debit_sms_count = ($client->debit_sms_count + $smsCount) - $client->credit_sms_count;
+                    $client->credit_sms_count = 0;
+                    $client->save();
+                    DB::connection('mysql2')->commit();
+                    return redirect('admin/manageClientPaidSms')->with('message', 'Sms purcahsed for client successfully.');
+                }
+                catch(Exception $e)
+                {
+                    DB::connection('mysql2')->rollback();
+                    return redirect('admin/manageClientPaidSms')->withErrors([$e->getMessage()]);
                 }
             }
         }
