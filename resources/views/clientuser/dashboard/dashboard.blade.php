@@ -203,14 +203,14 @@
         </li>
         @if(!Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
         <li class="treeview">
-          <a href="#" title="My Parent">
-            <i class="fa fa-graduation-cap"></i> <span>My Parent</span>
+          <a href="#" title="Add Parent">
+            <i class="fa fa-graduation-cap"></i> <span>Add Parent</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-            <li title="My Parent"><a href="{{ url('myParent')}}"><i class="fa fa-circle-o"></i> My Parent</a></li>
+            <li title="Add Parent"><a href="{{ url('myParent')}}"><i class="fa fa-circle-o"></i> Add Parent</a></li>
           </ul>
         </li>
         @endif

@@ -288,6 +288,7 @@
             </a>
             <ul class="treeview-menu">
               <li title="Manage History"><a href="{{ url('admin/manageClientHistory')}}"><i class="fa fa-circle-o"></i> History </a></li>
+              <li title="Paid Sms For Client"><a href="{{ url('admin/manageClientPaidSms')}}"><i class="fa fa-circle-o"></i> Paid Sms For Client </a></li>
             </ul>
           </li>
           <li class="treeview">

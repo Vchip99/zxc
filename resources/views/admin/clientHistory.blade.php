@@ -244,7 +244,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
 
         body.appendChild(eleTr);
       }
-      if( 0 > msg['plans'].length && 0 > msg['purchasedSubCategories'].length){
+      if( 0 == msg['plans'].length && 0 == msg['purchasedSubCategories'].length){
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = 'No result!';

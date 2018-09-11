@@ -172,6 +172,37 @@
                   <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
                     <div class="col-xs-12">
                       <div class="row">
+                        <div class="col-xs-5 "><b>Send sms about assignment to</b></div>
+                        <div class="col-xs-7 pull-left">
+                          @if(1 == $loginUser->assignment_sms)
+                            <input type="radio" name="assignment_sms" value="1" checked onClick="changeSetting(this);"> Student
+                          @else
+                            <input type="radio" name="assignment_sms" value="1" onClick="changeSetting(this);"> Student
+                          @endif
+                          @if(2 == $loginUser->assignment_sms)
+                            <input type="radio" name="assignment_sms" value="2" checked onClick="changeSetting(this);"> Parent
+                          @else
+                            <input type="radio" name="assignment_sms" value="2" onClick="changeSetting(this);"> Parent
+                          @endif
+                          @if(3 == $loginUser->assignment_sms)
+                            <input type="radio" name="assignment_sms" value="3" checked onClick="changeSetting(this);"> Both
+                          @else
+                            <input type="radio" name="assignment_sms" value="3" onClick="changeSetting(this);"> Both
+                          @endif
+                          @if(4 == $loginUser->assignment_sms)
+                            <input type="radio" name="assignment_sms" value="4" checked onClick="changeSetting(this);"> None
+                          @else
+                            <input type="radio" name="assignment_sms" value="4" onClick="changeSetting(this);"> None
+                          @endif
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
+                    <div class="col-xs-12">
+                      <div class="row">
                         <div class="col-xs-5 "><b>Send sms about notice to</b></div>
                         <div class="col-xs-7 pull-left">
                           @if(1 == $loginUser->notice_sms)
@@ -265,58 +296,6 @@
                   <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
                     <div class="col-xs-12">
                       <div class="row">
-                        <div class="col-xs-5 "><b>Send sms about assignment to</b></div>
-                        <div class="col-xs-7 pull-left">
-                          @if(1 == $loginUser->assignment_sms)
-                            <input type="radio" name="assignment_sms" value="1" checked onClick="changeSetting(this);"> Student
-                          @else
-                            <input type="radio" name="assignment_sms" value="1" onClick="changeSetting(this);"> Student
-                          @endif
-                          @if(2 == $loginUser->assignment_sms)
-                            <input type="radio" name="assignment_sms" value="2" checked onClick="changeSetting(this);"> Parent
-                          @else
-                            <input type="radio" name="assignment_sms" value="2" onClick="changeSetting(this);"> Parent
-                          @endif
-                          @if(3 == $loginUser->assignment_sms)
-                            <input type="radio" name="assignment_sms" value="3" checked onClick="changeSetting(this);"> Both
-                          @else
-                            <input type="radio" name="assignment_sms" value="3" onClick="changeSetting(this);"> Both
-                          @endif
-                          @if(4 == $loginUser->assignment_sms)
-                            <input type="radio" name="assignment_sms" value="4" checked onClick="changeSetting(this);"> None
-                          @else
-                            <input type="radio" name="assignment_sms" value="4" onClick="changeSetting(this);"> None
-                          @endif
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
-                    <div class="col-xs-12">
-                      <div class="row">
-                        <div class="col-xs-5 "><b>Send sms about lecture to</b></div>
-                        <div class="col-xs-7 pull-left">
-                          @if(1 == $loginUser->lecture_sms)
-                            <input type="radio" name="lecture_sms" value="1" checked onClick="changeSetting(this);"> Teacher
-                          @else
-                            <input type="radio" name="lecture_sms" value="1" onClick="changeSetting(this);"> Teacher
-                          @endif
-                          @if(0 == $loginUser->lecture_sms)
-                            <input type="radio" name="lecture_sms" value="0" checked onClick="changeSetting(this);"> No
-                          @else
-                            <input type="radio" name="lecture_sms" value="0" onClick="changeSetting(this);"> No
-                          @endif
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
-                    <div class="col-xs-12">
-                      <div class="row">
                         <div class="col-xs-5 "><b>Send sms about Individual to</b></div>
                         <div class="col-xs-7 pull-left">
                           @if(1 == $loginUser->individual_sms)
@@ -338,6 +317,27 @@
                             <input type="radio" name="individual_sms" value="4" checked onClick="changeSetting(this);"> None
                           @else
                             <input type="radio" name="individual_sms" value="4" onClick="changeSetting(this);"> None
+                          @endif
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="list-group-item">
+                  <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
+                    <div class="col-xs-12">
+                      <div class="row">
+                        <div class="col-xs-5 "><b>Send sms about lecture to</b></div>
+                        <div class="col-xs-7 pull-left">
+                          @if(1 == $loginUser->lecture_sms)
+                            <input type="radio" name="lecture_sms" value="1" checked onClick="changeSetting(this);"> Teacher
+                          @else
+                            <input type="radio" name="lecture_sms" value="1" onClick="changeSetting(this);"> Teacher
+                          @endif
+                          @if(0 == $loginUser->lecture_sms)
+                            <input type="radio" name="lecture_sms" value="0" checked onClick="changeSetting(this);"> No
+                          @else
+                            <input type="radio" name="lecture_sms" value="0" onClick="changeSetting(this);"> No
                           @endif
                         </div>
                       </div>

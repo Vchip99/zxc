@@ -10,8 +10,6 @@
   </section>
 @stop
 @section('dashboard_content')
-  &nbsp;
-
   <div class="content-wrapper v-container tab-content" >
     <div id="student-rcd" class="">
       <div class="top mrgn_40_btm">

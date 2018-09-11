@@ -413,7 +413,6 @@ class ClientBatchController extends ClientBaseController
         {
             $attendance = ClientUserAttendance::addOrUpdateClientUserAttendance($request);
             if(is_object($attendance)){
-                DB::connection('mysql2')->commit();
                 if('client' == InputSanitise::getCurrentGuard()){
                     $client = Auth::guard('client')->user();
                     $sendSmsStatus = $client->absent_sms;
@@ -437,10 +436,11 @@ class ClientBatchController extends ClientBaseController
                         }
                         $absentStudents = array_diff($allBatchStudents, $presentStudents);
                         if(count($absentStudents) > 0){
-                            InputSanitise::sendAbsentSms($absentStudents,$sendSmsStatus,$clientBatch->name,$attendance->attendance_date,$client->name,$client->id);
+                            InputSanitise::sendAbsentSms($absentStudents,$sendSmsStatus,$clientBatch->name,$attendance->attendance_date,$client);
                         }
                     }
                 }
+                DB::connection('mysql2')->commit();
                 return Redirect::to('manageAttendanceCalendar')->with('message', 'Attendance mark successfully!');
             }
         }

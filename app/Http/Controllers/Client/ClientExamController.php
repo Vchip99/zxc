@@ -68,8 +68,8 @@ class ClientExamController extends ClientBaseController
         {
             $clientExam = ClientExam::addOrUpdateClientExam($request);
             if(is_object($clientExam)){
-                DB::connection('mysql2')->commit();
                 $this->sendExam($clientExam,false);
+                DB::connection('mysql2')->commit();
                 return Redirect::to('manageExams')->with('message', 'Exam created successfully!');
             }
         }
@@ -112,8 +112,8 @@ class ClientExamController extends ClientBaseController
             {
                 $clientExam = ClientExam::addOrUpdateClientExam($request, true);
                 if(is_object($clientExam)){
-                    DB::connection('mysql2')->commit();
                     $this->sendExam($clientExam,true);
+                    DB::connection('mysql2')->commit();
                     return Redirect::to('manageExams')->with('message', 'Exam updated successfully!');
                 }
             }
@@ -165,7 +165,7 @@ class ClientExamController extends ClientBaseController
             } else {
                 $batchName = 'All';
             }
-            InputSanitise::sendExamSms($allBatchStudents,$sendSmsStatus,$clientExam->client_batch_id,$batchName,$clientExam->name,$clientExam->date,$clientExam->from_time,$clientExam->to_time,$client->name,$client->id, $isUpdate);
+            InputSanitise::sendExamSms($allBatchStudents,$sendSmsStatus,$clientExam->client_batch_id,$batchName,$clientExam->name,$clientExam->date,$clientExam->from_time,$clientExam->to_time,$client, $isUpdate);
         }
         return;
     }

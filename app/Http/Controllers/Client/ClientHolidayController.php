@@ -63,8 +63,8 @@ class ClientHolidayController extends ClientBaseController
         {
             $holiday = ClientHoliday::addOrUpdateClientHoliday($request);
             if(is_object($holiday)){
-                DB::connection('mysql2')->commit();
                 $this->sendHolidayMessage($holiday);
+                DB::connection('mysql2')->commit();
                 return Redirect::to('manageHolidays')->with('message', 'Holiday created successfully!');
             }
         }
@@ -107,8 +107,8 @@ class ClientHolidayController extends ClientBaseController
             {
                 $holiday = ClientHoliday::addOrUpdateClientHoliday($request, true);
                 if(is_object($holiday)){
-                    DB::connection('mysql2')->commit();
                     $this->sendHolidayMessage($holiday);
+                    DB::connection('mysql2')->commit();
                     return Redirect::to('manageHolidays')->with('message', 'Holiday updated successfully!');
                 }
             }
@@ -160,7 +160,7 @@ class ClientHolidayController extends ClientBaseController
             } else {
                 $batchName = 'All';
             }
-            InputSanitise::sendHolidaySms($allBatchStudents,$sendSmsStatus,$holiday->client_batch_id,$batchName,$holiday->note,$client->name,$client->id);
+            InputSanitise::sendHolidaySms($allBatchStudents,$sendSmsStatus,$holiday->client_batch_id,$batchName,$holiday->note,$client);
         }
     }
 }

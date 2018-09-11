@@ -384,6 +384,7 @@ class OnlineClientController extends Controller
                         'admin_approve' => 1,
                         'plan_id' => $planId,
                         'photo' => '/images/user1.png',
+                        'debit_sms_count' => 500,
                     ]);
 
                     if( !is_object($client)){

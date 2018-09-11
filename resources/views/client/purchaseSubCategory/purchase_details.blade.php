@@ -1,5 +1,4 @@
 @extends('client.dashboard')
-  &nbsp;
   @section('module_title')
   <section class="content-header">
     <h1> Purchased Sub Category  </h1>

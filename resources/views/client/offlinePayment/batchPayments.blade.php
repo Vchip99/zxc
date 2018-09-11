@@ -48,6 +48,8 @@
               <td> Total</td>
               <td>{{$totalBatchAmount}}</td>
             </tr>
+          @else
+            <tr><td colspan="3">No Batch payments</td></tr>
           @endif
         </tbody>
       </table>

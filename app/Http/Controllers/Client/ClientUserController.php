@@ -1178,7 +1178,6 @@ class ClientUserController extends BaseController
 
     protected function sendClientUserOtp(Request $request){
         $mobile = $request->get('mobile');
-        // return InputSanitise::sendOtp($mobile);
         return InputSanitise::checkMobileAndSendOpt($request,$mobile);
     }
 

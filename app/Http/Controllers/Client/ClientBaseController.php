@@ -123,7 +123,7 @@ class ClientBaseController extends BaseController
     protected function manageHistory($subdomainName){
         $client = Auth::guard('client')->user();
         $clientPlans = ClientPlan::where('client_id', $client->id)->orderBy('id')->get();
-        $payableSubCategories = PayableClientSubCategory::where('client_id', $client->id)->get();
+        $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdForAdmin($client->id);
         return view('client.plansAndBilling.history', compact('clientPlans','payableSubCategories', 'subdomainName'));
     }
 
@@ -733,5 +733,120 @@ class ClientBaseController extends BaseController
 
     protected function getContacts($subdomainName){
         return ClientChatMessage::showClientChatUsers($subdomainName);
+    }
+
+    protected function showPurchaseSms($subdomainName){
+        return view('client.plansAndBilling.sms', compact('subdomainName'));
+    }
+
+    protected function clientPurchaseSms(Request $request){
+        $smsCount = $request->get('sms_count');
+        $total = $request->get('total');
+        if(!empty($smsCount) && !empty($total)){
+            if(!(($total/150) == ($smsCount/1000))){
+                return redirect()->back()->withErrors('something went wrong in sms calculation.');
+            } else {
+                $loginUser = Auth::guard('client')->user();
+                $name = $loginUser->name;
+                $phone = $loginUser->phone;
+                $email = $loginUser->email;
+
+                $purpose = 'purchase '.$smsCount.' sms';
+                Session::put('client_purchase_sms', $smsCount);
+                Session::put('client_total', $total);
+                Session::save();
+                if('local' == \Config::get('app.env')){
+                    $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+                } else {
+                    $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+                }
+                try {
+                    $response = $api->paymentRequestCreate(array(
+                        "purpose" => $purpose,
+                        "amount" => $total,
+                        "buyer_name" => $name,
+                        "phone" => $phone,
+                        "send_email" => true,
+                        "send_sms" => true,
+                        "email" => $email,
+                        'allow_repeated_payments' => false,
+                        "redirect_url" => url('thankyouClientPurchaseSms'),
+                        "webhook" => url('webhookClientPurchaseSms')
+                        ));
+
+                    $pay_ulr = $response['longurl'];
+                    header("Location: $pay_ulr");
+                    exit();
+                }
+                catch (Exception $e) {
+                    return redirect('managePurchaseSms')->withErrors([$e->getMessage()]);
+                }
+            }
+        }
+        return redirect()->back();
+    }
+
+    protected function thankyouClientPurchaseSms(Request $request){
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        $payid = $request->get('payment_request_id');
+
+        try {
+            $response = $api->paymentRequestStatus($payid);
+
+            if( 'Credit' == $response['payments'][0]['status']){
+
+                $paymentRequestId = $response['id'];
+                $paymentId = $response['payments'][0]['payment_id'];
+                $loginUser = Auth::guard('client')->user();
+                $name = $loginUser->name;
+                $phone = $loginUser->phone;
+                $email = $loginUser->email;
+                $status = $response['payments'][0]['status'];
+                $purchasedSms = Session::get('client_purchase_sms');
+                $total = Session::get('client_total');
+                DB::connection('mysql2')->beginTransaction();
+                try
+                {
+                    $startDate = date('Y-m-d');
+                    $endDate = '2050-01-01';
+                    $client = Client::find($loginUser->id);
+                    if( is_object($client)){
+                        $smsArray = [
+                                        'client_id' => $client->id,
+                                        'total' => $total,
+                                        'payment_id' => $paymentId,
+                                        'payment_request_id' => $paymentRequestId,
+                                        'purcahsed_sms' => $purchasedSms,
+                                        'start_date' => $startDate,
+                                        'end_date' => $endDate,
+                                    ];
+                        PayableClientSubCategory::addClientPurchasedSms($smsArray);
+                        $client->debit_sms_count = ($client->debit_sms_count + $purchasedSms) - $client->credit_sms_count;
+                        $client->credit_sms_count = 0;
+                        $client->save();
+                        DB::connection('mysql2')->commit();
+                        return redirect('managePurchaseSms')->with('message', 'Thank you for purcahseing sms.');
+                    }
+                }
+                catch(Exception $e)
+                {
+                    DB::connection('mysql2')->rollback();
+                    return redirect('managePurchaseSms')->withErrors([$e->getMessage()]);
+                }
+            }
+        }
+        catch (Exception $e) {
+            return redirect('managePurchaseSms')->withErrors([$e->getMessage()]);
+        }
+        return redirect('managePurchaseSms');
+    }
+
+    protected function webhookClientPurchaseSms(Request $request){
+        return;
     }
 }

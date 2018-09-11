@@ -62,6 +62,8 @@
                 </td>
               </tr>
             @endforeach
+          @else
+            <tr><td colspan="5">No individual messages</td></tr>
           @endif
         </tbody>
       </table>

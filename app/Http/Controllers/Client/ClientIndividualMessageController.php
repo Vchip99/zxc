@@ -84,8 +84,8 @@ class ClientIndividualMessageController extends ClientBaseController
         {
             $message = ClientIndividualMessage::addClientIndividualMessage($allMessagesString,$batchId);
             if(is_object($message)){
-                DB::connection('mysql2')->commit();
                 $this->sendIndividualMessages($batchId,$studentsData);
+                DB::connection('mysql2')->commit();
                 return Redirect::to('manageIndividualMessage')->with('message', 'Individual Message created successfully!');
             }
         }
@@ -177,7 +177,7 @@ class ClientIndividualMessageController extends ClientBaseController
                 if(is_object($clientBatch)){
                     $batchName = $clientBatch->name;
                 }
-                InputSanitise::sendIndividualSms($studentsData,$sendSmsStatus,$batchName,$client->name,$client->id);
+                InputSanitise::sendIndividualSms($studentsData,$sendSmsStatus,$batchName,$client);
             }
         }
         return;

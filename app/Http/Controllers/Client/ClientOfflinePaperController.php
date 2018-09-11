@@ -243,7 +243,6 @@ class ClientOfflinePaperController extends ClientBaseController
         {
             $result = ClientOfflinePaperMark::assignOfflinePaperMarks($request);
             if('true' == $result){
-                DB::connection('mysql2')->commit();
                 if('client' == InputSanitise::getCurrentGuard()){
                     $client = Auth::guard('client')->user();
                     $sendSmsStatus = $client->offline_exam_sms;
@@ -269,10 +268,11 @@ class ClientOfflinePaperController extends ClientBaseController
                         $clientBatch = ClientBatch::find($clientBatchId);
                         $paper = ClientOfflinePaper::find($paperId);
                         if(is_object($clientBatch) && is_object($paper)){
-                            InputSanitise::sendOfflinePaperMarkSms($presentStudentsMark,$sendSmsStatus,$clientBatch->id,$clientBatch->name,$paper->name,$totalMarks,$client->name,$client->id);
+                            InputSanitise::sendOfflinePaperMarkSms($presentStudentsMark,$sendSmsStatus,$clientBatch->id,$clientBatch->name,$paper->name,$totalMarks,$client);
                         }
                     }
                 }
+                DB::connection('mysql2')->commit();
                 return Redirect::to('manageOfflineExam')->with('message', 'Assign marks to student successfully!');
             }
         }

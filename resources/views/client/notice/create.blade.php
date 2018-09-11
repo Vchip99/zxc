@@ -78,8 +78,13 @@
     <div class="form-group row">
       <label class="col-sm-2 col-form-label" for="is_emergency">Emergency Notice:</label>
       <div class="col-sm-3">
-        <input type="radio" name="is_emergency" value="1"> Yes
-        <input type="radio" name="is_emergency" value="0" checked> No
+        @if(isset($notice->id))
+          <input type="radio" name="is_emergency" value="1" @if(1 == $notice->is_emergency) checked @endif> Yes
+          <input type="radio" name="is_emergency" value="0" @if(0 == $notice->is_emergency) checked @endif> No
+        @else
+          <input type="radio" name="is_emergency" value="1"> Yes
+          <input type="radio" name="is_emergency" value="0" checked> No
+        @endif
       </div>
     </div>
     <div class="form-group row">

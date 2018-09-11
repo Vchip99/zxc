@@ -73,8 +73,8 @@ class ClientClassController extends ClientBaseController
         {
             $clientClass = ClientClass::addOrUpdateClientClass($request);
             if(is_object($clientClass)){
-                DB::connection('mysql2')->commit();
                 $this->sendLectureMessage($clientClass);
+                DB::connection('mysql2')->commit();
                 return Redirect::to('manageClasses')->with('message', 'Class created successfully!');
             }
         }
@@ -120,8 +120,8 @@ class ClientClassController extends ClientBaseController
             {
                 $clientClass = ClientClass::addOrUpdateClientClass($request, true);
                 if(is_object($clientClass)){
-                    DB::connection('mysql2')->commit();
                     $this->sendLectureMessage($clientClass);
+                    DB::connection('mysql2')->commit();
                     return Redirect::to('manageClasses')->with('message', 'Class updated successfully!');
                 }
             }
@@ -276,7 +276,7 @@ class ClientClassController extends ClientBaseController
                 $batchName = 'All';
             }
             $lecturer = $lecture->user;
-            InputSanitise::sendLectureSms($lecture,$batchName,$lecturer,$client->name);
+            InputSanitise::sendLectureSms($lecture,$batchName,$lecturer,$client);
         }
         return;
     }

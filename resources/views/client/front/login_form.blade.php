@@ -278,6 +278,7 @@
           $('#signUpPhone').prop('readonly', false);
           $('#signUpNameInput').prop('readonly', false);
           $('#signUpOtpMessage').addClass('hide');
+          $('#register').addClass('hide');
           $.confirm({
             title: 'Alert',
             content: resultObj.message

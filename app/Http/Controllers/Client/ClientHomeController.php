@@ -127,7 +127,6 @@ class ClientHomeController extends Controller
 
     protected function sendClientUserSignUpOtp(Request $request){
         $mobile = $request->get('mobile');
-        // return InputSanitise::sendOtp($mobile);
         return InputSanitise::checkMobileAndSendOpt($request,$mobile);
     }
 
@@ -135,41 +134,15 @@ class ClientHomeController extends Controller
         $mobile = $request->get('mobile');
         $result = [];
         if(!empty($mobile)){
-            $client = Client::where('subdomain', $request->getHost())->first();
-            if(is_object($client)){
-                $clientUsers = Clientuser::where('phone','=', $mobile)->whereNotNull('phone')->where('client_id', $client->id)->get();
-                if(is_object($clientUsers) && $clientUsers->count() > 0){
-                    if(1 == $clientUsers->count()){
-                        if(is_object($clientUsers[0]) && 0 == $clientUsers[0]->number_verified){
-                            $result['status'] = 'error';
-                            $result['message'] = 'Your mobile no is not verified.Please login with Email-Id and Password or contact at info@vchiptech.com';
-                            $data['phone'] = $mobile;
-                            $data['client'] = $client->name;
-
-                            // send mail to info@vchiptech.com
-                            Mail::to('info@vchiptech.com')->send(new UnAuthorisedUser($data));
-                        } else {
-                            $result['status'] = 'success';
-                            $result['message'] = InputSanitise::sendOtp($mobile);
-                        }
-                    } else {
-                        $unVerifiedCount = 0;
-                        $verifiedCount = 0;
-                        foreach($clientUsers as $clientUser){
-                            if(0 == $clientUser->number_verified){
-                                $unVerifiedCount++;
-                            } else {
-                                $verifiedCount++;
-                            }
-                        }
-                        if(1 == $verifiedCount){
-                            $result['status'] = 'success';
-                            $result['message'] = InputSanitise::sendOtp($mobile);
-                        } else {
-                            if($verifiedCount > 0){
-                                $result['status'] = 'error';
-                                $result['message'] = $verifiedCount.' users have this no. and all users are verified this no.so can not login.';
-                            } else {
+            DB::connection('mysql2')->beginTransaction();
+            try
+            {
+                $client = Client::where('subdomain', $request->getHost())->first();
+                if(is_object($client)){
+                    $clientUsers = Clientuser::where('phone','=', $mobile)->whereNotNull('phone')->where('client_id', $client->id)->get();
+                    if(is_object($clientUsers) && $clientUsers->count() > 0){
+                        if(1 == $clientUsers->count()){
+                            if(is_object($clientUsers[0]) && 0 == $clientUsers[0]->number_verified){
                                 $result['status'] = 'error';
                                 $result['message'] = 'Your mobile no is not verified.Please login with Email-Id and Password or contact at info@vchiptech.com';
                                 $data['phone'] = $mobile;
@@ -177,13 +150,53 @@ class ClientHomeController extends Controller
 
                                 // send mail to info@vchiptech.com
                                 Mail::to('info@vchiptech.com')->send(new UnAuthorisedUser($data));
+                            } else {
+                                $result['status'] = 'success';
+                                $result['message'] = InputSanitise::sendOtp($mobile);
+                                InputSanitise::setSmsCountStats($client);
+                                $client->save();
+                                DB::connection('mysql2')->commit();
+                            }
+                        } else {
+                            $unVerifiedCount = 0;
+                            $verifiedCount = 0;
+                            foreach($clientUsers as $clientUser){
+                                if(0 == $clientUser->number_verified){
+                                    $unVerifiedCount++;
+                                } else {
+                                    $verifiedCount++;
+                                }
+                            }
+                            if(1 == $verifiedCount){
+                                $result['status'] = 'success';
+                                $result['message'] = InputSanitise::sendOtp($mobile);
+                                InputSanitise::setSmsCountStats($client);
+                                $client->save();
+                                DB::connection('mysql2')->commit();
+                            } else {
+                                if($verifiedCount > 0){
+                                    $result['status'] = 'error';
+                                    $result['message'] = $verifiedCount.' users have this no. and all users are verified this no.so can not login.';
+                                } else {
+                                    $result['status'] = 'error';
+                                    $result['message'] = 'Your mobile no is not verified.Please login with Email-Id and Password or contact at info@vchiptech.com';
+                                    $data['phone'] = $mobile;
+                                    $data['client'] = $client->name;
+
+                                    // send mail to info@vchiptech.com
+                                    Mail::to('info@vchiptech.com')->send(new UnAuthorisedUser($data));
+                                }
                             }
                         }
+                    } else {
+                        $result['status'] = 'error';
+                        $result['message'] = 'Entered mobile no. does not exists in our records.';
                     }
-                } else {
-                    $result['status'] = 'error';
-                    $result['message'] = 'Entered mobile no. does not exists in our records.';
                 }
+            }
+            catch(\Exception $e)
+            {
+                DB::connection('mysql2')->rollback();
             }
         } else {
             $result['status'] = 'error';
@@ -202,13 +215,24 @@ class ClientHomeController extends Controller
         if(!empty($mobile)){
             $client = Client::where('subdomain', $request->getHost())->first();
             if(is_object($client)){
-                $parent = Clientuser::where('parent_phone','=', $mobile)->whereNotNull('parent_phone')->where('client_id', $client->id)->first();
-                if(is_object($parent)){
-                    $result['status'] = 'success';
-                    $result['message'] = InputSanitise::sendOtp($mobile);
-                } else {
-                    $result['status'] = 'error';
-                    $result['message'] = 'Entered mobile no. does not exists in our records.';
+                DB::connection('mysql2')->beginTransaction();
+                try
+                {
+                    $parent = Clientuser::where('parent_phone','=', $mobile)->whereNotNull('parent_phone')->where('client_id', $client->id)->first();
+                    if(is_object($parent)){
+                        $result['status'] = 'success';
+                        $result['message'] = InputSanitise::sendOtp($mobile);
+                        InputSanitise::setSmsCountStats($client);
+                        $client->save();
+                        DB::connection('mysql2')->commit();
+                    } else {
+                        $result['status'] = 'error';
+                        $result['message'] = 'Entered mobile no. does not exists in our records.';
+                    }
+                }
+                catch(\Exception $e)
+                {
+                    DB::connection('mysql2')->rollback();
                 }
             }
         } else {

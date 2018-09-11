@@ -89,7 +89,11 @@ class PayableClientSubCategory extends Model
     }
 
     protected static function getPayableSubCategoryByClientId($clientId){
-        return static::where('client_id', $clientId)->where('end_date', '>=',date('Y-m-d'))->get();
+        return static::where('client_id', $clientId)->where('category_id','>', 0)->where('sub_category_id','>', 0)->where('end_date', '>=',date('Y-m-d'))->get();
+    }
+
+    protected static function getPayableSubCategoryByClientIdForAdmin($clientId){
+        return static::where('client_id', $clientId)->get();
     }
 
     protected static function getPayableSubCategoriesBySubCategoryId($subcategoryId){
@@ -97,7 +101,11 @@ class PayableClientSubCategory extends Model
     }
 
     protected static function getDeActivePayableSubCategory(){
-        return static::where('end_date',date('Y-m-d', strtotime('-1 day')))->get();
+        return static::where('end_date',date('Y-m-d', strtotime('-1 day')))->where('category_id','>', 0)->where('sub_category_id','>', 0)->get();
+    }
+
+    protected static function getAllPayableSubCategory(){
+        return static::all();
     }
 
     public function client(){
@@ -111,5 +119,21 @@ class PayableClientSubCategory extends Model
         } else {
             return 'deleted';
         }
+    }
+
+    protected static function addClientPurchasedSms($data){
+        $sms = new static;
+        $sms->client_id = $data['client_id'];
+        $sms->category_id = 0;
+        $sms->sub_category_id = 0;
+        $sms->admin_price = $data['total'];
+        $sms->client_user_price = 0;
+        $sms->payment_request_id  = $data['payment_request_id'];
+        $sms->payment_id = $data['payment_id'];
+        $sms->client_image = '';
+        $sms->start_date = $data['start_date'];
+        $sms->end_date = $data['end_date'];
+        $sms->sub_category = 'purchased '.$data['purcahsed_sms'].' sms';
+        $sms->save();
     }
 }

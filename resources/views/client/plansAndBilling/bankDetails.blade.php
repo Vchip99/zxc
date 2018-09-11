@@ -1,5 +1,4 @@
 @extends('client.dashboard')
-  &nbsp;
   @section('module_title')
   <section class="content-header">
     <h1> Bank Details  </h1>
@@ -10,7 +9,6 @@
   </section>
 @stop
 @section('dashboard_content')
-  &nbsp;
   <div class="container admin_div">
     <form action="{{url('updateBankDetails')}}" method="POST">
   @if(isset($bankDetail->id))

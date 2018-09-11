@@ -77,6 +77,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/manageClientHistory', 'Admin\AdminController@manageClientHistory');
 	Route::post('admin/getClientHistory', 'Admin\AdminController@getClientHistory');
 	Route::get('admin/manageWebDevelopments', 'Admin\AdminController@manageWebDevelopments');
+	Route::get('admin/manageClientPaidSms', 'Admin\AdminController@manageClientPaidSms');
+	Route::post('admin/clientPurchaseSms', 'Admin\AdminController@clientPurchaseSms');
+
 
 	// Admin all users
 	Route::get('admin/allUsers', 'Admin\AllUsersInfoController@allUsers');
@@ -964,6 +967,11 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('dashboardPrivateChat', 'Client\ClientBaseController@dashboardPrivateChat');
 	Route::post('dashboardSendMessage', 'Client\ClientBaseController@dashboardSendMessage');
 	Route::post('getContacts', 'Client\ClientBaseController@getContacts');
+	Route::get('managePurchaseSms', 'Client\ClientBaseController@showPurchaseSms');
+	Route::post('clientPurchaseSms', 'Client\ClientBaseController@clientPurchaseSms');
+	Route::get('thankyouClientPurchaseSms', 'Client\ClientBaseController@thankyouClientPurchaseSms');
+	Route::post('webhookClientPurchaseSms', 'Client\ClientBaseController@webhookClientPurchaseSms');
+
 
   	// category
   	Route::get('manageOnlineCategory', 'Client\OnlineCourse\ClientOnlineCategoryController@show');

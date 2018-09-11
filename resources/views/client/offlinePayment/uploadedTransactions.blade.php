@@ -64,7 +64,7 @@
             </tr>
             @endforeach
           @else
-            <tr><td colspan="4">No batches are created.</td></tr>
+            <tr><td colspan="6">No offline payments.</td></tr>
           @endif
         </tbody>
       </table>

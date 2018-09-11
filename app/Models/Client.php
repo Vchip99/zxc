@@ -50,7 +50,7 @@ class Client extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'subdomain', 'admin_approve','remember_token', 'photo', 'plan_id','allow_non_verified_email','absent_sms','exam_sms','offline_exam_sms','notice_sms','emergency_notice_sms','holiday_sms','assignment_sms','lecture_sms','individual_sms','login_using'
+        'name', 'email', 'password','phone', 'subdomain', 'admin_approve','remember_token', 'photo', 'plan_id','allow_non_verified_email','absent_sms','exam_sms','offline_exam_sms','notice_sms','emergency_notice_sms','holiday_sms','assignment_sms','lecture_sms','individual_sms','login_using','academic_sms_count','message_sms_count','lecture_sms_count','otp_sms_count','debit_sms_count','credit_sms_count'
     ];
 
     /**
@@ -69,6 +69,12 @@ class Client extends Authenticatable
 
     const Facebook = 1;
     const Google   = 2;
+
+    // sms groups
+    // 1 - academic_sms_count -  absent_sms, exam_sms, offline_exam_sms, assignment_sms
+    // 2 - message_sms_count -  notice_sms, emergency_notice_sms, holiday_sms, individual_sms, offline due sms
+    // 3 - lecture_sms_count -  lecture_sms
+    // 4 - otp_sms_count - otp_sms_count
 
     /**
      * Send the password reset notification.

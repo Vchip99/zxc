@@ -26,6 +26,43 @@
       <div class="container">
         <div class="row">
           <div class="col-md-7 col-md-offset-2">
+            <b>Total Sms Count: <a href="#showSmsCount" data-toggle="modal"> {{Auth::guard('client')->user()->academic_sms_count + Auth::guard('client')->user()->message_sms_count + Auth::guard('client')->user()->lecture_sms_count + Auth::guard('client')->user()->otp_sms_count}}</a></b>
+            <b><span style="float: right;">Total Credit:
+            @if(Auth::guard('client')->user()->debit_sms_count > Auth::guard('client')->user()->credit_sms_count)
+              + {{Auth::guard('client')->user()->debit_sms_count - Auth::guard('client')->user()->credit_sms_count}}
+            @else
+              - {{Auth::guard('client')->user()->credit_sms_count}}
+            @endif
+            </span></b>
+            <br><br>
+            <div id="showSmsCount" class="modal fade" role="dialog">
+              <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button class="close" data-dismiss="modal">×</button>
+                    <h2  class="modal-title">Sms Count Details</h2>
+                  </div>
+                  <div class="modal-body">
+                    <div class="">
+                      <fieldset>
+                        <div class="form-group">
+                          <label>Academic Sms Count: {{Auth::guard('client')->user()->academic_sms_count }}</label>
+                        </div>
+                        <div class="form-group">
+                          <label>Message Sms Count: {{Auth::guard('client')->user()->message_sms_count }}</label>
+                        </div>
+                        <div class="form-group">
+                          <label>Lecture Sms Count: {{Auth::guard('client')->user()->lecture_sms_count }}</label>
+                        </div>
+                        <div class="form-group">
+                          <label>Otp Sms Count: {{Auth::guard('client')->user()->otp_sms_count }}</label>
+                        </div>
+                      </fieldset>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="panel panel-default">
               <div class="panel-heading">
                 @if(Session::has('message'))

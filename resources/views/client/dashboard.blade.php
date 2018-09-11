@@ -371,6 +371,7 @@
             <li title="History"><a href="{{ url('manageHistory')}}"><i class="fa fa-circle-o"></i> History </a></li>
             <li title="Bank Details"><a href="{{ url('manageBankDetails')}}"><i class="fa fa-circle-o"></i> Bank Details </a></li>
             <li title="User Payments"><a href="{{ url('manageUserPayments')}}"><i class="fa fa-circle-o"></i> User Payments </a></li>
+            <li title="Purchase Sms"><a href="{{ url('managePurchaseSms')}}"><i class="fa fa-circle-o"></i> Purchase Sms </a></li>
           </ul>
         </li>
         <li class="treeview">

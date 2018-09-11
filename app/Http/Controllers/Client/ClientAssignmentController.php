@@ -390,7 +390,7 @@ class ClientAssignmentController extends ClientBaseController
             } else {
                 $batchName = 'All';
             }
-            InputSanitise::sendAssignmentSms($allBatchStudents,$sendSmsStatus,$assignment->client_batch_id,$batchName,$assignment->topic->name,$client->name,$client->id);
+            InputSanitise::sendAssignmentSms($allBatchStudents,$sendSmsStatus,$assignment->client_batch_id,$batchName,$assignment->topic->name,$client);
         }
         return;
     }

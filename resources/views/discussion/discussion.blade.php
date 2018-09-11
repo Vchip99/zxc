@@ -349,7 +349,7 @@ margin-left: -13px;}
                 @if(1 == $i)
                   <div class="add-1">
                     <div class="course-box">
-                      <a class="img-course-box" href="http://mcoet.mauligroup.org/" target="_blank">
+                      <a class="img-course-box" href="http://www.ssgmce.org" target="_blank">
                         <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="Shri Sant Gajanan Maharaj College of Engineering"  class="img-responsive" />
                       </a>
                       <div class="course-box-content">

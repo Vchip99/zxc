@@ -3,10 +3,10 @@
 @stop
 @section('module_title')
   <section class="content-header">
-    <h1> My Parent  </h1>
+    <h1> Add Parent  </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-graduation-cap"></i> My Parent </li>
-      <li class="active"> My Parent </li>
+      <li><i class="fa fa-graduation-cap"></i> Add Parent </li>
+      <li class="active"> Add Parent </li>
     </ol>
   </section>
   <style type="text/css">
