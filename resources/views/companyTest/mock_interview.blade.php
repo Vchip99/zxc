@@ -99,7 +99,7 @@
     <div class="vchip-background-single">
       <div class="vchip-background-img">
         <figure>
-          <img src="{{asset('images/zero-to-hero-01.jpg')}}" alt="Background" style="vertical-align:top; background-attachment:fixed" alt="vchip courses" />
+          <img src="{{asset('images/zero-to-hero-01.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="Mock Interview" />
         </figure>
       </div>
       <div class="vchip-background-content">
@@ -347,27 +347,6 @@
       });
     } else {
       divUsers.innerHTML = 'No Result!';
-    }
-  }
-
-  window.onclick = function(event) {
-    var modelId = $(event.target).attr('id');
-    if(undefined != modelId){
-      var id = modelId.split('_')[1];
-      if(id > 0) {
-        toggleVideo('hide', id);
-      }
-    }
-  }
-
-  function toggleVideo(state, id) {
-    // if state == 'hide', hide. Else: show video
-    var div = document.getElementById("iframe_"+id);
-
-    if(div.getElementsByTagName("iframe").length > 0){
-      var iframe = div.getElementsByTagName("iframe")[0].contentWindow;
-      func = (state == 'hide' ) ? 'pauseVideo' : 'playVideo';
-      iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
     }
   }
   </script>

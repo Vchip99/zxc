@@ -30,7 +30,7 @@ margin-left: -13px;}
     <div class="vchip-background-single">
       <div class="vchip-background-img ">
         <figure class="">
-          <img src="{{ asset('images/discussion.jpg')}}" alt="Background" style="vertical-align:top; background-attachment:fixed"/ alt="vchip discussion Forum">
+          <img src="{{ asset('images/discussion.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed"/ alt="Vchip Discussion Forum">
         </figure>
       </div>
       <div class="overlay"></div>

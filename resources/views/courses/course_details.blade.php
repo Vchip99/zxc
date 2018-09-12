@@ -60,7 +60,7 @@ margin: 0px 5px;
     <div class="vchip-background-single">
       <div class="vchip-background-img">
         <figure>
-          <img src="{{asset('images/header.jpg')}}" alt="Background" style="vertical-align:top; background-attachment:fixed" alt="vchip course details" />
+          <img src="{{asset('images/header.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="Vchip Course Details" />
         </figure>
             <div class="vchip-background-content">
           <h2 class="animated bounceInLeft">Digital Education</h2>

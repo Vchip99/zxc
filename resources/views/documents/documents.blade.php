@@ -44,7 +44,7 @@
   <div class="vchip-background-single">
     <div class="vchip-background-img">
       <figure>
-        <img src="{{asset('images/document.jpg')}}" alt="Background" style="vertical-align:top; background-attachment:fixed" alt="vchip documents" />
+        <img src="{{asset('images/document.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="Vchip Documents" />
       </figure>
     </div>
     <div class="vchip-background-content">
@@ -351,7 +351,7 @@
 
          var modelDialogDiv = document.createElement('div');
          modelDialogDiv.className = 'modal-dialog';
-
+         modelDialogDiv.setAttribute('style','width: 100%; padding-right: 20px;');
           var modelContentDiv = document.createElement('div');
           modelContentDiv.setAttribute('style','background-color: white;');
           modelContentDiv.className = 'modal-content';

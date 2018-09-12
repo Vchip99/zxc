@@ -471,7 +471,7 @@ margin-right: 10px;
     <div class="vchip-background-single" >
         <div class="vchip-background-img">
             <figure>
-                <img src="{{ asset('images/about-us.jpg')}}" alt="Background" style="vertical-align:top; background-attachment:fixed" alt="about us" />
+                <img src="{{ asset('images/about-us.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="About Us" />
             </figure>
         </div>
         <div class="vchip-background-content">

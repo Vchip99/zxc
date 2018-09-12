@@ -59,7 +59,6 @@
            <p>Address: 3rd Floor,Sr No 132/2A/3</p>
            <p>Shrinivas,Labhade Park,Near BSNL</p>
            <p>Office, WARJE, PUNE-411058, INDIA.</p>
-           <p>Email: info@vchiptech.com</p>
            <p>Phone: 020-25235596</p>
          </address>
         </div>

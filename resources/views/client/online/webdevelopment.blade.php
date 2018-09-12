@@ -145,7 +145,7 @@ box-shadow: 0 13px 40px 0 rgba(62,68,93,.3), 0 2px 4px 0 rgba(62,68,93,.06);
     <div class="vchip-background-single" >
       <div class="vchip-background-img">
         <figure>
-          <img src="{{ asset('images/web&app.jpg')}}" alt="Background" style="vertical-align:top; background-attachment:fixed" alt="contact us" />
+          <img src="{{ asset('images/web&app.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="Vchip Development" />
         </figure>
       </div>
       <div class="vchip-background-content">

@@ -200,7 +200,7 @@
 	  <div class="vchip-background-single">
 	    <div class="vchip-background-img">
 	      <figure>
-	        <img src="{{asset('images/exam.jpg')}}" alt="Background" style="vertical-align:top; background-attachment:fixed" alt="vchip Exam" />
+	        <img src="{{asset('images/exam.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="Company Exam" />
 	      </figure>
 	    </div>
 	    <div class="vchip-background-content">
@@ -473,7 +473,7 @@
                                 	$skillArr = explode(',',$paperResult->skill_ids);
                                 @endphp
 			                    <div class="mainflip">
-			                        <div class="frontside" style="width: 350px;">
+			                        <div class="frontside" style="width: 90%;">
 			                            <div class="card">
 			                                <div class="card-body text-center"><br/>
 			                                    <p>
@@ -494,7 +494,7 @@
 			                                </div>
 			                            </div>
 			                        </div>
-			                        <div class="backside"  style="width: 350px;">
+			                        <div class="backside"  style="width: 90%;">
 			                            <div class="card">
 			                                <div class="card-body mt-4">
 			                                    <h4 class="card-title"> {{ $testUsers[$paperResult->user_id]->name }}</h4>
@@ -567,11 +567,11 @@
 		                        <div class="modal-dialog" style="width: 80%; height: 70%;">
 		                            <div class="modal-content">
 		                              	<div class="modal-header">
-		                                	<button class="close" data-dismiss="modal">×</button>
+		                                	<button class="close" data-dismiss="modal" id="close_{{$paperResult->id}}">×</button>
 	                                		<h2  class="modal-title">Interview</h2>
 		                              	</div>
 		                              	<div class="modal-body">
-		                                	<div class="iframe-container">
+		                                	<div class="iframe-container" id="iframe_{{$paperResult->id}}">
 		                                  		{!! $paperResult->youtube !!}
 	                                		</div>
 		                              	</div>
@@ -737,6 +737,28 @@
 		        }
 		    }
 		});
+	}
+
+	window.onclick = function(event) {
+		console.log(event.target);
+	    var modelId = $(event.target).attr('id');
+	    if(undefined != modelId){
+	      var id = modelId.split('_')[1];
+	      if(id > 0) {
+	        toggleVideo('hide', id);
+	      }
+	    }
+	}
+
+	function toggleVideo(state, id) {
+	    // if state == 'hide', hide. Else: show video
+	    var div = document.getElementById("student_"+id);
+
+	    if(div.getElementsByTagName("iframe").length > 0){
+	      var iframe = div.getElementsByTagName("iframe")[0].contentWindow;
+	      func = (state == 'hide' ) ? 'pauseVideo' : 'playVideo';
+	      iframe.postMessage('{"event":"command","func":"' + func + '","args":""}','*');
+	    }
 	}
 </script>
 @stop

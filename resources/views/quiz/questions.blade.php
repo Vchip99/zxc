@@ -206,7 +206,7 @@
     	</div>
 	   <div class="modal modal-wide fade" id="dynamic-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	      <div class="modal-dialog">
-	      	<div class="modal-content  modal-lg">
+	      	<div class="modal-content">
 	      	<div class="modal-header">
 	          <button type="button" class="close" data-dismiss="modal">Close</button>
 	        </div>
@@ -218,7 +218,7 @@
 	    </div>
 	    <div class="modal modal-wide fade" id="useful_data" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
 	      <div class="modal-dialog">
-	        <div class="modal-content">
+	        <div class="modal-content modal-sm">
 	        	<div class="modal-header">
 		          <button type="button" class="close" data-dismiss="modal">Close</button>
 		        </div>
@@ -242,7 +242,7 @@
 	    </div>
 	    <div class="modal modal-wide fade" id="user-profile" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
 	      <div class="modal-dialog">
-	        <div class="modal-content  modal-sm">
+	        <div class="modal-content modal-sm">
 	        	<div class="modal-header">
 		          <button type="button" class="close" data-dismiss="modal">Close</button>
 		        </div>

@@ -33,7 +33,7 @@
   <div class="vchip-background-single">
     <div class="vchip-background-img">
       <figure>
-        <img src="{{asset('images/v-kit.jpg')}}" alt="Background" style="vertical-align:top; background-attachment:fixed" alt="vchip vkit" />
+        <img src="{{asset('images/v-kit.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="Vchip Vkit" />
       </figure>
     </div>
     <div class="vchip-background-content">

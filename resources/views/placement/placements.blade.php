@@ -10,8 +10,8 @@
   .advertisement {
     position:relative;
     overflow:hidden;
-}
-    .caption {
+  }
+  .caption {
     position:absolute;
     top:0;
     right:0;
@@ -23,7 +23,7 @@
     text-align:center;
     color:#fff !important;
     z-index:2;
-}
+  }
 .caption p{ margin-top: 35%;}
 @media(min-width: 548px) and(max-width: 768px)
 {
@@ -207,7 +207,7 @@ ul.table_list{ margin-left: -30px; }
     <div class="vchip-background-single">
       <div class="vchip-background-img">
         <figure>
-          <img src="{{asset('images/placement-bg.jpg')}}" alt="Background" style="vertical-align:top; background-attachment:fixed" alt="vchip courses" />
+          <img src="{{asset('images/placement-bg.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="Placement" />
         </figure>
       </div>
       <div class="vchip-background-content">
