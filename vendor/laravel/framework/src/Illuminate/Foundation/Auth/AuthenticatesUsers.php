@@ -42,16 +42,32 @@ trait AuthenticatesUsers
             $serverOtp = Cache::get($userMobile);
             if($loginOtp == $serverOtp){
                 $client = Client::where('subdomain', $request->getHost())->first();
-                $cluentUser = Clientuser::where('number_verified', 1)->where('phone','=', $userMobile)->whereNotNull('phone')->where('client_id', $client->id)->where('client_approve', 1)->first();
-                if(!is_object($cluentUser)){
+                $clientUser = Clientuser::where('number_verified', 1)->where('phone','=', $userMobile)->whereNotNull('phone')->where('client_id', $client->id)->where('client_approve', 1)->first();
+                if(!is_object($clientUser)){
                     return Redirect::to('/')->withErrors('User does not exists or not client approve.');
                 }
-                Auth::guard('clientuser')->login($cluentUser);
+                Auth::guard('clientuser')->login($clientUser);
                 if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
                     Cache::forget($userMobile);
                     Cache::forget('mobile-'.$userMobile);
                 }
-                return redirect()->back()->with('message', 'Welcome '. $cluentUser->name);
+                return redirect()->back()->with('message', 'Welcome '. $clientUser->name);
+            } else {
+                return redirect()->back()->withErrors('Entered otp is wrong.');
+            }
+        } else if(empty($request->route()->getParameter('client')) && !empty($userMobile) && !empty($loginOtp)){
+            $serverOtp = Cache::get($userMobile);
+            if($loginOtp == $serverOtp){
+                $user = User::where('number_verified', 1)->whereNotNull('phone')->where('phone','=', $userMobile)->where('admin_approve', 1)->first();
+                if(!is_object($user)){
+                    return Redirect::to('/')->withErrors('User does not exists or not client approve.');
+                }
+                $this->guard('user')->login($user);
+                if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
+                    Cache::forget($userMobile);
+                    Cache::forget('mobile-'.$userMobile);
+                }
+                return redirect()->back()->with('message', 'Welcome '. $user->name);
             } else {
                 return redirect()->back()->withErrors('Entered otp is wrong.');
             }

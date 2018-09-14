@@ -495,7 +495,7 @@
 			                            </div>
 			                        </div>
 			                        <div class="backside"  style="width: 90%;">
-			                            <div class="card">
+			                            <div class="card" style="padding-left: 10px;">
 			                                <div class="card-body mt-4">
 			                                    <h4 class="card-title"> {{ $testUsers[$paperResult->user_id]->name }}</h4>
 
@@ -740,7 +740,6 @@
 	}
 
 	window.onclick = function(event) {
-		console.log(event.target);
 	    var modelId = $(event.target).attr('id');
 	    if(undefined != modelId){
 	      var id = modelId.split('_')[1];

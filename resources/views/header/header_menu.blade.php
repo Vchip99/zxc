@@ -53,7 +53,7 @@
                   @else
                     <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
                   @endif
-                  {{Auth::user()->name}}
+                  Dashbord
                   </a>
                 </li>
                 <li role="separator" class="divider"></li>

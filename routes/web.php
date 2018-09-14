@@ -319,6 +319,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('checkStartDate', 'HomeController@checkStartDate');
 	Route::post('checkDateSlot', 'HomeController@checkDateSlot');
 	Route::post('showAddCalendar', 'HomeController@showAddCalendar');
+	Route::post('sendVchipUserSignUpOtp','HomeController@sendVchipUserSignUpOtp');
+	Route::post('sendVchipUserSignInOtp','HomeController@sendVchipUserSignInOtp');
+
 
 	// online courses front
 	Route::get('courses', 'CourseController@courses');
@@ -575,6 +578,10 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('updateStudentVideo', 'AccountController@updateStudentVideo');
 	Route::post('searchContact', 'AccountController@searchContact');
 	Route::post('getContacts', 'AccountController@getContacts');
+	Route::post('addEmail', 'AccountController@addEmail');
+	Route::post('updateEmail', 'AccountController@updateEmail');
+	Route::post('verifyMobile', 'AccountController@verifyMobile');
+	Route::post('updateMobile', 'AccountController@updateMobile');
 
 	// like- dis-like count front
 	Route::post('likePost', 'CourseController@likePost');

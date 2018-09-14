@@ -69,7 +69,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'user_type', 'verified', 'admin_approve', 'degree', 'college_id', 'college_dept_id', 'year', 'roll_no', 'other_source', 'photo','resume','recorded_video','email_token', 'remember_token', 'google_provider_id', 'facebook_provider_id'
+        'name', 'email', 'password','phone', 'user_type', 'verified', 'admin_approve', 'degree', 'college_id', 'college_dept_id', 'year', 'roll_no', 'other_source', 'photo','resume','recorded_video','email_token', 'remember_token', 'google_provider_id', 'facebook_provider_id','number_verified'
     ];
 
     /**
@@ -226,9 +226,9 @@ class User extends Authenticatable
         $user = Auth::user();
         $user->name = $request->name;
         // $user->email = $request->email;
-        $user->phone = $request->phone;
-        $user->user_type = $request->user_type;
-        if(self::Student == $request->user_type){
+        // $user->phone = $request->phone;
+        // $user->user_type = $request->user_type;
+        if(self::Student == $user->user_type){
             $user->year = $request->year;
             $user->roll_no = $request->roll_no;
         } else {
@@ -458,7 +458,7 @@ class User extends Authenticatable
     protected static function searchContact(Request $request){
         $chatusers = [];
         $unreadCount = [];
-        $currentUserId = Auth()->user()->id;
+        $currentUserId = Auth::user()->id;
         $contact = InputSanitise::inputString($request->contact);
         $users = static::where('name', 'LIKE', '%'.$contact.'%')->where('verified',1)->where('admin_approve',1)->get();
         if(is_object($users) && false == $users->isEmpty()){
@@ -503,5 +503,49 @@ class User extends Authenticatable
 
     protected static function verifyUserByEmailIdByPaperId($email,$paper){
         return static::join('scores', 'scores.user_id', '=', 'users.id')->where('users.email', $email)->where('users.user_type', self::Student)->where('users.admin_approve', 1)->where('scores.paper_id', $paper)->select('users.*')->first();
+    }
+
+    protected static function addEmail(Request $request){
+        $user = Auth::user();
+        $user->email = $request->get('email');
+        $user->password = bcrypt($request->get('password'));
+        $user->email_token = str_random(60);
+        $user->save();
+        return $user;
+    }
+
+    protected static function verifyMobile(Request $request){
+        $userMobile = $request->get('phone');
+        $user = Auth::user();
+        $user->number_verified = 1;
+        $user->save();
+
+        // un approve number if have same number to other users with same client
+        $otherUsers = static::where('phone', $user->phone)->whereNotNull('phone')->where('id','!=', $user->id)->get();
+        if(is_object($otherUsers) && false == $otherUsers->isEmpty()){
+            foreach($otherUsers as $otherUser){
+                $otherUser->number_verified = 0;
+                $otherUser->save();
+            }
+        }
+        return;
+    }
+
+    protected static function updateMobile(Request $request){
+        $userMobile = $request->get('phone');
+        $user = Auth::user();
+        $user->phone = $userMobile;
+        $user->number_verified = 1;
+        $user->save();
+
+        // un approve number if have same number to other users with same client
+        $otherUsers = static::where('phone', $user->phone)->whereNotNull('phone')->where('id','!=', $user->id)->get();
+        if(is_object($otherUsers) && false == $otherUsers->isEmpty()){
+            foreach($otherUsers as $otherUser){
+                $otherUser->number_verified = 0;
+                $otherUser->save();
+            }
+        }
+        return;
     }
 }

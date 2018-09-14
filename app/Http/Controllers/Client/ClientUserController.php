@@ -1577,7 +1577,7 @@ class ClientUserController extends BaseController
 
     protected function sendClientUserParentAddOtp(Request $request){
         $mobile = $request->get('mobile');
-        return InputSanitise::checkMobileAndSendOpt($request,$mobile);
+        return InputSanitise::checkMobileAndSendOptForParent($request,$mobile);
     }
 
     protected function addParent(Request $request){

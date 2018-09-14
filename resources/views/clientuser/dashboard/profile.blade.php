@@ -1,8 +1,10 @@
 @extends((2==$loginUser->user_type)?'clientuser.dashboard.teacher_dashboard':'clientuser.dashboard.dashboard')
 @section('module_title')
+  @if(!Session::has('parent_'.Auth::guard('clientuser')->user()->parent_phone))
   <section class="content-header">
     <h1> Profile</h1>
   </section>
+  @endif
   <style type="text/css">
     @media screen and (max-width: 320px) {
       .container, .list-group .list-group-item, .col-xs-12, .col-xs-7, .col-sm-12{
@@ -198,8 +200,8 @@
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
                     <div class="col-xs-12">
                       <div class="row">
-                         <div class="col-xs-5 "><b>Mobile</b></div>
-                         <div class="col-xs-7 pull-left">
+                        <div class="col-xs-5 "><b>Mobile</b></div>
+                        <div class="col-xs-7 pull-left">
                           @if(!empty($loginUser->phone))
                             {{$loginUser->phone}}
                             @if(0 == $loginUser->number_verified)
@@ -313,15 +315,15 @@
                               <fieldset>
                                 <div class="form-group">
                                   <label>Old Password:</label>
-                                  <input class="form-control" type="password" name="old_password" placeholder="Enter Old Password" />
+                                  <input class="form-control" type="password" name="old_password" placeholder="Enter Old Password" required/>
                                 </div>
                                 <div class="form-group">
                                   <label>New Password:</label>
-                                  <input class="form-control" type="password" name="password" placeholder="Enter New Password" />
+                                  <input class="form-control" type="password" name="password" placeholder="Enter New Password" required/>
                                 </div>
                                 <div class="form-group">
                                   <label>Confirm New Password:</label>
-                                  <input class="form-control" type="password" name="confirm_password" placeholder="Confirm New Password" />
+                                  <input class="form-control" type="password" name="confirm_password" placeholder="Confirm New Password" required/>
                                 </div>
                                 <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
                                 <button class="btn btn-info" type="submit">Submit</button>
@@ -383,7 +385,6 @@
         data: {mobile:mobile}
       })
       .done(function( result ) {
-        console.log(result);
         $('#otpDiv').removeClass('hide');
         $('#sendOtpBtn').addClass('hide');
         $('#submit').removeClass('hide');

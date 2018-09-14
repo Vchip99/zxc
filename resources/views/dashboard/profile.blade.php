@@ -72,11 +72,11 @@
                                   <label>Email:</label>
                                   <input class="form-control" placeholder="yourmail@example.com" name="email" type="text" value="{{$loginUser->email}}">
                                 </div> -->
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                   <label>Phone:</label>
                                   <input class="form-control" placeholder="Mobile No." name="phone" type="text" value="{{$loginUser->phone}}">
-                                </div>
-                                <div class="form-group @if ($errors->has('user_type')) has-error @endif">
+                                </div> -->
+                                <!-- <div class="form-group @if ($errors->has('user_type')) has-error @endif">
                                   <label>Designation:</label>
                                     <select class="form-control slt mrgn_20_top" id="user" name="user_type" onChange="toggleOptions(this);" required="true">
                                       <option value="0">Select User</option>
@@ -87,7 +87,7 @@
                                       <option value="6" @if(6 == $loginUser->user_type) selected @endif >TNP officer</option>
                                     </select>
                                     <p class="help-block hide" id="user_error" style="color: red;">Please select user.</p>
-                                </div>
+                                </div> -->
                                 <div class="form-group @if ($errors->has('college')) has-error @endif">
                                   <label>College:</label>
                                     <select class="form-control  slt mrgn_20_top" id="clg" name="college" onChange="getDepartment(this);">
@@ -188,7 +188,134 @@
                     <div class="col-xs-12">
                       <div class="row">
                         <div class="col-xs-5 "><b>Email</b></div>
-                        <div class="col-xs-7 pull-left">{{$loginUser->email}}</div>
+                        <!-- <div class="col-xs-7 pull-left">{{$loginUser->email}}</div> -->
+                        <div class="col-xs-7 pull-left">
+                          @if(!empty($loginUser->email))
+                            {{$loginUser->email}}
+                            @if($loginUser->id.'@gmail.com' == $loginUser->email)
+                              <a href="#addEmail" data-toggle="modal" style="float: right;">Add Email</a>
+                              <div id="addEmail" class="modal fade" role="dialog">
+                                <div class="modal-dialog modal-sm">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <button class="close" data-dismiss="modal">×</button>
+                                      <h2  class="modal-title">Add Email</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                      <div class="">
+                                        <form action="{{url('addEmail')}}" method="POST" enctype="multipart/form-data">
+                                          {{ csrf_field() }}
+                                          <fieldset>
+                                            <div class="form-group">
+                                              <label>Email-id:</label>
+                                              <input class="form-control" type="email" name="email" placeholder="Enter Email-id" required/>
+                                            </div>
+                                            <div class="form-group">
+                                              <label>Password:</label>
+                                              <input class="form-control" type="password" name="password" placeholder="Enter Password" required/>
+                                            </div>
+                                            <div class="form-group">
+                                              <label>Confirm Password:</label>
+                                              <input class="form-control" type="password" name="confirm_password" placeholder="Confirm Password" required/>
+                                            </div>
+                                            <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
+                                            <button class="btn btn-info" type="submit">Submit</button>
+                                          </fieldset>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            @else
+                              <a href="#verifyEmail" data-toggle="modal" style="float: right;">Please Verify</a>
+                              <a href="#updateEmail" data-toggle="modal" style="float: right;">Update Email &nbsp;</a>
+                              <div id="verifyEmail" class="modal fade" role="dialog">
+                                <div class="modal-dialog modal-sm">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <button class="close" data-dismiss="modal">×</button>
+                                      <h2  class="modal-title">Verify Email</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                      <div class="">
+                                        <form action="{{url('verifyEmail')}}" method="POST" enctype="multipart/form-data">
+                                          {{ csrf_field() }}
+                                          <fieldset>
+                                            <div class="form-group">
+                                              <label>Email-id:</label>
+                                              <input class="form-control" type="email" name="email" value="{{$loginUser->email}}" readonly required/>
+                                            </div>
+                                            <button class="btn btn-info" type="submit">Send</button>
+                                          </fieldset>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div id="updateEmail" class="modal fade" role="dialog">
+                                <div class="modal-dialog modal-sm">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <button class="close" data-dismiss="modal">×</button>
+                                      <h2  class="modal-title">Update Email</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                      <div class="">
+                                        <form action="{{url('updateEmail')}}" method="POST" enctype="multipart/form-data">
+                                          {{ csrf_field() }}
+                                          <fieldset>
+                                            <div class="form-group">
+                                              <label>Email-id:</label>
+                                              <input class="form-control" type="email" name="email" value="" required/>
+                                            </div>
+                                            <button class="btn btn-info" type="submit">Send</button>
+                                          </fieldset>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            @endif
+                          @else
+                            <a href="#addEmail" data-toggle="modal" style="float: right;">Add Email</a>
+                            <div id="addEmail" class="modal fade" role="dialog">
+                              <div class="modal-dialog modal-sm">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <button class="close" data-dismiss="modal">×</button>
+                                    <h2  class="modal-title">Add Email</h2>
+                                  </div>
+                                  <div class="modal-body">
+                                    <div class="">
+                                      <form action="{{url('addEmail')}}" method="POST" enctype="multipart/form-data">
+                                        {{ csrf_field() }}
+                                        <fieldset>
+                                          <div class="form-group">
+                                            <label>Email-id:</label>
+                                            <input class="form-control" type="email" name="email" placeholder="Enter Email-id" required/>
+                                          </div>
+                                          <div class="form-group">
+                                            <label>Password:</label>
+                                            <input class="form-control" type="password" name="password" placeholder="Enter Password" required/>
+                                          </div>
+                                          <div class="form-group">
+                                            <label>Confirm Password:</label>
+                                            <input class="form-control" type="password" name="confirm_password" placeholder="Confirm Password" required/>
+                                          </div>
+                                          <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
+                                          <button class="btn btn-info" type="submit">Submit</button>
+                                        </fieldset>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          @endif
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -197,8 +324,81 @@
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
                     <div class="col-xs-12">
                       <div class="row">
-                         <div class="col-xs-5 "><b>Phone</b></div>
-                         <div class="col-xs-7 pull-left">{{$loginUser->phone}}</div>
+                        <div class="col-xs-5 "><b>Phone</b></div>
+                        <!-- <div class="col-xs-7 pull-left">{{$loginUser->phone}}</div> -->
+                        <div class="col-xs-7 pull-left">
+                          @if(!empty($loginUser->phone))
+                            {{$loginUser->phone}}
+                            @if(0 == $loginUser->number_verified)
+                              <a href="#verifyMobile" data-toggle="modal" style="float: right;">Please Verify</a>
+                              <div id="verifyMobile" class="modal fade" role="dialog">
+                                <div class="modal-dialog modal-sm">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <button class="close" data-dismiss="modal">×</button>
+                                      <h2  class="modal-title">Verify Mobile</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                      <div class="">
+                                        <form action="{{url('verifyMobile')}}" method="POST" enctype="multipart/form-data">
+                                          {{ csrf_field() }}
+                                          <fieldset>
+                                            <div class="form-group">
+                                              <label>Mobile:</label>
+                                              <input type="phone" class="form-control" name="phone" id="verifyPhone" value="{{$loginUser->phone}}" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" readonly />
+                                            </div>
+                                            <div class="form-group hide" id="verifyOtpDiv">
+                                              <label>Otp:</label>
+                                              <input name="user_otp" type="text" class="form-control" placeholder="Enter OTP" required>
+                                              <label class="hide" id="verifyOtpMessage">Otp sent successfully.</label>
+                                            </div>
+                                            <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
+                                            <button class="btn btn-info hide" type="submit" id="verifySubmit">Submit</button>
+                                            <button title="Send Otp" id="verifyOtpBtn" class="btn btn-info" onclick="event.preventDefault(); verifyVchipUserOtp();" >Send OTP</button></br>
+                                          </fieldset>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            @endif
+                            <a href="#changeMobile" data-toggle="modal" style="float: right;">Change&nbsp;&nbsp;&nbsp;</a>
+                          @else
+                            <a href="#changeMobile" data-toggle="modal" style="float: right;">Add</a>
+                          @endif
+                          <div id="changeMobile" class="modal fade" role="dialog">
+                            <div class="modal-dialog modal-sm">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <button class="close" data-dismiss="modal">×</button>
+                                  <h2  class="modal-title">Add/Change Mobile</h2>
+                                </div>
+                                <div class="modal-body">
+                                  <div class="">
+                                    <form action="{{url('updateMobile')}}" method="POST" enctype="multipart/form-data">
+                                      {{ csrf_field() }}
+                                      <fieldset>
+                                        <div class="form-group">
+                                          <label>Mobile:</label>
+                                          <input type="phone" class="form-control" name="phone" id="phone" value="" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" required/>
+                                        </div>
+                                        <div class="form-group hide" id="otpDiv">
+                                          <label>Otp:</label>
+                                          <input name="user_otp" type="text" class="form-control" placeholder="Enter OTP" required>
+                                          <label class="hide" id="addOtpMessage">Otp sent successfully.</label>
+                                        </div>
+                                        <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
+                                        <button class="btn btn-info hide" type="submit" id="submit">Submit</button>
+                                        <button title="Send Otp" id="sendOtpBtn" class="btn btn-info" onclick="event.preventDefault(); sendVchipUserOtp();" >Send OTP</button></br>
+                                      </fieldset>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -297,15 +497,15 @@
                               <fieldset>
                                 <div class="form-group">
                                   <label>Old Password:</label>
-                                  <input class="form-control" type="password" name="old_password" placeholder="Enter Old Password" />
+                                  <input class="form-control" type="password" name="old_password" placeholder="Enter Old Password" required/>
                                 </div>
                                 <div class="form-group">
                                   <label>New Password:</label>
-                                  <input class="form-control" type="password" name="password" placeholder="Enter New Password" />
+                                  <input class="form-control" type="password" name="password" placeholder="Enter New Password" required/>
                                 </div>
                                 <div class="form-group">
                                   <label>Confirm New Password:</label>
-                                  <input class="form-control" type="password" name="password_confirmation" placeholder="Confirm New Password" />
+                                  <input class="form-control" type="password" name="password_confirmation" placeholder="Confirm New Password" required/>
                                 </div>
                                 <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
                                 <button class="btn btn-info" type="submit">Submit</button>
@@ -358,6 +558,66 @@
     </div>
   </div>
 <script type="text/javascript">
+  function sendVchipUserOtp(){
+    var mobile = $('#phone').val();
+    if(mobile && 10 == mobile.length ){
+      $.ajax({
+        method: "POST",
+        url: "{{url('sendVchipUserSignInOtp')}}",
+        data: {mobile:mobile}
+      })
+      .done(function( result ) {
+        $('#otpDiv').removeClass('hide');
+        $('#sendOtpBtn').addClass('hide');
+        $('#submit').removeClass('hide');
+        $('#phone').prop('readonly', true);
+
+        var resultObj = JSON.parse(result);
+        if('000' == resultObj.ErrorCode && 'Success' == resultObj.ErrorMessage){
+          $('#addOtpMessage').removeClass('hide');
+        } else {
+          $.confirm({
+            title: 'Alert',
+            content: 'Something wrong in otp result.'
+          });
+        }
+      });
+    } else if(!mobile) {
+      alert('enter mobile no.');
+    } else if(mobile.length < 10){
+      alert('Enter 10 digit mobile no.');
+    }
+  }
+
+  function verifyVchipUserOtp(){
+    var mobile = $('#verifyPhone').val();
+    if(mobile && 10 == mobile.length ){
+      $.ajax({
+        method: "POST",
+        url: "{{url('sendVchipUserSignInOtp')}}",
+        data: {mobile:mobile}
+      })
+      .done(function( result ) {
+        $('#verifyOtpDiv').removeClass('hide');
+        $('#verifyOtpBtn').addClass('hide');
+        $('#verifySubmit').removeClass('hide');
+        var resultObj = JSON.parse(result);
+        if('000' == resultObj.ErrorCode && 'Success' == resultObj.ErrorMessage){
+          $('#verifyOtpMessage').removeClass('hide');
+        } else {
+          $.confirm({
+            title: 'Alert',
+            content: 'Something wrong in otp result.'
+          });
+        }
+      });
+    } else if(!mobile) {
+      alert('enter mobile no.');
+    } else if(mobile.length < 10){
+      alert('Enter 10 digit mobile no.');
+    }
+  }
+
   function toggleOptions(ele){
     var selectedVal = $(ele).val();
     if(3 == selectedVal || 4 == selectedVal){

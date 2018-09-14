@@ -261,7 +261,6 @@
             $('#signUpOtpMessage').removeClass('hide');
           } else {
             $('#sendSignUpOtpBtn').removeClass('hide');
-            $('#registerMobile').addClass('hide');
             $('#signUpOtpDiv').addClass('hide');
             $('#signUpPhone').prop('readonly', false);
             $('#signUpNameInput').prop('readonly', false);
@@ -273,7 +272,6 @@
           }
         } else {
           $('#sendSignUpOtpBtn').removeClass('hide');
-          $('#registerMobile').addClass('hide');
           $('#signUpOtpDiv').addClass('hide');
           $('#signUpPhone').prop('readonly', false);
           $('#signUpNameInput').prop('readonly', false);

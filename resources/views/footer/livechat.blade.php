@@ -778,8 +778,6 @@
               var roomMembers = roomArr.sort();
               var roomName = 'chatmessages_'+roomArr[0]+'_'+roomArr[1];
               var userchat = $('.userchat#'+roomName);
-              console.log(document.getElementById('unread_'+data.sender));
-              console.log(userchat.length);
               if( null == document.getElementById('unread_'+current_user+'_'+data.sender) && userchat.length > 0){
                 var spanUnread = document.createElement('span');
                 spanUnread.className = "hide";
@@ -789,7 +787,6 @@
                 userchat[0].appendChild(spanUnread);
               }
               var unread = document.getElementById('unread_'+current_user+'_'+data.sender).innerHTML;
-              console.log(unread);
               if(unread == ''){
                 document.getElementById('unread_'+current_user+'_'+data.sender).innerHTML = 1;
               } else {

@@ -58,14 +58,27 @@
                     </ul>
                     <div class="tab-content">
                       <div id="home" class="tab-pane fade in active">
+                        <div class="form-group" style="color: white;">
+                          <input type="radio" name="signin_type" id="signinRadioEmail" value="email" checked onClick="toggleSignIn(this.value);">Email-id/User-id
+                          <input type="radio" name="signin_type" value="mobile" onClick="toggleSignIn(this.value);">Mobile
+                        </div>
                         <form id="loginForm" method="post" action="{{ url('login') }}">
                             {!! csrf_field() !!}
                           <div class="form-group">
-                            <input id="email" name="email" type="text" class="form-control" placeholder="vchip@gmail.com" onfocus="this.type='email'" autocomplete="off" required>
+                            <input id="email" name="email" type="text" class="form-control signInEmail" placeholder="vchip@gmail.com" onfocus="this.type='email'" autocomplete="off" required>
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
-                            <input id="password" name="password" type="text" class="form-control" placeholder="password" data-type="password" onfocus="this.type='password'" autocomplete="off" required >
+                            <input id="password" name="password" type="text" class="form-control signInEmail" placeholder="password" data-type="password" onfocus="this.type='password'" autocomplete="off" required >
+                            <span class="help-block"></span>
+                          </div>
+                          <div class="form-group hide signInMobile">
+                            <input type="phone" class="form-control" name="mobile" id="signInPhone" value="" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" />
+                            <span class="help-block"></span>
+                          </div>
+                          <label class="hide" style="color: white;" id="signInOtpMessage">Otp sent successfully.</label>
+                          <div class="form-group hide" id="signInOtpDiv">
+                            <input name="login_otp" id="login_otp" type="text" class="form-control" placeholder="Enter OTP" >
                             <span class="help-block"></span>
                           </div>
                           <div id="loginErrorMsg" class="alert alert-error hide">Wrong username or password</div>
@@ -74,7 +87,8 @@
                               <input type="checkbox" name="remember" id="remember" data-toggle="tooltip" title="Remember login"> Remember login
                             </label>
                           </div>
-                          <button type="submit" value="login" name="submit" class="btn btn-info btn-block" data-toggle="tooltip" title="Login">Login</button>
+                          <button type="submit" value="login" name="submit" id="loginBtn" class="btn btn-info btn-block signInEmail" data-toggle="tooltip" title="Login">Login</button>
+                          <button title="Send Otp" id="sendSignInOtpBtn" class="btn btn-info btn-block hide signInMobile" onclick="event.preventDefault(); sendSignInOtp();" >Send OTP</button>
                         </form>
                         <br/>
                         <div class="form-group">
@@ -166,5 +180,68 @@
       }
     }
     document.getElementById('registerUser').submit();
+  }
+
+  function toggleSignIn(value){
+    if('email' == value){
+      $('.signInEmail').removeClass('hide');
+      $('.signInMobile').addClass('hide');
+      $('#sendSignInOtpBtn').addClass('hide');
+      $('#password').prop('required', true);
+      $('#email').prop('required', true);
+      $('#password').val('');
+      $('#email').val('');
+      $('#signInPhone').val('');
+    } else {
+      $('.signInEmail').addClass('hide');
+      $('.signInMobile').removeClass('hide');
+      $('#sendSignInOtpBtn').removeClass('hide');
+      $('#password').val('');
+      $('#email').val('');
+      $('#password').prop('required', false);
+      $('#email').prop('required', false);
+      $('#signInPhone').val('');
+    }
+  }
+
+  function sendSignInOtp(){
+    var mobile = $('#signInPhone').val();
+    if(mobile && 10 == mobile.length ){
+    $('#signInPhone').prop('readonly', true);
+      $.ajax({
+        method: "POST",
+        url: "{{url('sendVchipUserSignInOtp')}}",
+        data: {mobile:mobile}
+      })
+      .done(function( result ) {
+        var resultObj = JSON.parse(result);
+        if('000' == resultObj.ErrorCode && 'Success' == resultObj.ErrorMessage){
+          $('#signInOtpMessage').removeClass('hide');
+          $('#signInOtpDiv').removeClass('hide');
+          $('#loginBtn').removeClass('hide');
+          $('#sendSignInOtpBtn').addClass('hide');
+        } else {
+          $('#sendSignInOtpBtn').removeClass('hide');
+          $('#signInPhone').prop('readonly', false);
+          $('#signInOtpMessage').addClass('hide');
+          $('#signInOtpDiv').addClass('hide');
+          $('#loginBtn').addClass('hide');
+          $.confirm({
+            title: 'Alert',
+            content: 'Something wrong in otp result.'
+          });
+        }
+      });
+    } else if(!mobile) {
+      $.confirm({
+        title: 'Alert',
+        content: 'Enter mobile no.'
+      });
+    } else if(mobile.length < 10){
+      $.confirm({
+        title: 'Alert',
+        content: 'Enter 10 digit mobile no.'
+      });
+    }
   }
 </script>

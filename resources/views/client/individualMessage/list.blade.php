@@ -103,7 +103,6 @@
   }
 
   function showIndividualMessages(date){
-    console.log(date);
     var currentToken = $('meta[name="csrf-token"]').attr('content');
     if(date){
       $.ajax({

@@ -6,8 +6,10 @@
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="{{asset('css/bootstrap.min.css?ver=1.0')}}" rel="stylesheet">
+  <link href="{{asset('css/jquery-confirm.min.css?ver=1.0')}}" rel="stylesheet">
   <script src="{{asset('js/jquery.min.js?ver=1.0')}}"></script>
   <script src="{{asset('js/bootstrap.min.js?ver=1.0')}}"></script>
+  <script src="{{asset('js/jquery-confirm.min.js?ver=1.0')}}"></script>
   <link href="{{asset('css/index.css')}}" rel="stylesheet"/>
   <link href="{{asset('css/v_main.css')}}" rel="stylesheet"/>
 <script type="text/javascript">
@@ -84,28 +86,32 @@
                       <div id="home" class="tab-pane fade in active">
                         <form id="registerUser" method="post" action="{{ url('register')}}">
                           {{ csrf_field() }}
+                          <div class="form-group" style="color: white;">
+                            <input type="radio" name="signup_type" id="signupRadioEmail" value="email" checked onClick="toggleSignUp(this.value);">Email-id/User-id
+                            <input type="radio" name="signup_type" value="mobile" onClick="toggleSignUp(this.value);">Mobile
+                          </div>
                           <div class="form-group @if ($errors->has('name')) has-error @endif">
-                           <input id="name" type="text" class="form-control" name="name" value="{{ old('name')?:''}}" placeholder="User Name" autocomplete="off" required="true">
+                           <input id="name" type="text" class="form-control" name="name" value="{{ old('name')?:''}}" placeholder="Full Name" autocomplete="off" required="true">
                             <span class="help-block"></span>
                             @if($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
                           </div>
                           <div class="form-group @if ($errors->has('phone')) has-error @endif">
-                            <input type="phone" class="form-control" name="phone" value="{{ old('phone')?:''}}" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" required="true">
+                            <input type="phone" class="form-control" id="signUpPhone" name="phone" value="{{ old('phone')?:''}}" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" required="true">
                             <span class="help-block"></span>
                             @if($errors->has('phone')) <p class="help-block">{{ $errors->first('phone') }}</p> @endif
                           </div>
                           <div class="form-group @if ($errors->has('email')) has-error @endif">
-                            <input id="email" name="email" type="text" class="form-control" value="{{ old('email')?:''}}" onfocus="this.type='email'" autocomplete="off" placeholder="vchip@gmail.com" required="true">
+                            <input id="email" name="email" type="text" class="form-control signUpEmail" value="{{ old('email')?:''}}" onfocus="this.type='email'" autocomplete="off" placeholder="Email" required="true">
                             <span class="help-block"></span>
                             @if($errors->has('email')) <p class="help-block">{{ $errors->first('email') }}</p> @endif
                           </div>
                           <div class="form-group @if ($errors->has('password')) has-error @endif">
-                            <input id="password" name="password" type="text" class="form-control" data-type="password" onfocus="this.type='password'" autocomplete="off" placeholder="password" required="true">
+                            <input id="password" name="password" type="text" class="form-control signUpEmail" data-type="password" onfocus="this.type='password'" autocomplete="off" placeholder="Password" required="true">
                             <span class="help-block"></span>
                             @if($errors->has('password')) <p class="help-block">{{ $errors->first('password') }}</p> @endif
                           </div>
                           <div class="form-group @if ($errors->has('confirm_password')) has-error @endif">
-                            <input id="confirm_password" name="confirm_password" type="text" class="form-control" data-type="password" onfocus="this.type='password'" autocomplete="off" placeholder="confirm password" required="true">
+                            <input id="confirm_password" name="confirm_password" type="text" class="form-control signUpEmail" data-type="password" onfocus="this.type='password'" autocomplete="off" placeholder="Confirm Password" required="true">
                             <span class="help-block"></span>
                             @if($errors->has('confirm_password')) <p class="help-block">{{ $errors->first('confirm_password') }}</p> @endif
                           </div>
@@ -149,7 +155,7 @@
                             <p class="help-block hide" id="year_error" style="color: red;">Please select year.</p>
                           </div>
                           <div class="hide form-group mrgn_20_top @if ($errors->has('rollno')) has-error @endif" id="rollNo">
-                            <input type="number" class="form-control" name="roll_no" id="roll" value="" placeholder="Roll No." />
+                            <input type="number" class="form-control" name="roll_no" id="roll" min="1" value="" placeholder="Roll No." />
                             <span class="help-block"></span>
                             <p class="help-block hide" id="roll_error" style="color: red;">Please select roll no.</p>
                           </div>
@@ -157,18 +163,15 @@
                             <input type="text" class="form-control" name="other_source" id="other_source_input" value="" placeholder="college/company name" />
                             <p class="help-block hide" id="other_source_error" style="color: red;">Please enter college/company name.</p>
                           </div>
-                          <div class="hide input-group mrgn_20_top" id="subdomainDiv" >
-                            <input type="text" class="form-control " id="subdomain" name="subdomain" placeholder="Enter subdomain" aria-describedby="basic-addon" required/>
-                            <span class="input-group-addon" id="basic-addon">.vchipedu.com</span>
-                          </div>
-                          <div class="hide mrgn_10_top" id="subdomainEx" >
-                            <span readonly style="color: #fff;">Ex. gateexam.vchipedu.com</span></br>
-                            <p class="help-block hide" id="subdomain_error" style="color: red;">Please enter subdomain.</p>
-                          </div>
                           <br/>
-                          <!-- <button type="submit" value="Register" name="submit" class="btn btn-info btn-block">Register
-                          </button><br /> -->
-                          <button id="registerBtn" class="btn btn-info btn-block" onclick="event.preventDefault(); confirmSubmit();" data-toggle="tooltip" title="Register">Register</button></br>
+                          <label class="hide" style="color: white;" id="signUpOtpMessage">Otp sent successfully.</label>
+                          <button title="Send Otp" id="sendSignUpOtpBtn" class="btn btn-info btn-block hide signUpMobile" onclick="event.preventDefault(); sendSignUpOtp();" >Send OTP</button></br>
+                          <div class="form-group hide" id="signUpOtpDiv">
+                            <input name="user_otp" type="text" class="form-control" placeholder="Enter OTP" >
+                            <span class="help-block"></span>
+                          </div>
+                          <button id="registerBtn" class="btn btn-info btn-block signUpEmail" onclick="event.preventDefault(); confirmSubmit();" data-toggle="tooltip" title="Register">Register</button></br>
+                          <a href="{{ url('/')}}" class="btn btn-default btn-block"> Home</a>
                           <div><a class="mrgn_10_top" href="{{ url('/')}}">Alredy Member?</a></div>
                         </form>
                       </div>
@@ -351,7 +354,6 @@
       document.getElementById('year').classList.remove("hide");
       document.getElementById('rollNo').classList.remove("hide");
     }
-
   }
 
   function toggleOptions(ele){
@@ -386,6 +388,71 @@
       document.getElementById('rollNo').classList.add("hide");
       document.getElementById('dept').classList.add("hide");
       document.getElementById('clg').classList.add("show");
+    }
+  }
+
+  function toggleSignUp(value){
+    if('email' == value){
+      $('.signUpEmail').prop('required', true);
+      $('.signUpEmail').removeClass('hide');
+      $('.signUpMobile').prop('required', false);
+      $('.signUpMobile').addClass('hide');
+      $('#signUpPhone').prop('required', false);
+    } else {
+      $('.signUpEmail').prop('required', false);
+      $('.signUpEmail').addClass('hide');
+      $('.signUpMobile').prop('required', true);
+      $('.signUpMobile').removeClass('hide');
+      $('#signUpPhone').prop('required', true);
+    }
+    $('#name').val('');
+    $('#signUpPhone').val('');
+    $('#email').val('');
+    $('#password').val('');
+    $('#confirm_password').val('');
+  }
+
+  function sendSignUpOtp(){
+    var mobile = $('#signUpPhone').val();
+    if(mobile && 10 == mobile.length ){
+    $('#signUpOtpDiv').removeClass('hide');
+    $('#registerBtn').removeClass('hide');
+    $('#sendSignUpOtpBtn').addClass('hide');
+    $('#signUpOtpMessage').removeClass('hide');
+    $('#signUpPhone').prop('readonly', true);
+    $('#name').prop('readonly', true);
+      $.ajax({
+        method: "POST",
+        url: "{{url('sendVchipUserSignUpOtp')}}",
+        data: {mobile:mobile}
+      })
+      .done(function( result ) {
+        var resultObj = JSON.parse(result);
+        if('000' == resultObj.ErrorCode && 'Success' == resultObj.ErrorMessage){
+          $('#signUpOtpMessage').removeClass('hide');
+        } else {
+          $('#sendSignUpOtpBtn').removeClass('hide');
+          $('#registerMobile').addClass('hide');
+          $('#signUpOtpDiv').addClass('hide');
+          $('#signUpPhone').prop('readonly', false);
+          $('#name').prop('readonly', false);
+          $('#signUpOtpMessage').addClass('hide');
+          $.confirm({
+            title: 'Alert',
+            content: 'Something wrong in otp result.'
+          });
+        }
+      });
+    } else if(!mobile) {
+      $.confirm({
+        title: 'Alert',
+        content: 'Enter mobile no.'
+      });
+    } else if(mobile.length < 10){
+      $.confirm({
+        title: 'Alert',
+        content: 'Enter 10 digit mobile no.'
+      });
     }
   }
 </script>

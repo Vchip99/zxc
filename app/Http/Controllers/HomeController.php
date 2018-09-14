@@ -18,7 +18,7 @@ use App\Models\ZeroToHero;
 use App\Models\Area;
 use App\Models\Notification;
 use App\Models\ReadNotification;
-use View,DB,Session,Redirect, Auth,Validator,Cache;
+use View,DB,Session,Redirect, Auth,Validator,Cache,URL;
 use App\Mail\EmailVerification;
 use App\Mail\NewRegisteration;
 use App\Mail\SubscribedUserVerification;
@@ -300,7 +300,11 @@ class HomeController extends Controller
                     $email = new EmailVerification(new User(['email_token' => $user->email_token, 'name' => $user->name]));
                     Mail::to($user->email)->send($email);
                     DB::commit();
-                    return redirect('/')->with('message', 'Verify your email for your account activation.');
+                    if("profile" == array_reverse(explode('/', URL::previous()))[0]){
+                        return redirect('profile')->with('message', 'Verification email sent successfully. please check email and verify.');
+                    } else {
+                        return redirect('/')->with('message', 'Verify your email for your account activation.');
+                    }
                 }
                 catch(\Exception $e)
                 {
@@ -646,5 +650,15 @@ class HomeController extends Controller
 
         }
         return $events;
+    }
+
+    protected function sendVchipUserSignUpOtp(Request $request){
+        $mobile = $request->get('mobile');
+        return InputSanitise::sendOtp($mobile);
+    }
+
+    protected function sendVchipUserSignInOtp(Request $request){
+        $mobile = $request->get('mobile');
+        return InputSanitise::sendOtp($mobile);
     }
 }

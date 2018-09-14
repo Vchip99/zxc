@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EmailVerification;
 use App\Models\CourseCourse;
 use App\Models\TestSubjectPaper;
 use App\Models\TestSubject;
@@ -33,7 +35,7 @@ use App\Models\DiscussionCategory;
 use App\Models\ChatMessage;
 use App\Models\Question;
 use Excel;
-use Auth,Hash,DB, Redirect,Session,Validator,Input;
+use Auth,Hash,DB, Redirect,Session,Validator,Input,Cache;
 use App\Libraries\InputSanitise;
 
 class AccountController extends Controller
@@ -69,6 +71,12 @@ class AccountController extends Controller
         'old_password' => 'required',
         'password' => 'required|different:old_password|confirmed',
         'password_confirmation' => 'required|same:password',
+    ];
+
+    protected $validateAddEmail = [
+        'email' => 'required|max:255',
+        'password' => 'required',
+        'confirm_password' => 'required|same:password'
     ];
 
     protected function index(){
@@ -772,5 +780,123 @@ class AccountController extends Controller
 
     protected function getContacts(){
         return ChatMessage::showchatusers();
+    }
+
+    protected function addEmail(Request $request){
+        $v = Validator::make($request->all(), $this->validateAddEmail);
+        if ($v->fails())
+        {
+            return redirect()->back()->withErrors($v->errors());
+        }
+        if(!empty($request->get('email'))){
+            $checkEmail = User::where('email', $request->get('email'))->first();
+            if(is_object($checkEmail)){
+                return Redirect::to('profile')->withErrors('The email id '.$request->get('email').' is already exist.');
+            }
+        }
+        DB::beginTransaction();
+        try
+        {
+            $user = User::addEmail($request);
+            if(is_object($user)){
+                DB::commit();
+                if(!empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)){
+                    // send mail
+                    $email = new EmailVerification(new User(['email_token' => $user->email_token, 'name' => $user->name]));
+                    Mail::to($user->email)->send($email);
+                    return Redirect::to('profile')->with('message', 'Verification email sent successfully. please check email and verify.');
+                } else {
+                    return Redirect::to('profile')->with('message', 'Email added successfully!');
+                }
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('profile');
+    }
+
+    protected function updateEmail(Request $request){
+        $email = $request->get('email');
+        if(!empty($email)){
+            $existingUser = User::where('email', $email)->first();
+            if(!is_object($existingUser)){
+                DB::beginTransaction();
+                try
+                {
+                    $user = Auth::user();
+                    $user->email = $email;
+                    $user->verified = 0;
+                    $user->email_token = str_random(60);
+                    $user->save();
+
+                    $email = new EmailVerification(new User(['email_token' => $user->email_token, 'name' => $user->name]));
+                    Mail::to($user->email)->send($email);
+                    DB::commit();
+                    return Redirect::to('profile')->with('message', 'Verification email sent successfully. please check email and verify.');
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors('something went wrong.');
+                }
+            }
+            return redirect()->back()->withErrors(['Email id already exist, so please use another email id.']);
+        }
+        return redirect()->back()->withErrors(['Please enter email id.']);
+    }
+
+    protected function verifyMobile(Request $request){
+        $userMobile = $request->get('phone');
+        $userOtp = $request->get('user_otp');
+        $serverOtp = Cache::get($userMobile);
+        if($serverOtp == $userOtp){
+            DB::beginTransaction();
+            try
+            {
+                User::verifyMobile($request);
+                DB::commit();
+                if(Cache::has($userMobile) && Cache::has('mobile')){
+                    Cache::forget($userMobile);
+                    Cache::forget('mobile-'.$userMobile);
+                }
+                return Redirect::to('profile')->with('message', 'Mobile number verified successfully.');
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return redirect()->back()->withErrors('something went wrong.');
+            }
+        } else {
+            return Redirect::to('profile')->withErrors('Entered wrong otp.');
+        }
+    }
+
+    protected function updateMobile(Request $request){
+        $userMobile = $request->get('phone');
+        $userOtp = $request->get('user_otp');
+        $serverOtp = Cache::get($userMobile);
+        if($serverOtp == $userOtp){
+            DB::beginTransaction();
+            try
+            {
+                User::updateMobile($request);
+                DB::commit();
+                if(Cache::has($userMobile) && Cache::has('mobile')){
+                    Cache::forget($userMobile);
+                    Cache::forget('mobile-'.$userMobile);
+                }
+                return Redirect::to('profile')->with('message', 'Mobile number updated successfully.');
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return redirect()->back()->withErrors('something went wrong.');
+            }
+        } else {
+            return Redirect::to('profile')->withErrors('Entered wrong otp.');
+        }
     }
 }

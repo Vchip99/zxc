@@ -141,7 +141,6 @@
             data: {batch_id:batch,user_id:user}
         })
         .done(function( result ) {
-          console.log(result);
           if(result['paid'] && result['total']){
             document.getElementById('note').innerHTML = 'Total Paid-'+result['total']+':'+result['paid'];
             $('#note').removeClass('hide');

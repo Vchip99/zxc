@@ -10,7 +10,7 @@ use App\Models\ClientTeam;
 use App\Models\ClientCustomer;
 use App\Models\College;
 use App\Models\CollegeDept;
-use Validator, DB, Redirect;
+use Validator, DB, Redirect,Cache;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Auth;
@@ -59,14 +59,22 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'name' => 'required|max:255',
-            'phone' => 'required|regex:/[0-9]{10}/',
-            'email' => 'required|email|max:255|unique:users',
-            'password' => 'required',
-            'confirm_password' => 'required|same:password',
-            'user_type' => 'required',
-        ]);
+        if('mobile' == $data['signup_type']){
+            return Validator::make($data, [
+                'name' => 'required|max:255',
+                'phone' => 'required|regex:/[0-9]{10}/',
+                'user_type' => 'required',
+            ]);
+        } else {
+            return Validator::make($data, [
+                'name' => 'required|max:255',
+                'phone' => 'required|regex:/[0-9]{10}/',
+                'email' => 'required|email|max:255|unique:users',
+                'password' => 'required',
+                'confirm_password' => 'required|same:password',
+                'user_type' => 'required',
+            ]);
+        }
     }
 
     /**
@@ -82,14 +90,43 @@ class RegisterController extends Controller
             $data['year'] = '';
             $data['roll_no'] = '';
         }
-        $emailToken= str_random(60);
-        $user = User::create([
+        if(User::Student == $data['user_type']){
+            $adminApprove = 1;
+        } else {
+            $adminApprove = 0;
+        }
+        if('mobile' == $data['signup_type']){
+            $userMobile = $data['phone'];
+            $loginOtp = $data['user_otp'];
+            $serverOtp = Cache::get($userMobile);
+            if($loginOtp == $serverOtp){
+                $user = User::create([
+                    'name' => $data['name'],
+                    'phone' => $data['phone'],
+                    'email' => 'user@gmail.com',
+                    'password' => bcrypt(str_random(5)),
+                    'user_type' => $data['user_type'],
+                    'admin_approve' => $adminApprove,
+                    'degree' => 1,
+                    'college_id' => $data['college'],
+                    'college_dept_id' => $data['department'],
+                    'year' => $data['year'],
+                    'roll_no' => $data['roll_no'],
+                    'other_source' => $data['other_source'],
+                    'number_verified' => 1,
+                ]);
+            } else {
+                return 'Entered otp is wrong.';
+            }
+        } else {
+            $emailToken= str_random(60);
+            $user = User::create([
                 'name' => $data['name'],
                 'phone' => $data['phone'],
                 'email' => $data['email'],
                 'password' => bcrypt($data['password']),
                 'user_type' => $data['user_type'],
-                'admin_approve' => 1,
+                'admin_approve' => $adminApprove,
                 'degree' => 1,
                 'college_id' => $data['college'],
                 'college_dept_id' => $data['department'],
@@ -97,8 +134,9 @@ class RegisterController extends Controller
                 'roll_no' => $data['roll_no'],
                 'other_source' => $data['other_source'],
                 'email_token' => $emailToken,
+                'number_verified' => 0,
             ]);
-
+        }
         return $user;
     }
 
@@ -130,7 +168,6 @@ class RegisterController extends Controller
     {
         // Laravel validation
         $validator = $this->validator($request->all());
-
         if ($validator->fails())
         {
             $this->throwValidationException($request, $validator);
@@ -141,13 +178,26 @@ class RegisterController extends Controller
         {
             $user = $this->create($request->all());
             if( !is_object($user)){
-                return redirect('/')->withErrors('Something went wrong.');
+                return redirect('/')->withErrors($user);
+            }
+            if(1 == $user->number_verified){
+                $user->email = $user->id.'@gmail.com';
+                $user->save();
+                // un approve number if have same number to other users with same client
+                $otherUsers = User::whereNotNull('phone')->where('phone', $user->phone)->where('id','!=', $user->id)->get();
+                if(is_object($otherUsers) && false == $otherUsers->isEmpty()){
+                    foreach($otherUsers as $otherUser){
+                        $otherUser->number_verified = 0;
+                        $otherUser->save();
+                    }
+                }
             }
             DB::commit();
-
-            // After creating the user send an email with the random token generated in the create method above
-            $email = new EmailVerification(new User(['email_token' => $user->email_token, 'name' => $user->name]));
-            Mail::to($user->email)->send($email);
+            if(!empty($user->email) && 0 == $user->number_verified){
+                // After creating the user send an email with the random token generated in the create method above
+                $email = new EmailVerification(new User(['email_token' => $user->email_token, 'name' => $user->name]));
+                Mail::to($user->email)->send($email);
+            }
             $degree = [ 1 => 'Engineering'];
             $year   = [
                 1 => 'First Year',
@@ -201,8 +251,11 @@ class RegisterController extends Controller
 
             // send mail to admin after new registration
             Mail::to('vchipdesigng8@gmail.com')->send(new NewRegisteration($data));
-
-            return redirect('/')->with('message', 'Verify your email for your account activation.');
+            if('mobile' == $request->get('signup_type')){
+                return redirect('/')->with('message', 'Please login using mobile.');
+            } else {
+                return redirect('/')->with('message', 'Verify your email for your account activation.');
+            }
         }
         catch(Exception $e)
         {

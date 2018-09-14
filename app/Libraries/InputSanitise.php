@@ -155,6 +155,48 @@ class InputSanitise{
                         $result['status'] = 'error';
                         $result['message'] = 'This number is already in use, for more detail, please contact to admin @ '.$client->phone;
                     } else {
+                        if(is_object($loginUser) && $mobile == $loginUser->parent_phone){
+                            $result['status'] = 'error';
+                            $result['message'] = 'This number is already in use and assign to your parent.so enter another no.';
+                        } else {
+                            $result['status'] = 'success';
+                            $result['message'] = self::sendOtp($mobile);
+                            self::setSmsCountStats($client);
+                            $client->save();
+                            DB::connection('mysql2')->commit();
+                        }
+                    }
+                }
+                catch(\Exception $e)
+                {
+                    DB::connection('mysql2')->rollback();
+                }
+            }
+        } else {
+            $result['status'] = 'error';
+            $result['message'] = 'Please enter mobile no';
+        }
+        return $result;
+    }
+
+    public static function checkMobileAndSendOptForParent(Request $request,$mobile){
+        $result = [];
+        if(!empty($mobile)){
+            $client = Client::where('subdomain', $request->getHost())->first();
+            if(is_object($client)){
+                DB::connection('mysql2')->beginTransaction();
+                try
+                {
+                    $loginUser = Auth::guard('clientuser')->user();
+                    if(is_object($loginUser)){
+                        $parents = Clientuser::where('parent_phone','=', $mobile)->whereNotNull('parent_phone')->where('id','!=',$loginUser->id)->where('client_id', $client->id)->get();
+                    } else {
+                        $parents = Clientuser::where('parent_phone','=', $mobile)->whereNotNull('parent_phone')->where('client_id', $client->id)->get();
+                    }
+                    if(is_object($parents) && $parents->count() > 0){
+                        $result['status'] = 'error';
+                        $result['message'] = 'This number is already in use, for more detail, please contact to admin @ '.$client->phone;
+                    } else {
                         if(is_object($loginUser)){
                             $clientUsers = Clientuser::where('phone','=', $mobile)->whereNotNull('phone')->where('id','!=',$loginUser->id)->where('client_id', $client->id)->get();
                         } else {

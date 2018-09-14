@@ -329,7 +329,7 @@
     var departmentId = $(ele).data('department_id');
     var studentId = $(ele).data('student_id');
     var year = $(ele).data('year');
-    if(collegeId > 0 && departmentId > 0 && studentId > 0 && year > 0){
+    if(collegeId > 0 && departmentId > 0 && studentId > 0){
       $.ajax({
         method: "POST",
         url: "{{url('changeApproveStatus')}}",
