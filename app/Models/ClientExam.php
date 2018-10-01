@@ -51,4 +51,8 @@ class ClientExam extends Model
     public function batch(){
         return $this->belongsTo(ClientBatch::class, 'client_batch_id');
     }
+
+    protected static function deleteClientExamsByBtachIdByClientId($batchId,$clientId){
+        return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->delete();
+    }
 }

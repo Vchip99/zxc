@@ -19,6 +19,10 @@ use App\Models\ClientAssignmentAnswer;
 use App\Models\ClientMessage;
 use App\Models\ClientOfflinePayment;
 use App\Models\ClientUploadTransaction;
+use App\Models\ClientClass;
+use App\Models\ClientExam;
+use App\Models\ClientHoliday;
+use App\Models\ClientNotice;
 use DateTime;
 
 class ClientBatchController extends ClientBaseController
@@ -170,12 +174,14 @@ class ClientBatchController extends ClientBaseController
             DB::connection('mysql2')->beginTransaction();
             try
             {
-                $loginUser = InputSanitise::getLoginUserByGuardForClient();
-                if($batch->created_by > 0 && $loginUser->id != $batch->created_by){
-                    return Redirect::to('manageBatch');
-                }
-                if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
-                    return Redirect::to('manageBatch');
+                if('client' != InputSanitise::getCurrentGuard()){
+                    $loginUser = InputSanitise::getLoginUserByGuardForClient();
+                    if($batch->created_by > 0 && $loginUser->id != $batch->created_by){
+                        return Redirect::to('manageBatch');
+                    }
+                    if('clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+                        return Redirect::to('manageBatch');
+                    }
                 }
                 ClientUserAttendance::deleteAttendanceByBtachIdByClientId($batch->id,$batch->client_id);
                 ClientOfflinePaper::deleteOfflinePaperseByBtachIdByClientId($batch->id,$batch->client_id);
@@ -220,6 +226,10 @@ class ClientBatchController extends ClientBaseController
                         }
                     }
                 }
+                ClientClass::deleteClientClassesByBtachIdByClientId($batch->id,$batch->client_id);
+                ClientExam::deleteClientExamsByBtachIdByClientId($batch->id,$batch->client_id);
+                ClientHoliday::deleteClientHolidaysByBtachIdByClientId($batch->id,$batch->client_id);
+                ClientNotice::deleteClientNoticesByBtachIdByClientId($batch->id,$batch->client_id);
                 $batch->delete();
                 DB::connection('mysql2')->commit();
                 return Redirect::to('manageBatch')->with('message', 'Batch deleted successfully!');
@@ -485,7 +495,6 @@ class ClientBatchController extends ClientBaseController
         } else {
             $selectedBatch = $firstBatch;
             $result = $this->getAttendanceByBatchByYearByClient($selectedBatch,date('Y'),$clientId,$batchesCount);
-
         }
         $attendanceStats = implode(',', $result['attendanceStats']);
         if(!empty($selectedYear)){

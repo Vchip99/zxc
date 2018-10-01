@@ -169,6 +169,8 @@ class ClientClassController extends ClientBaseController
             foreach($batches as $batch){
                 $allBatches[$batch->id] = $batch->name;
             }
+        } else {
+            $allBatches[0] = 'All';
         }
         $emergencyNotices = ClientNotice::where('client_id', $clientId)->where('is_emergency', 1)->get();
         if(is_object($emergencyNotices) && false == $emergencyNotices->isEmpty()){

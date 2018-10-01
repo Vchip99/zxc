@@ -65,4 +65,8 @@ class ClientClass extends Model
             }
         }
     }
+
+    protected static function deleteClientClassesByBtachIdByClientId($batchId,$clientId){
+        return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->delete();
+    }
 }

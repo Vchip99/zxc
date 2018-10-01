@@ -50,10 +50,11 @@ class QuizController extends Controller
 
         if(!empty($categoryId) && !empty($subcategoryId) && !empty($subjectId) && !empty($paperId)){
             $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
-            foreach($questions->shuffle() as $question){
-                $results['questions'][$question->section_type][] = $question;
+            if(is_object($questions) && false == $questions->isEmpty()){
+                foreach($questions->shuffle() as $question){
+                    $results['questions'][$question->section_type][] = $question;
+                }
             }
-
             if(count(array_keys($results['questions'])) > 0){
                 $paperSections = Cache::remember('vchip:tests:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
                     return PaperSection::where('test_subject_paper_id', $paperId)->get();
