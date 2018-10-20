@@ -8,7 +8,7 @@
 @section('content')
   @include('header.header_menu')
   &nbsp;
-<section class=" v_container" >
+<section class=" v_container" style="padding-top: 100px;">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">

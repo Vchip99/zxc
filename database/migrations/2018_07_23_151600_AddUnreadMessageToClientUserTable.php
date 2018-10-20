@@ -14,7 +14,9 @@ class AddUnreadMessageToClientUserTable extends Migration
     public function up()
     {
         Schema::connection('mysql2')->table('clientusers', function (Blueprint $table) {
-           $table->string('unread_messages')->nullable();
+            $table->string('unread_messages')->nullable();
+            $table->string('user_type')->default(1);
+            $table->string('assigned_modules')->nullable();
         });
     }
 
@@ -27,6 +29,8 @@ class AddUnreadMessageToClientUserTable extends Migration
     {
         Schema::connection('mysql2')->table('clientusers', function (Blueprint $table) {
             $table->dropColumn('unread_messages');
+            $table->dropColumn('user_type');
+            $table->dropColumn('assigned_modules');
         });
     }
 }

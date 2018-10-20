@@ -132,16 +132,20 @@ class SocialiteController extends Controller
             if(is_object($authUser)){
                 if( 0 == $authUser->admin_approve ){
                     return Redirect::to($domainUrl)->withErrors('Your account is not approve. you can contact at info@vchiptech.com to approve your account.');
+                } else if( 0 == $authUser->verified ){
+                    return Redirect::to($domainUrl)->withErrors('Your account is not verified. please verify your account.');
                 } else {
-                    Auth::login($authUser);
-                    Session::remove('domainUrl');
-                    if(true == Session::has('subdomainUrl')){
-                        Session::remove('subdomainUrl');
+                    if( 1 == $authUser->admin_approve && 1 == $authUser->verified){
+                        Auth::login($authUser);
+                        Session::remove('domainUrl');
+                        if(true == Session::has('subdomainUrl')){
+                            Session::remove('subdomainUrl');
+                        }
+                        if(true == Session::has('subdomainReferer')){
+                            Session::remove('subdomainReferer');
+                        }
+                        return Redirect::to($domainUrl)->with('message', 'Welcome '. $authUser->name);
                     }
-                    if(true == Session::has('subdomainReferer')){
-                        Session::remove('subdomainReferer');
-                    }
-                    return Redirect::to($domainUrl)->with('message', 'Welcome '. $authUser->name);
                 }
             } else {
                 return Redirect::to('/');
@@ -150,14 +154,18 @@ class SocialiteController extends Controller
             if(is_object($authUser)){
                 if( 0 == $authUser->client_approve ){
                     return Redirect::to($subdomainReferer)->withErrors('Your account is not approve. you can contact at '.$authUser->client->email.' to approve your account.');
+                } else if( 0 == $authUser->verified ){
+                    return Redirect::to($subdomainReferer)->withErrors('Your account is not verified. please verify your account.');
                 } else {
-                    Auth::guard('clientuser')->login($authUser);
-                    Session::remove('subdomainUrl');
-                    Session::remove('subdomainReferer');
-                    if(true == Session::has('domainUrl')){
-                        Session::remove('domainUrl');
+                    if( 1 == $authUser->admin_approve && 1 == $authUser->verified){
+                        Auth::guard('clientuser')->login($authUser);
+                        Session::remove('subdomainUrl');
+                        Session::remove('subdomainReferer');
+                        if(true == Session::has('domainUrl')){
+                            Session::remove('domainUrl');
+                        }
+                        return Redirect::to($subdomainReferer)->with('message', 'Welcome '. $authUser->name);
                     }
-                    return Redirect::to($subdomainReferer)->with('message', 'Welcome '. $authUser->name);
                 }
             } else {
                 return Redirect::to('/');

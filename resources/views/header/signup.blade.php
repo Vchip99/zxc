@@ -368,6 +368,10 @@
       document.getElementById('year').classList.remove("show");
       document.getElementById('rollNo').classList.remove("show");
       document.getElementById('clg').classList.add("show");
+      $("#clg option[value='other']").hide();
+      document.getElementById('year').selectedIndex = 0;
+      document.getElementById('dept').selectedIndex = '';
+      document.getElementById('clg').selectedIndex = 0;
     } else if(2 == selectedVal){
       document.getElementById('year').classList.add("show");
       document.getElementById('rollNo').classList.add("show");
@@ -378,6 +382,11 @@
       document.getElementById('rollNo').classList.remove("hide");
       document.getElementById('dept').classList.remove("hide");
       document.getElementById('clg').classList.add("show");
+      $("#clg option[value='other']").show();
+
+      document.getElementById('year').selectedIndex = 0;
+      document.getElementById('dept').selectedIndex = '';
+      document.getElementById('clg').selectedIndex = 0;
     } else if(5 == selectedVal || 6 == selectedVal){
       document.getElementById('year').classList.remove("show");
       document.getElementById('rollNo').classList.remove("show");
@@ -388,6 +397,10 @@
       document.getElementById('rollNo').classList.add("hide");
       document.getElementById('dept').classList.add("hide");
       document.getElementById('clg').classList.add("show");
+      $("#clg option[value='other']").hide();
+      document.getElementById('year').selectedIndex = 0;
+      document.getElementById('dept').selectedIndex = '';
+      document.getElementById('clg').selectedIndex = 0;
     }
   }
 
