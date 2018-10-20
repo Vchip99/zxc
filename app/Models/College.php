@@ -15,10 +15,11 @@ class College extends Model
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['name','url'];
 
     protected function addOrUpdateCollege(Request $request, $isUpdate=false){
     	$collegeName = InputSanitise::inputString($request->college);
+      $collegeUrl = InputSanitise::inputString($request->url);
 
     	$collegeId = InputSanitise::inputInt($request->get('college_id'));
         if( $isUpdate && isset($collegeId)){
@@ -30,6 +31,7 @@ class College extends Model
             $college = new static;
         }
     	$college->name = $collegeName;
+      $college->url = $collegeUrl;
     	$college->save();
     	return $college;
     }

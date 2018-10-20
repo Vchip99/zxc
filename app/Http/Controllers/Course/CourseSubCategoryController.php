@@ -41,7 +41,7 @@ class CourseSubCategoryController extends Controller
      *  show list of course sub category
      */
     protected function show(){
-    	$courseSubCategories = CourseSubCategory::paginate();
+    	$courseSubCategories = CourseSubCategory::getCourseSubCategoriesWithPagination();
     	return view('courseSubcategory.list', compact('courseSubCategories'));
     }
 
@@ -49,7 +49,7 @@ class CourseSubCategoryController extends Controller
      *  show create category UI
      */
     protected function create(){
-    	$courseCategories = CourseCategory::all();
+    	$courseCategories = CourseCategory::getCourseCategoriesForAdmin();
     	$courseSubcategory = new CourseSubCategory;
     	return view('courseSubcategory.create', compact('courseSubcategory', 'courseCategories'));
     }
@@ -89,8 +89,8 @@ class CourseSubCategoryController extends Controller
     	if(isset($id)){
     		$courseSubcategory = CourseSubCategory::find($id);
     		if(is_object($courseSubcategory)){
-    			$courseCategories = CourseCategory::all();
-	    		return view('courseSubcategory.create', compact('courseSubcategory', 'courseCategories'));
+                $courseCategories = CourseCategory::getCourseCategoriesForAdmin();
+                return view('courseSubcategory.create', compact('courseSubcategory', 'courseCategories'));
     		}
     	}
     	return Redirect::to('admin/manageCourseSubCategory');

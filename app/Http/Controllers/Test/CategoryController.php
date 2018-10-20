@@ -9,6 +9,7 @@ use App\Models\TestCategory;
 use App\Models\UserSolution;
 use App\Models\Score;
 use App\Models\PaperSection;
+use App\Models\User;
 use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 
@@ -41,8 +42,8 @@ class CategoryController extends Controller
      * show all category
      */
     protected function show(){
-    	$testCategories = TestCategory::paginate();
-    	return view('category.list', compact('testCategories'));
+	    $testCategories = TestCategory::paginate();
+        return view('category.list', compact('testCategories'));
     }
 
     /**
@@ -88,7 +89,7 @@ class CategoryController extends Controller
     	if(isset($catId)){
     		$testCategory = TestCategory::find($catId);
     		if(is_object($testCategory)){
-    			return view('category.create', compact('testCategory'));
+            	return view('category.create', compact('testCategory'));
     		}
     	}
 		return Redirect::to('admin/manageCategory');

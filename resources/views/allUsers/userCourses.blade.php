@@ -90,7 +90,8 @@
           <div class="mrgn_20_btm">
             <div class="col-md-3 mrgn_10_btm">
              <select class="form-control" id="category" id="category" name="category" title="Category" onChange="selectSubcategory(this);">
-              <option value="0">Select Category</option>
+              <option value="">Select Category</option>
+              <option value="0">All</option>
               @if(count($categories) > 0)
                 @foreach($categories as $category)
                   <option value="{{$category->id}}">{{$category->name}}</option>
@@ -100,7 +101,8 @@
             </div>
             <div class="col-md-3 ">
              <select class="form-control" id="subcategory" name="subcategory" title="Sub Category" onChange="showResult();">
-              <option value="0">Select Sub Category</option>
+              <option value="">Select Sub Category</option>
+              <option value="0">All</option>
              </select>
             </div>
           </div>
@@ -151,7 +153,7 @@
     document.getElementById('selected_year').value = 0;
     document.getElementById('selected_student').value = 0;
     document.getElementById('course-result').innerHTML = '';
-    document.getElementById('category').value = 0;
+    document.getElementById('category').value = '';
     unsetSubCategory();
   }
 
@@ -215,7 +217,7 @@
     var selected_year = document.getElementById('selected_year').value;
     document.getElementById('selected_student').value = 0;
     document.getElementById('course-result').innerHTML = '';
-    document.getElementById('category').value = 0;
+    document.getElementById('category').value = '';
     unsetSubCategory();
     if(user_type > 0){
       $.ajax({
@@ -253,7 +255,7 @@
     document.getElementById('course-result').innerHTML = '';
 
     unsetStudent();
-    document.getElementById('category').value = 0;
+    document.getElementById('category').value = '';
     unsetSubCategory();
     if(college > 0){
       $.ajax({
@@ -296,9 +298,13 @@
           select = document.getElementById('subcategory');
           select.innerHTML = '';
           var opt = document.createElement('option');
-          opt.value = '0';
+          opt.value = '';
           opt.innerHTML = 'Select Sub Category';
           select.appendChild(opt);
+          var allOpt = document.createElement('option');
+          allOpt.value = '0';
+          allOpt.innerHTML = 'All';
+          select.appendChild(allOpt);
           if( 0 < msg.length){
             $.each(msg, function(idx, obj) {
                 var opt = document.createElement('option');
@@ -315,9 +321,13 @@
     select = document.getElementById('subcategory');
     select.innerHTML = '';
     var opt = document.createElement('option');
-    opt.value = '0';
+    opt.value = '';
     opt.innerHTML = 'Select Sub Category';
     select.appendChild(opt);
+    var allOpt = document.createElement('option');
+    allOpt.value = '0';
+    allOpt.innerHTML = 'All';
+    select.appendChild(allOpt);
   }
 
   function unsetStudent(){

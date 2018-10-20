@@ -116,7 +116,7 @@ color: #747474; }
     <div class="vchip-background-single" >
       <div class="vchip-background-img">
         <figure>
-          <img src="{{ asset('images/digital-education.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="Digital Education" />
+          <img src="{{ asset('images/digital-education.jpg')}}" class="header_img_top_pad_online" style="vertical-align:top; background-attachment:fixed" alt="Digital Education" />
         </figure>
       </div>
       <div class="vchip-background-content">

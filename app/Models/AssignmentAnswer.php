@@ -17,7 +17,7 @@ class AssignmentAnswer extends Model
      *
      * @var array
      */
-    protected $fillable = ['answer','assignment_question_id', 'student_id', 'lecturer_id', 'attached_link','is_student_created',];
+    protected $fillable = ['answer','assignment_question_id', 'student_id', 'lecturer_id', 'attached_link','is_student_created','student_dept_id'];
 
     /**
      *  add assignment answer
@@ -27,12 +27,14 @@ class AssignmentAnswer extends Model
         $questionId   = InputSanitise::inputInt($request->get('assignment_question_id'));
         $studentId   = InputSanitise::inputInt($request->get('student_id'));
         $lecturerId   = InputSanitise::inputInt($request->get('lecturer_id'));
+        $studentDeptId   = InputSanitise::inputInt($request->get('student_dept_id'));
 
         $assignmentAnswer = new static;
-        $assignmentAnswer->answer = $answer?:'';
+        $assignmentAnswer->answer = ($answer)?:'';
         $assignmentAnswer->assignment_question_id = $questionId;
         $assignmentAnswer->student_id = $studentId;
         $assignmentAnswer->lecturer_id = $lecturerId;
+        $assignmentAnswer->student_dept_id = $studentDeptId;
         if( 2 == Auth::user()->user_type){
             $assignmentAnswer->is_student_created = 1;
         } else {
@@ -62,5 +64,17 @@ class AssignmentAnswer extends Model
 
     public function teacher(){
         return $this->belongsTo(User::class, 'lecturer_id');
+    }
+
+    protected static function deleteAnswersByUserIdByStudentDeptIds($userId,$removedDepts){
+        $answers = static::where('lecturer_id', $userId)->whereIn('student_dept_id',$removedDepts)->get();
+        if(is_object($answers) && false == $answers->isEmpty()){
+            foreach($answers as $answer){
+                $dir = dirname($answer->attached_link);
+                InputSanitise::delFolder($dir);
+                $answer->delete();
+            }
+        }
+        return;
     }
 }

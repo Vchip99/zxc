@@ -9,7 +9,6 @@
   </section>
 @stop
 @section('admin_content')
-  &nbsp;
   <div class="container">
     @if(Session::has('message'))
       <div class="alert alert-success" id="message">
@@ -41,9 +40,9 @@
           <tr>
             <th scope="row">{{$index + $courseVideos->firstItem()}}</th>
             <td>{{$courseVideo->name}}</td>
-            <td>{{$courseVideo->category()}}</td>
-            <td>{{$courseVideo->subcategory()}}</td>
-            <td>{{$courseVideo->course->name}}</td>
+            <td>{{$courseVideo->category}}</td>
+            <td>{{$courseVideo->subcategory}}</td>
+            <td>{{$courseVideo->course}}</td>
             <td>
               <a href="{{url('admin/courseVideo')}}/{{$courseVideo->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$courseVideo->name}}" />
                 </a>

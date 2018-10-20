@@ -4,6 +4,8 @@
 Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('/', 'HomeController@home');
 	Route::get('/home', 'HomeController@home');
+	Route::get('/college/{college}', 'HomeController@collegeLogin');
+
 	// chat
 	Route::post('sendMessage', 'ChatController@sendMessage');
 	Route::post('privateChat', 'ChatController@privateChat');
@@ -79,7 +81,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/manageWebDevelopments', 'Admin\AdminController@manageWebDevelopments');
 	Route::get('admin/manageClientPaidSms', 'Admin\AdminController@manageClientPaidSms');
 	Route::post('admin/clientPurchaseSms', 'Admin\AdminController@clientPurchaseSms');
-
 
 	// Admin all users
 	Route::get('admin/allUsers', 'Admin\AllUsersInfoController@allUsers');
@@ -184,7 +185,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/isQuestionBankSubCategoryExist', 'QuestionBank\QuestionBankSubCategoryController@isQuestionBankSubCategoryExist');
 	Route::post('admin/getQuestionBankSubCategories', 'QuestionBank\QuestionBankSubCategoryController@getQuestionBankSubCategories');
 
-
 	// admin payable test sub category
 	Route::get('admin/managePayableSubCategory', 'PayableTest\PayableSubCategoryController@show');
 	Route::get('admin/createPayableSubCategory', 'PayableTest\PayableSubCategoryController@create');
@@ -257,8 +257,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/useQuestionBank', 'Test\QuestionController@useQuestionBank');
 	Route::post('admin/exportQuestionBank', 'Test\QuestionController@exportQuestionBank');
 
-
-		// admin question bank questions.
+	// admin question bank questions.
 	Route::get('admin/manageQuestionBankQuestions', 'QuestionBank\QuestionBankQuestionController@index');
 	Route::post('admin/showQuestionBankQuestions', 'QuestionBank\QuestionBankQuestionController@show');
 	Route::get('admin/createQuestionBankQuestion', 'QuestionBank\QuestionBankQuestionController@create');
@@ -286,7 +285,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/uploadPayableQuestions', 'PayableTest\PayableQuestionController@uploadPayableQuestions');
 	Route::post('admin/uploadPayableQuestions', 'PayableTest\PayableQuestionController@importPayableQuestions');
 	Route::post('admin/uploadPayableImages', 'PayableTest\PayableQuestionController@uploadPayableImages');
-
 
 	// verify account
 	Route::get('verifyAccount', 'HomeController@verifyAccount');
@@ -321,7 +319,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('showAddCalendar', 'HomeController@showAddCalendar');
 	Route::post('sendVchipUserSignUpOtp','HomeController@sendVchipUserSignUpOtp');
 	Route::post('sendVchipUserSignInOtp','HomeController@sendVchipUserSignInOtp');
-
+	Route::get('terms-and-conditions', 'HomeController@termsandconditions');
+	Route::get('privacy-policy', 'HomeController@privacypolicy');
+	Route::get('faq', 'HomeController@faq');
 
 	// online courses front
 	Route::get('courses', 'CourseController@courses');
@@ -340,6 +340,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('likeCourseVideo', 'CourseController@likeCourseVideo');
 	Route::post('likeCourseVideoComment', 'CourseController@likeCourseVideoComment');
 	Route::post('likeCourseVideoSubComment', 'CourseController@likeCourseVideoSubComment');
+	Route::post('getCollegeCourseByCatIdBySubCatId', 'CourseController@getCollegeCourseByCatIdBySubCatId');
 
 	/// user Post Comment
 	Route::post('createAllPost',  'PostCommentController@createAllPost');
@@ -394,6 +395,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('likeVkitProject', 'VkitController@likeVkitProject');
 	Route::post('likeVkitProjectComment', 'VkitController@likeVkitProjectComment');
 	Route::post('likekitProjectSubComment', 'VkitController@likekitProjectSubComment');
+	Route::post('getCollegeVkitProjectsByCategoryId', 'VkitController@getCollegeVkitProjectsByCategoryId');
 
 	// blog
 	Route::get('blog', 'BlogController@show');
@@ -407,7 +409,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('updateBlogSubComment', 'BlogController@updateBlogSubComment');
 	Route::post('deleteBlogSubComment', 'BlogController@deleteBlogSubComment');
 	Route::get('tagBlogs/{id}', 'BlogController@tagBlogs');
-
 
 	// admin blog category
 	Route::get('admin/manageBlogCategory', 'Blog\AdminBlogCategoryController@show');
@@ -427,7 +428,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteBlog', 'Blog\AdminBlogController@delete');
 	Route::post('admin/isBlogExist', 'Blog\AdminBlogController@isBlogExist');
 
-
 	// admin live courses
 	Route::get('admin/manageLiveCourse', 'LiveCourse\LiveCourseController@show');
 	Route::get('admin/createLiveCourse', 'LiveCourse\LiveCourseController@create');
@@ -437,7 +437,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteLiveCourses', 'LiveCourse\LiveCourseController@delete');
 	Route::post('admin/isLiveCourseExist', 'LiveCourse\LiveCourseController@isLiveCourseExist');
 
-
 	// admin live videos
 	Route::get('admin/manageLiveVideo', 'LiveCourse\LiveVideoController@show');
 	Route::get('admin/createLiveVideo', 'LiveCourse\LiveVideoController@create');
@@ -446,7 +445,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateLiveVideo', 'LiveCourse\LiveVideoController@update');
 	Route::delete('admin/deleteLiveVideo', 'LiveCourse\LiveVideoController@delete');
 	Route::post('admin/isLiveCourseVideoExist', 'LiveCourse\LiveVideoController@isLiveCourseVideoExist');
-
 
 	// admin Documents Category
 	Route::get('admin/manageDocumentsCategory', 'Documents\DocumentsCategoryController@show');
@@ -489,7 +487,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('goToPost', 'DiscussionController@goToPost');
 	Route::post('goToComment', 'DiscussionController@goToComment');
 
-
 	// live course front
 	Route::get('liveCourse', 'LiveCourseVideoController@show');
 	Route::get('liveCourse/{id}', 'LiveCourseVideoController@showLiveCourse');
@@ -521,7 +518,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('showUserTestResult', 'TestController@showUserTestResult');
 	Route::post('isTestGiven', 'TestController@isTestGiven');
 	Route::post('checkVerificationCode', 'TestController@checkVerificationCode');
-
+	Route::post('getCollegeTestSubCategories', 'TestController@getCollegeTestSubCategories');
+	Route::post('getCollegeDataByCatSubCat', 'TestController@getCollegeDataByCatSubCat');
 
 	// test Quiz front
 	Route::post('/start-quiz', 'QuizController@startQuiz');
@@ -538,50 +536,77 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('/account', 'AccountController@index');
 	Route::get('/checkEmail', 'AccountController@checkEmail');
 	Route::put('updatePassword', 'AccountController@updatePassword');
-	Route::get('/profile', 'AccountController@showProfile');
-	Route::get('myCourses', 'AccountController@myCourses');
-	Route::get('myTest', 'AccountController@myTest');
+	Route::get('/college/{college}/profile', 'AccountController@showProfile');
+	Route::get('/college/{college}/myCollegeCourses', 'AccountController@myCollegeCourses');
+	Route::get('/college/{college}/myVchipCourses', 'AccountController@myVchipCourses');
+	Route::get('/college/{college}/vchipCourseDetails/{courseId}', 'AccountController@vchipCourseDetails');
+	Route::get('/college/{college}/collegeCourseDetails/{courseId}', 'AccountController@collegeCourseDetails');
+	Route::get('/college/{college}/vchipCourseEpisode/{videoId}', 'AccountController@vchipCourseEpisode');
+	Route::get('/college/{college}/collegeCourseEpisode/{videoId}', 'AccountController@collegeCourseEpisode');
+	Route::get('/college/{college}/myVchipTest', 'AccountController@myVchipTest');
+	Route::get('/college/{college}/myCollegeTest', 'AccountController@myCollegeTest');
 	Route::get('myLiveCourses', 'AccountController@myLiveCourses');
-	Route::get('myDocuments', 'AccountController@myDocuments');
-	Route::get('myVkits', 'AccountController@myVkits');
-	Route::get('myQuestions', [ 'as' => 'myQuestions', 'uses' => 'AccountController@myQuestions']);
-	Route::get('myReplies', [ 'as' => 'myReplies', 'uses' => 'AccountController@myReplies']);
-	Route::get('myCertificate', 'AccountController@myCertificate');
-	Route::get('myFavouriteArticles', 'AccountController@myFavouriteArticles');
+	Route::get('/college/{college}/myDocuments', 'AccountController@myDocuments');
+	Route::get('/college/{college}/myVchipVkits', 'AccountController@myVchipVkits');
+	Route::get('/college/{college}/myCollegeVkits', 'AccountController@myCollegeVkits');
+	Route::get('/college/{college}/myQuestions', [ 'as' => 'myQuestions', 'uses' => 'AccountController@myQuestions']);
+	Route::get('/college/{college}/myReplies', [ 'as' => 'myReplies', 'uses' => 'AccountController@myReplies']);
+	Route::get('/college/{college}/myCertificate', 'AccountController@myCertificate');
+	Route::get('/college/{college}/myFavouriteArticles', 'AccountController@myFavouriteArticles');
 	Route::post('getFavouriteDocumentsByCategoryId', 'DocumentsController@getFavouriteDocumentsByCategoryId');
-	Route::get('students', 'AccountController@students');
+	Route::get('/college/{college}/students', 'AccountController@students');
 	Route::post('changeApproveStatus', 'AccountController@changeApproveStatus');
-	Route::delete('deleteStudentFromCollege', 'AccountController@deleteStudentFromCollege');
+	Route::delete('/college/{college}/deleteStudentFromCollege', 'AccountController@deleteStudentFromCollege');
 	Route::post('searchStudent', 'AccountController@searchStudent');
-	Route::get('studentTestResults/{id?}', 'AccountController@studentTestResults');
+	Route::get('/college/{college}/studentCollegeTestResults/{id?}', 'AccountController@studentCollegeTestResults');
+	Route::get('/college/{college}/studentVchipTestResults/{id?}', 'AccountController@studentVchipTestResults');
 	Route::post('showTestResults', 'AccountController@showTestResults');
-	Route::get('studentPlacement/{id?}', 'AccountController@studentPlacement');
-	Route::get('studentCourses/{id?}', 'AccountController@studentCourses');
-	Route::put('updateProfile', 'AccountController@updateProfile');
+	Route::post('showCollegeTestResults', 'AccountController@showCollegeTestResults');
+	Route::get('/college/{college}/studentPlacement', 'AccountController@studentPlacement');
+	Route::get('/college/{college}/studentCollegeCourses/{id?}', 'AccountController@studentCollegeCourses');
+	Route::get('/college/{college}/studentVchipCourses/{id?}', 'AccountController@studentVchipCourses');
+	Route::get('/college/{college}/lecturerPapers/{id?}', 'AccountController@lecturerPapers');
+	Route::get('/college/{college}/lecturerCourses/{id?}', 'AccountController@lecturerCourses');
+	Route::put('/college/{college}/updateProfile', 'AccountController@updateProfile');
 	Route::post('showStudentsByDepartmentByYear', 'AccountController@showStudentsByDepartmentByYear');
 	Route::post('getStudentById', 'AccountController@getStudentById');
 	Route::post('showStudentCourses', 'AccountController@showStudentCourses');
-	Route::get('myCourseResults', 'AccountController@myCourseResults');
-	Route::get('myTestResults', 'AccountController@myTestResults');
+	Route::post('showCollegeStudentCourses', 'AccountController@showCollegeStudentCourses');
+	Route::post('getLecturerPapers', 'AccountController@getLecturerPapers');
+	Route::post('showStudentsByUserType', 'AccountController@showStudentsByUserType');
+	Route::post('getLecturerCourses', 'AccountController@getLecturerCourses');
+	Route::post('showPlacementVideoByDepartmentByYear', 'AccountController@showPlacementVideoByDepartmentByYear');
+	Route::post('searchStudentByDeptByYearByName', 'AccountController@searchStudentByDeptByYearByName');
+	Route::post('assignDepatementsToUser', 'AccountController@assignDepatementsToUser');
+	Route::get('/college/{college}/myCollegeCourseResults', 'AccountController@myCollegeCourseResults');
+	Route::get('/college/{college}/myVchipCourseResults', 'AccountController@myVchipCourseResults');
+	Route::get('/college/{college}/myCollegeTestResults', 'AccountController@myCollegeTestResults');
+	Route::get('/college/{college}/myVchipTestResults', 'AccountController@myVchipTestResults');
 	Route::post('showUserTestResultsByCatBySubCat', 'AccountController@showUserTestResultsByCatBySubCat');
-	Route::get('allTestResults', 'AccountController@allTestResults');
+	Route::get('/college/{college}/collegeTestResults', 'AccountController@collegeTestResults');
+	Route::get('/college/{college}/vchipTestResults', 'AccountController@vchipTestResults');
 	Route::post('getSubjectsByCatIdBySubcatId', 'AccountController@getSubjectsByCatIdBySubcatId');
 	Route::post('getPapersBySubjectId', 'AccountController@getPapersBySubjectId');
 	Route::post('getAllTestResults', 'AccountController@getAllTestResults');
-	Route::get('myAssignments', 'AccountController@myAssignments');
-	Route::get('doAssignment/{id}', 'AccountController@doAssignment');
-	Route::post('createAssignmentAnswer', 'AccountController@createAssignmentAnswer');
-	Route::get('studentsAssignment', 'AccountController@studentsAssignment');
-	Route::get('assignmentRemark/{assignmentId}/{studentId}', 'AccountController@assignmentRemark');
+	Route::get('/college/{college}/myAssignments', 'AccountController@myAssignments');
+	Route::get('/college/{college}/doAssignment/{id}', 'AccountController@doAssignment');
+	Route::post('/college/{college}/createAssignmentAnswer', 'AccountController@createAssignmentAnswer');
+	Route::get('/college/{college}/studentsAssignment', 'AccountController@studentsAssignment');
+	Route::get('/college/{college}/assignmentRemark/{assignmentId}/{studentId}', 'AccountController@assignmentRemark');
 	Route::post('getDepartmentLecturers', 'AccountController@getDepartmentLecturers');
-	Route::get('studentVideo/{id?}', 'AccountController@studentVideo');
-	Route::put('updateStudentVideo', 'AccountController@updateStudentVideo');
+	Route::get('/college/{college}/studentVideo/{id?}', 'AccountController@studentVideo');
+	Route::put('/college/{college}/updateStudentVideo', 'AccountController@updateStudentVideo');
 	Route::post('searchContact', 'AccountController@searchContact');
 	Route::post('getContacts', 'AccountController@getContacts');
 	Route::post('addEmail', 'AccountController@addEmail');
 	Route::post('updateEmail', 'AccountController@updateEmail');
 	Route::post('verifyMobile', 'AccountController@verifyMobile');
 	Route::post('updateMobile', 'AccountController@updateMobile');
+	Route::get('testAuth', 'AccountController@testAuth');
+	Route::post('/college/{college}/showUserTestResult', 'AccountController@showUserTestResult');
+	Route::post('/college/{college}/showUserTestSolution', 'AccountController@showUserTestSolution');
+	Route::get('/college/{college}/vkitproject/{id}/{subcommentId?}', 'AccountController@vkitproject');
+	Route::get('/college/{college}/collegeVkitproject/{id}/{subcommentId?}', 'AccountController@collegeVkitproject');
 
 	// like- dis-like count front
 	Route::post('likePost', 'CourseController@likePost');
@@ -623,44 +648,45 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/isHeroExist', 'ZeroToHero\ZeroToHeroController@isHeroExist');
 
 	// Notifications
-	Route::get('myNotifications', 'AccountController@notifications');
-	Route::get('adminMessages/{year?}/{month?}', 'AccountController@adminMessages');
+	Route::get('/college/{college}/myNotifications', 'AccountController@notifications');
+	Route::get('/college/{college}/adminMessages/{year?}/{month?}', 'AccountController@adminMessages');
 	Route::get('downloadExcelResult', 'AccountController@downloadExcelResult');
-	Route::get('allChatMessages', 'AccountController@allChatMessages');
+	Route::get('/college/{college}/allChatMessages', 'AccountController@allChatMessages');
 	Route::post('dashboardPrivateChat', 'AccountController@dashboardPrivateChat');
 	Route::post('dashboardSendMessage', 'AccountController@dashboardSendMessage');
 
-
-	// AssignmentSubject
-	Route::get('manageAssignmentSubject', 'AssignmentSubjectController@show');
-	Route::get('createAssignmentSubject', 'AssignmentSubjectController@create');
-	Route::post('createAssignmentSubject', 'AssignmentSubjectController@store');
-	Route::get('assignmentSubject/{id}/edit', 'AssignmentSubjectController@edit');
-	Route::put('updateAssignmentSubject', 'AssignmentSubjectController@update');
-	Route::post('getAssignmentSubjectsByYear', 'AssignmentSubjectController@getAssignmentSubjectsByYear');
-	Route::post('getAssignmentSubjectsOfGivenAssignmentByLecturer', 'AssignmentSubjectController@getAssignmentSubjectsOfGivenAssignmentByLecturer');
-	Route::delete('deleteAssignmentSubject', 'AssignmentSubjectController@delete');
+	// // AssignmentSubject
+	// Route::get('manageAssignmentSubject', 'AssignmentSubjectController@show');
+	// Route::get('createAssignmentSubject', 'AssignmentSubjectController@create');
+	// Route::post('createAssignmentSubject', 'AssignmentSubjectController@store');
+	// Route::get('assignmentSubject/{id}/edit', 'AssignmentSubjectController@edit');
+	// Route::put('updateAssignmentSubject', 'AssignmentSubjectController@update');
+	// Route::post('getAssignmentSubjectsByYear', 'AssignmentSubjectController@getAssignmentSubjectsByYear');
+	// Route::post('getAssignmentSubjectsOfGivenAssignmentByLecturer', 'AssignmentSubjectController@getAssignmentSubjectsOfGivenAssignmentByLecturer');
+	// Route::delete('deleteAssignmentSubject', 'AssignmentSubjectController@delete');
 
 	// AssignmentTopic
-	Route::get('manageAssignmentTopic', 'AssignmentTopicController@show');
-	Route::get('createAssignmentTopic', 'AssignmentTopicController@create');
-	Route::post('createAssignmentTopic', 'AssignmentTopicController@store');
-	Route::get('assignmentTopic/{id}/edit', 'AssignmentTopicController@edit');
-	Route::put('updateAssignmentTopic', 'AssignmentTopicController@update');
-	Route::delete('deleteAssignmentTopic', 'AssignmentTopicController@delete');
+	Route::get('/college/{college}/manageAssignmentTopic', 'AssignmentTopicController@show');
+	Route::get('/college/{college}/createAssignmentTopic', 'AssignmentTopicController@create');
+	Route::post('/college/{college}/createAssignmentTopic', 'AssignmentTopicController@store');
+	Route::get('/college/{college}/assignmentTopic/{id}/edit', 'AssignmentTopicController@edit');
+	Route::put('/college/{college}/updateAssignmentTopic', 'AssignmentTopicController@update');
+	Route::delete('/college/{college}/deleteAssignmentTopic', 'AssignmentTopicController@delete');
+	Route::post('isAssignmentTopicExist', 'AssignmentTopicController@isAssignmentTopicExist');
+	Route::post('getAssignmentTopicsByDeptIdByYear', 'AssignmentTopicController@getAssignmentTopicsByDeptIdByYear');
 
 	// Assignments
-	Route::get('manageAssignment', 'AssignmentController@show');
-	Route::get('createAssignment', 'AssignmentController@create');
-	Route::post('createAssignment', 'AssignmentController@store');
-	Route::get('assignment/{id}/edit', 'AssignmentController@edit');
-	Route::put('updateAssignment', 'AssignmentController@update');
+	Route::get('/college/{college}/manageAssignment', 'AssignmentController@show');
+	Route::get('/college/{college}/createAssignment', 'AssignmentController@create');
+	Route::post('/college/{college}/createAssignment', 'AssignmentController@store');
+	Route::get('/college/{college}/assignment/{id}/edit', 'AssignmentController@edit');
+	Route::put('/college/{college}/updateAssignment', 'AssignmentController@update');
 	Route::post('getAssignmentTopics', 'AssignmentController@getAssignmentTopics');
 	Route::post('getAssignmentByTopic', 'AssignmentController@getAssignmentByTopic');
 	Route::post('getAssignments', 'AssignmentController@getAssignments');
 	Route::post('getAssignmentByTopicForStudent', 'AssignmentController@getAssignmentByTopicForStudent');
 	Route::post('checkAssignmentIsExist', 'AssignmentController@checkAssignmentIsExist');
-	Route::delete('deleteAssignment', 'AssignmentController@delete');
+	Route::delete('/college/{college}/deleteAssignment', 'AssignmentController@delete');
 
 	// workshop category
 	Route::get('admin/manageWorkshopCategory', 'Workshop\WorkshopCategoryController@show');
@@ -724,7 +750,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/checkCompanyDetails', 'Placement\PlacementCompanyDetailsController@checkCompanyDetails');
 	Route::delete('admin/deleteCompanyDetails', 'Placement\PlacementCompanyDetailsController@delete');
 
-
 	// placement process
 	Route::get('admin/managePlacementProcess', 'Placement\PlacementProcessController@show');
 	Route::get('admin/createPlacementProcess', 'Placement\PlacementProcessController@create');
@@ -733,7 +758,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updatePlacementProcess', 'Placement\PlacementProcessController@update');
 	Route::post('admin/checkPlacementCompanyProcesss', 'Placement\PlacementProcessController@checkPlacementCompanyProcesss');
 	Route::delete('admin/deletePlacementProcess', 'Placement\PlacementProcessController@delete');
-
 
 	// placement front
 	Route::get('placements', 'PlacementController@show');
@@ -777,7 +801,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteOfflineWorkshopCategory', 'OfflineWorkshop\OfflineWorkshopCategoryController@delete');
 	Route::post('admin/isOfflineWorkshopCategoryExist', 'OfflineWorkshop\OfflineWorkshopCategoryController@isOfflineWorkshopCategoryExist');
 
-
 	// offline workshop Details
 	Route::get('admin/manageOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@show');
 	Route::get('admin/createOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@create');
@@ -786,7 +809,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@update');
 	Route::delete('admin/deleteOfflineWorkshopDetails', 'OfflineWorkshop\OfflineWorkshopDetailsController@delete');
 	Route::post('admin/isOfflineWorkshopExist', 'OfflineWorkshop\OfflineWorkshopDetailsController@isOfflineWorkshopExist');
-
 
 	// front offline workshop
 	Route::get('offlineworkshops', 'OfflineWorkshopController@show');
@@ -802,7 +824,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateMotivationalSpeechCategory', 'MotivationalSpeech\MotivationalSpeechCategoryController@update');
 	Route::delete('admin/deleteMotivationalSpeechCategory', 'MotivationalSpeech\MotivationalSpeechCategoryController@delete');
 	Route::post('admin/isMotivationalSpeechCategoryExist', 'MotivationalSpeech\MotivationalSpeechCategoryController@isMotivationalSpeechCategoryExist');
-
 
 	// Motivational Speech Details
 	Route::get('admin/manageMotivationalSpeechDetails', 'MotivationalSpeech\MotivationalSpeechDetailsController@show');
@@ -822,7 +843,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateMotivationalSpeechVideo', 'MotivationalSpeech\MotivationalSpeechVideoController@update');
 	Route::delete('admin/deleteMotivationalSpeechVideo', 'MotivationalSpeech\MotivationalSpeechVideoController@delete');
 	Route::post('admin/isMotivationalSpeechVideoExist', 'MotivationalSpeech\MotivationalSpeechVideoController@isMotivationalSpeechVideoExist');
-
 
 	// Motional speech front
 	Route::get('motivationalspeech', 'MotivationalSpeechController@show');
@@ -868,6 +888,178 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateUserData', 'Admin\UserDataController@update');
 	Route::delete('admin/deleteUserData', 'Admin\UserDataController@delete');
 	Route::post('admin/verifyUserByEmailIdByPaperId', 'Admin\UserDataController@verifyUserByEmailIdByPaperId');
+
+	// // college module test category
+	// Route::get('/college/{college}/manageCategory', 'CollegeModule\Test\CategoryController@show');
+	// Route::get('/college/{college}/createCategory', 'CollegeModule\Test\CategoryController@create');
+	// Route::post('/college/{college}/createCategory', 'CollegeModule\Test\CategoryController@store');
+	// Route::get('/college/{college}/category/{id}/edit', 'CollegeModule\Test\CategoryController@edit');
+	// Route::put('/college/{college}/updateCategory', 'CollegeModule\Test\CategoryController@update');
+	// Route::delete('/college/{college}/deleteCategory', 'CollegeModule\Test\CategoryController@delete');
+	// Route::post('isTestCategoryExist', 'CollegeModule\Test\CategoryController@isTestCategoryExist');
+
+	// college module test sub category
+	Route::get('/college/{college}/manageSubCategory', 'CollegeModule\Test\SubCategoryController@show');
+	Route::get('/college/{college}/createSubCategory', 'CollegeModule\Test\SubCategoryController@create');
+	Route::post('/college/{college}/createSubCategory', 'CollegeModule\Test\SubCategoryController@store');
+	Route::get('/college/{college}/subCategory/{id}/edit', 'CollegeModule\Test\SubCategoryController@edit');
+	Route::put('/college/{college}/updateSubCategory', 'CollegeModule\Test\SubCategoryController@update');
+	Route::delete('/college/{college}/deleteSubCategory', 'CollegeModule\Test\SubCategoryController@delete');
+	Route::post('isTestSubCategoryExist', 'CollegeModule\Test\SubCategoryController@isTestSubCategoryExist');
+	Route::post('getCollegeSubCategories', 'CollegeModule\Test\SubCategoryController@getCollegeSubCategories');
+
+	// college module test subject
+	Route::get('/college/{college}/manageSubject', 'CollegeModule\Test\SubjectController@show');
+	Route::get('/college/{college}/createSubject', 'CollegeModule\Test\SubjectController@create');
+	Route::post('/college/{college}/createSubject', 'CollegeModule\Test\SubjectController@store');
+	Route::get('/college/{college}/subject/{id}/edit', 'CollegeModule\Test\SubjectController@edit');
+	Route::put('/college/{college}/updateSubject', 'CollegeModule\Test\SubjectController@update');
+	Route::delete('/college/{college}/deleteSubject', 'CollegeModule\Test\SubjectController@delete');
+	Route::post('isTestSubjectExist', 'CollegeModule\Test\SubjectController@isTestSubjectExist');
+
+	// college module test paper
+	Route::get('/college/{college}/managePaper', 'CollegeModule\Test\PaperController@show');
+	Route::get('/college/{college}/createPaper', 'CollegeModule\Test\PaperController@create');
+	Route::post('/college/{college}/createPaper', 'CollegeModule\Test\PaperController@store');
+	Route::get('/college/{college}/paper/{id}/edit', 'CollegeModule\Test\PaperController@edit');
+	Route::put('/college/{college}/updatePaper', 'CollegeModule\Test\PaperController@update');
+	Route::delete('/college/{college}/deletePaper', 'CollegeModule\Test\PaperController@delete');
+	Route::post('getCollegeSubjectsByCatIdBySubcatId', [ 'as' => 'getCollegeSubjectsByCatIdBySubcatId','uses' => 'CollegeModule\Test\PaperController@getCollegeSubjectsByCatIdBySubcatId' ]);
+	Route::post('getPaperSectionsByPaperId', [ 'as' => 'getPaperSectionsByPaperId','uses' => 'CollegeModule\Test\PaperController@getPaperSectionsByPaperId' ]);
+	Route::post('isTestPaperExist', 'CollegeModule\Test\PaperController@isTestPaperExist');
+	Route::post('getCollegeSubjectsByCatIdBySubcatIdByUser', 'CollegeModule\Test\PaperController@getCollegeSubjectsByCatIdBySubcatIdByUser');
+	Route::post('getCollegeSubjectsByCatIdBySubcatIdByUserType', 'CollegeModule\Test\PaperController@getCollegeSubjectsByCatIdBySubcatIdByUserType');
+
+	// college  test questions.
+	Route::get('/college/{college}/manageQuestions', 'CollegeModule\Test\QuestionController@index');
+	Route::post('/college/{college}/showQuestions', 'CollegeModule\Test\QuestionController@show');
+	Route::get('/college/{college}/createQuestion', 'CollegeModule\Test\QuestionController@create');
+	Route::post('/college/{college}/createQuestion', 'CollegeModule\Test\QuestionController@store');
+	Route::get('/college/{college}/question/{id}/edit', 'CollegeModule\Test\QuestionController@edit');
+	Route::put('/college/{college}/updateQuestion', 'CollegeModule\Test\QuestionController@update');
+	Route::delete('/college/{college}/deleteQuestion', 'CollegeModule\Test\QuestionController@delete');
+	Route::post('getCollegePapersBySubjectId', [ 'as' => 'getCollegePapersBySubjectId','uses' => 'CollegeModule\Test\QuestionController@getCollegePapersBySubjectId' ]);
+	Route::post('getNextQuestionCount', [ 'as' => 'getNextQuestionCount','uses' => 'CollegeModule\Test\QuestionController@getNextQuestionCount' ]);
+	Route::post('getCurrentQuestionCount', [ 'as' => 'getCurrentQuestionCount','uses' => 'CollegeModule\Test\QuestionController@getCurrentQuestionCount' ]);
+	Route::post('getPrevQuestion', [ 'as' => 'getPrevQuestion','uses' => 'CollegeModule\Test\QuestionController@getPrevQuestion' ]);
+	Route::get('/college/{college}/uploadCollegeQuestions', 'CollegeModule\Test\QuestionController@uploadQuestions');
+	Route::post('/college/{college}/uploadCollegeQuestions', 'CollegeModule\Test\QuestionController@importQuestions');
+	Route::post('/college/{college}/uploadCollegeTestImages', 'CollegeModule\Test\QuestionController@uploadTestImages');
+	Route::get('/college/{college}/showQuestionBank', 'CollegeModule\Test\QuestionController@showQuestionBank');
+	Route::post('/college/{college}/useCollegeQuestionBank', 'CollegeModule\Test\QuestionController@useCollegeQuestionBank');
+	Route::post('/college/{college}/exportCollegeQuestionBank', 'CollegeModule\Test\QuestionController@exportCollegeQuestionBank');
+	Route::post('getCollegeQuestionBankSubCategories', 'CollegeModule\Test\QuestionController@getCollegeQuestionBankSubCategories');
+
+	// college test All
+	Route::get('/college/{college}/manageTestAll', 'CollegeModule\Test\TestAllController@showAll');
+	Route::post('/college/{college}/createAllTestCategory', 'CollegeModule\Test\TestAllController@storeCategory');
+	Route::post('/college/{college}/createAllTestSubCategory', 'CollegeModule\Test\TestAllController@storeSubCategory');
+	Route::post('/college/{college}/createAllTestSubject', 'CollegeModule\Test\TestAllController@storeSubject');
+	Route::post('/college/{college}/createAllTestPaper', 'CollegeModule\Test\TestAllController@storePaper');
+
+	// // college course category
+	// Route::get('/college/{college}/manageCourseCategory', 'CollegeModule\Course\CourseCategoryController@show');
+	// Route::get('/college/{college}/createCourseCategory', 'CollegeModule\Course\CourseCategoryController@create');
+	// Route::post('/college/{college}/createCourseCategory', 'CollegeModule\Course\CourseCategoryController@store');
+	// Route::get('/college/{college}/coursecategory/{id}/edit', 'CollegeModule\Course\CourseCategoryController@edit');
+	// Route::put('/college/{college}/updateCourseCategory', 'CollegeModule\Course\CourseCategoryController@update');
+	// Route::delete('/college/{college}/deleteCourseCategory', 'CollegeModule\Course\CourseCategoryController@delete');
+	// Route::post('isCourseCategoryExist', 'CollegeModule\Course\CourseCategoryController@isCourseCategoryExist');
+
+	// college course sub category
+	Route::get('/college/{college}/manageCourseSubCategory', 'CollegeModule\Course\CourseSubCategoryController@show');
+	Route::get('/college/{college}/createCourseSubCategory', 'CollegeModule\Course\CourseSubCategoryController@create');
+	Route::post('/college/{college}/createCourseSubCategory', 'CollegeModule\Course\CourseSubCategoryController@store');
+	Route::get('/college/{college}/coursesubcategory/{id}/edit', 'CollegeModule\Course\CourseSubCategoryController@edit');
+	Route::put('/college/{college}/updateCourseSubCategory', 'CollegeModule\Course\CourseSubCategoryController@update');
+	Route::delete('/college/{college}/deleteCourseSubCategory', 'CollegeModule\Course\CourseSubCategoryController@delete');
+	Route::post('isCourseSubCategoryExist', 'CollegeModule\Course\CourseSubCategoryController@isCourseSubCategoryExist');
+
+	// college course course
+	Route::get('/college/{college}/manageCourseCourse', 'CollegeModule\Course\CourseCourseController@show');
+	Route::get('/college/{college}/createCourseCourse', 'CollegeModule\Course\CourseCourseController@create');
+	Route::post('/college/{college}/createCourseCourse', 'CollegeModule\Course\CourseCourseController@store');
+	Route::get('/college/{college}/courseCourse/{id}/edit', 'CollegeModule\Course\CourseCourseController@edit');
+	Route::put('/college/{college}/updateCourseCourse', 'CollegeModule\Course\CourseCourseController@update');
+	Route::delete('/college/{college}/deleteCourseCourse', 'CollegeModule\Course\CourseCourseController@delete');
+	Route::post('getCollegeCourseSubCategories', 'CollegeModule\Course\CourseCourseController@getCollegeCourseSubCategories');
+	Route::post('isCourseCourseExist', 'CollegeModule\Course\CourseCourseController@isCourseCourseExist');
+	Route::post('getCourseByCatIdBySubCatIdByUser', 'CollegeModule\Course\CourseCourseController@getCourseByCatIdBySubCatIdByUser');
+
+	// college course video
+	Route::get('/college/{college}/manageCourseVideo', 'CollegeModule\Course\CourseVideoController@show');
+	Route::get('/college/{college}/createCourseVideo', 'CollegeModule\Course\CourseVideoController@create');
+	Route::post('/college/{college}/createCourseVideo', 'CollegeModule\Course\CourseVideoController@store');
+	Route::get('/college/{college}/courseVideo/{id}/edit', 'CollegeModule\Course\CourseVideoController@edit');
+	Route::put('/college/{college}/updateCourseVideo', 'CollegeModule\Course\CourseVideoController@update');
+	Route::delete('/college/{college}/deleteCourseVideo', 'CollegeModule\Course\CourseVideoController@delete');
+	Route::post('isCourseVideoExist', 'CollegeModule\Course\CourseVideoController@isCourseVideoExist');
+
+	// college course all
+	Route::get('/college/{college}/manageCourseAll', 'CollegeModule\Course\CourseAllController@showAll');
+	Route::post('/college/{college}/createAllCourseCategory', 'CollegeModule\Course\CourseAllController@storeCategory');
+	Route::post('/college/{college}/createAllCourseSubCategory', 'CollegeModule\Course\CourseAllController@storeSubCategory');
+	Route::post('/college/{college}/createAllCourseCourse', 'CollegeModule\Course\CourseAllController@storeCourse');
+
+	// // college  vkit category
+	// Route::get('/college/{college}/manageVkitCategory', 'CollegeModule\Vkit\VkitCategoryController@show');
+	// Route::get('/college/{college}/createVkitCategory', 'CollegeModule\Vkit\VkitCategoryController@create');
+	// Route::post('/college/{college}/createVkitCategory', 'CollegeModule\Vkit\VkitCategoryController@store');
+	// Route::get('/college/{college}/vkitCategory/{id}/edit', 'CollegeModule\Vkit\VkitCategoryController@edit');
+	// Route::put('/college/{college}/updateVkitCategory', 'CollegeModule\Vkit\VkitCategoryController@update');
+	// Route::delete('/college/{college}/deleteVkitCategory', 'CollegeModule\Vkit\VkitCategoryController@delete');
+	// Route::post('isVkitCategoryExist', 'CollegeModule\Vkit\VkitCategoryController@isVkitCategoryExist');
+
+	// college vkit project
+	Route::get('/college/{college}/manageVkitProject', 'CollegeModule\Vkit\VkitProjectController@show');
+	Route::get('/college/{college}/createVkitProject', 'CollegeModule\Vkit\VkitProjectController@create');
+	Route::post('/college/{college}/createVkitProject', 'CollegeModule\Vkit\VkitProjectController@store');
+	Route::get('/college/{college}/vkitProject/{id}/edit', 'CollegeModule\Vkit\VkitProjectController@edit');
+	Route::put('/college/{college}/updateVkitProject', 'CollegeModule\Vkit\VkitProjectController@update');
+	Route::delete('/college/{college}/deleteVkitProject','CollegeModule\Vkit\VkitProjectController@delete');
+	Route::post('isVkitProjectExist', 'CollegeModule\Vkit\VkitProjectController@isVkitProjectExist');
+
+	// College Subject
+	Route::get('/college/{college}/manageCollegeSubject', 'CollegeModule\Academic\CollegeSubjectController@show');
+	Route::get('/college/{college}/createCollegeSubject', 'CollegeModule\Academic\CollegeSubjectController@create');
+	Route::post('/college/{college}/createCollegeSubject', 'CollegeModule\Academic\CollegeSubjectController@store');
+	Route::get('/college/{college}/collegeSubject/{id}/edit', 'CollegeModule\Academic\CollegeSubjectController@edit');
+	Route::put('/college/{college}/updateCollegeSubject', 'CollegeModule\Academic\CollegeSubjectController@update');
+	Route::post('getCollegeSubjectsByDepartmentIdByYear', 'CollegeModule\Academic\CollegeSubjectController@getCollegeSubjectsByDepartmentIdByYear');
+	Route::post('getAssignmentSubjectsOfGivenAssignmentByLecturer', 'CollegeModule\Academic\CollegeSubjectController@getAssignmentSubjectsOfGivenAssignmentByLecturer');
+	Route::delete('/college/{college}/deleteCollegeSubject', 'CollegeModule\Academic\CollegeSubjectController@delete');
+	Route::post('isCollegeSubjectExist', 'CollegeModule\Academic\CollegeSubjectController@isCollegeSubjectExist');
+
+	Route::get('/college/{college}/manageCollegeAttendance', 'CollegeModule\Academic\CollegeSubjectController@showAttendanceCalendar');
+	Route::get('/college/{college}/manageAttendance', 'CollegeModule\Academic\CollegeSubjectController@showAttendance');
+	Route::post('/college/{college}/markCollegeAttendance', 'CollegeModule\Academic\CollegeSubjectController@markCollegeAttendance');
+	Route::post('getCollegeStudentAttendanceByDepartmentIdByYearBySubject', 'CollegeModule\Academic\CollegeSubjectController@getCollegeStudentAttendanceByDepartmentIdByYearBySubject');
+	Route::post('getCollegeDepartmentsBySubjectId', 'CollegeModule\Academic\CollegeSubjectController@getCollegeDepartmentsBySubjectId');
+	Route::post('getCollegeSubjectByYear', 'CollegeModule\Academic\CollegeSubjectController@getCollegeSubjectByYear');
+	Route::post('getCollegeSubjectsByDeptIdByYear', 'CollegeModule\Academic\CollegeSubjectController@getCollegeSubjectsByDeptIdByYear');
+
+	// College Offline Paper
+	Route::get('/college/{college}/manageCollegeOfflinePaper', 'CollegeModule\Academic\CollegeOfflinePaperController@show');
+	Route::get('/college/{college}/createCollegeOfflinePaper', 'CollegeModule\Academic\CollegeOfflinePaperController@create');
+	Route::post('/college/{college}/createCollegeOfflinePaper', 'CollegeModule\Academic\CollegeOfflinePaperController@store');
+	Route::get('/college/{college}/collegeOfflinePaper/{id}/edit', 'CollegeModule\Academic\CollegeOfflinePaperController@edit');
+	Route::put('/college/{college}/updateCollegeOfflinePaper', 'CollegeModule\Academic\CollegeOfflinePaperController@update');
+	Route::post('isCollegeOfflinePaperExist', 'CollegeModule\Academic\CollegeOfflinePaperController@isCollegeOfflinePaperExist');
+	Route::get('/college/{college}/manageCollegeOfflineExam', 'CollegeModule\Academic\CollegeOfflinePaperController@manageCollegeOfflineExam');
+	Route::post('getCollegeOfflinePapersBySubjectId', 'CollegeModule\Academic\CollegeOfflinePaperController@getCollegeOfflinePapersBySubjectId');
+	Route::post('getCollegeStudentsAndMarksBySubjectIdByPaperId', 'CollegeModule\Academic\CollegeOfflinePaperController@getCollegeStudentsAndMarksBySubjectIdByPaperId');
+	Route::post('/college/{college}/assignCollegeOfflinePaperMarks', 'CollegeModule\Academic\CollegeOfflinePaperController@assignCollegeOfflinePaperMarks');
+	Route::delete('/college/{college}/deleteCollegeOfflinePaper', 'CollegeModule\Academic\CollegeOfflinePaperController@delete');
+	Route::post('getCollegeOfflinePapersByDeptIdByYear', 'CollegeModule\Academic\CollegeOfflinePaperController@getCollegeOfflinePapersByDeptIdByYear');
+
+	// college module college category
+	Route::get('/college/{college}/manageCollegeCategory', 'CollegeModule\Academic\CollegeCategoryController@show');
+	Route::get('/college/{college}/createCollegeCategory', 'CollegeModule\Academic\CollegeCategoryController@create');
+	Route::post('/college/{college}/createCollegeCategory', 'CollegeModule\Academic\CollegeCategoryController@store');
+	Route::get('/college/{college}/collegeCategory/{id}/edit', 'CollegeModule\Academic\CollegeCategoryController@edit');
+	Route::put('/college/{college}/updateCollegeCategory', 'CollegeModule\Academic\CollegeCategoryController@update');
+	Route::delete('/college/{college}/deleteCollegeCategory', 'CollegeModule\Academic\CollegeCategoryController@delete');
+	Route::post('isCollegeCategoryExist', 'CollegeModule\Academic\CollegeCategoryController@isCollegeCategoryExist');
 });
 
 Route::group(['domain' => '{client}.localvchip.com'], function () {
@@ -1358,5 +1550,4 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('individualMessage/{id}/edit', 'Client\ClientIndividualMessageController@edit');
 	Route::delete('deleteIndividualMessage', 'Client\ClientIndividualMessageController@delete');
 	Route::post('getIndividualMessagesByDate', 'Client\ClientIndividualMessageController@getIndividualMessagesByDate');
-
 });

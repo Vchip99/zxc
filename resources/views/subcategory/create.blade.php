@@ -26,8 +26,8 @@
         @if(count($testCategories) > 0)
           @foreach($testCategories as $testCategory)
             @if($testSubcategory->test_category_id == $testCategory->id)
-              <input type="text" class="form-control" name="category_text" id="category" value="{{$testCategory->name}}" readonly>
-              <input type="hidden" name="category" value="{{$testCategory->id}}">
+              <input type="text" class="form-control" name="category_text" value="{{$testCategory->name}}" readonly>
+              <input type="hidden" name="category" id="category" value="{{$testCategory->id}}">
             @endif
           @endforeach
         @endif

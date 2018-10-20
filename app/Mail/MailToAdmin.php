@@ -30,9 +30,14 @@ class MailToAdmin extends Mailable
      */
     public function build()
     {
+        if('local' == \Config::get('app.env')){
+            $subject = 'New Application on local';
+        } else {
+            $subject = 'New Application';
+        }
         $fromEmail = $this->request->email;
         if(!empty($this->request->resume)){
-            return $this->subject('New Application ')
+            return $this->subject($subject)
             ->from($fromEmail, $this->request->firstname)
             ->view('emails.mailtoadmin')
             ->with(['subject' => $this->request->subject,
@@ -53,7 +58,7 @@ class MailToAdmin extends Mailable
                 'mime' => 'application/pdf',
             ]);
         } else {
-            return $this->subject('New Application ')
+            return $this->subject($subject)
         ->from($fromEmail, $this->request->firstname)
         ->view('emails.mailtoadmin')
         ->with(['subject' => $this->request->subject,

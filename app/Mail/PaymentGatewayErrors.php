@@ -30,7 +30,12 @@ class PaymentGatewayErrors extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.paymentGatewayErrors')
+        if('local' == \Config::get('app.env')){
+            $subject = 'Payment Gateway Errors on local';
+        } else {
+            $subject = 'Payment Gateway Errors';
+        }
+        return $this->subject($subject)->view('emails.paymentGatewayErrors')
                     ->with('content', $this->content);
     }
 }

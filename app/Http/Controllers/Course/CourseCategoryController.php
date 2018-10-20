@@ -38,7 +38,7 @@ class CourseCategoryController extends Controller
      *  show list of course category
      */
     protected function show(){
-    	$courseCategories = CourseCategory::paginate();
+    	$courseCategories = CourseCategory::getCourseCategoriesWithPagination();
     	return view('courseCategory.list', compact('courseCategories'));
     }
 
@@ -85,7 +85,7 @@ class CourseCategoryController extends Controller
     	if(isset($id)){
     		$courseCategory = CourseCategory::find($id);
     		if(is_object($courseCategory)){
-    			return view('courseCategory.create', compact('courseCategory'));
+                return view('courseCategory.create', compact('courseCategory'));
     		}
     	}
     	return Redirect::to('admin/manageCourseCategory');

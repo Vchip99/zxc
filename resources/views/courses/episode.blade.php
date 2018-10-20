@@ -333,7 +333,7 @@
 @stop
 @section('footer')
   @include('footer.footer')
-  <script type="text/javascript">
+<script type="text/javascript">
   function renderComments(msg, userId){
     var chatDiv = document.getElementById('chat-box');
     chatDiv.innerHTML = '';
@@ -880,6 +880,6 @@
         $(this).closest('.zxc1').siblings('.zxc').toggle();
         return false;
       });
-  }
-     </script>
+    }
+</script>
 @stop

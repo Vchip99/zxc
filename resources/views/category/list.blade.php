@@ -9,7 +9,6 @@
   </section>
 @stop
 @section('admin_content')
-  &nbsp;
   <div class="container">
   @if(Session::has('message'))
     <div class="alert alert-success" id="message">
@@ -72,28 +71,26 @@
   </div>
   </div>
 <script type="text/javascript">
-
-    function confirmDelete(ele){
-      $.confirm({
-        title: 'Confirmation',
-        content: 'If you delete this category, all associated sub categories, subjects, papers and questions of this category will be deleted.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    var id = $(ele).attr('id');
-                    formId = 'deleteCategory_'+id;
-                    document.getElementById(formId).submit();
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
-    }
-
+  function confirmDelete(ele){
+    $.confirm({
+      title: 'Confirmation',
+      content: 'If you delete this category, all associated sub categories, subjects, papers and questions of this category will be deleted.',
+      type: 'red',
+      typeAnimated: true,
+      buttons: {
+        Ok: {
+            text: 'Ok',
+            btnClass: 'btn-red',
+            action: function(){
+              var id = $(ele).attr('id');
+              formId = 'deleteCategory_'+id;
+              document.getElementById(formId).submit();
+            }
+        },
+        Cancle: function () {
+        }
+      }
+    });
+  }
 </script>
 @stop

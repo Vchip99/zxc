@@ -32,6 +32,11 @@ class ClientUserEmailVerification extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.clientuserverification')->subject('User Email Verification');
+        if('local' == \Config::get('app.env')){
+            $subject = 'User Email Verification on local';
+        } else {
+            $subject = 'User Email Verification';
+        }
+        return $this->view('emails.clientuserverification')->subject($subject);
     }
 }

@@ -1,5 +1,4 @@
 @extends('admin.master')
-&nbsp;
 @section('module_title')
   <section class="content-header">
     <h1> Manage Sub Category </h1>
@@ -10,7 +9,6 @@
   </section>
 @stop
 @section('admin_content')
-  &nbsp;
   <div class="container">
     @if(Session::has('message'))
       <div class="alert alert-success" id="message">
@@ -28,10 +26,10 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Sub Category Name</th>
-          <th>Category Name</th>
-          <th>Edit Sub Category</th>
-          <th>Delete Sub Category</th>
+          <th>Sub Category </th>
+          <th>Category </th>
+          <th>Edit </th>
+          <th>Delete </th>
         </tr>
       </thead>
       <tbody>
@@ -40,7 +38,7 @@
           <tr>
             <th scope="row">{{$index + $courseSubCategories->firstItem()}}</th>
             <td>{{$courseSubCategory->name}}</td>
-            <td>{{$courseSubCategory->category->name}}</td>
+            <td>{{$courseSubCategory->category}}</td>
             <td>
               <a href="{{url('admin/coursesubcategory')}}/{{$courseSubCategory->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$courseSubCategory->name}}" />

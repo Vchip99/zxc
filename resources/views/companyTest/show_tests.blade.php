@@ -483,7 +483,7 @@
 				                                    	<img class="" src="{{ asset('images/user/user1.png')}}" alt="user image">
 				                                    @endif
 			                                    </p>
-			                                    <h4 class="card-title"> {{ $testUsers[$paperResult->user_id]->name }}</h4>
+			                                    <h4 class="card-title"> @if(isset($testUsers[$paperResult->user_id])) {{ $testUsers[$paperResult->user_id]->name}} @endif</h4>
 			                                    <p class="card-text">
 			                                    	@if(count($skillArr) > 0)
 			                                    		@foreach($skillArr as $skill)
@@ -497,7 +497,7 @@
 			                        <div class="backside"  style="width: 90%;">
 			                            <div class="card" style="padding-left: 10px;">
 			                                <div class="card-body mt-4">
-			                                    <h4 class="card-title"> {{ $testUsers[$paperResult->user_id]->name }}</h4>
+			                                    <h4 class="card-title"> @if(isset($testUsers[$paperResult->user_id])) {{ $testUsers[$paperResult->user_id]->name }} @endif</h4>
 
 			                                    <div class="desc"><b>Experience:</b> {{$expArr[0]}} yr {{$expArr[1]}} month</div>
 			                                    <div class="desc"><b>Company Name:</b> {{ $paperResult->company }}</div>

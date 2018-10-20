@@ -36,7 +36,7 @@
 @section('dashboard_content')
   <div class="container ">
     <div class="row">
-      <form action="{{url('adminMessages')}}" method="GET" id="search">
+      <form action="{{url('college/'.Session::get('college_user_url').'/adminMessages')}}" method="GET" id="search">
         <div class="col-sm-2 mrgn_10_btm">
           <select id="year" class="form-control" name="year" required>
             <option value="">Select Year</option>

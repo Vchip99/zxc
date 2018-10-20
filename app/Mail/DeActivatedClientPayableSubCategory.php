@@ -29,7 +29,12 @@ class DeActivatedClientPayableSubCategory extends Mailable
      */
     public function build()
     {
-        return $this->subject('Your purchased sub category has been deactivated')
+        if('local' == \Config::get('app.env')){
+            $subject = 'Your purchased sub category has been deactivated on local';
+        } else {
+            $subject = 'Your purchased sub category has been deactivated';
+        }
+        return $this->subject($subject)
             ->view('emails.deactivateSubCategory')
             ->with([
                     'client' => $this->data['client'],

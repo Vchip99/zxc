@@ -7,24 +7,34 @@
       <li class="active">Users </li>
     </ol>
   </section>
-  @if(Session::has('message'))
-    <div class="alert alert-success" id="message">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        {{ Session::get('message') }}
-    </div>
-  @endif
 @stop
 @section('dashboard_content')
 	<div class="content-wrapper v-container tab-content" >
     <div id="student-rcd" class="">
       <div class="top mrgn_40_btm">
         <div class="container">
+          @if(Session::has('message'))
+            <div class="alert alert-success" id="message">
+              <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                {{ Session::get('message') }}
+            </div>
+          @endif
           <div class="row">
             <div class="">
             <input type="hidden" id="login_User_Type" name="login_User_Type" value="{{Auth::user()->user_type}}">
+            <div class="col-md-3 mrgn_10_btm">
+              <select class="form-control" id="dept" onChange="resetStudents();">
+                <option value="0"> Select Department </option>
+                @if(count($collegeDepts) > 0)
+                  @foreach($collegeDepts as $collegeDept)
+                    <option value="{{$collegeDept->id}}">{{$collegeDept->name}}</option>
+                  @endforeach
+                @endif
+              </select>
+            </div>
             @if(4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
             <div class="col-md-3 mrgn_10_btm" id="showUsers">
-              <select class="form-control" id="user" name="user_type" onChange="showDepartments();" required="true">
+              <select class="form-control" id="user" name="user_type" onChange="showResult();" required="true">
                 <option value="0">Select User Type</option>
                 <option value="2">Student</option>
                 <option value="3">Lecturer</option>
@@ -33,18 +43,6 @@
                 @endif
               </select>
             </div>
-            @endif
-            @if(5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
-              <div class="col-md-3 mrgn_10_btm">
-                <select class="form-control" id="dept" onChange="showResult(this);">
-                  <option value="0"> Select Department </option>
-                  @if(count($collegeDepts) > 0)
-                    @foreach($collegeDepts as $collegeDept)
-                      <option value="{{$collegeDept->id}}">{{$collegeDept->name}}</option>
-                    @endforeach
-                  @endif
-                </select>
-              </div>
             @endif
             @if(3 == Auth::user()->user_type)
               <div class="col-md-3 mrgn_10_btm" id="div_year">
@@ -80,11 +78,7 @@
                 Records
               </div>
               <div class="panel-body">
-                @if(3 == Auth::user()->user_type)
-                  <table  class="" id="student-record">
-                @else
                   <table  class="hide" id="student-record">
-                @endif
                   <thead>
                     <tr>
                       <th>Sr. No.</th>
@@ -118,6 +112,7 @@
       </div>
     </div>
   </div>
+
 <script type="text/javascript">
 
   function showDepartments(){
@@ -149,11 +144,22 @@
     var user_type = parseInt(document.getElementById('user').value);
     document.getElementById('search_student').value ='';
     if(2 == user_type){
+      document.getElementById('div_year').classList.remove('hide');
       resetYear();
     }
     if(3 == user_type || 4 == user_type){
+      document.getElementById('div_year').classList.add('hide');
+      resetYear();
       showStudents();
     }
+  }
+
+  function resetStudents(){
+    if(document.getElementById('user')){
+      document.getElementById('user').selectedIndex = '0';
+    }
+    document.getElementById('div_year').classList.remove('hide');
+    resetYear();
   }
 
   function resetYear(){
@@ -189,12 +195,17 @@
       })
       .done(function( msg ) {
         if(2 == user_type){
+          document.getElementById('student-record').classList.remove('hide');
+          document.getElementById('lectures_hods_record').classList.add('hide');
           body = document.getElementById('students');
+          body.innerHTML = '';
         } else if(3 == user_type || 4 == user_type){
+          document.getElementById('lectures_hods_record').classList.remove('hide');
+          document.getElementById('student-record').classList.add('hide');
           body = document.getElementById('lecture_hods');
+          body.innerHTML = '';
         }
-        body.innerHTML = '';
-        if( 0 < msg.length){
+        if(msg['users'].length > 0){
           renderResult(msg,body,user_type);
         } else {
           var eleTr = document.createElement('tr');
@@ -241,7 +252,7 @@
           body = document.getElementById('lecture_hods');
         }
         body.innerHTML = '';
-        if( 0 < msg.length){
+        if(msg['users'].length > 0){
           renderResult(msg,body,user_type);
         } else {
           if(2 == user_type){
@@ -262,7 +273,7 @@
   }
 
   function renderResult(msg,body,user_type){
-    $.each(msg, function(idx, obj) {
+    $.each(msg['users'], function(idx, obj) {
       var eleTr = document.createElement('tr');
       var eleIndex = document.createElement('td');
       eleIndex.innerHTML = idx + 1;
@@ -273,8 +284,39 @@
       eleTr.appendChild(eleName);
 
       var eleDept = document.createElement('td');
-      eleDept.innerHTML = obj.department;
+      if(msg['departments'].length > 0){
+        eleDept.innerHTML = '<a href="#deptModal_'+obj.id+'" data-toggle="modal">'+obj.department+'</a>';
+      }else {
+        eleDept.innerHTML = obj.department;
+      }
       eleTr.appendChild(eleDept);
+
+      if(msg['departments'].length > 0){
+        var eleDeptModel = document.createElement('div');
+        eleDeptModel.className = 'modal fade';
+        eleDeptModel.id = 'deptModal_'+obj.id;
+        eleDeptModel.setAttribute('role', 'dialog');
+        var urlAssignedDept = "{{url('assignDepatementsToUser')}}";
+        var csrfField = '{{ csrf_field() }}';
+        var deptModel = '';
+        deptModel += '<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">×</button><h4 class="modal-title">Assigned Departments</h4><b>Note:</b>If remove depatement then data of this user associated with this department will be deleted.</div><form action="'+urlAssignedDept+'" method="POST">'+csrfField+'<div class="modal-body">';
+        deptModel += '<div class="form-group">';
+          var assignedDepts = JSON.parse("[" + obj.assigned_college_depts + "]");
+          $.each(msg['departments'],function(idx,dept){
+            if(obj.college_dept_id == dept.id){
+              deptModel += '<input type="checkbox" name="departments[]" value="'+dept.id+'" checked disabled>'+dept.name;
+            } else if(assignedDepts.indexOf(dept.id) > -1){
+              deptModel += '<input type="checkbox" name="departments[]" value="'+dept.id+'" checked>'+dept.name;
+            } else {
+              deptModel += '<input type="checkbox" name="departments[]" value="'+dept.id+'" disabled>'+dept.name;
+            }
+          });
+        deptModel += '</div><input type="hidden" name="user" value="'+obj.id+'"><input type="hidden" name="departments[]" value="'+obj.college_dept_id+'">';
+        deptModel += '</div><div class="modal-footer"><button type="submit" class="btn btn-default" style="float:right;">Submit</button></div></form></div></div>';
+        eleDeptModel.innerHTML = deptModel;
+        eleTr.appendChild(eleDeptModel);
+      }
+
       if(2 == user_type){
         var eleRollNo = document.createElement('td');
         eleRollNo.innerHTML = obj.roll_no;
@@ -292,7 +334,7 @@
 
       var eleDelete = document.createElement('td');
       eleDelete.innerHTML = '<button class="btn btn-danger btn-xs delet-bt delet-btn" data-title="Delete" data-toggle="modal" data-target="#delete" data-student_id="'+ obj.id +'" onclick="deleteUser(this);" ><span class="fa fa-trash-o" data-placement="top" data-toggle="tooltip" title="Delete"></span></button>';
-      var url = "{{url('deleteStudentFromCollege')}}";
+      var url = "{{url('college/'.Session::get('college_user_url').'/deleteStudentFromCollege')}}";
       var csrfField = '{{ csrf_field() }}';
       var deleteMethod ='{{ method_field("DELETE") }}';
       eleDelete.innerHTML += '<form id="deleteCollegeUser_'+ obj.id +'" action="'+url+'" method="POST" style="display: none;">'+csrfField+''+deleteMethod+'<input type="hidden" name="student_id" value="'+obj.id+'"><input type="hidden" name="college_id" value="'+obj.college_id+'"><input type="hidden" name="department_id" value="'+obj.college_dept_id+'"><input type="hidden" name="year" value="'+obj.year+'"></form>';
@@ -302,19 +344,28 @@
       eleModel.className = 'modal fade';
       eleModel.id = 'studentModal_'+obj.id;
       eleModel.setAttribute('role', 'dialog');
-      var urlStudentTest = "{{url('studentTestResults')}}/"+obj.id;
-      var urlStudentCourse = "{{url('studentCourses')}}/"+obj.id;
-      var urlStudentPlacement = "{{url('studentPlacement')}}/"+obj.id;
-      var urlStudentVideo = "{{url('studentVideo')}}/"+obj.id;
+      var urlStudentTest = "{{url('college/'.Session::get('college_user_url').'/studentCollegeTestResults')}}/"+obj.id;
+      var urlStudentCourse = "{{url('college/'.Session::get('college_user_url').'/studentCollegeCourses')}}/"+obj.id;
+      // var urlStudentPlacement = "{{url('college/'.Session::get('college_user_url').'/studentPlacement')}}/"+obj.id;
+      // var urlStudentVideo = "{{url('college/'.Session::get('college_user_url').'/studentVideo')}}/"+obj.id;
+      var urllecturerPaper = "{{url('college/'.Session::get('college_user_url').'/lecturerPapers')}}/"+obj.id;
+      var urlLecturerCourse = "{{url('college/'.Session::get('college_user_url').'/lecturerCourses')}}/"+obj.id;
       var modelInnerHTML = '';
-      modelInnerHTML='<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">Student Details</h4></div><div class="modal-body">';
       if(2 == user_type ){
+        modelInnerHTML='<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">Student Details</h4></div><div class="modal-body">';
+
         modelInnerHTML +='<div class="form-group"><label>Year:</label> '+obj.year+'</div>';
+      } else {
+        modelInnerHTML='<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">Lecturer Details</h4></div><div class="modal-body">';
       }
-      modelInnerHTML +='<div class="form-group"><label>Email:</label> '+obj.email+'</div><div class="form-group"><label>Phone:</label> '+obj.phone+'</div><div class="form-group"><a href="'+urlStudentTest+'">Test Result</a></div><div class="form-group"><a href="'+urlStudentCourse+'">Course</a></div>';
+      modelInnerHTML +='<div class="form-group"><label>Email:</label> '+obj.email+'</div><div class="form-group"><label>Phone:</label> '+obj.phone+'</div>';
       if(2 == user_type ){
-        modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Video</a></div>';
-        modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
+        modelInnerHTML +='<div class="form-group"><a href="'+urlStudentTest+'">Test Result</a></div><div class="form-group"><a href="'+urlStudentCourse+'">Course</a></div>';
+
+        // modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Video</a></div>';
+        // modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
+      } else {
+        modelInnerHTML +='<div class="form-group"><a href="'+urllecturerPaper+'">Lecturer Papers</a></div><div class="form-group"><a href="'+urlLecturerCourse+'">Lecturer Course</a></div>';
       }
       modelInnerHTML +='</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div>';
       eleModel.innerHTML = modelInnerHTML;
@@ -346,7 +397,7 @@
     if(studentId > 0){
       $.confirm({
         title: 'Confirmation',
-        content: 'Are you sure. you want to delete this student?',
+        content: 'Are you sure. you want to delete this user?',
         type: 'red',
         typeAnimated: true,
         buttons: {

@@ -48,7 +48,7 @@
         <h4 class="v_h4_subtitle "> Sort By</h4>
         <div class="mrgn_20_top_btm" id="cat">
           <select class="form-control" id="category" name="category" title="Category" onchange="showProjects(this);">
-            <option value="">Select Category ...</option>
+            <option value="">Select Category</option>
             @if(count($vkitCategories) > 0)
               @foreach($vkitCategories as $index => $vkitCategory)
                 <option value="{{$vkitCategory->id}}">{{$vkitCategory->name}}</option>
@@ -140,7 +140,7 @@
              <h4 class="v_h4_subtitle "> Sort By</h4>
               <div class="mrgn_20_top_btm" id="cat">
                 <select class="form-control" id="category" name="category" title="Category" onchange="showProjects(this);">
-                  <option value="">Select Category ...</option>
+                  <option value="">Select Category </option>
                   @if(count($vkitCategories) > 0)
                     @foreach($vkitCategories as $index => $vkitCategory)
                       <option value="{{$vkitCategory->id}}">{{$vkitCategory->name}}</option>

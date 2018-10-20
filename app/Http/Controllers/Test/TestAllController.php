@@ -62,7 +62,7 @@ class TestAllController extends Controller
      * show UI for create category
      */
     protected function showAll(){
-        $testCategories = TestCategory::all();
+        $testCategories = TestCategory::getAllTestCategories();
     	return view('testAll.create', compact('testCategories'));
     }
 

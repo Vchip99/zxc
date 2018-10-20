@@ -46,11 +46,14 @@
       width: 100% !important;
       height: 100% !important;
   }
+  .col-md-12{
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+  }
 }
 </style>
 @stop
 @section('dashboard_content')
-	&nbsp;
   <script src="{{asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
   <div class="container">
     @if(Session::has('message'))
@@ -61,22 +64,22 @@
     @endif
     <div class="row">
       <div class="col-md-12 ">
-        <div class="box box-primary direct-chat direct-chat-warning">
+        <div class="box box-primary direct-chat direct-chat-warning" style="overflow: auto;">
           <div class="box-header with-border">
             <div class="form-group row ">
-                <label class="col-sm-2 col-form-label">Student Name:</label>
+                <label class="col-sm-2 col-form-label">Student:</label>
                 <div class="col-sm-3">
                   {{$student->name}}
                 </div>
               </div>
             <div class="form-group row ">
-                <label class="col-sm-2 col-form-label">Subject Name:</label>
+                <label class="col-sm-2 col-form-label">Subject:</label>
                 <div class="col-sm-3">
                   {{$assignment->subject->name}}
                 </div>
               </div>
               <div class="form-group row ">
-                <label class="col-sm-2 col-form-label">Topic Name:</label>
+                <label class="col-sm-2 col-form-label">Topic:</label>
                 <div class="col-sm-3">
                   {{$assignment->topic->name}}
                 </div>
@@ -84,7 +87,7 @@
               <div class="form-group row ">
                 <label class="col-sm-2 col-form-label">Year:</label>
                 <div class="col-sm-3">
-                  {{$assignment->year}}
+                  {{$assignment->years}}
                 </div>
               </div>
               <div class="form-group row ">
@@ -132,11 +135,11 @@
                   @if(1 == $answer->is_student_created)
                     <div class="direct-chat-msg left">
                       <div class="direct-chat-info clearfix">
-                        <span class="direct-chat-name pull-left">{{ $answer->student->name }}</span>
+                        <span class="direct-chat-name pull-left">{{ $student->name }}</span>
                         <span class="direct-chat-timestamp ">{{ $answer->created_at->format('d M Y i a')}}</span>
                       </div>
-                      @if(!empty($answer->student->photo))
-                        <img class="direct-chat-img" src="{{ asset($answer->student->photo) }}" alt="User Image" />
+                      @if(!empty($student->photo))
+                        <img class="direct-chat-img" src="{{ asset($student->photo) }}" alt="User Image" />
                       @else
                         <img class="direct-chat-img" src="{{ url('images/user/user1.png')}}" alt="User Image" />
                       @endif
@@ -184,7 +187,7 @@
               @endif
             <hr>
             @if(Auth::user()->id == $assignment->lecturer_id)
-              <form action="{{url('createAssignmentAnswer')}}" method="POST" enctype="multipart/form-data">
+              <form action="{{url('college/'.Session::get('college_user_url').'/createAssignmentAnswer')}}" method="POST" enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <div class="form-group row @if ($errors->has('answer')) has-error @endif">
                   <label for="answer" class="col-sm-2 col-form-label">Remark:</label>
@@ -204,6 +207,7 @@
                 </div>
                 <input type="hidden" name="assignment_question_id" value="{{$assignment->id}}">
                 <input type="hidden" name="student_id" value="{{ $student->id }}">
+                <input type="hidden" name="student_dept_id" value="{{ $student->college_dept_id }}">
                 <input type="hidden" name="lecturer_id" value="{{$assignment->lecturer_id}}">
                 <div class="form-group row">
                   <div class="offset-sm-2 col-sm-3" title="Submit">

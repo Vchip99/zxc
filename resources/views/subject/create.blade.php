@@ -26,8 +26,8 @@
         @if(count($testCategories) > 0)
           @foreach($testCategories as $testCategory)
             @if($subject->test_category_id == $testCategory->id)
-              <input type="text" class="form-control" name="category_text" id="category" value="{{$testCategory->name}}" readonly>
-              <input type="hidden" name="category" value="{{$testCategory->id}}">
+              <input type="text" class="form-control" name="category_text" value="{{$testCategory->name}}" readonly>
+              <input type="hidden" name="category" id="category" value="{{$testCategory->id}}">
             @endif
           @endforeach
         @endif
@@ -51,8 +51,8 @@
         @if(count($testSubCategories) > 0 && isset($subject->id))
           @foreach($testSubCategories as $testSubCategory)
             @if($subject->test_sub_category_id == $testSubCategory->id)
-              <input type="text" class="form-control" name="subcategory_text" id="subcategory" value="{{$testSubCategory->name}}" readonly>
-              <input type="hidden" name="subcategory" value="{{$testSubCategory->id}}">
+              <input type="text" class="form-control" name="subcategory_text" value="{{$testSubCategory->name}}" readonly>
+              <input type="hidden" name="subcategory" id="subcategory" value="{{$testSubCategory->id}}">
             @endif
           @endforeach
         @endif

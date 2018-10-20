@@ -617,7 +617,7 @@
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Sub Category ...';
+	            opt.innerHTML = 'Select Sub Category';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -646,7 +646,7 @@
 	            selectSub.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Subject ...';
+	            opt.innerHTML = 'Select Subject';
 	            selectSub.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -772,7 +772,7 @@
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Paper ...';
+	            opt.innerHTML = 'Select Paper';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 		            $.each(msg, function(idx, obj) {
@@ -780,9 +780,6 @@
 		                opt.value = obj.id;
 		                opt.setAttribute('data-option_count', obj.option_count);
 		                opt.innerHTML = obj.name;
-		                if(0 < selectedPaperId){
-		                	opt.selected = true;
-		                }
 		                select.appendChild(opt);
 		            });
 	            }

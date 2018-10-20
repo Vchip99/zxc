@@ -1,7 +1,5 @@
 @extends('admin.master')
-@section('admin_content')
-  &nbsp;
-  @section('module_title')
+@section('module_title')
   <section class="content-header">
     <h1> Manage Sub Category </h1>
     <ol class="breadcrumb">
@@ -10,7 +8,7 @@
     </ol>
   </section>
 @stop
-  &nbsp;
+@section('admin_content')
   <div class="container admin_div">
   @if(isset($courseSubcategory->id))
     <form action="{{url('admin/updateCourseSubCategory')}}" method="POST" id="submitForm">
@@ -19,7 +17,6 @@
   @else
       <form action="{{url('admin/createCourseSubCategory')}}" method="POST" id="submitForm">
   @endif
-
     {{ csrf_field() }}
   <div class="form-group row @if ($errors->has('category')) has-error @endif">
     <label class="col-sm-2 col-form-label">Category Name:</label>
@@ -28,14 +25,14 @@
       @if(count($courseCategories) > 0)
         @foreach($courseCategories as $courseCategory)
           @if( $courseSubcategory->course_category_id == $courseCategory->id)
-            <input type="text" class="form-control" name="category_text" id="category" value="{{$courseCategory->name}}" readonly>
-            <input type="hidden" name="category" value="{{$courseCategory->id}}">
+            <input type="text" class="form-control" name="category_text" value="{{$courseCategory->name}}" readonly>
+            <input type="hidden" name="category" id="category" value="{{$courseCategory->id}}">
           @endif
         @endforeach
       @endif
     @else
       <select class="form-control" name="category" id="category" title="Category" required="true">
-          <option value="">Select Category ...</option>
+          <option value="">Select Category</option>
           @if(count($courseCategories) > 0)
             @foreach($courseCategories as $courseCategory)
               <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>

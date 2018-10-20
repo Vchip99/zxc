@@ -50,7 +50,7 @@ class CourseCourseController extends Controller
      *  show list of courses
      */
     protected function show(){
-    	$courseCourses = CourseCourse::paginate();
+    	$courseCourses = CourseCourse::getCoursesWithPagination();
     	return view('courseCourse.list', compact('courseCourses'));
     }
 
@@ -58,10 +58,9 @@ class CourseCourseController extends Controller
      *  show create course UI
      */
     protected function create(){
-    	$courseCategories   = CourseCategory::all();
+    	$courseCategories = CourseCategory::getCourseCategoriesForAdmin();
 		$courseSubCategories = [];
 		$course= new CourseCourse;
-
 		return view('courseCourse.create', compact('courseCategories','courseSubCategories','course'));
     }
 
@@ -100,7 +99,7 @@ class CourseCourseController extends Controller
     	if(isset($id)){
     		$course = CourseCourse::find($id);
     		if(is_object($course)){
-    			$courseCategories   = CourseCategory::all();
+                $courseCategories = CourseCategory::getCourseCategoriesForAdmin();
 				$courseSubCategories = CourseSubCategory::getCourseSubCategoriesByCategoryId($course->course_category_id);
 				return view('courseCourse.create', compact('courseCategories','courseSubCategories','course'));
     		}
@@ -148,27 +147,30 @@ class CourseCourseController extends Controller
                 DB::beginTransaction();
                 try
                 {
-                    if(true == is_object($course->videos) && false == $course->videos->isEmpty()){
-                        foreach($course->videos as $video){
-                            $video->deleteCommantsAndSubComments();
-                            if(true == preg_match('/courseVideos/',$video->video_path)){
-                                $courseVideoFolder = "courseVideos/".$video->course_id."/".$video->id;
-                                if(is_dir($courseVideoFolder)){
-                                    InputSanitise::delFolder($courseVideoFolder);
+                    $courseCategory = $course->category;
+                    if(0 == $courseCategory->college_id && 0 == $courseCategory->user_id){
+                        if(true == is_object($course->videos) && false == $course->videos->isEmpty()){
+                            foreach($course->videos as $video){
+                                $video->deleteCommantsAndSubComments();
+                                if(true == preg_match('/courseVideos/',$video->video_path)){
+                                    $courseVideoFolder = "courseVideos/".$video->course_id."/".$video->id;
+                                    if(is_dir($courseVideoFolder)){
+                                        InputSanitise::delFolder($courseVideoFolder);
+                                    }
                                 }
+                                $video->delete();
                             }
-                            $video->delete();
                         }
+                        $course->deleteRegisteredCourses();
+                        $course->deleteCourseImageFolder();
+                        $courseVideoFolder = "courseVideos/".$course->id;
+                        if(is_dir($courseVideoFolder)){
+                            InputSanitise::delFolder($courseVideoFolder);
+                        }
+            			$course->delete();
+                        DB::commit();
+            			return Redirect::to('admin/manageCourseCourse')->with('message', 'Course deleted successfully!');
                     }
-                    $course->deleteRegisteredCourses();
-                    $course->deleteCourseImageFolder();
-                    $courseVideoFolder = "courseVideos/".$course->id;
-                    if(is_dir($courseVideoFolder)){
-                        InputSanitise::delFolder($courseVideoFolder);
-                    }
-        			$course->delete();
-                    DB::commit();
-        			return Redirect::to('admin/manageCourseCourse')->with('message', 'Course deleted successfully!');
                 }
                 catch(\Exception $e)
                 {

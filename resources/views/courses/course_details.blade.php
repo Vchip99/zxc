@@ -177,7 +177,7 @@ margin: 0px 5px;
       No Contents.
     @endif
   </div>
-      </section>
+</section>
 @stop
 @section('footer')
 	@include('footer.footer')
@@ -206,7 +206,7 @@ margin: 0px 5px;
 
   </script>
   <script>
-   var showChar = 60;
+  var showChar = 60;
   var ellipsestext = "...";
   var moretext = "Read more";
   var lesstext = "less";

@@ -27,11 +27,11 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Course Name</th>
-          <th>Category Name</th>
-          <th>Sub Category Name</th>
-          <th>Edit Course</th>
-          <th>Delete Course</th>
+          <th>Course </th>
+          <th>Category </th>
+          <th>Sub Category </th>
+          <th>Edit </th>
+          <th>Delete </th>
         </tr>
       </thead>
       <tbody>
@@ -40,8 +40,8 @@
           <tr>
             <th scope="row">{{$index + $courseCourses->firstItem()}}</th>
             <td>{{$courseCourse->name}}</td>
-            <td>{{$courseCourse->category->name}}</td>
-            <td>{{$courseCourse->subcategory->name}}</td>
+            <td>{{$courseCourse->subcategory}}</td>
+            <td>{{$courseCourse->category}}</td>
             <td>
               <a href="{{url('admin/courseCourse')}}/{{$courseCourse->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$courseCourse->name}}" />

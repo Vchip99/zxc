@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use DB,Cache;
 use App\Models\TestSubjectPaper;
+use App\Models\TestCategory;
+use App\Models\CollegeCategory;
 
 class Question extends Model
 {
@@ -119,13 +121,46 @@ class Question extends Model
         $subjectId = InputSanitise::inputInt($subjectId);
         $paperId = InputSanitise::inputInt($paperId);
         $sectionTypeId = InputSanitise::inputInt($sectionTypeId);
-        return DB::table('questions')
-            ->where('category_id', $categoryId)
-            ->where('subcat_id', $subcategoryId)
-            ->where('subject_id', $subjectId)
-            ->where('paper_id', $paperId)
-            ->where('section_type', $sectionTypeId)
+        // return DB::table('questions')
+        //     ->where('category_id', $categoryId)
+        //     ->where('subcat_id', $subcategoryId)
+        //     ->where('subject_id', $subjectId)
+        //     ->where('paper_id', $paperId)
+        //     ->where('section_type', $sectionTypeId)
+        //     ->select('questions.*')
+        //     ->get();
+        return DB::table('questions')->join('test_categories', 'test_categories.id', '=', 'questions.category_id')
+            ->join('test_sub_categories', 'test_sub_categories.id', '=', 'questions.subcat_id')
+            ->join('test_subjects', 'test_subjects.id', '=', 'questions.subject_id')
+            ->join('test_subject_papers', 'test_subject_papers.id', '=', 'questions.paper_id')
+            ->where('test_sub_categories.created_for', 1)
+            ->where('questions.category_id', $categoryId)
+            ->where('questions.subcat_id', $subcategoryId)
+            ->where('questions.subject_id', $subjectId)
+            ->where('questions.paper_id', $paperId)
+            ->where('questions.section_type', $sectionTypeId)
             ->select('questions.*')
+            ->get();
+    }
+
+    /**
+     *  return questions by subjectId by paperId
+     */
+    protected static function getCollegeQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId, $paperId, $sectionTypeId){
+        $subjectId = InputSanitise::inputInt($subjectId);
+        $paperId = InputSanitise::inputInt($paperId);
+        $sectionTypeId = InputSanitise::inputInt($sectionTypeId);
+        return DB::table('questions')->join('college_categories', 'college_categories.id', '=', 'questions.category_id')
+            ->join('test_sub_categories', 'test_sub_categories.id', '=', 'questions.subcat_id')
+            ->join('test_subjects', 'test_subjects.id', '=', 'questions.subject_id')
+            ->join('test_subject_papers', 'test_subject_papers.id', '=', 'questions.paper_id')
+            ->where('test_sub_categories.created_for', 0)
+            ->where('questions.category_id', $categoryId)
+            ->where('questions.subcat_id', $subcategoryId)
+            ->where('questions.subject_id', $subjectId)
+            ->where('questions.paper_id', $paperId)
+            ->where('questions.section_type', $sectionTypeId)
+            ->select('questions.*','test_subjects.created_by')
             ->get();
     }
 
@@ -217,5 +252,19 @@ class Question extends Model
      */
     public function paper(){
         return $this->belongsTo(TestSubjectPaper::class, 'paper_id');
+    }
+
+    /**
+     *  get category of question
+     */
+    public function category(){
+        return $this->belongsTo(TestCategory::class, 'category_id');
+    }
+
+    /**
+     *  get category of paper
+     */
+    public function subject(){
+        return $this->belongsTo(TestSubject::class, 'subject_id');
     }
 }

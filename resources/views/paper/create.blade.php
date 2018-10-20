@@ -29,8 +29,8 @@
         @if(count($testCategories) > 0)
           @foreach($testCategories as $testCategory)
             @if($paper->test_category_id == $testCategory->id)
-              <input type="text" class="form-control" name="category_text" id="category" value="{{$testCategory->name}}" readonly>
-              <input type="hidden" name="category" value="{{$testCategory->id}}">
+              <input type="text" class="form-control" name="category_text" value="{{$testCategory->name}}" readonly>
+              <input type="hidden" name="category" id="category" value="{{$testCategory->id}}">
             @endif
           @endforeach
         @endif
@@ -54,8 +54,8 @@
         @if(count($testSubCategories) > 0)
             @foreach($testSubCategories as $testSubCategory)
               @if($paper->test_sub_category_id == $testSubCategory->id)
-                <input type="text" class="form-control" name="subcategory_text" id="subcategory" value="{{$testSubCategory->name}}" readonly>
-                <input type="hidden" name="subcategory" value="{{$testSubCategory->id}}">
+                <input type="text" class="form-control" name="subcategory_text" value="{{$testSubCategory->name}}" readonly>
+                <input type="hidden" name="subcategory" id="subcategory" value="{{$testSubCategory->id}}">
               @endif
             @endforeach
           @endif
@@ -74,8 +74,8 @@
         @if(count($testSubjects) > 0)
           @foreach($testSubjects as $testSubject)
             @if($paper->test_subject_id == $testSubject->id)
-                <input type="text" class="form-control" name="subject_text" id="subject" value="{{$testSubject->name}}" readonly>
-                <input type="hidden" name="subject" value="{{$testSubject->id}}">
+                <input type="text" class="form-control" name="subject_text" value="{{$testSubject->name}}" readonly>
+                <input type="hidden" name="subject" id="subject" value="{{$testSubject->id}}">
             @endif
           @endforeach
         @endif
@@ -176,7 +176,7 @@
               <td class="col-sm-3 duration">
                 <input type="text" class="form-control" name="duration_{{$session->id}}" value="{{$session->duration}}">
               </td>
-              <td class=""><button type="button" onClick="addSessions();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
+              <td class=""><button type="button" onClick="addSessions(event);"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
               @if($index > 0 )
                 <td class=""><button onClick="removeElement('all_session',{{$session->id}});"> <i class="fa fa-minus-circle" aria-hidden="true"></i></button></td>
               @endif
@@ -186,7 +186,7 @@
           <tr id="tr_1">
             <td class="col-sm-3"><input type="text" class="form-control" name="session_1" value="" required="true"></td>
             <td class="col-sm-3 duration"><input type="text" class="form-control " name="duration_1" value=""></td>
-            <td class=""><button type="button" onClick="addSessions();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
+            <td class=""><button type="button" onClick="addSessions(event);"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
             @if(isset($paper))
               <td class=""><input type="hidden" name="new_1" value="new"></td>
             @else
@@ -293,7 +293,7 @@
 <input type="hidden" id="selected_time_out" name="selected_time_out" value="{{$paper->time_out_by}}">
 <script type="text/javascript">
 
-    function addSessions(){
+    function addSessions(event){
       event.preventDefault();
       var allSession = document.getElementById('all_session');
       var count = parseInt(document.getElementById('all_session_count').value) + 1;
@@ -335,7 +335,7 @@
       var thirdTd = document.createElement('td');
 
       var thirdButton = document.createElement('button');
-      thirdButton.setAttribute("onClick", "addSessions();");
+      thirdButton.setAttribute("onClick", "addSessions(event);");
       thirdButton.innerHTML = '<i class="fa fa-plus-circle" aria-hidden="true"></i>';
       thirdTd.appendChild(thirdButton);
       firstTr.appendChild(thirdTd);

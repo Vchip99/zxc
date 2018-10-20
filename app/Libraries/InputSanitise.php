@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\ClientHomePage;
 use App\Models\Client;
 use App\Models\Clientuser;
-use DB, Cache, File,LRedis,Auth;
+use DB, Cache, File,LRedis,Auth,Session;
 
 class InputSanitise{
 
@@ -31,6 +31,15 @@ class InputSanitise{
         	return false;
         }
         return $subdomain;
+    }
+
+    public static function checkCollegeUrl(Request $request){
+        $requestCollegeUrl = explode('/', $request->path())[1];
+        $sessionCollegeUrl = Session::get('college_user_url');
+        if($requestCollegeUrl == $sessionCollegeUrl){
+            return true;
+        }
+        return false;
     }
 
     public static function getCurrentGuard(){

@@ -37,6 +37,14 @@
       @if($errors->has('college')) <p class="help-block">{{ $errors->first('college') }}</p> @endif
       <span class="hide" id="collegeError" style="color: white;">Given college name is already exist.Please enter another name.</span>
     </div>
+    <div class="form-group row  @if ($errors->has('url')) has-error @endif">
+      <label class="col-sm-2 col-form-label" for="url">College Url/Extention:</label>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" id="url" name="url" value="{{($college)?$college->url:null}}" required="true" placeholder="College Url/Extention">
+      </div>
+      @if($errors->has('college')) <p class="help-block">{{ $errors->first('college') }}</p> @endif
+      <span class="hide" id="collegeError" style="color: white;">Given college name is already exist.Please enter another name.</span>
+    </div>
     @if(!empty($college->id) && count($college->departments) > 0)
     <div class="form-group row ">
       <label class="col-sm-2 col-form-label" for="department">Departments:</label>
@@ -69,15 +77,15 @@
 
     <div class="form-group row">
       <!-- <div class="offset-sm-2 col-sm-3"> -->
-        <button id="submitCollege" class="btn btn-primary" onclick="searchCollege();">Submit</button>
-        <button id="addDept" class="btn btn-primary">Add Department</button>
+        <button type="button" id="submitCollege" class="btn btn-primary" onclick="searchCollege(event);">Submit</button>
+        <button type="button" id="addDept" class="btn btn-primary">Add Department</button>
       <!-- </div> -->
     </div>
     </form>
     </div>
   </div>
 <script type="text/javascript">
-  $('#addDept').click(function(){
+  $('#addDept').click(function(event){
     event.preventDefault();
     var departmrnts = document.getElementById('departments');
     var numberOfChildren = departmrnts.getElementsByTagName('input').length + 1;
@@ -131,7 +139,7 @@
       document.getElementById("delete_depts").value += childDiv + ',';
     }
   }
-  function searchCollege(){
+  function searchCollege(event){
     event.preventDefault();
     var college = document.getElementById('college').value;
     if(document.getElementById('college_id')){

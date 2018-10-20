@@ -120,7 +120,7 @@
     <div class="vchip-background-single" >
       <div class="vchip-background-img">
         <figure>
-          <img src="{{ asset('images/prizing-bg.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="Vchip Pricing" />
+          <img src="{{ asset('images/prizing-bg.jpg')}}" class="header_img_top_pad_online" style="vertical-align:top; background-attachment:fixed" alt="Vchip Pricing" />
         </figure>
       </div>
       <div class="vchip-background-content">

@@ -29,7 +29,12 @@ class BillGenerated extends Mailable
      */
     public function build()
     {
-        return $this->subject('Please pay your current plan bill')
+        if('local' == \Config::get('app.env')){
+            $subject = 'Please pay your current plan bill on local';
+        } else {
+            $subject = 'Please pay your current plan bill';
+        }
+        return $this->subject($subject)
             ->view('emails.billGenerated')
             ->with([
                     'client' => $this->data['client'],

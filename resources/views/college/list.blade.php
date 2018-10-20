@@ -27,9 +27,10 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>College Name</th>
-          <th>Edit College</th>
-          <th>Delete College</th>
+          <th>College</th>
+          <th>Url/Extention</th>
+          <th>Edit</th>
+          <th>Delete</th>
         </tr>
       </thead>
       <tbody>
@@ -38,6 +39,7 @@
           <tr>
             <th scope="row">{{$index + 1}}</th>
             <td>{{$college->name}}</td>
+            <td>{{$college->url}}</td>
             <td>
               <a href="{{url('admin/college')}}/{{$college->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$college->name}}" />
                 </a>

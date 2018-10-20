@@ -32,7 +32,7 @@
         <h4 class="v_h4_subtitle"> Sort By</h4>
         <div class="mrgn_20_top_btm" >
           <select id="category" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectSubcategory(this);" required>
-            <option value="0">Select Category ...</option>
+            <option value="0">Select Category</option>
             @if(count($courseCategories) > 0)
               @foreach($courseCategories as $courseCategory)
                 <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
@@ -42,7 +42,7 @@
         </div>
         <div class="dropdown mrgn_20_top_btm" id="subcat">
           <select id="subcategory" class="form-control" name="subcategory" data-toggle="tooltip" title="Sub Category" onChange="selectCourses(this);" required>
-              <option value="">Select Sub Category ...</option>
+              <option value="">Select Sub Category</option>
             </select>
         </div>
         <h4 class="v_h4_subtitle mrgn_20_top_btm"> Filter By</h4>
@@ -129,7 +129,7 @@
           <div class="mrgn_20_top_btm" >
 
             <select id="categoryNew" class="form-control" name="category" data-toggle="tooltip" title="Category" onChange="selectSubcategoryNew(this);" required>
-              <option value="0">Select Category ...</option>
+              <option value="0">Select Category</option>
               @if(count($courseCategories) > 0)
                 @foreach($courseCategories as $courseCategory)
                   <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
@@ -139,7 +139,7 @@
           </div>
           <div class="dropdown mrgn_20_top_btm" id="subcat">
             <select id="subcategoryNew" class="form-control" name="subcategory" data-toggle="tooltip" title="Sub Category" onChange="selectCoursesNew(this);" required>
-                <option value="">Select Sub Category ...</option>
+                <option value="">Select Sub Category</option>
               </select>
           </div>
           <h4 class="v_h4_subtitle mrgn_20_top_btm"> Filter By</h4>
@@ -307,7 +307,7 @@
         select.innerHTML = '';
         var opt = document.createElement('option');
         opt.value = '';
-        opt.innerHTML = 'Select Sub Category ...';
+        opt.innerHTML = 'Select Sub Category';
         select.appendChild(opt);
         if( 0 < msg.length){
           $.each(msg, function(idx, obj) {
@@ -339,7 +339,7 @@
         select.innerHTML = '';
         var opt = document.createElement('option');
         opt.value = '';
-        opt.innerHTML = 'Select Sub Category ...';
+        opt.innerHTML = 'Select Sub Category';
         select.appendChild(opt);
         if( 0 < msg.length){
           $.each(msg, function(idx, obj) {

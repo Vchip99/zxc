@@ -27,9 +27,9 @@
         <thead >
           <tr>
             <th>#</th>
-            <th>Category Name</th>
-            <th>Edit Category</th>
-            <th>Delete Category</th>
+            <th>Category</th>
+            <th>Edit </th>
+            <th>Delete </th>
           </tr>
         </thead>
         <tbody>
@@ -54,7 +54,7 @@
             </tr>
             @endforeach
           @else
-            <tr><td>No category is created.</td></tr>
+            <tr><td colspan="4">No category is created.</td></tr>
           @endif
         </tbody>
       </table>

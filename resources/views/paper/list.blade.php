@@ -43,9 +43,9 @@
           <tr>
             <th scope="row">{{$index + $testPapers->firstItem()}}</th>
             <td>{{$testPaper->name}}</td>
-            <td>{{$testPaper->category->name}}</td>
-            <td>{{$testPaper->subcategory->name}}</td>
-            <td>{{$testPaper->subject->name}}</td>
+            <td>{{$testPaper->category}}</td>
+            <td>{{$testPaper->subcategory}}</td>
+            <td>{{$testPaper->subject}}</td>
             <td>
               @if(!empty($testPaper->verification_code))
                 <a data-toggle="modal" data-target="#model_{{$testPaper->id}}">Yes</a>

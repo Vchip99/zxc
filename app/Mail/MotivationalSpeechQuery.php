@@ -30,7 +30,12 @@ class MotivationalSpeechQuery extends Mailable
      */
     public function build()
     {
-        return $this->subject('Motivational Speech Query')
+        if('local' == \Config::get('app.env')){
+            $subject = 'Motivational Speech Query on local';
+        } else {
+            $subject = 'Motivational Speech Query';
+        }
+        return $this->subject($subject)
             ->view('emails.motivationalSpeechQuery')
             ->with([
                     'name' => $this->data['name'],

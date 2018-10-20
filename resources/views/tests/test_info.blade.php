@@ -31,7 +31,7 @@
         <h4 class="v_h4_subtitle"> Filter By</h4>
         <div class="dropdown mrgn_20_top_btm" id="cat">
           <select class="form-control" id="category_id" name="category_id" title="Category" onchange="showSubCategories(this);">
-            <option>Select Category ...</option>
+            <option>Select Category</option>
             @if(count($testCategories) > 0)
               @foreach($testCategories as $testCategory)
                 @if($catId == $testCategory->id)
@@ -76,7 +76,7 @@
           <h4 class="v_h4_subtitle"> Filter By</h4>
           <div class="dropdown mrgn_20_top_btm" id="cat">
             <select class="form-control" id="category_id" name="category_id" title="Category" onchange="showSubCategories(this);">
-              <option>Select Category ...</option>
+              <option>Select Category</option>
               @if(count($testCategories) > 0)
                 @foreach($testCategories as $testCategory)
                   @if($catId == $testCategory->id)

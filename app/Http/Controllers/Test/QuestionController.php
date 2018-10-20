@@ -67,7 +67,7 @@ class QuestionController extends Controller
      *  show questions associated with subject and paper
      */
     protected function index(){
-        $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+        $testCategories = TestCategory::getAllTestCategories();
         if(Session::has('search_selected_category')){
             $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin(Session::get('search_selected_category'));
         } else {
@@ -129,7 +129,7 @@ class QuestionController extends Controller
             Session::put('search_selected_section', $sectionTypeId);
 
     		$questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType($categoryId,$subcategoryId,$subjectId, $paperId, $sectionTypeId);
-            $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+            $testCategories = TestCategory::getAllTestCategories();
             $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($categoryId);
             $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($categoryId,$subcategoryId);
             $papers = TestSubjectPaper::getSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin($categoryId,$subcategoryId, $subjectId);
@@ -145,7 +145,7 @@ class QuestionController extends Controller
      */
     protected function create(Request $request){
 
-        $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+        $testCategories = TestCategory::getAllTestCategories();
         if(Session::has('selected_category')){
             $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin(Session::get('selected_category'));
         } else {
@@ -262,25 +262,28 @@ class QuestionController extends Controller
     	if(isset($id)){
     		$testQuestion = Question::find($id);
     		if(is_object($testQuestion)){
-                $testCategories = TestCategory::all();
-                $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($testQuestion->category_id);
-                $testSubjects = TestSubject::getSubjectsByCatIdBySubcatid($testQuestion->category_id, $testQuestion->subcat_id);
-                $papers = TestSubjectPaper::getSubjectPapersBySubjectId($testQuestion->subject_id);
-                $prevQuestionId = $this->getPrevQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
-                $nextQuestionId = $this->getNextQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
-                $currentQuestionNo = $this->getCurrentQuestionNo($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
-                Session::put('selected_category', $testQuestion->category_id);
-                Session::put('selected_subcategory', $testQuestion->subcat_id);
-                Session::put('selected_subject', $testQuestion->subject_id);
-                Session::put('selected_paper', $testQuestion->paper_id);
-                Session::put('selected_section', $testQuestion->section_type);
-                Session::put('selected_question_type', $testQuestion->question_type);
-                Session::put('selected_prev_question', $testQuestion->id);
-                $nextQuestionNo = $this->getNextQuestionNo($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type);
-                Session::put('next_question_no', $nextQuestionNo);
+                $testCategory = $testQuestion->category;
+                if(0 == $testCategory->college_id && 0 == $testCategory->user_id){
+                    $testCategories = TestCategory::getAllTestCategories();
+                    $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($testQuestion->category_id);
+                    $testSubjects = TestSubject::getSubjectsByCatIdBySubcatid($testQuestion->category_id, $testQuestion->subcat_id);
+                    $papers = TestSubjectPaper::getSubjectPapersBySubjectId($testQuestion->subject_id);
+                    $prevQuestionId = $this->getPrevQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
+                    $nextQuestionId = $this->getNextQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
+                    $currentQuestionNo = $this->getCurrentQuestionNo($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
+                    Session::put('selected_category', $testQuestion->category_id);
+                    Session::put('selected_subcategory', $testQuestion->subcat_id);
+                    Session::put('selected_subject', $testQuestion->subject_id);
+                    Session::put('selected_paper', $testQuestion->paper_id);
+                    Session::put('selected_section', $testQuestion->section_type);
+                    Session::put('selected_question_type', $testQuestion->question_type);
+                    Session::put('selected_prev_question', $testQuestion->id);
+                    $nextQuestionNo = $this->getNextQuestionNo($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type);
+                    Session::put('next_question_no', $nextQuestionNo);
 
-                $paperSections =  PaperSection::where('test_subject_paper_id', $testQuestion->paper_id)->get();
-                return view('question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'currentQuestionNo', 'paperSections'));
+                    $paperSections =  PaperSection::where('test_subject_paper_id', $testQuestion->paper_id)->get();
+                    return view('question.create', compact('testCategories', 'testSubCategories', 'testSubjects', 'testQuestion', 'papers', 'prevQuestionId', 'nextQuestionId', 'currentQuestionNo', 'paperSections'));
+                }
     		}
     	}
 		return Redirect::to('admin/manageQuestions');
@@ -428,7 +431,7 @@ class QuestionController extends Controller
     }
 
     protected function uploadQuestions(){
-        $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+        $testCategories = TestCategory::getAllTestCategories();
         $testSubCategories = [];
         $testSubjects = [];
         $papers =[];
@@ -556,7 +559,7 @@ class QuestionController extends Controller
      *  show questions associated with subject and paper
      */
     protected function showSession(){
-        $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+        $testCategories = TestCategory::getAllTestCategories();
         if(Session::has('search_selected_category')){
             $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin(Session::get('search_selected_category'));
         } else {
@@ -599,7 +602,7 @@ class QuestionController extends Controller
             Session::put('search_selected_section', $sectionTypeId);
 
             $questions = Question::getQuestionsForSessionAssociation($categoryId,$subcategoryId,$subjectId, $paperId, $sectionTypeId);
-            $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+            $testCategories = TestCategory::getAllTestCategories();
             $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($categoryId);
             $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($categoryId,$subcategoryId);
             $papers = TestSubjectPaper::getSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin($categoryId,$subcategoryId, $subjectId);
@@ -658,7 +661,7 @@ class QuestionController extends Controller
      *  show questions
      */
     protected function showQuestionBank(){
-        $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+        $testCategories = TestCategory::getAllTestCategories();
         if(Session::has('search_selected_category')){
             $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin(Session::get('search_selected_category'));
         } else {
@@ -709,7 +712,7 @@ class QuestionController extends Controller
         Session::put('search_question_bank_category', $bankCategoryId);
         Session::put('search_question_bank_subcategory', $bankSubCategoryId);
 
-        $testCategories = TestCategory::getTestCategoriesAssociatedWithPapers();
+        $testCategories = TestCategory::getAllTestCategories();
         $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($categoryId);
         $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($categoryId,$subcategoryId);
         $papers = TestSubjectPaper::getSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin($categoryId,$subcategoryId, $subjectId);
@@ -754,8 +757,8 @@ class QuestionController extends Controller
                         $testQuestion->answer = $question->answer;
                         $testQuestion->solution = $question->solution;
                         if(0 == $question->question_type){
-                            $testQuestion->min = $question->min;
-                            $testQuestion->max = $question->max;
+                            $testQuestion->min = (!empty($question->min))?:0.00;
+                            $testQuestion->max = (!empty($question->max))?:0.00;
                         } else {
                             $testQuestion->min = 0.00;
                             $testQuestion->max = 0.00;

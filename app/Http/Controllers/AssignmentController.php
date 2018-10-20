@@ -7,7 +7,7 @@ use App\Http\Requests;
 use Auth,Hash,DB, Redirect,Session,Validator,Input;
 use App\Models\AssignmentQuestion;
 use App\Models\AssignmentAnswer;
-use App\Models\AssignmentSubject;
+use App\Models\CollegeSubject;
 use App\Models\AssignmentTopic;
 use App\Models\CollegeDept;
 use App\Models\User;
@@ -39,27 +39,69 @@ class AssignmentController extends Controller
     /**
      * show all assignment
      */
-    protected function show(){
+    protected function show($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $assignmentTeachers = [];
         $departments = [];
+        $allSubjects = [];
+        $allTopics = [];
         $loginUser = Auth::user();
-    	$assignments = AssignmentQuestion::where('lecturer_id', $loginUser->id)->paginate();
-        if(User::Hod == $loginUser->user_type){
-            $assignmentTeachers = User::getTeachers();
+    	$assignments = AssignmentQuestion::where('college_id', $loginUser->college_id)->paginate();
+
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+           $assignments = AssignmentQuestion::getAssignmentsByCollegeIdByAssignedDeptsWithPagination($loginUser->college_id);
+        } else {
+            $assignments = AssignmentQuestion::getAssignmentsByCollegeIdWithPagination($loginUser->college_id);
         }
-        if(User::Directore == $loginUser->user_type){
-            $departments = CollegeDept::where('college_id', $loginUser->college_id)->get();
+
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $deptIds = explode(',',$loginUser->assigned_college_depts);
+            $departments = CollegeDept::getDepartmentsByCollegeIdByDeptIds($loginUser->college_id,$deptIds);
+        } else {
+            $departments = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
         }
-    	return view('assignment.list', compact('assignments', 'assignmentTeachers', 'departments'));
+
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $topics = AssignmentTopic::getAssignmentTopicsByCollegeIdByAssignedDeptsForList($loginUser->college_id);
+        } else {
+            $topics = AssignmentTopic::getAssignmentTopicsByCollegeId($loginUser->college_id);
+        }
+        if(is_object($topics) && false == $topics->isEmpty()){
+            foreach($topics as $topic){
+                $allTopics[$topic->id] = $topic->name;
+            }
+        }
+
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $subjects = CollegeSubject::getCollegeSubjectByCollegeIdByAssignedDeptsForList($loginUser->college_id);
+        } else {
+            $subjects = CollegeSubject::getCollegeSubjectByCollegeId($loginUser->college_id);
+        }
+        if(is_object($subjects) && false == $subjects->isEmpty()){
+            foreach($subjects as $subject){
+                $allSubjects[$subject->id] = $subject->name;
+            }
+        }
+
+    	return view('assignment.list', compact('assignments', 'assignmentTeachers', 'departments','allSubjects','allTopics'));
     }
 
     /**
      *  show create UI for topic
      */
-    protected function create(){
+    protected function create($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
     	$topics = [];
-    	// $subjects = AssignmentSubject::where('lecturer_id', Auth::user()->id)->get();
-        $subjects = [];
+        $loginUser = Auth::user();
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $subjects = CollegeSubject::getCollegeSubjectByCollegeIdByAssignedDeptsByUser($loginUser->college_id);
+        } else {
+            $subjects = CollegeSubject::getCollegeSubjectByCollegeIdByUserId($loginUser->college_id,$loginUser->id);
+        }
     	$assignment = new AssignmentQuestion;
     	return view('assignment.create', compact('subjects', 'assignment', 'topics'));
     }
@@ -67,7 +109,10 @@ class AssignmentController extends Controller
     /**
      *  store assignment
      */
-    protected function store(Request $request){
+    protected function store($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $v = Validator::make($request->all(), $this->validateCreateAssignment);
         if ($v->fails())
         {
@@ -80,7 +125,7 @@ class AssignmentController extends Controller
             $assignment = AssignmentQuestion::addOrUpdateAssignment($request);
             if(is_object($assignment)){
                 DB::commit();
-                return Redirect::to('manageAssignment')->with('message', 'Assignment created successfully!');
+                return Redirect::to('college/'.$collegeUrl.'/manageAssignment')->with('message', 'Assignment created successfully!');
             }
         }
         catch(\Exception $e)
@@ -88,37 +133,47 @@ class AssignmentController extends Controller
             DB::rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }
-		return Redirect::to('manageAssignment');
+		return Redirect::to('college/'.$collegeUrl.'/manageAssignment');
     }
 
     /**
      * edit assignment
      */
-    protected function edit($id){
+    protected function edit($collegeUrl,$id,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
     	$assignmentId = InputSanitise::inputInt(json_decode($id));
     	if(isset($assignmentId)){
     		$assignment = AssignmentQuestion::find($assignmentId);
     		if(is_object($assignment)){
                 $loginUser = Auth::user();
                 $subjects = '';
-                if(User::Lecturer == $loginUser->user_type){
-    			    $subjects = AssignmentSubject::where('lecturer_id', $loginUser->id)->get();
-                } else if(User::Hod == $loginUser->user_type){
-                    $subjects = AssignmentSubject::where('college_dept_id', $loginUser->college_dept_id)->get();
-                } else if(User::Directore == $loginUser->user_type){
-                    $subjects = AssignmentSubject::where('college_id', $loginUser->college_id)->get();
+                if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+                    $topics = AssignmentTopic::getAssignmentTopicsByCollegeIdByAssignedDeptsForList($loginUser->college_id);
+                } else {
+                    $topics = AssignmentTopic::getAssignmentTopicsByCollegeId($loginUser->college_id);
                 }
-    			$topics = AssignmentTopic::getAssignmentTopics($assignment->assignment_subject_id);
+
+                if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+                    $subjects = CollegeSubject::getCollegeSubjectByCollegeIdByAssignedDeptsForList($loginUser->college_id);
+                } else {
+                    $subjects = CollegeSubject::getCollegeSubjectByCollegeId($loginUser->college_id);
+                }
+
     			return view('assignment.create', compact('subjects', 'assignment', 'topics'));
     		}
     	}
-		return Redirect::to('manageAssignment');
+		return Redirect::to('college/'.$collegeUrl.'/manageAssignment');
     }
 
     /**
      * update assignment
      */
-    protected function update(Request $request){
+    protected function update($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $v = Validator::make($request->all(), $this->validateCreateAssignment);
         if ($v->fails())
         {
@@ -132,7 +187,7 @@ class AssignmentController extends Controller
                 $assignment = AssignmentQuestion::addOrUpdateAssignment($request, true);
                 if(is_object($assignment)){
                     DB::commit();
-                    return Redirect::to('manageAssignment')->with('message', 'Assignment updated successfully!');
+                    return Redirect::to('college/'.$collegeUrl.'/manageAssignment')->with('message', 'Assignment updated successfully!');
                 }
             }
             catch(\Exception $e)
@@ -141,7 +196,7 @@ class AssignmentController extends Controller
                 return back()->withErrors('something went wrong.');
             }
         }
-        return Redirect::to('manageAssignment');
+        return Redirect::to('college/'.$collegeUrl.'/manageAssignment');
     }
 
     protected function getAssignmentTopics(Request $request){
@@ -149,20 +204,67 @@ class AssignmentController extends Controller
     }
 
     protected function getAssignmentByTopic(Request $request){
+        $allSubjects = [];
+        $allTopics = [];
+        $loginUser = Auth::user();
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $subjects = CollegeSubject::getCollegeSubjectByCollegeIdByAssignedDeptsForList($loginUser->college_id);
+        } else {
+            $subjects = CollegeSubject::getCollegeSubjectByCollegeId($loginUser->college_id);
+        }
+        if(is_object($subjects) && false == $subjects->isEmpty()){
+            foreach($subjects as $subject){
+                $allSubjects[$subject->id] = $subject->name;
+            }
+        }
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $topics = AssignmentTopic::getAssignmentTopicsByCollegeIdByAssignedDeptsForList($loginUser->college_id);
+        } else {
+            $topics = AssignmentTopic::getAssignmentTopicsByCollegeId($loginUser->college_id);
+        }
+        if(is_object($topics) && false == $topics->isEmpty()){
+            foreach($topics as $topic){
+                $allTopics[$topic->id] = $topic->name;
+            }
+        }
+
         $assignment = AssignmentQuestion::getAssignmentByTopic($request->topic);
         $result = [];
         if(is_object($assignment)){
             $result['id'] = $assignment->id;
             $result['question'] = $assignment->question;
             $result['attached_link'] = basename($assignment->attached_link);
-            $result['topic'] = $assignment->topic->name;
-            $result['subject'] = $assignment->subject->name;
+            $result['topic'] = $allTopics[$assignment->assignment_topic_id];
+            $result['subject'] = $allSubjects[$assignment->college_subject_id];
             $result['lecturer_id'] = $assignment->lecturer_id;
         }
         return $result;
     }
 
     protected function getAssignments(Request $request){
+        $allSubjects = [];
+        $allTopics = [];
+        $loginUser = Auth::user();
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $subjects = CollegeSubject::getCollegeSubjectByCollegeIdByAssignedDeptsForList($loginUser->college_id);
+        } else {
+            $subjects = CollegeSubject::getCollegeSubjectByCollegeId($loginUser->college_id);
+        }
+        if(is_object($subjects) && false == $subjects->isEmpty()){
+            foreach($subjects as $subject){
+                $allSubjects[$subject->id] = $subject->name;
+            }
+        }
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $topics = AssignmentTopic::getAssignmentTopicsByCollegeIdByAssignedDeptsForList($loginUser->college_id);
+        } else {
+            $topics = AssignmentTopic::getAssignmentTopicsByCollegeId($loginUser->college_id);
+        }
+        if(is_object($topics) && false == $topics->isEmpty()){
+            foreach($topics as $topic){
+                $allTopics[$topic->id] = $topic->name;
+            }
+        }
         $result = [];
         $assignments = AssignmentQuestion::getAssignments($request);
         if(is_object($assignments) && false == $assignments->isEmpty()){
@@ -170,8 +272,8 @@ class AssignmentController extends Controller
                 $result[$index+1]['id'] = $assignment->id;
                 $result[$index+1]['question'] = $assignment->question;
                 $result[$index+1]['attached_link'] = basename($assignment->attached_link);
-                $result[$index+1]['topic'] = $assignment->topic->name;
-                $result[$index+1]['subject'] = $assignment->subject->name;
+                $result[$index+1]['topic'] = $allTopics[$assignment->assignment_topic_id];
+                $result[$index+1]['subject'] = $allSubjects[$assignment->college_subject_id];
                 $result[$index+1]['lecturer_id'] = $assignment->lecturer_id;
             }
         }
@@ -179,18 +281,42 @@ class AssignmentController extends Controller
     }
 
     protected function getAssignmentByTopicForStudent(Request $request){
+        $allSubjects = [];
+        $allTopics = [];
+        $loginUser = Auth::user();
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $subjects = CollegeSubject::getCollegeSubjectByCollegeIdByAssignedDeptsForList($loginUser->college_id);
+        } else {
+            $subjects = CollegeSubject::getCollegeSubjectByCollegeId($loginUser->college_id);
+        }
+        if(is_object($subjects) && false == $subjects->isEmpty()){
+            foreach($subjects as $subject){
+                $allSubjects[$subject->id] = $subject->name;
+            }
+        }
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $topics = AssignmentTopic::getAssignmentTopicsByCollegeIdByAssignedDeptsForList($loginUser->college_id);
+        } else {
+            $topics = AssignmentTopic::getAssignmentTopicsByCollegeId($loginUser->college_id);
+        }
+        if(is_object($topics) && false == $topics->isEmpty()){
+            foreach($topics as $topic){
+                $allTopics[$topic->id] = $topic->name;
+            }
+        }
         $assignment = AssignmentQuestion::getAssignmentByTopic($request->topic);
         $result = [];
         if(is_object($assignment)){
             $result['id'] = $assignment->id;
             $result['question'] = $assignment->question;
             $result['attached_link'] = basename($assignment->attached_link);
-            $result['topic'] = $assignment->topic->name;
-            $result['subject'] = $assignment->subject->name;
-            Session::put('selected_assignment_year', $assignment->year);
-            Session::put('selected_assignment_subject', $assignment->assignment_subject_id);
-            Session::put('selected_assignment_topic', $assignment->assignment_topic_id);
+            $result['topic'] = $allTopics[$assignment->assignment_topic_id];
+            $result['subject'] = $allSubjects[$assignment->college_subject_id];
+            Session::put('selected_assignment_year', $request->year);
+            Session::put('selected_assignment_subject', $request->subject);
+            Session::put('selected_assignment_topic', $request->topic);
             Session::put('selected_assignment_student', $request->student);
+            Session::put('selected_assignment_department', $request->department);
         }
         return $result;
     }
@@ -199,23 +325,31 @@ class AssignmentController extends Controller
         return AssignmentQuestion::checkAssignmentIsExist($request);
     }
 
-    protected function delete(Request $request){
+    protected function delete($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $assignmentId = InputSanitise::inputInt($request->get('assignment_id'));
         $assignment = AssignmentQuestion::find($assignmentId);
         if(is_object($assignment)){
             DB::beginTransaction();
             try
             {
-                $answers = AssignmentAnswer::where('assignment_question_id', $assignment->id)->where('lecturer_id',Auth::user()->id)->get();
-                if(is_object($answers) && false == $answers->isEmpty()){
-                    foreach($answers as $answer){
-                        $answer->delete();
+                if(Auth::user()->id == $assignment->lecturer_id){
+                    $answers = AssignmentAnswer::where('assignment_question_id', $assignment->id)->where('lecturer_id',Auth::user()->id)->get();
+                    if(is_object($answers) && false == $answers->isEmpty()){
+                        foreach($answers as $answer){
+                            $dir = dirname($answer->attached_link);
+                            InputSanitise::delFolder($dir);
+                            $answer->delete();
+                        }
                     }
+                    $dir = dirname($assignment->attached_link);
+                    InputSanitise::delFolder($dir);
+                    $assignment->delete();
+                    DB::commit();
+                    return Redirect::to('college/'.$collegeUrl.'/manageAssignment')->with('message', 'Assignment deleted successfully!');
                 }
-                $assignment->delete();
-                DB::commit();
-                return Redirect::to('manageAssignment')->with('message', 'Assignment deleted successfully!');
-
             }
             catch(\Exception $e)
             {
@@ -223,6 +357,6 @@ class AssignmentController extends Controller
                 return back()->withErrors('something went wrong.');
             }
         }
-        return Redirect::to('manageAssignment');
+        return Redirect::to('college/'.$collegeUrl.'/manageAssignment');
     }
 }

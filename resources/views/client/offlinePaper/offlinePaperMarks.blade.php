@@ -10,7 +10,6 @@
   </section>
 @stop
 @section('dashboard_content')
-  &nbsp;
   <div class="container ">
     @if(count($errors) > 0)
       <div class="alert alert-danger">
@@ -130,9 +129,9 @@
           if(result['batchUsers'].length){
             $.each(result['batchUsers'], function(idx, obj) {
               if(result['studentMarks'][obj.id]){
-                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="text" name="'+obj.id+'" id="student_'+obj.id+'" value="'+result['studentMarks'][obj.id].marks+'"></td><td><input type="text" name="total_marks" value="'+result['studentMarks'][obj.id].total_marks+'" readonly></td></tr>';
+                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="number" name="'+obj.id+'" id="student_'+obj.id+'" value="'+result['studentMarks'][obj.id].marks+'" max="'+result['studentMarks'][obj.id].total_marks+'" step="any"></td><td><input type="text" name="total_marks" value="'+result['studentMarks'][obj.id].total_marks+'" readonly></td></tr>';
               } else {
-                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="text" name="'+obj.id+'" id="student_'+obj.id+'" value=""></td><td><input type="text" name="total_marks" value="'+paperMarks+'" readonly></td></tr>';
+                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="number" name="'+obj.id+'" id="student_'+obj.id+'" value="" max="'+paperMarks+'" step="any"></td><td><input type="text" name="total_marks" value="'+paperMarks+'" readonly></td></tr>';
               }
             });
           } else {

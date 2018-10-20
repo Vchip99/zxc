@@ -14,49 +14,20 @@
   <script src="{{asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
   <div class="container admin_div">
   @if(isset($assignment->id))
-    <form action="{{url('updateAssignment')}}" method="POST" enctype="multipart/form-data">
+    <form action="{{url('college/'.Session::get('college_user_url').'/updateAssignment')}}" method="POST" enctype="multipart/form-data">
       {{method_field('PUT')}}
       <input type="hidden" name="assignment_id" value="{{$assignment->id}}">
   @else
-      <form action="{{url('createAssignment')}}" method="POST" enctype="multipart/form-data">
+      <form action="{{url('college/'.Session::get('college_user_url').'/createAssignment')}}" method="POST" enctype="multipart/form-data">
   @endif
     {{ csrf_field() }}
-  <div class="form-group row @if ($errors->has('year')) has-error @endif">
-    <label class="col-sm-2 col-form-label">Year:</label>
-    <div class="col-sm-3">
-      @if(isset($assignment->id))
-        @if(isset($assignment->year) && 1 == $assignment->year)
-          <input class="form-control" type="text" name="year" value="First Year" readonly="true">
-          <input type="hidden" name="year" value="1">
-        @elseif(isset($assignment->year) && 2 == $assignment->year)
-          <input class="form-control" type="text" name="year" value="Second Year" readonly="true">
-          <input type="hidden" name="year" value="2">
-        @elseif(isset($assignment->year) && 3 == $assignment->year)
-          <input class="form-control" type="text" name="year" value="Third Year" readonly="true">
-          <input type="hidden" name="year" value="3">
-        @else
-          <input class="form-control" type="text" name="year" value="Fourth Year" readonly="true">
-          <input type="hidden" name="year" value="4">
-        @endif
-      @else
-        <select class="form-control" id="year" name="year" required title="year" onChange="selectSubject(this);">
-          <option value="0">Select Year</option>
-          <option value="1" @if(isset($assignment->year) && 1 == $assignment->year)) selected="selected" @endif>First Year</option>
-          <option value="2" @if(isset($assignment->year) && 2 == $assignment->year)) selected="selected" @endif>Second Year</option>
-          <option value="3" @if(isset($assignment->year) && 3 == $assignment->year)) selected="selected" @endif>Third Year</option>
-          <option value="4" @if(isset($assignment->year) && 4 == $assignment->year)) selected="selected" @endif>Fourth Year</option>
-        </select>
-        @if($errors->has('year')) <p class="help-block">{{ $errors->first('year') }}</p> @endif
-      @endif
-    </div>
-  </div>
   <div class="form-group row @if ($errors->has('subject')) has-error @endif">
     <label class="col-sm-2 col-form-label">Subject Name:</label>
     <div class="col-sm-3">
-      @if(isset($assignment->id))
+       @if(isset($assignment->id))
           @if(count($subjects) > 0)
             @foreach($subjects as $subject)
-              @if( $assignment->assignment_subject_id == $subject->id)
+              @if( $assignment->college_subject_id == $subject->id)
                 <input class="form-control" type="text" name="subject_text" value="{{$subject->name}}" readonly="true">
                 <input type="hidden" name="subject" value="{{$subject->id}}">
               @endif
@@ -64,18 +35,14 @@
           @endif
       @else
       <select class="form-control" id="subject" name="subject" required title="Subject" onChange="selectTopic(this);">
-          <option value="0">Select Subject</option>
-          @if(count($subjects) > 0)
-            @foreach($subjects as $subject)
-              @if( $assignment->assignment_subject_id == $subject->id)
-                <option value="{{$subject->id}}" selected="true">{{$subject->name}}</option>
-              @else
-                <option value="{{$subject->id}}">{{$subject->name}}</option>
-              @endif
-            @endforeach
-          @endif
-        </select>
-        @if($errors->has('subject')) <p class="help-block">{{ $errors->first('subject') }}</p> @endif
+        <option value="">Select Subject</option>
+        @if(count($subjects) > 0)
+          @foreach($subjects as $subject)
+            <option value="{{$subject->id}}">{{$subject->name}}</option>
+          @endforeach
+        @endif
+      </select>
+      @if($errors->has('subject')) <p class="help-block">{{ $errors->first('subject') }}</p> @endif
       @endif
     </div>
   </div>
@@ -85,7 +52,7 @@
       @if(isset($assignment->id))
           @if(count($topics) > 0)
             @foreach($topics as $topic)
-              @if( $assignment->assignment_topic_id == $topic->id)
+              @if($assignment->assignment_topic_id == $topic->id)
                 <input class="form-control" type="text" name="topic_text" value="{{$topic->name}}" readonly="true">
                 <input type="hidden" name="topic" value="{{$topic->id}}">
               @endif
@@ -93,14 +60,10 @@
           @endif
       @else
       	<select class="form-control" id="topic" name="topic" required title="Topic" onChange="checkAssignment(this);">
-        	<option value="0">Select Topic</option>
+        	<option value="">Select Topic</option>
         	@if(count($topics) > 0)
         		@foreach($topics as $topic)
-        			@if( $assignment->assignment_topic_id == $topic->id)
-		                <option value="{{$topic->id}}" selected="true">{{$topic->name}}</option>
-	              	@else
-		                <option value="{{$topic->id}}">{{$topic->name}}</option>
-		            @endif
+              <option value="{{$topic->id}}">{{$topic->name}}</option>
         		@endforeach
         	@endif
         </select>
@@ -207,7 +170,7 @@
             select = document.getElementById('topic');
             select.innerHTML = '';
             var opt = document.createElement('option');
-            opt.value = 0;
+            opt.value = '';
             opt.innerHTML = 'Select Topic';
             select.appendChild(opt);
             if( 0 < msg.length){
@@ -223,60 +186,57 @@
 	}
 
   function checkAssignment(ele){
-    var year = document.getElementById('year').value;
-    var topic = document.getElementById('topic').value;
     var subject = document.getElementById('subject').value;
+    var topic = document.getElementById('topic').value;
 
-    if( 0 < year ){
+    if( subject && topic ){
       $.ajax({
           method: "POST",
           url: "{{url('checkAssignmentIsExist')}}",
-          data: {year:year,subject:subject,topic:topic}
+          data: {subject:subject,topic:topic}
       })
       .done(function( msg ) {
         if('true' == msg['status']){
           document.getElementById('message_error').classList.remove('hide');
           document.getElementById('assignment').setAttribute('href', 'assignment/'+msg['id']+'/edit');
           document.getElementById('submit').classList.add('hide');
-
         } else {
           document.getElementById('message_error').classList.add('hide');
           document.getElementById('submit').classList.remove('hide');
         }
-
       });
     }
   }
-    function selectSubject(ele){
-      id = parseInt($(ele).val());
-      document.getElementById('topic').value = 0;
-      document.getElementById('message_error').classList.add('hide');
-      document.getElementById('submit').classList.remove('hide');
-      if( 0 < id ){
-        // get subjects
-        $.ajax({
-          method: "POST",
-          url: "{{url('getAssignmentSubjectsByYear')}}",
-          data: {year:id}
-        })
-        .done(function( msg ) {
-          select = document.getElementById('subject');
-          select.innerHTML = '';
-          var opt = document.createElement('option');
-          opt.value = 0;
-          opt.innerHTML = 'Select Subject';
-          select.appendChild(opt);
-          if( 0 < msg.length){
-            $.each(msg, function(idx, obj) {
-                var opt = document.createElement('option');
-                opt.value = obj.id;
-                opt.innerHTML = obj.name;
-                select.appendChild(opt);
-            });
-          }
-        });
+    // function selectSubject(ele){
+    //   id = parseInt($(ele).val());
+    //   document.getElementById('topic').value = 0;
+    //   document.getElementById('message_error').classList.add('hide');
+    //   document.getElementById('submit').classList.remove('hide');
+    //   if( 0 < id ){
+    //     // get subjects
+    //     $.ajax({
+    //       method: "POST",
+    //       url: "{{url('getAssignmentSubjectsByYear')}}",
+    //       data: {year:id}
+    //     })
+    //     .done(function( msg ) {
+    //       select = document.getElementById('subject');
+    //       select.innerHTML = '';
+    //       var opt = document.createElement('option');
+    //       opt.value = 0;
+    //       opt.innerHTML = 'Select Subject';
+    //       select.appendChild(opt);
+    //       if( 0 < msg.length){
+    //         $.each(msg, function(idx, obj) {
+    //             var opt = document.createElement('option');
+    //             opt.value = obj.id;
+    //             opt.innerHTML = obj.name;
+    //             select.appendChild(opt);
+    //         });
+    //       }
+    //     });
 
-      }
-    }
+    //   }
+    // }
 </script>
 @stop

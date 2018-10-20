@@ -1,5 +1,173 @@
 @extends('dashboard.dashboard')
+<style>
+    .memberinfotop{
+      margin-top: 100px;
+    }
+    .memberinfo{
+      margin:10px;
+    }
+    /*.image{
+      height:150px;
+      width:150px;
+    }*/
+    .topcontent{
+      padding-top:20px;
+    }
+    .content{
+      /*padding-top: 20px;*/
+    }
+
+    .button{
+      float:right;
+
+    }
+    .button1{
+      float:left;
+    }
+    @media only screen and (max-width: 418px){
+      body{
+        font-size: 13px;
+      }
+    }
+    @media only screen and (max-width: 386px){
+      body{
+        font-size: 12px;
+      }
+    }
+    @media only screen and (max-width: 375px){
+      body{
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 1190px) {
+      .navbar-header {
+          float: none;
+      }
+      .navbar-left,.navbar-right {
+          float: none !important;
+      }
+      .navbar-toggle {
+          display: block;
+      }
+      .navbar-collapse {
+          border-top: 1px solid transparent;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+          min-height: 410px;
+      }
+      .navbar-fixed-top {
+          top: 0;
+          border-width: 0 0 1px;
+      }
+      .navbar-collapse.collapse {
+          display: none!important;
+      }
+      .navbar-nav {
+          float: none!important;
+          margin-top: 7.5px;
+      }
+      .navbar-nav>li {
+          float: none;
+      }
+      .navbar-nav>li>a {
+          padding-top: 10px;
+          padding-bottom: 10px;
+      }
+      .collapse.in{
+          display:block !important;
+      }
+    }
+    .iframe-container iframe{
+      width: 100% !important;
+    }
+    .vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; }
+    .vid iframe, .vid object,.vid embed {position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
+</style>
 @section('module_title')
+  <style>
+    .memberinfotop{
+      margin-top: 100px;
+    }
+    .memberinfo{
+      margin:10px;
+    }
+    /*.image{
+      height:150px;
+      width:150px;
+    }*/
+    .topcontent{
+      padding-top:20px;
+    }
+    .content{
+      /*padding-top: 20px;*/
+    }
+
+    .button{
+      float:right;
+
+    }
+    .button1{
+      float:left;
+    }
+    @media only screen and (max-width: 418px){
+      body{
+        font-size: 13px;
+      }
+    }
+    @media only screen and (max-width: 386px){
+      body{
+        font-size: 12px;
+      }
+    }
+    @media only screen and (max-width: 375px){
+      body{
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 1190px) {
+      .navbar-header {
+          float: none;
+      }
+      .navbar-left,.navbar-right {
+          float: none !important;
+      }
+      .navbar-toggle {
+          display: block;
+      }
+      .navbar-collapse {
+          border-top: 1px solid transparent;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+          min-height: 410px;
+      }
+      .navbar-fixed-top {
+          top: 0;
+          border-width: 0 0 1px;
+      }
+      .navbar-collapse.collapse {
+          display: none!important;
+      }
+      .navbar-nav {
+          float: none!important;
+          margin-top: 7.5px;
+      }
+      .navbar-nav>li {
+          float: none;
+      }
+      .navbar-nav>li>a {
+          padding-top: 10px;
+          padding-bottom: 10px;
+      }
+      .collapse.in{
+          display:block !important;
+      }
+    }
+    .iframe-container iframe{
+      width: 100% !important;
+    }
+    .vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; }
+    .vid iframe, .vid object,.vid embed {position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
+  </style>
   <section class="content-header">
     <h1> Placement </h1>
     <ol class="breadcrumb">
@@ -20,112 +188,82 @@
       <div class="top mrgn_40_btm"">
         <div class="container">
           <div class="row">
-            @if(5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
-              <div class="col-md-3 mrgn_10_btm">
-                <select class="form-control" id="dept" onChange="resetYear(this);">
-                  <option value="0"> Select Department </option>
-                  @if(is_object($selectedStudent) && count($collegeDepts) > 0)
-                    @foreach($collegeDepts as $collegeDept)
-                      @if(is_object($selectedStudent) && $selectedStudent->college_dept_id == $collegeDept->id)
-                        <option value="{{$collegeDept->id}}" selected="true">{{$collegeDept->name}}</option>
-                      @else
-                        <option value="{{$collegeDept->id}}">{{$collegeDept->name}}</option>
-                      @endif
-                    @endforeach
-                  @else
-                    @foreach($collegeDepts as $collegeDept)
-                        <option value="{{$collegeDept->id}}">{{$collegeDept->name}}</option>
-                    @endforeach
-                  @endif
-                </select>
-              </div>
-            @endif
+            <div class="col-md-3 mrgn_10_btm">
+              <select class="form-control" id="dept" onChange="resetYear(this);">
+                <option value="0"> Select Department </option>
+                @if($department > 0 && count($collegeDepts) > 0)
+                  @foreach($collegeDepts as $collegeDept)
+                    @if($department == $collegeDept->id)
+                      <option value="{{$collegeDept->id}}" selected="true">{{$collegeDept->name}}</option>
+                    @else
+                      <option value="{{$collegeDept->id}}">{{$collegeDept->name}}</option>
+                    @endif
+                  @endforeach
+                @else
+                  @foreach($collegeDepts as $collegeDept)
+                      <option value="{{$collegeDept->id}}">{{$collegeDept->name}}</option>
+                  @endforeach
+                @endif
+              </select>
+            </div>
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="selected_year" name="year" onChange="showStudents(this);">
                 <option value="0"> Select Year </option>
-                <option value="1" @if(is_object($selectedStudent) &&'1' == $selectedStudent->year) selected="true" @endif >First Year</option>
-                <option value="2" @if(is_object($selectedStudent) &&'2' == $selectedStudent->year) selected="true" @endif >Second Year</option>
-                <option value="3" @if(is_object($selectedStudent) &&'3' == $selectedStudent->year) selected="true" @endif >Third Year</option>
-                <option value="4" @if(is_object($selectedStudent) &&'4' == $selectedStudent->year) selected="true" @endif >Fourth Year</option>
+                <option value="1" @if('1' == $year) selected="true" @endif >First Year</option>
+                <option value="2" @if('2' == $year) selected="true" @endif >Second Year</option>
+                <option value="3" @if('3' == $year) selected="true" @endif >Third Year</option>
+                <option value="4" @if('4' == $year) selected="true" @endif >Fourth Year</option>
               </select>
             </div>
             <div class="col-md-3 ">
-              <select class="form-control" id="student" onChange="showResult(this);">
-                  <option value="0">Select Student </option>
-                  @if(is_object($selectedStudent) && count($students) > 0)
-                    @foreach($students as $student)
-                      @if(is_object($selectedStudent) && $selectedStudent->year == $student->year)
-                        @if($selectedStudent->id == $student->id)
-                          <option value="{{$student->id}}" selected="true">{{$student->name}}</option>
-                        @else
-                          <option value="{{$student->id}}">{{$student->name}}</option>
-                        @endif
-                      @endif
-                    @endforeach
-                  @endif
-                </select>
+              <input class="form-control" type="text" name="student" id="student" placeholder="Search Student" onkeyup="searchStudent();">
             </div>
           </div>
         </div>
       </div>
       <div class="container">
-        <div class="row text-center">
-          <div class="mrgn_20_btm" id="video">
-            <button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_video" onClick="toggleVideo();"><i class="fa fa-book" >
-              @if(is_object($selectedStudent) && $selectedStudent->recorded_video)
-                Recorded Video of Student
-              @else
-                Video of Student is not uploaded
-              @endif
-            </i></button>
-            <div id="student_video" class="modal fade" role="dialog">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button class="close" data-dismiss="modal" onClick="toggleVideo('hide');">×</button>
-                    <h2  class="modal-title">Recorded Video</h2>
+        <div class="" id="allUsers">
+          @if(count($students) > 0)
+            @foreach($students as $student)
+            <div style="border:1px solid black;">
+              <div class="row memberinfo" >
+                <div class="col-md-5 ">
+                  <div class="vid">
+                    @if(!empty($student->recorded_video))
+                      {!! $student->recorded_video !!}
+                    @else
+                      No Video
+                    @endif
                   </div>
-                  <div class="modal-body">
-                    <div id="iframe-video" class="iframe-container">
-                      @if(is_object($selectedStudent) && $selectedStudent->recorded_video)
-                         {!! $selectedStudent->recorded_video !!}
-                      @else
-                        Video of Student is not uploaded
-                      @endif
-                    </div>
-                  </div>
+                </div>
+                <div class="col-md-7">
+                  @php
+                    if(!empty($student->skills)){
+                      $skillArr = explode(',',$student->skills);
+                    }else{
+                      $skillArr = [];
+                    }
+                  @endphp
+                  <h4><strong>{{ $student->name }}</strong></h4>
+                  <p><strong>Education:</strong>BE</p>
+                  <p><strong>Skills:</strong>
+                    @if(count($skillArr) > 0)
+                      @foreach($skillArr as $skillId)
+                        #{{$userSkills[$skillId]}}
+                      @endforeach
+                    @endif
+                  </p>
+                  @if(!empty($student->resume) && is_file($student->resume))
+                  <div style="padding-left: 10px;"><a href="{{asset($student->resume)}}" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>
+                  @endif
                 </div>
               </div>
             </div>
-          </div>
-          <div class="mrgn_20_btm" id="resume">
-            <button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_resume"><i class="fa fa-book" >
-            @if(is_object($selectedStudent) && $selectedStudent->resume)
-              Resume of Student
-            @else
-              Resume of Student is not uploaded
-            @endif
-            </i></button>
-            <div id="student_resume" class="modal fade" role="dialog">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button class="close" data-dismiss="modal">×</button>
-                    <h2  class="modal-title">Resume</h2>
-                  </div>
-                  <div class="modal-body">
-                    <div class="iframe-container">
-                      @if(is_object($selectedStudent) && $selectedStudent->resume)
-                        <iframe src="{{asset($selectedStudent->resume)}}" frameborder="0"></iframe>
-                      @else
-                        Resume of Student is not uploaded
-                      @endif
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            <br>
+            @endforeach
+          @else
+            No Data
+          @endif
         </div>
       </div>
     </div>
@@ -133,91 +271,98 @@
 <script type="text/javascript">
   function resetYear(){
     document.getElementById('selected_year').value = 0;
-    document.getElementById('student').value = 0;
-    document.getElementById('video').innerHTML = '';
-    document.getElementById('resume').innerHTML = '';
+    document.getElementById('student').value = '';
+    document.getElementById('allUsers').innerHTML = '';
+  }
+
+  function searchStudent(){
+    var student = document.getElementById('student').value;
+    var year = parseInt(document.getElementById('selected_year').value);
+    var department = parseInt(document.getElementById("dept").value);
+    document.getElementById('allUsers').innerHTML = '';
+    if(department > 0 && year > 0 && student.length > 0){
+      $.ajax({
+          method: "POST",
+          url: "{{url('searchStudentByDeptByYearByName')}}",
+          data: {year:year,department:department,student:student}
+      })
+      .done(function( msg ) {
+        renderData(msg);
+      });
+    } else {
+      showStudents();
+    }
   }
 
   function showStudents(){
     var year = parseInt(document.getElementById('selected_year').value);
-    if(document.getElementById("dept")){
-        var department = parseInt(document.getElementById("dept").value);
-    } else {
-        var department = 0;
-    }
-    document.getElementById('video').innerHTML = '';
-    document.getElementById('resume').innerHTML = '';
-    if(year > 0){
+    var department = parseInt(document.getElementById("dept").value);
+    document.getElementById('allUsers').innerHTML = '';
+    if(department > 0 && year > 0){
       $.ajax({
-            method: "POST",
-            url: "{{url('showStudentsByDepartmentByYear')}}",
-            data: {year:year,department:department}
-        })
-        .done(function( msg ) {
-          select = document.getElementById('student');
-          select.innerHTML = '';
-          var opt = document.createElement('option');
-          opt.value = '0';
-          opt.innerHTML = 'Select Student';
-          select.appendChild(opt);
-          if( 0 < msg.length){
-            $.each(msg, function(idx, obj) {
-                var opt = document.createElement('option');
-                opt.value = obj.id;
-                opt.innerHTML = obj.name;
-                select.appendChild(opt);
-            });
-          }
-        });
+          method: "POST",
+          url: "{{url('showPlacementVideoByDepartmentByYear')}}",
+          data: {year:year,department:department}
+      })
+      .done(function( msg ) {
+        renderData(msg);
+      });
     }
   }
 
-  function showResult(ele){
-    var student = parseInt(document.getElementById('student').value);
-    $.ajax({
-        method: "POST",
-        url: "{{url('getStudentById')}}",
-        data: {student:student}
-    })
-    .done(function( msg ) {
-      var divVideo = document.getElementById('video');
-      divVideo.innerHTML = '';
-      var divResume = document.getElementById('resume');
-      divResume.innerHTML = '';
-      if(msg){
-        var videoInnerHTML = '<button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_video" onClick="toggleVideo();"><i class="fa fa-book" >';
-        if(msg.recorded_video){
-          videoInnerHTML += 'Recorded Video of Student';
-        } else {
-          videoInnerHTML += 'Video of Student is not uploaded';
-        }
-        videoInnerHTML += '</i></button><div id="student_video" class="modal fade" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal" onClick="toggleVideo(\'hide\');">×</button><h2  class="modal-title">Recorded Video</h2></div><div class="modal-body"><div class="iframe-container" id="iframe-video">';
-        if(msg.recorded_video){
-          videoInnerHTML += msg.recorded_video;
-        } else {
-          videoInnerHTML += 'Video of Student is not uploaded';
-        }
-        videoInnerHTML += '</div></div></div></div></div>';
-        divVideo.innerHTML = videoInnerHTML;
+  function renderData(msg){
+    divUsers = document.getElementById('allUsers');
+    divUsers.innerHTML = '';
+    if(Object.keys(msg['users']).length) {
+      $.each(msg['users'], function(id, userData) {
+          var firstDiv = document.createElement('div');
+          firstDiv.setAttribute('style', 'border:1px solid black;');
 
-        var resumeInnerHTML = '<button type="button" class="btn btn-lg btn-primary btn-circle" title="Read" data-toggle="modal" data-placement="bottom"   href="#student_resume"><i class="fa fa-book" >';
-        if(msg.resume){
-          resumeInnerHTML += 'Resume of Student';
-        } else {
-          resumeInnerHTML += 'Resume of Student is not uploaded';
-        }
-        resumeInnerHTML += '</i></button><div id="student_resume" class="modal fade" role="dialog"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button><h2  class="modal-title">Resume</h2></div><div class="modal-body"><div class="iframe-container">';
-        if(msg.resume){
-          var url = "{{url('')}}/"+msg.resume;
-          resumeInnerHTML += '<iframe src="'+url+'" frameborder="0"></iframe>';
-        } else {
-          resumeInnerHTML += 'Resume of Student is not uploaded';
-        }
-        resumeInnerHTML += '</div></div></div></div></div>';
-        divResume.innerHTML = resumeInnerHTML;
-      }
+          var secondDiv = document.createElement('div');
+          secondDiv.className = 'row memberinfo';
 
-    });
+          var thirdDiv = document.createElement('div');
+          thirdDiv.className = 'col-md-5';
+          if(userData.recorded_video){
+            thirdDiv.innerHTML = '<div class="vid">'+userData.recorded_video+'</div>';
+          } else {
+            thirdDiv.innerHTML = '<div class="vid">No Video</div>';
+          }
+          secondDiv.appendChild(thirdDiv);
+
+          var fourthDiv = document.createElement('div');
+          fourthDiv.className = 'col-md-7 topcontent';
+          fourthDivInnerHtml = '';
+          fourthDivInnerHtml += '<h4><strong>'+userData.name+'</strong></h4><p><strong>Education:</strong> BE</p>';
+          if(userData.skills){
+            var studenSkills = userData.skills.split(',');
+            if(studenSkills.length){
+              var skillStr = '';
+              $.each(studenSkills,function(idx, skillId){
+                if(msg['skills'][skillId]){
+                  if(0 == idx){
+                    skillStr = ' #'+msg['skills'][skillId];
+                  } else {
+                    skillStr += '#'+msg['skills'][skillId];
+                  }
+                }
+              });
+              fourthDivInnerHtml += '<p><strong>Skills:</strong>'+skillStr+'</p>';
+            }
+          }
+          if(userData.resume){
+            fourthDivInnerHtml += '<div style="padding-left: 30px;"><a href="'+ userData.resume +'" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>';
+          }
+          fourthDiv.innerHTML = fourthDivInnerHtml;
+          secondDiv.appendChild(fourthDiv);
+          firstDiv.appendChild(secondDiv);
+          divUsers.appendChild(firstDiv);
+          var brEle = document.createElement('br');
+          divUsers.appendChild(brEle);
+      });
+    } else {
+      divUsers.innerHTML = 'No Result!';
+    }
   }
 
   function toggleVideo(state) {

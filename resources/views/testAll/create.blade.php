@@ -9,7 +9,6 @@
   </section>
 @stop
 @section('admin_content')
-  &nbsp;
   <script src="{{asset('js/moment-with-locales.min.js?ver=1.0')}}" type="text/javascript"></script>
   <script src="{{asset('js/bootstrap-datetimepicker.min.js?ver=1.0')}}" type="text/javascript"></script>
   <link href="{{asset('css/bootstrap-datetimepicker.min.css?ver=1.0')}}" rel="stylesheet"/>
@@ -32,6 +31,7 @@
         <span class="hide" id="categoryError" style="color: white;">Given name is already exist.Please enter another name.</span>
       </div>
     </div>
+    <input type="hidden" name="category_for" value="1">
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
         <button type="button" class="btn btn-primary" onclick="searchCategory();">Submit</button>
@@ -47,7 +47,7 @@
         <label class="col-sm-2 col-form-label">Category Name:</label>
         <div class="col-sm-3">
           <select class="form-control" name="category" id="select_category" required title="Category">
-              <option value="">Select Category ...</option>
+              <option value="">Select Category</option>
               @if(count($testCategories) > 0)
                 @foreach($testCategories as $testCategory)
                   <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
@@ -87,7 +87,7 @@
         <label class="col-sm-2 col-form-label">Category Name:</label>
         <div class="col-sm-3">
           <select id="subject_category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-              <option value="">Select Category ...</option>
+              <option value="">Select Category</option>
               @if(count($testCategories) > 0)
                 @foreach($testCategories as $testCategory)
                   <option value="{{$testCategory->id}}">{{$testCategory->name}}</option>
@@ -101,7 +101,7 @@
         <label class="col-sm-2 col-form-label">Sub Category Name:</label>
         <div class="col-sm-3">
           <select id="subject_subcategory" class="form-control" name="subcategory" required title="Sub Category">
-            <option value="">Select Sub Category ...</option>
+            <option value="">Select Sub Category</option>
           </select>
           @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
         </div>

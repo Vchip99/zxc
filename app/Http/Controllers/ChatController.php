@@ -38,7 +38,7 @@ class chatController extends Controller
         } else {
             $skipUsers = explode(',', $request->get('previuos_chat_users'));
             array_push($skipUsers, $loginUser->id);
-            $users = User::whereNotIn('id', $skipUsers)->take(10)->get();
+            $users = User::where('college_id',$loginUser->college_id)->whereNotIn('id', array_unique($skipUsers))->where('verified',1)->where('admin_approve',1)->orderBy('name','asc')->take(10)->get();
 
             if(is_object($users) && false == $users->isEmpty()){
                 foreach($users as $user){
@@ -49,13 +49,25 @@ class chatController extends Controller
                     } else {
                         $isImageExist = 'false';
                     }
+                    if(User::Student == $user->user_type){
+                        $userType = 'Student';
+                    } elseif(User::Lecturer == $user->user_type){
+                        $userType = 'Lecturer';
+                    } elseif(User::Hod == $user->user_type){
+                        $userType = 'Hod';
+                    } elseif(User::Directore == $user->user_type){
+                        $userType = 'Director';
+                    } elseif(User::TNP == $user->user_type){
+                        $userType = 'TNP';
+                    }
+
                     $chatusers[] = [
                         'id' => $user->id,
                         'name' => $user->name,
                         'photo' => $user->photo,
                         'image_exist' => $isImageExist,
                         'chat_room_id' => $user->chatroomid(),
-                        'college' => $user->getCollegeName(),
+                        'college' => $userType,
                     ];
                 }
             }

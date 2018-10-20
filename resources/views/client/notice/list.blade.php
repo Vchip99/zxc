@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> Manage Notices </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-calendar"></i> Syllabus Management </li>
+      <li><i class="fa fa-calendar"></i> Calendar Management </li>
       <li class="active"> Manage Notices </li>
     </ol>
   </section>

@@ -261,7 +261,7 @@
 															Answer:{!! $question->answer !!}
 														@else
 															<br>
-															Answer:{{$question->min}} - {{$question->max}}
+															Answer:{{$question->question}}
 														@endif
 													</div>
 								          		</td>
@@ -283,7 +283,7 @@
 							        <input type="hidden" name="selected_paper" id="selected_paper" value="">
 							        <input type="hidden" name="selected_section_type" id="selected_section_type" value="">
 					    		@else
-					    			<tr><td colspan="3">No questions are created.</td></tr>
+					    			<tr><td colspan="5">No questions are created.</td></tr>
 					    			<input type="hidden" name="selected_category" id="selected_category" value="">
 							        <input type="hidden" name="selected_subcategory" id="selected_subcategory" value="">
 							        <input type="hidden" name="selected_subject" id="selected_subject" value="">

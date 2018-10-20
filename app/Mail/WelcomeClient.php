@@ -29,7 +29,12 @@ class WelcomeClient extends Mailable
      */
     public function build()
     {
-        return $this->subject('Welcome to Vchipedu Digital Education')
+        if('local' == \Config::get('app.env')){
+            $subject = 'Welcome to Vchipedu Digital Education on local';
+        } else {
+            $subject = 'Welcome to Vchipedu Digital Education';
+        }
+        return $this->subject($subject)
             ->view('emails.welcomeclient')
             ->with([
                     'name' => $this->data['name'],

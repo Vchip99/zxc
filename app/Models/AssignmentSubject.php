@@ -17,7 +17,7 @@ class AssignmentSubject extends Model
     protected $fillable = ['name','lecturer_id', 'college_id', 'college_dept_id', 'year'];
 
     /**
-     *  add/update course category
+     *  add/update assignment subject
      */
     protected static function addOrUpdateAssignmentSubject( Request $request, $isUpdate=false){
         $subjectName = InputSanitise::inputString($request->get('subject'));

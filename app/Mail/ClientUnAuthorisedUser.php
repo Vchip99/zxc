@@ -29,7 +29,12 @@ class ClientUnAuthorisedUser extends Mailable
      */
     public function build()
     {
-        return $this->subject('Please upgrade your plan')
+        if('local' == \Config::get('app.env')){
+            $subject = 'Please upgrade your plan on local';
+        } else {
+            $subject = 'Please upgrade your plan';
+        }
+        return $this->subject($subject)
             ->view('emails.clientUnAuthorisedUser')
             ->with([
                     'name' => $this->data['name'],

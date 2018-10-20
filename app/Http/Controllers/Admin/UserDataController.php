@@ -78,7 +78,6 @@ class UserDataController extends Controller
      *  store userData
      */
     protected function store(Request $request){
-        // dd($request->file('resume'));
         $v = Validator::make($request->all(), $this->validateCreateUserData);
         if ($v->fails())
         {

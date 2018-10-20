@@ -36,6 +36,7 @@ trait AuthenticatesUsers
      */
     public function login(Request $request)
     {
+        // login using mobile
         $userMobile = $request->get('mobile');
         $loginOtp = $request->get('login_otp');
         if(!empty($request->route()->getParameter('client')) && !empty($userMobile) && !empty($loginOtp)){
@@ -60,18 +61,52 @@ trait AuthenticatesUsers
             if($loginOtp == $serverOtp){
                 $user = User::where('number_verified', 1)->whereNotNull('phone')->where('phone','=', $userMobile)->where('admin_approve', 1)->first();
                 if(!is_object($user)){
-                    return Redirect::to('/')->withErrors('User does not exists or not client approve.');
+                    return Redirect::to('/')->withErrors('User does not exists or not admin approve.');
                 }
                 $this->guard('user')->login($user);
                 if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
                     Cache::forget($userMobile);
                     Cache::forget('mobile-'.$userMobile);
                 }
+                if(is_object($this->guard('user')->user())){
+                    if($this->guard('user')->user()->college_id > 0){
+                        if(1 == $request->get('signin_using_college') && !empty($request->get('college_url')) && $request->get('college_id') != $this->guard('user')->user()->college_id){
+                            $userCollege = $this->guard('user')->user()->college;
+                            $this->guard('user')->logout();
+                            Session::flush();
+                            Session::regenerate();
+
+                            return redirect('college/'.$request->get('college_url'))->withErrors(['You are belong to '.$userCollege->name.' college and your college url is <a href="'.url('college/'.$userCollege->url).'">'.url('college/'.$userCollege->url).'</a>. Please login using given url']);
+                        }
+                        $collegeUrl = $this->guard('user')->user()->college->url;
+                        if(empty($collegeUrl)){
+                            $collegeUrl = 'vchipedu';
+                        }
+                    } else {
+                        if(1 == $request->get('signin_using_college') && !empty($request->get('college_url')) && $request->get('college_id') != $this->guard('user')->user()->college_id){
+                            $userCollege = $this->guard('user')->user()->college;
+                            $this->guard('user')->logout();
+                            Session::flush();
+                            Session::regenerate();
+
+                            return redirect('college/'.$request->get('college_url'))->withErrors(['You are belong to Other college and your college url is <a href="'.url('college/other').'">'.url('college/other').'</a>. Please login using given url']);
+                        }
+                        $collegeUrl = 'other';
+                    }
+                    Session::put('college_user_url',$collegeUrl);
+                    if(1 == $request->get('signin_using_college') && !empty($request->get('college_url'))){
+                        $collegeUrlStr = 'college/'.$collegeUrl.'/profile';
+                        return redirect($collegeUrlStr)->with('message', 'Welcome '. $user->name);
+                    } else {
+                        return redirect()->back()->with('message', 'Welcome '. $user->name);
+                    }
+                }
                 return redirect()->back()->with('message', 'Welcome '. $user->name);
             } else {
                 return redirect()->back()->withErrors('Entered otp is wrong.');
             }
         }
+        // login using email
         $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -99,6 +134,33 @@ trait AuthenticatesUsers
                 }
             }
             if( 'true' == $isValidUser ){
+                if(is_object($this->guard('user')->user())){
+                    if($this->guard('user')->user()->college_id > 0){
+                        if(1 == $request->get('signin_using_college') && !empty($request->get('college_url')) && $request->get('college_id') != $this->guard('user')->user()->college_id){
+                            $userCollege = $this->guard('user')->user()->college;
+                            $this->guard('user')->logout();
+                            Session::flush();
+                            Session::regenerate();
+
+                            return redirect('college/'.$request->get('college_url'))->withErrors(['You are belong to '.$userCollege->name.' college and your college url is <a href="'.url('college/'.$userCollege->url).'">'.url('college/'.$userCollege->url).'</a>. Please login using given url']);
+                        }
+                        $collegeUrl = $this->guard('user')->user()->college->url;
+                        if(empty($collegeUrl)){
+                            $collegeUrl = 'vchipedu';
+                        }
+                    } else {
+                        if(1 == $request->get('signin_using_college') && !empty($request->get('college_url')) && $request->get('college_id') != $this->guard('user')->user()->college_id){
+                            $userCollege = $this->guard('user')->user()->college;
+                            $this->guard('user')->logout();
+                            Session::flush();
+                            Session::regenerate();
+
+                            return redirect('college/'.$request->get('college_url'))->withErrors(['You are belong to Other college and your college url is <a href="'.url('college/other').'">'.url('college/other').'</a>. Please login using given url']);
+                        }
+                        $collegeUrl = 'other';
+                    }
+                    Session::put('college_user_url',$collegeUrl);
+                }
                 return $this->sendLoginResponse($request);
             }
         } else {
@@ -258,7 +320,15 @@ trait AuthenticatesUsers
         if('ceo@vchiptech.com' == $user->email){
             Cache::put('vchip:chatAdminLive', true, 60);
         }
-        return redirect()->intended($this->redirectPath())->with('message', 'Welcome '. $user->name);
+        if(1 == $request->get('signin_using_college') && !empty($request->get('college_url'))){
+            if(!Session::has('college_user_url')){
+                Session::put('college_user_url',$request->get('college_url'));
+            }
+            $collegeUrl = 'college/'.$request->get('college_url').'/profile';
+            return redirect($collegeUrl)->with('message', 'Welcome '. $user->name);
+        } else {
+            return redirect()->intended($this->redirectPath())->with('message', 'Welcome '. $user->name);
+        }
     }
 
     /**

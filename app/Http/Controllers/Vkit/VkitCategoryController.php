@@ -38,7 +38,7 @@ class VkitCategoryController extends Controller
      *  show list of vkit category
      */
     protected function show(){
-    	$vkitCategories = VkitCategory::paginate();
+    	$vkitCategories = VkitCategory::getProjectCategoriesWithPagination();
     	return view('vkitCategory.list', compact('vkitCategories'));
     }
 

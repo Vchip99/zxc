@@ -13,7 +13,6 @@
   </section>
 @stop
 @section('dashboard_content')
-  &nbsp;
   <div class="container ">
     @if(count($errors) > 0)
       <div class="alert alert-danger">
@@ -87,7 +86,7 @@
                 <tbody id="client_batch_users" class="">
                   @if(count($batchUsers) > 0)
                     @foreach($batchUsers as $index => $user)
-                      <tr>
+                      <tr style="overflow: auto;">
                         <td>{{ $index + 1}}</td>
                         <td> {{$user->name}}</td>
                         <td> {{$user->email}}</td>
@@ -152,9 +151,9 @@
           if(result['batchUsers'].length){
             $.each(result['batchUsers'], function(idx, obj) {
               if(result['batchAttendance'].indexOf(String(obj.id)) > -1){
-                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td>'+obj.email+'</td><td><input type="checkbox" name="students[]" id="student_'+obj.id+'" value="'+obj.id+'" checked="checked"></td></tr>';
+                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" style="overflow: auto;"><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td>'+obj.email+'</td><td><input type="checkbox" name="students[]" id="student_'+obj.id+'" value="'+obj.id+'" checked="checked"></td></tr>';
               } else {
-                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td>'+obj.email+'</td><td><input type="checkbox" name="students[]" id="student_'+obj.id+'" value="'+obj.id+'"></td></tr>';
+                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" style="overflow: auto;"><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td>'+obj.email+'</td><td><input type="checkbox" name="students[]" id="student_'+obj.id+'" value="'+obj.id+'"></td></tr>';
               }
               if(0 == idx){
                 allUsers.value = obj.id;

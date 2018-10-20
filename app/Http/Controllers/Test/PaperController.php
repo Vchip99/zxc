@@ -53,7 +53,7 @@ class PaperController extends Controller
      * show all test paper
      */
     public function show(){
-    	$testPapers = TestSubjectPaper::paginate();
+        $testPapers = TestSubjectPaper::getPapersWithPagination();
     	return view('paper.list', compact('testPapers'));
     }
 
@@ -62,7 +62,7 @@ class PaperController extends Controller
      */
     protected function create(){
         $allSessions = [];
-        $testCategories    = TestCategory::all();
+        $testCategories = TestCategory::getAllTestCategories();
         $testSubCategories = [];
         $testSubjects = [];
         $paper = new TestSubjectPaper;
@@ -104,7 +104,7 @@ class PaperController extends Controller
     	if(isset($id)){
     		$paper = TestSubjectPaper::find($id);
     		if(is_object($paper)){
-    			$testCategories    = TestCategory::all();
+    			$testCategories = TestCategory::getAllTestCategories();
 				$testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($paper->test_category_id);
 				$testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($paper->test_category_id, $paper->test_sub_category_id);
                 $allSessions = PaperSection::where('test_subject_paper_id', $paper->id)->get();

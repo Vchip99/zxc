@@ -66,7 +66,7 @@
               </select>
             </div>
             <div class="col-md-3 mrgn_10_btm" id="student">
-              <select class="form-control" id="selected_student" name="student" onChange="showResult();">
+              <select class="form-control" id="selected_student" name="student" onChange="showResultByStudent();">
                 <option value="0"> Select User </option>
                  @if(is_object($selectedStudent) && count($students) > 0)
                   @foreach($students as $student)
@@ -90,7 +90,8 @@
           <div class="mrgn_20_btm">
             <div class="col-md-3 mrgn_10_btm">
              <select class="form-control" id="category" id="category" name="category" title="Category" onChange="selectSubcategory(this);">
-              <option value="0">Select Category</option>
+              <option value="">Select Category</option>
+              <option value="0">All</option>
               @if(count($categories) > 0)
                 @foreach($categories as $category)
                   <option value="{{$category->id}}">{{$category->name}}</option>
@@ -100,7 +101,8 @@
             </div>
             <div class="col-md-3 ">
              <select class="form-control" id="subcategory" name="subcategory" title="Sub Category" onChange="showResult();">
-              <option value="0">Select Sub Category</option>
+              <option value="">Select Sub Category</option>
+              <option value="0">All</option>
              </select>
             </div>
           </div>
@@ -125,8 +127,8 @@
                       @foreach($results as $index => $result)
                         <tr class="">
                           <td>{{$index + 1}}</td>
-                          <td>{{$result->subject->name}}</td>
-                          <td>{{$result->paper->name}}</td>
+                          <td>{{$result->subject}}</td>
+                          <td>{{$result->paper}}</td>
                           <td class="center">{{$result->test_score}} / {{$result->totalMarks()['totalMarks']}}</td>
                           <td class="center">{{$result->rank($selectedStudent->college_id)}}</td>
                         </tr>
@@ -145,36 +147,6 @@
               </div>
             </div>
           </div>
-          <!-- <div class="col-lg-12" id="bar-chart">
-            <div class="panel panel-info">
-              <div class="panel-heading text-center">
-                 RESULT
-              </div>
-              <div class="panel-body">
-                <div class="barchart-Wrapper">
-                  <div class="barchart-TimeCol">
-                    @foreach($barchartLimits as $barchartLimit)
-                      <div class="barchart-Time">
-                        <span class="barchart-TimeText">{{$barchartLimit}}</span>
-                      </div>
-                    @endforeach
-                  </div>
-                  <div class="barChart-Container">
-                    <div class="barchart" id="barchart">
-                      @if(count($results) > 0)
-                        @foreach($results as $index => $result)
-                          <div class="barchart-Col">
-                            <div class="barchart-Bar" style="height: {{$result->totalMarks()['percentage']}}%;" title="{{$result->subject->name}}-{{$result->paper->name}}" attr-height="{{$result->totalMarks()['percentage']}}%"></div>
-                            <div class="barchart-BarFooter " title="{{$result->paper->name}}">{{$result->paper->name}}</div>
-                          </div>
-                        @endforeach
-                      @endif
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
         </div>
       </div>
     </div>
@@ -184,13 +156,19 @@
     document.getElementById('selected_year').value = 0;
     document.getElementById('selected_student').value = 0;
     document.getElementById('test-result').innerHTML = '';
-    // document.getElementById('barchart').innerHTML = '';
-    document.getElementById('category').value = 0;
+    document.getElementById('category').value = '';
     unsetSubCategory();
     unsetStudent();
   }
 
-  function showResult(ele){
+  function showResultByStudent(){
+    document.getElementById('category').value = 0;
+    unsetSubCategory();
+    document.getElementById('subcategory').value = 0;
+    showResult();
+  }
+
+  function showResult(){
     var subcategory = parseInt(document.getElementById('subcategory').value);
     var category = parseInt(document.getElementById('category').value);
     var college = parseInt(document.getElementById('college').value);
@@ -205,8 +183,6 @@
         .done(function( msg ) {
           body = document.getElementById('test-result');
           body.innerHTML = '';
-          // barchart = document.getElementById('barchart');
-          // barchart.innerHTML = '';
           if( 0 < msg['scores'].length){
             $.each(msg['scores'], function(idx, obj) {
                 var eleTr = document.createElement('tr');
@@ -230,13 +206,6 @@
                 eleRank.innerHTML = msg['ranks'][obj.id];
                 eleTr.appendChild(eleRank);
                 body.appendChild(eleTr);
-
-                // var eleMainDiv = document.createElement('div');
-                // eleMainDiv.className = 'barchart-Col';
-                // eleInnerHtml = '<div class="barchart-Bar" style="height:'+ msg['marks'][obj.id]['percentage']+ '%;" title="'+obj.subject+'-'+obj.paper+'" attr-height="'+ msg['marks'][obj.id]['percentage']+ '%"></div>';
-                // eleInnerHtml += '<div class="barchart-BarFooter " title="'+obj.paper+'">'+obj.paper+'</div>';
-                // eleMainDiv.innerHTML = eleInnerHtml;
-                // barchart.appendChild(eleMainDiv);
             });
           } else {
             var eleTr = document.createElement('tr');
@@ -255,8 +224,7 @@
     var selected_year = document.getElementById('selected_year').value;
     document.getElementById('selected_student').value = 0;
     document.getElementById('test-result').innerHTML = '';
-    // document.getElementById('barchart').innerHTML = '';
-    document.getElementById('category').value = 0;
+    document.getElementById('category').value = '';
     unsetSubCategory();
 
     if(user_type > 0){
@@ -292,10 +260,10 @@
     document.getElementById('selected_dept').value = 0;
     document.getElementById('selected_year').value = 0;
     document.getElementById('test-result').innerHTML = '';
-    // document.getElementById('barchart').innerHTML = '';
 
-    document.getElementById('category').value = 0;
+    document.getElementById('category').value = '';
     unsetSubCategory();
+    document.getElementById('subcategory').value = '';
     unsetStudent();
 
     if(college > 0){
@@ -339,9 +307,13 @@
           select = document.getElementById('subcategory');
           select.innerHTML = '';
           var opt = document.createElement('option');
-          opt.value = '0';
+          opt.value = '';
           opt.innerHTML = 'Select Sub Category';
           select.appendChild(opt);
+          var allOpt = document.createElement('option');
+          allOpt.value = '0';
+          allOpt.innerHTML = 'All';
+          select.appendChild(allOpt);
           if( 0 < msg.length){
             $.each(msg, function(idx, obj) {
                 var opt = document.createElement('option');
@@ -353,13 +325,18 @@
       });
     }
   }
+
   function unsetSubCategory(){
     select = document.getElementById('subcategory');
     select.innerHTML = '';
     var opt = document.createElement('option');
-    opt.value = '0';
+    opt.value = '';
     opt.innerHTML = 'Select Sub Category';
     select.appendChild(opt);
+    var allOpt = document.createElement('option');
+    allOpt.value = '0';
+    allOpt.innerHTML = 'All';
+    select.appendChild(allOpt);
   }
 
   function unsetStudent(){

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
 use App\Models\TestSubCategory;
-use DB;
+use DB,Auth;
 
 class TestCategory extends Model
 {
@@ -51,18 +51,25 @@ class TestCategory extends Model
     protected static function getTestCategoriesByRegisteredSubjectPapersByUserId($userId){
         $userId = InputSanitise::inputInt($userId);
         return DB::table('test_categories')
+                ->join('test_sub_categories', 'test_sub_categories.test_category_id', '=', 'test_categories.id')
+                ->join('test_subjects', 'test_subjects.test_category_id' , '=', 'test_categories.id' )
                 ->join('test_subject_papers', 'test_subject_papers.test_category_id', 'test_categories.id')
                 ->join('register_papers', 'register_papers.test_subject_paper_id', 'test_subject_papers.id')
                 ->join('users', 'users.id', '=', 'register_papers.user_id')
+                ->where('test_categories.category_for', 1)
+                ->where('test_sub_categories.created_for', 1)
                 ->where('register_papers.user_id', $userId)
                 ->select('test_categories.id', 'test_categories.name')->groupBy('test_categories.id')->get();
     }
 
     protected static function getTestCategoriesAssociatedWithQuestion(){
         return DB::table('test_categories')
+                ->join('test_sub_categories', 'test_sub_categories.test_category_id', '=', 'test_categories.id')
+                ->join('test_subjects', 'test_subjects.test_category_id' , '=', 'test_categories.id' )
                 ->join('test_subject_papers', 'test_subject_papers.test_category_id', 'test_categories.id')
                 ->join('questions', 'questions.category_id', 'test_categories.id')
-                ->where('category_for', 1)
+                ->where('test_categories.category_for', 1)
+                ->where('test_sub_categories.created_for', 1)
                 ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
                 ->select('test_categories.id', 'test_categories.name')->groupBy('test_categories.id')->get();
     }
@@ -75,10 +82,35 @@ class TestCategory extends Model
                 ->select('test_categories.id', 'test_categories.name')->groupBy('test_categories.id')->get();
     }
 
-    protected static function getTestCategoriesAssociatedWithPapers(){
-        return DB::table('test_categories')
-                ->join('test_subject_papers', 'test_subject_papers.test_category_id', 'test_categories.id')
+    protected static function getTestCategoriesByCollegeIdByDeptIdAssociatedWithQuestion($collegeId,$deptId=NULL){
+        $result =  DB::table('test_categories')
+                ->join('test_subject_papers', 'test_subject_papers.test_category_id', '=','test_categories.id')
+                ->join('questions', 'questions.category_id', 'test_categories.id')
+                ->where('test_categories.college_id', $collegeId);
+        if($deptId != NULL){
+            $result->where('test_categories.college_dept_id', $deptId);
+        }
+        return $result->where('test_categories.category_for', 1)
                 ->select('test_categories.id', 'test_categories.name')->groupBy('test_categories.id')->get();
+    }
+
+    protected static function getTestCategoriesByCollegeIdByDeptIdAssociatedWithPapers($collegeId,$deptId=NULL){
+        $result =  DB::table('test_categories')
+                ->join('test_subject_papers', 'test_subject_papers.test_category_id', '=','test_categories.id')
+                ->where('test_categories.college_id', $collegeId);
+        if($deptId != NULL){
+            $result->where('test_categories.college_dept_id', $deptId);
+        }
+        return $result->where('test_categories.category_for', 1)
+                ->select('test_categories.id', 'test_categories.name')->groupBy('test_categories.id')->get();
+    }
+
+    protected static function getTestCategoriesByCollegeIdByDeptIdWithPagination($collegeId,$deptId=NULL){
+        $result = static::where('college_id', $collegeId);
+        if($deptId != NULL){
+            $result->where('college_dept_id', $deptId);
+        }
+        return $result->paginate();
     }
 
     public function subcategories(){
@@ -93,7 +125,6 @@ class TestCategory extends Model
             $result->where('id', '!=', $categoryId);
         }
         $result->first();
-
         if(is_object($result) && 1 == $result->count()){
             return 'true';
         } else {

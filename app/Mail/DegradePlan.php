@@ -29,7 +29,12 @@ class DegradePlan extends Mailable
      */
     public function build()
     {
-        return $this->subject('Your current plan has been degraded')
+        if('local' == \Config::get('app.env')){
+            $subject = 'Your current plan has been degraded on local';
+        } else {
+            $subject = 'Your current plan has been degraded';
+        }
+        return $this->subject($subject)
             ->view('emails.degradePlan')
             ->with([
                     'client' => $this->data['client']

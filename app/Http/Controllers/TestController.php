@@ -154,13 +154,30 @@ class TestController extends Controller
 		if($request->ajax()){
 			$categoryId = $request->get('id');
 			$userId = $request->get('userId');
-			if(isset($categoryId) && empty($userId)){
-				return Cache::remember('vchip:tests:testSubCategories:cat-'.$categoryId,30, function() use ($categoryId) {
+			// if(isset($categoryId) && empty($userId)){
+				// return Cache::remember('vchip:tests:testSubCategories:cat-'.$categoryId,30, function() use ($categoryId) {
 		            return TestSubCategory::getSubcategoriesByCategoryId($categoryId);
-		        });
-			} else {
-				return $subCategories = TestSubCategory::getTestSubCategoriesByRegisteredSubjectPapersByCategoryIdByUserId($categoryId,$userId);
-			}
+		        // });
+			// } else {
+			// 	// $subCategories = TestSubCategory::getTestSubCategoriesByRegisteredSubjectPapersByCategoryIdByUserId($categoryId,$userId);
+			// 	$result['subCategories'] = Cache::remember('vchip:tests:testSubCategories:cat-'.$categoryId,30, function() use ($categoryId) {
+		 //            return TestSubCategory::getSubcategoriesByCategoryId($categoryId);
+		 //        });
+			// 	$result['registerPapers'] = RegisterPaper::getRegisteredPapersByUserId($userId);
+			// 	return $result;
+			// }
+		}
+	}
+
+		/**
+	 *	return sub categories by categoryId or by registered subject papers
+	 */
+	public function getCollegeTestSubCategories(Request $request){
+		if($request->ajax()){
+			$categoryId = $request->get('id');
+			return Cache::remember(Session::get('college_user_url').':tests:testSubCategories:cat-'.$categoryId,30, function() use ($categoryId) {
+	            return TestSubCategory::getCollegeSubCategoriesByCategoryId($categoryId);
+	        });
 		}
 	}
 
@@ -173,7 +190,7 @@ class TestController extends Controller
 		$catId = $request->get('cat');
 		$subcatId = $request->get('subcat');
 		$userId = $request->get('userId');
-		if(empty($userId)){
+		// if(empty($userId)){
 			$result['subjects'] = Cache::remember('vchip:tests:testSubjects:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
 	            return TestSubject::getSubjectsByCatIdBySubcatid($catId, $subcatId);
 	        });
@@ -181,10 +198,39 @@ class TestController extends Controller
 	            return TestSubjectPaper::getSubjectPapersByCatIdBySubCatId($catId, $subcatId);
 	        });
 			$result['registeredPaperIds'] = $this->getRegisteredPaperIds();
-		} else {
-			$result['subjects'] = TestSubject::getRegisteredSubjectsByCatIdBySubcatIdByUserId($catId, $subcatId,$userId);
-			$result['papers'] = TestSubjectPaper::getRegisteredSubjectPapersByCatIdBySubCatIdByUserId($catId, $subcatId,$userId);
+		// } else {
+		// 	$result['subjects'] = TestSubject::getRegisteredSubjectsByCatIdBySubcatIdByUserId($catId, $subcatId,$userId);
+		// 	$result['papers'] = TestSubjectPaper::getRegisteredSubjectPapersByCatIdBySubCatIdByUserId($catId, $subcatId,$userId);
+		// }
+		if(is_array($result['papers'])){
+			foreach($result['papers'] as $testPapers){
+				foreach($testPapers as $testPaper){
+					$testSubjectPaperIds[] = $testPaper->id;
+				}
+			}
+			$testSubjectPaperIds = array_values($testSubjectPaperIds);
 		}
+
+		$result['alreadyGivenPapers'] = $this->getTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
+		$result['currentDate'] = date('Y-m-d H:i:s');
+		return $result;
+	}
+
+	/**
+	 *	return subjects and papers by categoryId by sub categoryId
+	 */
+	public function getCollegeDataByCatSubCat(Request $request){
+		$result= [];
+		$testSubjectPaperIds = [];
+		$catId = $request->get('cat');
+		$subcatId = $request->get('subcat');
+		$result['subjects'] = Cache::remember(Session::get('college_user_url').':tests:testSubjects:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
+            return TestSubject::getCollegeSubjectsByCatIdBySubcatid($catId, $subcatId);
+        });
+		$result['papers'] = Cache::remember(Session::get('college_user_url').':tests:testSubjectPapers:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
+            return TestSubjectPaper::getCollegeSubjectPapersByCatIdBySubCatId($catId, $subcatId);
+        });
+		$result['registeredPaperIds'] = $this->getRegisteredPaperIds();
 		if(is_array($result['papers'])){
 			foreach($result['papers'] as $testPapers){
 				foreach($testPapers as $testPaper){

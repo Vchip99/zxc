@@ -27,10 +27,10 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Project Name</th>
-          <th>Category Name</th>
-          <th>Edit Project</th>
-          <th>Delete Project</th>
+          <th>Project </th>
+          <th>Category </th>
+          <th>Edit </th>
+          <th>Delete </th>
         </tr>
       </thead>
       <tbody>
@@ -39,7 +39,7 @@
           <tr>
             <th scope="row">{{$index + $projects->firstItem() }}</th>
             <td>{{$project->name}}</td>
-            <td>{{$project->category->name}}</td>
+            <td>{{$project->category}}</td>
             <td>
               <a href="{{url('admin/vkitProject')}}/{{$project->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$project->name}}" />
                 </a>

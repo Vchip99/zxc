@@ -222,6 +222,18 @@ class HomeController extends Controller
         return view('more.us');
     }
 
+    protected function termsandconditions(){
+        return view('more.termsAndConditions');
+    }
+
+    protected function privacypolicy(){
+        return view('more.privacypolicy');
+    }
+
+    protected function faq(){
+        return view('more.faq');
+    }
+
     /**
      *  show career
      */
@@ -647,7 +659,6 @@ class HomeController extends Controller
                     "color" => "#f05050",
                 );
             }
-
         }
         return $events;
     }
@@ -660,5 +671,23 @@ class HomeController extends Controller
     protected function sendVchipUserSignInOtp(Request $request){
         $mobile = $request->get('mobile');
         return InputSanitise::sendOtp($mobile);
+    }
+
+    protected function collegeLogin($college){
+        if(is_object(Auth::user())){
+            return redirect('/');
+        }
+        $collegeUrl = InputSanitise::inputString($college);
+        if(!empty($collegeUrl)){
+            if('other' == $collegeUrl){
+                return view('header.college', compact('college'));
+            } else {
+                $college = College::whereNotNull('url')->where('url',$collegeUrl)->first();
+                if($college){
+                    return view('header.college', compact('college'));
+                }
+            }
+        }
+        return redirect('/');
     }
 }

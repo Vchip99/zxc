@@ -41,27 +41,26 @@
       @media  (max-width: 349px) {
           .hidden-sm { display: none; }
         }
-.fa-comment-o, .first-like i, .your-cmt{
-  font-weight: bold;
-  font-size: 18px;
-  color: #555;
-}
-.first-like i{
-  margin-right: 5px;
-}
-hr{
-  margin-top: 5px;
-  margin-bottom: 2px;
-  border-bottom: 1px solid ;
-}
-.comment-meta{
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
+    .fa-comment-o, .first-like i, .your-cmt{
+      font-weight: bold;
+      font-size: 18px;
+      color: #555;
+    }
+    .first-like i{
+      margin-right: 5px;
+    }
+    hr{
+      margin-top: 5px;
+      margin-bottom: 2px;
+      border-bottom: 1px solid ;
+    }
+    .comment-meta{
+      margin-left: 20px;
+      margin-right: 20px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
  </style>
-
 
 @stop
 @section('header-js')
@@ -112,7 +111,7 @@ hr{
   <div class="col-md-3">
     <div class="vchip-right-sidebar text-center">
       <label>Favourite : </label>&nbsp;
-      <div class="btn-group" role="group" title="Favourite">
+      <div class="btn-group" role="group" title="Favourite" style="cursor: pointer;">
         @if($registeredProjectIds && in_array($project->id, $registeredProjectIds))
           <a class=" voted-btn" id="favourite" data-favourite="true" onClick="registerProject(this);" data-project_id="{{$project->id}}" title="Favourite" style="color: #e91e63;"> <i class="fa fa-star " aria-hidden="true"></i> </a>
         @else
@@ -162,10 +161,10 @@ hr{
           <div class="comment-meta">
             <span id="like_{{$project->id}}"  class="first-like">
               @if( isset($likesCount[$project->id]) && is_object($currentUser) && isset($likesCount[$project->id]['user_id'][$currentUser->id]))
-                   <i id="project_like_{{$project->id}}" data-project_id="{{$project->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>
+                   <i id="project_like_{{$project->id}}" data-project_id="{{$project->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
                    <span id="like1-bs3">{{count($likesCount[$project->id]['like_id'])}}</span>
               @else
-                   <i id="project_like_{{$project->id}}" data-project_id="{{$project->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>
+                   <i id="project_like_{{$project->id}}" data-project_id="{{$project->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
                    <span id="like1-bs3">@if( isset($likesCount[$project->id])) {{count($likesCount[$project->id]['like_id'])}} @endif</span>
               @endif
             </span>

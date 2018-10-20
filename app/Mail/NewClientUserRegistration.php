@@ -30,11 +30,17 @@ class NewClientUserRegistration extends Mailable
      */
     public function build()
     {
-         return $this->subject('New Registration ')
-        ->view('emails.newClientUserRegistrationToClient')
-        ->with([
-                'name' => $this->data['name'],
-                'email' => $this->data['email'],
-            ]);
+        if('local' == \Config::get('app.env')){
+            $subject = 'New Registration on local';
+        } else {
+            $subject = 'New Registration';
+        }
+
+        return $this->subject($subject)
+            ->view('emails.newClientUserRegistrationToClient')
+            ->with([
+                    'name' => $this->data['name'],
+                    'email' => $this->data['email'],
+                ]);
     }
 }

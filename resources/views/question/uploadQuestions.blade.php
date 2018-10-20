@@ -135,7 +135,7 @@
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Sub Category ...';
+	            opt.innerHTML = 'Select Sub Category';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -165,7 +165,7 @@
 	            selectSub.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Subject ...';
+	            opt.innerHTML = 'Select Subject';
 	            selectSub.appendChild(opt);
 	            if( 0 < msg.length){
 	              $.each(msg, function(idx, obj) {
@@ -190,7 +190,7 @@
 	            select.innerHTML = '';
 	            var opt = document.createElement('option');
 	            opt.value = '';
-	            opt.innerHTML = 'Select Paper ...';
+	            opt.innerHTML = 'Select Paper';
 	            select.appendChild(opt);
 	            if( 0 < msg.length){
 		            $.each(msg, function(idx, obj) {

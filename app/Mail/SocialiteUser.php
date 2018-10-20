@@ -29,7 +29,13 @@ class SocialiteUser extends Mailable
      */
     public function build()
     {
-        return $this->subject('New User Registration')
+        if('local' == \Config::get('app.env')){
+            $subject = 'New User Registration on local';
+        } else {
+            $subject = 'New User Registration';
+        }
+
+        return $this->subject($subject)
             ->view('emails.socialiteUser')
             ->with([
                     'email' => $this->data['email'],

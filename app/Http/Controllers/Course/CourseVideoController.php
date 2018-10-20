@@ -61,7 +61,7 @@ class CourseVideoController extends Controller
      *  show list of course video
      */
     protected function show(){
-    	$courseVideos = CourseVideo::paginate();
+    	$courseVideos = CourseVideo::getCourseVideosWithPagination();
     	return view('courseVideo.list', compact('courseVideos'));
     }
 
@@ -69,9 +69,9 @@ class CourseVideoController extends Controller
      *  show create course video UI
      */
     protected function create(){
-        $courseCategories   = CourseCategory::all();
-        $courseSubCategories = new CourseSubCategory;
-        $courseCourses= new CourseCourse;
+        $courseCategories = CourseCategory::getCourseCategoriesForAdmin();
+        $courseSubCategories = [];
+        $courseCourses= [];
     	$video = new CourseVideo;
     	return view('courseVideo.create', compact('courseCategories','courseSubCategories','courseCourses', 'video'));
     }
@@ -81,7 +81,6 @@ class CourseVideoController extends Controller
      */
     protected function store(Request $request){
     	$v = Validator::make($request->all(), $this->validateCourseVideo);
-        // dd($v->errors());
         if ($v->fails())
         {
             return redirect()->back()->withErrors($v->errors());
@@ -131,10 +130,11 @@ class CourseVideoController extends Controller
     	if(isset($id)){
     		$video = CourseVideo::find($id);
     		if(is_object($video)){
-    			$courseCategories   = CourseCategory::all();
+    			$courseCategories = CourseCategory::getCourseCategoriesForAdmin();
                 $courseSubCategories = CourseSubCategory::getCourseSubCategoriesByCategoryId($video->course_category_id);
                 $courseCourses= CourseCourse::getCourseByCatIdBySubCatIdForAdmin($video->course_category_id,$video->course_sub_category_id);
     			return view('courseVideo.create', compact('courseCategories','courseSubCategories','courseCourses', 'video'));
+
     		}
     	}
     	return Redirect::to('admin/manageCourseVideo');
@@ -179,16 +179,19 @@ class CourseVideoController extends Controller
                 DB::beginTransaction();
                 try
                 {
-                    $video->deleteCommantsAndSubComments();
-                    if(true == preg_match('/courseVideos/',$video->video_path)){
-                        $courseVideoFolder = "courseVideos/".$video->course_id."/".$video->id;
-                        if(is_dir($courseVideoFolder)){
-                            InputSanitise::delFolder($courseVideoFolder);
+                    $videoCategory = $video->videoCategory;
+                    if(0 == $videoCategory->college_id && 0 == $videoCategory->user_id){
+                        $video->deleteCommantsAndSubComments();
+                        if(true == preg_match('/courseVideos/',$video->video_path)){
+                            $courseVideoFolder = "courseVideos/".$video->course_id."/".$video->id;
+                            if(is_dir($courseVideoFolder)){
+                                InputSanitise::delFolder($courseVideoFolder);
+                            }
                         }
+            			$video->delete();
+                        DB::commit();
+            			return Redirect::to('admin/manageCourseVideo')->with('message', 'Video deleted successfully!');
                     }
-        			$video->delete();
-                    DB::commit();
-        			return Redirect::to('admin/manageCourseVideo')->with('message', 'Video deleted successfully!');
                 }
                 catch(\Exception $e)
                 {

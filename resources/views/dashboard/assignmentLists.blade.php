@@ -63,7 +63,7 @@
             <td>{{$assignment->topic->name}}</td>
             <td>{{$assignment->subject->name}}</td>
             <td>
-              <a href="{{url('doAssignment')}}/{{$assignment->id}}" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Do Assignment " />
+              <a href="{{url('college/'.Session::get('college_user_url').'/doAssignment')}}/{{$assignment->id}}" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Do Assignment " />
                 </a>
             </td>
           </tr>
@@ -210,7 +210,7 @@
           eleSubject.innerHTML = msg['subject'];
           eleTr.appendChild(eleSubject);
 
-          var url = "{{url('doAssignment')}}/"+ msg['id'];
+          var url = "{{url('college/'.Session::get('college_user_url').'/doAssignment')}}/"+ msg['id'];
           var imageSrc = "{{asset('images/edit1.png')}}";
           var eleRemark = document.createElement('td');
           eleRemark.innerHTML = '<a href="'+ url +'" ><img src="'+imageSrc+'" width=\'30\' height=\'30\' title=" Edit Assignment " /></a>';
@@ -253,7 +253,7 @@
       eleSubject.innerHTML = msg['subject'];
       eleTr.appendChild(eleSubject);
 
-      var url = "{{url('doAssignment')}}/"+ msg['id'];
+      var url = "{{url('college/'.Session::get('college_user_url').'/doAssignment')}}/"+ msg['id'];
       var imageSrc = "{{asset('images/edit1.png')}}";
       var eleRemark = document.createElement('td');
       eleRemark.innerHTML = '<a href="'+ url +'" ><img src="'+imageSrc+'" width=\'30\' height=\'30\' title=" Edit Assignment " /></a>';

@@ -10,7 +10,8 @@ use App\Models\CourseComment;
 use App\Models\CourseVideoLike;
 use App\Models\CourseSubCategory;
 use App\Models\CourseCategory;
-use File;
+use App\Models\CollegeCategory;
+use File,Auth;
 
 class CourseVideo extends Model
 {
@@ -89,11 +90,128 @@ class CourseVideo extends Model
     }
 
     /**
-     *  get category of sub category
+     *  return course video by collegeId by deptId
+     */
+    protected static function getCourseVideosByCollegeIdByDeptIdWithPagination($collegeId, $deptId=NULL){
+        $loginUser = Auth::user();
+        $collegeId = InputSanitise::inputInt($collegeId);
+        $deptId = InputSanitise::inputInt($deptId);
+        $result = static::join('college_categories', 'college_categories.id', '=', 'course_videos.course_category_id')
+            ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_videos.course_sub_category_id')
+            ->join('course_courses', 'course_courses.id', '=', 'course_videos.course_id')
+            ->join('users','users.id','=','course_courses.created_by')
+            ->where('college_categories.college_id', $collegeId)->where('course_sub_categories.created_for', 0);
+        if(NULL != $deptId){
+            $result->where('college_categories.college_dept_id', '=', $deptId);
+        }
+
+        if(User::TNP == $loginUser->user_type){
+            $result->where('course_courses.created_by', $loginUser->id);
+        }
+        return $result->select('course_videos.id', 'course_videos.name', 'college_categories.name as category', 'course_sub_categories.name as subcategory', 'course_courses.name as course','college_categories.college_dept_id', 'course_courses.created_by', 'course_videos.course_id','users.name as user')
+            ->groupBy('course_videos.id')
+            ->paginate();
+    }
+
+    protected static function getCourseVideosByCollegeIdByAssignedDeptsWithPagination($collegeId){
+        $loginUser = Auth::user();
+        $result = static::join('college_categories', 'college_categories.id', '=', 'course_videos.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_videos.course_sub_category_id')
+                ->join('course_courses', 'course_courses.id', '=', 'course_videos.course_id')
+                ->join('users','users.id','=','course_courses.created_by')
+                ->where('users.college_id', $collegeId);
+        if(User::Lecturer == $loginUser->user_type){
+            $result->where('course_courses.created_by', $loginUser->id);
+        } else {
+            $result->where(function($query) use($loginUser){
+                $query->where('users.user_type', User::Lecturer);
+                $query->orWhere('users.id',$loginUser->id);
+            })
+            ->where('course_courses.created_by', '>', 0)->whereIn('users.college_dept_id', explode(',',$loginUser->assigned_college_depts));
+        }
+        return $result->where('course_sub_categories.created_for', 0)->select('course_videos.id', 'course_videos.name', 'college_categories.name as category', 'course_sub_categories.name as subcategory', 'course_courses.name as course','college_categories.college_dept_id', 'course_courses.created_by', 'course_videos.course_id','users.name as user')
+            ->groupBy('course_videos.id')
+            ->paginate();
+    }
+
+    /**
+     *  return course video by collegeId by deptId
+     */
+    protected static function getCourseVideosWithPagination(){
+        return static::join('course_categories', 'course_categories.id', '=', 'course_videos.course_category_id')
+            ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_videos.course_sub_category_id')
+            ->join('course_courses', 'course_courses.id', '=', 'course_videos.course_id')
+            ->where('course_sub_categories.created_for', 1)
+            ->select('course_videos.id', 'course_videos.name', 'course_categories.name as category', 'course_sub_categories.name as subcategory', 'course_courses.name as course')
+            ->groupBy('course_videos.id')
+            ->paginate();
+    }
+
+    /**
+     *  return course video by collegeId by videoId
+     */
+    protected static function getCourseVideoByCollegeIdByVideoId($collegeId, $videoId){
+        $collegeId = InputSanitise::inputInt($collegeId);
+        $videoId = InputSanitise::inputInt($videoId);
+        return static::join('course_courses', 'course_courses.id', '=', 'course_videos.course_id')
+            ->join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+            ->join('course_sub_categories', 'course_sub_categories.id','=','course_videos.course_sub_category_id')
+            ->where('course_sub_categories.created_for', 0)
+            ->where('college_categories.college_id', $collegeId)
+            ->where('course_videos.id', $videoId)
+            ->select('course_videos.*')
+            ->first();
+    }
+
+    /**
+     *  return course video by videoId
+     */
+    protected static function getCourseVideoByVideoId($videoId){
+        $videoId = InputSanitise::inputInt($videoId);
+        // return static::join('course_courses', 'course_courses.id', '=', 'course_videos.course_id')
+        //     ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+        //     ->join('course_sub_categories', 'course_sub_categories.id','=','course_videos.course_sub_category_id')
+        //     ->where('course_sub_categories.created_for', 1)
+        //     ->where('course_videos.id', $videoId)
+        //     ->select('course_videos.*')
+        //     ->first();
+        return static::where('course_videos.id', $videoId)
+            ->select('course_videos.*')
+            ->first();
+    }
+
+    /**
+     *  get course
      */
     public function course(){
+        $course = CourseCourse::find($this->course_id);
+        if(is_object($course)){
+            return $course->name;
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     *  get category of sub category
+     */
+    public function collegeCourse(){
         return $this->belongsTo(CourseCourse::class, 'course_id');
     }
+
+    /**
+     *  get category of sub category
+     */
+    public function videoCategory(){
+        return $this->belongsTo(CourseCategory::class, 'course_category_id');
+    }
+
+    // /**
+    //  *  get category of sub category
+    //  */
+    // public function collegeCategory(){
+    //     return $this->belongsTo(CollegeCategory::class, 'course_category_id');
+    // }
 
     /**
      *  get category of video
@@ -171,10 +289,31 @@ class CourseVideo extends Model
         $courseId = InputSanitise::inputInt($request->get('course'));
         $videoName = InputSanitise::inputString($request->get('video'));
         $videoId = InputSanitise::inputInt($request->get('video_id'));
-        $result = static::where('course_id', $courseId)->where('name', $videoName);
-        if(!empty($videoId)){
-            $result->where('id', '!=', $videoId);
+
+        $loginUser = Auth::guard('web')->user();
+        if(is_object($loginUser)){
+            $result = static::join('college_categories', 'college_categories.id','=','course_videos.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_videos.course_sub_category_id')
+                ->join('course_courses', 'course_courses.id', '=', 'course_videos.course_id')
+                ->where('course_sub_categories.created_for', 0)
+                ->where('course_videos.course_id', $courseId)
+                ->where('course_videos.name', $videoName);
+            if(!empty($videoId)){
+                $result->where('course_videos.id', '!=', $videoId);
+            }
+            $result->where('college_categories.college_id', $loginUser->college_id);
+        } else {
+            $result = static::join('course_categories', 'course_categories.id','=','course_videos.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_videos.course_sub_category_id')
+                ->join('course_courses', 'course_courses.id', '=', 'course_videos.course_id')
+                ->where('course_sub_categories.created_for', 1)
+                ->where('course_videos.course_id', $courseId)
+                ->where('course_videos.name', $videoName);
+            if(!empty($videoId)){
+                $result->where('course_videos.id', '!=', $videoId);
+            }
         }
+
         $result->first();
         if(is_object($result) && 1 == $result->count()){
             return 'true';

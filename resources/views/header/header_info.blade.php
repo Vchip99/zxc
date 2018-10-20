@@ -59,13 +59,13 @@
                     <div class="tab-content">
                       <div id="home" class="tab-pane fade in active">
                         <div class="form-group" style="color: white;">
-                          <input type="radio" name="signin_type" id="signinRadioEmail" value="email" checked onClick="toggleSignIn(this.value);">Email-id/User-id
+                          <input type="radio" name="signin_type" id="signinRadioEmail" value="email" checked onClick="toggleSignIn(this.value);">Email-id
                           <input type="radio" name="signin_type" value="mobile" onClick="toggleSignIn(this.value);">Mobile
                         </div>
                         <form id="loginForm" method="post" action="{{ url('login') }}">
                             {!! csrf_field() !!}
                           <div class="form-group">
-                            <input id="email" name="email" type="text" class="form-control signInEmail" placeholder="vchip@gmail.com" onfocus="this.type='email'" autocomplete="off" required>
+                            <input id="email" name="email" type="text" class="form-control signInEmail" placeholder="Email-id" onfocus="this.type='email'" autocomplete="off" required>
                             <span class="help-block"></span>
                           </div>
                           <div class="form-group">
@@ -82,9 +82,9 @@
                             <span class="help-block"></span>
                           </div>
                           <div id="loginErrorMsg" class="alert alert-error hide">Wrong username or password</div>
-                          <div class="checkbox">
+                          <div>
                             <label>
-                              <input type="checkbox" name="remember" id="remember" data-toggle="tooltip" title="Remember login"> Remember login
+                              <input type="radio" name="terms_condition" checked><a href="{{ url('terms-and-conditions')}}">Accepted Terms and Condition</a>
                             </label>
                           </div>
                           <button type="submit" value="login" name="submit" id="loginBtn" class="btn btn-info btn-block signInEmail" data-toggle="tooltip" title="Login">Login</button>
@@ -192,6 +192,7 @@
       $('#password').val('');
       $('#email').val('');
       $('#signInPhone').val('');
+      $('#loginBtn').prop('type','submit');
     } else {
       $('.signInEmail').addClass('hide');
       $('.signInMobile').removeClass('hide');
@@ -201,6 +202,7 @@
       $('#password').prop('required', false);
       $('#email').prop('required', false);
       $('#signInPhone').val('');
+      $('#loginBtn').prop('type','button');
     }
   }
 
@@ -220,12 +222,14 @@
           $('#signInOtpDiv').removeClass('hide');
           $('#loginBtn').removeClass('hide');
           $('#sendSignInOtpBtn').addClass('hide');
+          $('#loginBtn').prop('type','submit');
         } else {
           $('#sendSignInOtpBtn').removeClass('hide');
           $('#signInPhone').prop('readonly', false);
           $('#signInOtpMessage').addClass('hide');
           $('#signInOtpDiv').addClass('hide');
           $('#loginBtn').addClass('hide');
+          $('#loginBtn').prop('type','button');
           $.confirm({
             title: 'Alert',
             content: 'Something wrong in otp result.'

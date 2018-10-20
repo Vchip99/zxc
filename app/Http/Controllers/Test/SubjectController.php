@@ -45,7 +45,7 @@ class SubjectController extends Controller
      *	show all subjects
      */
 	public function show(){
-		$testSubjects 	   = TestSubject::paginate();
+		$testSubjects = TestSubject::getSubjectsWithPagination();
 		return view('subject.list', compact('testSubjects'));
 	}
 
@@ -53,10 +53,9 @@ class SubjectController extends Controller
 	 *	show create UI for subject
 	 */
 	protected function create(){
-		$testCategories    = TestCategory::all();
+		$testCategories = TestCategory::getAllTestCategories();
 		$testSubCategories = [];
 		$subject = new TestSubject;
-
 		return view('subject.create', compact('testCategories','testSubCategories','subject'));
 	}
 
@@ -95,7 +94,7 @@ class SubjectController extends Controller
 		if(isset($id)){
 			$subject = TestSubject::find($id);
 			if(is_object($subject)){
-				$testCategories    = TestCategory::all();
+				$testCategories = TestCategory::getAllTestCategories();
 				$testSubCategories = TestSubCategory::getSubjectSubcategoriesByCategoryId($subject->test_category_id);
 				return view('subject.create', compact('testCategories','testSubCategories','subject'));
 			}
@@ -145,23 +144,26 @@ class SubjectController extends Controller
 				DB::beginTransaction();
 		        try
 		        {
-					if(true == is_object($testSubject->papers) && false == $testSubject->papers->isEmpty()){
-						foreach($testSubject->papers as $paper){
-							if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
-								foreach($paper->questions as $question){
-									UserSolution::deleteUserSolutionsByQuestionId($question->id);
-									$question->delete();
+		        	$subjectCategory = $testSubject->category;
+                    if(0 == $subjectCategory->college_id && 0 == $subjectCategory->user_id){
+						if(true == is_object($testSubject->papers) && false == $testSubject->papers->isEmpty()){
+							foreach($testSubject->papers as $paper){
+								if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
+									foreach($paper->questions as $question){
+										UserSolution::deleteUserSolutionsByQuestionId($question->id);
+										$question->delete();
+									}
 								}
+								Score::deleteUserScoresByPaperId($paper->id);
+								PaperSection::deletePaperSectionsByPaperId($paper->id);
+	                    		$paper->deleteRegisteredPaper();
+								$paper->delete();
 							}
-							Score::deleteUserScoresByPaperId($paper->id);
-							PaperSection::deletePaperSectionsByPaperId($paper->id);
-                    		$paper->deleteRegisteredPaper();
-							$paper->delete();
 						}
+						$testSubject->delete();
+						DB::commit();
+						return Redirect::to('admin/manageSubject')->with('message', 'Subject deleted successfully!');
 					}
-					$testSubject->delete();
-					DB::commit();
-					return Redirect::to('admin/manageSubject')->with('message', 'Subject deleted successfully!');
 				}
 		        catch(\Exception $e)
 		        {

@@ -52,8 +52,6 @@ class Controller extends BaseController
         //     return TestCategory::getCompanyTestCategoriesAssociatedWithQuestion();
         // });
         $testForCompany = TestSubjectPaper::getFirstCompanyTestPaperAssociatedWithQuestion();
-        // dd(\DB::getQueryLog());
-        // dd($testForCompany);
         view::share('testForCompany', $testForCompany);
     }
 }

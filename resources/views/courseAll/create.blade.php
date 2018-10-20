@@ -9,7 +9,6 @@
   </section>
 @stop
 @section('admin_content')
-  &nbsp;
   <script src="{{asset('js/moment-with-locales.min.js?ver=1.0')}}" type="text/javascript"></script>
     <script src="{{asset('js/bootstrap-datetimepicker.min.js?ver=1.0')}}" type="text/javascript"></script>
     <link href="{{asset('css/bootstrap-datetimepicker.min.css?ver=1.0')}}" rel="stylesheet"/>
@@ -47,7 +46,7 @@
         <label class="col-sm-2 col-form-label">Category Name:</label>
         <div class="col-sm-3">
           <select class="form-control" name="category" id="select_category" title="Category" required="true">
-              <option value="">Select Category ...</option>
+              <option value="">Select Category</option>
               @if(count($courseCategories) > 0)
                 @foreach($courseCategories as $courseCategory)
                   <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
@@ -80,7 +79,7 @@
         <label class="col-sm-2 col-form-label">Category Name:</label>
         <div class="col-sm-3">
           <select id="course_category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-              <option value="0">Select Category ...</option>
+              <option value="">Select Category</option>
               @if(count($courseCategories) > 0)
                 @foreach($courseCategories as $courseCategory)
                   <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
@@ -94,7 +93,7 @@
         <label class="col-sm-2 col-form-label">Sub Category Name:</label>
         <div class="col-sm-3">
           <select id="course_subcategory" class="form-control" name="subcategory" required title="Sub Category">
-            <option value="0">Select Sub Category ...</option>
+            <option value="">Select Sub Category</option>
           </select>
           @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
         </div>
@@ -146,7 +145,7 @@
         <label class="col-sm-2 col-form-label">Difficulty Level:</label>
         <div class="col-sm-3">
           <select id="difficulty_level" class="form-control" name="difficulty_level" required title="Difficulty Level">
-              <option value="">Select Difficulty Level ...</option>
+              <option value="">Select Difficulty Level</option>
               <option value="1">Beginner</option>
               <option value="2">Intermediate</option>
               <option value="3">Advance</option>
@@ -257,7 +256,7 @@
         select = document.getElementById('course_subcategory');
         select.innerHTML = '';
         var opt = document.createElement('option');
-        opt.value = '0';
+        opt.value = '';
         opt.innerHTML = 'Select Sub Category';
         select.appendChild(opt);
         if( 0 < msg.length){

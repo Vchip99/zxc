@@ -53,7 +53,7 @@ class VkitController extends Controller
             $page = $request->getQueryString();
         }
         $projects = Cache::remember('vchip:projects:projects-'.$page,60, function() {
-            return VkitProject::paginate(12);
+            return VkitProject::getVkitProjectsWithPagination();
         });
 
         $vkitCategories= Cache::remember('vchip:projects:vkitCategories',60, function() {
@@ -69,11 +69,11 @@ class VkitController extends Controller
      */
     protected function vkitproject($id,$subcommentId=NULL){
         $project = Cache::remember('vchip:projects:project-'.$id,60, function() use ($id){
-            return VkitProject::find(json_decode($id));
+            return VkitProject::getVkitProjectsById(json_decode($id));
         });
         if(is_object($project)){
-            $projects = Cache::remember('vchip:projects:projects',60, function() {
-                return VkitProject::all();
+            $projects = Cache::remember('vchip:projects:projects:'.$project->category_id,60, function() use($project) {
+                return VkitProject::getVkitProjectsByCategoryId($project->category_id);
             });
             $comments = VkitProjectComment::where('vkit_project_id', $id)->orderBy('id', 'desc')->get();
 
@@ -126,6 +126,17 @@ class VkitController extends Controller
         } else {
             return VkitProject::getRegisteredVkitProjectsByUserIdByCategoryId($userId, $categoryId);
         }
+    }
+
+
+     /**
+     *  return vkits project by categoryId
+     */
+    protected function getCollegeVkitProjectsByCategoryId(Request $request){
+        $categoryId = $request->get('id');
+        return Cache::remember(Session::get('college_user_url').':projects:projects:cat-'.$categoryId, 60, function() use ($categoryId){
+            return VkitProject::getCollegeVkitProjectsByCategoryId($categoryId);
+        });
     }
 
     /**

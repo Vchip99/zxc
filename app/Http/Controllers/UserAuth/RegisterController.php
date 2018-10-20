@@ -95,6 +95,11 @@ class RegisterController extends Controller
         } else {
             $adminApprove = 0;
         }
+        if(User::Hod == $data['user_type'] || User::Lecturer == $data['user_type']){
+            $assignedCollegeDepts = $data['department'];
+        } else {
+            $assignedCollegeDepts = '';
+        }
         if('mobile' == $data['signup_type']){
             $userMobile = $data['phone'];
             $loginOtp = $data['user_otp'];
@@ -114,12 +119,22 @@ class RegisterController extends Controller
                     'roll_no' => $data['roll_no'],
                     'other_source' => $data['other_source'],
                     'number_verified' => 1,
+                    'assigned_college_depts' => $assignedCollegeDepts,
                 ]);
             } else {
                 return 'Entered otp is wrong.';
             }
         } else {
             $emailToken= str_random(60);
+            if('other' == $data['college']){
+             if(!empty($data['other_source'])){
+                $otherSource = $data['other_source'];
+             } else {
+                $otherSource = 'other';
+             }
+            } else {
+                $otherSource = '';
+            }
             $user = User::create([
                 'name' => $data['name'],
                 'phone' => $data['phone'],
@@ -132,9 +147,10 @@ class RegisterController extends Controller
                 'college_dept_id' => $data['department'],
                 'year' => $data['year'],
                 'roll_no' => $data['roll_no'],
-                'other_source' => $data['other_source'],
+                'other_source' => $otherSource,
                 'email_token' => $emailToken,
                 'number_verified' => 0,
+                'assigned_college_depts' => $assignedCollegeDepts,
             ]);
         }
         return $user;
@@ -183,7 +199,7 @@ class RegisterController extends Controller
             if(1 == $user->number_verified){
                 $user->email = $user->id.'@gmail.com';
                 $user->save();
-                // un approve number if have same number to other users with same client
+                // un approve number if have same number to other users
                 $otherUsers = User::whereNotNull('phone')->where('phone', $user->phone)->where('id','!=', $user->id)->get();
                 if(is_object($otherUsers) && false == $otherUsers->isEmpty()){
                     foreach($otherUsers as $otherUser){
@@ -252,9 +268,17 @@ class RegisterController extends Controller
             // send mail to admin after new registration
             Mail::to('vchipdesigng8@gmail.com')->send(new NewRegisteration($data));
             if('mobile' == $request->get('signup_type')){
-                return redirect('/')->with('message', 'Please login using mobile.');
+                if(1 == $request->get('signup_using_college')){
+                    return redirect()->back()->with('message', 'Please login using mobile.');
+                } else {
+                    return redirect('/')->with('message', 'Please login using mobile.');
+                }
             } else {
-                return redirect('/')->with('message', 'Verify your email for your account activation.');
+                if(1 == $request->get('signup_using_college')){
+                    return redirect()->back()->with('message', 'Verify your email for your account activation.');
+                } else {
+                    return redirect('/')->with('message', 'Verify your email for your account activation.');
+                }
             }
         }
         catch(Exception $e)

@@ -9,7 +9,6 @@
   </section>
 @stop
 @section('admin_content')
-  &nbsp;
     <script src="{{asset('js/moment-with-locales.min.js?ver=1.0')}}" type="text/javascript"></script>
     <script src="{{asset('js/bootstrap-datetimepicker.min.js?ver=1.0')}}" type="text/javascript"></script>
     <link href="{{asset('css/bootstrap-datetimepicker.min.css?ver=1.0')}}" rel="stylesheet"/>
@@ -29,14 +28,14 @@
         @if(count($courseCategories) > 0)
           @foreach($courseCategories as $courseCategory)
             @if( isset($course->id) && $course->course_category_id == $courseCategory->id)
-              <input type="text" class="form-control" name="category_text" id="category" value="{{$courseCategory->name}}" readonly>
-              <input type="hidden" name="category" value="{{$courseCategory->id}}">
+              <input type="text" class="form-control" name="category_text" value="{{$courseCategory->name}}" readonly>
+              <input type="hidden" name="category" id="category" value="{{$courseCategory->id}}">
             @endif
           @endforeach
         @endif
       @else
         <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-            <option value="0">Select Category ...</option>
+            <option value="0">Select Category</option>
             @if(count($courseCategories) > 0)
               @foreach($courseCategories as $courseCategory)
                 <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
@@ -53,13 +52,13 @@
         @if(isset($course->id) && count($courseSubCategories) > 0)
             @foreach($courseSubCategories as $courseSubCategory)
               @if($course->course_sub_category_id == $courseSubCategory->id)
-                <input type="text" class="form-control" name="subcategory_text" id="subcategory" value="{{$courseSubCategory->name}}" readonly>
-                <input type="hidden" name="subcategory" value="{{$courseSubCategory->id}}">
+                <input type="text" class="form-control" name="subcategory_text" value="{{$courseSubCategory->name}}" readonly>
+                <input type="hidden" name="subcategory" id="subcategory" value="{{$courseSubCategory->id}}">
               @endif
             @endforeach
         @else
           <select id="subcategory" class="form-control" name="subcategory" required title="Sub Category">
-            <option value="0">Select Sub Category ...</option>
+            <option value="0">Select Sub Category</option>
           </select>
         @endif
         @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
@@ -135,7 +134,7 @@
       <label class="col-sm-2 col-form-label">Difficulty Level:</label>
       <div class="col-sm-3">
         <select id="difficulty_level" class="form-control" name="difficulty_level" required title="Difficulty Level">
-            <option value="">Select Difficulty Level ...</option>
+            <option value="">Select Difficulty Level</option>
             <option value="1" @if('1' == $course->difficulty_level ) selected @endif>Beginner</option>
             <option value="2" @if('2' == $course->difficulty_level ) selected @endif>Intermediate</option>
             <option value="3" @if('3' == $course->difficulty_level ) selected @endif>Advance</option>

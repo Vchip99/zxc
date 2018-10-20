@@ -30,7 +30,12 @@ class VirtualPlacementQuery extends Mailable
      */
     public function build()
     {
-        return $this->subject(' Virtual Placement Query')
+        if('local' == \Config::get('app.env')){
+            $subject = 'Virtual Placement Query on local';
+        } else {
+            $subject = 'Virtual Placement Query';
+        }
+        return $this->subject($subject)
             ->view('emails.virtualPlacementQuery')
             ->with([
                     'name' => $this->data['name'],

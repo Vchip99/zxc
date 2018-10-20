@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Libraries\InputSanitise;
-use DB;
+use DB,Auth;
 use App\Models\VkitProject;
 
 class VkitCategory extends Model
@@ -32,6 +32,7 @@ class VkitCategory extends Model
             $vkitCategory = new static;
         }
         $vkitCategory->name = $categoryName;
+        $loginUser = Auth::guard('web')->user();
         $vkitCategory->save();
         return $vkitCategory;
     }
@@ -45,6 +46,31 @@ class VkitCategory extends Model
             ->select('vkit_categories.id', 'vkit_categories.name')->groupBy('vkit_categories.id')
             ->get();
     }
+
+    /**
+     *  return all project categories
+     */
+    protected function getProjectCategoriesWithPagination(){
+        return  static::paginate();
+    }
+
+    /**
+     *  return all project categories
+     */
+    protected function getProjectCategories(){
+        return  static::get();
+    }
+
+    // /**
+    //  *  return all project categories
+    //  */
+    // protected function getProjectCategoriesByCollegeIdByDeptId($collegeId,$deptId=NULL){
+    //     $result =  static::where('college_id', $collegeId);
+    //     if($deptId != NULL){
+    //         $result->where('college_dept_id', $deptId);
+    //     }
+    //     return $result->select('id', 'name')->get();
+    // }
 
     public function projects(){
         return $this->hasMany(VkitProject::class, 'category_id');

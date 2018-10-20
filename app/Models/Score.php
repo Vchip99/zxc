@@ -146,8 +146,11 @@ class Score extends Model
 
     protected static function getScoreByCollegeIdByDeptIdByFilters($collegeId,$collegeDeptId,Request $request){
         $result = static::join('users', 'users.id', '=', 'scores.user_id')
+                        ->join('test_categories', 'test_categories.id','=','scores.category_id')
+                        ->join('test_sub_categories', 'test_sub_categories.id', '=', 'scores.subcat_id')
                         ->join('test_subjects', 'test_subjects.id' , '=', 'scores.subject_id' )
-                        ->join('test_subject_papers', 'test_subject_papers.id' , '=', 'scores.paper_id' );
+                        ->join('test_subject_papers', 'test_subject_papers.id' , '=', 'scores.paper_id' )
+                        ->where('test_sub_categories.created_for', 1);
         if($request->student > 0){
             $result->where('scores.user_id', $request->student);
         }
@@ -163,8 +166,39 @@ class Score extends Model
         if($request->subcategory > 0){
             $result->where('scores.subcat_id', $request->subcategory);
         }
+
         return $result->where('users.year', $request->year)
                 ->select('scores.*', 'test_subjects.name as subject', 'test_subject_papers.name as paper')
+                ->groupBy('scores.id')
+                ->orderBy('test_score', 'desc')->get();
+    }
+
+    protected static function getCollegeScoreByCollegeIdByDeptIdByFilters($collegeId,$collegeDeptId,Request $request){
+        $result = static::join('users', 'users.id', '=', 'scores.user_id')
+                        ->join('college_categories', 'college_categories.id','=','scores.category_id')
+                        ->join('test_sub_categories', 'test_sub_categories.id', '=', 'scores.subcat_id')
+                        ->join('test_subjects', 'test_subjects.id' , '=', 'scores.subject_id' )
+                        ->join('test_subject_papers', 'test_subject_papers.id' , '=', 'scores.paper_id' )
+                        ->where('test_sub_categories.created_for', 0);
+        if($request->student > 0){
+            $result->where('scores.user_id', $request->student);
+        }
+        if($collegeId > 0){
+            $result->where('users.college_id', $collegeId);
+        }
+        if($request->department > 0){
+            $result->where('users.college_dept_id', $collegeDeptId);
+        }
+        if($request->category > 0){
+            $result->where('scores.category_id', $request->category);
+        }
+        if($request->subcategory > 0){
+            $result->where('scores.subcat_id', $request->subcategory);
+        }
+
+        return $result->where('users.year', $request->year)
+                ->select('scores.*', 'test_subjects.name as subject', 'test_subject_papers.name as paper')
+                ->groupBy('scores.id')
                 ->orderBy('test_score', 'desc')->get();
     }
 
@@ -236,6 +270,33 @@ class Score extends Model
 
     protected static function getAllCompanyTestResults(){
         return static::join('test_categories', 'test_categories.id','=', 'scores.category_id')
-            ->where('test_categories.category_for',0)->orderBy('test_score', 'desc')->get();
+            ->where('test_categories.category_for',0)->select('scores.*')->orderBy('test_score', 'desc')->get();
+    }
+
+    protected static function getScoresWithCollegeTestCategoriesByCollegeIdByDeptIdByUserId($collegeId,$deptId,$userId){
+        return static::join('college_categories', 'college_categories.id','=', 'scores.category_id')
+            ->join('test_sub_categories', function($join){
+                $join->on('test_sub_categories.test_category_id', '=', 'college_categories.id');
+                $join->on('test_sub_categories.test_category_id', '=', 'scores.category_id');
+                $join->on('test_sub_categories.id', '=', 'scores.subcat_id');
+            })
+            ->join('test_subjects', 'test_subjects.id' , '=', 'scores.subject_id' )
+            ->join('test_subject_papers', 'test_subject_papers.id' , '=', 'scores.paper_id' )
+            ->where('test_sub_categories.created_for', 0)
+            ->where('college_categories.college_id',$collegeId)
+            // ->where('college_categories.college_dept_id',$deptId)
+            ->where('scores.user_id',$userId)
+            ->select('scores.*', 'test_subjects.name as subject', 'test_subject_papers.name as paper')->groupBy('scores.id')->orderBy('test_score', 'desc')->get();
+    }
+
+    protected static function getScoresWithTestCategoriesByUserId($userId){
+        return static::join('test_categories', 'test_categories.id','=', 'scores.category_id')
+            ->join('test_sub_categories', 'test_sub_categories.test_category_id', '=', 'scores.subcat_id')
+            ->join('test_subjects', 'test_subjects.id' , '=', 'scores.subject_id' )
+            ->join('test_subject_papers', 'test_subject_papers.id' , '=', 'scores.paper_id' )
+            ->where('test_categories.category_for',1)
+            ->where('test_sub_categories.created_for', 1)
+            ->where('scores.user_id',$userId)
+            ->select('scores.*', 'test_subjects.name as subject', 'test_subject_papers.name as paper')->groupBy('scores.id')->orderBy('test_score', 'desc')->get();
     }
 }

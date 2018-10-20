@@ -106,14 +106,13 @@ class AllUsersInfoController extends Controller
             }
             $collegeDepts = CollegeDept::where('college_id', $selectedStudent->college_id)->get();
             $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
-            $results = Score::where('user_id', $id)->get();
+            $results = Score::getScoresWithTestCategoriesByUserId($id);
             Session::set('admin_selected_user', $id);
             Session::set('admin_selected_user_type', $selectedStudent->user_type);
         }
         $colleges = College::all();
-        $categories = TestCategory::all();
-        $barchartLimits = range(100, 0, 10);
-        return view('allUsers.userTestResults', compact('colleges', 'categories','collegeDepts', 'students', 'results', 'selectedStudent','barchartLimits'));
+        $categories = TestCategory::getAllTestCategories();
+        return view('allUsers.userTestResults', compact('colleges', 'categories','collegeDepts', 'students', 'results', 'selectedStudent'));
     }
 
     protected function showUserTestResults(Request $request){
@@ -156,7 +155,7 @@ class AllUsersInfoController extends Controller
             Session::set('admin_selected_user_type', $selectedStudent->user_type);
         }
         $colleges = College::all();
-        $categories = CourseCategory::all();
+        $categories = CourseCategory::getCourseCategoriesForAdmin();
         return view('allUsers.userCourses', compact('colleges', 'categories','collegeDepts', 'students', 'courses', 'selectedStudent'));
     }
 
@@ -275,7 +274,7 @@ class AllUsersInfoController extends Controller
 
     protected function allTestResults(Request $request){
         $colleges = College::all();
-        $categories = TestCategory::all();
+        $categories = TestCategory::getAllTestCategories();
         $scores =[];
         return view('allUsers.allTestResults', compact('colleges', 'categories', 'scores'));
     }

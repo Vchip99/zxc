@@ -64,14 +64,23 @@
           </ul>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3">
-          <h3> Contact Us </h3>
-          <address>
+          <h3> About Vchip </h3>
+          <ul>
+            <li><a href="{{url('us')}}" title="US">US</a></li>
+            <li><a href="{{url('ourpartner')}}" title="Our partners">Our partners</a></li>
+            <li><a href="{{url('career')}}" title="Career">Career</a></li>
+            <li><a href="{{url('contactus')}}" title="Contact us">Contact us</a></li>
+            <li><a href="{{url('terms-and-conditions')}}" title="Terms and Conditions">Terms and Conditions</a></li>
+            <li><a href="{{url('privacy-policy')}}" title="Privacy Policy">Privacy Policy</a></li>
+            <li><a href="{{url('faq')}}" title="FAQ">FAQ</a></li>
+          </ul>
+          <!-- <address>
            <p>VCHIP TECHNOLOGY PVT LTD</p>
            <p>Address: 3rd Floor,Sr No 132/2A/3</p>
            <p>Shrinivas,Labhade Park,Near BSNL</p>
            <p>Office, WARJE, PUNE-411058, INDIA.</p>
            <p>Phone: 020-25235596</p>
-         </address>
+         </address> -->
         </div>
       </div>
    </div>

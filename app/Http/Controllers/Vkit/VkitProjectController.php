@@ -62,7 +62,7 @@ class VkitProjectController extends Controller
      *  show list of vkit projects
      */
     protected function show(){
-        $projects = VkitProject::paginate();
+        $projects = VkitProject::getVkitProjectsWithPagination();
         return view('vkitProject.list', compact('projects'));
     }
 
@@ -71,7 +71,7 @@ class VkitProjectController extends Controller
      */
     protected function create(){
         $project = new VkitProject;
-        $vkitCategories = VkitCategory::all();
+        $vkitCategories = VkitCategory::getProjectCategories();
         return view('vkitProject.create', compact('project', 'vkitCategories'));
     }
 
@@ -128,9 +128,12 @@ class VkitProjectController extends Controller
         $id = InputSanitise::inputInt(json_decode($id));
         if(isset($id)){
             $project = VkitProject::find($id);
-            $vkitCategories = VkitCategory::all();
-            return view('vkitProject.create', compact('project', 'vkitCategories'));
+            if(is_object($project)){
+                $vkitCategories = VkitCategory::getProjectCategories();
+                return view('vkitProject.create', compact('project', 'vkitCategories'));
+            }
         }
+        return Redirect::to('admin/manageVkitProject');
     }
 
     /**

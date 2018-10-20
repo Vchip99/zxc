@@ -475,7 +475,7 @@
 								    	divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Add to Favourite will be enabled on date to active"><i class="fa fa-star" aria-hidden="true" ></i></button></td>';
 								    } else {
 									    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
-									    	divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Already Added to Favourite."><i class="fa fa-star" aria-hidden="true" ></i></button></td>';
+									    	divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Already Added to Favourite."><i class="fa fa-star" aria-hidden="true" style="color: rgb(233, 30, 99);"></i></button></td>';
 									    } else {
 									    	divInnerHtml += '<td id="registerPaper_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'" onClick="registerPaper(this);" ><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-star" aria-hidden="true" ></i></button></td>';
 									    }
@@ -567,7 +567,7 @@
 								    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Add to Favourite will be enabled on date to active"><span class="fa fa-star" aria-hidden="true" ></span>Add</button></li>';
 								    } else {
 									    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
-									    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already Added to Favourite."><span class="fa fa-star" aria-hidden="true" ></span>Add</button></li>';
+									    	ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already Added to Favourite."><span class="fa fa-star" aria-hidden="true" style="color: rgb(233, 30, 99);"></span>Add</button></li>';
 									    } else {
 									    	ulDivInnerHtml += '<li id="registerPaper_mobile_'+obj.id+'" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'" onClick="registerPaper(this);" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Add to Favourite!"><span class="fa fa-star" aria-hidden="true" ></span>Add</button></li>';
 									    }

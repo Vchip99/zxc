@@ -426,7 +426,7 @@
 	  <div class="vchip-background-single">
 	    <div class="vchip-background-img">
 	      <figure>
-	        <img src="{{asset('images/exam.jpg')}}" alt="Background" style="vertical-align:top; background-attachment:fixed" alt="vchip Exam" />
+	        <img src="{{asset('images/exam.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed" alt="vchip Exam" />
 	      </figure>
 	    </div>
 	    <div class="vchip-background-content">
@@ -516,7 +516,7 @@
 		                            <span class="text-gray-9 font-weight-normal ng-binding">{{$percentile}}</span>
 		                            <span class="font-size-small">%</span>
 		                        </h3>
-		                        <p class="mar-b0 text-uppercase">percentile</p>
+		                        <p class="mar-b0 text-uppercase">Percentile</p>
 		                    </div>
 		                </div>
 		              </div>
@@ -537,7 +537,7 @@
 		                    <span class="pull-right text-ellipsis value ng-binding">{{$globalTotalRank}}</span>
 		                  </li>
 		                  <li class="">
-		                    <span class="name">percentile</span>
+		                    <span class="name">Percentile</span>
 		                    <span class="pull-right text-ellipsis value ng-binding">{{$percentile}}</span>
 		                  </li>
 		                </ul>
@@ -590,7 +590,7 @@
 		                            <span class="text-gray-9 font-weight-normal ng-binding">{{$percentage}}</span>
 		                            <span class="font-size-small">%</span>
 		                        </h3>
-		                        <p class="mar-b0 text-uppercase">percentage</p>
+		                        <p class="mar-b0 text-uppercase">Percentage</p>
 		                    </div>
 		                </div>
 		              </div>

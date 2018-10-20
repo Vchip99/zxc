@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailVerification;
 use App\Models\CourseCourse;
+use App\Models\CourseVideo;
 use App\Models\TestSubjectPaper;
 use App\Models\TestSubject;
 use App\Models\RegisterLiveCourse;
@@ -15,7 +16,6 @@ use App\Models\DiscussionPost;
 use App\Models\DiscussionComment;
 use App\Models\User;
 use App\Models\RegisterProject;
-use App\Models\CourseCategory;
 use App\Models\CourseSubCategory;
 use App\Models\TestCategory;
 use App\Models\RegisterDocuments;
@@ -29,11 +29,29 @@ use App\Models\Notification;
 use App\Models\ReadNotification;
 use App\Models\AssignmentQuestion;
 use App\Models\AssignmentAnswer;
-use App\Models\AssignmentSubject;
+use App\Models\CollegeSubject;
 use App\Models\AssignmentTopic;
 use App\Models\DiscussionCategory;
 use App\Models\ChatMessage;
 use App\Models\Question;
+use App\Models\RegisterOnlineCourse;
+use App\Models\CourseComment;
+use App\Models\CourseSubComment;
+use App\Models\CourseVideoLike;
+use App\Models\CourseCommentLike;
+use App\Models\CourseSubCommentLike;
+use App\Models\UserSolution;
+use App\Models\PaperSection;
+use App\Models\VkitProjectComment;
+use App\Models\VkitProjectLike;
+use App\Models\VkitProjectCommentLike;
+use App\Models\VkitProjectSubCommentLike;
+use App\Models\CollegeCategory;
+use App\Models\CourseCategory;
+use App\Models\VkitCategory;
+use App\Models\Skill;
+use App\Models\CollegeUserAttendance;
+use App\Models\CollegeOfflinePaper;
 use Excel;
 use Auth,Hash,DB, Redirect,Session,Validator,Input,Cache;
 use App\Libraries\InputSanitise;
@@ -127,7 +145,10 @@ class AccountController extends Controller
         return redirect('/');
     }
 
-    protected function showProfile(){
+    protected function showProfile(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $collegeDepts = [];
         $users = self::Users;
         $colleges = College::all();
@@ -152,7 +173,24 @@ class AccountController extends Controller
         return view('dashboard.profile', compact('users', 'colleges', 'collegeDepts', 'obtainedScore', 'totalScore', 'loginUser'));
     }
 
-    protected function myCourses(){
+    protected function myCollegeCourses(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $categoryIds = [];
+        $userId = Auth::user()->id;
+        $courses = CourseCourse::getCoursesAssociatedWithVideosByCollegeIdByDeptId(Auth::user()->college_id);
+        foreach($courses as $course){
+            $categoryIds[] = $course->course_category_id;
+        }
+        $categories = CollegeCategory::find($categoryIds);
+        return view('dashboard.myCollegeCourses', compact('courses', 'categories'));
+    }
+
+    protected function myVchipCourses(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $categoryIds = [];
         $userId = Auth::user()->id;
         $courses = CourseCourse::getRegisteredOnlineCourses($userId);
@@ -160,10 +198,106 @@ class AccountController extends Controller
             $categoryIds[] = $course->course_category_id;
         }
         $categories = CourseCategory::find($categoryIds);
-        return view('dashboard.myCourses', compact('courses', 'categories', 'subcategories'));
+        return view('dashboard.myVchipCourses', compact('courses', 'categories', 'subcategories'));
     }
 
-    protected function myTest(){
+    protected function vchipCourseDetails($collegeUrl,$courseId,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $courseId = json_decode(trim($courseId));
+        $course = Cache::remember('vchip:courses:Course-'.$courseId,30, function() use ($courseId){
+            return CourseCourse::getOnlineCourseByCourseId($courseId);
+        });
+        if(is_object($course)){
+            $videos = Cache::remember('vchip:courses:videos:courseId-'.$courseId,30, function() use ($courseId){
+                return CourseVideo::getCourseVideosByCourseId($courseId);
+            });
+
+            $isCourseRegistered = RegisterOnlineCourse::isCourseRegistered($courseId);
+            $isVchipCourse = true;
+            return view('dashboard.courseDetails', compact('videos','isCourseRegistered','courseId','course','isVchipCourse'));
+        }
+        return Redirect::to('/college/'.$collegeUrl.'/myVchipCourses');
+    }
+
+    protected function collegeCourseDetails($collegeUrl,$courseId,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $courseId = json_decode(trim($courseId));
+        $course = Cache::remember($collegeUrl.':courses:Course-'.$courseId,30, function() use ($courseId){
+            return CourseCourse::getOnlineCourseByCourseIdByCollegeId($courseId,Auth::user()->college_id);
+        });
+        if(is_object($course)){
+            $videos = Cache::remember($collegeUrl.':courses:videos:courseId-'.$courseId,30, function() use ($courseId){
+                return CourseVideo::getCourseVideosByCourseId($courseId);
+            });
+            $isCourseRegistered = RegisterOnlineCourse::isCourseRegistered($courseId);
+            $isVchipCourse = false;
+            return view('dashboard.courseDetails', compact('videos','isCourseRegistered','courseId','course','isVchipCourse'));
+        }
+        return Redirect::to('/college/'.$collegeUrl.'/myCollegeCourses');
+    }
+
+    protected function vchipCourseEpisode($collegeUrl,$videoId,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $videoId = json_decode(trim($videoId));
+        if(isset($videoId)){
+            $video = Cache::remember('vchip:courses:video-'.$videoId,30, function() use ($videoId){
+                return CourseVideo::getCourseVideoByVideoId($videoId);
+            });
+            if(is_object($video)){
+                $courseId = $video->course_id;
+                $courseVideos = Cache::remember('vchip:courses:videos:courseId-'.$courseId,30, function() use ($courseId){
+                    return CourseVideo::getCourseVideosByCourseId($courseId);
+                });
+                $comments = CourseComment::where('course_video_id', $videoId)->orderBy('id', 'desc')->get();
+                $likesCount = CourseVideoLike::getLikesByVideoId($videoId);
+                $commentLikesCount = CourseCommentLike::getLikesByVideoId($videoId);
+                $subcommentLikesCount = CourseSubCommentLike::getLikesByVideoId($videoId);
+                $currentUser = Auth::user();
+                $isVchipCourse = true;
+                return view('dashboard.courseEpisode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount','isVchipCourse'));
+            }
+        }
+        return Redirect::to('/college/'.$collegeUrl.'/myVchipCourses');
+    }
+
+    protected function collegeCourseEpisode($collegeUrl,$videoId,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $videoId = json_decode(trim($videoId));
+
+        if(isset($videoId)){
+            $video = Cache::remember($collegeUrl.':courses:video-'.$videoId,30, function() use ($videoId){
+                return CourseVideo::getCourseVideoByCollegeIdByVideoId(Auth::user()->college_id,$videoId);
+            });
+
+            if(is_object($video)){
+                $courseId = $video->course_id;
+                $courseVideos = Cache::remember($collegeUrl.':courses:videos:courseId-'.$courseId,30, function() use ($courseId){
+                    return CourseVideo::getCourseVideosByCourseId($courseId);
+                });
+                $comments = CourseComment::where('course_video_id', $videoId)->orderBy('id', 'desc')->get();
+                $likesCount = CourseVideoLike::getLikesByVideoId($videoId);
+                $commentLikesCount = CourseCommentLike::getLikesByVideoId($videoId);
+                $subcommentLikesCount = CourseSubCommentLike::getLikesByVideoId($videoId);
+                $currentUser = Auth::user();
+                $isVchipCourse = false;
+                return view('dashboard.courseEpisode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount','isVchipCourse'));
+            }
+        }
+        return Redirect::to('/college/'.$collegeUrl.'/myCollegeCourses');
+    }
+
+    protected function myVchipTest($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $results = [];
         $testSubjectPapers   = [];
         $testSubjects        = [];
@@ -177,10 +311,127 @@ class AccountController extends Controller
             $testSubjectIds = $results['subjectIds'];
             $testSubjects = TestSubject::getSubjectsByIds($results['subjectIds']);
         }
-        $testCategories = TestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($userId);
+        $testCategories = Cache::remember('vchip:tests:testCategoriesWithQuestions',60, function() {
+            return TestCategory::getTestCategoriesAssociatedWithQuestion();
+        });
         $alreadyGivenPapers = Score::getTestUserScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $userId);
         $currentDate = date('Y-m-d H:i:s');
-        return view('dashboard.myTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate'));
+        return view('dashboard.myVchipTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate'));
+
+    }
+    protected function myCollegeTest(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $results = [];
+        $testSubjectPapers   = [];
+        $testSubjects        = [];
+        $testSubjectPaperIds = [];
+        $testSubjectIds      = [];
+        $user = Auth::user();
+        $results = TestSubjectPaper::getSubjectPapersByCollegeIdByCollegeDeptId($user->college_id);
+        if(count($results)>0){
+            $testSubjectPapers = $results['papers'];
+            $testSubjectPaperIds = $results['paperIds'];
+            $testSubjectIds = $results['subjectIds'];
+            $testSubjects = TestSubject::getSubjectsByIds($results['subjectIds']);
+        }
+        $testCategories = CollegeCategory::getTestCategoriesByCollegeIdByDeptIdAssociatedWithQuestion($user->college_id);
+        $alreadyGivenPapers = Score::getTestUserScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $user->id);
+        $currentDate = date('Y-m-d H:i:s');
+        return view('dashboard.myCollegeTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate'));
+    }
+
+    protected function showUserTestResult($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $categoryId = $request->get('category_id');
+        $subcatId   = $request->get('subcategory_id');
+        $paperId   = $request->get('paper_id');
+        $subjectId  = $request->get('subject_id');
+        $loginUser = Auth::user();
+        $userId = $loginUser->id;
+        $collegeId = $loginUser->college_id;
+        $totalMarks = 0 ;
+        $userAnswers = [];
+        $positiveMarks = 0;
+        $negativeMarks = 0;
+
+        $score = Score::getUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcatId,$paperId,$subjectId,$userId);
+        if(is_object($score)){
+            $collegeRank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$score->test_score,$collegeId);
+            $collegeTotalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcatId,$subjectId, $paperId,$collegeId);
+            $globalRank =Score::getUserTestRankByCategoryIdBySubcategoryIdBySubjectIdByPaperIdByTestScore($categoryId,$subcatId,$subjectId,$paperId,$score->test_score,'all');
+            $globalTotalRank =Score::getUserTestTotalRankByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId,$subcatId,$subjectId, $paperId,'all');
+
+            $userSolutions = UserSolution::getUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $score->id, $subjectId, $paperId);
+            if(is_object($userSolutions) && false == $userSolutions->isEmpty()){
+                foreach($userSolutions as $userSolution){
+                    $userAnswers[$userSolution->ques_id] = $userSolution->user_answer;
+                }
+            }
+
+            $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcatId, $subjectId, $paperId);
+            if(is_object($questions) && false == $questions->isEmpty()){
+                foreach($questions as $question){
+                    if(isset($userAnswers[$question->id])){
+                        $totalMarks += $question->positive_marks;
+                        if($question->answer == $userAnswers[$question->id] && $question->question_type == 1){
+                            $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
+                        } else if($userAnswers[$question->id] >= $question->min && $userAnswers[$question->id] <= $question->max && $question->question_type == 0){
+                            $positiveMarks = (float) $positiveMarks + (float) $question->positive_marks;
+                        } else if($userAnswers[$question->id]=='unsolved' || $userAnswers[$question->id] =='' ){
+                            continue;
+                        } else {
+                            $negativeMarks =  (float) $negativeMarks + (float) $question->negative_marks;
+                        }
+                    }
+                }
+            }
+            $percentile = ceil(((($globalTotalRank + 1) - ($globalRank +1) )/ $globalTotalRank)*100);
+            $percentage = ceil(($score->test_score/$totalMarks)*100);
+            if(($score->right_answered + $score->wrong_answered) > 0){
+                $accuracy =  ceil(($score->right_answered/($score->right_answered + $score->wrong_answered))*100);
+            } else {
+                $accuracy = 0;
+            }
+            return view('dashboard.myPaperResult', compact('score', 'globalRank', 'totalMarks', 'globalTotalRank', 'percentile', 'percentage', 'accuracy', 'collegeRank', 'collegeTotalRank', 'positiveMarks', 'negativeMarks'));
+        } else {
+            return Redirect::to('/college/'.$collegeUrl.'/myVchipTest');
+        }
+    }
+
+    protected function showUserTestSolution(Request $request){
+        $sections = [];
+        $paper = TestSubjectPaper::find($request->paper_id);
+        $userId = $request->user_id;
+        $scoreId = $request->score_id;
+        if(is_object($paper)){
+            $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($paper->test_category_id, $paper->test_sub_category_id, $paper->test_subject_id, $paper->id);
+
+            foreach($questions as $question){
+                $results['questions'][$question->section_type][] = $question;
+            }
+            if(count(array_keys($results['questions'])) > 0){
+                $paperId = $paper->id;
+                $paperSections = Cache::remember('vchip:tests:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
+                    return PaperSection::where('test_subject_paper_id', $paperId)->get();
+                });
+                if(is_object($paperSections) && false == $paperSections->isEmpty()){
+                    foreach($paperSections as $paperSection){
+                        if(in_array($paperSection->id, array_keys($results['questions']))){
+                            $sections[$paperSection->id] = $paperSection;
+                        }
+                    }
+                }
+            }
+            $userSolutions = UserSolution::getUserSolutionsByUserIdByscoreIdByBubjectIdByPaperId($userId, $scoreId, $paper->test_subject_id, $paper->id);
+            foreach ($userSolutions  as $key => $result) {
+                $userResults[$result->ques_id] = $result;
+            }
+            return view('dashboard.myTestSolution', compact('results', 'userResults', 'paper', 'sections'));
+        }
     }
 
     protected function myLiveCourses(){
@@ -197,21 +448,132 @@ class AccountController extends Controller
         return view('dashboard.myLiveCourses', compact('liveCourses', 'categoryIds'));
     }
 
-    protected function myDocuments(){
+    protected function myDocuments(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $userId = Auth::user()->id;
         $documents = DocumentsDoc::allRegisterDocuments($userId);
         $categories = RegisterDocuments::getRegisteredCategoriesByUserId($userId);
         return view('dashboard.myDocuments', compact('documents', 'categories'));
     }
 
-    protected function myVkits(){
+    protected function myVchipVkits(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $userId = Auth::user()->id;
         $projects = RegisterProject::getRegisteredProjectsByUserId($userId);
         $categories = RegisterProject::getRegisteredCategoriesByUserId($userId);
-        return view('dashboard.myVkits', compact('projects', 'categories'));
+        return view('dashboard.myVchipVkits', compact('projects', 'categories'));
     }
 
-    protected function myQuestions(){
+    protected function myCollegeVkits(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $user = Auth::user();
+        $projects = VkitProject::getVkitProjectsByCollegeIdByDeptId($user->college_id);
+        $categories = CollegeCategory::getProjectCategoriesByCollegeIdByDeptId($user->college_id);
+        return view('dashboard.myCollegeVkits', compact('projects', 'categories'));
+    }
+
+    /**
+     *  show vkits project by Id
+     */
+    protected function vkitproject($collegeUrl,Request $request,$id,$subcommentId=NULL){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $project = Cache::remember('vchip:projects:project-'.$id,60, function() use ($id){
+            return VkitProject::getVkitProjectsById(json_decode($id));
+        });
+        if(is_object($project)){
+            $projects = Cache::remember('vchip:projects:projects-'.$project->category_id,60, function() use($project){
+                return VkitProject::getVkitProjectsByCategoryId($project->category_id);
+            });
+            $comments = VkitProjectComment::where('vkit_project_id', $id)->orderBy('id', 'desc')->get();
+            $likesCount = VkitProjectLike::getLikesByVkitProjectId($id);
+            $commentLikesCount = VkitProjectCommentLike::getLikesByVkitProjectId($id);
+            $subcommentLikesCount = VkitProjectSubCommentLike::getLikesByVkitProjectId($id);
+            $currentUser = Auth::user();
+            if(is_object($currentUser)){
+                $userId = $currentUser->id;
+                $registeredProjects = RegisterProject::getRegisteredVkitProjectsByUserId($userId);
+                if(false == $registeredProjects->isEmpty()){
+                    foreach($registeredProjects as $registeredProject){
+                        $registeredProjectIds[] = $registeredProject->project_id;
+                    }
+                }
+            }
+            if(is_object($currentUser)){
+                if($id > 0 || $subcommentId > 0){
+                    DB::beginTransaction();
+                    try
+                    {
+                        if($id > 0 && $subcommentId == NULL){
+                            $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINVKITPROJECT,$id,$currentUser->id);
+                            if(is_object($readNotification)){
+                                DB::commit();
+                            }
+                        } else {
+                            Session::set('show_subcomment_area', $subcommentId);
+                        }
+                        Session::set('project_comment_area', 0);
+                    }
+                    catch(\Exception $e)
+                    {
+                        DB::rollback();
+                        return redirect()->back()->withErrors('something went wrong.');
+                    }
+                } else {
+                    Session::set('show_subcomment_area', 0);
+                }
+            } else {
+                $currentUser = NULL;
+            }
+            return view('dashboard.myVkitsProject', compact('project', 'projects', 'comments', 'registeredProjectIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
+        }
+        return Redirect::to('/');
+    }
+
+    /**
+     *  show vkits project by Id
+     */
+    protected function collegeVkitproject($collegeUrl,Request $request,$id,$subcommentId=NULL){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $project = Cache::remember(Session::get('college_user_url').':projects:project-'.$id,60, function() use ($id){
+            return VkitProject::getCollegeVkitProjectsById(json_decode($id));
+        });
+        if(is_object($project)){
+            $projects = Cache::remember(Session::get('college_user_url').':projects:projects-'.$project->category_id,60, function() use ($project) {
+                return VkitProject::getCollegeVkitProjectsByCategoryId($project->category_id);
+            });
+            $comments = VkitProjectComment::where('vkit_project_id', $id)->orderBy('id', 'desc')->get();
+            $likesCount = VkitProjectLike::getLikesByVkitProjectId($id);
+            $commentLikesCount = VkitProjectCommentLike::getLikesByVkitProjectId($id);
+            $subcommentLikesCount = VkitProjectSubCommentLike::getLikesByVkitProjectId($id);
+            $currentUser = Auth::user();
+            if(is_object($currentUser)){
+                $userId = $currentUser->id;
+                $registeredProjects = RegisterProject::getRegisteredVkitProjectsByUserId($userId);
+                if(false == $registeredProjects->isEmpty()){
+                    foreach($registeredProjects as $registeredProject){
+                        $registeredProjectIds[] = $registeredProject->project_id;
+                    }
+                }
+            }
+            return view('dashboard.myCollegeVkitProject', compact('project', 'projects', 'comments', 'registeredProjectIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
+        }
+        return Redirect::to('/');
+    }
+
+    protected function myQuestions(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $loginUser = Auth::user();
         $posts = DiscussionPost::where('user_id', $loginUser->id)->orderBy('discussion_posts.id', 'desc')->get();
         $user = new User;
@@ -222,7 +584,10 @@ class AccountController extends Controller
         return view('dashboard.myQuestions', compact('posts', 'user', 'allPostModuleId', 'likesCount', 'currentUser', 'discussionCategories'));
     }
 
-    protected function myReplies(){
+    protected function myReplies(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $postIds = [];
         $loginUser = Auth::user();
         $discussionComments = DiscussionComment::where('user_id', $loginUser->id)->select('discussion_post_id')->get();
@@ -242,22 +607,34 @@ class AccountController extends Controller
         return view('dashboard.myReplies', compact('posts', 'user', 'allPostModuleId', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
     }
 
-    protected function myCertificate(){
+    protected function myCertificate(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         return view('dashboard.myCertificate');
     }
 
-    protected function myFavouriteArticles(){
+    protected function myFavouriteArticles(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $userId = Auth::user()->id;
         $documents = DocumentsDoc::allFavouriteRegisterDocuments($userId);
         $categories = RegisterDocuments::getRegisteredFavouriteCategoriesByUserId($userId);
         return view('dashboard.myFavouriteArticles', compact('documents', 'categories'));
     }
 
-    protected function students(Request $request){
-        $user = Auth::user();
+    protected function students($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $loginUser = Auth::user();
         $collegeDepts = [];
-        if(5 == $user->user_type || 6 == $user->user_type){
-            $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $deptIds = explode(',',$loginUser->assigned_college_depts);
+            $collegeDepts = CollegeDept::getDepartmentsByCollegeIdByDeptIds($loginUser->college_id,$deptIds);
+        } else {
+            $collegeDepts = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
         }
         return view('dashboard.students', compact('collegeDepts'));
     }
@@ -266,31 +643,182 @@ class AccountController extends Controller
         return User::changeUserApproveStatus($request);
     }
 
-    protected function deleteStudentFromCollege(Request $request){
-        $result = User::deleteStudentFromCollege($request);
-        if('true' == $result){
-            return Redirect::to('students')->with('message', 'Student deleted successfully!');
+    protected function deleteStudentFromCollege($collegeUrl,Request $request){
+        DB::beginTransaction();
+        try
+        {
+            $result = User::deleteStudentFromCollege($request);
+            if('true' == $result){
+                DB::commit();
+                return Redirect::to('/college/'.$collegeUrl.'/students')->with('message', 'Student deleted successfully!');
+            }
         }
-        return Redirect::to('students');
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('/college/'.$collegeUrl.'/students');
     }
 
     protected function searchStudent(Request $request){
-        return User::searchStudent($request);
+        $user = Auth::user();
+        $result['departments'] = [];
+        // if(User::Directore == $user->user_type && 0 == $request->year && User::Hod == $request->user_type){
+            $result['departments'] = CollegeDept::getDepartmentsByCollegeId($user->college_id);
+        // } else if(User::Hod == $user->user_type && 0 == $request->year && User::Lecturer == $request->user_type){
+        //     $deptIds = explode(',',$user->assigned_college_depts);
+        //     $result['departments'] = CollegeDept::getDepartmentsByCollegeIdByDeptIds($user->college_id,$deptIds);
+        // }
+        $result['users']  = User::searchStudent($request);
+        return $result;
+        // return User::searchStudent($request);
+    }
+
+    protected function assignDepatementsToUser(Request $request){
+        DB::beginTransaction();
+        try
+        {
+            $userData = User::find($request->get('user'));
+            if(!is_object($userData)){
+                return Redirect::to('college/'.Session::get('college_user_url').'/students');
+            }
+            $oldAssignedDepts = explode(',', $userData->assigned_college_depts);
+            $user = User::assignDepatementsToUser($request);
+            if(is_object($user)){
+                $newAssignedDepts = explode(',', $user->assigned_college_depts);
+                $removedDepts = array_values(array_diff($oldAssignedDepts, $newAssignedDepts));
+                if(count($removedDepts) > 0){
+                    // delete attendance by college dept userid
+                    CollegeUserAttendance::deleteAttendanceByCollegeIdByDepartmentIdsByUserId($user->college_id,$removedDepts,$user->id);
+                    // delete peper and marks
+                    CollegeOfflinePaper::deleteCollegeOfflinePapersByCollegeIdByDepartmentIdsByUserId($user->college_id,$removedDepts,$user->id);
+                    // remove depts for topic
+                    AssignmentTopic::removeDepartmentsByCollegeIdByDepartmentIdsByUserId($user->college_id,$removedDepts,$user->id);
+                    // remove topics for empty depts
+                    AssignmentTopic::deleteTopicsByCollegeIdByUserIdForEmptyDept($user->college_id,$user->id);
+
+                    // remove depts for assignment question
+                    AssignmentQuestion::removeDepartmentsByCollegeIdByDepartmentIdsByUserId($user->college_id,$removedDepts,$user->id);
+                    // delete assignment question for empty depts
+                    AssignmentQuestion::deleteAssignmentsByCollegeIdByUserIdForEmptyDept($user->college_id,$user->id);
+                    // delete answer
+                    AssignmentAnswer::deleteAnswersByUserIdByStudentDeptIds($user->id,$removedDepts);
+
+                }
+                DB::commit();
+                return Redirect::to('college/'.Session::get('college_user_url').'/students')->with('message', 'Departments assigned successfully.');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('college/'.Session::get('college_user_url').'/students');
     }
 
     protected function searchContact(Request $request){
         return User::searchContact($request);
     }
 
-    protected function studentTestResults($id=Null){
+    protected function studentCollegeTestResults($collegeUrl,Request $request,$id=Null){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $results = [];
         $students = [];
         $selectedStudent = '';
         $user = Auth::user();
-        $categories = TestCategory::all();
+        $categories = CollegeCategory::getCollegeCategoriesByCollegeIdByDeptId($user->college_id);
         if(empty($id)){
             $id = Session::get('selected_student');
         }
+        if($id > 0){
+            $selectedStudent = User::find($id);
+            if(!is_object($selectedStudent)){
+                return redirect()->back();
+            }
+            // if(4 == $user->user_type){
+            //     $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
+            // } else {
+                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
+            // }
+
+            $results = Score::getScoresWithCollegeTestCategoriesByCollegeIdByDeptIdByUserId($selectedStudent->college_id,$selectedStudent->college_dept_id,$id);
+            Session::set('selected_student', $id);
+            Session::set('selected_user_type', $selectedStudent->user_type);
+        }
+        if(5 == $user->user_type || 6 == $user->user_type){
+            $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        } else {
+            $collegeDepts = [];
+        }
+        return view('dashboard.studentCollegeTestResults', compact('categories','students','results','selectedStudent', 'collegeDepts'));
+    }
+
+    protected function lecturerPapers($collegeUrl,Request $request,$id=Null){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $results = [];
+        $users = [];
+        $selectedUser = '';
+        $user = Auth::user();
+        if(empty($id)){
+            $id = Session::get('selected_lecturer');
+        }
+        if($id > 0){
+            $selectedUser = User::find($id);
+            if(!is_object($selectedUser)){
+                return redirect()->back();
+            }
+            $users = User::getAllStudentsByCollegeIdByDeptId($selectedUser->college_id,$selectedUser->college_dept_id,$selectedUser->user_type);
+            $results = TestSubjectPaper::getPapersByUserIdByCollegeIdByDeptId($id,$user->college_id);
+            Session::set('selected_lecturer', $id);
+            Session::set('selected_user_type', $selectedUser->user_type);
+        } else {
+            $users = User::getAllStudentsByCollegeIdByDeptId($user->college_id,$user->college_dept_id,User::Lecturer);
+        }
+        if(User::Directore == $user->user_type || User::TNP == $user->user_type){
+            $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        } else {
+            $collegeDepts = [];
+        }
+        return view('dashboard.lecturerPapers', compact('users','results','selectedUser','collegeDepts'));
+    }
+
+    protected function showStudentsByUserType(Request $request){
+        $userType = $request->get('user_type');
+        $department = $request->get('department');
+        $user = Auth::user();
+        if(User::Directore == $user->user_type || User::TNP == $user->user_type){
+            return User::getAllStudentsByCollegeIdByDeptId($user->college_id,$department,$userType);
+        } else {
+            return User::getAllStudentsByCollegeIdByDeptId($user->college_id,$user->college_dept_id,$userType);
+        }
+    }
+
+    protected function getLecturerPapers(Request $request){
+        $lecturer = $request->lecturer;
+        $user = Auth::user();
+        Session::set('selected_lecturer', $lecturer);
+        return TestSubjectPaper::getPapersByUserIdByCollegeIdByDeptId($lecturer,$user->college_id);
+    }
+
+    protected function studentVchipTestResults($collegeUrl,Request $request,$id=Null){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $results = [];
+        $students = [];
+        $selectedStudent = '';
+        $user = Auth::user();
+        $categories = TestCategory::getAllTestCategories();
+        if(empty($id)){
+            $id = Session::get('selected_student');
+        }
+
         if($id > 0){
             $selectedStudent = User::find($id);
             if(!is_object($selectedStudent)){
@@ -301,13 +829,16 @@ class AccountController extends Controller
             } else {
                 $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
             }
-            $results = Score::where('user_id', $id)->get();
+            $results = Score::getScoresWithTestCategoriesByUserId($id);
             Session::set('selected_student', $id);
             Session::set('selected_user_type', $selectedStudent->user_type);
         }
-        $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
-        $barchartLimits = range(100, 0, 10);
-        return view('dashboard.studentTestResults', compact('categories','students','results','barchartLimits', 'selectedStudent', 'collegeDepts'));
+        if(5 == $user->user_type || 6 == $user->user_type){
+            $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        } else {
+            $collegeDepts = [];
+        }
+        return view('dashboard.studentVchipTestResults', compact('categories','students','results','selectedStudent', 'collegeDepts'));
     }
 
     protected function showTestResults(Request $request){
@@ -335,38 +866,65 @@ class AccountController extends Controller
         return $result;
     }
 
-    protected function studentPlacement($id=NULL){
+    protected function showCollegeTestResults(Request $request){
+        $ranks = [];
+        $marks = [];
         $user = Auth::user();
-        if(empty($id)){
-            $id = Session::get('selected_student');
-        }
-        if($id > 0){
-            $selectedStudent = User::find($id);
-            if(!is_object($selectedStudent)){
-                return redirect()->back();
+
+        $scores = Score::getCollegeScoreByCollegeIdByDeptIdByFilters($user->college_id,$request->department,$request);
+        if( false == $scores->isEmpty()){
+            foreach($scores as $score){
+                $ranks[$score->id] = $score->rank($user->college_id);
+                $marks[$score->id] = $score->totalMarks();
             }
-            if(4 == $user->user_type){
-                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
-            } else {
-                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
-            }
-            Session::set('selected_student', $id);
-            Session::set('selected_user_type', $selectedStudent->user_type);
-        } else {
-            $students = User::getAllStudentsByCollegeIdByDeptId($user->college_id,$user->college_dept_id);
-            $selectedStudent = '';
         }
-        $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
-        return view('dashboard.studentPlacement', compact('students', 'selectedStudent', 'collegeDepts'));
+        $result['scores'] = $scores;
+        $result['ranks'] = $ranks;
+        $result['marks'] = $marks;
+        if($request->student > 0){
+            $selectedStudent = User::find($request->student);
+            if(is_object($selectedStudent)){
+                Session::set('selected_student', $selectedStudent->id);
+                Session::set('selected_user_type', $selectedStudent->user_type);
+            }
+        }
+        return $result;
     }
 
-    protected function studentCourses($id=Null){
+    protected function studentPlacement($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $students = [];
+        $userSkills = [];
+        $user = Auth::user();
+        $year = Session::get('selected_placement_year');
+        $department = Session::get('selected_placement_department');
+        if($year > 0 && $department > 0){
+            $students = User::showPlacementVideoByDepartmentByYear($user->college_id,$department,$year,User::Student);
+            Session::set('selected_placement_year', $year);
+            Session::set('selected_placement_department', $department);
+        }
+        $allSkills = Skill::all();
+        if(is_object($allSkills) && false == $allSkills->isEmpty()){
+            foreach($allSkills as $skill){
+                $userSkills[$skill->id] = $skill->name;
+            }
+        }
+        $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        return view('dashboard.studentPlacement', compact('students', 'year', 'collegeDepts','department','userSkills'));
+    }
+
+    protected function studentCollegeCourses($collegeUrl,Request $request,$id=Null){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $results = [];
         $students = [];
         $courses = [];
         $selectedStudent = '';
         $user = Auth::user();
-        $categories = CourseCategory::all();
+        $categories = CollegeCategory::getCollegeCategoriesByCollegeIdByDeptId($user->college_id);
         if(empty($id)){
             $id = Session::get('selected_student');
         }
@@ -375,18 +933,96 @@ class AccountController extends Controller
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            if(4 == $user->user_type){
-                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
-            } else {
+            // if(4 == $user->user_type){
+            //     $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
+            // } else {
                 $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
+            // }
+            $courses = CourseCourse::getRegisteredCollegeOnlineCourses($id);
+            Session::set('selected_student', $id);
+            Session::set('selected_user_type', $selectedStudent->user_type);
+        }
+        if(5 == $user->user_type || 6 == $user->user_type){
+            $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        } else {
+            $collegeDepts = [];
+        }
+
+        return view('dashboard.studentCollegeCourses', compact('students', 'selectedStudent', 'collegeDepts', 'categories', 'courses'));
+    }
+
+    protected function lecturerCourses($collegeUrl,Request $request,$id=Null){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $results = [];
+        $users = [];
+        $selectedUser = '';
+        $user = Auth::user();
+        if(empty($id)){
+            $id = Session::get('selected_lecturer');
+        }
+        if($id > 0){
+            $selectedUser = User::find($id);
+            if(!is_object($selectedUser)){
+                return redirect()->back();
             }
+            $users = User::getAllStudentsByCollegeIdByDeptId($selectedUser->college_id,$selectedUser->college_dept_id,$selectedUser->user_type);
+            $results = CourseCourse::getCoursesByUserIdByCollegeIdByDeptId($id,$selectedUser->college_id);
+            Session::set('selected_lecturer', $id);
+            Session::set('selected_user_type', $selectedUser->user_type);
+        } else {
+            $users = User::getAllStudentsByCollegeIdByDeptId($user->college_id,$user->college_dept_id,User::Lecturer);
+        }
+        if(5 == $user->user_type || 6 == $user->user_type){
+            $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        } else {
+            $collegeDepts = [];
+        }
+        return view('dashboard.lecturerCourses', compact('users', 'selectedUser', 'results','collegeDepts'));
+    }
+
+    protected function getLecturerCourses(Request $request){
+        $lecturer = $request->lecturer;
+        $user = Auth::user();
+        Session::set('selected_lecturer', $lecturer);
+        return CourseCourse::getCoursesByUserIdByCollegeIdByDeptId($lecturer,$user->college_id);
+    }
+
+    protected function studentVchipCourses($collegeUrl,Request $request,$id=Null){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $results = [];
+        $students = [];
+        $courses = [];
+        $selectedStudent = '';
+        $user = Auth::user();
+        $categories = CourseCategory::getCourseCategoriesForAdmin();
+        if(empty($id)){
+            $id = Session::get('selected_student');
+        }
+        if($id > 0){
+            $selectedStudent = User::find($id);
+            if(!is_object($selectedStudent)){
+                return redirect()->back();
+            }
+            // if(4 == $user->user_type){
+            //     $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
+            // } else {
+                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
+            // }
             $courses = CourseCourse::getRegisteredOnlineCourses($id);
             Session::set('selected_student', $id);
             Session::set('selected_user_type', $selectedStudent->user_type);
         }
-        $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        if(5 == $user->user_type || 6 == $user->user_type){
+            $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        } else {
+            $collegeDepts = [];
+        }
 
-        return view('dashboard.studentCourses', compact('students', 'selectedStudent', 'collegeDepts', 'categories', 'courses'));
+        return view('dashboard.studentVchipCourses', compact('students', 'selectedStudent', 'collegeDepts', 'categories', 'courses'));
     }
 
     protected function updateProfile(Request $request){
@@ -396,7 +1032,7 @@ class AccountController extends Controller
             $user = User::updateUser($request);
             if(is_object($user)){
                 DB::commit();
-                return Redirect::to('profile')->with('message', 'User profile updated successfully.');
+                return Redirect::to('college/'.Session::get('college_user_url').'/profile')->with('message', 'User profile updated successfully.');
             }
         }
         catch(\Exception $e)
@@ -404,7 +1040,7 @@ class AccountController extends Controller
             DB::rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }
-        return Redirect::to('profile');
+        return Redirect::to('college/'.Session::get('college_user_url').'/profile');
     }
 
     protected function showStudentsByDepartmentByYear(Request $request){
@@ -415,6 +1051,35 @@ class AccountController extends Controller
             return User::getAllUsersByCollegeIdByDeptIdByYearByUserType($user->college_id,$request->department, $request->year, $request->user_type);
         }
     }
+
+    protected function showPlacementVideoByDepartmentByYear(Request $request){
+        $user = Auth::user();
+        Session::set('selected_placement_year',$request->year);
+        Session::set('selected_placement_department',$request->department);
+        $result['users'] = User::showPlacementVideoByDepartmentByYear($user->college_id,$request->department, $request->year, User::Student);
+        $allSkills = Skill::all();
+        if(is_object($allSkills) && false == $allSkills->isEmpty()){
+            foreach($allSkills as $skill){
+                $result['skills'][$skill->id] = $skill->name;
+            }
+        }
+        return $result;
+    }
+
+    protected function searchStudentByDeptByYearByName(Request $request){
+        $user = Auth::user();
+        Session::set('selected_placement_year',$request->year);
+        Session::set('selected_placement_department',$request->department);
+        $result['users'] = User::searchStudentByDeptByYearByName($request);
+        $allSkills = Skill::all();
+        if(is_object($allSkills) && false == $allSkills->isEmpty()){
+            foreach($allSkills as $skill){
+                $result['skills'][$skill->id] = $skill->name;
+            }
+        }
+        return $result;
+    }
+
 
     protected function getStudentById(Request $request){
         $selectedStudent = User::getStudentById($request->student);
@@ -435,24 +1100,65 @@ class AccountController extends Controller
         return CourseCourse::getOnlineCoursesByUserIdByCategoryBySubCategory($request->student,$request->category,$request->subcategory);
     }
 
-    protected function myCourseResults(){
+    protected function showCollegeStudentCourses(Request $request){
+        $selectedStudent = User::getStudentById($request->student);
+        if(is_object($selectedStudent)){
+            Session::set('selected_student', $selectedStudent->id);
+            Session::set('selected_user_type', $selectedStudent->user_type);
+        }
+        return CourseCourse::getOnlineCollegeCoursesByUserIdByCategoryBySubCategory($request->student,$request->category,$request->subcategory);
+    }
+
+    protected function myVchipCourseResults(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $categoryIds = [];
         $user = Auth::user();
         $courses = CourseCourse::getRegisteredOnlineCourses($user->id);
-        foreach($courses as $course){
-            $categoryIds[] = $course->course_category_id;
+        if(is_object($courses) && false == $courses->isEmpty()){
+            foreach($courses as $course){
+                $categoryIds[] = $course->course_category_id;
+            }
         }
         $categories = CourseCategory::find($categoryIds);
-        return view('dashboard.myCourseResult', compact('categories', 'courses'));
+        return view('dashboard.myVchipCourseResult', compact('categories', 'courses'));
     }
 
-    protected function myTestResults(){
+    protected function myCollegeCourseResults(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $categoryIds = [];
         $user = Auth::user();
-        $categories = TestCategory::all();
-        $results = Score::where('user_id', $user->id)->get();
-        $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
-        $barchartLimits = range(100, 0, 10);
-        return view('dashboard.myTestResults', compact('categories','results','barchartLimits', 'collegeDepts'));
+        $courses = CourseCourse::getRegisteredCollegeOnlineCourses($user->id);
+        if(is_object($courses) && false == $courses->isEmpty()){
+            foreach($courses as $course){
+                $categoryIds[] = $course->course_category_id;
+            }
+        }
+        $categories = CollegeCategory::find($categoryIds);
+        return view('dashboard.myCollegeCourseResult', compact('categories', 'courses'));
+    }
+
+    protected function myCollegeTestResults(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $user = Auth::user();
+        $categories = CollegeCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($user->id,$user->college_id,$user->college_dept_id);
+        $results = Score::getScoresWithCollegeTestCategoriesByCollegeIdByDeptIdByUserId($user->college_id,$user->college_dept_id,$user->id);
+        return view('dashboard.myCollegeTestResults', compact('categories','results'));
+    }
+
+    protected function myVchipTestResults(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $user = Auth::user();
+        $categories = TestCategory::getTestCategoriesByRegisteredSubjectPapersByUserId($user->id);
+        $results = Score::getScoresWithTestCategoriesByUserId($user->id);
+        return view('dashboard.myVchipTestResults', compact('categories','results'));
     }
 
     protected function showUserTestResultsByCatBySubCat(Request $request){
@@ -472,11 +1178,19 @@ class AccountController extends Controller
         return $result;
     }
 
-    protected function allTestResults(){
+    protected function collegeTestResults(){
         $colleges = College::all();
-        $categories = TestCategory::all();
+        $user = Auth::user();
+        $categories = CollegeCategory::getCollegeCategoriesByCollegeIdByDeptId($user->college_id);
         $scores =[];
-        return view('dashboard.allTestResults', compact('colleges', 'categories', 'scores'));
+        return view('dashboard.collegeTestResults', compact('colleges', 'categories', 'scores'));
+    }
+
+    protected function vchipTestResults(){
+        $colleges = College::all();
+        $categories = TestCategory::getAllTestCategories();
+        $scores =[];
+        return view('dashboard.vchipTestResults', compact('colleges', 'categories', 'scores'));
     }
 
     protected function getSubjectsByCatIdBySubcatId(Request $request){
@@ -522,7 +1236,10 @@ class AccountController extends Controller
         return $results;
     }
 
-    protected function notifications(){
+    protected function notifications(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         DB::beginTransaction();
         try
         {
@@ -540,6 +1257,9 @@ class AccountController extends Controller
     }
 
     protected function adminMessages(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $sortIds = [];
         $allIds = [];
         $idsImploded = '';
@@ -625,28 +1345,37 @@ class AccountController extends Controller
         })->download('xls');
     }
 
-    protected function myAssignments(){
+    protected function myAssignments($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $assignments = AssignmentQuestion::getStudentAssignments();
         $assignmentTeachers = User::getTeachers();
         return view('dashboard.assignmentLists', compact('assignments', 'assignmentTeachers'));
     }
 
-    protected function doAssignment($id){
+    protected function doAssignment($collegeUrl,$id,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $assignment = AssignmentQuestion::find($id);
         $answers = AssignmentAnswer::where('student_id', Auth::user()->id)->where('assignment_question_id', $id)->get();
         return view('dashboard.assignmentDetails', compact('assignment', 'answers'));
     }
 
-    protected function createAssignmentAnswer(Request $request){
+    protected function createAssignmentAnswer($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $questionId   = InputSanitise::inputInt($request->get('assignment_question_id'));
         $studentId   = InputSanitise::inputInt($request->get('student_id'));
         $answer = $request->get('answer');
         $loginUser = Auth::user();
         if(empty($answer) && false == $request->exists('attached_link')){
             if(User::Student == $loginUser->user_type){
-                return Redirect::to('doAssignment/'.$questionId);
+                return Redirect::to('college/'.Session::get('college_user_url').'/doAssignment/'.$questionId);
             } else {
-                return Redirect::to('assignmentRemark/'.$questionId.'/'.$studentId);
+                return Redirect::to('college/'.Session::get('college_user_url').'/assignmentRemark/'.$questionId.'/'.$studentId);
             }
         }
 
@@ -656,9 +1385,9 @@ class AccountController extends Controller
             AssignmentAnswer::addAssignmentAnswer($request);
             DB::commit();
             if(User::Student == $loginUser->user_type){
-                return Redirect::to('doAssignment/'.$questionId)->with('message', 'Assignment updated successfully.');
+                return Redirect::to('college/'.Session::get('college_user_url').'/doAssignment/'.$questionId)->with('message', 'Assignment updated successfully.');
             } else {
-                return Redirect::to('assignmentRemark/'.$questionId.'/'.$studentId )->with('message', 'Assignment updated successfully.');
+                return Redirect::to('college/'.Session::get('college_user_url').'/assignmentRemark/'.$questionId.'/'.$studentId )->with('message', 'Assignment updated successfully.');
             }
         }
         catch(\Exception $e)
@@ -666,10 +1395,13 @@ class AccountController extends Controller
             DB::rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }
-        return Redirect::to('doAssignment/'.$questionId);
+        return Redirect::to('college/'.Session::get('college_user_url').'/doAssignment/'.$questionId);
     }
 
-    protected function studentsAssignment(){
+    protected function studentsAssignment($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $assignmentSubjects = [];
         $assignmentTopics = [];
         $assignmentUsers = [];
@@ -678,22 +1410,34 @@ class AccountController extends Controller
         $selectedAssignmentSubject  = Session::get('selected_assignment_subject');
         $selectedAssignmentTopic = Session::get('selected_assignment_topic');
         $selectedAssignmentStudent = Session::get('selected_assignment_student');
+        $selectedAssignmentDepartment = Session::get('selected_assignment_department');
+
         if($selectedAssignmentSubject > 0 && $selectedAssignmentYear > 0){
-            $assignmentSubjects = AssignmentSubject::getAssignmentSubjectsByYear($selectedAssignmentYear);
+            $assignmentSubjects = CollegeSubject::getCollegeSubjectByYear($selectedAssignmentYear);
         }
         if($selectedAssignmentSubject > 0){
             $assignmentTopics = AssignmentTopic::getAssignmentTopics($selectedAssignmentSubject);
         }
         if($selectedAssignmentStudent > 0){
-            $assignmentUsers = User::getAssignmentUsers($selectedAssignmentYear);
+            $assignmentUsers = User::getAssignmentUsers($selectedAssignmentYear,$selectedAssignmentDepartment);
         }
         if($selectedAssignmentSubject > 0 && $selectedAssignmentYear > 0 && $selectedAssignmentTopic > 0 && $selectedAssignmentStudent > 0){
             $assignment = AssignmentQuestion::getAssignmentByTopic($selectedAssignmentTopic);
         }
-        return view('dashboard.studentsAssignment', compact('selectedAssignmentYear','selectedAssignmentSubject','selectedAssignmentTopic','selectedAssignmentStudent', 'assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'assignment'));
+        $loginUser = Auth::user();
+        if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+            $deptIds = explode(',',$loginUser->assigned_college_depts);
+            $collegeDepts = CollegeDept::getDepartmentsByCollegeIdByDeptIds($loginUser->college_id,$deptIds);
+        } else {
+            $collegeDepts = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
+        }
+        return view('dashboard.studentsAssignment', compact('selectedAssignmentYear','selectedAssignmentSubject','selectedAssignmentTopic','selectedAssignmentStudent', 'assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'assignment','collegeDepts','selectedAssignmentDepartment'));
     }
 
-    protected function assignmentRemark($assignmentId, $studentId){
+    protected function assignmentRemark($collegeUrl,$assignmentId, $studentId,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $assignmentId = InputSanitise::inputInt(json_decode($assignmentId));
         $studentId = InputSanitise::inputInt(json_decode($studentId));
         $assignment = AssignmentQuestion::find($assignmentId);
@@ -706,10 +1450,13 @@ class AccountController extends Controller
         return User::getTeachers($request->department);
     }
 
-    protected function studentVideo($id=Null){
+    protected function studentVideo($collegeUrl,Request $request,$id=Null){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $students = [];
-        $collegeDepts = [];
         $selectedStudent = '';
+        $selectedStudentSkills = [];
         $user = Auth::user();
         if(empty($id)){
             $id = Session::get('selected_student');
@@ -719,48 +1466,86 @@ class AccountController extends Controller
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            if(4 == $user->user_type){
-                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
-            } else {
-                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
-            }
+            $selectedStudentSkills = explode(',', $selectedStudent->skills);
+            $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
             Session::set('selected_student', $id);
             Session::set('selected_user_type', $selectedStudent->user_type);
         }
-        if(5 == $user->user_type || 6 == $user->user_type){
-            $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
-        }
-
-        return view('dashboard.studentVideo', compact('students', 'selectedStudent', 'collegeDepts'));
+        $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        $skills = Skill::all();
+        return view('dashboard.studentVideo', compact('students', 'selectedStudent', 'collegeDepts','skills','selectedStudentSkills'));
     }
 
-    protected function updateStudentVideo(Request $request){
-        $student = User::find($request->student);
-        if(is_object($student)){
-
-            $dom = new \DOMDocument;
-            $dom->loadHTML($request->recorded_video);
-            $iframes = $dom->getElementsByTagName('iframe');
-            foreach ($iframes as $iframe) {
-                $url =  '?enablejsapi=1';
-                if (strpos($iframe->getAttribute('src'), $url) === false) {
-                    $iframe->setAttribute('src', $iframe->getAttribute('src').$url);
+    protected function updateStudentVideo($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        DB::beginTransaction();
+        try
+        {
+            $student = User::find($request->student);
+            if(is_object($student)){
+                $userStoragePath = "userStorage/".$student->id;
+                if(!is_dir($userStoragePath)){
+                    mkdir($userStoragePath);
                 }
-            }
-            $html = $dom->saveHTML();
-            $body = explode('<body>', $html);
-            $body = explode('</body>', $body[1]);
 
-            $student->recorded_video = $body[0];
-            $student->save();
-            Session::set('selected_student', $student->id);
-            Session::set('selected_user_type', $student->user_type);
-            return Redirect::to('studentVideo')->with('message', 'User video url updated successfully.');
+                $dom = new \DOMDocument;
+                $dom->loadHTML($request->recorded_video);
+                $iframes = $dom->getElementsByTagName('iframe');
+                foreach ($iframes as $iframe) {
+                    $url =  '?enablejsapi=1';
+                    if (strpos($iframe->getAttribute('src'), $url) === false) {
+                        $iframe->setAttribute('src', $iframe->getAttribute('src').$url);
+                    }
+                }
+                $html = $dom->saveHTML();
+                $body = explode('<body>', $html);
+                $body = explode('</body>', $body[1]);
+
+                $student->recorded_video = $body[0];
+
+                if($request->exists('resume')){
+                    $userResume = $request->file('resume')->getClientOriginalName();
+                    if(!empty($student->resume) && file_exists($student->resume)){
+                        unlink($student->resume);
+                    }
+                    $request->file('resume')->move($userStoragePath, $userResume);
+                    $student->resume = $userStoragePath."/".$userResume;
+                }
+                $userSkills = '';
+
+                if(is_array($request->skills)){
+                    foreach($request->skills as $index => $skill){
+                        if(0 == $index){
+                            $userSkills = $skill;
+                        } else {
+                            $userSkills .= ','.$skill;
+                        }
+                    }
+                    $student->skills = $userSkills;
+                } else {
+                    $student->skills = $userSkills;
+                }
+                $student->save();
+                DB::commit();
+                Session::set('selected_student', $student->id);
+                Session::set('selected_user_type', $student->user_type);
+                return Redirect::to('college/'.$collegeUrl.'/studentVideo')->with('message', 'User video url updated successfully.');
+            }
         }
-        return Redirect::to('studentVideo');
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('college/'.$collegeUrl.'/studentVideo');
     }
 
-    protected function allChatMessages(){
+    protected function allChatMessages(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
         $result = ChatMessage::showchatusers();
         $users = $result['chatusers'];
         if(isset($result['unreadCount'])){
@@ -791,7 +1576,7 @@ class AccountController extends Controller
         if(!empty($request->get('email'))){
             $checkEmail = User::where('email', $request->get('email'))->first();
             if(is_object($checkEmail)){
-                return Redirect::to('profile')->withErrors('The email id '.$request->get('email').' is already exist.');
+                return Redirect::to('college/'.Session::get('college_user_url').'/profile')->withErrors('The email id '.$request->get('email').' is already exist.');
             }
         }
         DB::beginTransaction();
@@ -804,9 +1589,9 @@ class AccountController extends Controller
                     // send mail
                     $email = new EmailVerification(new User(['email_token' => $user->email_token, 'name' => $user->name]));
                     Mail::to($user->email)->send($email);
-                    return Redirect::to('profile')->with('message', 'Verification email sent successfully. please check email and verify.');
+                    return Redirect::to('college/'.Session::get('college_user_url').'/profile')->with('message', 'Verification email sent successfully. please check email and verify.');
                 } else {
-                    return Redirect::to('profile')->with('message', 'Email added successfully!');
+                    return Redirect::to('college/'.Session::get('college_user_url').'/profile')->with('message', 'Email added successfully!');
                 }
             }
         }
@@ -815,7 +1600,7 @@ class AccountController extends Controller
             DB::rollback();
             return redirect()->back()->withErrors('something went wrong.');
         }
-        return Redirect::to('profile');
+        return Redirect::to('college/'.Session::get('college_user_url').'/profile');
     }
 
     protected function updateEmail(Request $request){
@@ -835,7 +1620,7 @@ class AccountController extends Controller
                     $email = new EmailVerification(new User(['email_token' => $user->email_token, 'name' => $user->name]));
                     Mail::to($user->email)->send($email);
                     DB::commit();
-                    return Redirect::to('profile')->with('message', 'Verification email sent successfully. please check email and verify.');
+                    return Redirect::to('college/'.Session::get('college_user_url').'/profile')->with('message', 'Verification email sent successfully. please check email and verify.');
                 }
                 catch(\Exception $e)
                 {
@@ -862,7 +1647,7 @@ class AccountController extends Controller
                     Cache::forget($userMobile);
                     Cache::forget('mobile-'.$userMobile);
                 }
-                return Redirect::to('profile')->with('message', 'Mobile number verified successfully.');
+                return Redirect::to('college/'.Session::get('college_user_url').'/profile')->with('message', 'Mobile number verified successfully.');
             }
             catch(\Exception $e)
             {
@@ -870,7 +1655,7 @@ class AccountController extends Controller
                 return redirect()->back()->withErrors('something went wrong.');
             }
         } else {
-            return Redirect::to('profile')->withErrors('Entered wrong otp.');
+            return Redirect::to('college/'.Session::get('college_user_url').'/profile')->withErrors('Entered wrong otp.');
         }
     }
 
@@ -888,7 +1673,7 @@ class AccountController extends Controller
                     Cache::forget($userMobile);
                     Cache::forget('mobile-'.$userMobile);
                 }
-                return Redirect::to('profile')->with('message', 'Mobile number updated successfully.');
+                return Redirect::to('college/'.Session::get('college_user_url').'/profile')->with('message', 'Mobile number updated successfully.');
             }
             catch(\Exception $e)
             {
@@ -896,7 +1681,7 @@ class AccountController extends Controller
                 return redirect()->back()->withErrors('something went wrong.');
             }
         } else {
-            return Redirect::to('profile')->withErrors('Entered wrong otp.');
+            return Redirect::to('college/'.Session::get('college_user_url').'/profile')->withErrors('Entered wrong otp.');
         }
     }
 }

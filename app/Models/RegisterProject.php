@@ -33,6 +33,7 @@ class RegisterProject extends Model
     protected static function getRegisteredProjectsByUserId($userId){
     	return DB::table('vkit_projects')
     			->join('register_projects', 'register_projects.project_id', '=', 'vkit_projects.id')
+                ->where('vkit_projects.created_for', 1)
                 ->where('register_projects.user_id', $userId)
     			->select('vkit_projects.*')
     			->get();

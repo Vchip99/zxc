@@ -21,22 +21,24 @@ class CollegeDept extends Model
     	$deptmentArr = [];
     	$existCollegeId = InputSanitise::inputInt($request->get('college_id'));
     	if(!empty($existCollegeId)){
-    		$deptments = $request->except('_token', 'college', '_method', 'college_id', 'delete_depts');
+    		$deptments = $request->except('_token', 'college', '_method', 'college_id', 'delete_depts', 'url');
 
     		if(count($deptments) > 0){
     			foreach($deptments as $deptmentId => $deptmentName){
-    				$id = explode('_', $deptmentId);
-    				$deptId = $id[1];
-    				$dept = static::where('id',$deptId)->where('college_id', $existCollegeId)->first();
-		            if(is_object($dept)){
-		            	$dept->name = $deptmentName;
-		            	$dept->save();
-		            } else {
-		            	$dept = new static;
-		            	$dept->name = $deptmentName;
-		            	$dept->college_id = $existCollegeId;
-		            	$dept->save();
-		            }
+                    if(!empty($deptmentName)){
+        				$id = explode('_', $deptmentId);
+        				$deptId = $id[1];
+        				$dept = static::where('id',$deptId)->where('college_id', $existCollegeId)->first();
+    		            if(is_object($dept)){
+    		            	$dept->name = $deptmentName;
+    		            	$dept->save();
+    		            } else {
+    		            	$dept = new static;
+    		            	$dept->name = $deptmentName;
+    		            	$dept->college_id = $existCollegeId;
+    		            	$dept->save();
+    		            }
+                    }
     			}
     		}
     		$deleteDepts = trim($request->get('delete_depts'), ',');
@@ -53,12 +55,14 @@ class CollegeDept extends Model
 
 	    	if($deptments > 0){
 	    		for($i=1; $i<=$deptments; $i++){
-	    			$deptmentArr[] = [
-	    				'name' => $request->get('department_'.$i),
-	    				'college_id' => $collegeId,
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'updated_at' => date('Y-m-d H:i:s')
-	    			];
+                    if(!empty($request->get('department_'.$i))){
+    	    			$deptmentArr[] = [
+    	    				'name' => $request->get('department_'.$i),
+    	    				'college_id' => $collegeId,
+                            'created_at' => date('Y-m-d H:i:s'),
+                            'updated_at' => date('Y-m-d H:i:s')
+    	    			];
+                    }
 	    		}
 	    		if(count($deptmentArr) > 0){
 	    			DB::table('college_depts')->insert($deptmentArr);
@@ -67,6 +71,14 @@ class CollegeDept extends Model
 	    	}
     	}
     	return 'false';
+    }
+
+    protected static function getDepartmentsByCollegeId($collegeId){
+        return static::where('college_id', $collegeId)->get();
+    }
+
+    protected static function getDepartmentsByCollegeIdByDeptIds($collegeId,$deptIds){
+        return static::where('college_id', $collegeId)->whereIn('id',$deptIds)->get();
     }
 
 }

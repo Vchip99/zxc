@@ -22,7 +22,6 @@
               {!! $subdomain->contact_us !!}
             @endif
          </h4>
-
        </div>
      </div>
      <!--/.row-->

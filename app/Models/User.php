@@ -47,6 +47,10 @@ use App\Models\PlacementProcessComment;
 use App\Models\PlacementProcessSubComment;
 use App\Models\ChatMessage;
 use App\Models\PlacementExperiance;
+use App\Models\CourseCourse;
+use App\Models\TestSubject;
+use App\Models\VkitProject;
+use App\Models\CollegeSubject;
 use Auth, DB, Cache;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -69,7 +73,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','phone', 'user_type', 'verified', 'admin_approve', 'degree', 'college_id', 'college_dept_id', 'year', 'roll_no', 'other_source', 'photo','resume','recorded_video','email_token', 'remember_token', 'google_provider_id', 'facebook_provider_id','number_verified'
+        'name', 'email', 'password','phone', 'user_type', 'verified', 'admin_approve', 'degree', 'college_id', 'college_dept_id', 'year', 'roll_no', 'other_source', 'photo','resume','recorded_video','email_token', 'remember_token', 'google_provider_id', 'facebook_provider_id','number_verified','skills','assigned_college_depts'
     ];
 
     /**
@@ -118,7 +122,21 @@ class User extends Authenticatable
         if($year > 0){
             $result->where('year', $year);
         }
-        return $result->select('users.id', 'users.name')->get();
+        return $result->select('users.id','users.name','users.email')->get();
+    }
+
+    protected function showPlacementVideoByDepartmentByYear($college,$department,$year,$userType){
+        $result = static::where('college_id', $college);
+        if($userType > 0){
+            $result->where('user_type', $userType);
+        }
+        if($department > 0){
+            $result->where('college_dept_id', $department);
+        }
+        if($year > 0){
+            $result->where('year', $year);
+        }
+        return $result->whereNotNUll('resume')->select('users.id','users.name','users.email','users.recorded_video','users.resume','users.skills')->get();
     }
 
     protected static function changeUserApproveStatus(Request $request){
@@ -161,12 +179,18 @@ class User extends Authenticatable
                 ->where('year', $year)
                 ->where('id', $studentId)->first();
         if(is_object($student)){
-            $student->college_id = 'other';
-            $student->college_dept_id = 0;
-            $student->year = 0;
-            $student->roll_no = 0;
-            $student->other_source = 'deleted by user- '.Auth::user()->name.' from college - '.$collegeId;
-            $student->save();
+            if(self::Student == $student->user_type){
+                $student->college_id = 'other';
+                $student->college_dept_id = 0;
+                $student->year = 0;
+                $student->roll_no = 0;
+                $student->other_source = 'deleted by user- '.Auth::user()->name.' from college - '.$collegeId;
+                $student->save();
+                $student->deleteOtherInfoByUserId($studentId);
+            } else {
+                $student->deleteOtherInfoByUserId($studentId);
+                $student->delete();
+            }
             return 'true';
         }
         return 'false';
@@ -219,7 +243,32 @@ class User extends Authenticatable
         if(!empty($request->student)){
             $student->where('users.name', 'LIKE', '%'.$request->student.'%');
         }
-        return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department')->get();
+        return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department','users.assigned_college_depts')->get();
+    }
+
+    protected static function assignDepatementsToUser(Request $request){
+        $user = static::find($request->get('user'));
+        if(is_object($user)){
+            $departments = $request->get('departments');
+            sort($departments);
+            $deptsStr = implode(',', $departments);
+            $user->assigned_college_depts = $deptsStr;
+            $user->save();
+            return $user;
+        }
+        return;
+    }
+
+    protected static function searchStudentByDeptByYearByName(Request $request){
+        $user = Auth::user();
+        return static::where('users.college_id', $user->college_id)
+                    ->where('users.college_dept_id', $request->department)
+                    ->where('users.year', $request->year)
+                    ->where('users.name', 'LIKE', '%'.$request->student.'%')
+                    ->where('users.user_type', self::Student)
+                    ->whereNotNUll('resume')
+                    ->select('users.id','users.name','users.email','users.recorded_video','users.resume','users.skills')
+                    ->get();
     }
 
     protected static function updateUser(Request $request){
@@ -288,7 +337,7 @@ class User extends Authenticatable
     protected static function getStudentById($studentId){
         return static::where('id', $studentId)
                 ->where('user_type', self::Student)
-                ->select('id','resume','recorded_video')->first();
+                ->select('id','resume','recorded_video','skills')->first();
     }
 
     protected static function deleteStudent(Request $request){
@@ -343,6 +392,12 @@ class User extends Authenticatable
         ChatMessage::deleteChatMessagesByUserId($userId);
         Notification::deleteUserNotificationByUserId($userId);
         PlacementExperiance::deletePlacementExperiancesByUserId($userId);
+
+        // delete college related data
+        CourseCourse::deleteCollegeCoursesAndCourseVideosByUserId($userId);
+        TestSubject::deleteCollegeSubjectAndPapersByUserId($userId);
+        VkitProject::deleteCollegeProjectsByUserId($userId);
+        CollegeSubject::deleteCollegeSubjectsByUserId($userId);
         return;
     }
 
@@ -416,9 +471,13 @@ class User extends Authenticatable
         return $result->count();
     }
 
-    protected static function getAssignmentUsers($selectedAssignmentYear){
+    protected static function getAssignmentUsers($selectedAssignmentYear,$dept){
         $loginUser = Auth::user();
-        return static::where('user_type', self::Student)->where('college_id', $loginUser->college_id)->where('college_dept_id', $loginUser->college_dept_id)->where('year', $selectedAssignmentYear)->get();
+        // if(5 == $loginUser->user_type || 6 == $loginUser->user_type){
+            return static::where('user_type', self::Student)->where('college_id', $loginUser->college_id)->where('college_dept_id', $dept)->where('year', $selectedAssignmentYear)->get();
+        // } else {
+        //     return static::where('user_type', self::Student)->where('college_id', $loginUser->college_id)->where('college_dept_id', $loginUser->college_dept_id)->where('year', $selectedAssignmentYear)->get();
+        // }
     }
 
     protected static function getTeachers($collegeDept=NULL){
@@ -428,25 +487,32 @@ class User extends Authenticatable
                 ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
                 ->where('users.college_id', $loginUser->college_id)
                 ->where('users.college_dept_id', $loginUser->college_dept_id)
-                ->where('assignment_questions.year', $loginUser->year)
+                ->whereRaw("find_in_set($loginUser->year , assignment_questions.years)")
                 ->select('users.id', 'users.*')->groupBy('users.id')->get();
         } else if( self::Lecturer == $loginUser->user_type){
             return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
                 ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
                 ->where('users.college_id', $loginUser->college_id)
                 ->where('users.college_dept_id', $loginUser->college_dept_id)
-                // ->where('assignment_questions.year', $loginUser->year)
                 ->select('users.id', 'users.*')->groupBy('users.id')->get();
         } else if( self::Hod == $loginUser->user_type){
+            $departments = explode(',',$loginUser->assigned_college_depts);
             return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
                 ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
                 ->where('users.college_id', $loginUser->college_id)
-                ->where('users.college_dept_id', $loginUser->college_dept_id)
+                ->whereIn('users.college_dept_id', $departments)
                 ->select('users.id', 'users.*')->groupBy('users.id')->get();
         } else if( self::Directore == $loginUser->user_type){
             return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
-                ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
-                ->where('users.college_dept_id', $collegeDept)
+                ->whereIn('users.user_type', array(self::Lecturer,self::Hod,self::Directore,self::TNP))
+                ->where('users.college_id', $loginUser->college_id)
+                // ->where('users.college_dept_id', $collegeDept)
+                ->select('users.id', 'users.*')->groupBy('users.id')->get();
+        } else if( self::TNP == $loginUser->user_type){
+            return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
+                ->whereIn('users.user_type', array(self::TNP))
+                ->where('users.college_id', $loginUser->college_id)
+                // ->where('users.college_dept_id', $collegeDept)
                 ->select('users.id', 'users.*')->groupBy('users.id')->get();
         }
     }
@@ -547,5 +613,16 @@ class User extends Authenticatable
             }
         }
         return;
+    }
+
+    protected static function getCollegeStudentsByPaperIdByDeptIdByYear($paperId,$deptId,$year){
+        $loginUser = Auth::user();
+        return static::join('college_offline_papers','college_offline_papers.college_id','=','users.college_id')
+            ->where('college_offline_papers.id', $paperId)
+            ->where('users.college_dept_id', $deptId)
+            ->where('users.year', $year)
+            ->where('college_offline_papers.college_id', $loginUser->college_id)
+            ->where('users.user_type', self::Student)->where('users.admin_approve', 1)
+            ->select('users.id','users.name','college_offline_papers.marks')->get();
     }
 }

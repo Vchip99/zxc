@@ -23,6 +23,7 @@ class ChatMessage extends Model
 
     protected static function showchatusers(){
         $chatusers = [];
+        $initialChatuserIds = [];
         $chatmessageusers = [];
         $loginUser = Auth()->user();
         if(Cache::has('vchip:user-'.$loginUser->id.':chatusers')){
@@ -54,9 +55,9 @@ class ChatMessage extends Model
                 }
             }
 
-            $chatusers['chat_users'] = $orderById = implode(',', $chatmessageusers);
+            $orderById = implode(',', $chatmessageusers);
             if(count($chatmessageusers) > 0){
-                $messageusers = User::whereIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
+                $messageusers = User::where('college_id',$loginUser->college_id)->whereIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
                 if(is_object($messageusers) && false == $messageusers->isEmpty()){
                     foreach($messageusers as $user){
                         if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
@@ -66,13 +67,25 @@ class ChatMessage extends Model
                         } else {
                             $isImageExist = 'false';
                         }
+                        if(User::Student == $user->user_type){
+                            $userType = 'Student';
+                        } elseif(User::Lecturer == $user->user_type){
+                            $userType = 'Lecturer';
+                        } elseif(User::Hod == $user->user_type){
+                            $userType = 'Hod';
+                        } elseif(User::Directore == $user->user_type){
+                            $userType = 'Director';
+                        } elseif(User::TNP == $user->user_type){
+                            $userType = 'TNP';
+                        }
+                        $initialChatuserIds[] = $user->id;
                         $chatusers['users'][] = [
                             'id' => $user->id,
                             'name' => $user->name,
                             'photo' => $user->photo,
                             'image_exist' => $isImageExist,
                             'chat_room_id' => $user->chatroomid(),
-                            'college' => $user->getCollegeName(),
+                            'college' => $userType,
                         ];
                     }
                 }
@@ -80,7 +93,7 @@ class ChatMessage extends Model
 
             array_push($chatmessageusers, $adminChatUserId);
             array_push($chatmessageusers, $loginUser->id);
-            $users = User::whereNotIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->take(10)->get();
+            $users = User::where('college_id',$loginUser->college_id)->whereNotIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->orderBy('name','asc')->take(10)->get();
 
             if(is_object($users) && false == $users->isEmpty()){
                 foreach($users as $user){
@@ -91,17 +104,30 @@ class ChatMessage extends Model
                     } else {
                         $isImageExist = 'false';
                     }
+                    if(User::Student == $user->user_type){
+                        $userType = 'Student';
+                    } elseif(User::Lecturer == $user->user_type){
+                        $userType = 'Lecturer';
+                    } elseif(User::Hod == $user->user_type){
+                        $userType = 'Hod';
+                    } elseif(User::Directore == $user->user_type){
+                        $userType = 'Director';
+                    } elseif(User::TNP == $user->user_type){
+                        $userType = 'TNP';
+                    }
+                    $initialChatuserIds[] = $user->id;
                     $chatusers['users'][] = [
                         'id' => $user->id,
                         'name' => $user->name,
                         'photo' => $user->photo,
                         'image_exist' => $isImageExist,
                         'chat_room_id' => $user->chatroomid(),
-                        'college' => $user->getCollegeName(),
+                        'college' => $userType,
                     ];
                 }
             }
-
+            $newChatArray = array_merge($initialChatuserIds, $chatmessageusers);
+            $chatusers['chat_users'] = implode(',', array_unique($newChatArray));
             Cache::put('vchip:user-'.$loginUser->id.':chatusers', $chatusers, 60);
             $userResult['chatusers'] = $chatusers;
         }

@@ -72,7 +72,7 @@
     <section class="sidebar">
       <div class="user-panel">
         <div class="pull-left image">
-          <a href="{{ url('profile')}}">
+          <a href="{{ url('college/'.Session::get('college_user_url').'/profile')}}">
           @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
             <img src="{{ asset(Auth::user()->photo)}}" id="dashboardUserImage" class="img-circle" alt="User Image">
           @else
@@ -99,9 +99,10 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ url('allChatMessages')}}"><i class="fa fa-circle-o"></i> Chat Messages : <b style="color: red;" id="unreadCountDash_2_{{Auth::user()->id}}">{{Auth::user()->unreadChatMessagesCount()}}</b></a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/allChatMessages')}}"><i class="fa fa-circle-o"></i> Chat Messages : <b style="color: red;" id="unreadCountDash_2_{{Auth::user()->id}}">{{Auth::user()->unreadChatMessagesCount()}}</b></a></li>
           </ul>
         </li>
+        @if(2 == Auth::user()->user_type)
         <li class="treeview ">
           <a href="#">
             <i class="fa fa-star"></i><span>Notifications </span><b style="color: red;">{{Auth::user()->userNotificationCount()}}</b>
@@ -110,10 +111,11 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ url('myNotifications')}}"><i class="fa fa-circle-o"></i> My Notifications : <b style="color: red;">{{Auth::user()->userNotificationCount()}} </b></a></li>
-            <li><a href="{{ url('adminMessages')}}"><i class="fa fa-circle-o"></i> Admin Messages : <b style="color: red;">{{Auth::user()->adminNotificationCount()}} </b></a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/myNotifications')}}"><i class="fa fa-circle-o"></i> My Notifications : <b style="color: red;">{{Auth::user()->userNotificationCount()}} </b></a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/adminMessages')}}"><i class="fa fa-circle-o"></i> Admin Messages : <b style="color: red;">{{Auth::user()->adminNotificationCount()}} </b></a></li>
           </ul>
         </li>
+        @endif
         <li class="treeview ">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>Online Courses</span>
@@ -122,10 +124,19 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ url('myCourses')}}"><i class="fa fa-circle-o"></i> My Online Courses</a></li>
-            <li><a href="{{ url('myCourseResults')}}"><i class="fa fa-circle-o"></i> My Course Results</a></li>
-            <li><a href="{{ url('myCertificate')}}"><i class="fa fa-circle-o"></i> My Certificate</a></li>
-            <li><a href="{{ url('courses')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Courses</a></li>
+            @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+              @if(4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCourseAll')}}"><i class="fa fa-circle-o"></i> Manage All </a></li>
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCourseSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
+              @endif
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCourseCourse')}}"><i class="fa fa-circle-o"></i> Manage Course </a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCourseVideo')}}"><i class="fa fa-circle-o"></i> Manage Video </a></li>
+            @elseif(2 == Auth::user()->user_type)
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeCourses')}}"><i class="fa fa-circle-o"></i> My Online Courses</a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeCourseResults')}}"><i class="fa fa-circle-o"></i> My Course Results</a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/myCertificate')}}"><i class="fa fa-circle-o"></i> My Certificate</a></li>
+              <li><a href="{{ url('courses')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Courses</a></li>
+            @endif
           </ul>
         </li>
         <li class="treeview">
@@ -137,37 +148,24 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ url('myTest')}}"><i class="fa fa-circle-o"></i> My Test</a></li>
-            <li><a href="{{ url('myTestResults')}}"><i class="fa fa-circle-o"></i> My Test Results</a></li>
-            <li><a href="{{ url('online-tests')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Test</a></li>
+            @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+              @if(4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageTestAll')}}"><i class="fa fa-circle-o"></i> Manage All </a></li>
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
+              @endif
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/managePaper')}}"><i class="fa fa-circle-o"></i> Manage Paper </a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageQuestions')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/showQuestionBank')}}"><i class="fa fa-circle-o"></i> Question Bank </a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/uploadCollegeQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
+            @elseif(2 == Auth::user()->user_type)
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeTest')}}"><i class="fa fa-circle-o"></i> My Test</a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeTestResults')}}"><i class="fa fa-circle-o"></i> My Test Results</a></li>
+              <li><a href="{{ url('online-tests')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Test</a></li>
+            @endif
           </ul>
         </li>
-        <!-- <li class="treeview">
-          <a href="#">
-            <i class="fa fa-pie-chart"></i>
-            <span>Live Courses</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-            <li><a href="{{ url('myLiveCourses')}}"><i class="fa fa-circle-o"></i>My Live Courses</a></li>
-            <li><a href="{{ url('liveCourse')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Courses</a></li>
-          </ul>
-        </li>
-        <li class="treeview ">
-          <a href="#">
-            <i class="fa fa-laptop"></i>
-            <span>My Webinar</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-            <li><a href="#"><i class="fa fa-circle-o"></i> My Webinar</a></li>
-            <li class="active"><a href="{{ url('webinar') }}"><i class="fa fa-circle-o"></i> more Webinar</a></li>
-          </ul>
-        </li> -->
+        @if(2 == Auth::user()->user_type)
         <li class="treeview">
           <a href="#">
             <i class="fa fa-book"></i> <span>Documents</span>
@@ -176,11 +174,13 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ url('myDocuments') }}"><i class="fa fa-circle-o"></i> Read Articles</a></li>
-            <li><a href="{{ url('myFavouriteArticles') }}"><i class="fa fa-circle-o"></i> Favourite Articles</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/myDocuments') }}"><i class="fa fa-circle-o"></i> Read Articles</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/myFavouriteArticles') }}"><i class="fa fa-circle-o"></i> Favourite Articles</a></li>
             <li><a href="{{ url('documents') }}" target="_blank" ><i class="fa fa-circle-o"></i> More Articles</a></li>
           </ul>
         </li>
+        @endif
+        @if(2 == Auth::user()->user_type || 3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type)
         <li class="treeview">
           <a href="#">
             <i class="fa fa-table"></i> <span>Vkit</span>
@@ -189,10 +189,17 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ url('myVkits')}}"><i class="fa fa-circle-o"></i>  Favourite Projects</a></li>
-            <li><a href="{{ url('vkits')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Projects</a></li>
+            @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type)
+              <!-- <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageVkitCategory')}}"><i class="fa fa-circle-o"></i>  Manage Category</a></li> -->
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageVkitProject')}}" ><i class="fa fa-circle-o"></i> Manage Project</a></li>
+            @elseif(2 == Auth::user()->user_type)
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeVkits')}}"><i class="fa fa-circle-o"></i>  Favourite Projects</a></li>
+              <li><a href="{{ url('vkits')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Projects</a></li>
+            @endif
           </ul>
         </li>
+        @endif
+        @if(2 == Auth::user()->user_type)
         <li class="treeview">
           <a href="#">
             <i class="fa fa-comments"></i> <span>Discussion</span>
@@ -201,12 +208,31 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ url('myQuestions')}}"><i class="fa fa-circle-o"></i> My Questions</a></li>
-            <li><a href="{{ url('myReplies')}}"><i class="fa fa-circle-o"></i> My Replies</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/myQuestions')}}"><i class="fa fa-circle-o"></i> My Questions</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/myReplies')}}"><i class="fa fa-circle-o"></i> My Replies</a></li>
             <li><a href="{{ url('discussion')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Discussion</a></li>
           </ul>
         </li>
-        @if(2 == Auth::user()->user_type || 3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type)
+        @endif
+        @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-calendar"></i> <span>Academic</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            @if(4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeCategory')}}"><i class="fa fa-circle-o"></i> Manage Category</a></li>
+            @endif
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeAttendance')}}"><i class="fa fa-circle-o"></i> Manage Attendance</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
+          </ul>
+        </li>
+        @endif
         <li class="treeview">
           <a href="#">
             <i class="fa fa-tasks"></i> <span>Assignment</span>
@@ -215,23 +241,15 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type)
-              @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type)
-                <li><a href="{{ url('manageAssignmentSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject</a></li>
-                <li><a href="{{ url('manageAssignmentTopic')}}"><i class="fa fa-circle-o"></i> Manage Topic</a></li>
-              @endif
-              @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type)
-                <li><a href="{{ url('manageAssignment')}}"><i class="fa fa-circle-o"></i> Manage Assignment</a></li>
-              @endif
-              @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type)
-                <li><a href="{{ url('studentsAssignment')}}"><i class="fa fa-circle-o"></i> Students Assignment</a></li>
-              @endif
+            @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type|| 6 == Auth::user()->user_type)
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageAssignmentTopic')}}"><i class="fa fa-circle-o"></i> Manage Topic</a></li>
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageAssignment')}}"><i class="fa fa-circle-o"></i> Manage Assignment</a></li>
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/studentsAssignment')}}"><i class="fa fa-circle-o"></i> Students Assignment</a></li>
             @elseif(2 == Auth::user()->user_type)
-              <li><a href="{{ url('myAssignments')}}"><i class="fa fa-circle-o"></i> My Assignments</a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/myAssignments')}}"><i class="fa fa-circle-o"></i> My Assignments</a></li>
             @endif
           </ul>
         </li>
-        @endif
         @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
           <li class="treeview">
             <a href="#">
@@ -241,13 +259,18 @@
               </span>
             </a>
             <ul class="treeview-menu">
-              <li><a href="{{ url('students')}}"><i class="fa fa-circle-o"></i>Users</a></li>
-              <li><a href="{{ url('studentTestResults')}}"><i class="fa fa-circle-o"></i>Test Result</a></li>
-              <li><a href="{{ url('studentCourses')}}"><i class="fa fa-circle-o"></i>Course</a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/students')}}"><i class="fa fa-circle-o"></i>Users</a></li>
               @if(2 == $selectedUserType)
-                <li><a href="{{ url('studentVideo')}}"><i class="fa fa-circle-o"></i> Video </a></li>
-                <li><a href="{{ url('studentPlacement')}}"><i class="fa fa-circle-o"></i>Placement</a></li>
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/studentCollegeTestResults')}}"><i class="fa fa-circle-o"></i>Test Result</a></li>
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/studentCollegeCourses')}}"><i class="fa fa-circle-o"></i>Course</a></li>
+              @elseif(3 == $selectedUserType || 4 == $selectedUserType)
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/lecturerPapers')}}"><i class="fa fa-circle-o"></i>Lecturer Papers</a></li>
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/lecturerCourses')}}"><i class="fa fa-circle-o"></i>Lecturer Courses</a></li>
               @endif
+               @if(6 == Auth::user()->user_type)
+                <li><a href="{{ url('college/'.Session::get('college_user_url').'/studentVideo')}}"><i class="fa fa-circle-o"></i> Video </a></li>
+              @endif
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/studentPlacement')}}"><i class="fa fa-circle-o"></i>Placement</a></li>
             </ul>
           </li>
           <li class="treeview">
@@ -258,7 +281,7 @@
               </span>
             </a>
             <ul class="treeview-menu">
-              <li title="Show All Test Results"><a href="{{ url('allTestResults')}}"><i class="fa fa-circle-o"></i> All Test Results </a></li>
+              <li title="Show College Test Results"><a href="{{ url('college/'.Session::get('college_user_url').'/collegeTestResults')}}"><i class="fa fa-circle-o"></i> All Test Results </a></li>
             </ul>
           </li>
         @endif

@@ -49,7 +49,7 @@ class SubCategoryController extends Controller
      *  show all sub category
      */
     protected function show(){
-    	$testSubCategories = TestSubCategory::paginate();
+        $testSubCategories = TestSubCategory::getSubcategoriesWithPagination();
     	return view('subcategory.list', compact('testSubCategories'));
     }
 
@@ -57,7 +57,7 @@ class SubCategoryController extends Controller
      *  show create UI for sub category
      */
     protected function create(){
-    	$testCategories = TestCategory::all();
+    	$testCategories = TestCategory::getAllTestCategories();
     	$testSubcategory = new TestSubCategory;
     	return view('subcategory.create', compact('testCategories', 'testSubcategory'));
     }
@@ -97,8 +97,8 @@ class SubCategoryController extends Controller
     	if(isset($id)){
     		$testSubcategory = TestSubCategory::find($id);
     		if(is_object($testSubcategory)){
-    			$testCategories = TestCategory::all();
-    			return view('subcategory.create', compact('testCategories', 'testSubcategory'));
+    			$testCategories = TestCategory::getAllTestCategories();
+                return view('subcategory.create', compact('testCategories', 'testSubcategory'));
     		}
         }
 		return Redirect::to('admin/manageSubCategory');

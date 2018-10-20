@@ -10,20 +10,32 @@
   </section>
 @stop
 @section('dashboard_content')
-  &nbsp;
-
   <div class="content-wrapper v-container tab-content" >
     <div id="student-rcd" class="">
       <div class="top mrgn_40_btm">
         <div class="container">
           <div class="row">
             <div class="col-md-3 mrgn_10_btm">
+              <select class="form-control" id="dept" onChange="resetYear(this);">
+                <option value=""> Select Department </option>
+                @if(count($collegeDepts) > 0)
+                  @foreach($collegeDepts as $collegeDept)
+                    @if($selectedAssignmentDepartment == $collegeDept->id)
+                      <option value="{{$collegeDept->id}}" selected>{{$collegeDept->name}}</option>
+                    @else
+                      <option value="{{$collegeDept->id}}">{{$collegeDept->name}}</option>
+                    @endif
+                  @endforeach
+                @endif
+              </select>
+            </div>
+            <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="year" name="year" required title="year" onChange="selectSubject(this);">
                 <option value="">Select Year</option>
-                <option value="1" @if($selectedAssignmentYear > 0 && 1 == $selectedAssignmentYear) selected @endif >First Year</option>
-                <option value="2" @if($selectedAssignmentYear > 0 && 2 == $selectedAssignmentYear) selected @endif >Second Year</option>
-                <option value="3" @if($selectedAssignmentYear > 0 && 3 == $selectedAssignmentYear) selected @endif >Third Year</option>
-                <option value="4" @if($selectedAssignmentYear > 0 && 4 == $selectedAssignmentYear) selected @endif >Fourth Year</option>
+                <option value="1" @if($selectedAssignmentYear > 0 && 1 == $selectedAssignmentYear) selected @endif >First </option>
+                <option value="2" @if($selectedAssignmentYear > 0 && 2 == $selectedAssignmentYear) selected @endif >Second </option>
+                <option value="3" @if($selectedAssignmentYear > 0 && 3 == $selectedAssignmentYear) selected @endif >Third </option>
+                <option value="4" @if($selectedAssignmentYear > 0 && 4 == $selectedAssignmentYear) selected @endif >Fourth </option>
               </select>
             </div>
             <div class="col-md-3 mrgn_10_btm">
@@ -56,7 +68,7 @@
             </div>
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="student" name="student" title="Student" onChange="getAssignments(this);">
-              <option value="0">Select Student</option>
+              <option value="">Select Student</option>
               @if($selectedAssignmentStudent > 0 && count($assignmentUsers) > 0)
                 @foreach($assignmentUsers as $assignmentUser)
                   @if($selectedAssignmentStudent == $assignmentUser->id)
@@ -85,21 +97,21 @@
                       <th>#</th>
                       <th>Assignment</th>
                       <th>Attachment</th>
-                      <th>Subject Name</th>
-                      <th>Topic Name</th>
-                      <th>Assignment Remark</th>
+                      <th>Subject </th>
+                      <th>Topic </th>
+                      <th>Remark</th>
                     </tr>
                   </thead>
                   <tbody id="studentAssignment" class="">
                   @if(is_object($assignment))
-                    <tr>
+                    <tr style="overflow: auto;">
                       <td>1</td>
                       <td>{!! mb_strimwidth($assignment->question, 0, 400, "...") !!}</td>
                       <td>{!! basename($assignment->attached_link) !!}</td>
                       <td>{{$assignment->subject->name}}</td>
                       <td>{{$assignment->topic->name}}</td>
                       <td>
-                        <a href="{{url('assignmentRemark')}}/{{$assignment->id}}/{{$selectedAssignmentStudent}}" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Assignment Remark" />
+                        <a href="{{url('college/'.Session::get('college_user_url').'/assignmentRemark')}}/{{$assignment->id}}/{{$selectedAssignmentStudent}}" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Assignment Remark" />
                           </a>
                       </td>
                     </tr>
@@ -118,23 +130,28 @@
     function selectStudent(ele){
       document.getElementById('studentAssignment').innerHTML = '';
       year = document.getElementById('year').value;
-      topic = document.getElementById('topic').value;
+      topic = parseInt(document.getElementById('topic').value);
+      if(document.getElementById('dept')){
+        var department = document.getElementById('dept').value;
+      } else {
+        var department = 0;
+      }
       user_type = 2;
       if( 0 < year && 0 < topic){
         $.ajax({
           method: "POST",
           url: "{{url('searchStudent')}}",
-          data: {year:year, user_type:user_type}
+          data: {year:year,user_type:user_type,department:department}
         })
         .done(function( msg ) {
           select = document.getElementById('student');
           select.innerHTML = '';
           var opt = document.createElement('option');
-          opt.value = 0;
+          opt.value = '';
           opt.innerHTML = 'Select Student';
           select.appendChild(opt);
-          if( 0 < msg.length){
-            $.each(msg, function(idx, obj) {
+          if( 0 < msg['users'].length){
+            $.each(msg['users'], function(idx, obj) {
                 var opt = document.createElement('option');
                 opt.value = obj.id;
                 opt.innerHTML = obj.name;
@@ -149,6 +166,7 @@
 
     function selectSubject(ele){
       id = parseInt($(ele).val());
+      var department = document.getElementById('dept').value;
       document.getElementById('subject').value = 0;
       document.getElementById('studentAssignment').innerHTML = '';
       renderTopic();
@@ -157,14 +175,14 @@
         // get subjects
         $.ajax({
           method: "POST",
-          url: "{{url('getAssignmentSubjectsByYear')}}",
-          data: {year:id}
+          url: "{{url('getCollegeSubjectByYear')}}",
+          data: {year:id,department:department}
         })
         .done(function( msg ) {
           select = document.getElementById('subject');
           select.innerHTML = '';
           var opt = document.createElement('option');
-          opt.value = 0;
+          opt.value = '';
           opt.innerHTML = 'Select Subject';
           select.appendChild(opt);
           if( 0 < msg.length){
@@ -213,11 +231,18 @@
     function getAssignments(ele){
       id = parseInt($(ele).val());
       topic = parseInt(document.getElementById('topic').value);
-      if( 0 < id ){
+      subject = document.getElementById('subject').value;
+      year = document.getElementById('year').value;
+      if(document.getElementById('dept')){
+        var department = document.getElementById('dept').value;
+      } else {
+        var department = 0;
+      }
+      if( 0 < id && topic && subject && year){
         $.ajax({
           method: "POST",
           url: "{{url('getAssignmentByTopicForStudent')}}",
-          data: {topic:topic, student:id}
+          data: {topic:topic, student:id,subject:subject,year:year,department:department}
         })
         .done(function( msg ) {
           body = document.getElementById('studentAssignment');
@@ -225,6 +250,7 @@
           studentId = document.getElementById('student').value;
           if(msg['id']){
             var eleTr = document.createElement('tr');
+            eleTr.setAttribute("style","overflow: auto;");
 
             var eleIndex = document.createElement('td');
             eleIndex.innerHTML = 1;
@@ -250,7 +276,7 @@
             eleTopic.innerHTML = msg['topic'];
             eleTr.appendChild(eleTopic);
 
-            var url = "{{url('assignmentRemark')}}/"+ msg['id']+"/"+studentId;
+            var url = "{{url('college/'.Session::get('college_user_url').'/assignmentRemark')}}/"+ msg['id']+"/"+studentId;
             var imageSrc = "{{asset('images/edit1.png')}}";
             var eleRemark = document.createElement('td');
             eleRemark.innerHTML = '<a href="'+ url +'" ><img src="'+imageSrc+'" width=\'30\' height=\'30\' title=" Assignment Remark" /></a><form id="form_'+ msg['id']+'" action="" method="GET"></form>';
@@ -274,7 +300,7 @@
     select = document.getElementById('student');
     select.innerHTML = '';
     var opt = document.createElement('option');
-    opt.value = 0;
+    opt.value = '';
     opt.innerHTML = 'Select Student';
     select.appendChild(opt);
   }
@@ -283,9 +309,26 @@
     select = document.getElementById('topic');
     select.innerHTML = '';
     var opt = document.createElement('option');
-    opt.value = 0;
+    opt.value = '';
     opt.innerHTML = 'Select Topic';
     select.appendChild(opt);
+  }
+
+  function renderSubject(){
+    select = document.getElementById('subject');
+    select.innerHTML = '';
+    var opt = document.createElement('option');
+    opt.value = '';
+    opt.innerHTML = 'Select Subject';
+    select.appendChild(opt);
+  }
+
+  function resetYear(){
+    document.getElementById('year').selectedIndex = '';
+    document.getElementById('studentAssignment').innerHTML = '';
+    renderSubject();
+    renderTopic();
+    renderStudent();
   }
 </script>
 @stop

@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use DB, Redirect;
+use DB, Redirect,Auth;
 use App\Libraries\InputSanitise;
 use App\Models\CourseCategory;
+use App\Models\CollegeCategory;
 use App\Models\CourseSubCategory;
 use App\Models\CourseVideo;
 use App\Models\RegisterOnlineCourse;
@@ -20,7 +21,7 @@ class CourseCourse extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'course_category_id', 'course_sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path','release_date'];
+    protected $fillable = ['name', 'course_category_id', 'course_sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path','release_date','created_by'];
 
     /**
      *  create/update course
@@ -102,7 +103,9 @@ class CourseCourse extends Model
             // save image interlaced
             $img->save();
         }
-
+        if(is_object(Auth::user()) && Auth::user()->college_id > 0){
+            $course->created_by = Auth::user()->id;
+        }
         $course->release_date = $release_date;
     	$course->save();
     	return $course;
@@ -112,14 +115,125 @@ class CourseCourse extends Model
     /**
      *  display courses associated with videos
      */
-    protected static function getCourseAssocaitedWithVideos(){
+    protected static function getCourseAssocaitedWithVideosWithPagination(){
         return DB::table('course_courses')
                 ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
                 ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
                 ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                ->where('course_sub_categories.created_for', 1)
                 ->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category')
                 ->groupBy('course_courses.id')
                 ->paginate(9);
+    }
+
+    /**
+     *  couses by collegeId by deptId
+     */
+    protected static function getCoursesByCollegeIdByDeptIdWithPagination($collegeId,$deptId=NULL){
+        $loginUser = Auth::user();
+        $result = static::join('users','users.id','=','course_courses.created_by')
+                ->join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->where('college_categories.college_id', '=', $collegeId);
+        if(NULL != $deptId){
+            $result->where('college_categories.college_dept_id', '=', $deptId);
+        }
+        if(User::TNP == $loginUser->user_type){
+            $result->where('course_courses.created_by', $loginUser->id);
+        }
+
+        return $result->where('course_sub_categories.created_for', 0)->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'college_categories.name as category','college_categories.college_dept_id','users.name as user')
+                ->groupBy('course_courses.id')
+                ->paginate();
+    }
+
+    protected static function getCoursesByCollegeIdByAssignedDeptsWithPagination($collegeId){
+        $loginUser = Auth::user();
+        $result = static::join('users','users.id','=','course_courses.created_by')
+                ->join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->where('users.college_id', $collegeId);
+        if(User::Lecturer == $loginUser->user_type){
+            $result->where('course_courses.created_by', $loginUser->id);
+        } else {
+            $result->where(function($query) use($loginUser){
+                $query->where('users.user_type', User::Lecturer);
+                $query->orWhere('users.id',$loginUser->id);
+            })
+            ->where('course_courses.created_by', '>', 0)->whereIn('users.college_dept_id', explode(',',$loginUser->assigned_college_depts));
+        }
+        return $result->where('course_sub_categories.created_for', 0)->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'college_categories.name as category','college_categories.college_dept_id','users.name as user')
+                ->groupBy('course_courses.id')
+                ->paginate();
+    }
+
+    protected static function getCoursesByCollegeIdByAssignedDepts($collegeId){
+        $loginUser = Auth::user();
+        $result = static::join('users','users.id','=','course_courses.created_by')
+                ->join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->where('users.college_id', $collegeId);
+        if(User::Lecturer == $loginUser->user_type){
+            $result->where('course_courses.created_by', $loginUser->id);
+        } else {
+            $result->where(function($query) use($loginUser){
+                $query->where('users.user_type', User::Lecturer);
+                $query->orWhere('users.id',$loginUser->id);
+            })
+            ->where('course_courses.created_by', '>', 0)->whereIn('users.college_dept_id', explode(',',$loginUser->assigned_college_depts));
+        }
+        return $result->where('course_sub_categories.created_for', 0)->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'college_categories.name as category','college_categories.college_dept_id')
+                ->groupBy('course_courses.id')
+                ->get();
+    }
+
+    /**
+     *  couses
+     */
+    protected static function getCoursesWithPagination(){
+        return static::join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->where('course_sub_categories.created_for', 1)
+                ->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category')
+                ->groupBy('course_courses.id')
+                ->paginate();
+    }
+
+    /**
+     *  couses by collegeId by deptId
+     */
+    protected static function getCoursesAssociatedWithVideosByCollegeIdByDeptId($collegeId,$deptId=NULL){
+        $result = static::join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
+                ->where('college_categories.college_id', '=', $collegeId)
+                ->where('course_sub_categories.created_for', 0);
+        if(NULL != $deptId){
+            $result->where('college_categories.college_dept_id', '=', $deptId);
+        }
+
+        return $result->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'college_categories.name as category')
+                ->groupBy('course_courses.id')
+                ->get();
+    }
+
+    /**
+     *  couses by collegeId by deptId
+     */
+    protected static function getCoursesByUserIdByCollegeIdByDeptId($userId,$collegeId,$deptId=NULL){
+        $result = static::join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
+                ->where('college_categories.college_id', '=', $collegeId)
+                ->where('course_courses.created_by', '=', $userId)
+                ->where('course_sub_categories.created_for', 0);
+        if(NULL != $deptId){
+            $result->where('college_categories.college_dept_id', '=', $deptId);
+        }
+
+        return $result->select('course_courses.id','course_courses.name as course', 'course_sub_categories.name as subcategory', 'college_categories.name as category')
+                ->groupBy('course_courses.id')
+                ->get();
     }
 
     /**
@@ -140,6 +254,7 @@ class CourseCourse extends Model
                     ->where('course_courses.course_category_id', $categoryId)
                     ->where('course_courses.course_sub_category_id', $subcategoryId)
                     ->where('register_online_courses.user_id', $userId)
+                    ->where('course_sub_categories.created_for', 1)
                     ->select('course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category', 'register_online_courses.grade as grade')
                     ->groupBy('course_courses.id')
                     ->get() ;
@@ -153,10 +268,32 @@ class CourseCourse extends Model
                     ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
                     ->where('course_courses.course_category_id', $categoryId)
                     ->where('course_courses.course_sub_category_id', $subcategoryId)
+                    ->where('course_sub_categories.created_for', 1)
                     ->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category')
                     ->groupBy('course_courses.id')
                     ->get() ;
         }
+    }
+
+    /**
+     *  return courses by categoryId by sub categoryId
+     */
+    protected static function getCollegeCourseByCatIdBySubCatId($categoryId,$subcategoryId){
+        $categoryId = InputSanitise::inputInt($categoryId);
+        $subcategoryId = InputSanitise::inputInt($subcategoryId);
+
+        /**
+         *  display courses associated with videos by category and sub category
+         */
+        return static::join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
+                ->where('course_courses.course_category_id', $categoryId)
+                ->where('course_courses.course_sub_category_id', $subcategoryId)
+                ->where('course_sub_categories.created_for', 0)
+                ->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'college_categories.name as category')
+                ->groupBy('course_courses.id')
+                ->get();
     }
 
     /**
@@ -216,13 +353,27 @@ class CourseCourse extends Model
      */
     protected static function getRegisteredOnlineCourses($userId){
         $userId = InputSanitise::inputInt($userId);
-        return DB::table('course_courses')
-                ->join('register_online_courses', 'register_online_courses.online_course_id', '=', 'course_courses.id')
+        $result = DB::table('course_courses')
+                ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
                 ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
                 ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
-                ->where('register_online_courses.user_id', $userId)
-                ->select('course_courses.*', 'course_categories.name as category', 'course_sub_categories.name as subCategory', 'register_online_courses.grade as grade')
-                ->get();
+                ->where('course_sub_categories.created_for', 1);
+
+        return $result->select('course_courses.*', 'course_categories.name as category', 'course_sub_categories.name as subCategory')->groupBy('course_courses.id')->get();
+    }
+
+    /**
+     *  get registered online courses for user
+     */
+    protected static function getRegisteredCollegeOnlineCourses($userId){
+        $userId = InputSanitise::inputInt($userId);
+        $result = DB::table('course_courses')
+                ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
+                ->join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->where('course_sub_categories.created_for', 0);
+
+        return $result->select('course_courses.*', 'college_categories.name as category', 'course_sub_categories.name as subCategory')->groupBy('course_courses.id')->get();
     }
 
     /**
@@ -233,7 +384,9 @@ class CourseCourse extends Model
         $result = DB::table('course_courses')
                 ->join('register_online_courses', 'register_online_courses.online_course_id', '=', 'course_courses.id')
                 ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
-                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id');
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->where('course_sub_categories.created_for', 1);
+
         if($userId > 0)  {
             $result->where('register_online_courses.user_id', $userId);
         }
@@ -243,7 +396,30 @@ class CourseCourse extends Model
         if($subcategory > 0)  {
             $result->where('course_sub_categories.id', $subcategory);
         }
-        return $result->select('course_courses.*', 'course_categories.name as category', 'course_sub_categories.name as subCategory', 'register_online_courses.grade as grade')->get();
+        return $result->select('course_courses.*', 'course_categories.name as category', 'course_sub_categories.name as subCategory', 'register_online_courses.grade as grade')->groupBy('course_courses.id')->get();
+    }
+
+    /**
+     *  get registered online courses for user by category n sub category
+     */
+    protected static function getOnlineCollegeCoursesByUserIdByCategoryBySubCategory($userId,$category,$subcategory){
+        $userId = InputSanitise::inputInt($userId);
+        $result = DB::table('course_courses')
+                ->join('register_online_courses', 'register_online_courses.online_course_id', '=', 'course_courses.id')
+                ->join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->where('course_sub_categories.created_for', 0);
+
+        if($userId > 0)  {
+            $result->where('register_online_courses.user_id', $userId);
+        }
+        if($category > 0)  {
+            $result->where('college_categories.id', $category);
+        }
+        if($subcategory > 0)  {
+            $result->where('course_sub_categories.id', $subcategory);
+        }
+        return $result->select('course_courses.*', 'college_categories.name as category', 'course_sub_categories.name as subCategory', 'register_online_courses.grade as grade')->groupBy('course_courses.id')->get();
     }
 
     /**
@@ -251,6 +427,13 @@ class CourseCourse extends Model
      */
     public function category(){
         return $this->belongsTo(CourseCategory::class, 'course_category_id');
+    }
+
+    /**
+     *  get category of sub category
+     */
+    public function collegeCategory(){
+        return $this->belongsTo(CollegeCategory::class, 'course_category_id');
     }
 
     /**
@@ -285,10 +468,29 @@ class CourseCourse extends Model
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
         $courseName = InputSanitise::inputString($request->get('course'));
         $courseId = InputSanitise::inputInt($request->get('course_id'));
-        $result = static::where('course_category_id', $categoryId)->where('course_sub_category_id', $subcategoryId)->where('name', $courseName);
-        if(!empty($courseId)){
-            $result->where('id', '!=', $courseId);
+
+        $loginUser = Auth::guard('web')->user();
+        if(is_object($loginUser)){
+            $result = static::join('college_categories', 'college_categories.id','=','course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id','=','course_courses.course_sub_category_id')
+                ->where('course_courses.course_category_id', $categoryId)
+                ->where('course_courses.course_sub_category_id', $subcategoryId)
+                ->where('course_courses.name', $courseName);
+            if(!empty($courseId)){
+                $result->where('course_courses.id', '!=', $courseId);
+            }
+            $result->where('course_sub_categories.created_for', 0)->where('college_categories.college_id', $loginUser->college_id);
+        } else {
+            $result = static::join('course_categories', 'course_categories.id','=','course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id','=','course_courses.course_sub_category_id')
+                ->where('course_courses.course_category_id', $categoryId)
+                ->where('course_courses.course_sub_category_id', $subcategoryId)
+                ->where('course_courses.name', $courseName)->where('course_sub_categories.created_for', 1);
+            if(!empty($courseId)){
+                $result->where('course_courses.id', '!=', $courseId);
+            }
         }
+
         $result->first();
         if(is_object($result) && 1 == $result->count()){
             return 'true';
@@ -302,4 +504,62 @@ class CourseCourse extends Model
         return static::where('course_category_id', $categoryId)->where('course_sub_category_id', $subcategoryId)->get();
     }
 
+    protected static function getCourseByCatIdBySubCatIdByUser($categoryId,$subcategoryId){
+        $loginUser = Auth::guard('web')->user();
+        return static::where('course_category_id', $categoryId)->where('course_sub_category_id', $subcategoryId)->where('created_by', $loginUser->id)->get();
+    }
+
+    /**
+     *  get online courses by course id
+     */
+    protected static function getOnlineCourseByCourseIdByCollegeId($courseId,$collegeId){
+        $courseId = InputSanitise::inputInt($courseId);
+        return DB::table('course_courses')
+                ->join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id','=','course_courses.course_sub_category_id')
+                ->where('course_sub_categories.created_for', 0)
+                ->where('course_courses.id', $courseId)
+                ->where('college_categories.college_id',$collegeId)->first();
+    }
+
+    /**
+     *  get online courses by course id
+     */
+    protected static function getOnlineCourseByCourseId($courseId){
+        $courseId = InputSanitise::inputInt($courseId);
+        return DB::table('course_courses')
+                ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id','=','course_courses.course_sub_category_id')
+                ->where('course_sub_categories.created_for', 1)
+                ->where('course_courses.id', $courseId)
+                ->first();
+    }
+
+    protected static function deleteCollegeCoursesAndCourseVideosByUserId($userId){
+        $courses =  static::where('created_by', $userId)->get();
+        if(is_object($courses) && false == $courses->isEmpty()){
+            foreach($courses as $course){
+                if(true == is_object($course->videos) && false == $course->videos->isEmpty()){
+                    foreach($course->videos as $video){
+                        $video->deleteCommantsAndSubComments();
+                        if(true == preg_match('/courseVideos/',$video->video_path)){
+                            $courseVideoFolder = "courseVideos/".$video->course_id."/".$video->id;
+                            if(is_dir($courseVideoFolder)){
+                                InputSanitise::delFolder($courseVideoFolder);
+                            }
+                        }
+                        $video->delete();
+                    }
+                }
+                $course->deleteRegisteredCourses();
+                $course->deleteCourseImageFolder();
+                $courseVideoFolder = "courseVideos/".$course->id;
+                if(is_dir($courseVideoFolder)){
+                    InputSanitise::delFolder($courseVideoFolder);
+                }
+                $course->delete();
+            }
+        }
+        return;
+    }
 }

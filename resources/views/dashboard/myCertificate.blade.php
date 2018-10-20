@@ -10,6 +10,6 @@
 @stop
 @section('dashboard_content')
 	<div class="container">
-  		<img class="img-responsive " src="images/certificate.jpg" alt="">
+  		<img class="img-responsive " src="{{url('/images/certificate.jpg')}}" alt="">
   	</div>
 @stop

@@ -87,7 +87,7 @@
                         <form id="registerUser" method="post" action="{{ url('register')}}">
                           {{ csrf_field() }}
                           <div class="form-group" style="color: white;">
-                            <input type="radio" name="signup_type" id="signupRadioEmail" value="email" checked onClick="toggleSignUp(this.value);">Email-id/User-id
+                            <input type="radio" name="signup_type" id="signupRadioEmail" value="email" checked onClick="toggleSignUp(this.value);">Email-id
                             <input type="radio" name="signup_type" value="mobile" onClick="toggleSignUp(this.value);">Mobile
                           </div>
                           <div class="form-group @if ($errors->has('name')) has-error @endif">

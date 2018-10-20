@@ -48,7 +48,6 @@ class CourseController extends Controller
      *  show all courses associated with videos
      */
     protected function courses(Request $request){
-        $courseIds = [];
         $courseCategories = Cache::remember('vchip:courses:courseCats',60, function() {
             return CourseCategory::getCategoriesAssocaitedWithVideos();
         });
@@ -58,7 +57,7 @@ class CourseController extends Controller
             $page = $request->getQueryString();
         }
         $courses = Cache::remember('vchip:courses:courses-'.$page,60, function() {
-            return CourseCourse::getCourseAssocaitedWithVideos();
+            return CourseCourse::getCourseAssocaitedWithVideosWithPagination();
         });
         $courseVideoCount = Cache::remember('vchip:courses:courseVideoCnt-'.$page,60, function() use ($courses){
             return $this->getVideoCount($courses);
@@ -88,6 +87,22 @@ class CourseController extends Controller
         return $result;
     }
 
+
+    /**
+     *  return courses by categoryId by sub CategoryId or by userId
+     */
+    protected function getCollegeCourseByCatIdBySubCatId(Request $request){
+        $result = [];
+        $categoryId = $request->get('catId');
+        $subcategoryId = $request->get('subcatId');
+        if(isset($categoryId) && isset($subcategoryId)){
+            $result['courses'] = Cache::remember('vchip:'.Session::get('college_user_url').':courses:cat-'.$categoryId.':subcat-'.$subcategoryId,30, function() use ($categoryId,$subcategoryId){
+                return CourseCourse::getCollegeCourseByCatIdBySubCatId($categoryId,$subcategoryId);
+            });
+        }
+        return $result;
+    }
+
     /**
      *  show course details by courseId
      */
@@ -97,7 +112,7 @@ class CourseController extends Controller
             return CourseCourse::find($courseId);
         });
         if(is_object($course)){
-            $videos = Cache::remember('vchip:courses:videos:coursId-'.$courseId,30, function() use ($courseId){
+            $videos = Cache::remember('vchip:courses:videos:courseId-'.$courseId,30, function() use ($courseId){
                 return CourseVideo::getCourseVideosByCourseId($courseId);
             });
             $isCourseRegistered = RegisterOnlineCourse::isCourseRegistered($courseId);
@@ -117,7 +132,7 @@ class CourseController extends Controller
             });
             if(is_object($video)){
                 $courseId = $video->course_id;
-                $courseVideos = Cache::remember('vchip:courses:videos:coursId-'.$courseId,30, function() use ($courseId){
+                $courseVideos = Cache::remember('vchip:courses:videos:courseId-'.$courseId,30, function() use ($courseId){
                     return CourseVideo::getCourseVideosByCourseId($courseId);
                 });
                 $comments = CourseComment::where('course_video_id', $id)->orderBy('id', 'desc')->get();

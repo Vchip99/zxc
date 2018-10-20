@@ -4,25 +4,10 @@
     <h1> Profile </h1>
   </section>
   <style type="text/css">
-    @media screen and (max-width: 320px) {
-      .v-container .container, .list-group .list-group-item, .col-xs-12, .col-xs-7{
+    @media screen and (max-width: 500px) {
+      .v-container .container, .list-group .list-group-item, .col-xs-12, .col-xs-9,.col-md-offset-2, .col-xs-10{
         padding-left: 0px !important;
         padding-right: 0px !important;
-      }
-      .col-md-offset-2, .col-xs-10{
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-      }
-    }
-
-    @media screen and (max-width: 375px) {
-      .v-container .container, .list-group .list-group-item, .col-xs-12, .col-xs-7{
-        padding-left: 0px !important;
-        padding-right: 0px !important;
-      }
-      .col-md-offset-2, .col-xs-10{
-        padding-left: 5px !important;
-        padding-right: 5px !important;
       }
     }
   </style>
@@ -60,7 +45,7 @@
                         </div>
                         <div class="modal-body">
                           <div class="">
-                            <form action="{{url('updateProfile')}}" method="POST" enctype="multipart/form-data">
+                            <form action="{{url('college/'.Session::get('college_user_url').'/updateProfile')}}" method="POST" enctype="multipart/form-data">
                               {{ method_field('PUT') }}
                               {{ csrf_field() }}
                               <fieldset>
@@ -68,26 +53,6 @@
                                   <label>Name:</label>
                                   <input class="form-control" placeholder="name" name="name" type="text" value="{{$loginUser->name}}">
                                 </div>
-                                <!-- <div class="form-group">
-                                  <label>Email:</label>
-                                  <input class="form-control" placeholder="yourmail@example.com" name="email" type="text" value="{{$loginUser->email}}">
-                                </div> -->
-                                <!-- <div class="form-group">
-                                  <label>Phone:</label>
-                                  <input class="form-control" placeholder="Mobile No." name="phone" type="text" value="{{$loginUser->phone}}">
-                                </div> -->
-                                <!-- <div class="form-group @if ($errors->has('user_type')) has-error @endif">
-                                  <label>Designation:</label>
-                                    <select class="form-control slt mrgn_20_top" id="user" name="user_type" onChange="toggleOptions(this);" required="true">
-                                      <option value="0">Select User</option>
-                                      <option value="2" @if(2 == $loginUser->user_type) selected @endif >Student</option>
-                                      <option value="3" @if(3 == $loginUser->user_type) selected @endif >Lecturer</option>
-                                      <option value="4" @if(4 == $loginUser->user_type) selected @endif >HOD</option>
-                                      <option value="5" @if(5 == $loginUser->user_type) selected @endif >Principal / Director</option>
-                                      <option value="6" @if(6 == $loginUser->user_type) selected @endif >TNP officer</option>
-                                    </select>
-                                    <p class="help-block hide" id="user_error" style="color: red;">Please select user.</p>
-                                </div> -->
                                 <div class="form-group @if ($errors->has('college')) has-error @endif">
                                   <label>College:</label>
                                     <select class="form-control  slt mrgn_20_top" id="clg" name="college" onChange="getDepartment(this);">
@@ -126,7 +91,7 @@
                                   </div>
                                   <div class="form-group mrgn_20_top @if ($errors->has('rollno')) has-error @endif @if(2 != $loginUser->user_type) hide @endif" id="rollNo">
                                     <label>Roll No:</label>
-                                    <input type="number" class="form-control" name="roll_no" id="roll" value="{{$loginUser->roll_no}}" placeholder="Roll No." />
+                                    <input type="number" class="form-control" name="roll_no" id="roll" value="{{$loginUser->roll_no}}" placeholder="Roll No."  min="0" />
                                     <span class="help-block"></span>
                                     <p class="help-block hide" id="roll_error" style="color: red;">Please select roll no.</p>
                                   </div>
@@ -156,29 +121,31 @@
                   </div>
                   <div  align="center" style="background-image: url('{{ url('images/user/profile-bg.jpg')}}');"">
                     @if(is_file($loginUser->photo) || (!empty($loginUser->photo) && false == preg_match('/userStorage/',$loginUser->photo)))
-                      <img alt="User Pic" style="max-height: 200px !important;" src="{{$loginUser->photo}}" id="profile-image1" class="user-prof img-responsive">
+                      <img alt="User Pic" style="max-height: 200px !important;" src="{{ url($loginUser->photo)}}" id="profile-image1" class="user-prof img-responsive">
                     @else
                       <img alt="User Pic" src="{{ url('images/user/user1.png')}}" id="profile-image1" class="img-circle img-responsive">
                     @endif
                   </div>
               </div>
               <ul class="list-group">
+                @if(2 == $loginUser->user_type)
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
                     <div class="col-xs-12">
                       <div class="row">
-                        <div class="col-xs-5 "><b>Score</b></div>
-                        <div class="col-xs-7 pull-left">{{$obtainedScore}}/{{$totalScore}}</div>
+                        <div class="col-xs-3 "><b>Score</b></div>
+                        <div class="col-xs-9 pull-left">{{$obtainedScore}}/{{$totalScore}}</div>
                       </div>
                     </div>
                   </div>
                 </li>
+                @endif
                 <li class="list-group-item">
                   <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
                     <div class="col-xs-12">
                       <div class="row">
-                        <div class="col-xs-5 "><b>Name</b></div>
-                        <div class="col-xs-7 pull-left">{{$loginUser->name}}</div>
+                        <div class="col-xs-3 "><b>Name</b></div>
+                        <div class="col-xs-9 pull-left">{{$loginUser->name}}</div>
                       </div>
                     </div>
                   </div>
@@ -187,9 +154,9 @@
                   <div class="row toggle" id="dropdown-detail-2" data-toggle="detail-2">
                     <div class="col-xs-12">
                       <div class="row">
-                        <div class="col-xs-5 "><b>Email</b></div>
-                        <!-- <div class="col-xs-7 pull-left">{{$loginUser->email}}</div> -->
-                        <div class="col-xs-7 pull-left">
+                        <div class="col-xs-3 "><b>Email</b></div>
+                        <!-- <div class="col-xs-9 pull-left">{{$loginUser->email}}</div> -->
+                        <div class="col-xs-9 pull-left">
                           @if(!empty($loginUser->email))
                             {{$loginUser->email}}
                             @if($loginUser->id.'@gmail.com' == $loginUser->email)
@@ -228,7 +195,9 @@
                                 </div>
                               </div>
                             @else
+                              @if(0 == $loginUser->verified && filter_var($loginUser->email, FILTER_VALIDATE_EMAIL))
                               <a href="#verifyEmail" data-toggle="modal" style="float: right;">Please Verify</a>
+                              @endif
                               <a href="#updateEmail" data-toggle="modal" style="float: right;">Update Email &nbsp;</a>
                               <div id="verifyEmail" class="modal fade" role="dialog">
                                 <div class="modal-dialog modal-sm">
@@ -324,9 +293,9 @@
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
                     <div class="col-xs-12">
                       <div class="row">
-                        <div class="col-xs-5 "><b>Phone</b></div>
-                        <!-- <div class="col-xs-7 pull-left">{{$loginUser->phone}}</div> -->
-                        <div class="col-xs-7 pull-left">
+                        <div class="col-xs-3 "><b>Phone</b></div>
+                        <!-- <div class="col-xs-9 pull-left">{{$loginUser->phone}}</div> -->
+                        <div class="col-xs-9 pull-left">
                           @if(!empty($loginUser->phone))
                             {{$loginUser->phone}}
                             @if(0 == $loginUser->number_verified)
@@ -407,8 +376,8 @@
                   <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
                     <div class="col-xs-12">
                       <div class="row">
-                         <div class="col-xs-5 "><b> Designation</b></div>
-                         <div class="col-xs-7 ">{{$users[$loginUser->user_type]}}</div>
+                         <div class="col-xs-3 "><b> Designation</b></div>
+                         <div class="col-xs-9 ">{{$users[$loginUser->user_type]}}</div>
                       </div>
                     </div>
                   </div>
@@ -418,8 +387,8 @@
                     <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
                       <div class="col-xs-12">
                         <div class="row">
-                           <div class="col-xs-5 "><b> College</b></div>
-                           <div class="col-xs-7 ">{{$loginUser->college->name}}</div>
+                           <div class="col-xs-3 "><b> College</b></div>
+                           <div class="col-xs-9 ">{{$loginUser->college->name}}</div>
                         </div>
                       </div>
                     </div>
@@ -429,8 +398,8 @@
                       <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
                         <div class="col-xs-12">
                           <div class="row">
-                             <div class="col-xs-5 "><b> Department</b></div>
-                             <div class="col-xs-7 ">{{$loginUser->department->name}}</div>
+                             <div class="col-xs-3 "><b> Department</b></div>
+                             <div class="col-xs-9 ">{{$loginUser->department->name}}</div>
                           </div>
                         </div>
                       </div>
@@ -441,8 +410,8 @@
                     <div class="row toggle" id="dropdown-detail-4" data-toggle="detail-4">
                       <div class="col-xs-12">
                         <div class="row">
-                           <div class="col-xs-5 "><b> Other</b></div>
-                           <div class="col-xs-7 ">{{$loginUser->other_source}}</div>
+                           <div class="col-xs-3 "><b> Other</b></div>
+                           <div class="col-xs-9 ">{{$loginUser->other_source}}</div>
                         </div>
                       </div>
                     </div>
@@ -453,8 +422,8 @@
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
                     <div class="col-xs-12">
                       <div class="row">
-                         <div class="col-xs-5 "><b>Year</b></div>
-                         <div class="col-xs-7 pull-left">{{$loginUser->year}}</div>
+                         <div class="col-xs-3 "><b>Year</b></div>
+                         <div class="col-xs-9 pull-left">{{$loginUser->year}}</div>
                       </div>
                     </div>
                   </div>
@@ -463,8 +432,8 @@
                   <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
                     <div class="col-xs-12">
                       <div class="row">
-                         <div class="col-xs-5 "><b>Roll No</b></div>
-                         <div class="col-xs-7 pull-left">{{$loginUser->roll_no}}</div>
+                         <div class="col-xs-3 "><b>Roll No</b></div>
+                         <div class="col-xs-9 pull-left">{{$loginUser->roll_no}}</div>
                       </div>
                     </div>
                   </div>
@@ -557,6 +526,7 @@
        </div>
     </div>
   </div>
+  <input type="hidden" id="user_type" value="{{$loginUser->user_type}}">
 <script type="text/javascript">
   function sendVchipUserOtp(){
     var mobile = $('#phone').val();
@@ -657,7 +627,7 @@
 
   function getDepartment(ele){
     var college = $(ele).val();
-    var userType = document.getElementById('user').value;
+    var userType = document.getElementById('user_type').value;
     if((2 == userType || 3 == userType || 4 == userType) && college > 0){
       $.ajax({
           method: "POST",
@@ -696,7 +666,7 @@
   }
 
   function showDeptYearRoll(){
-    var userType = document.getElementById('user').value;
+    var userType = document.getElementById('user_type').value;
     if(3 == userType || 4 == userType){
       document.getElementById('year').classList.remove("show");
       document.getElementById('rollNo').classList.remove("show");

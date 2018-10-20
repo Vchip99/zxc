@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
-use App\Models\AssignmentSubject;
+use App\Models\CollegeSubject;
 use App\Models\AssignmentTopic;
 
 class AssignmentQuestion extends Model
@@ -17,7 +17,7 @@ class AssignmentQuestion extends Model
      *
      * @var array
      */
-    protected $fillable = ['question','assignment_subject_id','assignment_topic_id', 'attached_link', 'lecturer_id', 'college_id', 'college_dept_id', 'year'];
+    protected $fillable = ['question','college_subject_id','assignment_topic_id', 'attached_link', 'lecturer_id', 'college_id', 'college_dept_ids', 'years'];
 
     /**
      *  add/update assignment
@@ -26,7 +26,6 @@ class AssignmentQuestion extends Model
         $question = $request->get('question');
         $subjectId   = InputSanitise::inputInt($request->get('subject'));
         $topicId   = InputSanitise::inputInt($request->get('topic'));
-        $year   = InputSanitise::inputInt($request->get('year'));
         $assignmentId   = InputSanitise::inputInt($request->get('assignment_id'));
 
         if( $isUpdate && isset($assignmentId)){
@@ -37,14 +36,19 @@ class AssignmentQuestion extends Model
         } else {
             $assignment = new static;
         }
+        $assignmentTopic = AssignmentTopic::find($topicId);
+        if(!is_object($assignmentTopic)){
+            return 'false';
+        }
+
         $loginUser = Auth::user();
         $assignment->question = $question;
-        $assignment->assignment_subject_id = $subjectId;
+        $assignment->college_subject_id = $subjectId;
         $assignment->assignment_topic_id = $topicId;
         $assignment->lecturer_id = $loginUser->id;
         $assignment->college_id = $loginUser->college_id;
-        $assignment->college_dept_id = $loginUser->college_dept_id;
-        $assignment->year = $year;
+        $assignment->college_dept_ids = $assignmentTopic->college_dept_ids;
+        $assignment->years = $assignmentTopic->years;
 
         if($request->exists('attached_link')){
 	        $attachmentFolderPath = "assignmentStorage/topicId-".$topicId;
@@ -67,7 +71,7 @@ class AssignmentQuestion extends Model
      *  get subject
      */
     public function subject(){
-        return $this->belongsTo(AssignmentSubject::class, 'assignment_subject_id');
+        return $this->belongsTo(CollegeSubject::class, 'college_subject_id');
     }
 
     /**
@@ -80,44 +84,55 @@ class AssignmentQuestion extends Model
     protected static function getStudentAssignments(){
         $loginUser = Auth::user();
         return static::where('college_id', $loginUser->college_id)
-                ->where('college_dept_id', $loginUser->college_dept_id)
-                ->where('year', $loginUser->year)
+                ->whereRaw("find_in_set($loginUser->college_dept_id , college_dept_ids)")
+                ->whereRaw("find_in_set($loginUser->year , years)")
                 ->paginate();
     }
 
     protected static function getAssignments(Request $request){
         $loginUser = Auth::user();
-        $resultQuery = static::where('college_id', $loginUser->college_id);
+
+        $resultQuery = static::join('users','users.id','=','assignment_questions.lecturer_id')
+            ->where('assignment_questions.college_id', $loginUser->college_id);
+        if(User::Lecturer == $loginUser->user_type){
+            $resultQuery->where('users.user_type', User::Lecturer);
+        } else if(User::TNP == $loginUser->user_type){
+            $resultQuery->where('users.user_type', User::TNP);
+        } else if(User::Hod == $loginUser->user_type){
+            $resultQuery->whereIn('users.user_type', [User::Hod,User::Lecturer]);
+        } else if(User::Directore == $loginUser->user_type){
+            $resultQuery->whereIn('users.user_type', [User::Lecturer,User::Hod,User::Directore,User::TNP]);
+        }
 
         if(!empty($request->department)){
-            $resultQuery->where('college_dept_id', $request->department);
-        } else {
-            $resultQuery->where('college_dept_id', $loginUser->college_dept_id);
+            $resultQuery->whereRaw("find_in_set($request->department , assignment_questions.college_dept_ids)");
         }
+
         if(!empty($request->year)){
-            $resultQuery->where('year', $request->year);
+            $resultQuery->whereRaw("find_in_set($request->year , assignment_questions.years)");
         }else if(User::Student == $loginUser->user_type){
-            $resultQuery->where('year', $loginUser->year);
+            $resultQuery->whereRaw("find_in_set($loginUser->year , assignment_questions.years)");
         }
 
-        if(User::Lecturer == $loginUser->user_type){
-            $resultQuery->where('lecturer_id', $loginUser->id);
+        if(User::Lecturer == $loginUser->user_type || User::TNP == $loginUser->user_type){
+            $resultQuery->where('assignment_questions.lecturer_id', $loginUser->id);
         } else if(!empty($request->lecturer_id)){
-            $resultQuery->where('lecturer_id', $request->lecturer_id);
+            $resultQuery->where('assignment_questions.lecturer_id', $request->lecturer_id);
+        }
+        if(!empty($request->subject)){
+            $resultQuery->where('assignment_questions.college_subject_id', $request->subject);
         }
 
-        if(!empty($request->subject)){
-            $resultQuery->where('assignment_subject_id', $request->subject);
-        }
         if(!empty($request->topic)){
-            $resultQuery->where('assignment_topic_id', $request->topic);
+            $resultQuery->where('assignment_questions.assignment_topic_id', $request->topic);
         }
-        return $resultQuery->get();
+        return $resultQuery->select('assignment_questions.*')->groupBy('assignment_questions.id')->get();
     }
 
     protected static function getAssignmentByTopic($topic){
         if(User::Student == Auth::user()->user_type){
-            return static::where('assignment_topic_id',$topic)->where('year', Auth::user()->year)->first();
+            $userYear = Auth::user()->year;
+            return static::where('assignment_topic_id',$topic)->whereRaw("find_in_set($userYear , years)")->first();
         } else {
             return static::where('assignment_topic_id',$topic)->first();
         }
@@ -125,9 +140,8 @@ class AssignmentQuestion extends Model
 
     protected static function checkAssignmentIsExist(Request $request){
         $result = [];
-        $assignment = static::where('assignment_subject_id',$request->subject)
+        $assignment = static::where('college_subject_id',$request->subject)
             ->where('assignment_topic_id', $request->topic)
-            ->where('year', $request->year)
             ->first();
         if(is_object($assignment)){
             $result['status'] = 'true';
@@ -136,5 +150,92 @@ class AssignmentQuestion extends Model
             $result['status'] = 'false';
         }
         return $result;
+    }
+
+    protected static function getAssignmentsBySubjectId($subjectId){
+        $loginUser = Auth::user();
+        return static::where('college_id', $loginUser->college_id)->where('college_subject_id',$subjectId)->get();
+    }
+
+    protected static function getAssignmentsByCollegeIdWithPagination($collegeId){
+        $loginUser = Auth::guard('web')->user();
+        $result = static::where('college_id', $collegeId);
+        if(User::TNP == $loginUser->user_type){
+            $result->where('lecturer_id', $loginUser->id);
+        }
+        return $result->paginate();
+    }
+
+    protected static function getAssignmentsByCollegeIdByAssignedDeptsWithPagination($collegeId){
+        $loginUser = Auth::guard('web')->user();
+        $result = static::join('users','users.id','=','assignment_questions.lecturer_id')
+            ->where('assignment_questions.college_id', $collegeId);
+        if(User::Lecturer == $loginUser->user_type){
+            $result->where('assignment_questions.lecturer_id', $loginUser->id)->where('users.user_type', User::Lecturer);
+        } else {
+            $result->whereIn('users.user_type', [User::Hod,User::Lecturer]);
+        }
+
+        $departments = explode(',',$loginUser->assigned_college_depts);
+        if(count($departments) > 0){
+            sort($departments);
+            $result->where(function($query) use($departments) {
+                foreach($departments as $index => $department){
+                    if(0 == $index){
+                        $query->whereRaw("find_in_set($department , assignment_questions.college_dept_ids)");
+                    } else {
+                        $query->orWhereRaw("find_in_set($department , assignment_questions.college_dept_ids)");
+                    }
+                }
+            });
+        }
+        return $result->select('assignment_questions.*')->groupBy('assignment_questions.id')->paginate();
+    }
+
+    protected static function removeDepartmentsByCollegeIdByDepartmentIdsByUserId($collegeId,$removedDepts,$userId){
+        $loginUser = Auth::guard('web')->user();
+        $result = static::where('college_id', $collegeId)->where('lecturer_id', $userId);
+        if(count($removedDepts) > 0){
+            sort($removedDepts);
+            $result->where(function($query) use($removedDepts) {
+                foreach($removedDepts as $index => $department){
+                    if(0 == $index){
+                        $query->whereRaw("find_in_set($department , college_dept_ids)");
+                    } else {
+                        $query->orWhereRaw("find_in_set($department , college_dept_ids)");
+                    }
+                }
+            });
+        }
+        $assignments = $result->get();
+        if(is_object($assignments) && false == $assignments->isEmpty()){
+            foreach($assignments as $assignment){
+                $oldDepartments = explode(',',$assignment->college_dept_ids);
+                $remainingDepts = array_values(array_diff($oldDepartments, $removedDepts));
+                if(count($remainingDepts) > 0){
+                    $assignment->college_dept_ids = implode(',', $remainingDepts);
+                } else {
+                    $assignment->college_dept_ids = '';
+                }
+                $assignment->save();
+            }
+        }
+        return;
+    }
+
+    protected static function deleteAssignmentsByCollegeIdByUserIdForEmptyDept($collegeId,$userId){
+        $assignments = static::where('college_id', $collegeId)->where('lecturer_id', $userId)->where('college_dept_ids','')->get();
+        if(is_object($assignments) && false == $assignments->isEmpty()){
+            foreach($assignments as $assignment){
+                $dir = dirname($assignment->attached_link);
+                InputSanitise::delFolder($dir);
+                $assignment->delete();
+            }
+        }
+        return;
+    }
+
+    protected static function getAssignmentsByUserId($userId){
+        return static::where('lecturer_id', $userId)->get();
     }
 }

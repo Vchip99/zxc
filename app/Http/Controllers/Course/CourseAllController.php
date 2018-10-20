@@ -58,7 +58,7 @@ class CourseAllController extends Controller
      *  show create course category UI
      */
     protected function showAll(){
-        $courseCategories = CourseCategory::all();
+        $courseCategories = CourseCategory::getCourseCategoriesForAdmin();
         return view('courseAll.create', compact('courseCategories'));
     }
 

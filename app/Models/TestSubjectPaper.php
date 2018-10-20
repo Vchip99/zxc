@@ -10,7 +10,7 @@ use App\Models\TestSubject;
 use App\Models\Question;
 use App\Models\PaperSection;
 use App\Libraries\InputSanitise;
-use DB;
+use DB,Auth;
 
 class TestSubjectPaper extends Model
 {
@@ -231,6 +231,34 @@ class TestSubjectPaper extends Model
                     ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
                     ->where('test_subject_papers.test_category_id', $catId)
                     ->where('test_subject_papers.test_sub_category_id', $subcatId)
+                    ->where('test_sub_categories.created_for', 1)
+                    ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
+                    ->select('test_subject_papers.id','test_subject_papers.*')
+                    ->groupBy('test_subject_papers.id')
+                    ->get();
+
+        foreach($papers as $paper){
+            $testSubjectPapers[$paper->test_subject_id][] = $paper;
+        }
+        return $testSubjectPapers;
+    }
+
+     /**
+     *  return papers by categoryId by sub categoryId
+     */
+    protected static function getCollegeSubjectPapersByCatIdBySubCatId($catId, $subcatId){
+        $testSubjectPapers = [];
+        $papers = [];
+        $catId = InputSanitise::inputInt($catId);
+        $subcatId = InputSanitise::inputInt($subcatId);
+        $papers = DB::table('test_subject_papers')
+                    ->join('questions', 'questions.paper_id', '=', 'test_subject_papers.id')
+                    ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                    ->join('college_categories', 'college_categories.id', '=', 'test_subject_papers.test_category_id')
+                    ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                    ->where('test_subject_papers.test_category_id', $catId)
+                    ->where('test_subject_papers.test_sub_category_id', $subcatId)
+                    ->where('test_sub_categories.created_for', 0)
                     ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
                     ->select('test_subject_papers.id','test_subject_papers.*')
                     ->groupBy('test_subject_papers.id')
@@ -262,10 +290,17 @@ class TestSubjectPaper extends Model
         $testPaperIds = [];
         $results = [];
         $papers = DB::table('test_subject_papers')
-                    ->join('register_papers', 'register_papers.test_subject_paper_id', '=', 'test_subject_papers.id')
-                    ->join('users', 'users.id', '=', 'register_papers.user_id')
-                    ->where('users.id', $userId)
+                    ->join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+                    ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                    ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                    ->join('questions', 'questions.paper_id', '=', 'test_subject_papers.id')
+                    // ->join('register_papers', 'register_papers.test_subject_paper_id', '=', 'test_subject_papers.id')
+                    // ->join('users', 'users.id', '=', 'register_papers.user_id')
+                    ->where('test_sub_categories.created_for', 1)
+                    ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
+                    // ->where('register_papers.user_id', $userId)
                     ->select('test_subject_papers.*')
+                    ->groupBy('test_subject_papers.id')
                     ->get();
         if(false == $papers->isEmpty()){
             foreach($papers as $paper){
@@ -279,6 +314,63 @@ class TestSubjectPaper extends Model
         }
         return $results;
     }
+
+    protected static function getSubjectPapersByCollegeIdByCollegeDeptId($collegeId,$collegeDeptId=NULL){
+        $testSubjectPapers = [];
+        $papers = [];
+        $testSubjectIds = [];
+        $testPaperIds = [];
+        $results = [];
+        $papers = DB::table('test_subject_papers')
+                    ->join('questions', 'questions.paper_id', '=', 'test_subject_papers.id')
+                    ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                    ->join('college_categories', 'college_categories.id', '=', 'test_subject_papers.test_category_id')
+                    ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                    ->where('test_sub_categories.created_for', 0)
+                    ->where('college_categories.college_id', $collegeId)
+                    ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
+                    ->select('test_subject_papers.*')->groupBy('test_subject_papers.id')
+                    ->get();
+        if(false == $papers->isEmpty()){
+            foreach($papers as $paper){
+                $testSubjectPapers[$paper->test_subject_id][] = $paper;
+                $testSubjectIds[] = $paper->test_subject_id;
+                $testPaperIds[] = $paper->id;
+            }
+            $results['papers'] = $testSubjectPapers;
+            $results['paperIds'] = $testPaperIds;
+            $results['subjectIds'] = array_unique($testSubjectIds);
+        }
+        return $results;
+    }
+
+    // protected static function getSubjectPapers(){
+    //     $testSubjectPapers = [];
+    //     $papers = [];
+    //     $testSubjectIds = [];
+    //     $testPaperIds = [];
+    //     $results = [];
+    //     $papers = DB::table('test_subject_papers')
+    //                 ->join('questions', 'questions.paper_id', '=', 'test_subject_papers.id')
+    //                 ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+    //                 ->join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+    //                 ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+    //                 ->where('test_sub_categories.created_for', 1)
+    //                 ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
+    //                 ->select('test_subject_papers.*')->groupBy('test_subject_papers.id')
+    //                 ->get();
+    //     if(false == $papers->isEmpty()){
+    //         foreach($papers as $paper){
+    //             $testSubjectPapers[$paper->test_subject_id][] = $paper;
+    //             $testSubjectIds[] = $paper->test_subject_id;
+    //             $testPaperIds[] = $paper->id;
+    //         }
+    //         $results['papers'] = $testSubjectPapers;
+    //         $results['paperIds'] = $testPaperIds;
+    //         $results['subjectIds'] = array_unique($testSubjectIds);
+    //     }
+    //     return $results;
+    // }
 
     protected static function getRegisteredSubjectPapersByCatIdBySubCatIdByUserId($catId, $subcatId, $userId){
         $testSubjectPapers = [];
@@ -303,6 +395,21 @@ class TestSubjectPaper extends Model
                     ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
                     ->join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
                     ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                    ->where('test_sub_categories.created_for', 1)
+                    ->where('test_subject_papers.test_category_id', $catId)
+                    ->where('test_subject_papers.test_sub_category_id', $subcatId)
+                    ->where('test_subject_papers.test_subject_id', $subjectId)
+                    ->select('test_subject_papers.id','test_subject_papers.*')
+                    ->groupBy('test_subject_papers.id')
+                    ->get();
+    }
+
+    protected static function getCollegeSubjectPapersByCategoryIdBySubCategoryIdBySubjectIdForAdmin($catId, $subcatId, $subjectId){
+        return DB::table('test_subject_papers')
+                    ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                    ->join('college_categories', 'college_categories.id', '=', 'test_subject_papers.test_category_id')
+                    ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                    ->where('test_sub_categories.created_for', 0)
                     ->where('test_subject_papers.test_category_id', $catId)
                     ->where('test_subject_papers.test_sub_category_id', $subcatId)
                     ->where('test_subject_papers.test_subject_id', $subjectId)
@@ -317,6 +424,13 @@ class TestSubjectPaper extends Model
     public function category(){
         return $this->belongsTo(TestCategory::class, 'test_category_id');
     }
+
+    // /**
+    //  *  get category of sub category
+    //  */
+    // public function collegeCategory(){
+    //     return $this->belongsTo(CollegeCategory::class, 'test_category_id');
+    // }
 
     /**
      *  get category of paper
@@ -358,10 +472,29 @@ class TestSubjectPaper extends Model
         $subjectId = InputSanitise::inputInt($request->get('subject'));
         $paperName = InputSanitise::inputString($request->get('paper'));
         $paperId = InputSanitise::inputInt($request->get('paper_id'));
-        $result = static::where('test_category_id', $categoryId)->where('test_sub_category_id', $subcategoryId)->where('test_subject_id', $subjectId)->where('name', $paperName);
-        if(!empty($paperId)){
-            $result->where('id', '!=', $paperId);
+
+        $loginUser = Auth::guard('web')->user();
+        if(is_object($loginUser)){
+            $result = static::join('college_categories', 'college_categories.id','=','test_subject_papers.test_category_id')
+                ->join('test_sub_categories', 'test_sub_categories.id','=','test_subject_papers.test_sub_category_id')
+                ->join('test_subjects', 'test_subjects.id','=','test_subject_papers.test_subject_id')
+                ->where('test_subject_papers.test_category_id', $categoryId)->where('test_subject_papers.test_sub_category_id', $subcategoryId)->where('test_subject_papers.test_subject_id', $subjectId)->where('test_subject_papers.name', $paperName);
+
+            if(!empty($paperId)){
+                $result->where('test_subject_papers.id', '!=', $paperId);
+            }
+            $result->where('test_sub_categories.created_for', 0)->where('college_categories.college_id',$loginUser->college_id);
+        } else {
+            $result = static::join('test_categories', 'test_categories.id','=','test_subject_papers.test_category_id')
+                ->join('test_sub_categories', 'test_sub_categories.id','=','test_subject_papers.test_sub_category_id')
+                ->join('test_subjects', 'test_subjects.id','=','test_subject_papers.test_subject_id')
+                ->where('test_subject_papers.test_category_id', $categoryId)->where('test_subject_papers.test_sub_category_id', $subcategoryId)->where('test_subject_papers.test_subject_id', $subjectId)->where('test_subject_papers.name', $paperName)->where('test_sub_categories.created_for', 1);
+
+            if(!empty($paperId)){
+                $result->where('test_subject_papers.id', '!=', $paperId);
+            }
         }
+
         $result->first();
         if(is_object($result) && 1 == $result->count()){
             return 'true';
@@ -382,7 +515,7 @@ class TestSubjectPaper extends Model
                 $join->on('questions.subject_id', '=', 'test_subjects.id');
                 $join->on('questions.paper_id', '=', 'test_subject_papers.id');
             })
-            ->where('category_for', 0)
+            ->where('test_categories.category_for', 0)
             ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
             ->select('test_subject_papers.id','test_subject_papers.name')
             ->groupBy('test_subject_papers.id')->first();
@@ -398,7 +531,7 @@ class TestSubjectPaper extends Model
                 $join->on('questions.subject_id', '=', 'test_subjects.id');
                 $join->on('questions.paper_id', '=', 'test_subject_papers.id');
             })
-            ->where('category_for', 0)
+            ->where('test_categories.category_for', 0)
             ->select('test_subject_papers.id','test_subject_papers.name','test_subject_papers.date_to_active','test_subject_papers.date_to_inactive')
             ->groupBy('test_subject_papers.id')->get();
     }
@@ -414,10 +547,82 @@ class TestSubjectPaper extends Model
                 $join->on('questions.subject_id', '=', 'test_subjects.id');
                 $join->on('questions.paper_id', '=', 'test_subject_papers.id');
             })
-            ->where('category_for', 0)
+            ->where('test_categories.category_for', 0)
             ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
             ->where('test_subject_papers.id', $id)
             ->select('test_subject_papers.id','test_subject_papers.*')
             ->groupBy('test_subject_papers.id')->first();
+    }
+
+    /**
+     *  return test papers  by collegeId by dept
+     */
+    protected static function getPapersByCollegeIdByDeptIdWithPagination($collegeId,$deptId=NULL){
+        $loginUser = Auth::user();
+        $collegeId = InputSanitise::inputInt($collegeId);
+        $deptId = InputSanitise::inputInt($deptId);
+        $result = static::join('college_categories', 'college_categories.id', '=', 'test_subject_papers.test_category_id')
+                ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                ->join('users','users.id','=','test_subjects.created_by')
+                ->where('college_categories.college_id', $collegeId);
+        if($deptId != NULL){
+            $result->where('college_categories.college_dept_id', $deptId);
+        }
+        if(User::TNP == $loginUser->user_type){
+            $result->where('test_subjects.created_by', $loginUser->id);
+        }
+        return $result->where('test_sub_categories.created_for', 0)->select('test_subject_papers.*','college_categories.college_dept_id','college_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject','test_subjects.created_by','users.name as user')
+                ->groupBy('test_subject_papers.id')->paginate();
+    }
+
+    protected static function getPapersByCollegeIdByAssignedDeptsWithPagination($collegeId){
+        $loginUser = Auth::user();
+        $result = static::join('college_categories', 'college_categories.id', '=', 'test_subject_papers.test_category_id')
+                ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                ->join('users','users.id','=','test_subjects.created_by')
+                ->where('users.college_id', $collegeId);
+        if(User::Lecturer == $loginUser->user_type){
+            $result->where('test_subjects.created_by', $loginUser->id);
+        } else {
+            $result->where(function($query) use($loginUser){
+                $query->where('users.user_type', User::Lecturer);
+                $query->orWhere('users.id',$loginUser->id);
+            })
+            ->where('test_subjects.created_by', '>', 0)->whereIn('users.college_dept_id', explode(',',$loginUser->assigned_college_depts));
+        }
+        return $result->where('test_sub_categories.created_for', 0)->select('test_subject_papers.*','college_categories.college_dept_id','college_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject','test_subjects.created_by','users.name as user')
+                ->groupBy('test_subject_papers.id')->paginate();
+    }
+
+    /**
+     *  return test papers  by collegeId by dept
+     */
+    protected static function getPapersByUserIdByCollegeIdByDeptId($userId,$collegeId,$deptId=NULL){
+        $collegeId = InputSanitise::inputInt($collegeId);
+        $deptId = InputSanitise::inputInt($deptId);
+        $result = static::join('college_categories', 'college_categories.id', '=', 'test_subject_papers.test_category_id')
+                ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                ->where('college_categories.college_id', $collegeId)
+                ->where('test_subjects.created_by', $userId);
+        if($deptId != NULL){
+            $result->where('college_categories.college_dept_id', $deptId);
+        }
+        return $result->where('test_sub_categories.created_for', 0)->select('test_subject_papers.id','test_subject_papers.name','college_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject')
+                ->groupBy('test_subject_papers.id')->get();
+    }
+
+    /**
+     *  return test papers
+     */
+    protected static function getPapersWithPagination(){
+        return static::join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+                ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                ->where('test_sub_categories.created_for', 1)
+                ->select('test_subject_papers.*','test_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject')
+                ->groupBy('test_subject_papers.id')->paginate();
     }
 }

@@ -81,7 +81,7 @@
               <div class="form-group row ">
                 <label class="col-sm-2 col-form-label">Year:</label>
                 <div class="col-sm-3">
-                  {{$assignment->year}}
+                  {{$assignment->years}}
                 </div>
               </div>
               <div class="form-group row ">
@@ -182,7 +182,7 @@
             <!-- </div>
             <div class="box-footer"> -->
             <hr>
-              <form  id="myAnswer" action="{{url('createAssignmentAnswer')}}" method="POST" enctype="multipart/form-data">
+              <form  id="myAnswer" action="{{url('college/'.Session::get('college_user_url').'/createAssignmentAnswer')}}" method="POST" enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <div class="form-group row @if ($errors->has('answer')) has-error @endif">
                   <label for="answer" class="col-sm-2 col-form-label">Solution:</label>

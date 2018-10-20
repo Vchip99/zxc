@@ -30,8 +30,6 @@ class LogLastUserActivity
             $expiresAt = Carbon::now()->addMinutes(5);
             $client = explode('.', $request->getHost())[0];
             Cache::put($client.':online_user-' . Auth::guard('clientuser')->user()->id, true, $expiresAt);
-            $expiresChatAt = Carbon::now()->addMinutes(60);
-
         }
         return $next($request);
     }

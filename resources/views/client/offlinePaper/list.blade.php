@@ -10,7 +10,6 @@
   </section>
 @stop
 @section('dashboard_content')
-  &nbsp;
   <div class="container">
   @if(Session::has('message'))
     <div class="alert alert-success" id="message">

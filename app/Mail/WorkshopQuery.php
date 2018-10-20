@@ -30,6 +30,11 @@ class WorkshopQuery extends Mailable
      */
     public function build()
     {
+        if('local' == \Config::get('app.env')){
+            $subject = 'Offline Workshop Query on local';
+        } else {
+            $subject = 'Offline Workshop Query';
+        }
         return $this->subject('Offline Workshop Query')
             ->view('emails.workshopQuery')
             ->with([

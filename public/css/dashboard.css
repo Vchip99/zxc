@@ -78,7 +78,7 @@ only screen and (max-width: 760px),
   #test-result td:nth-of-type(3):before { content: "Paper"; font-weight: bolder;}
   #test-result td:nth-of-type(4):before { content: "Marks"; font-weight: bolder;}
   #test-result td:nth-of-type(5):before { content: "Rank"; font-weight: bolder;}
-/*course result*/
+  /*course result*/
   #course-result td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
   #course-result td:nth-of-type(2):before { content: "Courses";  font-weight: bolder;}
   #course-result td:nth-of-type(3):before { content: "Grade"; font-weight: bolder;}
@@ -196,20 +196,28 @@ only screen and (max-width: 760px),
   #assignmentTopics td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
   #assignmentTopics td:nth-of-type(2):before { content: "Topic" ; font-weight: bolder; }
   #assignmentTopics td:nth-of-type(3):before { content: "Subject";  font-weight: bolder;}
-  #assignmentTopics td:nth-of-type(4):before { content: "Edit";  font-weight: bolder;}
-  #assignmentTopics td:nth-of-type(5):before { content: "Delete";  font-weight: bolder;}
+  #assignmentTopics td:nth-of-type(4):before { content: "Departments";  font-weight: bolder;}
+  #assignmentTopics td:nth-of-type(5):before { content: "Years";  font-weight: bolder;}
+  #assignmentTopics td:nth-of-type(6):before { content: "Created By";  font-weight: bolder;}
+  #assignmentTopics td:nth-of-type(7):before { content: "Edit";  font-weight: bolder;}
+  #assignmentTopics td:nth-of-type(8):before { content: "Delete";  font-weight: bolder;}
 
   /* client_batch_users */
   #client_batch_users td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
   #client_batch_users td:nth-of-type(2):before { content: "Name";  font-weight: bolder;}
-  #client_batch_users td:nth-of-type(3):before { content: "Status";  font-weight: bolder;}
+  #client_batch_users td:nth-of-type(3):before { content: "Email";  font-weight: bolder;}
+  #client_batch_users td:nth-of-type(4):before { content: "Status";  font-weight: bolder;}
 
-    /* assignmentSubjects */
-  #assignmentSubjects td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
-  #assignmentSubjects td:nth-of-type(2):before { content: "Subject";  font-weight: bolder;}
-  #assignmentSubjects td:nth-of-type(3):before { content: "Year";  font-weight: bolder;}
-  #assignmentSubjects td:nth-of-type(4):before { content: "Edit";  font-weight: bolder;}
-  #assignmentSubjects td:nth-of-type(5):before { content: "Delete";  font-weight: bolder;}
+
+    /* collegeSubjects */
+  #collegeSubjects td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeSubjects td:nth-of-type(2):before { content: "Subject";  font-weight: bolder;}
+  #collegeSubjects td:nth-of-type(3):before { content: "Years";  font-weight: bolder;}
+  #collegeSubjects td:nth-of-type(4):before { content: "Departments";  font-weight: bolder;}
+  #collegeSubjects td:nth-of-type(5):before { content: "Created By";  font-weight: bolder;}
+  #collegeSubjects td:nth-of-type(6):before { content: "Edit";  font-weight: bolder;}
+  #collegeSubjects td:nth-of-type(7):before { content: "Delete";  font-weight: bolder;}
+
     /*  clientAssignmentSubjects */
   #clientAssignmentSubjects td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
   #clientAssignmentSubjects td:nth-of-type(2):before { content: "Subject" ; font-weight: bolder; }
@@ -234,7 +242,118 @@ only screen and (max-width: 760px),
   #clientOfflinePapers td:nth-of-type(5):before { content: "Edit";  font-weight: bolder;}
   #clientOfflinePapers td:nth-of-type(6):before { content: "Delete";  font-weight: bolder;}
 
-    /*mobile_client_user_permission*/
+  /* collegeTestCategory */
+  #collegeTestCategory td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeTestCategory td:nth-of-type(2):before { content: "Category" ; font-weight: bolder; }
+  #collegeTestCategory td:nth-of-type(3):before { content: "Edit";  font-weight: bolder;}
+  #collegeTestCategory td:nth-of-type(4):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeTestSubCategory*/
+  #collegeTestSubCategory td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeTestSubCategory td:nth-of-type(2):before { content: "Sub Category" ; font-weight: bolder; }
+  #collegeTestSubCategory td:nth-of-type(3):before { content: "Category" ; font-weight: bolder; }
+  #collegeTestSubCategory td:nth-of-type(4):before { content: "Created By";  font-weight: bolder;}
+  #collegeTestSubCategory td:nth-of-type(5):before { content: "Edit";  font-weight: bolder;}
+  #collegeTestSubCategory td:nth-of-type(6):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeTestSubject*/
+  #collegeTestSubject td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeTestSubject td:nth-of-type(2):before { content: "Subject" ; font-weight: bolder; }
+  #collegeTestSubject td:nth-of-type(3):before { content: "Category" ; font-weight: bolder; }
+  #collegeTestSubject td:nth-of-type(4):before { content: "Sub Category" ; font-weight: bolder; }
+  #collegeTestSubject td:nth-of-type(5):before { content: "Created By";  font-weight: bolder;}
+  #collegeTestSubject td:nth-of-type(6):before { content: "Edit";  font-weight: bolder;}
+  #collegeTestSubject td:nth-of-type(7):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeListQuestions*/
+  #collegeListQuestions td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeListQuestions td:nth-of-type(2):before { content: "Question" ; font-weight: bolder; }
+  #collegeListQuestions td:nth-of-type(3):before { content: "Edit";  font-weight: bolder;}
+  #collegeListQuestions td:nth-of-type(4):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeTestPaper*/
+  #collegeTestPaper td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeTestPaper td:nth-of-type(2):before { content: "Paper" ; font-weight: bolder; }
+  #collegeTestPaper td:nth-of-type(3):before { content: "Category" ; font-weight: bolder; }
+  #collegeTestPaper td:nth-of-type(4):before { content: "Sub Category" ; font-weight: bolder; }
+  #collegeTestPaper td:nth-of-type(5):before { content: "Subject" ; font-weight: bolder; }
+  #collegeTestPaper td:nth-of-type(6):before { content: "Verification Code";  font-weight: bolder;}
+  #collegeTestPaper td:nth-of-type(7):before { content: "Created By";  font-weight: bolder;}
+  #collegeTestPaper td:nth-of-type(8):before { content: "Edit";  font-weight: bolder;}
+  #collegeTestPaper td:nth-of-type(9):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeCourseCategory*/
+  #collegeCourseCategory td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeCourseCategory td:nth-of-type(2):before { content: "Category" ; font-weight: bolder; }
+  #collegeCourseCategory td:nth-of-type(3):before { content: "Created By ";  font-weight: bolder;}
+  #collegeCourseCategory td:nth-of-type(4):before { content: "Edit";  font-weight: bolder;}
+  #collegeCourseCategory td:nth-of-type(5):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeCourseSubCategory*/
+  #collegeCourseSubCategory td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeCourseSubCategory td:nth-of-type(2):before { content: "Sub Category" ; font-weight: bolder; }
+  #collegeCourseSubCategory td:nth-of-type(3):before { content: "Category" ; font-weight: bolder; }
+  #collegeCourseSubCategory td:nth-of-type(4):before { content: "Created By ";  font-weight: bolder;}
+  #collegeCourseSubCategory td:nth-of-type(5):before { content: "Edit";  font-weight: bolder;}
+  #collegeCourseSubCategory td:nth-of-type(6):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeCourseCourse*/
+  #collegeCourseCourse td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeCourseCourse td:nth-of-type(2):before { content: "Course" ; font-weight: bolder; }
+  #collegeCourseCourse td:nth-of-type(3):before { content: "Category" ; font-weight: bolder; }
+  #collegeCourseCourse td:nth-of-type(4):before { content: "Sub Category" ; font-weight: bolder; }
+  #collegeCourseCourse td:nth-of-type(5):before { content: "Created By ";  font-weight: bolder;}
+  #collegeCourseCourse td:nth-of-type(6):before { content: "Edit";  font-weight: bolder;}
+  #collegeCourseCourse td:nth-of-type(7):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeCourseVideo*/
+  #collegeCourseVideo td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeCourseVideo td:nth-of-type(2):before { content: "Video" ; font-weight: bolder; }
+  #collegeCourseVideo td:nth-of-type(3):before { content: "Category" ; font-weight: bolder; }
+  #collegeCourseVideo td:nth-of-type(4):before { content: "Sub Category" ; font-weight: bolder; }
+  #collegeCourseVideo td:nth-of-type(5):before { content: "Course" ; font-weight: bolder; }
+  #collegeCourseVideo td:nth-of-type(6):before { content: "Created By ";  font-weight: bolder;}
+  #collegeCourseVideo td:nth-of-type(7):before { content: "Edit";  font-weight: bolder;}
+  #collegeCourseVideo td:nth-of-type(8):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeVkitCategory*/
+  #collegeVkitCategory td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeVkitCategory td:nth-of-type(2):before { content: "Category" ; font-weight: bolder; }
+  #collegeVkitCategory td:nth-of-type(3):before { content: "Edit";  font-weight: bolder;}
+  #collegeVkitCategory td:nth-of-type(4):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeVkitProject*/
+  #collegeVkitProject td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeVkitProject td:nth-of-type(2):before { content: "Project" ; font-weight: bolder; }
+  #collegeVkitProject td:nth-of-type(3):before { content: "Category" ; font-weight: bolder; }
+  #collegeVkitProject td:nth-of-type(4):before { content: "Created By ";  font-weight: bolder;}
+  #collegeVkitProject td:nth-of-type(5):before { content: "Edit";  font-weight: bolder;}
+  #collegeVkitProject td:nth-of-type(6):before { content: "Delete";  font-weight: bolder;}
+
+  /* college_attendance_users */
+  #college_attendance_users td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #college_attendance_users td:nth-of-type(2):before { content: "Name";  font-weight: bolder;}
+  #college_attendance_users td:nth-of-type(3):before { content: "Email";  font-weight: bolder;}
+  #college_attendance_users td:nth-of-type(4):before { content: "Status";  font-weight: bolder;}
+
+  /*collegeOfflinePaper*/
+  #collegeOfflinePaper td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeOfflinePaper td:nth-of-type(2):before { content: "Paper" ; font-weight: bolder; }
+  #collegeOfflinePaper td:nth-of-type(3):before { content: "Subject";  font-weight: bolder;}
+  #collegeOfflinePaper td:nth-of-type(4):before { content: "Department";  font-weight: bolder;}
+  #collegeOfflinePaper td:nth-of-type(5):before { content: "Year";  font-weight: bolder;}
+  #collegeOfflinePaper td:nth-of-type(6):before { content: "Marks";  font-weight: bolder;}
+  #collegeOfflinePaper td:nth-of-type(7):before { content: "Created By";  font-weight: bolder;}
+  #collegeOfflinePaper td:nth-of-type(8):before { content: "Edit";  font-weight: bolder;}
+  #collegeOfflinePaper td:nth-of-type(9):before { content: "Delete";  font-weight: bolder;}
+
+  /*college_offline_paper_marks*/
+  #college_offline_paper_marks td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #college_offline_paper_marks td:nth-of-type(2):before { content: "Email";  font-weight: bolder;}
+  #college_offline_paper_marks td:nth-of-type(3):before { content: "Mark";  font-weight: bolder;}
+  #college_offline_paper_marks td:nth-of-type(4):before { content: "OutOff";  font-weight: bolder;}
+
+  /*mobile_client_user_permission*/
   #mobile_client_user_permission td:nth-of-type(1):before { content: "Course Name" ; font-weight: bolder; }
   #mobile_client_user_permission td:nth-of-type(2):before { content: "Test Permission";  font-weight: bolder;}
   #mobile_client_user_permission td:nth-of-type(3):before { content: "Course Permission";  font-weight: bolder;}
@@ -243,8 +362,6 @@ only screen and (max-width: 760px),
     position: relative;
     padding-left: 0px;
   }
-
-
 }
 
 table.inner-table-border{

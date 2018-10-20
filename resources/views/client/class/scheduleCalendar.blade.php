@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> Batch Schedules </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-calendar"></i> Syllabus Management </li>
+      <li><i class="fa fa-calendar"></i> Calendar Management </li>
       <li class="active"> Batch Schedules </li>
     </ol>
   </section>
