@@ -15,7 +15,7 @@ class AssignmentTopic extends Model
      *
      * @var array
      */
-    protected $fillable = ['name','college_subject_id','lecturer_id', 'college_id', 'college_dept_ids', 'years'];
+    protected $fillable = ['name','college_subject_id','lecturer_id', 'college_id', 'college_dept_ids', 'years','lecturer_type'];
 
     /**
      *  add/update assignment topic
@@ -80,6 +80,7 @@ class AssignmentTopic extends Model
         $topic->college_id = $loginUser->college_id;
         $topic->college_dept_ids = $collegeDeptIds;
         $topic->years = $years;
+        $topic->lecturer_type = $loginUser->user_type;
         $topic->save();
         return $topic;
     }
@@ -91,10 +92,47 @@ class AssignmentTopic extends Model
         return $this->belongsTo(CollegeSubject::class, 'college_subject_id');
     }
 
-    protected static function getAssignmentTopics($subjectId){
+    protected static function getAssignmentTopics($subjectId,$year=NULL,$department=NULL){
+        $loginUser = Auth::guard('web')->user();
         $subjectId = InputSanitise::inputInt($subjectId);
-        return static::join('college_subjects','college_subjects.id', '=', 'assignment_topics.college_subject_id')
-                ->where('assignment_topics.college_subject_id', $subjectId)->select('assignment_topics.id', 'assignment_topics.*')->groupBy('assignment_topics.id')->get();
+        $result = static::join('college_subjects','college_subjects.id', '=', 'assignment_topics.college_subject_id');
+        if($subjectId > 0){
+            $result->where('assignment_topics.college_subject_id', $subjectId);
+        }
+        if(!empty($year) && $year > 0){
+            $result->whereRaw("find_in_set($year , assignment_topics.years)");
+        }
+        if(!empty($department)){
+            if('All' == $department){
+                if(User::Lecturer == $loginUser->user_type || User::Hod == $loginUser->user_type){
+                    $departments = explode(',',$loginUser->assigned_college_depts);
+                    if(count($departments) > 0){
+                        sort($departments);
+                        $result->where(function($query) use($departments) {
+                            foreach($departments as $index => $department){
+                                if(0 == $index){
+                                    $query->whereRaw("find_in_set($department , assignment_topics.college_dept_ids)");
+                                } else {
+                                    $query->orWhereRaw("find_in_set($department , assignment_topics.college_dept_ids)");
+                                }
+                            }
+                        });
+                    }
+                }
+            } elseif($department > 0) {
+                $result->whereRaw("find_in_set($department , assignment_topics.college_dept_ids)");
+            }
+        }
+        if(User::TNP == $loginUser->user_type){
+            $result->where('assignment_topics.lecturer_id', $loginUser->id)->where('assignment_topics.lecturer_type', User::TNP);
+        } elseif(User::Hod == $loginUser->user_type){
+            $result->whereIn('assignment_topics.lecturer_type', [User::Hod,User::Lecturer]);
+        } elseif(User::Lecturer == $loginUser->user_type){
+            $result->where('assignment_topics.lecturer_id', $loginUser->id)->where('assignment_topics.lecturer_type', User::Lecturer);
+        }
+        return $result->select('assignment_topics.id', 'assignment_topics.*')->groupBy('assignment_topics.id')->get();
+        // return static::join('college_subjects','college_subjects.id', '=', 'assignment_topics.college_subject_id')
+        //         ->where('assignment_topics.college_subject_id', $subjectId)->select('assignment_topics.id', 'assignment_topics.*')->groupBy('assignment_topics.id')->get();
     }
 
     protected static function isAssignmentTopicExist(Request $request){

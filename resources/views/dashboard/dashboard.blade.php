@@ -250,6 +250,19 @@
             @endif
           </ul>
         </li>
+        @if(2 == Auth::user()->user_type)
+          <li class="treeview">
+            <a href="#">
+              <i class="fa fa-group"></i> <span>Users Info</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/studentCollegePlacement')}}"><i class="fa fa-circle-o"></i>Placement</a></li>
+            </ul>
+          </li>
+        @endif
         @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
           <li class="treeview">
             <a href="#">
@@ -270,7 +283,7 @@
                @if(6 == Auth::user()->user_type)
                 <li><a href="{{ url('college/'.Session::get('college_user_url').'/studentVideo')}}"><i class="fa fa-circle-o"></i> Video </a></li>
               @endif
-              <li><a href="{{ url('college/'.Session::get('college_user_url').'/studentPlacement')}}"><i class="fa fa-circle-o"></i>Placement</a></li>
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/studentCollegePlacement')}}"><i class="fa fa-circle-o"></i>Placement</a></li>
             </ul>
           </li>
           <li class="treeview">

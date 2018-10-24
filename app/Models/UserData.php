@@ -17,7 +17,7 @@ class UserData extends Model
      *
      * @var array
      */
-    protected $fillable = ['category_id', 'sub_category_id','subject_id', 'paper_id', 'user_id', 'experiance', 'company', 'education', 'skill_ids','facebook', 'twitter', 'skype', 'google', 'youtube', 'resume'];
+    protected $fillable = ['category_id', 'sub_category_id','subject_id', 'paper_id', 'user_id', 'experiance', 'company', 'education', 'skill_ids','facebook', 'twitter', 'skype', 'google', 'youtube', 'resume','college_id'];
 
     /**
      *  add/update UserData
@@ -29,6 +29,7 @@ class UserData extends Model
         $subjectId = InputSanitise::inputInt($request->get('subject'));
         $paperId = InputSanitise::inputInt($request->get('paper'));
         $userId = InputSanitise::inputInt($request->get('user'));
+        $collegeId = InputSanitise::inputInt($request->get('college_id'));
         $year = InputSanitise::inputString($request->get('year'));
         $month = InputSanitise::inputString($request->get('month'));
         $company = InputSanitise::inputString($request->get('company'));
@@ -53,6 +54,7 @@ class UserData extends Model
         $userData->subject_id = $subjectId;
         $userData->paper_id = $paperId;
         $userData->user_id = $userId;
+        $userData->college_id = $collegeId;
         $userData->experiance = $year.','.$month;
         $userData->company = $company;
         $userData->education = $education;
@@ -95,5 +97,33 @@ class UserData extends Model
 
     protected static function getSelectedStudentBySkillId($skillId){
         return static::whereRaw("find_in_set($skillId , skill_ids)")->get();
+    }
+
+    protected function showVchipPlacementVideoByDepartmentByYear($college,$department,$year){
+        $result = static::join('users','users.id','=','user_datas.user_id')
+            ->where('users.user_type', User::Student)
+            ->where('users.college_id', $college);
+        if($department > 0){
+            $result->where('users.college_dept_id', $department);
+        }
+        if($year > 0){
+            $result->where('users.year', $year);
+        }
+        return $result->select('user_datas.id','users.name','users.email','user_datas.youtube','user_datas.resume','user_datas.skill_ids','user_datas.education','user_datas.experiance','user_datas.company')->get();
+    }
+
+    protected static function searchVchipStudentByDeptByYearByName(Request $request){
+        $user = Auth::user();
+        $result = static::join('users','users.id','=','user_datas.user_id')
+                    ->where('users.college_id', $user->college_id)
+                    ->where('users.user_type', User::Student)
+                    ->where('users.name', 'LIKE', '%'.$request->student.'%');
+        if($request->department > 0){
+            $result->where('users.college_dept_id', $request->department);
+        }
+        if($request->year > 0){
+            $result->where('users.year', $request->year);
+        }
+        return $result->select('user_datas.id','users.name','users.email','user_datas.youtube','user_datas.resume','user_datas.skill_ids','user_datas.education','user_datas.experiance','user_datas.company')->get();
     }
 }

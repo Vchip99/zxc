@@ -227,7 +227,7 @@ class TestSubject extends Model
     }
 
     protected static function getSubjectsByIds($ids){
-        return DB::table('test_subjects')->whereIn('id', $ids)
+        return static::whereIn('id', $ids)
                         ->select('test_subjects.*')
                         ->get();
     }
@@ -247,7 +247,7 @@ class TestSubject extends Model
     }
 
     /**
-     *  get category of subject
+     *  get sub category of subject
      */
     public function subcategory(){
         return $this->belongsTo(TestSubCategory::class, 'test_sub_category_id');

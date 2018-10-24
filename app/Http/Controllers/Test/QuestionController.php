@@ -266,7 +266,7 @@ class QuestionController extends Controller
                 if(0 == $testCategory->college_id && 0 == $testCategory->user_id){
                     $testCategories = TestCategory::getAllTestCategories();
                     $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($testQuestion->category_id);
-                    $testSubjects = TestSubject::getSubjectsByCatIdBySubcatid($testQuestion->category_id, $testQuestion->subcat_id);
+                    $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($testQuestion->category_id, $testQuestion->subcat_id);
                     $papers = TestSubjectPaper::getSubjectPapersBySubjectId($testQuestion->subject_id);
                     $prevQuestionId = $this->getPrevQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);
                     $nextQuestionId = $this->getNextQuestionIdWithQuestionId($testQuestion->category_id,$testQuestion->subcat_id,$testQuestion->subject_id,$testQuestion->paper_id,$testQuestion->section_type, $testQuestion->id);

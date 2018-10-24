@@ -71,7 +71,7 @@
           <div class="form-group row">
             <label class="col-sm-2 col-form-label" >User Video Url(User You tube Url):</label>
             <div class="col-sm-3">
-              <input type="text" class="form-control" id="recorded_video" name="recorded_video" value="{{($selectedStudent)?$selectedStudent->recorded_video:null}}" required="true" placeholder="Enter video url">
+              <input type="text" class="form-control" id="recorded_video" name="recorded_video" value="{{($selectedStudent)?$selectedStudent->recorded_video:null}}" placeholder="Enter video url">
             </div>
           </div>
           <div class="form-group row">
@@ -157,6 +157,8 @@
       document.getElementById('recorded_video').value = msg.recorded_video;
       if(msg.resume){
         document.getElementById('selectedResume').innerHTML = msg.resume.split('/').reverse()[0];
+      } else {
+        document.getElementById('selectedResume').innerHTML = '';
       }
       if(msg.skills){
         var skills = msg.skills.split(',');

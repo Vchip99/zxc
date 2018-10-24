@@ -38,8 +38,11 @@ class chatController extends Controller
         } else {
             $skipUsers = explode(',', $request->get('previuos_chat_users'));
             array_push($skipUsers, $loginUser->id);
-            $users = User::where('college_id',$loginUser->college_id)->whereNotIn('id', array_unique($skipUsers))->where('verified',1)->where('admin_approve',1)->orderBy('name','asc')->take(10)->get();
-
+            if('ceo@vchiptech.com' == $loginUser->email){
+                $users = User::whereNotIn('id', array_unique($skipUsers))->where('verified',1)->where('admin_approve',1)->orderBy('name','asc')->take(10)->get();
+            } else {
+                $users = User::where('college_id',$loginUser->college_id)->whereNotIn('id', array_unique($skipUsers))->where('verified',1)->where('admin_approve',1)->orderBy('name','asc')->take(10)->get();
+            }
             if(is_object($users) && false == $users->isEmpty()){
                 foreach($users as $user){
                     if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){

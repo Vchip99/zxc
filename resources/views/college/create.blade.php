@@ -35,15 +35,13 @@
         <input type="text" class="form-control" id="college" name="college" value="{{($college)?$college->name:null}}" required="true" placeholder="College Name">
       </div>
       @if($errors->has('college')) <p class="help-block">{{ $errors->first('college') }}</p> @endif
-      <span class="hide" id="collegeError" style="color: white;">Given college name is already exist.Please enter another name.</span>
+      <span class="hide" id="collegeError" style="color: white;">Given college name and url is already exist.Please enter another name or another url.</span>
     </div>
     <div class="form-group row  @if ($errors->has('url')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="url">College Url/Extention:</label>
       <div class="col-sm-3">
         <input type="text" class="form-control" id="url" name="url" value="{{($college)?$college->url:null}}" required="true" placeholder="College Url/Extention">
       </div>
-      @if($errors->has('college')) <p class="help-block">{{ $errors->first('college') }}</p> @endif
-      <span class="hide" id="collegeError" style="color: white;">Given college name is already exist.Please enter another name.</span>
     </div>
     @if(!empty($college->id) && count($college->departments) > 0)
     <div class="form-group row ">
@@ -147,11 +145,13 @@
     } else {
       var collegeId = 0;
     }
+    var url = document.getElementById('url').value;
+
     if(college){
       $.ajax({
         method:'POST',
         url: "{{url('admin/isCollegeExist')}}",
-        data:{college:college,college_id:collegeId}
+        data:{college:college,url:url,college_id:collegeId}
       }).done(function( msg ) {
         if('true' == msg){
           document.getElementById('collegeError').classList.remove('hide');

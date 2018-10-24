@@ -108,9 +108,11 @@
 			        @if(is_object($user) > 0 && isset($userData->id))
 				        <input class="form-control" type="text" id="email" name="email" value="{{$user->email}}" readonly>
 				        <input class="form-control" type="hidden" id="user" name="user" value="{{$user->id}}" required>
+				        <input class="form-control" type="hidden" id="college_id" name="college_id" value="{{$user->college_id}}" required>
 				    @else
 				    	<input class="form-control" type="text" id="email" name="email" value="" placeholder="Enter Email" required>
 				        <input class="form-control" type="hidden" id="user" name="user" value="" required>
+				        <input class="form-control" type="hidden" id="college_id" name="college_id" value="" required>
 				    @endif
 			    </div>
 			    @if(is_object($user) > 0 && !isset($userData->id))
@@ -314,6 +316,7 @@
 	          .done(function( user ) {
 	          	if(user){
 	          		document.getElementById('user').value = user.id;
+	          		document.getElementById('college_id').value = user.college_id;
 	          	} else {
 	          		document.getElementById('email').value = '';
 	          		document.getElementById('user').value = '';

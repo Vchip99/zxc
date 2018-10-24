@@ -297,6 +297,7 @@ class TestSubjectPaper extends Model
                     // ->join('register_papers', 'register_papers.test_subject_paper_id', '=', 'test_subject_papers.id')
                     // ->join('users', 'users.id', '=', 'register_papers.user_id')
                     ->where('test_sub_categories.created_for', 1)
+                    ->where('test_categories.category_for', 1)
                     ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
                     // ->where('register_papers.user_id', $userId)
                     ->select('test_subject_papers.*')

@@ -105,10 +105,28 @@ class AssignmentQuestion extends Model
         }
 
         if(!empty($request->department)){
-            $resultQuery->whereRaw("find_in_set($request->department , assignment_questions.college_dept_ids)");
+            if('All' == $request->department){
+                if(User::Lecturer == $loginUser->user_type || User::Hod == $loginUser->user_type){
+                    $departments = explode(',',$loginUser->assigned_college_depts);
+                    if(count($departments) > 0){
+                        sort($departments);
+                        $resultQuery->where(function($query) use($departments) {
+                            foreach($departments as $index => $department){
+                                if(0 == $index){
+                                    $query->whereRaw("find_in_set($department , assignment_questions.college_dept_ids)");
+                                } else {
+                                    $query->orWhereRaw("find_in_set($department , assignment_questions.college_dept_ids)");
+                                }
+                            }
+                        });
+                    }
+                }
+            } else {
+                $resultQuery->whereRaw("find_in_set($request->department , assignment_questions.college_dept_ids)");
+            }
         }
 
-        if(!empty($request->year)){
+        if(!empty($request->year) && 'All' != $request->year && $request->year > 0){
             $resultQuery->whereRaw("find_in_set($request->year , assignment_questions.years)");
         }else if(User::Student == $loginUser->user_type){
             $resultQuery->whereRaw("find_in_set($loginUser->year , assignment_questions.years)");
@@ -116,14 +134,14 @@ class AssignmentQuestion extends Model
 
         if(User::Lecturer == $loginUser->user_type || User::TNP == $loginUser->user_type){
             $resultQuery->where('assignment_questions.lecturer_id', $loginUser->id);
-        } else if(!empty($request->lecturer_id)){
+        } else if(!empty($request->lecturer_id) && $request->lecturer_id > 0){
             $resultQuery->where('assignment_questions.lecturer_id', $request->lecturer_id);
         }
-        if(!empty($request->subject)){
+        if(!empty($request->subject) && $request->subject > 0){
             $resultQuery->where('assignment_questions.college_subject_id', $request->subject);
         }
 
-        if(!empty($request->topic)){
+        if(!empty($request->topic) && $request->topic > 0){
             $resultQuery->where('assignment_questions.assignment_topic_id', $request->topic);
         }
         return $resultQuery->select('assignment_questions.*')->groupBy('assignment_questions.id')->get();
@@ -135,6 +153,136 @@ class AssignmentQuestion extends Model
             return static::where('assignment_topic_id',$topic)->whereRaw("find_in_set($userYear , years)")->first();
         } else {
             return static::where('assignment_topic_id',$topic)->first();
+        }
+    }
+
+    protected static function getAssignmentByDeptIdByYearBySubjectIdByTopicIdForStudent($deptId,$year,$subjectId,$topicId,$student){
+        $loginUser = Auth::user();
+        if(User::Student == $loginUser->user_type){
+            $userYear = $loginUser->year;
+            return static::where('assignment_topic_id',$topic)->whereRaw("find_in_set($userYear , years)")->first();
+        } else {
+            if(User::TNP == $loginUser->user_type){
+                $result = static::join('users','users.college_id','=','assignment_questions.college_id')
+                    ->where('assignment_questions.college_id',$loginUser->college_id)
+                    ->where('assignment_questions.lecturer_id',$loginUser->id)
+                    ->where('users.user_type',User::Student);
+                if($topicId > 0){
+                    $result->where('assignment_questions.assignment_topic_id',$topicId);
+                }
+                if($subjectId > 0){
+                    $result->where('assignment_questions.college_subject_id',$subjectId);
+                }
+                if($year > 0){
+                    $result->whereRaw("find_in_set($year , assignment_questions.years)")->where('users.year',$year);
+                }
+                if($deptId > 0){
+                    $result->whereRaw("find_in_set($deptId , assignment_questions.college_dept_ids)")->where('users.college_dept_id',$deptId);
+                }
+                if($student > 0){
+                    $result->where('users.id',$student);
+                }
+                return $result->select('assignment_questions.*','users.id as user_id','users.name as user')
+                    ->groupBy('assignment_questions.id','users.id')->get();
+            }elseif(User::Directore == $loginUser->user_type){
+                $result = static::join('users','users.college_id','=','assignment_questions.college_id')
+                    ->where('assignment_questions.college_id',$loginUser->college_id)
+                    ->where('users.user_type',User::Student);
+                if($topicId > 0){
+                    $result->where('assignment_questions.assignment_topic_id',$topicId);
+                }
+                if($subjectId > 0){
+                    $result->where('assignment_questions.college_subject_id',$subjectId);
+                }
+                if($year > 0){
+                    $result->whereRaw("find_in_set($year , assignment_questions.years)")->where('users.year',$year);
+                }
+                if($deptId > 0){
+                    $result->whereRaw("find_in_set($deptId , assignment_questions.college_dept_ids)")->where('users.college_dept_id',$deptId);
+                }
+                if($student > 0){
+                    $result->where('users.id',$student);
+                }
+                return $result->select('assignment_questions.*','users.id as user_id','users.name as user')
+                    ->groupBy('assignment_questions.id','users.id')->get();
+            }elseif(User::Hod == $loginUser->user_type){
+                $result = static::join('users','users.college_id','=','assignment_questions.college_id')
+                    ->join('assignment_topics','assignment_topics.id', '=', 'assignment_questions.assignment_topic_id')
+                    ->where('assignment_questions.college_id',$loginUser->college_id)
+                    ->where('users.user_type',User::Student)
+                    ->whereIn('assignment_topics.lecturer_type',[User::Lecturer,User::Hod]);
+                if($topicId > 0){
+                    $result->where('assignment_questions.assignment_topic_id',$topicId);
+                }
+                if($subjectId > 0){
+                    $result->where('assignment_questions.college_subject_id',$subjectId);
+                }
+                if($year > 0){
+                    $result->whereRaw("find_in_set($year , assignment_questions.years)")->where('users.year',$year);
+                }
+                if($deptId > 0){
+                    $result->whereRaw("find_in_set($deptId , assignment_questions.college_dept_ids)")->where('users.college_dept_id',$deptId);
+                } else {
+                    $departments = explode(',',$loginUser->assigned_college_depts);
+                    if(count($departments) > 0){
+                        sort($departments);
+                        $result->where(function($query) use($departments) {
+                            foreach($departments as $index => $department){
+                                if(0 == $index){
+                                    $query->whereRaw("find_in_set($department , assignment_questions.college_dept_ids)");
+                                } else {
+                                    $query->orWhereRaw("find_in_set($department , assignment_questions.college_dept_ids)");
+                                }
+                            }
+                        });
+                        $result->whereIn('users.college_dept_id',$departments);
+                    }
+                }
+                if($student > 0){
+                    $result->where('users.id',$student);
+                }
+                return $result->select('assignment_questions.*','users.id as user_id','users.name as user')
+                    ->groupBy('assignment_questions.id','users.id')->get();
+            }elseif(User::Lecturer == $loginUser->user_type){
+                $result = static::join('users','users.college_id','=','assignment_questions.college_id')
+                    ->join('assignment_topics','assignment_topics.id', '=', 'assignment_questions.assignment_topic_id')
+                    ->where('assignment_questions.college_id',$loginUser->college_id)
+                    ->where('assignment_questions.lecturer_id',$loginUser->id)
+                    ->where('users.user_type',User::Student)
+                    ->where('assignment_topics.lecturer_type',User::Lecturer);
+                if($topicId > 0){
+                    $result->where('assignment_questions.assignment_topic_id',$topicId);
+                }
+                if($subjectId > 0){
+                    $result->where('assignment_questions.college_subject_id',$subjectId);
+                }
+                if($year > 0){
+                    $result->whereRaw("find_in_set($year , assignment_questions.years)")->where('users.year',$year);
+                }
+                if($deptId > 0){
+                    $result->whereRaw("find_in_set($deptId , assignment_questions.college_dept_ids)")->where('users.college_dept_id',$deptId);
+                } else {
+                    $departments = explode(',',$loginUser->assigned_college_depts);
+                    if(count($departments) > 0){
+                        sort($departments);
+                        $result->where(function($query) use($departments) {
+                            foreach($departments as $index => $department){
+                                if(0 == $index){
+                                    $query->whereRaw("find_in_set($department , assignment_questions.college_dept_ids)");
+                                } else {
+                                    $query->orWhereRaw("find_in_set($department , assignment_questions.college_dept_ids)");
+                                }
+                            }
+                        });
+                        $result->whereIn('users.college_dept_id',$departments);
+                    }
+                }
+                if($student > 0){
+                    $result->where('users.id',$student);
+                }
+                return $result->select('assignment_questions.*','users.id as user_id','users.name as user')
+                    ->groupBy('assignment_questions.id','users.id')->get();
+            }
         }
     }
 

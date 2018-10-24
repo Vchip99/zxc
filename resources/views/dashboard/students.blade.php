@@ -25,6 +25,7 @@
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="dept" onChange="resetStudents();">
                 <option value="0"> Select Department </option>
+                <option value="All">All</option>
                 @if(count($collegeDepts) > 0)
                   @foreach($collegeDepts as $collegeDept)
                     <option value="{{$collegeDept->id}}">{{$collegeDept->name}}</option>
@@ -51,6 +52,7 @@
             @endif
                 <select class="form-control" id="selected_year" name="year" onChange="showStudents(this);">
                   <option value="0"> Select Year </option>
+                  <option value="All">All</option>
                   <option value="1">First Year</option>
                   <option value="2">Second Year</option>
                   <option value="3">Third Year</option>
@@ -84,12 +86,13 @@
                       <th>Sr. No.</th>
                       <th>Name</th>
                       <th>Department</th>
+                      <th>Year</th>
                       <th>Roll No.</th>
                       <th>Approval</th>
                       <th>Delete</th>
                     </tr>
                   </thead>
-                  <tbody id="students">
+                  <tbody id="studentsTbl">
                   </tbody>
                 </table>
                 <table  class="hide" id="lectures_hods_record">
@@ -127,7 +130,7 @@
       document.getElementById('student-record').classList.remove('hide');
       document.getElementById('lectures_hods_record').classList.add('hide');
       document.getElementById('div_year').classList.remove('hide');
-      document.getElementById('students').innerHTML = '';
+      document.getElementById('studentsTbl').innerHTML = '';
     }
     if(3 == user_type || 4 == user_type){
       document.getElementById('lecture_hods').innerHTML = '';
@@ -164,7 +167,7 @@
 
   function resetYear(){
     document.getElementById('selected_year').value = 0;
-    document.getElementById('students').innerHTML = '';
+    document.getElementById('studentsTbl').innerHTML = '';
   }
   function showStudents(){
     document.getElementById('search_student').value ='';
@@ -174,7 +177,7 @@
       var year = 0;
     }
     if(document.getElementById("dept")){
-        var department = parseInt(document.getElementById("dept").value);
+        var department = document.getElementById("dept").value;
     } else {
         var department = 0;
     }
@@ -197,7 +200,7 @@
         if(2 == user_type){
           document.getElementById('student-record').classList.remove('hide');
           document.getElementById('lectures_hods_record').classList.add('hide');
-          body = document.getElementById('students');
+          body = document.getElementById('studentsTbl');
           body.innerHTML = '';
         } else if(3 == user_type || 4 == user_type){
           document.getElementById('lectures_hods_record').classList.remove('hide');
@@ -211,7 +214,7 @@
           var eleTr = document.createElement('tr');
           var eleIndex = document.createElement('td');
           eleIndex.innerHTML = 'No result!';
-          eleIndex.setAttribute('colspan', '6');
+          eleIndex.setAttribute('colspan', '7');
           eleTr.appendChild(eleIndex);
           body.appendChild(eleTr);
         }
@@ -225,7 +228,7 @@
       var year = 0;
     }
     if(document.getElementById("dept")){
-        var department = parseInt(document.getElementById("dept").value);
+        var department = document.getElementById("dept").value;
     } else {
         var department = 0;
     }
@@ -265,7 +268,7 @@
           var eleTr = document.createElement('tr');
           var eleIndex = document.createElement('td');
           eleIndex.innerHTML = 'No result!';
-          eleIndex.setAttribute('colspan', '6');
+          eleIndex.setAttribute('colspan', '7');
           eleTr.appendChild(eleIndex);
           body.appendChild(eleTr);
         }
@@ -273,8 +276,10 @@
   }
 
   function renderResult(msg,body,user_type){
+    var login_User_Type = parseInt(document.getElementById('login_User_Type').value);
     $.each(msg['users'], function(idx, obj) {
       var eleTr = document.createElement('tr');
+      eleTr.setAttribute('style','overflow-x: auto;');
       var eleIndex = document.createElement('td');
       eleIndex.innerHTML = idx + 1;
       eleTr.appendChild(eleIndex);
@@ -284,40 +289,18 @@
       eleTr.appendChild(eleName);
 
       var eleDept = document.createElement('td');
-      if(msg['departments'].length > 0){
+      if((3 == user_type && 4 == login_User_Type) || (4 == user_type && 5 == login_User_Type) && msg['departments'].length > 0){
         eleDept.innerHTML = '<a href="#deptModal_'+obj.id+'" data-toggle="modal">'+obj.department+'</a>';
       }else {
         eleDept.innerHTML = obj.department;
       }
       eleTr.appendChild(eleDept);
 
-      if(msg['departments'].length > 0){
-        var eleDeptModel = document.createElement('div');
-        eleDeptModel.className = 'modal fade';
-        eleDeptModel.id = 'deptModal_'+obj.id;
-        eleDeptModel.setAttribute('role', 'dialog');
-        var urlAssignedDept = "{{url('assignDepatementsToUser')}}";
-        var csrfField = '{{ csrf_field() }}';
-        var deptModel = '';
-        deptModel += '<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">×</button><h4 class="modal-title">Assigned Departments</h4><b>Note:</b>If remove depatement then data of this user associated with this department will be deleted.</div><form action="'+urlAssignedDept+'" method="POST">'+csrfField+'<div class="modal-body">';
-        deptModel += '<div class="form-group">';
-          var assignedDepts = JSON.parse("[" + obj.assigned_college_depts + "]");
-          $.each(msg['departments'],function(idx,dept){
-            if(obj.college_dept_id == dept.id){
-              deptModel += '<input type="checkbox" name="departments[]" value="'+dept.id+'" checked disabled>'+dept.name;
-            } else if(assignedDepts.indexOf(dept.id) > -1){
-              deptModel += '<input type="checkbox" name="departments[]" value="'+dept.id+'" checked>'+dept.name;
-            } else {
-              deptModel += '<input type="checkbox" name="departments[]" value="'+dept.id+'" disabled>'+dept.name;
-            }
-          });
-        deptModel += '</div><input type="hidden" name="user" value="'+obj.id+'"><input type="hidden" name="departments[]" value="'+obj.college_dept_id+'">';
-        deptModel += '</div><div class="modal-footer"><button type="submit" class="btn btn-default" style="float:right;">Submit</button></div></form></div></div>';
-        eleDeptModel.innerHTML = deptModel;
-        eleTr.appendChild(eleDeptModel);
-      }
-
       if(2 == user_type){
+        var eleYear = document.createElement('td');
+        eleYear.innerHTML = obj.year;
+        eleTr.appendChild(eleYear);
+
         var eleRollNo = document.createElement('td');
         eleRollNo.innerHTML = obj.roll_no;
         eleTr.appendChild(eleRollNo);
@@ -370,6 +353,36 @@
       modelInnerHTML +='</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div>';
       eleModel.innerHTML = modelInnerHTML;
       eleTr.appendChild(eleModel);
+
+      if(msg['departments'].length > 0){
+        var eleDeptModel = document.createElement('div');
+        eleDeptModel.className = 'modal fade';
+        eleDeptModel.id = 'deptModal_'+obj.id;
+        eleDeptModel.setAttribute('role', 'dialog');
+        var urlAssignedDept = "{{url('assignDepatementsToUser')}}";
+        var csrfField = '{{ csrf_field() }}';
+        var deptModel = '';
+        deptModel += '<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">×</button><h4 class="modal-title">Assigned Departments</h4><b>Note:</b>If remove depatement then data of this user associated with this department will be deleted.</div><form action="'+urlAssignedDept+'" method="POST">'+csrfField+'<div class="modal-body">';
+        deptModel += '<div class="form-group">';
+          var assignedDepts = JSON.parse("[" + obj.assigned_college_depts + "]");
+          $.each(msg['departments'],function(idx,dept){
+            if(obj.college_dept_id == dept.id){
+              deptModel += '<input type="checkbox" name="departments[]" value="'+dept.id+'" checked disabled>'+dept.name;
+            } else if(assignedDepts.indexOf(dept.id) > -1){
+              deptModel += '<input type="checkbox" name="departments[]" value="'+dept.id+'" checked>'+dept.name;
+            } else {
+              if(5 == login_User_Type){
+                deptModel += '<input type="checkbox" name="departments[]" value="'+dept.id+'" >'+dept.name;
+              } else {
+                deptModel += '<input type="checkbox" name="departments[]" value="'+dept.id+'" disabled>'+dept.name;
+              }
+            }
+          });
+        deptModel += '</div><input type="hidden" name="user" value="'+obj.id+'"><input type="hidden" name="departments[]" value="'+obj.college_dept_id+'">';
+        deptModel += '</div><div class="modal-footer"><button type="submit" class="btn btn-default" style="float:right;">Submit</button></div></form></div></div>';
+        eleDeptModel.innerHTML = deptModel;
+        eleTr.appendChild(eleDeptModel);
+      }
 
       body.appendChild(eleTr);
     });

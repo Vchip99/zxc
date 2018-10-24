@@ -10,7 +10,7 @@
 @stop
 @section('content')
     @include('header.header_menu')
-<section class="v_container" style="margin-top: 80px;">
+<section class="v_container" style="margin-top: 80px; overflow-x: hidden;">
     <ol>
         <li>
             <h1>Privacy Policy</h1>

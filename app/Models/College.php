@@ -42,10 +42,11 @@ class College extends Model
 
     protected static function isCollegeExist(Request $request){
       $college = InputSanitise::inputString($request->get('college'));
+      $collegeUrl = InputSanitise::inputString($request->get('url'));
       $collegeId   = InputSanitise::inputInt($request->get('college_id'));
-      $result = static::where('name', '=',$college);
+      $result = static::where('name', '=',$college)->where('url', '=',$collegeUrl);
       if(!empty($collegeId)){
-          $result->where('id', '!=', $collegeId);
+        $result->where('id', '!=', $collegeId);
       }
       $result->first();
       if(is_object($result) && 1 == $result->count()){

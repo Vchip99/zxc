@@ -17,7 +17,8 @@
           <div class="row">
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="college" name="college" onChange="showUsers(this.value);">
-                <option value="0"> Select College </option>
+                <option value=""> Select College </option>
+                <option value="All">All</option>
                 <option value="other">Other</option>
                 @if(count($colleges) > 0)
                   @foreach($colleges as $college)
@@ -28,7 +29,7 @@
             </div>
             <div class="col-md-3 mrgn_10_btm hide" id="showUsers">
               <select class="form-control" id="user" name="user_type" onChange="showDepartments();" required="true">
-                <option value="0">Select User</option>
+                <option value="">Select User</option>
                 <option value="2">Student</option>
                 <option value="3">Lecturer</option>
                 <option value="4">HOD</option>
@@ -38,12 +39,14 @@
             </div>
             <div class="col-md-3 mrgn_10_btm hide" id="dept">
               <select class="form-control" id="selected_dept" name="departemnt" onChange="showYears();">
-                <option value="0"> Select Departemnt </option>
+                <option value=""> Select Departemnt </option>
+                <option value="All">All</option>
               </select>
             </div>
             <div class="col-md-3 mrgn_10_btm hide" id="showYears">
               <select class="form-control" id="selected_year" name="year" onChange="showStudents(this.value);">
-                <option value="0"> Select Year </option>
+                <option value=""> Select Year </option>
+                <option value="All">All</option>
                 <option value="1">First Year</option>
                 <option value="2">Second Year</option>
                 <option value="3">Third Year</option>
@@ -149,7 +152,7 @@
     } else {
       var selected_year = 0;
     }
-    if(user_type > 0 && college > 0){
+    if(user_type && college){
       $.ajax({
         method: "POST",
         url: "{{url('admin/searchUsers')}}",
@@ -220,7 +223,7 @@
   function showYears(){
     var user_type = document.getElementById('user').value;
 
-    document.getElementById('selected_year').value = 0;
+    document.getElementById('selected_year').value = '';
     document.getElementById('search_student').value = '';
 
     document.getElementById('students').innerHTML = '';
@@ -241,8 +244,8 @@
     document.getElementById('lecture_hods').innerHTML = '';
     document.getElementById('principal_tnp').innerHTML = '';
     document.getElementById('search').classList.remove('hide');
-    if((2 == user_type || 3 == user_type || 4 == user_type) && college > 0){
-      document.getElementById('selected_year').value = 0;
+    if((2 == user_type || 3 == user_type || 4 == user_type)){
+      document.getElementById('selected_year').value = '';
       document.getElementById('dept').classList.remove('hide');
       if(2 == user_type){
         document.getElementById('student-record').classList.remove('hide');
@@ -256,36 +259,45 @@
         document.getElementById('lectures_hods_record').classList.remove('hide');
         document.getElementById('showYears').classList.add('hide');
       }
-      $.ajax({
-        method: "POST",
-        url: "{{url('admin/getDepartments')}}",
-        data:{college:college}
-      })
-      .done(function( msg ) {
-        document.getElementById('dept').classList.remove('hide');
-        select = document.getElementById('selected_dept');
-        select.innerHTML = '';
-        var opt = document.createElement('option');
-        opt.value = '0';
-        opt.innerHTML = 'Select Department';
-        select.appendChild(opt);
-        if( 0 < msg.length){
-          $.each(msg, function(idx, obj) {
-              var opt = document.createElement('option');
-              opt.value = obj.id;
-              opt.innerHTML = obj.name;
-              select.appendChild(opt);
-          });
-        }
-      });
+      if(college > 0){
+        $.ajax({
+          method: "POST",
+          url: "{{url('admin/getDepartments')}}",
+          data:{college:college}
+        })
+        .done(function( msg ) {
+          document.getElementById('dept').classList.remove('hide');
+          select = document.getElementById('selected_dept');
+          select.innerHTML = '';
+          var opt = document.createElement('option');
+          opt.value = '';
+          opt.innerHTML = 'Select Department';
+          select.appendChild(opt);
+          var optAll = document.createElement('option');
+          optAll.value = 'All';
+          optAll.innerHTML = 'All';
+          select.appendChild(optAll);
+          if( 0 < msg.length){
+            $.each(msg, function(idx, obj) {
+                var opt = document.createElement('option');
+                opt.value = obj.id;
+                opt.innerHTML = obj.name;
+                select.appendChild(opt);
+            });
+          }
+        });
+      } else {
+        document.getElementById('selected_dept').selectedIndex = '';
+        document.getElementById('selected_year').selectedIndex = '';
+      }
     } else {
       document.getElementById('dept').classList.add('hide');
       document.getElementById('showYears').classList.add('hide');
       document.getElementById('principal_tnp_record').classList.remove('hide');
       document.getElementById('student-record').classList.add('hide');
       document.getElementById('lectures_hods_record').classList.add('hide');
-      document.getElementById('selected_dept').value = 0;
-      document.getElementById('selected_year').value = 0;
+      document.getElementById('selected_dept').selectedIndex = '';
+      document.getElementById('selected_year').selectedIndex = '';
       showStudents();
     }
     document.getElementById('search_student').value = '';
@@ -294,7 +306,7 @@
   function showUsers(collegeId){
     if('other' == collegeId){
       document.getElementById('showUsers').classList.add('hide');
-      document.getElementById('user').value = 0;
+      document.getElementById('user').value = '';
       document.getElementById('other_student_record').classList.remove('hide');
       document.getElementById('student-record').classList.add('hide');
       document.getElementById('dept').classList.add('hide');
@@ -306,7 +318,7 @@
       showOtherStudents();
     } else {
       document.getElementById('showUsers').classList.remove('hide');
-      document.getElementById('user').value = 0;
+      document.getElementById('user').value = '';
       document.getElementById('other_student_record').classList.add('hide');
       document.getElementById('search').classList.add('hide');
     }
@@ -335,22 +347,31 @@
         eleTr.appendChild(eleIndex);
 
         var eleName = document.createElement('td');
-        eleName.innerHTML = '<a href="#studentModal_'+obj.id+'" data-toggle="modal">'+obj.name+'</a>';
+        if(2 == obj.user_type){
+          eleName.innerHTML = '<a href="#studentModal_'+obj.id+'" data-toggle="modal">'+obj.name+'</a>';
+        } else {
+          eleName.innerHTML = obj.name;
+        }
         eleTr.appendChild(eleName);
         if(obj.college_id > 0 && 2 == obj.user_type || 3 == obj.user_type || 4 == obj.user_type){
           var eleDept = document.createElement('td');
           eleDept.innerHTML = obj.department;
           eleTr.appendChild(eleDept);
-        }
-        if(obj.college_id > 0 && 2 == obj.user_type ){
-          var eleRollNo = document.createElement('td');
-          eleRollNo.innerHTML = obj.roll_no;
-          eleTr.appendChild(eleRollNo);
-        }
-        if('other' == obj.college_id){
+
+          if(2 == obj.user_type ){
+            var eleRollNo = document.createElement('td');
+            eleRollNo.innerHTML = obj.roll_no;
+            eleTr.appendChild(eleRollNo);
+          }
+        } else if('other' == obj.college_id){
           var eleDept = document.createElement('td');
           eleDept.innerHTML = obj.other_source;
           eleTr.appendChild(eleDept);
+          if(obj.roll_no){
+            var eleRollNo = document.createElement('td');
+            eleRollNo.innerHTML = obj.roll_no;
+            eleTr.appendChild(eleRollNo);
+          }
         }
 
         var eleApprove = document.createElement('td');
@@ -365,40 +386,41 @@
         var eleDelete = document.createElement('td');
         eleDelete.innerHTML = '<button class="btn btn-danger btn-xs delet-bt delet-btn" data-title="Delete" data-toggle="modal" data-target="#delete" data-student_id="'+ obj.id +'" data-college_id="'+ obj.college_id +'" data-college_dept_id="'+ obj.college_dept_id +'" data-user_type="'+ obj.user_type +'" data-year="'+ obj.year +'" onclick="deleteStudent(this);" ><span class="fa fa-trash-o" data-placement="top" data-toggle="tooltip" title="Delete"></span></button>';
         eleTr.appendChild(eleDelete);
-        var eleModel = document.createElement('div');
-        eleModel.className = 'modal';
-        eleModel.id = 'studentModal_'+obj.id;
-        eleModel.setAttribute('role', 'dialog');
-        var urlStudentTest = "{{url('admin/userTestResults')}}/"+obj.id;
-        var urlStudentCourse = "{{url('admin/userCourses')}}/"+obj.id;
-        var urlStudentPlacement = "{{url('admin/userPlacement')}}/"+obj.id;
-        var urlStudentVideo = "{{url('admin/userVideo')}}/"+obj.id;
-        var modelInnerHTML = '';
-        modelInnerHTML='<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button>';
-        if(2 == obj.user_type ){
-          modelInnerHTML +='<h4 class="modal-title">Student Details</h4>';
-        } else if(3 == obj.user_type ){
-          modelInnerHTML +='<h4 class="modal-title">Lecturer Details</h4>';
-        } else if(4 == obj.user_type ){
-          modelInnerHTML +='<h4 class="modal-title">Hod Details</h4>';
-        } else if(5 == obj.user_type ){
-          modelInnerHTML +='<h4 class="modal-title">Principal Details</h4>';
-        } else if(6 == obj.user_type ){
-          modelInnerHTML +='<h4 class="modal-title">Tnp Details</h4>';
+        if(2 == obj.user_type){
+          var eleModel = document.createElement('div');
+          eleModel.className = 'modal';
+          eleModel.id = 'studentModal_'+obj.id;
+          eleModel.setAttribute('role', 'dialog');
+          var urlStudentTest = "{{url('admin/userTestResults')}}/"+obj.id;
+          var urlStudentCourse = "{{url('admin/userCourses')}}/"+obj.id;
+          var urlStudentPlacement = "{{url('admin/userPlacement')}}/"+obj.id;
+          var urlStudentVideo = "{{url('admin/userVideo')}}/"+obj.id;
+          var modelInnerHTML = '';
+          modelInnerHTML='<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button>';
+          if(2 == obj.user_type ){
+            modelInnerHTML +='<h4 class="modal-title">Student Details</h4>';
+          } else if(3 == obj.user_type ){
+            modelInnerHTML +='<h4 class="modal-title">Lecturer Details</h4>';
+          } else if(4 == obj.user_type ){
+            modelInnerHTML +='<h4 class="modal-title">Hod Details</h4>';
+          } else if(5 == obj.user_type ){
+            modelInnerHTML +='<h4 class="modal-title">Principal Details</h4>';
+          } else if(6 == obj.user_type ){
+            modelInnerHTML +='<h4 class="modal-title">Tnp Details</h4>';
+          }
+          modelInnerHTML +='</div><div class="modal-body">';
+          if('other' != obj.college_id && 2 == obj.user_type ){
+            modelInnerHTML +='<div class="form-group"><label>Year:</label> '+obj.year+'</div>';
+          }
+          modelInnerHTML +='<div class="form-group"><label>Email:</label> '+obj.email+'</div><div class="form-group"><label>Phone:</label> '+obj.phone+'</div><div class="form-group"><a href="'+urlStudentTest+'">Test Result</a></div><div class="form-group"><a href="'+urlStudentCourse+'">Course</a></div>';
+          if(2 == obj.user_type ){
+            modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
+            modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Student Video Url</a></div>';
+          }
+          modelInnerHTML +='</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div>';
+          eleModel.innerHTML = modelInnerHTML;
+          eleTr.appendChild(eleModel);
         }
-        modelInnerHTML +='</div><div class="modal-body">';
-        if('other' != obj.college_id && 2 == obj.user_type ){
-          modelInnerHTML +='<div class="form-group"><label>Year:</label> '+obj.year+'</div>';
-        }
-        modelInnerHTML +='<div class="form-group"><label>Email:</label> '+obj.email+'</div><div class="form-group"><label>Phone:</label> '+obj.phone+'</div><div class="form-group"><a href="'+urlStudentTest+'">Test Result</a></div><div class="form-group"><a href="'+urlStudentCourse+'">Course</a></div>';
-        if(2 == obj.user_type ){
-          modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
-          modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Student Video Url</a></div>';
-        }
-        modelInnerHTML +='</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div>';
-        eleModel.innerHTML = modelInnerHTML;
-        eleTr.appendChild(eleModel);
-
         body.appendChild(eleTr);
       });
     } else {

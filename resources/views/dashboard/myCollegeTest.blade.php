@@ -90,8 +90,11 @@
   <section>
     <div class="container exam-panel" id="subjects">
       @if(count($testSubjects)>0)
-          @foreach($testSubjects as $testSubject)
-            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" >
+          @foreach($testSubjects as $subCategoryId => $testSubjectArr)
+            @if(isset($subcategories[$subCategoryId]) && count($testSubjectArr) > 0)
+              <span style="color: Blue;"><h4>{{$subcategories[$subCategoryId]}}</h4></span>
+              @foreach($testSubjectArr as $testSubject)
+              <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" >
                 <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingOne">
                     <h4 class="panel-title">
@@ -101,103 +104,105 @@
                       </a>
                     </h4>
                   </div>
-              <div id="subject{{$testSubject->id}}" class="panel-collapse collapse panel-lg" role="tabpanel" aria-labelledby="headingOne">
-                <div class="panel-body">
-                  <table class="table data-lg">
-                    <thead>
-                      <tr>
-                          <th>Test Number</th>
-                          <th>Start test</th>
-                          <th>Result</th>
-                          <th>Date to Active</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @if(isset($testSubjectPapers[$testSubject->id]))
-                      @foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
-                        <tr>
-                            <td class=" ">{{ $testSubjectPaper->name }}</td>
-                            <td id="startTest_{{$testSubjectPaper->id}}">
-                              @if($currentDate < $testSubjectPaper->date_to_active)
-                                <button disabled="true" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button>
-                              @elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-                                <button disabled="true" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button>
-                              @else
-                                <button onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->test_category_id}}" data-subcategory="{{$testSubjectPaper->test_sub_category_id}}"  title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button>
-                              @endif
-                            </td>
-                            <td id="showUserResultBtn_{{$testSubjectPaper->id}}">
-                              @if($currentDate < $testSubjectPaper->date_to_active)
-                                  <button disabled="true" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
-                              @elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-                                <form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('college/'.Session::get('college_user_url').'/showUserTestResult') }}" target="_blank">
-                                  {{ csrf_field() }}
-                                  <input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
-                                  <input type="hidden" name="category_id" value="{{$testSubjectPaper->test_category_id}}">
-                                  <input type="hidden" name="subcategory_id" value="{{$testSubjectPaper->test_sub_category_id}}">
-                                  <input type="hidden" name="subject_id" value="{{$testSubject->id}}">
-                                </form>
-                                <button onClick="showUserTestResult(this);" data-paper_id="{{$testSubjectPaper->id}}" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
-                              @else
-                                <button disabled="true" title="Result will enabled after test given."><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
-                              @endif
-                            </td>
-                            <td class=" ">{{ $testSubjectPaper->date_to_active }}</td>
-                        </tr>
-                      @endforeach
-                      @endif
-                    </tbody>
-                  </table>
-                  <div class="data-sm">
-                    @if(isset($testSubjectPapers[$testSubject->id]))
-                      @foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
-                            <div class=" panel panel-info" >
-                              <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">{{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
-                              </div>
-                                <div id="paper{{$testSubjectPaper->id}}" class="panel-body" style="padding:2px 0px;">
-                                  <div class="container">
-                                      <div class="fluid-row">
-                                        <ul class="">
-                                          <li id="startTest_mobile_{{$testSubjectPaper->id}}">
-                                            @if($currentDate < $testSubjectPaper->date_to_active)
-                                              <button class="btn-magick btn-sm btn3d" disabled="true"  title="Test will be enabled on date to active."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button>
-                                            @elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-                                              <button class="btn-magick btn-sm btn3d" disabled="true"  title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" >Start</span></button>
-                                            @else
-                                              <button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->test_category_id}}" data-subcategory="{{$testSubjectPaper->test_sub_category_id}}"   title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true"></span>Start</button>
-                                            @endif
-                                          </li>
-                                          <li id="showUserResultMobileBtn_{{$testSubjectPaper->id}}">
-                                            @if($currentDate < $testSubjectPaper->date_to_active)
-                                              <button class="btn-magick btn-sm btn3d" disabled="true"  title="Result will enabled after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
-                                            @elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-                                              <form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('college/'.Session::get('college_user_url').'/showUserTestResult') }}" target="_blank">
-                                                {{ csrf_field() }}
-                                                <input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
-                                                <input type="hidden" name="category_id" value="{{$testSubjectPaper->test_category_id}}">
-                                                <input type="hidden" name="subcategory_id" value="{{$testSubjectPaper->test_sub_category_id}}">
-                                                <input type="hidden" name="subject_id" value="{{$testSubject->id}}">
-                                              </form>
-                                              <button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="{{$testSubjectPaper->id}}"  title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
-                                            @else
-                                              <button class="btn-magick btn-sm btn3d" disabled="true"  title="Result will enabled after test given."><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
-                                            @endif
-                                          </li>
-                                          <li>
-                                            <button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span> {{ $testSubjectPaper->date_to_active }}</button>
-                                          </li>
-                                        </ul>
-                                      </div>
-                                  </div>
-                                </div>
-                            </div>
+                  <div id="subject{{$testSubject->id}}" class="panel-collapse collapse panel-lg" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                      <table class="table data-lg">
+                        <thead>
+                          <tr>
+                              <th>Test Number</th>
+                              <th>Start test</th>
+                              <th>Result</th>
+                              <th>Date to Active</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @if(isset($testSubjectPapers[$testSubject->id]))
+                          @foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
+                            <tr>
+                                <td class=" ">{{ $testSubjectPaper->name }}</td>
+                                <td id="startTest_{{$testSubjectPaper->id}}">
+                                  @if($currentDate < $testSubjectPaper->date_to_active)
+                                    <button disabled="true" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button>
+                                  @elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+                                    <button disabled="true" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button>
+                                  @else
+                                    <button onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->test_category_id}}" data-subcategory="{{$testSubjectPaper->test_sub_category_id}}"  title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button>
+                                  @endif
+                                </td>
+                                <td id="showUserResultBtn_{{$testSubjectPaper->id}}">
+                                  @if($currentDate < $testSubjectPaper->date_to_active)
+                                      <button disabled="true" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+                                  @elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+                                    <form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('college/'.Session::get('college_user_url').'/showUserTestResult') }}" target="_blank">
+                                      {{ csrf_field() }}
+                                      <input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
+                                      <input type="hidden" name="category_id" value="{{$testSubjectPaper->test_category_id}}">
+                                      <input type="hidden" name="subcategory_id" value="{{$testSubjectPaper->test_sub_category_id}}">
+                                      <input type="hidden" name="subject_id" value="{{$testSubject->id}}">
+                                    </form>
+                                    <button onClick="showUserTestResult(this);" data-paper_id="{{$testSubjectPaper->id}}" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+                                  @else
+                                    <button disabled="true" title="Result will enabled after test given."><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+                                  @endif
+                                </td>
+                                <td class=" ">{{ $testSubjectPaper->date_to_active }}</td>
+                            </tr>
                           @endforeach
-                        @endif
+                          @endif
+                        </tbody>
+                      </table>
+                      <div class="data-sm">
+                        @if(isset($testSubjectPapers[$testSubject->id]))
+                          @foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
+                                <div class=" panel panel-info" >
+                                  <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">{{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
+                                  </div>
+                                    <div id="paper{{$testSubjectPaper->id}}" class="panel-body" style="padding:2px 0px;">
+                                      <div class="container">
+                                          <div class="fluid-row">
+                                            <ul class="">
+                                              <li id="startTest_mobile_{{$testSubjectPaper->id}}">
+                                                @if($currentDate < $testSubjectPaper->date_to_active)
+                                                  <button class="btn-magick btn-sm btn3d" disabled="true"  title="Test will be enabled on date to active."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button>
+                                                @elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+                                                  <button class="btn-magick btn-sm btn3d" disabled="true"  title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" >Start</span></button>
+                                                @else
+                                                  <button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->test_category_id}}" data-subcategory="{{$testSubjectPaper->test_sub_category_id}}"   title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true"></span>Start</button>
+                                                @endif
+                                              </li>
+                                              <li id="showUserResultMobileBtn_{{$testSubjectPaper->id}}">
+                                                @if($currentDate < $testSubjectPaper->date_to_active)
+                                                  <button class="btn-magick btn-sm btn3d" disabled="true"  title="Result will enabled after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
+                                                @elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+                                                  <form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('college/'.Session::get('college_user_url').'/showUserTestResult') }}" target="_blank">
+                                                    {{ csrf_field() }}
+                                                    <input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
+                                                    <input type="hidden" name="category_id" value="{{$testSubjectPaper->test_category_id}}">
+                                                    <input type="hidden" name="subcategory_id" value="{{$testSubjectPaper->test_sub_category_id}}">
+                                                    <input type="hidden" name="subject_id" value="{{$testSubject->id}}">
+                                                  </form>
+                                                  <button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="{{$testSubjectPaper->id}}"  title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
+                                                @else
+                                                  <button class="btn-magick btn-sm btn3d" disabled="true"  title="Result will enabled after test given."><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
+                                                @endif
+                                              </li>
+                                              <li>
+                                                <button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span> {{ $testSubjectPaper->date_to_active }}</button>
+                                              </li>
+                                            </ul>
+                                          </div>
+                                      </div>
+                                    </div>
+                                </div>
+                              @endforeach
+                            @endif
+                        </div>
                     </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            </div>
+              @endforeach
+            @endif
         @endforeach
       @else
         No Tests are given.

@@ -52,6 +52,8 @@ use App\Models\VkitCategory;
 use App\Models\Skill;
 use App\Models\CollegeUserAttendance;
 use App\Models\CollegeOfflinePaper;
+use App\Models\UserData;
+use App\Models\TestSubCategory;
 use Excel;
 use Auth,Hash,DB, Redirect,Session,Validator,Input,Cache;
 use App\Libraries\InputSanitise;
@@ -303,20 +305,36 @@ class AccountController extends Controller
         $testSubjects        = [];
         $testSubjectPaperIds = [];
         $testSubjectIds      = [];
+        $subcategoryIds = [];
+        $subcategories = [];
         $userId = Auth::user()->id;
         $results = TestSubjectPaper::getRegisteredSubjectPapersByUserId($userId);
         if(count($results)>0){
             $testSubjectPapers = $results['papers'];
             $testSubjectPaperIds = $results['paperIds'];
             $testSubjectIds = $results['subjectIds'];
-            $testSubjects = TestSubject::getSubjectsByIds($results['subjectIds']);
+            $selectedSubjects = TestSubject::getSubjectsByIds($results['subjectIds']);
+            if(is_object($selectedSubjects) && false == $selectedSubjects->isEmpty()){
+                foreach($selectedSubjects as $selectedSubject){
+                    $testSubjects[$selectedSubject->test_sub_category_id][] = $selectedSubject;
+                    $subcategoryIds[] = $selectedSubject->test_sub_category_id;
+                }
+            }
+            if(count($subcategoryIds) > 0){
+                $selectedSubCategories = TestSubCategory::find(array_unique($subcategoryIds));
+                if(is_object($selectedSubCategories) && false == $selectedSubCategories->isEmpty()){
+                    foreach($selectedSubCategories as $selectedSubCategory){
+                        $subcategories[$selectedSubCategory->id] = $selectedSubCategory->name;
+                    }
+                }
+            }
         }
         $testCategories = Cache::remember('vchip:tests:testCategoriesWithQuestions',60, function() {
             return TestCategory::getTestCategoriesAssociatedWithQuestion();
         });
         $alreadyGivenPapers = Score::getTestUserScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $userId);
         $currentDate = date('Y-m-d H:i:s');
-        return view('dashboard.myVchipTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate'));
+        return view('dashboard.myVchipTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate','subcategories'));
 
     }
     protected function myCollegeTest(Request $request){
@@ -328,18 +346,34 @@ class AccountController extends Controller
         $testSubjects        = [];
         $testSubjectPaperIds = [];
         $testSubjectIds      = [];
+        $subcategoryIds = [];
+        $subcategories = [];
         $user = Auth::user();
         $results = TestSubjectPaper::getSubjectPapersByCollegeIdByCollegeDeptId($user->college_id);
         if(count($results)>0){
             $testSubjectPapers = $results['papers'];
             $testSubjectPaperIds = $results['paperIds'];
             $testSubjectIds = $results['subjectIds'];
-            $testSubjects = TestSubject::getSubjectsByIds($results['subjectIds']);
+            $selectedSubjects = TestSubject::getSubjectsByIds($results['subjectIds']);
+            if(is_object($selectedSubjects) && false == $selectedSubjects->isEmpty()){
+                foreach($selectedSubjects as $selectedSubject){
+                    $testSubjects[$selectedSubject->test_sub_category_id][] = $selectedSubject;
+                    $subcategoryIds[] = $selectedSubject->test_sub_category_id;
+                }
+            }
+            if(count($subcategoryIds) > 0){
+                $selectedSubCategories = TestSubCategory::find(array_unique($subcategoryIds));
+                if(is_object($selectedSubCategories) && false == $selectedSubCategories->isEmpty()){
+                    foreach($selectedSubCategories as $selectedSubCategory){
+                        $subcategories[$selectedSubCategory->id] = $selectedSubCategory->name;
+                    }
+                }
+            }
         }
         $testCategories = CollegeCategory::getTestCategoriesByCollegeIdByDeptIdAssociatedWithQuestion($user->college_id);
         $alreadyGivenPapers = Score::getTestUserScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $user->id);
         $currentDate = date('Y-m-d H:i:s');
-        return view('dashboard.myCollegeTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate'));
+        return view('dashboard.myCollegeTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate','subcategories'));
     }
 
     protected function showUserTestResult($collegeUrl,Request $request){
@@ -891,19 +925,19 @@ class AccountController extends Controller
         return $result;
     }
 
-    protected function studentPlacement($collegeUrl,Request $request){
+    protected function studentCollegePlacement($collegeUrl,Request $request){
         if( false == InputSanitise::checkCollegeUrl($request)){
             return Redirect::to('/');
         }
         $students = [];
         $userSkills = [];
         $user = Auth::user();
-        $year = Session::get('selected_placement_year');
-        $department = Session::get('selected_placement_department');
-        if($year > 0 && $department > 0){
+        $year = Session::get('selected_college_placement_year');
+        $department = Session::get('selected_college_placement_department');
+        if($year && $department ){
             $students = User::showPlacementVideoByDepartmentByYear($user->college_id,$department,$year,User::Student);
-            Session::set('selected_placement_year', $year);
-            Session::set('selected_placement_department', $department);
+            Session::set('selected_college_placement_year', $year);
+            Session::set('selected_college_placement_department', $department);
         }
         $allSkills = Skill::all();
         if(is_object($allSkills) && false == $allSkills->isEmpty()){
@@ -912,7 +946,32 @@ class AccountController extends Controller
             }
         }
         $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
-        return view('dashboard.studentPlacement', compact('students', 'year', 'collegeDepts','department','userSkills'));
+        return view('dashboard.studentCollegePlacement', compact('students', 'year', 'collegeDepts','department','userSkills'));
+    }
+
+    protected function studentVchipPlacement($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $students = [];
+        $userSkills = [];
+        $user = Auth::user();
+        $year = Session::get('selected_vchip_placement_year');
+        $department = Session::get('selected_vchip_placement_department');
+        if($year && $department){
+            $students = UserData::showVchipPlacementVideoByDepartmentByYear($user->college_id,$department,$year);
+            Session::set('selected_vchip_placement_year', $year);
+            Session::set('selected_vchip_placement_department', $department);
+        }
+
+        $allSkills = Skill::all();
+        if(is_object($allSkills) && false == $allSkills->isEmpty()){
+            foreach($allSkills as $skill){
+                $userSkills[$skill->id] = $skill->name;
+            }
+        }
+        $collegeDepts = CollegeDept::where('college_id', $user->college_id)->get();
+        return view('dashboard.studentVchipPlacement', compact('students', 'year', 'collegeDepts','department','userSkills'));
     }
 
     protected function studentCollegeCourses($collegeUrl,Request $request,$id=Null){
@@ -1054,9 +1113,24 @@ class AccountController extends Controller
 
     protected function showPlacementVideoByDepartmentByYear(Request $request){
         $user = Auth::user();
-        Session::set('selected_placement_year',$request->year);
-        Session::set('selected_placement_department',$request->department);
+        Session::set('selected_college_placement_year',$request->year);
+        Session::set('selected_college_placement_department',$request->department);
         $result['users'] = User::showPlacementVideoByDepartmentByYear($user->college_id,$request->department, $request->year, User::Student);
+        $allSkills = Skill::all();
+        if(is_object($allSkills) && false == $allSkills->isEmpty()){
+            foreach($allSkills as $skill){
+                $result['skills'][$skill->id] = $skill->name;
+            }
+        }
+        return $result;
+    }
+
+
+    protected function showVchipPlacementVideoByDepartmentByYear(Request $request){
+        $user = Auth::user();
+        Session::set('selected_vchip_placement_year',$request->year);
+        Session::set('selected_vchip_placement_department',$request->department);
+        $result['users'] = UserData::showVchipPlacementVideoByDepartmentByYear($user->college_id,$request->department, $request->year);
         $allSkills = Skill::all();
         if(is_object($allSkills) && false == $allSkills->isEmpty()){
             foreach($allSkills as $skill){
@@ -1068,8 +1142,8 @@ class AccountController extends Controller
 
     protected function searchStudentByDeptByYearByName(Request $request){
         $user = Auth::user();
-        Session::set('selected_placement_year',$request->year);
-        Session::set('selected_placement_department',$request->department);
+        Session::set('selected_college_placement_year',$request->year);
+        Session::set('selected_college_placement_department',$request->department);
         $result['users'] = User::searchStudentByDeptByYearByName($request);
         $allSkills = Skill::all();
         if(is_object($allSkills) && false == $allSkills->isEmpty()){
@@ -1080,6 +1154,19 @@ class AccountController extends Controller
         return $result;
     }
 
+    protected function searchVchipStudentByDeptByYearByName(Request $request){
+        $user = Auth::user();
+        Session::set('selected_vchip_placement_year',$request->year);
+        Session::set('selected_vchip_placement_department',$request->department);
+        $result['users'] = UserData::searchVchipStudentByDeptByYearByName($request);
+        $allSkills = Skill::all();
+        if(is_object($allSkills) && false == $allSkills->isEmpty()){
+            foreach($allSkills as $skill){
+                $result['skills'][$skill->id] = $skill->name;
+            }
+        }
+        return $result;
+    }
 
     protected function getStudentById(Request $request){
         $selectedStudent = User::getStudentById($request->student);
@@ -1425,13 +1512,18 @@ class AccountController extends Controller
             $assignment = AssignmentQuestion::getAssignmentByTopic($selectedAssignmentTopic);
         }
         $loginUser = Auth::user();
+        $selectedStudentName = '';
+        $selectedStudent = User::find($selectedAssignmentStudent);
+        if(is_object($selectedStudent)){
+            $selectedStudentName = $selectedStudent->name;
+        }
         if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
             $deptIds = explode(',',$loginUser->assigned_college_depts);
             $collegeDepts = CollegeDept::getDepartmentsByCollegeIdByDeptIds($loginUser->college_id,$deptIds);
         } else {
             $collegeDepts = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
         }
-        return view('dashboard.studentsAssignment', compact('selectedAssignmentYear','selectedAssignmentSubject','selectedAssignmentTopic','selectedAssignmentStudent', 'assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'assignment','collegeDepts','selectedAssignmentDepartment'));
+        return view('dashboard.studentsAssignment', compact('selectedAssignmentYear','selectedAssignmentSubject','selectedAssignmentTopic','selectedAssignmentStudent', 'assignmentSubjects', 'assignmentTopics', 'assignmentUsers', 'assignment','collegeDepts','selectedAssignmentDepartment','selectedStudentName'));
     }
 
     protected function assignmentRemark($collegeUrl,$assignmentId, $studentId,Request $request){

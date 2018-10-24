@@ -200,7 +200,7 @@ class AssignmentController extends Controller
     }
 
     protected function getAssignmentTopics(Request $request){
-    	return AssignmentTopic::getAssignmentTopics($request->id);
+    	return AssignmentTopic::getAssignmentTopics($request->id,$request->year,$request->department);
     }
 
     protected function getAssignmentByTopic(Request $request){
@@ -304,19 +304,25 @@ class AssignmentController extends Controller
                 $allTopics[$topic->id] = $topic->name;
             }
         }
-        $assignment = AssignmentQuestion::getAssignmentByTopic($request->topic);
         $result = [];
-        if(is_object($assignment)){
-            $result['id'] = $assignment->id;
-            $result['question'] = $assignment->question;
-            $result['attached_link'] = basename($assignment->attached_link);
-            $result['topic'] = $allTopics[$assignment->assignment_topic_id];
-            $result['subject'] = $allSubjects[$assignment->college_subject_id];
-            Session::put('selected_assignment_year', $request->year);
-            Session::put('selected_assignment_subject', $request->subject);
-            Session::put('selected_assignment_topic', $request->topic);
-            Session::put('selected_assignment_student', $request->student);
-            Session::put('selected_assignment_department', $request->department);
+        $assignments = AssignmentQuestion::getAssignmentByDeptIdByYearBySubjectIdByTopicIdForStudent($request->department,$request->year,$request->subject,$request->topic,$request->student);
+        if(is_object($assignments) && false == $assignments->isEmpty()){
+            foreach($assignments as $index => $userAssignment){
+                $result[$index]['id'] = $userAssignment->id;
+                $result[$index]['question'] = $userAssignment->question;
+                $result[$index]['attached_link'] = basename($userAssignment->attached_link);
+                $result[$index]['topic'] = $allTopics[$userAssignment->assignment_topic_id];
+                $result[$index]['subject'] = $allSubjects[$userAssignment->college_subject_id];
+                $result[$index]['user'] = $userAssignment->user;
+                $result[$index]['user_id'] = $userAssignment->user_id;
+            }
+            if($request->department > 0 && $request->year > 0 && $request->subject > 0 && $request->topic > 0 && $request->student > 0){
+                Session::put('selected_assignment_year', $request->year);
+                Session::put('selected_assignment_subject', $request->subject);
+                Session::put('selected_assignment_topic', $request->topic);
+                Session::put('selected_assignment_student', $request->student);
+                Session::put('selected_assignment_department', $request->department);
+            }
         }
         return $result;
     }

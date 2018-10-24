@@ -46,6 +46,7 @@
  <hr class="section-dash-dark"/>
     <div class="container">
         <div class="row">
+        <p><b>Address:</b> VCHIP TECHNOLOGY PVT LTD,3rd Floor,Sr No 132/2A/3,Shrinivas,Labhade Park,Near BSNL Office, WARJE. PUNE-411058, INDIA. Phone: 020-25235596</p>
             <form class="form-horizontal" method="post" action="{{ url('sendContactUsMail')}}" enctype="multipart/form-data">
                 <div class="v_contactus-area">
                     <div class="well">

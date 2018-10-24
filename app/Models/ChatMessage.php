@@ -57,7 +57,11 @@ class ChatMessage extends Model
 
             $orderById = implode(',', $chatmessageusers);
             if(count($chatmessageusers) > 0){
-                $messageusers = User::where('college_id',$loginUser->college_id)->whereIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
+                if('ceo@vchiptech.com' == $loginUser->email){
+                    $messageusers = User::whereIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
+                } else {
+                    $messageusers = User::where('college_id',$loginUser->college_id)->whereIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->orderByRaw(DB::raw("FIELD(id,$orderById)"))->get();
+                }
                 if(is_object($messageusers) && false == $messageusers->isEmpty()){
                     foreach($messageusers as $user){
                         if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
@@ -93,8 +97,11 @@ class ChatMessage extends Model
 
             array_push($chatmessageusers, $adminChatUserId);
             array_push($chatmessageusers, $loginUser->id);
-            $users = User::where('college_id',$loginUser->college_id)->whereNotIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->orderBy('name','asc')->take(10)->get();
-
+            if('ceo@vchiptech.com' == $loginUser->email){
+                $users = User::whereNotIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->orderBy('name','asc')->take(10)->get();
+            } else {
+                $users = User::where('college_id',$loginUser->college_id)->whereNotIn('id', $chatmessageusers)->where('verified',1)->where('admin_approve',1)->orderBy('name','asc')->take(10)->get();
+            }
             if(is_object($users) && false == $users->isEmpty()){
                 foreach($users as $user){
                     if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){

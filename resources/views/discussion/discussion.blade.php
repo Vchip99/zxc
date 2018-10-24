@@ -170,66 +170,68 @@ margin-left: -13px;}
                         <div class="box-body chat" id="chat-box">
                           @if(count( $post->descComments) > 0)
                             @foreach($post->descComments as $comment)
-                              <div class="item cmt-left-margin-10" id="showComment_{{$comment->id}}">
-                                @if(is_file($comment->getUser($comment->user_id)->photo) || (!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)))
-                                  <img src="{{ asset($comment->getUser($comment->user_id)->photo)}} " class="img-circle" alt="User Image">
-                                @else
-                                  <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
-                                @endif
-                                <div class="message">
-                                  @if(is_object($currentUser) && ($currentUser->id == $comment->user_id || $currentUser->id == $post->user_id))
-                                  <div class="dropdown pull-right">
-                                    <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                      <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                      @if($currentUser->id == $comment->user_id || $currentUser->id == $post->user_id)
-                                        <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
-                                      @endif
-                                      @if($currentUser->id == $comment->user_id)
-                                        <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
-                                      @endif
-                                    </ul>
-                                  </div>
+                              @if(is_object($comment))
+                                <div class="item cmt-left-margin-10" id="showComment_{{$comment->id}}">
+                                  @if(is_file($comment->getUser($comment->user_id)->photo) || (!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)))
+                                    <img src="{{ asset($comment->getUser($comment->user_id)->photo)}} " class="img-circle" alt="User Image">
+                                  @else
+                                    <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
                                   @endif
-                                    <a class="SubCommentName">{{ $comment->getUser($comment->user_id)->name }}</a>
-                                    <p class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</p>
-                                      <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
-                                        <textarea class="form-control" name="comment" id="comment_{{$post->id}}_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
-                                        <button class="btn btn-primary" data-post_id="{{$post->id}}" data-comment_id="{{$comment->id}}" onclick="updateComment(this);">Update</button>
-                                        <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
-                                      </div>
-                                  </div>
-                                  <div class="comment-meta reply-1 cmt-left-margin">
-                                    <span id="cmt_like_{{$comment->id}}" >
-                                      @if( isset($commentLikesCount[$comment->id]) &&  is_object($currentUser) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser->id]))
-                                           <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                           <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
+                                  <div class="message">
+                                    @if(is_object($currentUser) && ($currentUser->id == $comment->user_id || $currentUser->id == $post->user_id))
+                                    <div class="dropdown pull-right">
+                                      <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                      </button>
+                                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                        @if($currentUser->id == $comment->user_id || $currentUser->id == $post->user_id)
+                                          <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
+                                        @endif
+                                        @if($currentUser->id == $comment->user_id)
+                                          <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
+                                        @endif
+                                      </ul>
+                                    </div>
+                                    @endif
+                                      <a class="SubCommentName">{{ $comment->getUser($comment->user_id)->name }}</a>
+                                      <p class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</p>
+                                        <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
+                                          <textarea class="form-control" name="comment" id="comment_{{$post->id}}_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
+                                          <button class="btn btn-primary" data-post_id="{{$post->id}}" data-comment_id="{{$comment->id}}" onclick="updateComment(this);">Update</button>
+                                          <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
+                                        </div>
+                                    </div>
+                                    <div class="comment-meta reply-1 cmt-left-margin">
+                                      <span id="cmt_like_{{$comment->id}}" >
+                                        @if( isset($commentLikesCount[$comment->id]) &&  is_object($currentUser) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser->id]))
+                                             <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                             <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
+                                        @else
+                                             <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                             <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
+                                        @endif
+                                      </span>
+                                     <span class="mrgn_5_left">
+                                      @if(is_object($currentUser))
+                                        <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$post->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
                                       @else
-                                           <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
-                                           <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
+                                        <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
                                       @endif
                                     </span>
-                                   <span class="mrgn_5_left">
-                                    @if(is_object($currentUser))
-                                      <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$post->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
-                                    @else
-                                      <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
-                                    @endif
-                                  </span>
-                                  <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
-                                  <div class="collapse replyComment" id="replyToComment{{$post->id}}-{{$comment->id}}">
-                                      <div class="form-group">
-                                        <label for="subcomment">Your Sub Comment</label>
-                                          <textarea name="subcomment" id="subcomment_{{$post->id}}_{{$comment->id}}" class="form-control" rows="3"></textarea>
-                                      </div>
-                                      <button class="btn btn-default" data-post_id="{{$post->id}}" data-comment_id="{{$comment->id}}" onclick="confirmSubmitReplytoComment(this);">Send</button>
-                                      <button type="button" class="btn btn-default" data-id="replyToComment{{$post->id}}-{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
+                                    <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
+                                    <div class="collapse replyComment" id="replyToComment{{$post->id}}-{{$comment->id}}">
+                                        <div class="form-group">
+                                          <label for="subcomment">Your Sub Comment</label>
+                                            <textarea name="subcomment" id="subcomment_{{$post->id}}_{{$comment->id}}" class="form-control" rows="3"></textarea>
+                                        </div>
+                                        <button class="btn btn-default" data-post_id="{{$post->id}}" data-comment_id="{{$comment->id}}" onclick="confirmSubmitReplytoComment(this);">Send</button>
+                                        <button type="button" class="btn btn-default" data-id="replyToComment{{$post->id}}-{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              @if(count( $comment->children ) > 0)
-                                @include('discussion.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'currentUser' => $currentUser])
+                                @if(count( $comment->children ) > 0)
+                                  @include('discussion.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'currentUser' => $currentUser])
+                                @endif
                               @endif
                             @endforeach
                           @endif

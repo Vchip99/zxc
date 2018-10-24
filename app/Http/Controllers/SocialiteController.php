@@ -51,7 +51,6 @@ class SocialiteController extends Controller
      */
     public function handleProviderCallback(Request $request, $provider)
     {
-
         $state = $request->get('state');
         $request->session()->put('state',$state);
         if(true == Session::has('domainUrl')){
@@ -73,6 +72,7 @@ class SocialiteController extends Controller
     	try
         {
         	$user = Socialite::driver($provider)->user();
+
         }
         catch (Exception $e) {
             if(!empty($domainUrl) && empty($subdomainUrl) && empty($subdomainReferer)){
@@ -127,7 +127,6 @@ class SocialiteController extends Controller
                 return Redirect::to('/');
             }
         }
-
         if(!empty($domainUrl) && empty($subdomainUrl) && empty($subdomainReferer)){
             if(is_object($authUser)){
                 if( 0 == $authUser->admin_approve ){
@@ -137,6 +136,12 @@ class SocialiteController extends Controller
                 } else {
                     if( 1 == $authUser->admin_approve && 1 == $authUser->verified){
                         Auth::login($authUser);
+                        if($authUser->college_id > 0){
+                            $collegeUrl = $authUser->college->url;
+                        } else {
+                            $collegeUrl = 'other';
+                        }
+                        Session::put('college_user_url',$collegeUrl);
                         Session::remove('domainUrl');
                         if(true == Session::has('subdomainUrl')){
                             Session::remove('subdomainUrl');
@@ -148,6 +153,15 @@ class SocialiteController extends Controller
                     }
                 }
             } else {
+                if(true == Session::has('subdomainUrl')){
+                    Session::remove('subdomainUrl');
+                }
+                if(true == Session::has('subdomainReferer')){
+                    Session::remove('subdomainReferer');
+                }
+                if(true == Session::has('domainUrl')){
+                    Session::remove('domainUrl');
+                }
                 return Redirect::to('/');
             }
         } else {
@@ -157,7 +171,7 @@ class SocialiteController extends Controller
                 } else if( 0 == $authUser->verified ){
                     return Redirect::to($subdomainReferer)->withErrors('Your account is not verified. please verify your account.');
                 } else {
-                    if( 1 == $authUser->admin_approve && 1 == $authUser->verified){
+                    if( 1 == $authUser->client_approve && 1 == $authUser->verified){
                         Auth::guard('clientuser')->login($authUser);
                         Session::remove('subdomainUrl');
                         Session::remove('subdomainReferer');
@@ -168,7 +182,16 @@ class SocialiteController extends Controller
                     }
                 }
             } else {
-                return Redirect::to('/');
+                if(true == Session::has('subdomainUrl')){
+                    Session::remove('subdomainUrl');
+                }
+                if(true == Session::has('subdomainReferer')){
+                    Session::remove('subdomainReferer');
+                }
+                if(true == Session::has('domainUrl')){
+                    Session::remove('domainUrl');
+                }
+                return Redirect::to($subdomainReferer);
             }
         }
         return Redirect::to('/');

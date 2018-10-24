@@ -562,7 +562,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('/college/{college}/studentVchipTestResults/{id?}', 'AccountController@studentVchipTestResults');
 	Route::post('showTestResults', 'AccountController@showTestResults');
 	Route::post('showCollegeTestResults', 'AccountController@showCollegeTestResults');
-	Route::get('/college/{college}/studentPlacement', 'AccountController@studentPlacement');
+	Route::get('/college/{college}/studentCollegePlacement', 'AccountController@studentCollegePlacement');
+	Route::get('/college/{college}/studentVchipPlacement', 'AccountController@studentVchipPlacement');
 	Route::get('/college/{college}/studentCollegeCourses/{id?}', 'AccountController@studentCollegeCourses');
 	Route::get('/college/{college}/studentVchipCourses/{id?}', 'AccountController@studentVchipCourses');
 	Route::get('/college/{college}/lecturerPapers/{id?}', 'AccountController@lecturerPapers');
@@ -576,7 +577,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('showStudentsByUserType', 'AccountController@showStudentsByUserType');
 	Route::post('getLecturerCourses', 'AccountController@getLecturerCourses');
 	Route::post('showPlacementVideoByDepartmentByYear', 'AccountController@showPlacementVideoByDepartmentByYear');
+	Route::post('showVchipPlacementVideoByDepartmentByYear', 'AccountController@showVchipPlacementVideoByDepartmentByYear');
 	Route::post('searchStudentByDeptByYearByName', 'AccountController@searchStudentByDeptByYearByName');
+	Route::post('searchVchipStudentByDeptByYearByName', 'AccountController@searchVchipStudentByDeptByYearByName');
 	Route::post('assignDepatementsToUser', 'AccountController@assignDepatementsToUser');
 	Route::get('/college/{college}/myCollegeCourseResults', 'AccountController@myCollegeCourseResults');
 	Route::get('/college/{college}/myVchipCourseResults', 'AccountController@myVchipCourseResults');

@@ -43,6 +43,7 @@
                       <th>Sr. No.</th>
                       <th>College/Company</th>
                       <th>Name</th>
+                      <th>Designation</th>
                       <th>Approval</th>
                     </tr>
                   </thead>
@@ -58,10 +59,25 @@
                           @endif
                           <td>{{ $upApproveUser->name }}</td>
                           <td>
+                            @if(2 == $upApproveUser->user_type)
+                              Student
+                            @elseif(3 == $upApproveUser->user_type)
+                              Lecturer
+                            @elseif(4 == $upApproveUser->user_type)
+                              Hod
+                            @elseif(5 == $upApproveUser->user_type)
+                              Director
+                            @elseif(6 == $upApproveUser->user_type)
+                              TNP
+                            @endif
+                          </td>
+                          <td>
                               <input type="checkbox" data-student_id="{{$upApproveUser->id}}" data-college_id="{{$upApproveUser->college_id}}" onclick="approveUser(this);">
                           </td>
                         </tr>
                       @endforeach
+                    @else
+                      <tr><td colspan="6"> No Result</td></tr>
                     @endif
                   </tbody>
                 </table>
@@ -109,6 +125,20 @@
         eleName.innerHTML = obj.name;
         eleTr.appendChild(eleName);
 
+        var eleDesignation = document.createElement('td');
+        if(2 == obj.user_type){
+          eleDesignation.innerHTML = 'Student';
+        } else if(3 == obj.user_type){
+          eleDesignation.innerHTML = 'Lecturer';
+        } else if(4 == obj.user_type){
+          eleDesignation.innerHTML = 'Hod';
+        } else if(5 == obj.user_type){
+          eleDesignation.innerHTML = 'Director';
+        } else if(6 == obj.user_type){
+          eleDesignation.innerHTML = 'TNP';
+        }
+        eleTr.appendChild(eleDesignation);
+
         var eleApprove = document.createElement('td');
         eleApprove.innerHTML = '<input type="checkbox" data-student_id="'+ obj.id +'" data-college_id="'+ obj.college_id +'" onclick="approveUser(this);">';
         eleTr.appendChild(eleApprove);
@@ -119,7 +149,7 @@
       var eleTr = document.createElement('tr');
       var eleIndex = document.createElement('td');
       eleIndex.innerHTML = 'No result!';
-      eleIndex.setAttribute('colspan', '4');
+      eleIndex.setAttribute('colspan', '5');
       eleTr.appendChild(eleIndex);
       body.appendChild(eleTr);
     }

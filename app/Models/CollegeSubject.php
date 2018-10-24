@@ -198,34 +198,55 @@ class CollegeSubject extends Model
     protected static function getCollegeSubjectByYear($year,$lecturer=NULL,$collegeDept=NULL){
         $loginUser = Auth::user();
         if($lecturer > 0){
-            $query = static::join('users','users.id','=','college_subjects.lecturer_id')
+            $resultQuery = static::join('users','users.id','=','college_subjects.lecturer_id')
                 ->join('assignment_topics','assignment_topics.college_subject_id', '=', 'college_subjects.id')->where('college_subjects.lecturer_id', $lecturer);
         } else {
             if(User::Lecturer == $loginUser->user_type || User::TNP == $loginUser->user_type){
-                $query = static::join('users','users.id','=','college_subjects.lecturer_id')
+                $resultQuery = static::join('users','users.id','=','college_subjects.lecturer_id')
                     ->join('assignment_topics','assignment_topics.college_subject_id', '=', 'college_subjects.id')->where('college_subjects.lecturer_id', $loginUser->id);
             } else {
-                $query = static::join('users','users.id','=','college_subjects.lecturer_id')
+                $resultQuery = static::join('users','users.id','=','college_subjects.lecturer_id')
                     ->join('assignment_topics','assignment_topics.college_subject_id', '=', 'college_subjects.id');
             }
         }
-        $query->where('college_subjects.college_id', $loginUser->college_id);
+        $resultQuery->where('college_subjects.college_id', $loginUser->college_id);
         if(User::Lecturer == $loginUser->user_type){
-            $query->where('users.user_type', User::Lecturer);
+            $resultQuery->where('users.user_type', User::Lecturer);
         } else if(User::TNP == $loginUser->user_type){
-            $query->where('users.user_type', User::TNP);
+            $resultQuery->where('users.user_type', User::TNP);
         } else if(User::Hod == $loginUser->user_type){
-            $query->whereIn('users.user_type', [User::Hod,User::Lecturer]);
+            $resultQuery->whereIn('users.user_type', [User::Hod,User::Lecturer]);
         } else if(User::Directore == $loginUser->user_type){
-            $query->whereIn('users.user_type', [User::Lecturer,User::Hod,User::Directore,User::TNP]);
+            $resultQuery->whereIn('users.user_type', [User::Lecturer,User::Hod,User::Directore,User::TNP]);
         }
 
-        if($collegeDept > 0){
-            $query->whereRaw("find_in_set($collegeDept , college_subjects.college_dept_ids)");
+        if(!empty($collegeDept)){
+            if('All' == $collegeDept){
+                if(User::Lecturer == $loginUser->user_type || User::Hod == $loginUser->user_type){
+                    $departments = explode(',',$loginUser->assigned_college_depts);
+                    if(count($departments) > 0){
+                        sort($departments);
+                        $resultQuery->where(function($query) use($departments) {
+                            foreach($departments as $index => $department){
+                                if(0 == $index){
+                                    $query->whereRaw("find_in_set($department , college_subjects.college_dept_ids)");
+                                } else {
+                                    $query->orWhereRaw("find_in_set($department , college_subjects.college_dept_ids)");
+                                }
+                            }
+                        });
+                    }
+                }
+            } else if($collegeDept > 0) {
+                $resultQuery->whereRaw("find_in_set($collegeDept , college_subjects.college_dept_ids)");
+            }
         } else if($loginUser->college_dept_id > 0){
-        	$query->whereRaw("find_in_set($loginUser->college_dept_id , college_subjects.college_dept_ids)");
+        	$resultQuery->whereRaw("find_in_set($loginUser->college_dept_id , college_subjects.college_dept_ids)");
         }
-        return $query->whereRaw("find_in_set($year , college_subjects.years)")->select('college_subjects.id','college_subjects.*')->groupBy('college_subjects.id')->get();
+        if(!empty($year) && 'All' != $year && $year > 0){
+            $resultQuery->whereRaw("find_in_set($year , college_subjects.years)");
+        }
+        return $resultQuery->select('college_subjects.id','college_subjects.*')->groupBy('college_subjects.id')->get();
     }
 
     protected static function getAssignmentSubjectsOfGivenAssignmentByLecturer(Request $request){

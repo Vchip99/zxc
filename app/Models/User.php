@@ -232,7 +232,7 @@ class User extends Authenticatable
         if($request->department > 0){
             $student->where('users.college_dept_id', $request->department);
         } else if(3 == $user->user_type || 4 == $user->user_type){
-            $student->where('users.college_dept_id', $user->college_dept_id);
+            $student->whereIn('users.college_dept_id', explode(',', $user->assigned_college_depts));
         }
         if($request->user_type > 0){
             $student->where('users.user_type', $request->user_type);
@@ -419,8 +419,10 @@ class User extends Authenticatable
             if(self::Directore == $userType || self::TNP == $userType){
                 $student = static::where('users.user_type', $userType);
             } else {
-                $student = static::join('college_depts', 'college_depts.id', '=', 'users.college_dept_id')
-                            ->where('users.user_type', $userType);
+                $student = static::join('college_depts', 'college_depts.id', '=', 'users.college_dept_id');
+                if($userType > 0){
+                    $student->where('users.user_type', $userType);
+                }
             }
             if($departmentId > 0){
                 $student->where('users.college_dept_id', $departmentId);
@@ -432,10 +434,15 @@ class User extends Authenticatable
                 $student->where('users.name', 'LIKE', '%'.$userName.'%');
             }
             if(self::Directore == $userType || self::TNP == $userType){
-                return $student->where('users.college_id', $collegeId)->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.user_type','users.year','users.email','users.phone','users.admin_approve')->get();
+                if($collegeId > 0){
+                    $student->where('users.college_id', $collegeId);
+                }
+                return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.user_type','users.year','users.email','users.phone','users.admin_approve','users.other_source')->get();
             } else {
-                return $student->where('users.college_id', $collegeId)
-                                ->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.user_type','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department')
+                if($collegeId > 0){
+                    $student->where('users.college_id', $collegeId);
+                }
+                return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.user_type','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department','users.other_source')
                                 ->get();
             }
         }
@@ -448,10 +455,10 @@ class User extends Authenticatable
     protected static function unApproveUsers($collegeId){
         if($collegeId > 0){
             $result = static::where('users.admin_approve', 0)->where('users.college_id', $collegeId);
-            return $result->select('users.id','users.name','users.college_id','users.other_source as collegeName','users.admin_approve')->orderBy('college_id')->get();
+            return $result->select('users.id','users.name','users.college_id','users.other_source as collegeName','users.admin_approve','users.user_type')->orderBy('college_id')->get();
         } else {
             $result = static::where('users.admin_approve', 0);
-        return $result->where('user_type', '!=', '1')->select('users.id','users.name','users.college_id','users.other_source as collegeName','users.admin_approve')->orderBy('college_id')->get();
+        return $result->where('user_type', '!=', '1')->select('users.id','users.name','users.college_id','users.other_source as collegeName','users.admin_approve','users.user_type')->orderBy('college_id')->get();
         }
     }
 
@@ -524,9 +531,15 @@ class User extends Authenticatable
     protected static function searchContact(Request $request){
         $chatusers = [];
         $unreadCount = [];
-        $currentUserId = Auth::user()->id;
+        $loginUser = Auth()->user();
+        $currentUserId = $loginUser->id;
         $contact = InputSanitise::inputString($request->contact);
-        $users = static::where('name', 'LIKE', '%'.$contact.'%')->where('verified',1)->where('admin_approve',1)->get();
+
+        if('ceo@vchiptech.com' == $loginUser->email){
+            $users = static::where('name', 'LIKE', '%'.$contact.'%')->where('verified',1)->where('admin_approve',1)->get();
+        } else {
+            $users = static::where('college_id',$loginUser->college_id)->where('name', 'LIKE', '%'.$contact.'%')->where('verified',1)->where('admin_approve',1)->get();
+        }
         if(is_object($users) && false == $users->isEmpty()){
             foreach($users as $user){
                 if($currentUserId != $user->id){
@@ -537,13 +550,24 @@ class User extends Authenticatable
                     } else {
                         $isImageExist = 'false';
                     }
+                    if(User::Student == $user->user_type){
+                        $userType = 'Student';
+                    } elseif(User::Lecturer == $user->user_type){
+                        $userType = 'Lecturer';
+                    } elseif(User::Hod == $user->user_type){
+                        $userType = 'Hod';
+                    } elseif(User::Directore == $user->user_type){
+                        $userType = 'Director';
+                    } elseif(User::TNP == $user->user_type){
+                        $userType = 'TNP';
+                    }
                     $chatusers[] = [
                         'id' => $user->id,
                         'name' => $user->name,
                         'photo' => $user->photo,
                         'image_exist' => $isImageExist,
                         'chat_room_id' => $user->chatroomid(),
-                        'college' => $user->getCollegeName(),
+                        'college' => $userType,
                     ];
                 }
             }

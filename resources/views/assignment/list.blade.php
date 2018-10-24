@@ -21,6 +21,7 @@
         <div class="col-md-3 mrgn_10_btm">
          <select class="form-control" id="department" name="department" title="department" onChange="getDepartmentLecturers(this);">
           <option value="">Select Department</option>
+          <option value="All">All</option>
           @if(count($departments) > 0)
             @foreach($departments as $department)
               <option value="{{ $department->id }}">{{ $department->name }}</option>
@@ -28,10 +29,11 @@
           @endif
          </select>
         </div>
-      @if(4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+      @if(4 == Auth::user()->user_type || 5 == Auth::user()->user_type)
         <div class="col-md-3 mrgn_10_btm">
          <select class="form-control" id="lecturer" name="lecturer" title="Lecturer" onChange="getLecturerAssignments(this);">
           <option value="">Select User</option>
+          <option value="All">All</option>
           @if(count($assignmentTeachers) > 0)
             @foreach($assignmentTeachers as $assignmentTeacher)
               <option value="{{ $assignmentTeacher->id }}">{{ $assignmentTeacher->name }}</option>
@@ -43,6 +45,7 @@
       <div class="col-md-3 mrgn_10_btm">
         <select class="form-control" id="year" name="year" required title="year" onChange="selectSubject(this);">
           <option value="">Select Year</option>
+          <option value="All">All</option>
           <option value="1">First </option>
           <option value="2">Second </option>
           <option value="3">Third </option>
@@ -52,11 +55,13 @@
       <div class="col-md-3 mrgn_10_btm">
        <select class="form-control" id="subject" name="subject" title="Subject" onChange="selectTopic(this);">
         <option value="">Select Subject</option>
+        <option value="All">All</option>
        </select>
       </div>
       <div class="col-md-3 mrgn_10_btm">
        <select class="form-control" id="topic" name="topic" title="Topic" onChange="getAssignment(this);">
         <option value="">Select Topic</option>
+        <option value="All">All</option>
        </select>
       </div>
       <div id="addTopicDiv">
@@ -120,61 +125,63 @@
 <script type="text/javascript">
 
   function getDepartmentLecturers(ele){
-    id = parseInt($(ele).val());
+    id = $(ele).val();
     renderTopic();
     renderSubject();
     document.getElementById('year').selectedIndex = 0;
-    if(id > 0){
-      // get assignments
+    // get assignments
+    $.ajax({
+      method: "POST",
+      url: "{{url('getAssignments')}}",
+      data: {department:id}
+    })
+    .done(function( msgs ) {
+      body = document.getElementById('studentAssignment');
+      body.innerHTML = '';
+      if(Object.keys(msgs).length > 0){
+        renderRecords(msgs, body);
+      } else {
+        var eleTr = document.createElement('tr');
+        var eleQuestion = document.createElement('td');
+        eleQuestion.innerHTML = 'No Assignment for this department';
+        eleQuestion.setAttribute('colspan', 7);
+        eleTr.appendChild(eleQuestion);
+        body.appendChild(eleTr);
+      }
+    });
+
+    if(document.getElementById('user_type').value > 3 && document.getElementById('user_type').value != 6){
+      // get dept lecturer
       $.ajax({
         method: "POST",
-        url: "{{url('getAssignments')}}",
+        url: "{{url('getDepartmentLecturers')}}",
         data: {department:id}
       })
-      .done(function( msgs ) {
-        body = document.getElementById('studentAssignment');
-        body.innerHTML = '';
-        if(Object.keys(msgs).length > 0){
-          renderRecords(msgs, body);
-        } else {
-          var eleTr = document.createElement('tr');
-          var eleQuestion = document.createElement('td');
-          eleQuestion.innerHTML = 'No Assignment for this department';
-          eleQuestion.setAttribute('colspan', 7);
-          eleTr.appendChild(eleQuestion);
-          body.appendChild(eleTr);
+      .done(function( msg ) {
+        select = document.getElementById('lecturer');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = 0;
+        opt.innerHTML = 'Select Lecturer';
+        select.appendChild(opt);
+        var optAll = document.createElement('option');
+        optAll.value = 'All';
+        optAll.innerHTML = 'All';
+        select.appendChild(optAll);
+        if( 0 < msg.length){
+          $.each(msg, function(idx, obj) {
+              var opt = document.createElement('option');
+              opt.value = obj.id;
+              opt.innerHTML = obj.name;
+              select.appendChild(opt);
+          });
         }
       });
-
-      if(document.getElementById('user_type').value > 3){
-        // get dept lecturer
-        $.ajax({
-          method: "POST",
-          url: "{{url('getDepartmentLecturers')}}",
-          data: {department:id}
-        })
-        .done(function( msg ) {
-          select = document.getElementById('lecturer');
-          select.innerHTML = '';
-          var opt = document.createElement('option');
-          opt.value = 0;
-          opt.innerHTML = 'Select Lecturer';
-          select.appendChild(opt);
-          if( 0 < msg.length){
-            $.each(msg, function(idx, obj) {
-                var opt = document.createElement('option');
-                opt.value = obj.id;
-                opt.innerHTML = obj.name;
-                select.appendChild(opt);
-            });
-          }
-        });
-      }
     }
   }
 
   function getLecturerAssignments(ele){
-      id = parseInt($(ele).val());
+      id = $(ele).val();
       document.getElementById('paginate').innerHTML = '';
       document.getElementById('studentAssignment').innerHTML = '';
       document.getElementById('year').selectedIndex = 0;
@@ -185,32 +192,31 @@
       } else {
         var department = '';
       }
-      if(id > 0){
-        // get assignments
-        $.ajax({
-          method: "POST",
-          url: "{{url('getAssignments')}}",
-          data: {lecturer_id:id,department:department}
-        })
-        .done(function( msgs ) {
-          body = document.getElementById('studentAssignment');
-          body.innerHTML = '';
-          if(Object.keys(msgs).length > 0){
-            renderRecords(msgs, body);
-          } else {
-            var eleTr = document.createElement('tr');
-            var eleQuestion = document.createElement('td');
-            eleQuestion.innerHTML = 'No Assignment for this lecturer';
-            eleQuestion.setAttribute('colspan', 7);
-            eleTr.appendChild(eleQuestion);
-            body.appendChild(eleTr);
-          }
-        });
-      }
+
+      // get assignments
+      $.ajax({
+        method: "POST",
+        url: "{{url('getAssignments')}}",
+        data: {lecturer_id:id,department:department}
+      })
+      .done(function( msgs ) {
+        body = document.getElementById('studentAssignment');
+        body.innerHTML = '';
+        if(Object.keys(msgs).length > 0){
+          renderRecords(msgs, body);
+        } else {
+          var eleTr = document.createElement('tr');
+          var eleQuestion = document.createElement('td');
+          eleQuestion.innerHTML = 'No Assignment for this lecturer';
+          eleQuestion.setAttribute('colspan', 7);
+          eleTr.appendChild(eleQuestion);
+          body.appendChild(eleTr);
+        }
+      });
   }
 
   function selectSubject(ele){
-    id = parseInt($(ele).val());
+    id = $(ele).val();
     document.getElementById('studentAssignment').innerHTML = '';
     document.getElementById('paginate').innerHTML = '';
     if(document.getElementById('lecturer')){
@@ -227,7 +233,7 @@
       $.ajax({
         method: "POST",
         url: "{{url('getCollegeSubjectByYear')}}",
-        data: {year:id, lecturer:lecturer,department:department}
+        data: {year:id,lecturer:lecturer,department:department}
       })
       .done(function( msg ) {
         select = document.getElementById('subject');
@@ -236,6 +242,10 @@
         opt.value = 0;
         opt.innerHTML = 'Select Subject';
         select.appendChild(opt);
+        var optAll = document.createElement('option');
+        optAll.value = 'All';
+        optAll.innerHTML = 'All';
+        select.appendChild(optAll);
         if( 0 < msg.length){
           $.each(msg, function(idx, obj) {
               var opt = document.createElement('option');
@@ -250,7 +260,7 @@
       $.ajax({
         method: "POST",
         url: "{{url('getAssignments')}}",
-        data: {year:id, lecturer_id:lecturer,department:department}
+        data: {year:id,lecturer_id:lecturer,department:department}
       })
       .done(function( msgs ) {
         body = document.getElementById('studentAssignment');
@@ -335,18 +345,24 @@
   }
 
   function selectTopic(ele){
-    id = parseInt($(ele).val());
+    id = $(ele).val();
     document.getElementById('studentAssignment').innerHTML = '';
     if(document.getElementById('department')){
       var department = document.getElementById('department').value;
     } else {
       var department = '';
     }
-    if( 0 < id ){
+    if(document.getElementById('lecturer')){
+      var lecturer = document.getElementById('lecturer').value;
+    } else {
+      var lecturer = '';
+    }
+    year = document.getElementById('year').value;
+    if(id){
       $.ajax({
           method: "POST",
           url: "{{url('getAssignmentTopics')}}",
-          data: {id:id}
+          data: {id:id,year:year,department:department,lecturer_id:lecturer}
       })
       .done(function( msg ) {
         select = document.getElementById('topic');
@@ -355,6 +371,10 @@
         opt.value = 0;
         opt.innerHTML = 'Select Topic';
         select.appendChild(opt);
+        var optAll = document.createElement('option');
+        optAll.value = 'All';
+        optAll.innerHTML = 'All';
+        select.appendChild(optAll);
         if( 0 < msg.length){
           $.each(msg, function(idx, obj) {
               var opt = document.createElement('option');
@@ -365,12 +385,12 @@
         }
       });
 
-      year = document.getElementById('year').value;
+
       // get assignments
       $.ajax({
         method: "POST",
         url: "{{url('getAssignments')}}",
-        data: {year:year, subject:id, department:department}
+        data: {year:year,subject:id,department:department,lecturer_id:lecturer}
       })
       .done(function( msgs ) {
         body = document.getElementById('studentAssignment');
@@ -392,33 +412,36 @@
   }
 
   function getAssignment(ele){
-    id = parseInt($(ele).val());
+    id = $(ele).val();
     year = document.getElementById('year').value;
     department = document.getElementById('department').value;
     subject = document.getElementById('subject').value;
     document.getElementById('studentAssignment').innerHTML = '';
-    if( 0 < id ){
-      $.ajax({
-        method: "POST",
-        url: "{{url('getAssignments')}}",
-        data: {year:year,subject:subject,department:department,topic:id}
-      })
-      .done(function( msgs ) {
-        body = document.getElementById('studentAssignment');
-        body.innerHTML = '';
-        if(Object.keys(msgs).length > 0){
-          renderRecords(msgs, body);
-        } else {
-          var eleTr = document.createElement('tr');
-
-          var eleQuestion = document.createElement('td');
-          eleQuestion.innerHTML = 'No Assignment for this topic';
-          eleQuestion.setAttribute('colspan', 7);
-          eleTr.appendChild(eleQuestion);
-          body.appendChild(eleTr);
-        }
-      });
+    if(document.getElementById('lecturer')){
+      var lecturer = document.getElementById('lecturer').value;
+    } else {
+      var lecturer = '';
     }
+    $.ajax({
+      method: "POST",
+      url: "{{url('getAssignments')}}",
+      data: {year:year,subject:subject,department:department,topic:id,lecturer_id:lecturer}
+    })
+    .done(function( msgs ) {
+      body = document.getElementById('studentAssignment');
+      body.innerHTML = '';
+      if(Object.keys(msgs).length > 0){
+        renderRecords(msgs, body);
+      } else {
+        var eleTr = document.createElement('tr');
+
+        var eleQuestion = document.createElement('td');
+        eleQuestion.innerHTML = 'No Assignment for this topic';
+        eleQuestion.setAttribute('colspan', 7);
+        eleTr.appendChild(eleQuestion);
+        body.appendChild(eleTr);
+      }
+    });
   }
 
   function renderTopic(){
@@ -428,6 +451,10 @@
     opt.value = '';
     opt.innerHTML = 'Select Topic';
     select.appendChild(opt);
+    var optAll = document.createElement('option');
+    optAll.value = 'All';
+    optAll.innerHTML = 'All';
+    select.appendChild(optAll);
   }
 
   function renderSubject(){
@@ -437,6 +464,10 @@
     opt.value = '';
     opt.innerHTML = 'Select Subject';
     select.appendChild(opt);
+    var optAll = document.createElement('option');
+    optAll.value = 'All';
+    optAll.innerHTML = 'All';
+    select.appendChild(optAll);
   }
 
   $(document).ready(function(){

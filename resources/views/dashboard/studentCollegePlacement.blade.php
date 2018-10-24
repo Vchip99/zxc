@@ -82,6 +82,7 @@
     }
     .vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; }
     .vid iframe, .vid object,.vid embed {position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
+
 </style>
 @section('module_title')
   <style>
@@ -167,6 +168,9 @@
     }
     .vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; }
     .vid iframe, .vid object,.vid embed {position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
+    .btn-primary{
+      width: 150px;
+    }
   </style>
   <section class="content-header">
     <h1> Placement </h1>
@@ -188,9 +192,15 @@
       <div class="top mrgn_40_btm"">
         <div class="container">
           <div class="row">
+            <a href="{{ url('college/'.Session::get('college_user_url').'/studentCollegePlacement')}}" class="btn btn-primary" >College Placement</a>&nbsp;
+            <a href="{{ url('college/'.Session::get('college_user_url').'/studentVchipPlacement')}}" class="btn btn-default">Vchip Placement</a>
+          </div>
+          <br>
+          <div class="row">
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="dept" onChange="resetYear(this);">
                 <option value="0"> Select Department </option>
+                <option value="All"> All </option>
                 @if($department > 0 && count($collegeDepts) > 0)
                   @foreach($collegeDepts as $collegeDept)
                     @if($department == $collegeDept->id)
@@ -209,6 +219,7 @@
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="selected_year" name="year" onChange="showStudents(this);">
                 <option value="0"> Select Year </option>
+                <option value="All"> All </option>
                 <option value="1" @if('1' == $year) selected="true" @endif >First Year</option>
                 <option value="2" @if('2' == $year) selected="true" @endif >Second Year</option>
                 <option value="3" @if('3' == $year) selected="true" @endif >Third Year</option>
@@ -295,10 +306,10 @@
   }
 
   function showStudents(){
-    var year = parseInt(document.getElementById('selected_year').value);
-    var department = parseInt(document.getElementById("dept").value);
+    var year = document.getElementById('selected_year').value;
+    var department = document.getElementById("dept").value;
     document.getElementById('allUsers').innerHTML = '';
-    if(department > 0 && year > 0){
+    if(department&& year){
       $.ajax({
           method: "POST",
           url: "{{url('showPlacementVideoByDepartmentByYear')}}",
