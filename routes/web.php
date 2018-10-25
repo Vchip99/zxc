@@ -89,11 +89,13 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/getDepartments', 'Admin\AllUsersInfoController@getDepartments');
 	Route::post('admin/changeUserApproveStatus', 'Admin\AllUsersInfoController@changeUserApproveStatus');
 	Route::post('admin/searchUsers', 'Admin\AllUsersInfoController@searchUsers');
+	Route::post('admin/searchUsersForAdmin', 'Admin\AllUsersInfoController@searchUsersForAdmin');
 	Route::get('admin/userTestResults/{id?}', 'Admin\AllUsersInfoController@userTestResults');
 	Route::post('admin/showUserTestResults', 'Admin\AllUsersInfoController@showUserTestResults');
 	Route::get('admin/userCourses/{id?}', 'Admin\AllUsersInfoController@userCourses');
 	Route::post('admin/showUserCourses', 'Admin\AllUsersInfoController@showUserCourses');
-	Route::get('admin/userPlacement/{id?}', 'Admin\AllUsersInfoController@userPlacement');
+	Route::get('admin/collegePlacement', 'Admin\AllUsersInfoController@collegePlacement');
+	Route::get('admin/vchipPlacement', 'Admin\AllUsersInfoController@vchipPlacement');
 	Route::post('admin/getStudentById', 'Admin\AllUsersInfoController@getStudentById');
 	Route::get('admin/userVideo/{id?}', 'Admin\AllUsersInfoController@userVideo');
 	Route::put('admin/updateStudentVideo', 'Admin\AllUsersInfoController@updateStudentVideo');
@@ -103,6 +105,12 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/allTestResults', 'Admin\AllUsersInfoController@allTestResults');
 	Route::post('admin/getAllTestResults', 'Admin\AllUsersInfoController@getAllTestResults');
 	Route::get('admin/downloadExcelResult', 'Admin\AllUsersInfoController@downloadExcelResult');
+
+	Route::post('admin/showCollegePlacementVideoByCollegeIdByDeptIdByYear', 'Admin\AllUsersInfoController@showCollegePlacementVideoByCollegeIdByDeptIdByYear');
+	Route::post('admin/showVchipPlacementVideoByCollegeIdByDeptIdByYear', 'Admin\AllUsersInfoController@showVchipPlacementVideoByCollegeIdByDeptIdByYear');
+	Route::post('admin/searchCollegeStudentByCollegeByDeptByYearByName', 'Admin\AllUsersInfoController@searchCollegeStudentByCollegeByDeptByYearByName');
+	Route::post('admin/searchVchipStudentByCollegeByDeptByYearByName', 'Admin\AllUsersInfoController@searchVchipStudentByCollegeByDeptByYearByName');
+
 
 	// admin college info
 	Route::get('admin/manageCollegeInfo', 'Test\CollegeInfoController@manageCollegeInfo');

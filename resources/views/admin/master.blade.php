@@ -248,13 +248,11 @@
               <li title="Show Users Info"><a href="{{ url('admin/allUsers')}}"><i class="fa fa-circle-o"></i> All Users </a></li>
               <li title="Show User Test Results"><a href="{{ url('admin/userTestResults')}}"><i class="fa fa-circle-o"></i> User Test Results </a></li>
               <li title="Show User Courses"><a href="{{ url('admin/userCourses')}}"><i class="fa fa-circle-o"></i> User Courses </a></li>
-              @if(2 == $collegeUserType)
-                <li title="Show User Placement"><a href="{{ url('admin/userPlacement')}}"><i class="fa fa-circle-o"></i> User Placement </a></li>
-                <li title="Show User video"><a href="{{ url('admin/userVideo')}}"><i class="fa fa-circle-o"></i> User Video </a></li>
-              @endif
-                <li title="Show Un Approve Users"><a href="{{ url('admin/unapproveUsers')}}"><i class="fa fa-circle-o"></i> Un Approve Users </a></li>
-                <li title="Manage Skills"><a href="{{ url('admin/manageSkill')}}"><i class="fa fa-circle-o"></i> Manage Skills </a></li>
-                <li title="User Data"><a href="{{ url('admin/manageUserData')}}"><i class="fa fa-circle-o"></i> Manage User Data </a></li>
+              <li title="Show User Placement"><a href="{{ url('admin/collegePlacement')}}"><i class="fa fa-circle-o"></i> User Placement </a></li>
+              <li title="Show User video"><a href="{{ url('admin/userVideo')}}"><i class="fa fa-circle-o"></i> User Video </a></li>
+              <li title="Show Un Approve Users"><a href="{{ url('admin/unapproveUsers')}}"><i class="fa fa-circle-o"></i> Un Approve Users </a></li>
+              <li title="Manage Skills"><a href="{{ url('admin/manageSkill')}}"><i class="fa fa-circle-o"></i> Manage Skills </a></li>
+              <li title="User Data"><a href="{{ url('admin/manageUserData')}}"><i class="fa fa-circle-o"></i> Manage User Data </a></li>
             </ul>
           </li>
           <li class="treeview">

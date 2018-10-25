@@ -16,6 +16,8 @@ use App\Models\CourseCourse;
 use App\Models\TestCategory;
 use App\Models\CourseCategory;
 use App\Models\TestSubjectPaper;
+use App\Models\Skill;
+use App\Models\UserData;
 use Excel;
 
 class AllUsersInfoController extends Controller
@@ -46,7 +48,9 @@ class AllUsersInfoController extends Controller
     }
 
     protected function showOtherStudents(){
-        return User::showOtherStudents();
+        $result = [];
+        $result['users'] = User::showOtherStudents();
+        return $result;
     }
 
     protected function deleteStudent(Request $request){
@@ -89,6 +93,22 @@ class AllUsersInfoController extends Controller
 
     protected function searchUsers(Request $request){
         return User::searchUsers($request);
+    }
+
+    protected function searchUsersForAdmin(Request $request){
+        $result = [];
+        if('All' == $request->college_id){
+            $allDepts = CollegeDept::all();
+            if(is_object($allDepts) && false == $allDepts->isEmpty()){
+                foreach($allDepts as $dept){
+                    $result['depts'][$dept->id] = $dept->name;
+                }
+            }
+        } else {
+            $result['depts']=[];
+        }
+        $result['users'] = User::searchUsersForAdmin($request);
+        return $result;
     }
 
     protected function userTestResults($id=NULL){
@@ -164,25 +184,106 @@ class AllUsersInfoController extends Controller
         return CourseCourse::getOnlineCoursesByUserIdByCategoryBySubCategory($request->student,$request->category,$request->subcategory);
     }
 
-    protected function userPlacement($id=NULL){
+    protected function collegePlacement(){
         $students = [];
         $collegeDepts = [];
-        $selectedStudent = '';
-        if(empty($id)){
-            $id = Session::get('admin_selected_user');
+        $userSkills = [];
+        $selectedCollege = Session::get('selected_college_placement_college');
+        $selectedYear = Session::get('selected_college_placement_year');
+        $selectedDept = Session::get('selected_college_placement_department');
+        if($selectedCollege > 0){
+            $collegeDepts = CollegeDept::where('college_id', $selectedCollege)->get();
         }
-        if($id > 0){
-            $selectedStudent = User::find($id);
-            if(!is_object($selectedStudent)){
-                return redirect()->back();
+        if($selectedCollege > 0){
+            $students = User::showPlacementVideoByDepartmentByYear($selectedCollege,$selectedDept,$selectedYear,User::Student);
+            $allSkills = Skill::all();
+            if(is_object($allSkills) && false == $allSkills->isEmpty()){
+                foreach($allSkills as $skill){
+                    $userSkills[$skill->id] = $skill->name;
+                }
             }
-            $collegeDepts = CollegeDept::where('college_id', $selectedStudent->college_id)->get();
-            $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
-            Session::set('admin_selected_user', $id);
-            Session::set('admin_selected_user_type', $selectedStudent->user_type);
         }
         $colleges = College::all();
-        return view('allUsers.userPlacement', compact('colleges', 'collegeDepts', 'students', 'selectedStudent'));
+        return view('allUsers.collegePlacement', compact('colleges', 'collegeDepts', 'students', 'selectedCollege','selectedYear','selectedDept','userSkills'));
+    }
+
+    protected function vchipPlacement(){
+        $students = [];
+        $collegeDepts = [];
+        $userSkills = [];
+        $selectedCollege = Session::get('selected_vchip_placement_college');
+        $selectedYear = Session::get('selected_vchip_placement_year');
+        $selectedDept = Session::get('selected_vchip_placement_department');
+        if($selectedCollege > 0){
+            $collegeDepts = CollegeDept::where('college_id', $selectedCollege)->get();
+        }
+        if($selectedCollege > 0){
+            $students = UserData::showVchipPlacementVideoByDepartmentByYear($selectedCollege,$selectedDept,$selectedYear);
+            $allSkills = Skill::all();
+            if(is_object($allSkills) && false == $allSkills->isEmpty()){
+                foreach($allSkills as $skill){
+                    $userSkills[$skill->id] = $skill->name;
+                }
+            }
+        }
+        $colleges = College::all();
+        return view('allUsers.vchipPlacement', compact('colleges', 'collegeDepts', 'students', 'selectedCollege','selectedYear','selectedDept','userSkills'));
+    }
+
+    protected function showCollegePlacementVideoByCollegeIdByDeptIdByYear(Request $request){
+        Session::set('selected_college_placement_college',$request->college_id);
+        Session::set('selected_college_placement_year',$request->year);
+        Session::set('selected_college_placement_department',$request->department);
+        $result['users'] = User::showPlacementVideoByDepartmentByYear($request->college_id,$request->department, $request->year, User::Student);
+        $allSkills = Skill::all();
+        if(is_object($allSkills) && false == $allSkills->isEmpty()){
+            foreach($allSkills as $skill){
+                $result['skills'][$skill->id] = $skill->name;
+            }
+        }
+        return $result;
+    }
+
+    protected function showVchipPlacementVideoByCollegeIdByDeptIdByYear(Request $request){
+        Session::set('selected_vchip_placement_college',$request->college_id);
+        Session::set('selected_vchip_placement_year',$request->year);
+        Session::set('selected_vchip_placement_department',$request->department);
+        $result['users'] = UserData::showVchipPlacementVideoByDepartmentByYear($request->college_id,$request->department, $request->year);
+        $allSkills = Skill::all();
+        if(is_object($allSkills) && false == $allSkills->isEmpty()){
+            foreach($allSkills as $skill){
+                $result['skills'][$skill->id] = $skill->name;
+            }
+        }
+        return $result;
+    }
+
+    protected function searchCollegeStudentByCollegeByDeptByYearByName(Request $request){
+        Session::set('selected_college_placement_college',$request->college_id);
+        Session::set('selected_college_placement_year',$request->year);
+        Session::set('selected_college_placement_department',$request->department);
+        $result['users'] = User::searchStudentByCollegeByDeptByYearByName($request);
+        $allSkills = Skill::all();
+        if(is_object($allSkills) && false == $allSkills->isEmpty()){
+            foreach($allSkills as $skill){
+                $result['skills'][$skill->id] = $skill->name;
+            }
+        }
+        return $result;
+    }
+
+    protected function searchVchipStudentByCollegeByDeptByYearByName(Request $request){
+        Session::set('selected_vchip_placement_college',$request->college_id);
+        Session::set('selected_vchip_placement_year',$request->year);
+        Session::set('selected_vchip_placement_department',$request->department);
+        $result['users'] = UserData::searchVchipStudentByCollegeByDeptByYearByName($request);
+        $allSkills = Skill::all();
+        if(is_object($allSkills) && false == $allSkills->isEmpty()){
+            foreach($allSkills as $skill){
+                $result['skills'][$skill->id] = $skill->name;
+            }
+        }
+        return $result;
     }
 
     protected function getStudentById(Request $request){
@@ -194,6 +295,7 @@ class AllUsersInfoController extends Controller
         $students = [];
         $collegeDepts = [];
         $selectedStudent = '';
+        $selectedStudentSkills = [];
         if(empty($id)){
             $id = Session::get('admin_selected_user');
         }
@@ -202,37 +304,74 @@ class AllUsersInfoController extends Controller
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
+            $selectedStudentSkills = explode(',', $selectedStudent->skills);
             $collegeDepts = CollegeDept::where('college_id', $selectedStudent->college_id)->get();
             $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
             Session::set('admin_selected_user', $id);
             Session::set('admin_selected_user_type', $selectedStudent->user_type);
         }
         $colleges = College::all();
-        return view('allUsers.userVideo', compact('colleges', 'collegeDepts', 'students', 'selectedStudent'));
+        $skills = Skill::all();
+        return view('allUsers.userVideo', compact('colleges', 'collegeDepts', 'students', 'selectedStudent','skills','selectedStudentSkills'));
     }
 
     protected function updateStudentVideo(Request $request){
-        $student = User::find($request->student);
-        if(is_object($student)){
-
-            $dom = new \DOMDocument;
-            $dom->loadHTML($request->recorded_video);
-            $iframes = $dom->getElementsByTagName('iframe');
-            foreach ($iframes as $iframe) {
-                $url =  '?enablejsapi=1';
-                if (strpos($iframe->getAttribute('src'), $url) === false) {
-                    $iframe->setAttribute('src', $iframe->getAttribute('src').$url);
+        DB::beginTransaction();
+        try
+        {
+            $student = User::getUserByUserIdByCollegeByDeptByYear($request);
+            if(is_object($student)){
+                $dom = new \DOMDocument;
+                $dom->loadHTML($request->recorded_video);
+                $iframes = $dom->getElementsByTagName('iframe');
+                foreach ($iframes as $iframe) {
+                    $url =  '?enablejsapi=1';
+                    if (strpos($iframe->getAttribute('src'), $url) === false) {
+                        $iframe->setAttribute('src', $iframe->getAttribute('src').$url);
+                    }
                 }
-            }
-            $html = $dom->saveHTML();
-            $body = explode('<body>', $html);
-            $body = explode('</body>', $body[1]);
+                $html = $dom->saveHTML();
+                $body = explode('<body>', $html);
+                $body = explode('</body>', $body[1]);
 
-            $student->recorded_video = $body[0];
-            $student->save();
-            Session::set('admin_selected_user', $student->id);
-            Session::set('admin_selected_user_type', $student->user_type);
-            return Redirect::to('admin/userVideo')->with('message', 'User updated successfully.');
+                $student->recorded_video = $body[0];
+
+                if($request->exists('resume')){
+                    $userStoragePath = "userStorage/".$student->id;
+                    if(!is_dir($userStoragePath)){
+                        mkdir($userStoragePath);
+                    }
+                    $userResume = $request->file('resume')->getClientOriginalName();
+                    if(!empty($student->resume) && file_exists($student->resume)){
+                        unlink($student->resume);
+                    }
+                    $request->file('resume')->move($userStoragePath, $userResume);
+                    $student->resume = $userStoragePath."/".$userResume;
+                }
+                $userSkills = '';
+                if(is_array($request->skills)){
+                    foreach($request->skills as $index => $skill){
+                        if(0 == $index){
+                            $userSkills = $skill;
+                        } else {
+                            $userSkills .= ','.$skill;
+                        }
+                    }
+                    $student->skills = $userSkills;
+                } else {
+                    $student->skills = $userSkills;
+                }
+                $student->save();
+                DB::commit();
+                Session::set('admin_selected_user', $student->id);
+                Session::set('admin_selected_user_type', $student->user_type);
+                return Redirect::to('admin/userVideo')->with('message', 'User updated successfully.');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return redirect()->back()->withErrors('something went wrong.');
         }
         return Redirect::to('admin/userVideo');
     }

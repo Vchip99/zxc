@@ -155,7 +155,7 @@
     if(user_type && college){
       $.ajax({
         method: "POST",
-        url: "{{url('admin/searchUsers')}}",
+        url: "{{url('admin/searchUsersForAdmin')}}",
         data:{college_id:college, user_type:user_type, department_id:selected_dept, selected_year:selected_year}
       })
       .done(function( msg ) {
@@ -195,7 +195,7 @@
       }
       $.ajax({
           method: "POST",
-          url: "{{url('admin/searchUsers')}}",
+          url: "{{url('admin/searchUsersForAdmin')}}",
           data:{college_id:college, user_type:user_type, department_id:selected_dept, selected_year:selected_year, student:student}
         })
         .done(function( msg ) {
@@ -339,8 +339,8 @@
   }
 
   function renderRecords(msg, body){
-    if( 0 < msg.length){
-      $.each(msg, function(idx, obj) {
+    if(msg['users'].length > 0){
+      $.each(msg['users'], function(idx, obj) {
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = idx + 1;
@@ -355,7 +355,11 @@
         eleTr.appendChild(eleName);
         if(obj.college_id > 0 && 2 == obj.user_type || 3 == obj.user_type || 4 == obj.user_type){
           var eleDept = document.createElement('td');
-          eleDept.innerHTML = obj.department;
+          if(obj.department){
+            eleDept.innerHTML = obj.department;
+          } else {
+            eleDept.innerHTML = msg['depts'][obj.college_dept_id];
+          }
           eleTr.appendChild(eleDept);
 
           if(2 == obj.user_type ){
@@ -367,7 +371,11 @@
           var eleDept = document.createElement('td');
           eleDept.innerHTML = obj.other_source;
           eleTr.appendChild(eleDept);
-          if(obj.roll_no){
+          if(msg['depts']){
+            var eleRollNo = document.createElement('td');
+            eleRollNo.innerHTML = obj.roll_no;
+            eleTr.appendChild(eleRollNo);
+          } else if(obj.roll_no){
             var eleRollNo = document.createElement('td');
             eleRollNo.innerHTML = obj.roll_no;
             eleTr.appendChild(eleRollNo);
@@ -393,8 +401,8 @@
           eleModel.setAttribute('role', 'dialog');
           var urlStudentTest = "{{url('admin/userTestResults')}}/"+obj.id;
           var urlStudentCourse = "{{url('admin/userCourses')}}/"+obj.id;
-          var urlStudentPlacement = "{{url('admin/userPlacement')}}/"+obj.id;
-          var urlStudentVideo = "{{url('admin/userVideo')}}/"+obj.id;
+          // var urlStudentPlacement = "{{url('admin/userPlacement')}}/"+obj.id;
+          // var urlStudentVideo = "{{url('admin/userVideo')}}/"+obj.id;
           var modelInnerHTML = '';
           modelInnerHTML='<div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button>';
           if(2 == obj.user_type ){
@@ -413,10 +421,10 @@
             modelInnerHTML +='<div class="form-group"><label>Year:</label> '+obj.year+'</div>';
           }
           modelInnerHTML +='<div class="form-group"><label>Email:</label> '+obj.email+'</div><div class="form-group"><label>Phone:</label> '+obj.phone+'</div><div class="form-group"><a href="'+urlStudentTest+'">Test Result</a></div><div class="form-group"><a href="'+urlStudentCourse+'">Course</a></div>';
-          if(2 == obj.user_type ){
-            modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
-            modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Student Video Url</a></div>';
-          }
+          // if(2 == obj.user_type ){
+          //   modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
+          //   modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Student Video Url</a></div>';
+          // }
           modelInnerHTML +='</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div>';
           eleModel.innerHTML = modelInnerHTML;
           eleTr.appendChild(eleModel);

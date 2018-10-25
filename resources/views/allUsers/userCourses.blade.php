@@ -105,6 +105,8 @@
               <option value="0">All</option>
              </select>
             </div>
+            <a href="{{ url('admin/userTestResults')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title=" Test Result"><i class="fa fa-files-o"></i></a>&nbsp;
+            <a href="{{ url('admin/userCourses')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="Courses"><i class="fa fa-dashboard"></i></a>
           </div>
           <div class="col-lg-12" id="all-result">
             <div class="panel panel-info">

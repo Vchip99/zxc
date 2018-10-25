@@ -261,13 +261,33 @@ class User extends Authenticatable
 
     protected static function searchStudentByDeptByYearByName(Request $request){
         $user = Auth::user();
-        return static::where('users.college_id', $user->college_id)
-                    ->where('users.college_dept_id', $request->department)
-                    ->where('users.year', $request->year)
+        $result =   static::where('users.college_id', $user->college_id)
                     ->where('users.name', 'LIKE', '%'.$request->student.'%')
                     ->where('users.user_type', self::Student)
-                    ->whereNotNUll('resume')
-                    ->select('users.id','users.name','users.email','users.recorded_video','users.resume','users.skills')
+                    ->whereNotNUll('resume');
+        if($request->department > 0){
+            $result->where('users.college_dept_id', $request->department);
+        }
+        if($request->year > 0){
+            $result->where('users.year', $request->year);
+        }
+        return $result->select('users.id','users.name','users.email','users.recorded_video','users.resume','users.skills')
+                    ->get();
+    }
+
+
+    protected static function searchStudentByCollegeByDeptByYearByName(Request $request){
+        $result =   static::where('users.college_id', $request->college_id)
+                    ->where('users.name', 'LIKE', '%'.$request->student.'%')
+                    ->where('users.user_type', self::Student)
+                    ->whereNotNUll('resume');
+        if($request->department > 0){
+            $result->where('users.college_dept_id', $request->department);
+        }
+        if($request->year > 0){
+            $result->where('users.year', $request->year);
+        }
+        return $result->select('users.id','users.name','users.email','users.recorded_video','users.resume','users.skills')
                     ->get();
     }
 
@@ -402,7 +422,7 @@ class User extends Authenticatable
     }
 
     protected static function showOtherStudents(){
-        return static::where('college_id', 'other')->select('id', 'name', 'email', 'phone', 'admin_approve', 'other_source', 'college_id', 'user_type', 'recorded_video')->get();
+        return static::where('college_id', 'other')->select('id', 'name', 'email', 'phone', 'admin_approve', 'other_source', 'college_id', 'user_type', 'recorded_video','roll_no')->get();
     }
 
     protected static function searchUsers(Request $request){
@@ -414,7 +434,7 @@ class User extends Authenticatable
         if('other' == $collegeId){
             return static::where('users.college_id', $collegeId)
                         ->where('users.name', 'LIKE', '%'.$userName.'%')
-                        ->select('id', 'name', 'email', 'phone', 'admin_approve', 'other_source', 'college_id', 'user_type', 'recorded_video')->get();
+                        ->select('id', 'name', 'email', 'phone', 'admin_approve', 'other_source', 'college_id', 'user_type', 'recorded_video','roll_no')->get();
         } else {
             if(self::Directore == $userType || self::TNP == $userType){
                 $student = static::where('users.user_type', $userType);
@@ -445,6 +465,34 @@ class User extends Authenticatable
                 return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.user_type','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department','users.other_source')
                                 ->get();
             }
+        }
+    }
+
+    protected static function searchUsersForAdmin(Request $request){
+        $collegeId = $request->college_id;
+        $departmentId = $request->department_id;
+        $userType = $request->user_type;
+        $year = $request->selected_year;
+
+        if($collegeId > 0){
+            $student = static::join('college_depts', 'college_depts.id', '=', 'users.college_dept_id')
+                    ->where('users.user_type', $userType)
+                    ->where('users.college_id', $collegeId);
+        } else {
+            $student = static::where('users.user_type', $userType);
+        }
+        if($departmentId > 0){
+            $student->where('users.college_dept_id', $departmentId);
+        }
+        if($year > 0){
+            $student->where('users.year', $year);
+        }
+        if($collegeId > 0){
+            return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.user_type','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department','users.other_source')
+                            ->get();
+        } else {
+            return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.user_type','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','users.other_source')
+                            ->get();
         }
     }
 
@@ -648,5 +696,15 @@ class User extends Authenticatable
             ->where('college_offline_papers.college_id', $loginUser->college_id)
             ->where('users.user_type', self::Student)->where('users.admin_approve', 1)
             ->select('users.id','users.name','college_offline_papers.marks')->get();
+    }
+
+    protected static function getUserByUserIdByCollegeByDeptByYear(Request $request){
+        $college = $request->get('college');
+        $department = $request->get('department');
+        $year = $request->get('year');
+        $student = $request->get('student');
+        return static::where('id', $student)->where('college_id',$college)
+                ->where('college_dept_id',$department)
+                ->where('year',$year)->first();
     }
 }

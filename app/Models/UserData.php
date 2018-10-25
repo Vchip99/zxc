@@ -126,4 +126,18 @@ class UserData extends Model
         }
         return $result->select('user_datas.id','users.name','users.email','user_datas.youtube','user_datas.resume','user_datas.skill_ids','user_datas.education','user_datas.experiance','user_datas.company')->get();
     }
+
+    protected static function searchVchipStudentByCollegeByDeptByYearByName(Request $request){
+        $result = static::join('users','users.id','=','user_datas.user_id')
+                    ->where('users.college_id', $request->college_id)
+                    ->where('users.user_type', User::Student)
+                    ->where('users.name', 'LIKE', '%'.$request->student.'%');
+        if($request->department > 0){
+            $result->where('users.college_dept_id', $request->department);
+        }
+        if($request->year > 0){
+            $result->where('users.year', $request->year);
+        }
+        return $result->select('user_datas.id','users.name','users.email','user_datas.youtube','user_datas.resume','user_datas.skill_ids','user_datas.education','user_datas.experiance','user_datas.company')->get();
+    }
 }

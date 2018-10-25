@@ -8,27 +8,27 @@
       <li class="active"> User Video Url </li>
     </ol>
   </section>
-  @if(Session::has('message'))
-    <div class="alert alert-success" id="message">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        {{ Session::get('message') }}
-    </div>
-  @endif
 @stop
 @section('admin_content')
   <div class="content-wrapper v-container tab-content" >
     <div id="student-rcd" class="">
       <div class="top mrgn_40_btm">
-        <div class="container">
+        <div class="container admin_div">
+        @if(Session::has('message'))
+          <div class="alert alert-success" id="message">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+              {{ Session::get('message') }}
+          </div>
+        @endif
+          <form action="{{url('admin/updateStudentVideo')}}" method="POST" enctype="multipart/form-data">
+          {{ method_field('PUT') }}
+          <input type="hidden" id="student_id" name="student" value="{{($selectedStudent)?$selectedStudent->id:null}}">
+          {{ csrf_field() }}
           <div class="row">
+            <label class="col-sm-2 col-form-label" >College:</label>
             <div class="col-md-3 mrgn_10_btm">
-              <select class="form-control" id="college" name="college" onChange="showDepartments();">
-                <option value="0"> Select College </option>
-                @if(is_object($selectedStudent) && 'other' == $selectedStudent->college_id)
-                  <option value="other" selected="true">Other</option>
-                @else
-                  <option value="other">Other</option>
-                @endif
+              <select class="form-control" id="college" name="college" onChange="showDepartments();" required>
+                <option value=""> Select College </option>
                 @if(count($colleges) > 0)
                   @foreach($colleges as $college)
                     @if(is_object($selectedStudent) && $selectedStudent->college_id == $college->id)
@@ -40,13 +40,12 @@
                 @endif
               </select>
             </div>
-            @if(is_object($selectedStudent) && ('other' == $selectedStudent->college_id || 5 == $selectedStudent->user_type || 6 == $selectedStudent->user_type))
-              <div class="col-md-3 mrgn_10_btm hide" id="dept">
-            @else
-              <div class="col-md-3 mrgn_10_btm" id="dept">
-            @endif
-              <select class="form-control" id="selected_dept" name="departemnt" onChange="resetYear();">
-                <option value="0"> Select Departemnt </option>
+          </div>
+          <div class="row">
+            <label class="col-sm-2 col-form-label" >Department:</label>
+            <div class="col-md-3 mrgn_10_btm" id="dept">
+              <select class="form-control" id="selected_dept" name="department" onChange="resetYear();" required>
+                <option value=""> Select Departemnt </option>
                 @if(is_object($selectedStudent) && count($collegeDepts) > 0)
                   @foreach($collegeDepts as $collegeDept)
                     @if($selectedStudent->college_dept_id == $collegeDept->id)
@@ -58,22 +57,24 @@
                 @endif
               </select>
             </div>
-            @if(is_object($selectedStudent) && ('other' == $selectedStudent->college_id || 4 == $selectedStudent->user_type || 5 == $selectedStudent->user_type || 6 == $selectedStudent->user_type))
-              <div class="col-md-3 mrgn_10_btm hide" id="showYears">
-            @else
-              <div class="col-md-3 mrgn_10_btm" id="showYears">
-            @endif
-              <select class="form-control" id="selected_year" name="year" onChange="showStudents(this.value);">
-                <option value="0"> Select Year </option>
+          </div>
+          <div class="row">
+            <label class="col-sm-2 col-form-label" >Year:</label>
+            <div class="col-md-3 mrgn_10_btm" id="showYears">
+              <select class="form-control" id="selected_year" name="year" onChange="showStudents(this.value);" required>
+                <option value=""> Select Year </option>
                   <option value="1" @if(is_object($selectedStudent) &&'1' == $selectedStudent->year) selected="true" @endif >First Year</option>
                   <option value="2" @if(is_object($selectedStudent) &&'2' == $selectedStudent->year) selected="true" @endif >Second Year</option>
                   <option value="3" @if(is_object($selectedStudent) &&'3' == $selectedStudent->year) selected="true" @endif >Third Year</option>
                   <option value="4" @if(is_object($selectedStudent) &&'4' == $selectedStudent->year) selected="true" @endif >Fourth Year</option>
               </select>
             </div>
+          </div>
+          <div class="row">
+            <label class="col-sm-2 col-form-label" >Student:</label>
             <div class="col-md-3 mrgn_10_btm" id="student">
-              <select class="form-control" id="selected_student" name="student" onChange="showResult();">
-                <option value="0"> Select User </option>
+              <select class="form-control" id="selected_student" name="student" onChange="showResult();" required>
+                <option value=""> Select User </option>
                  @if(is_object($selectedStudent) && count($students) > 0)
                   @foreach($students as $student)
                     @if($selectedStudent->year == $student->year)
@@ -86,43 +87,56 @@
                   @endforeach
                 @endif
               </select>
-              </select>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="container">
         <div class="row">
-          <div class="container admin_div">
-              <form action="{{url('admin/updateStudentVideo')}}" method="POST">
-              {{ method_field('PUT') }}
-              <input type="hidden" id="student_id" name="student" value="{{($selectedStudent)?$selectedStudent->id:null}}">
-
-              {{ csrf_field() }}
-              <div class="form-group row">
-                <label class="col-sm-2 col-form-label" for="category">Video Url:</label>
-                <div class="col-sm-3">
-                  <input type="text" class="form-control" id="recorded_video" name="recorded_video" value="{{($selectedStudent)?$selectedStudent->recorded_video:null}}" required="true">
-                </div>
-              </div>
-              <div class="form-group row">
-                <div class="col-sm-2" title="Submit">
-                  <button type="submit" class="btn btn-primary" style="width: 100px;">Submit</button>
-                </div>
-              </div>
-              </form>
+          <label class="col-sm-2 col-form-label" for="category">Video Url:</label>
+          <div class="col-sm-3  mrgn_10_btm">
+            <input type="text" class="form-control" id="recorded_video" name="recorded_video" value="{{($selectedStudent)?$selectedStudent->recorded_video:null}}" required="true">
           </div>
         </div>
-      </div>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label" >Resume:</label>
+          <div class="col-sm-3  mrgn_10_btm">
+            <input type="file" name="resume" id="resume" class="form-control">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label" >Selected Resume:</label>
+          <div class="col-sm-3  mrgn_10_btm">
+            <span id="selectedResume"> {{($selectedStudent)?basename($selectedStudent->resume):null}}</span>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label" >Skills:</label>
+          <div class="col-sm-10  mrgn_10_btm">
+            @if(count($skills) > 0)
+              @foreach($skills as $skill)
+                @if(in_array($skill->id,$selectedStudentSkills))
+                  <input type="checkbox" class="userKills" name="skills[]" value="{{$skill->id}}" id="skill-{{$skill->id}}" checked> {{$skill->name}}
+                @else
+                  <input type="checkbox" class="userKills" name="skills[]" value="{{$skill->id}}" id="skill-{{$skill->id}}" > {{$skill->name}}
+                @endif
+              @endforeach
+            @endif
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-2" title="Submit">
+            <button type="submit" class="btn btn-primary" style="width: 100px;">Submit</button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 <script type="text/javascript">
   function resetYear(){
-    document.getElementById('selected_year').value = 0;
-    document.getElementById('selected_student').value = 0;
+    document.getElementById('selected_year').selectedIndex = '';
+    document.getElementById('selected_student').selectedIndex = '';
     document.getElementById('student_id').value = 0;
     document.getElementById('recorded_video').value = '';
     unsetStudent();
+    resetSkills();
   }
 
   function showResult(ele){
@@ -133,15 +147,34 @@
           data: {student:student}
       })
       .done(function( msg ) {
-        if(msg.recorded_video){
-          document.getElementById('student_id').value = msg.id;
-          document.getElementById('recorded_video').value = msg.recorded_video;
+        document.getElementById('recorded_video').value = msg.recorded_video;
+        if(msg.resume){
+          document.getElementById('selectedResume').innerHTML = msg.resume.split('/').reverse()[0];
         } else {
-          document.getElementById('student_id').value = msg.id;
-          document.getElementById('recorded_video').value = 'Enter video url';
+          document.getElementById('selectedResume').innerHTML = '';
+        }
+        if(msg.skills){
+          var skills = msg.skills.split(',');
+          $.each(skills,function(idx,skill){
+            if($('#skill-'+skill)){
+              $('#skill-'+skill).prop('checked', true);
+            }
+          });
+        } else {
+          $.each($('.userKills'),function(idx,skill){
+            $(skill).prop('checked', false);
+          });
         }
     });
   }
+
+  function resetSkills(){
+    document.getElementById('selectedResume').innerHTML = '';
+    $.each($('.userKills'),function(idx,skill){
+      $(skill).prop('checked', false);
+    });
+  }
+
   function showStudents(){
     var college = document.getElementById('college').value;
     var user_type = 2;
@@ -161,7 +194,7 @@
         select = document.getElementById('selected_student');
         select.innerHTML = '';
         var opt = document.createElement('option');
-        opt.value = '0';
+        opt.value = '';
         opt.innerHTML = 'Select User';
         select.appendChild(opt);
         if( 0 < msg.length){
@@ -197,7 +230,7 @@
         select = document.getElementById('selected_dept');
         select.innerHTML = '';
         var opt = document.createElement('option');
-        opt.value = '0';
+        opt.value = '';
         opt.innerHTML = 'Select Department';
         select.appendChild(opt);
         if( 0 < msg.length){
@@ -210,44 +243,22 @@
         }
       });
     } else {
-      document.getElementById('dept').classList.add('hide');
-      document.getElementById('showYears').classList.add('hide');
-      showStudents();
+      select = document.getElementById('selected_dept');
+      select.innerHTML = '';
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.innerHTML = 'Select Department';
+      select.appendChild(opt);
     }
-  }
-
-  function selectSubcategory(ele){
-    id = parseInt($(ele).val());
-    if( 0 < id ){
-      $.ajax({
-            method: "POST",
-            url: "{{url('getSubCategories')}}",
-            data: {id:id}
-        })
-        .done(function( msg ) {
-          select = document.getElementById('subcategory');
-          select.innerHTML = '';
-          var opt = document.createElement('option');
-          opt.value = '0';
-          opt.innerHTML = 'Select Sub Category';
-          select.appendChild(opt);
-          if( 0 < msg.length){
-            $.each(msg, function(idx, obj) {
-                var opt = document.createElement('option');
-                opt.value = obj.id;
-                opt.innerHTML = obj.name;
-                select.appendChild(opt);
-            });
-          }
-      });
-    }
+    document.getElementById('selected_year').selectedIndex = '';
+    resetSkills();
   }
 
   function unsetStudent(){
     select = document.getElementById('selected_student');
     select.innerHTML = '';
     var opt = document.createElement('option');
-    opt.value = '0';
+    opt.value = '';
     opt.innerHTML = 'Select User';
     select.appendChild(opt);
   }

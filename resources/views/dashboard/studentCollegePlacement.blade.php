@@ -200,8 +200,8 @@
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="dept" onChange="resetYear(this);">
                 <option value="0"> Select Department </option>
-                <option value="All"> All </option>
-                @if($department > 0 && count($collegeDepts) > 0)
+                <option value="All" @if('All' == $department) selected="true" @endif> All </option>
+                @if(count($collegeDepts) > 0)
                   @foreach($collegeDepts as $collegeDept)
                     @if($department == $collegeDept->id)
                       <option value="{{$collegeDept->id}}" selected="true">{{$collegeDept->name}}</option>
@@ -219,7 +219,7 @@
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="selected_year" name="year" onChange="showStudents(this);">
                 <option value="0"> Select Year </option>
-                <option value="All"> All </option>
+                <option value="All" @if('All' == $year) selected="true" @endif> All </option>
                 <option value="1" @if('1' == $year) selected="true" @endif >First Year</option>
                 <option value="2" @if('2' == $year) selected="true" @endif >Second Year</option>
                 <option value="3" @if('3' == $year) selected="true" @endif >Third Year</option>
@@ -288,10 +288,10 @@
 
   function searchStudent(){
     var student = document.getElementById('student').value;
-    var year = parseInt(document.getElementById('selected_year').value);
-    var department = parseInt(document.getElementById("dept").value);
+    var year = document.getElementById('selected_year').value;
+    var department = document.getElementById("dept").value;
     document.getElementById('allUsers').innerHTML = '';
-    if(department > 0 && year > 0 && student.length > 0){
+    if(department && year && student.length > 0){
       $.ajax({
           method: "POST",
           url: "{{url('searchStudentByDeptByYearByName')}}",
