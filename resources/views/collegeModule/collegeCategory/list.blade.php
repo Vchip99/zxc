@@ -24,6 +24,7 @@
       </div>
     @endif
     <div class="form-group row">
+      <b>*</b> - Category is commom for Online Courses, Online Test and Vkit
       <div id="addCategoryDiv">
         <a id="addCategory" href="{{url('college/'.Session::get('college_user_url').'/createCollegeCategory')}}" type="button" class="btn btn-primary" style="float: right;" title="Add New Category">Add New Category</a>&nbsp;&nbsp;
       </div>

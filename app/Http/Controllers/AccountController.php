@@ -679,6 +679,7 @@ class AccountController extends Controller
         $loginUser = Auth::user();
         $collegeDepts = [];
         $collegeDeptNames = [];
+        $collegeAllDeptNames = [];
         if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
             $deptIds = explode(',',$loginUser->assigned_college_depts);
             $collegeDepts = CollegeDept::getDepartmentsByCollegeIdByDeptIds($loginUser->college_id,$deptIds);
@@ -687,11 +688,18 @@ class AccountController extends Controller
                     $collegeDeptNames[$collegeDept->id] = $collegeDept->name;
                 }
             }
+            $collegeAllDepts = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
+            if(is_object($collegeAllDepts) && false == $collegeAllDepts->isEmpty()){
+                foreach($collegeAllDepts as $collegeDept){
+                    $collegeAllDeptNames[$collegeDept->id] = $collegeDept->name;
+                }
+            }
         } else {
             $collegeDepts = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
             if(is_object($collegeDepts) && false == $collegeDepts->isEmpty()){
                 foreach($collegeDepts as $collegeDept){
                     $collegeDeptNames[$collegeDept->id] = $collegeDept->name;
+                    $collegeAllDeptNames[$collegeDept->id] = $collegeDept->name;
                 }
             }
         }
@@ -700,10 +708,11 @@ class AccountController extends Controller
         $selectedDept = Session::get('user_info_selected_department');
         $selectedYear = Session::get('user_info_selected_year');
         $selectedUserType = Session::get('user_info_selected_user_type');
-        if(!empty($selectedUserType) && !empty($selectedDept) && !empty($selectedYear)){
+
+        if(isset($selectedUserType) && isset($selectedDept) && isset($selectedYear)){
             $users = User::getUsersByUserTypeByDeptIdByYear($selectedUserType,$selectedDept,$selectedYear);
         }
-        return view('dashboard.students', compact('collegeDepts','selectedDept','selectedYear','selectedUserType','users','collegeDeptNames'));
+        return view('dashboard.students', compact('collegeDepts','selectedDept','selectedYear','selectedUserType','users','collegeDeptNames','collegeAllDeptNames'));
     }
 
     protected function changeApproveStatus(Request $request){
@@ -735,7 +744,7 @@ class AccountController extends Controller
         Session::put('user_info_selected_department',$request->department);
         Session::put('user_info_selected_year',$request->year);
         Session::put('user_info_selected_user_type',$request->user_type);
-        if(2 == $request->user_type){
+        if(User::Student == $request->user_type){
             $result['assignDepts'] = CollegeDept::find(explode(',', $user->assigned_college_depts));
         }
         return $result;

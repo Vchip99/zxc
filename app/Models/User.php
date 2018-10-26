@@ -227,23 +227,27 @@ class User extends Authenticatable
 
     protected static function searchStudent(Request $request){
         $user = Auth::user();
-        $student = static::join('college_depts', 'college_depts.id', '=', 'users.college_dept_id')
-                    ->where('users.college_id', $user->college_id);
-        if($request->department > 0){
-            $student->where('users.college_dept_id', $request->department);
-        } else if(3 == $user->user_type || 4 == $user->user_type){
-            $student->whereIn('users.college_dept_id', explode(',', $user->assigned_college_depts));
+        if(6 == $request->user_type){
+            return static::where('college_id', $user->college_id)->where('user_type', $request->user_type)->get();
+        } else {
+            $student = static::join('college_depts', 'college_depts.id', '=', 'users.college_dept_id')
+                        ->where('users.college_id', $user->college_id);
+            if($request->department > 0){
+                $student->where('users.college_dept_id', $request->department);
+            } else if(3 == $user->user_type || 4 == $user->user_type){
+                $student->whereIn('users.college_dept_id', explode(',', $user->assigned_college_depts));
+            }
+            if($request->user_type > 0){
+                $student->where('users.user_type', $request->user_type);
+            }
+            if($request->year > 0){
+                $student->where('users.year', $request->year);
+            }
+            if(!empty($request->student)){
+                $student->where('users.name', 'LIKE', '%'.$request->student.'%');
+            }
+            return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department','users.assigned_college_depts')->get();
         }
-        if($request->user_type > 0){
-            $student->where('users.user_type', $request->user_type);
-        }
-        if($request->year > 0){
-            $student->where('users.year', $request->year);
-        }
-        if(!empty($request->student)){
-            $student->where('users.name', 'LIKE', '%'.$request->student.'%');
-        }
-        return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department','users.assigned_college_depts')->get();
     }
 
     protected static function assignDepatementsToUser(Request $request){

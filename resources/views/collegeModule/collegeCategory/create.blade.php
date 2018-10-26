@@ -16,6 +16,7 @@
 </section>
 @stop
 @section('dashboard_content')
+    * Category is commom for Online Courses, Online Test and Vkit
   <div class="container admin_div">
   @if(isset($collegeCategory->id))
     <form action="{{url('college/'.Session::get('college_user_url').'/updateCollegeCategory')}}" method="POST" id="submitForm">
