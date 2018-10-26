@@ -577,6 +577,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('/college/{college}/lecturerPapers/{id?}', 'AccountController@lecturerPapers');
 	Route::get('/college/{college}/lecturerCourses/{id?}', 'AccountController@lecturerCourses');
 	Route::put('/college/{college}/updateProfile', 'AccountController@updateProfile');
+	Route::put('/college/{college}/updateUserProfile', 'AccountController@updateUserProfile');
 	Route::post('showStudentsByDepartmentByYear', 'AccountController@showStudentsByDepartmentByYear');
 	Route::post('getStudentById', 'AccountController@getStudentById');
 	Route::post('showStudentCourses', 'AccountController@showStudentCourses');

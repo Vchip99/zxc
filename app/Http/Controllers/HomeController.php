@@ -86,6 +86,15 @@ class HomeController extends Controller
      *  show home
      */
     public function home(Request $request){
+        $loginUser = Auth::user();
+        if(is_object($loginUser)){
+            if($loginUser->college_id > 0){
+                $collegeUrl = $loginUser->college->url;
+            } else {
+                $collegeUrl = 'other';
+            }
+            Session::put('college_user_url',$collegeUrl);
+        }
         return view('layouts.home');
     }
 
@@ -300,7 +309,7 @@ class HomeController extends Controller
     protected function verifyEmail(Request $request){
         $email = $request->get('email');
         if(!empty($email)){
-            $user = User::where('email', $email)->where('verified', 0)->first();
+            $user = User::where('email', Auth::user()->email)->where('verified', 0)->first();
             if(is_object($user)){
                 DB::beginTransaction();
                 try
@@ -313,7 +322,7 @@ class HomeController extends Controller
                     Mail::to($user->email)->send($email);
                     DB::commit();
                     if("profile" == array_reverse(explode('/', URL::previous()))[0]){
-                        return redirect('profile')->with('message', 'Verification email sent successfully. please check email and verify.');
+                        return redirect('college/'.Session::get('college_user_url').'/profile')->with('message', 'Verification email sent successfully. please check email and verify.');
                     } else {
                         return redirect('/')->with('message', 'Verify your email for your account activation.');
                     }

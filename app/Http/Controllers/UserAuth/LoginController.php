@@ -89,6 +89,12 @@ class LoginController extends Controller
                 Cache::put('vchip:chatAdminLive', true, 60);
             }
             $request->session()->regenerate();
+            if($this->guard('user')->user()->college_id > 0){
+                $collegeUrl = $this->guard('user')->user()->college->url;
+            } else {
+                $collegeUrl = 'other';
+            }
+            Session::put('college_user_url',$collegeUrl);
             return 'true';
         } else {
             return 'false';

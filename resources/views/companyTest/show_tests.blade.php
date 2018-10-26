@@ -447,9 +447,9 @@
 			        <div id="" >
 			          	<div class="panel-body">
 			          		<ol>
-			          			<li>On every alternative week-end, we conduct Online Virtual placement drive.</li>
-			          			<li>At first, on every Saturday, we conduct online aptitude test according to pattern of most of companies.</li>
-			          			<li>On Sunday, we conduct interview of selected students on skype.</li>
+			          			<li>In first week of every month, we conduct Online Virtual placement drive</li>
+			          			<li>At first, on 1st of every month, we conduct online aptitude test according to pattern of most of companies.</li>
+			          			<li>On week-end of same week, we conduct interview of selected students on skype.</li>
 			          			<li>Record these interviews and put on our platform, so our partner companies will go through it. If they like the performance then they can directly call for second round.</li>
 			          		</ol>
 						</div>

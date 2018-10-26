@@ -51,37 +51,40 @@
                               <fieldset>
                                 <div class="form-group row">
                                   <label>Name:</label>
-                                  <input class="form-control" placeholder="name" name="name" type="text" value="{{$loginUser->name}}">
+                                  <input class="form-control" placeholder="name" name="name" type="text" value="{{$loginUser->name}}" required>
                                 </div>
-                                <div class="form-group @if ($errors->has('college')) has-error @endif">
-                                  <label>College:</label>
-                                    <select class="form-control  slt mrgn_20_top" id="clg" name="college" onChange="getDepartment(this);">
-                                      <option value="0">Select College Name</option>
-                                      <option value="other" id="other" @if('other' == $loginUser->college_id) selected @endif >Other</option>
-                                      @if(count($colleges) > 0)
-                                        @foreach($colleges as $college)
-                                          <option value="{{$college->id}}" @if($college->id == $loginUser->college_id) selected @endif >{{$college->name}}</option>
+                                @if(2 == $loginUser->user_type && 'other' == $loginUser->college_id)
+                                  <div class="form-group @if ($errors->has('college')) has-error @endif">
+                                    <label>College:</label>
+                                      <select class="form-control  slt mrgn_20_top" id="clg" name="college" onChange="getDepartment(this);" required>
+                                        <option value="">Select College Name</option>
+                                        <option value="other" id="other" @if('other' == $loginUser->college_id) selected @endif >Other</option>
+                                        @if(count($colleges) > 0)
+                                          @foreach($colleges as $college)
+                                            <option value="{{$college->id}}" @if($college->id == $loginUser->college_id) selected @endif >{{$college->name}}</option>
+                                          @endforeach
+                                        @endif
+                                      </select>
+                                      <p class="help-block hide" id="college_error" style="color: red;">Please select college.</p>
+                                  </div>
+                                  <div class="form-group @if ($errors->has('department')) has-error @endif" id="deptDiv" >
+                                    <label>Department:</label>
+                                    <select class="form-control  slt mrgn_20_top" name="department" id="dept" required>
+                                      <option value="">Select Department</option>
+                                      @if(count($collegeDepts) > 0)
+                                        @foreach($collegeDepts as $collegeDept)
+                                          <option value="{{$collegeDept->id}}" @if($collegeDept->id == $loginUser->college_dept_id) selected @endif >{{$collegeDept->name}}</option>
                                         @endforeach
                                       @endif
                                     </select>
-                                    <p class="help-block hide" id="college_error" style="color: red;">Please select college.</p>
-                                </div>
-                                <div class="form-group @if ($errors->has('department')) has-error @endif @if(5 == $loginUser->user_type || 6 == $loginUser->user_type) hide @endif" id="deptDiv" >
-                                  <label>Department:</label>
-                                  <select class="form-control  slt mrgn_20_top" name="department" id="dept" >
-                                    <option value="0">Select Department</option>
-                                    @if(count($collegeDepts) > 0)
-                                      @foreach($collegeDepts as $collegeDept)
-                                        <option value="{{$collegeDept->id}}" @if($collegeDept->id == $loginUser->college_dept_id) selected @endif >{{$collegeDept->name}}</option>
-                                      @endforeach
-                                    @endif
-                                  </select>
-                                  <p class="help-block hide" id="department_error" style="color: red;">Please select department.</p>
-                                </div>
-                                  <div class="form-group @if ($errors->has('year')) has-error @endif @if(2 != $loginUser->user_type) hide @endif" id="year" >
+                                    <p class="help-block hide" id="department_error" style="color: red;">Please select department.</p>
+                                  </div>
+                                @endif
+                                @if(2 == $loginUser->user_type)
+                                  <div class="form-group @if ($errors->has('year')) has-error @endif " id="year" >
                                     <label>Year:</label>
-                                    <select class="form-control  slt mrgn_20_top" name="year">
-                                      <option value="0">Select Year</option>
+                                    <select class="form-control  slt mrgn_20_top" name="year" required>
+                                      <option value="">Select Year</option>
                                       <option value="1" @if(1 == $loginUser->year) selected @endif >First Year</option>
                                       <option value="2" @if(2 == $loginUser->year) selected @endif >Second Year </option>
                                       <option value="3" @if(3 == $loginUser->year) selected @endif >Third Year</option>
@@ -89,7 +92,7 @@
                                     </select>
                                     <p class="help-block hide" id="year_error" style="color: red;">Please select year.</p>
                                   </div>
-                                  <div class="form-group mrgn_20_top @if ($errors->has('rollno')) has-error @endif @if(2 != $loginUser->user_type) hide @endif" id="rollNo">
+                                  <div class="form-group mrgn_20_top @if ($errors->has('rollno')) has-error @endif " id="rollNo">
                                     <label>Roll No:</label>
                                     <input type="number" class="form-control" name="roll_no" id="roll" value="{{$loginUser->roll_no}}" placeholder="Roll No."  min="0" />
                                     <span class="help-block"></span>
@@ -100,16 +103,19 @@
                                     <input type="text" class="form-control" name="other_source" id="other_source_input" value="" placeholder="college/company name" />
                                     <p class="help-block hide" id="other_source_error" style="color: red;">Please enter college/company name.</p>
                                   </div>
+                                @endif
                                 <div class="form-group">
                                   <label>Photo:</label>
                                   <input class="form-control" placeholder="Mobile No." name="photo" type="file">
                                   <label>Existing Photo:</label> {{basename($loginUser->photo)}}
                                 </div>
-                                <div class="form-group @if(2 != $loginUser->user_type) hide @endif">
+                                @if(2 == $loginUser->user_type)
+                                <div class="form-group">
                                   <label>Resume:</label>
                                   <input class="form-control" placeholder="Mobile No." name="resume" type="file">
                                   <label>Existing Resume:</label> {{basename($loginUser->resume)}}
                                 </div>
+                                @endif
                                 <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
                                 <button class="btn btn-info" type="submit">Submit</button>
                               </fieldset>
@@ -196,32 +202,14 @@
                               </div>
                             @else
                               @if(0 == $loginUser->verified && filter_var($loginUser->email, FILTER_VALIDATE_EMAIL))
-                              <a href="#verifyEmail" data-toggle="modal" style="float: right;">Please Verify</a>
+                                <a style="float: right;" onclick="sendVerifyEmail();">Please Verify &nbsp; </a>
+                                <a href="#updateEmail" data-toggle="modal" style="float: right;">Update Email &nbsp; | &nbsp;</a>
                               @endif
-                              <a href="#updateEmail" data-toggle="modal" style="float: right;">Update Email &nbsp;</a>
-                              <div id="verifyEmail" class="modal fade" role="dialog">
-                                <div class="modal-dialog modal-sm">
-                                  <div class="modal-content">
-                                    <div class="modal-header">
-                                      <button class="close" data-dismiss="modal">×</button>
-                                      <h2  class="modal-title">Verify Email</h2>
-                                    </div>
-                                    <div class="modal-body">
-                                      <div class="">
-                                        <form action="{{url('verifyEmail')}}" method="POST" enctype="multipart/form-data">
-                                          {{ csrf_field() }}
-                                          <fieldset>
-                                            <div class="form-group">
-                                              <label>Email-id:</label>
-                                              <input class="form-control" type="email" name="email" value="{{$loginUser->email}}" readonly required/>
-                                            </div>
-                                            <button class="btn btn-info" type="submit">Send</button>
-                                          </fieldset>
-                                        </form>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
+                              <div>
+                                <form action="{{url('verifyEmail')}}" method="POST" enctype="multipart/form-data" id="verifyEmail">
+                                  {{ csrf_field() }}
+                                  <input class="form-control hide" type="email" name="email" value="{{$loginUser->email}}" readonly required/>
+                                </form>
                               </div>
                               <div id="updateEmail" class="modal fade" role="dialog">
                                 <div class="modal-dialog modal-sm">
@@ -248,41 +236,6 @@
                                 </div>
                               </div>
                             @endif
-                          @else
-                            <a href="#addEmail" data-toggle="modal" style="float: right;">Add Email</a>
-                            <div id="addEmail" class="modal fade" role="dialog">
-                              <div class="modal-dialog modal-sm">
-                                <div class="modal-content">
-                                  <div class="modal-header">
-                                    <button class="close" data-dismiss="modal">×</button>
-                                    <h2  class="modal-title">Add Email</h2>
-                                  </div>
-                                  <div class="modal-body">
-                                    <div class="">
-                                      <form action="{{url('addEmail')}}" method="POST" enctype="multipart/form-data">
-                                        {{ csrf_field() }}
-                                        <fieldset>
-                                          <div class="form-group">
-                                            <label>Email-id:</label>
-                                            <input class="form-control" type="email" name="email" placeholder="Enter Email-id" required/>
-                                          </div>
-                                          <div class="form-group">
-                                            <label>Password:</label>
-                                            <input class="form-control" type="password" name="password" placeholder="Enter Password" required/>
-                                          </div>
-                                          <div class="form-group">
-                                            <label>Confirm Password:</label>
-                                            <input class="form-control" type="password" name="confirm_password" placeholder="Confirm Password" required/>
-                                          </div>
-                                          <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
-                                          <button class="btn btn-info" type="submit">Submit</button>
-                                        </fieldset>
-                                      </form>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
                           @endif
                         </div>
                       </div>
@@ -399,7 +352,11 @@
                         <div class="col-xs-12">
                           <div class="row">
                              <div class="col-xs-3 "><b> Department</b></div>
-                             <div class="col-xs-9 ">{{$loginUser->department->name}}</div>
+                             <div class="col-xs-9 ">{{$loginUser->department->name}}
+                             @if(count($otherDepts) > 0)
+                              ,{{ implode(',',$otherDepts) }}
+                             @endif
+                             </div>
                           </div>
                         </div>
                       </div>
@@ -418,28 +375,27 @@
                   </li>
                 @endif
                 @if(2 == $loginUser->user_type)
-                <li class="list-group-item">
-                  <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
-                    <div class="col-xs-12">
-                      <div class="row">
-                         <div class="col-xs-3 "><b>Year</b></div>
-                         <div class="col-xs-9 pull-left">{{$loginUser->year}}</div>
+                  <li class="list-group-item">
+                    <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
+                      <div class="col-xs-12">
+                        <div class="row">
+                           <div class="col-xs-3 "><b>Year</b></div>
+                           <div class="col-xs-9 pull-left">{{$loginUser->year}}</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
-                    <div class="col-xs-12">
-                      <div class="row">
-                         <div class="col-xs-3 "><b>Roll No</b></div>
-                         <div class="col-xs-9 pull-left">{{$loginUser->roll_no}}</div>
+                  </li>
+                  <li class="list-group-item">
+                    <div class="row toggle" id="dropdown-detail-3" data-toggle="detail-3">
+                      <div class="col-xs-12">
+                        <div class="row">
+                           <div class="col-xs-3 "><b>Roll No</b></div>
+                           <div class="col-xs-9 pull-left">{{$loginUser->roll_no}}</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </li>
+                  </li>
                 @endif
-
                 <li class="list-group-item" style="cursor: pointer;">
                   <div class="row toggle" id="dropdown-detail-2" data-toggle="detail-5">
                       <div class="col-xs-10">
@@ -694,6 +650,10 @@
     document.getElementById('deptDiv').classList.remove("show");
     document.getElementById('year').classList.remove("show");
     document.getElementById('rollNo').classList.remove("show");
+  }
+
+  function sendVerifyEmail(){
+    document.getElementById('verifyEmail').submit();
   }
 </script>
 @stop

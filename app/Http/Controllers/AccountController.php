@@ -151,28 +151,42 @@ class AccountController extends Controller
         if( false == InputSanitise::checkCollegeUrl($request)){
             return Redirect::to('/');
         }
+        $colleges = [];
         $collegeDepts = [];
-        $users = self::Users;
-        $colleges = College::all();
-        $loginUser = Auth::user();
-        if($loginUser->college_id > 0){
-            $collegeDepts = CollegeDept::where('college_id', $loginUser->college_id)->get();
-        }
+        $otherDepts = [];
         $obtainedScore = 0;
         $totalScore = 0;
-        $userScores = Score::where('user_id',  $loginUser->id)->get();
-        if(is_object($userScores) && false == $userScores->isEmpty()){
-            foreach($userScores as $userScore){
-                $obtainedScore += $userScore->test_score;
-                $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($userScore->category_id, $userScore->subcat_id, $userScore->subject_id, $userScore->paper_id);
-                if(is_object($questions) && false == $questions->isEmpty()){
-                    foreach($questions as $question){
-                        $totalScore += $question->positive_marks;
+        $users = self::Users;
+        $loginUser = Auth::user();
+        if(User::Student == $loginUser->user_type){
+            if('other' == $loginUser->college_id){
+                $colleges = College::all();
+            }
+            $userScores = Score::where('user_id',  $loginUser->id)->get();
+            if(is_object($userScores) && false == $userScores->isEmpty()){
+                foreach($userScores as $userScore){
+                    $obtainedScore += $userScore->test_score;
+                    $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($userScore->category_id, $userScore->subcat_id, $userScore->subject_id, $userScore->paper_id);
+                    if(is_object($questions) && false == $questions->isEmpty()){
+                        foreach($questions as $question){
+                            $totalScore += $question->positive_marks;
+                        }
+                    }
+                }
+            }
+        } elseif(User::Lecturer == $loginUser->user_type || User::Hod == $loginUser->user_type){
+            $userAssgnDepts = explode(',', $loginUser->assigned_college_depts);
+            $otherDeptIds = array_diff($userAssgnDepts, [$loginUser->college_dept_id]);
+            if(count($otherDeptIds) > 0){
+                $depts = CollegeDept::find($otherDeptIds);
+                if(is_object($depts) && false == $depts->isEmpty()){
+                    foreach($depts as $dept){
+                        $otherDepts[] = $dept->name;
                     }
                 }
             }
         }
-        return view('dashboard.profile', compact('users', 'colleges', 'collegeDepts', 'obtainedScore', 'totalScore', 'loginUser'));
+        return view('dashboard.profile', compact('users', 'colleges', 'collegeDepts', 'obtainedScore', 'totalScore', 'loginUser','otherDepts'));
     }
 
     protected function myCollegeCourses(Request $request){
@@ -664,13 +678,32 @@ class AccountController extends Controller
         }
         $loginUser = Auth::user();
         $collegeDepts = [];
+        $collegeDeptNames = [];
         if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
             $deptIds = explode(',',$loginUser->assigned_college_depts);
             $collegeDepts = CollegeDept::getDepartmentsByCollegeIdByDeptIds($loginUser->college_id,$deptIds);
+            if(is_object($collegeDepts) && false == $collegeDepts->isEmpty()){
+                foreach($collegeDepts as $collegeDept){
+                    $collegeDeptNames[$collegeDept->id] = $collegeDept->name;
+                }
+            }
         } else {
             $collegeDepts = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
+            if(is_object($collegeDepts) && false == $collegeDepts->isEmpty()){
+                foreach($collegeDepts as $collegeDept){
+                    $collegeDeptNames[$collegeDept->id] = $collegeDept->name;
+                }
+            }
         }
-        return view('dashboard.students', compact('collegeDepts'));
+
+        $users = [];
+        $selectedDept = Session::get('user_info_selected_department');
+        $selectedYear = Session::get('user_info_selected_year');
+        $selectedUserType = Session::get('user_info_selected_user_type');
+        if(!empty($selectedUserType) && !empty($selectedDept) && !empty($selectedYear)){
+            $users = User::getUsersByUserTypeByDeptIdByYear($selectedUserType,$selectedDept,$selectedYear);
+        }
+        return view('dashboard.students', compact('collegeDepts','selectedDept','selectedYear','selectedUserType','users','collegeDeptNames'));
     }
 
     protected function changeApproveStatus(Request $request){
@@ -697,16 +730,15 @@ class AccountController extends Controller
 
     protected function searchStudent(Request $request){
         $user = Auth::user();
-        $result['departments'] = [];
-        // if(User::Directore == $user->user_type && 0 == $request->year && User::Hod == $request->user_type){
-            $result['departments'] = CollegeDept::getDepartmentsByCollegeId($user->college_id);
-        // } else if(User::Hod == $user->user_type && 0 == $request->year && User::Lecturer == $request->user_type){
-        //     $deptIds = explode(',',$user->assigned_college_depts);
-        //     $result['departments'] = CollegeDept::getDepartmentsByCollegeIdByDeptIds($user->college_id,$deptIds);
-        // }
+        $result['departments'] = CollegeDept::getDepartmentsByCollegeId($user->college_id);
         $result['users']  = User::searchStudent($request);
+        Session::put('user_info_selected_department',$request->department);
+        Session::put('user_info_selected_year',$request->year);
+        Session::put('user_info_selected_user_type',$request->user_type);
+        if(2 == $request->user_type){
+            $result['assignDepts'] = CollegeDept::find(explode(',', $user->assigned_college_depts));
+        }
         return $result;
-        // return User::searchStudent($request);
     }
 
     protected function assignDepatementsToUser(Request $request){
@@ -1090,6 +1122,12 @@ class AccountController extends Controller
         {
             $user = User::updateUser($request);
             if(is_object($user)){
+                if($user->college_id > 0){
+                    $collegeUrl = $user->college->url;
+                } else {
+                    $collegeUrl = 'other';
+                }
+                Session::put('college_user_url',$collegeUrl);
                 DB::commit();
                 return Redirect::to('college/'.Session::get('college_user_url').'/profile')->with('message', 'User profile updated successfully.');
             }
@@ -1100,6 +1138,24 @@ class AccountController extends Controller
             return redirect()->back()->withErrors('something went wrong.');
         }
         return Redirect::to('college/'.Session::get('college_user_url').'/profile');
+    }
+
+    protected function updateUserProfile(Request $request){
+        DB::beginTransaction();
+        try
+        {
+            $user = User::updateUserProfile($request);
+            if(is_object($user)){
+                DB::commit();
+                return Redirect::to('college/'.Session::get('college_user_url').'/students')->with('message', 'User profile updated successfully.');
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return redirect()->back()->withErrors('something went wrong.');
+        }
+        return Redirect::to('college/'.Session::get('college_user_url').'/students');
     }
 
     protected function showStudentsByDepartmentByYear(Request $request){

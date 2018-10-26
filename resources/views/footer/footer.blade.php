@@ -60,7 +60,6 @@
             <li><a href="{{url('blog')}}">Blogs</a></li>
             <li><a href="{{url('ourpartner')}}">Our Partners</a></li>
             <li><a href="{{url('career')}}">Career</a></li>
-            <li><a href="{{url('admin/login')}}">Admin Dashboard</a></li>
           </ul>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3">
@@ -74,13 +73,6 @@
             <li><a href="{{url('privacy-policy')}}" title="Privacy Policy">Privacy Policy</a></li>
             <li><a href="{{url('faq')}}" title="FAQ">FAQ</a></li>
           </ul>
-          <!-- <address>
-           <p>VCHIP TECHNOLOGY PVT LTD</p>
-           <p>Address: 3rd Floor,Sr No 132/2A/3</p>
-           <p>Shrinivas,Labhade Park,Near BSNL</p>
-           <p>Office, WARJE, PUNE-411058, INDIA.</p>
-           <p>Phone: 020-25235596</p>
-         </address> -->
         </div>
       </div>
    </div>

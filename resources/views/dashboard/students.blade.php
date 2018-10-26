@@ -25,10 +25,14 @@
             <div class="col-md-3 mrgn_10_btm">
               <select class="form-control" id="dept" onChange="resetStudents();">
                 <option value="0"> Select Department </option>
-                <option value="All">All</option>
+                <option value="All" @if('All' == $selectedDept) selected @endif>All</option>
                 @if(count($collegeDepts) > 0)
                   @foreach($collegeDepts as $collegeDept)
-                    <option value="{{$collegeDept->id}}">{{$collegeDept->name}}</option>
+                    @if($selectedDept == $collegeDept->id)
+                      <option value="{{$collegeDept->id}}" selected>{{$collegeDept->name}}</option>
+                    @else
+                      <option value="{{$collegeDept->id}}">{{$collegeDept->name}}</option>
+                    @endif
                   @endforeach
                 @endif
               </select>
@@ -37,10 +41,10 @@
             <div class="col-md-3 mrgn_10_btm" id="showUsers">
               <select class="form-control" id="user" name="user_type" onChange="showResult();" required="true">
                 <option value="0">Select User Type</option>
-                <option value="2">Student</option>
-                <option value="3">Lecturer</option>
+                <option value="2" @if(2 == $selectedUserType) selected @endif>Student</option>
+                <option value="3" @if(3 == $selectedUserType) selected @endif>Lecturer</option>
                 @if(5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
-                  <option value="4">Hod</option>
+                  <option value="4" @if(4 == $selectedUserType) selected @endif>Hod</option>
                 @endif
               </select>
             </div>
@@ -48,15 +52,19 @@
             @if(3 == Auth::user()->user_type)
               <div class="col-md-3 mrgn_10_btm" id="div_year">
             @else
-              <div class="col-md-3 mrgn_10_btm hide" id="div_year">
+              @if(!empty($selectedYear))
+                <div class="col-md-3 mrgn_10_btm" id="div_year">
+              @else
+                <div class="col-md-3 mrgn_10_btm hide" id="div_year">
+              @endif
             @endif
                 <select class="form-control" id="selected_year" name="year" onChange="showStudents(this);">
                   <option value="0"> Select Year </option>
-                  <option value="All">All</option>
-                  <option value="1">First Year</option>
-                  <option value="2">Second Year</option>
-                  <option value="3">Third Year</option>
-                  <option value="4">Fourth Year</option>
+                  <option value="All" @if('All' == $selectedYear) selected @endif>All</option>
+                  <option value="1" @if(1 == $selectedYear) selected @endif>First Year</option>
+                  <option value="2" @if(2 == $selectedYear) selected @endif>Second Year</option>
+                  <option value="3" @if(3 == $selectedYear) selected @endif>Third Year</option>
+                  <option value="4" @if(4 == $selectedYear) selected @endif>Fourth Year</option>
                 </select>
               </div>
               <div class="col-md-3 ">
@@ -80,7 +88,11 @@
                 Records
               </div>
               <div class="panel-body">
-                  <table  class="hide" id="student-record">
+                @if(2 == $selectedUserType)
+                  <table id="student-record">
+                @else
+                  <table class="hide" id="student-record">
+                @endif
                   <thead>
                     <tr>
                       <th>Sr. No.</th>
@@ -90,12 +102,155 @@
                       <th>Roll No.</th>
                       <th>Approval</th>
                       <th>Delete</th>
+                      @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type)
+                        <th>Edit Profile</th>
+                      @endif
                     </tr>
                   </thead>
                   <tbody id="studentsTbl">
+                    @if(count($users) > 0)
+                      @foreach($users as $index => $user)
+                        <tr style="overflow-x: auto;">
+                          <td>{{ $index + 1}}</td>
+                          <td>
+                            <a href="#studentModal_{{$user->id}}" data-toggle="modal">{{$user->name}}</a>
+                          </td>
+                          <td>{{$collegeDeptNames[$user->college_dept_id]}}</td>
+                          <td>{{$user->year}}</td>
+                          <td>{{$user->roll_no}}</td>
+                          <td>
+                            @if(1 == $user->admin_approve)
+                              <input type="checkbox" value="" data-student_id="{{$user->id}}" data-college_id="{{$user->college_id}}" data-department_id="{{$user->college_dept_id}}" data-year="{{$user->year}}" onclick="changeApproveStatus(this);" checked="checked">
+                            @else
+                              <input type="checkbox" value="" data-student_id="{{$user->id}}" data-college_id="{{$user->college_id}}" data-department_id="{{$user->college_dept_id}}" data-year="{{$user->year}}" onclick="changeApproveStatus(this);">
+                            @endif
+                          </td>
+                          <td>
+                            <button class="btn btn-danger btn-xs delet-bt delet-btn" data-title="Delete" data-toggle="modal" data-target="#delete" data-student_id="3" onclick="deleteUser(this);">
+                              <span class="fa fa-trash-o" data-placement="top" data-toggle="tooltip" title="Delete"></span>
+                            </button>
+                            <form id="deleteCollegeUser_{{$user->id}}" action="{{url('college/'.Session::get('college_user_url').'/deleteStudentFromCollege')}}" method="POST" style="display: none;">
+                              {{ csrf_field() }}
+                              {{ method_field("DELETE") }}
+                              <input type="hidden" name="student_id" value="{{$user->id}}">
+                              <input type="hidden" name="college_id" value="{{$user->college_id}}">
+                              <input type="hidden" name="department_id" value="{{$user->college_dept_id}}">
+                              <input type="hidden" name="year" value="{{$user->year}}">
+                            </form>
+                          </td>
+                          @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type)
+                            <td>
+                              <a href="#studentProfile_{{$user->id}}" data-toggle="modal">Edit</a>
+                            </td>
+                          @endif
+                        </tr>
+                        <div class="modal fade in" id="studentModal_{{$user->id}}" role="dialog" style=" padding-right: 15px;">
+                          <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">×</button>
+                                <h4 class="modal-title">Student Details</h4>
+                              </div>
+                              <div class="modal-body">
+                                <div class="form-group">
+                                  <label>Year:</label> {{$user->year}}
+                                </div>
+                                <div class="form-group">
+                                  <label>Email:</label> {{$user->email}}
+                                </div>
+                                <div class="form-group">
+                                  <label>Phone:</label> {{$user->phone}}
+                                </div>
+                                <div class="form-group">
+                                  <a href="{{url('college/'.Session::get('college_user_url').'/studentCollegeTestResults')}}/{{$user->id}}">Test Result</a>
+                                </div>
+                                  <div class="form-group">
+                                    <a href="{{url('college/'.Session::get('college_user_url').'/studentCollegeCourses')}}/{{$user->id}}">Course</a>
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type)
+                          <div id="studentProfile_{{$user->id}}" class="modal fade" role="dialog">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <button class="close" data-dismiss="modal">×</button>
+                                  <h2  class="modal-title">Edit Profile</h2>
+                                </div>
+                                <div class="modal-body">
+                                  <form action="{{url('college/'.Session::get('college_user_url').'/updateUserProfile')}}" method="POST" enctype="multipart/form-data">
+                                    {{ method_field('PUT') }}
+                                    {{ csrf_field() }}
+                                    <fieldset>
+                                      <div class="form-group row">
+                                        <label>Name:</label>
+                                        <input class="form-control" placeholder="name" name="name" type="text" value="{{$user->name}}" required>
+                                      </div>
+                                      <div class="form-group" id="deptDiv" >
+                                        <label>Department:</label>
+                                        <select class="form-control  slt mrgn_20_top" name="department" id="dept" required>
+                                          <option value="">Select Department</option>
+                                          @if(count($collegeDepts) > 0)
+                                            @foreach($collegeDepts as $collegeDept)
+                                              <option value="{{$collegeDept->id}}" @if($collegeDept->id == $user->college_dept_id) selected @endif >{{$collegeDept->name}}</option>
+                                            @endforeach
+                                          @endif
+                                        </select>
+                                      </div>
+                                        <div class="form-group @if ($errors->has('year')) has-error @endif " id="year" >
+                                          <label>Year:</label>
+                                          <select class="form-control  slt mrgn_20_top" name="year" required>
+                                            <option value="">Select Year</option>
+                                            <option value="1" @if(1 == $user->year) selected @endif >First Year</option>
+                                            <option value="2" @if(2 == $user->year) selected @endif >Second Year </option>
+                                            <option value="3" @if(3 == $user->year) selected @endif >Third Year</option>
+                                            <option value="4" @if(4 == $user->year) selected @endif >Final Year</option>
+                                          </select>
+                                        </div>
+                                        <div class="form-group mrgn_20_top" id="rollNo">
+                                          <label>Roll No:</label>
+                                          <input type="number" class="form-control" name="roll_no" id="roll" value="{{$user->roll_no}}" placeholder="Roll No."  min="0" required/>
+                                          <span class="help-block"></span>
+                                        </div>
+                                      <div class="form-group">
+                                        <label>Photo:</label>
+                                        <input class="form-control" placeholder="Mobile No." name="photo" type="file">
+                                        <label>Existing Photo:</label> {{basename($user->photo)}}
+                                      </div>
+                                      <div class="form-group">
+                                        <label>Resume:</label>
+                                        <input class="form-control" placeholder="Mobile No." name="resume" type="file">
+                                        <label>Existing Resume:</label> {{basename($user->resume)}}
+                                      </div>
+                                      <input type="hidden" name="college_id" value="{{ $user->college_id }}">
+                                      <input type="hidden" name="user_id" value="{{ $user->id }}">
+                                      <button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button>
+                                      <button class="btn btn-info" type="submit">Submit</button>
+                                    </fieldset>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        @endif
+                        @endforeach
+                    @else
+                      <tr>
+                        <td colspan="8"> No Result! </td>
+                      </tr>
+                    @endif
                   </tbody>
                 </table>
-                <table  class="hide" id="lectures_hods_record">
+                @if(3 == $selectedUserType || 4 == $selectedUserType)
+                  <table id="lectures_hods_record">
+                @else
+                  <table class="hide" id="lectures_hods_record">
+                @endif
                   <thead>
                     <tr>
                       <th>Sr. No.</th>
@@ -267,8 +422,8 @@
           }
           var eleTr = document.createElement('tr');
           var eleIndex = document.createElement('td');
-          eleIndex.innerHTML = 'No result!';
-          eleIndex.setAttribute('colspan', '7');
+          eleIndex.innerHTML = 'No Result!';
+          eleIndex.setAttribute('colspan', '8');
           eleTr.appendChild(eleIndex);
           body.appendChild(eleTr);
         }
@@ -329,8 +484,6 @@
       eleModel.setAttribute('role', 'dialog');
       var urlStudentTest = "{{url('college/'.Session::get('college_user_url').'/studentCollegeTestResults')}}/"+obj.id;
       var urlStudentCourse = "{{url('college/'.Session::get('college_user_url').'/studentCollegeCourses')}}/"+obj.id;
-      // var urlStudentPlacement = "{{url('college/'.Session::get('college_user_url').'/studentPlacement')}}/"+obj.id;
-      // var urlStudentVideo = "{{url('college/'.Session::get('college_user_url').'/studentVideo')}}/"+obj.id;
       var urllecturerPaper = "{{url('college/'.Session::get('college_user_url').'/lecturerPapers')}}/"+obj.id;
       var urlLecturerCourse = "{{url('college/'.Session::get('college_user_url').'/lecturerCourses')}}/"+obj.id;
       var modelInnerHTML = '';
@@ -344,15 +497,72 @@
       modelInnerHTML +='<div class="form-group"><label>Email:</label> '+obj.email+'</div><div class="form-group"><label>Phone:</label> '+obj.phone+'</div>';
       if(2 == user_type ){
         modelInnerHTML +='<div class="form-group"><a href="'+urlStudentTest+'">Test Result</a></div><div class="form-group"><a href="'+urlStudentCourse+'">Course</a></div>';
-
-        // modelInnerHTML +='<div class="form-group"><a href="'+urlStudentVideo+'">Video</a></div>';
-        // modelInnerHTML +='<div class="form-group"><a href="'+urlStudentPlacement+'">Placement</a></div>';
       } else {
         modelInnerHTML +='<div class="form-group"><a href="'+urllecturerPaper+'">Lecturer Papers</a></div><div class="form-group"><a href="'+urlLecturerCourse+'">Lecturer Course</a></div>';
       }
       modelInnerHTML +='</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div>';
       eleModel.innerHTML = modelInnerHTML;
       eleTr.appendChild(eleModel);
+
+      if(2 == user_type && (3 == login_User_Type || 4 == login_User_Type)){
+        var eleProfile = document.createElement('td');
+        eleProfile.innerHTML = '<a href="#studentProfile_'+obj.id+'" data-toggle="modal">Edit</a>';
+        eleTr.appendChild(eleProfile);
+
+        var eleProfileModel = document.createElement('div');
+        eleProfileModel.className = 'modal fade';
+        eleProfileModel.id = 'studentProfile_'+obj.id;
+        eleProfileModel.setAttribute('role', 'dialog');
+        var updateUserProfile = "{{url('college/'.Session::get('college_user_url').'/updateUserProfile')}}";
+        var csrfField = '{{ csrf_field() }}';
+        var putMethod ='{{ method_field("PUT") }}';
+        var modelProfileInnerHTML = '';
+        modelProfileInnerHTML='<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button><h2 class="modal-title">Edit Profile</h2></div><div class="modal-body"><form action="'+updateUserProfile+'" method="POST" enctype="multipart/form-data">'+csrfField+''+putMethod;
+
+        modelProfileInnerHTML +='<fieldset><div class="form-group row"><label>Name:</label><input class="form-control" placeholder="name" name="name" value="'+obj.name+'" required="" type="text"></div>';
+        modelProfileInnerHTML +='<div class="form-group" id="deptDiv"><label>Department:</label><select class="form-control  slt mrgn_20_top" name="department" id="dept" required=""><option value="">Select Department</option>';
+        if(msg['assignDepts'].length > 0){
+          $.each(msg['assignDepts'],function(idx,dept){
+            if(obj.college_dept_id == dept.id){
+              modelProfileInnerHTML +='<option value="'+dept.id+'" selected>'+dept.name+'</option>';
+            } else {
+              modelProfileInnerHTML +='<option value="'+dept.id+'">'+dept.name+'</option>';
+            }
+          });
+        }
+        modelProfileInnerHTML +='</select></div>';
+        modelProfileInnerHTML +='<div class="form-group  " id="year"><label>Year:</label><select class="form-control  slt mrgn_20_top" name="year" required=""><option value="">Select Year</option>';
+        if(1 == obj.year){
+          modelProfileInnerHTML +='<option value="1" selected>First Year</option>';
+        } else {
+          modelProfileInnerHTML +='<option value="1">First Year</option>';
+        }
+        if(2 == obj.year){
+          modelProfileInnerHTML +='<option value="2" selected>Second Year </option>';
+        } else {
+          modelProfileInnerHTML +='<option value="2">Second Year </option>';
+        }
+        if(3 == obj.year){
+          modelProfileInnerHTML +='<option value="3" selected>Third Year</option>';
+        } else {
+          modelProfileInnerHTML +='<option value="3">Third Year</option>';
+        }
+        if(4 == obj.year){
+          modelProfileInnerHTML +='<option value="4" selected>Final Year</option>';
+        } else {
+          modelProfileInnerHTML +='<option value="4">Final Year</option>';
+        }
+        modelProfileInnerHTML +='</select></div>';
+        modelProfileInnerHTML +='<div class="form-group mrgn_20_top" id="rollNo"><label>Roll No:</label><input class="form-control" name="roll_no" id="roll" value="'+obj.roll_no+'" placeholder="Roll No." min="0" required="" type="number"><span class="help-block"></span></div>';
+
+        modelProfileInnerHTML +='<div class="form-group"><label>Photo:</label><input class="form-control" placeholder="Mobile No." name="photo" type="file"><label>Existing Photo:</label></div>';
+
+        modelProfileInnerHTML +='<div class="form-group"><label>Resume:</label><input class="form-control" placeholder="Mobile No." name="resume" type="file"><label>Existing Resume:</label></div>';
+
+        modelProfileInnerHTML +='<input name="college_id" value="'+obj.college_id+'" type="hidden"><input name="user_id" value="'+obj.id+'" type="hidden"><button data-dismiss="modal" class="btn btn-info" type="button">Cancel</button><button class="btn btn-info" type="submit">Submit</button></fieldset></form></div></div></div>';
+        eleProfileModel.innerHTML = modelProfileInnerHTML;
+        eleTr.appendChild(eleProfileModel);
+      }
 
       if(msg['departments'].length > 0){
         var eleDeptModel = document.createElement('div');

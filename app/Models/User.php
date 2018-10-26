@@ -300,22 +300,11 @@ class User extends Authenticatable
         if(self::Student == $user->user_type){
             $user->year = $request->year;
             $user->roll_no = $request->roll_no;
-        } else {
-            $user->year = 0;
-            $user->roll_no = 0;
-        }
-
-        $user->college_id = $request->college;
-        if('other' == $request->college){
-            $user->college_dept_id = 0;
-            $user->other_source = $request->other_source;
-        } elseif($request->college > 0){
-            if(self::Directore == $request->user_type || self::TNP == $request->user_type){
-                $user->college_dept_id = 0;
-            } else {
+            if($request->college > 0){
+                $user->college_id = $request->college;
                 $user->college_dept_id = $request->department;
+                $user->other_source = '';
             }
-            $user->other_source = '';
         }
 
         $userStoragePath = "userStorage/".$user->id;
@@ -352,6 +341,51 @@ class User extends Authenticatable
         }
         $user->save();
         return $user;
+    }
+
+    protected static function updateUserProfile(Request $request){
+        $user = static::where('id', $request->user_id)->where('college_id',$request->college_id)->first();
+        if(is_object($user)){
+            $user->name = $request->name;
+            $user->year = $request->year;
+            $user->roll_no = $request->roll_no;
+            $user->college_dept_id = $request->department;
+            $userStoragePath = "userStorage/".$user->id;
+            if(!is_dir($userStoragePath)){
+                mkdir($userStoragePath);
+            }
+            if($request->exists('photo')){
+                $userImage = $request->file('photo')->getClientOriginalName();
+                if(!empty($user->photo) && file_exists($user->photo)){
+                    unlink($user->photo);
+                }
+                $request->file('photo')->move($userStoragePath, $userImage);
+                $dbUserImagePath = $userStoragePath."/".$userImage;
+            }
+            if($request->exists('resume')){
+                $userResume = $request->file('resume')->getClientOriginalName();
+                if(!empty($user->resume) && file_exists($user->resume)){
+                    unlink($user->resume);
+                }
+                $request->file('resume')->move($userStoragePath, $userResume);
+                $dbUserResumePath = $userStoragePath."/".$userResume;
+            }
+            if(!empty($dbUserImagePath)){
+                $user->photo = $dbUserImagePath;
+                // open image
+                $img = Image::make($user->photo);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
+            if(!empty($dbUserResumePath)){
+                $user->resume = $dbUserResumePath;
+            }
+            $user->save();
+            return $user;
+        }
+        return;
     }
 
     protected static function getStudentById($studentId){
@@ -539,9 +573,15 @@ class User extends Authenticatable
         $loginUser = Auth::user();
         if( self::Student == $loginUser->user_type){
             return static::join('assignment_questions', 'assignment_questions.lecturer_id', '=', 'users.id')
-                ->whereIn('users.user_type', array(self::Lecturer,self::Hod))
+                ->where(function($query) use($loginUser){
+                    $query->whereIn('users.user_type', array(self::Lecturer,self::Hod));
+                    $query->whereRaw("find_in_set($loginUser->college_dept_id , users.assigned_college_depts)");
+                    $query->whereRaw("find_in_set($loginUser->college_dept_id , assignment_questions.college_dept_ids)");
+                })
+                ->orWhere(function($query){
+                    $query->whereIn('users.user_type', array(self::Directore,self::TNP));
+                })
                 ->where('users.college_id', $loginUser->college_id)
-                ->where('users.college_dept_id', $loginUser->college_dept_id)
                 ->whereRaw("find_in_set($loginUser->year , assignment_questions.years)")
                 ->select('users.id', 'users.*')->groupBy('users.id')->get();
         } else if( self::Lecturer == $loginUser->user_type){
@@ -706,5 +746,21 @@ class User extends Authenticatable
         return static::where('id', $student)->where('college_id',$college)
                 ->where('college_dept_id',$department)
                 ->where('year',$year)->first();
+    }
+
+    protected static function getUsersByUserTypeByDeptIdByYear($selectedUserType,$selectedDept,$selectedYear){
+        $loginUser = Auth::user();
+        $result = static::where('user_type', $selectedUserType)->where('college_id',$loginUser->college_id);
+        if($selectedDept > 0){
+            $result->where('college_dept_id',$selectedDept);
+        } else {
+            if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
+                $result->whereIn('college_dept_id',explode(',',$loginUser->assigned_college_depts));
+            }
+        }
+        if($selectedYear > 0){
+            $result->where('year',$selectedYear);
+        }
+        return $result->get();
     }
 }
