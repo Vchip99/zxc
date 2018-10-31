@@ -307,9 +307,13 @@ class HomeController extends Controller
     }
 
     protected function verifyEmail(Request $request){
-        $email = $request->get('email');
+        if(is_object(Auth::user())){
+            $email = Auth::user()->email;
+        } else {
+            $email = $request->get('email');
+        }
         if(!empty($email)){
-            $user = User::where('email', Auth::user()->email)->where('verified', 0)->first();
+            $user = User::where('email', $email)->where('verified', 0)->first();
             if(is_object($user)){
                 DB::beginTransaction();
                 try
