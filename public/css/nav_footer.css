@@ -834,3 +834,46 @@ color: #fff;
     font-size: 12px;
   }
 }
+
+.job-menu{
+  top: 35% !important;
+  right: 2%;
+  left: 86%;
+}
+@media screen and (max-width: 1500px) {
+  .job-menu{
+    right: 2%;
+    left: 86%;
+  }
+}
+
+@media screen and (max-width: 1400px) {
+  .job-menu{
+    right: 2%;
+    left: 86%;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .job-menu{
+    right: 2%;
+    left: 83%;
+  }
+}
+@media screen and (max-width: 1000px) {
+  .job-menu{
+    right: 3%;
+    left: 78%;
+  }
+}
+@media screen and (max-width: 750px) {
+  .job-menu{
+    right: 10%;
+    left: 66%;
+  }
+}
+@media screen and (max-width: 550px) {
+  .job-menu{
+    right: 17%;
+    left: 50%;
+  }
+}

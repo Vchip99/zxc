@@ -26,7 +26,7 @@
 								</div><br/>
 								<div class="row answer">D. {!! $question->answer4 !!}
 								</div>
-								@if(!empty($question->answer5))
+								@if(!empty($question->answer5) && $optionCount > 4)
 								<div class="row answer">E. {!! $question->answer5 !!}
 								</div>
 								@endif

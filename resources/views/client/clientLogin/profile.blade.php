@@ -31,7 +31,7 @@
             @if(Auth::guard('client')->user()->debit_sms_count > Auth::guard('client')->user()->credit_sms_count)
               + {{Auth::guard('client')->user()->debit_sms_count - Auth::guard('client')->user()->credit_sms_count}}
             @else
-              - {{Auth::guard('client')->user()->credit_sms_count}}
+              - {{Auth::guard('client')->user()->credit_sms_count - Auth::guard('client')->user()->debit_sms_count}}
             @endif
             </span></b>
             <br><br>

@@ -228,6 +228,22 @@
             </ul>
         </li>
         <li class="header">Dashboard</li>
+        <li class="treeview">
+          <a href="#" title="Batch">
+            <i class="fa fa-address-book"></i> <span>Batch</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Manage Batch"><a href="{{ url('manageBatch')}}"><i class="fa fa-circle-o"></i> Manage Batch</a></li>
+            <li title="Batch Students"><a href="{{ url('associateBatchStudents')}}"><i class="fa fa-circle-o"></i> Batch Students</a></li>
+            <!-- <li title="Manage Attendance"><a href="{{ url('manageAttendance')}}"><i class="fa fa-circle-o"></i> Manage Attendance</a></li> -->
+            <li title="Attendance Calendar"><a href="{{ url('manageAttendanceCalendar')}}"><i class="fa fa-circle-o"></i> Attendance Calendar</a></li>
+            <li title="Manage Offline Paper"><a href="{{ url('manageOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
+            <li title="Manage Offline Exam"><a href="{{ url('manageOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
+          </ul>
+        </li>
         <li class="treeview ">
           <a href="#" title="Online Courses">
             <i class="fa fa-dashboard"></i> <span>Online Courses</span>
@@ -326,22 +342,6 @@
           </a>
           <ul class="treeview-menu">
             <li title="Show All Test Results"><a href="{{ url('allTestResults')}}"><i class="fa fa-circle-o"></i> All Test Results </a></li>
-          </ul>
-        </li>
-        <li class="treeview">
-          <a href="#" title="Batch">
-            <i class="fa fa-address-book"></i> <span>Batch</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-            <li title="Manage Batch"><a href="{{ url('manageBatch')}}"><i class="fa fa-circle-o"></i> Manage Batch</a></li>
-            <li title="Batch Students"><a href="{{ url('associateBatchStudents')}}"><i class="fa fa-circle-o"></i> Batch Students</a></li>
-            <!-- <li title="Manage Attendance"><a href="{{ url('manageAttendance')}}"><i class="fa fa-circle-o"></i> Manage Attendance</a></li> -->
-            <li title="Attendance Calendar"><a href="{{ url('manageAttendanceCalendar')}}"><i class="fa fa-circle-o"></i> Attendance Calendar</a></li>
-            <li title="Manage Offline Paper"><a href="{{ url('manageOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
-            <li title="Manage Offline Exam"><a href="{{ url('manageOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
           </ul>
         </li>
         <li class="treeview">

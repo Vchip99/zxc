@@ -331,6 +331,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
      */
     protected function getAllQuestions($subdomainName,Request $request){
         $sections = [];
+        $optionCount = 4;
         $categoryId = $request->get('category');
         $subcategoryId = $request->get('subcategory');
         $subjectId = $request->get('subject');
@@ -367,9 +368,13 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                     }
                 }
             }
+            $paper = ClientOnlineTestSubjectPaper::find($paperId);
+            if(is_object($paper)){
+                $optionCount = $paper->option_count;
+            }
         }
 
-        return view('client.front.question.show_questions', compact('questions', 'sections'));
+        return view('client.front.question.show_questions', compact('questions', 'sections','optionCount'));
     }
 
     /**
@@ -377,6 +382,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
      */
     protected function downloadQuestions($subdomainName, $category, $subcategory, $subject, $paper,Request $request){
         $sections = [];
+        $optionCount = 4;
         $categoryId = $category;
         $subcategoryId = $subcategory;
         $subjectId = $subject;
@@ -405,9 +411,13 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                     }
                 }
             }
+            $paper = ClientOnlineTestSubjectPaper::find($paperId);
+            if(is_object($paper)){
+                $optionCount = $paper->option_count;
+            }
         }
 
-        $html = view('client.front.question.show_questions', compact('questions', 'sections'));
+        $html = view('client.front.question.show_questions', compact('questions', 'sections','optionCount'));
         $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8','tempDir' => __DIR__ .'/../../mpdfFont']);
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;

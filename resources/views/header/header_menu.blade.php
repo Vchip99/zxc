@@ -8,7 +8,24 @@
             <a href="{{ url('companyTest')}}" class="btn " style="border-radius: 0px !important;border-right: 1px solid black;border-left: 1px solid black;">Mock Test </a>
         @endif
           <a href="{{ url('mockInterview')}}" class="btn " style="border-radius: 0px !important;border-right: 1px solid black;">Mock Interview</a>
-          <a href="{{ url('placements')}}" class="btn " style="border-radius: 0px !important;border-right: 1px solid black;">Placement</a>
+          <!-- <a href="{{ url('placements')}}" class="btn " style="border-radius: 0px !important;border-right: 1px solid black;">Placement</a> -->
+
+          <a href="#" id="myTabDrop2" class="dropdown dropdown-toggle" data-toggle="dropdown" aria-controls="myTabDrop2-contents" data-toggle="tab" aria-expanded="true" >
+            <span class="text">Placement</span>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu  job-menu" role="menu" aria-labelledby="myTabDrop2" id="myTabDrop2-contents">
+            <li>
+              <a href="{{ url('jobUpdates')}}">
+                <span>Job updates</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ url('placements')}}">
+                <span>Companies details</span>
+              </a>
+            </li>
+          </ul>
       </div>
     </div>
   <div class="container">

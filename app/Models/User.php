@@ -511,6 +511,7 @@ class User extends Authenticatable
         $departmentId = $request->department_id;
         $userType = $request->user_type;
         $year = $request->selected_year;
+        $userName = $request->student;
 
         if($collegeId > 0){
             $student = static::join('college_depts', 'college_depts.id', '=', 'users.college_dept_id')
@@ -524,6 +525,9 @@ class User extends Authenticatable
         }
         if($year > 0){
             $student->where('users.year', $year);
+        }
+        if($userName){
+            $student->where('users.name', 'LIKE', '%'.$userName.'%');
         }
         if($collegeId > 0){
             return $student->select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.user_type','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','college_depts.name as department','users.other_source')

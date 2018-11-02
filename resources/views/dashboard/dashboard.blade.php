@@ -116,6 +116,25 @@
           </ul>
         </li>
         @endif
+        @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-calendar"></i> <span>Academic</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            @if(4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+              <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeCategory')}}"><i class="fa fa-circle-o"></i> Manage Category</a></li>
+            @endif
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeAttendance')}}"><i class="fa fa-circle-o"></i> Manage Attendance</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
+          </ul>
+        </li>
+        @endif
         <li class="treeview ">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>Online Courses</span>
@@ -213,25 +232,6 @@
             <li><a href="{{ url('discussion')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Discussion</a></li> -->
           </ul>
         </li>
-        @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-calendar"></i> <span>Academic</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-            @if(4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
-              <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeCategory')}}"><i class="fa fa-circle-o"></i> Manage Category</a></li>
-            @endif
-            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject</a></li>
-            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeAttendance')}}"><i class="fa fa-circle-o"></i> Manage Attendance</a></li>
-            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
-            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
-          </ul>
-        </li>
-        @endif
         <li class="treeview">
           <a href="#">
             <i class="fa fa-tasks"></i> <span>Assignment</span>

@@ -83,6 +83,7 @@ class QuizController extends Controller
     protected function getAllQuestions(Request $request){
         $questions = [];
         $sections = [];
+        $optionCount = 4;
         $categoryId = $request->get('category');
         $subcategoryId = $request->get('subcategory');
         $subjectId = $request->get('subject');
@@ -103,9 +104,15 @@ class QuizController extends Controller
                     }
                 }
             }
+            $paper = Cache::remember('vchip:tests:paper-'.$paperId,30, function() use ($paperId) {
+                return TestSubjectPaper::find($paperId);
+            });
+            if(is_object($paper)){
+                $optionCount = $paper->option_count;
+            }
         }
 
-        return view('quiz.show_questions', compact('questions', 'sections'));
+        return view('quiz.show_questions', compact('questions', 'sections','optionCount'));
     }
 
     // /**
@@ -335,6 +342,7 @@ class QuizController extends Controller
      */
     protected function downloadQuestions($category, $subcategory, $subject, $paper,Request $request){
         $sections = [];
+        $optionCount = 4;
         $categoryId = $category;
         $subcategoryId = $subcategory;
         $subjectId = $subject;
@@ -355,9 +363,15 @@ class QuizController extends Controller
                     }
                 }
             }
+            $paper = Cache::remember('vchip:tests:paper-'.$paperId,30, function() use ($paperId) {
+                return TestSubjectPaper::find($paperId);
+            });
+            if(is_object($paper)){
+                $optionCount = $paper->option_count;
+            }
         }
 
-        $html = view('quiz.show_questions', compact('questions', 'sections'));
+        $html = view('quiz.show_questions', compact('questions', 'sections','optionCount'));
         $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8','tempDir' => __DIR__ . '/mpdfFont']);
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;

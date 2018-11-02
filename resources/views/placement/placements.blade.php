@@ -269,8 +269,7 @@ ul.table_list{ margin-left: -30px; }
                   </a>
                 </li>
                 <li role="presentation" class="dropdown" title="Experience"  >
-                  <a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown" aria-controls="myTabDrop1-contents" data-toggle="tab" href="#tab_4"
-                    aria-expanded="true" >
+                  <a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown" aria-controls="myTabDrop1-contents" data-toggle="tab" aria-expanded="true" >
                     <span class="text">Experience</span>
                     <span class="caret"></span>
                   </a>
@@ -291,12 +290,6 @@ ul.table_list{ margin-left: -30px; }
                   <a data-toggle="tab" href="#tab_3"
                     aria-expanded="true">
                     <div class="">  FAQ  </div>
-                  </a>
-                </li>
-                <li class="" title="Mock Test">
-                  <a data-toggle="tab" href="#tab_4"
-                    aria-expanded="true">
-                    <div class=""> Apply Job </div>
                   </a>
                 </li>
               </ul>
@@ -644,63 +637,11 @@ ul.table_list{ margin-left: -30px; }
                       No faq available.
                     @endif
                   </div>
-                  <!-- end FAQ -->
-                  <div id="tab_4" class="tab-pane fade ">
-                     <div class="panel panel-default">
-                        <div class="panel-body" style="padding: 0px;">
-                          <table  class="" id="student-record">
-                            <thead>
-                              <tr>
-                                <th>Company Name</th>
-                                <th>Job Description</th>
-                                <th>Mock Test</th>
-                                <th>Apply</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              @if(count($applyJobs) > 0)
-                                @foreach($applyJobs as $applyJob)
-                                  <tr>
-                                    <td class="name"><b>{{ $applyJob->company }}</b></td>
-                                    <td> {!! mb_strimwidth( $applyJob->job_description , 0, 400, '...') !!}</br>
-                                         <a type="button" class="btn btn-info btn-circle btn-xs" title="Read" data-toggle="modal" data-placement="bottom" href="#company_{{$applyJob->id }}">Read More</a>
-                                    </td>
-                                    <td>
-                                      <a class="btn btn-primary btn-xs delet-bt delet-btn" href="{{ $applyJob->mock_test }}">Mock Test</a>
-                                    </td>
-                                    <td>
-                                     <a class="btn btn-primary btn-xs delet-bt delet-btn" href="{{ $applyJob->job_url }}" target="_blank">Apply</a>
-                                    </td>
-                                  </tr>
-                                @endforeach
-                              @else
-                                <tr><td colspan="4">No data available.</td></tr>
-                              @endif
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                  </div>
                 </div>
               </div>
             </div>
          </div>
       </div>
-      @if(count($applyJobs) > 0)
-        @foreach($applyJobs as $applyJob)
-          <div id="company_{{ $applyJob->id }}" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-              <div class="modal-content" style="background-color: white;">
-                <div class="modal-header">
-                  <button class="close" data-dismiss="modal">×</button>
-                  <h2  class="modal-title">{{ $applyJob->company }}</h2>
-                </div>
-                <div class="modal-body">{!! $applyJob->job_description !!}</div>
-              </div>
-            </div>
-          </div>
-        @endforeach
-      @endif
       <div class="col-sm-3 col-sm-pull-9">
         <div class=" hidden-div1">
           <select id="area2" class="form-control mrgn_20_btm" name="area" data-toggle="tooltip" title="Area" onChange="selectCompany(this);" required>

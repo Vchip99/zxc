@@ -109,7 +109,16 @@ class PlacementController extends Controller
             $ads = Add::getAdds($request->url(),$date);
             return view('placement.placements', compact('placementProcess', 'placementAreas', 'placementCompanies', 'companyDetails', 'selectedCompany', 'selectedArea', 'placementFaqs', 'examPatterns', 'placementExperiances', 'comments', 'commentLikesCount', 'subcommentLikesCount', 'currentUser', 'likesCount', 'applyJobs', 'ads'));
         }
+    }
 
+    protected function jobUpdates(Request $request){
+
+        $applyJobs = Cache::remember('vchip:placements:applyJobs',60, function() {
+            return ApplyJob::orderBy('id', 'desc')->get();
+        });
+        $date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+        return view('placement.jobs', compact('applyJobs', 'ads'));
     }
 
     protected function showPlacements(Request $request){

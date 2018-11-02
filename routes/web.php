@@ -780,6 +780,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deletePlacementProcess', 'Placement\PlacementProcessController@delete');
 
 	// placement front
+	Route::get('jobUpdates', 'PlacementController@jobUpdates');
 	Route::get('placements', 'PlacementController@show');
 	Route::post('placements', 'PlacementController@showPlacements');
 	Route::post('getPlacementCompaniesByArea', 'PlacementController@getPlacementCompaniesByArea');
