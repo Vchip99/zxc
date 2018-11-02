@@ -292,7 +292,7 @@ class TestController extends Controller
     	return RegisterPaper::registerTestPaper($userId, $paperId);
     }
 
-    protected function getRegisteredPaperIds(){
+    public function getRegisteredPaperIds(){
     	$registeredPaperIds = [];
     	$loginUser = Auth::user();
     	if(is_object($loginUser)){

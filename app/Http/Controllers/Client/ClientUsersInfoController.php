@@ -372,7 +372,7 @@ class ClientUsersInfoController extends BaseController
         } else {
             $paperName = $request->get('paper');
         }
-        $sheetName = $paperName;
+        $sheetName = substr($paperName, 0, 25);
         $resultArray[] = ['Test Series Result:',$sheetName, '',''];
         $resultArray[] = [];
         // Define the Excel spreadsheet headers
@@ -397,7 +397,7 @@ class ClientUsersInfoController extends BaseController
             $subjectName = $request->get('subject');
         }
 
-        $downloadResult = $subjectName.'_'.$paperName.'_result';
+        $downloadResult = substr($subjectName.'_'.$paperName.'_result', 0, 25);
         return \Excel::create($downloadResult, function($excel) use ($sheetName,$resultArray) {
             $excel->sheet($sheetName , function($sheet) use ($resultArray)
             {

@@ -126,8 +126,13 @@
           <ol class="list-group">
             @if(count($courseVideos)>0)
               @foreach($courseVideos as $courseVideo)
-                <li class="list-group-item">
-                  <a class="ellipsis" href="{{url('episode')}}/{{$courseVideo->id}}" data-toggle="tooltip" title="{{$courseVideo->name}}">{{$courseVideo->name}} </a>
+                <li class="list-group-item"  title="{{$courseVideo->name}}">
+                  @if('true' == $isCoursePurchased || 1 == $courseVideo->is_free || $videoCoursePrice <= 0)
+                    <a class="ellipsis" href="{{url('episode')}}/{{$courseVideo->id}}">{{$courseVideo->name}} </a>
+                  @else
+                    <a class="ellipsis" onClick="purchaseCourse();">{{$courseVideo->name}} </a>
+                  @endif
+                  <!-- <a class="ellipsis" href="{{url('episode')}}/{{$courseVideo->id}}" data-toggle="tooltip" title="{{$courseVideo->name}}">{{$courseVideo->name}} </a> -->
                   <span class="running-time"> {{ gmdate('H:i:s', $courseVideo->duration)}} </span>
                 </li>
               @endforeach
@@ -334,6 +339,14 @@
 @section('footer')
   @include('footer.footer')
 <script type="text/javascript">
+  function purchaseCourse(){
+    $.alert({
+        title: 'Alert!',
+        content: 'Please purchase course to acces this video.',
+    });
+    return false;
+  }
+
   function renderComments(msg, userId){
     var chatDiv = document.getElementById('chat-box');
     chatDiv.innerHTML = '';
@@ -750,92 +763,92 @@
     document.getElementById(id).classList.remove("in");
   }
 
-    $(document).on("click", "i[id^=video_like_]", function(e) {
-        var videoId = $(this).data('video_id');
-        var dislike = $(this).data('dislike');
-        var userId = parseInt(document.getElementById('user_id').value);
-        if( isNaN(userId)) {
-          $('#loginUserModel').modal();
-        } else {
-          $.ajax({
-              method: "POST",
-              url: "{{url('likeCourseVideo')}}",
-              data: {video_id:videoId, dis_like:dislike}
-          })
-          .done(function( msg ) {
-            if( 'false' != msg ){
-              var likeSpan = document.getElementById('like_'+videoId);
+  $(document).on("click", "i[id^=video_like_]", function(e) {
+      var videoId = $(this).data('video_id');
+      var dislike = $(this).data('dislike');
+      var userId = parseInt(document.getElementById('user_id').value);
+      if( isNaN(userId)) {
+        $('#loginUserModel').modal();
+      } else {
+        $.ajax({
+            method: "POST",
+            url: "{{url('likeCourseVideo')}}",
+            data: {video_id:videoId, dis_like:dislike}
+        })
+        .done(function( msg ) {
+          if( 'false' != msg ){
+            var likeSpan = document.getElementById('like_'+videoId);
+            likeSpan.innerHTML = '';
+            if( 1 == dislike ){
+              likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>';
+              likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+            } else {
+              likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>';
+              likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+            }
+          }
+        });
+      }
+  });
+
+  $(document).on("click", "i[id^=comment_like_]", function(e) {
+      var videoId = $(this).data('video_id');
+      var commentId = $(this).data('comment_id');
+      var dislike = $(this).data('dislike');
+      var userId = parseInt(document.getElementById('user_id').value);
+      if( isNaN(userId)) {
+        $('#loginUserModel').modal();
+      } else {
+        $.ajax({
+            method: "POST",
+            url: "{{url('likeCourseVideoComment')}}",
+            data: {video_id:videoId, comment_id:commentId, dis_like:dislike}
+        })
+        .done(function( msg ) {
+          if( 'false' != msg ){
+              var likeSpan = document.getElementById('cmt_like_'+commentId);
               likeSpan.innerHTML = '';
               if( 1 == dislike ){
-                likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>';
+                likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like" style= "margin-right:5px;"></i>';
                 likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
               } else {
-                likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>';
+                likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like" style= "margin-right:5px;"></i>';
                 likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
               }
-            }
-          });
         }
-    });
+        });
+      }
+  });
 
-    $(document).on("click", "i[id^=comment_like_]", function(e) {
-        var videoId = $(this).data('video_id');
-        var commentId = $(this).data('comment_id');
-        var dislike = $(this).data('dislike');
-        var userId = parseInt(document.getElementById('user_id').value);
-        if( isNaN(userId)) {
-          $('#loginUserModel').modal();
-        } else {
-          $.ajax({
-              method: "POST",
-              url: "{{url('likeCourseVideoComment')}}",
-              data: {video_id:videoId, comment_id:commentId, dis_like:dislike}
-          })
-          .done(function( msg ) {
-            if( 'false' != msg ){
-                var likeSpan = document.getElementById('cmt_like_'+commentId);
-                likeSpan.innerHTML = '';
-                if( 1 == dislike ){
-                  likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like" style= "margin-right:5px;"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                } else {
-                  likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like" style= "margin-right:5px;"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                }
-          }
-          });
+  $(document).on("click", "i[id^=sub_comment_like_]", function(e) {
+      var videoId = $(this).data('video_id');
+      var commentId = $(this).data('comment_id');
+      var subCommentId = $(this).data('sub_comment_id');
+      var dislike = $(this).data('dislike');
+      var userId = parseInt(document.getElementById('user_id').value);
+      if( isNaN(userId)) {
+        $('#loginUserModel').modal();
+      } else {
+        $.ajax({
+            method: "POST",
+            url: "{{url('likeCourseVideoSubComment')}}",
+            data: {video_id:videoId, comment_id:commentId, sub_comment_id:subCommentId, dis_like:dislike}
+        })
+        .done(function( msg ) {
+          if( 'false' != msg ){
+              var likeSpan = document.getElementById('sub_cmt_like_'+subCommentId);
+              likeSpan.innerHTML = '';
+              if( 1 == dislike ){
+                likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+              } else {
+                likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+              }
         }
-    });
-
-    $(document).on("click", "i[id^=sub_comment_like_]", function(e) {
-        var videoId = $(this).data('video_id');
-        var commentId = $(this).data('comment_id');
-        var subCommentId = $(this).data('sub_comment_id');
-        var dislike = $(this).data('dislike');
-        var userId = parseInt(document.getElementById('user_id').value);
-        if( isNaN(userId)) {
-          $('#loginUserModel').modal();
-        } else {
-          $.ajax({
-              method: "POST",
-              url: "{{url('likeCourseVideoSubComment')}}",
-              data: {video_id:videoId, comment_id:commentId, sub_comment_id:subCommentId, dis_like:dislike}
-          })
-          .done(function( msg ) {
-            if( 'false' != msg ){
-                var likeSpan = document.getElementById('sub_cmt_like_'+subCommentId);
-                likeSpan.innerHTML = '';
-                if( 1 == dislike ){
-                  likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                } else {
-                  likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                }
-          }
-          });
-        }
-    });
+        });
+      }
+  });
 </script>
 <script type="text/javascript">
   $( document ).ready(function() {

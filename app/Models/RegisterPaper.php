@@ -12,7 +12,7 @@ class RegisterPaper extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'test_subject_paper_id'];
+    protected $fillable = ['user_id', 'test_subject_paper_id','payment_id','payment_request_id','price'];
 
     protected static function registerTestPaper($userId, $paperId){
     	if(isset($userId) && isset($paperId)){
@@ -37,5 +37,16 @@ class RegisterPaper extends Model
             }
         }
         return;
+    }
+
+    protected static function addPurchasedPaper($paymentArray){
+        $purchasedPaper = new static;
+        $purchasedPaper->user_id = $paymentArray['user_id'];
+        $purchasedPaper->test_subject_paper_id = $paymentArray['test_subject_paper_id'];
+        $purchasedPaper->payment_id = $paymentArray['payment_id'];
+        $purchasedPaper->payment_request_id = $paymentArray['payment_request_id'];
+        $purchasedPaper->price = $paymentArray['price'];
+        $purchasedPaper->save();
+        return $purchasedPaper;
     }
 }

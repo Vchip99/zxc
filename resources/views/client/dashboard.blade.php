@@ -263,6 +263,18 @@
           </ul>
         </li>
         <li class="treeview">
+          <a href="#" title="Discussion">
+            <i class="fa fa-comments-o"></i> <span>Discussion</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Manage Discussion Category"><a href="{{ url('manageDiscussionCategory')}}"><i class="fa fa-circle-o"></i> Discussion Category </a></li>
+            <li title="Discussion"><a href="{{ url('manageDiscussion')}}"><i class="fa fa-circle-o"></i> Discussion</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
           <a href="#" title="Users Info">
             <i class="fa fa-group"></i> <span>Users Info</span>
             <span class="pull-right-container">

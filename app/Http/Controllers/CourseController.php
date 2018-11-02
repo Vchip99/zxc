@@ -59,12 +59,10 @@ class CourseController extends Controller
         $courses = Cache::remember('vchip:courses:courses-'.$page,60, function() {
             return CourseCourse::getCourseAssocaitedWithVideosWithPagination();
         });
-        $courseVideoCount = Cache::remember('vchip:courses:courseVideoCnt-'.$page,60, function() use ($courses){
-            return $this->getVideoCount($courses);
-        });
         $date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
-        return view('courses.courses', compact('courseCategories', 'courses', 'courseVideoCount', 'ads'));
+        $userPurchasedCourses = $this->getRegisteredCourseIds();
+        return view('courses.courses', compact('courseCategories', 'courses', 'ads','userPurchasedCourses'));
     }
 
     /**
@@ -79,10 +77,10 @@ class CourseController extends Controller
             $result['courses'] = Cache::remember('vchip:courses:courses:cat-'.$categoryId.':subcat-'.$subcategoryId,30, function() use ($categoryId,$subcategoryId){
                 return CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId);
             });
-            $result['courseVideoCount'] = $this->getVideoCount($result['courses']);
+            $result['userPurchasedCourses'] = $this->getRegisteredCourseIds();
         } else {
             $result['courses'] = CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId,$userId);
-            $result['courseVideoCount'] = $this->getVideoCount($result['courses']);
+            $result['userPurchasedCourses'] = $this->getRegisteredCourseIds();
         }
         return $result;
     }
@@ -125,13 +123,29 @@ class CourseController extends Controller
      *  show episode and its details by id
      */
     protected function episode($id,$subcomment=NULL){
+        $currentUser = Auth::user();
         $videoId = json_decode(trim($id));
         if(isset($videoId)){
             $video = Cache::remember('vchip:courses:video-'.$videoId,30, function() use ($videoId){
                 return CourseVideo::find($videoId);
             });
             if(is_object($video)){
-                $courseId = $video->course_id;
+
+                $videoCourse = $video->videoCourse;
+                $courseId = $videoCourse->id;
+                $videoCoursePrice = $videoCourse->price;
+
+                if(0 == $video->is_free && $videoCoursePrice > 0 ){
+                    if(is_object($currentUser)){
+                        $isCoursePurchased = RegisterOnlineCourse::isCourseRegistered($courseId);
+                        if( 'false' ==  $isCoursePurchased){
+                            return Redirect::to('courses');
+                        }
+                    } else {
+                        return Redirect::to('courses');
+                    }
+                }
+
                 $courseVideos = Cache::remember('vchip:courses:videos:courseId-'.$courseId,30, function() use ($courseId){
                     return CourseVideo::getCourseVideosByCourseId($courseId);
                 });
@@ -139,7 +153,7 @@ class CourseController extends Controller
                 $likesCount = CourseVideoLike::getLikesByVideoId($videoId);
                 $commentLikesCount = CourseCommentLike::getLikesByVideoId($videoId);
                 $subcommentLikesCount = CourseSubCommentLike::getLikesByVideoId($videoId);
-                $currentUser = Auth::user();
+
                 if(is_object($currentUser)){
                     if($videoId > 0 || $subcomment > 0){
                         DB::beginTransaction();
@@ -163,10 +177,15 @@ class CourseController extends Controller
                     } else {
                         Session::set('show_subcomment_area', 0);
                     }
+                    $isCoursePurchased = RegisterOnlineCourse::isCourseRegistered($courseId);
                 } else {
                     $currentUser = NULL;
+                    $isCoursePurchased = 'false';
+                    if(0 == $video->is_free && $videoCoursePrice > 0){
+                        return Redirect::to('courses');
+                    }
                 }
-                return view('courses.episode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
+                return view('courses.episode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount','isCoursePurchased','videoCoursePrice'));
             }
         }
         return Redirect::to('courses');
@@ -192,7 +211,6 @@ class CourseController extends Controller
      */
     protected function getOnlineCourseBySearchArray(Request $request){
         $result['courses'] = CourseCourse::getOnlineCourseBySearchArray($request);
-        $result['courseVideoCount'] = $this->getVideoCount($result['courses']);
         return $result;
     }
 
@@ -200,7 +218,7 @@ class CourseController extends Controller
         return RegisterOnlineCourse::registerCourse($request);
     }
 
-    protected function getRegisteredCourseIds(){
+    public function getRegisteredCourseIds(){
         $registeredCourseIds = [];
         $loginUser = Auth::user();
         if(is_object($loginUser)){
@@ -222,8 +240,9 @@ class CourseController extends Controller
                 $courseIds[] = $course->id;
             }
             $courseIds = array_unique($courseIds);
+            return CourseVideo::getCoursevideoCount($courseIds);
         }
-        return CourseVideo::getCoursevideoCount($courseIds);
+        return;
     }
 
     protected function likeCourseVideo(Request $request){

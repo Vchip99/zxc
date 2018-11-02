@@ -482,6 +482,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	// discussion and comments front
 	Route::get('discussion/{commentId?}/{subcommentId?}', 'DiscussionController@discussion');
 	Route::post('createPost', 'DiscussionController@createPost');
+	Route::post('createMyPost', 'DiscussionController@createMyPost');
 	Route::post('createComment', 'DiscussionController@createComment');
 	Route::post('createSubComment', 'DiscussionController@createSubComment');
 	Route::post('getDiscussionPostsByCategoryId', 'DiscussionController@getDiscussionPostsByCategoryId');
@@ -557,6 +558,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('/college/{college}/myDocuments', 'AccountController@myDocuments');
 	Route::get('/college/{college}/myVchipVkits', 'AccountController@myVchipVkits');
 	Route::get('/college/{college}/myCollegeVkits', 'AccountController@myCollegeVkits');
+	Route::get('/college/{college}/discussion', [ 'as' => 'discussion', 'uses' => 'AccountController@discussion']);
 	Route::get('/college/{college}/myQuestions', [ 'as' => 'myQuestions', 'uses' => 'AccountController@myQuestions']);
 	Route::get('/college/{college}/myReplies', [ 'as' => 'myReplies', 'uses' => 'AccountController@myReplies']);
 	Route::get('/college/{college}/myCertificate', 'AccountController@myCertificate');
@@ -619,6 +621,12 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('/college/{college}/showUserTestSolution', 'AccountController@showUserTestSolution');
 	Route::get('/college/{college}/vkitproject/{id}/{subcommentId?}', 'AccountController@vkitproject');
 	Route::get('/college/{college}/collegeVkitproject/{id}/{subcommentId?}', 'AccountController@collegeVkitproject');
+	Route::post('purchaseTest', 'AccountController@purchaseTest');
+	Route::get('thankyouPurchaseTest', 'AccountController@thankyouPurchaseTest');
+	Route::post('webhookPurchaseTest', 'AccountController@webhookPurchaseTest');
+	Route::post('purchaseCourse', 'AccountController@purchaseCourse');
+	Route::get('thankyouPurchaseCourse', 'AccountController@thankyouPurchaseCourse');
+	Route::post('webhookPurchaseCourse', 'AccountController@webhookPurchaseCourse');
 
 	// like- dis-like count front
 	Route::post('likePost', 'CourseController@likePost');
@@ -1389,6 +1397,10 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('sendClientUserParentAddOtp', 'Client\ClientUserController@sendClientUserParentAddOtp');
   	Route::post('addParent', 'Client\ClientUserController@addParent');
   	Route::get('myIndividualMessage', 'Client\ClientUserController@myIndividualMessage');
+  	Route::get('myDiscussion', 'Client\ClientUserController@myDiscussion');
+  	Route::get('myQuestions', 'Client\ClientUserController@myQuestions');
+  	Route::get('myReplies', 'Client\ClientUserController@myReplies');
+
 
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');
@@ -1562,4 +1574,32 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('individualMessage/{id}/edit', 'Client\ClientIndividualMessageController@edit');
 	Route::delete('deleteIndividualMessage', 'Client\ClientIndividualMessageController@delete');
 	Route::post('getIndividualMessagesByDate', 'Client\ClientIndividualMessageController@getIndividualMessagesByDate');
+
+	// discussion CRUD
+	Route::get('manageDiscussionCategory', 'Client\ClientDiscussionCategoryController@show');
+	Route::get('createDiscussionCategory', 'Client\ClientDiscussionCategoryController@create');
+	Route::post('createDiscussionCategory', 'Client\ClientDiscussionCategoryController@store');
+	Route::get('discussioncategory/{id}/edit', 'Client\ClientDiscussionCategoryController@edit');
+	Route::put('updateDiscussionCategory', 'Client\ClientDiscussionCategoryController@update');
+	Route::delete('deleteDiscussionCategory', 'Client\ClientDiscussionCategoryController@delete');
+	Route::post('isClientDiscussionCategoryExist', 'Client\ClientDiscussionCategoryController@isClientDiscussionCategoryExist');
+	Route::get('manageDiscussion', 'Client\ClientDiscussionCategoryController@manageDiscussion');
+	Route::post('createPost', 'Client\ClientDiscussionCategoryController@createPost');
+	Route::post('updatePost', 'Client\ClientDiscussionCategoryController@updatePost');
+	Route::post('createComment', 'Client\ClientDiscussionCategoryController@createComment');
+	Route::post('createSubComment', 'Client\ClientDiscussionCategoryController@createSubComment');
+	Route::post('getDiscussionPostsByCategoryId', 'Client\ClientDiscussionCategoryController@getDiscussionPostsByCategoryId');
+	Route::post('updateComment', 'Client\ClientDiscussionCategoryController@updateComment');
+	Route::post('updateSubComment', 'Client\ClientDiscussionCategoryController@updateSubComment');
+	Route::post('deleteComment', 'Client\ClientDiscussionCategoryController@deleteComment');
+	Route::post('deleteSubComment', 'Client\ClientDiscussionCategoryController@deleteSubComment');
+	Route::get('manageQuestions', 'Client\ClientDiscussionCategoryController@manageQuestions');
+	Route::post('createMyPost', 'Client\ClientDiscussionCategoryController@createMyPost');
+	Route::post('updateMyPost', 'Client\ClientDiscussionCategoryController@updateMyPost');
+	Route::post('deleteMyPost', 'Client\ClientDiscussionCategoryController@deleteMyPost');
+	Route::post('deletePost', 'Client\ClientDiscussionCategoryController@deletePost');
+	Route::get('manageReplies', 'Client\ClientDiscussionCategoryController@manageReplies');
+	Route::post('discussionLikePost', 'Client\ClientDiscussionCategoryController@discussionLikePost');
+	Route::post('discussionLikeComment', 'Client\ClientDiscussionCategoryController@discussionLikeComment');
+	Route::post('discussionLikeSubComment', 'Client\ClientDiscussionCategoryController@discussionLikeSubComment');
 });

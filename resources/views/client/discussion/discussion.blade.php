@@ -1,11 +1,15 @@
-@extends('layouts.master')
-@section('header-title')
-  <title>Vchip-edu – Technical Discussion Forum |Vchip Technology</title>
+@extends(is_object(Auth::guard('client')->user())?'client.dashboard':'clientuser.dashboard.dashboard')
+@section('dashboard_header')
+  <script src="{{asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
 @stop
-@section('header-css')
-  @include('layouts.home-css')
-  <link href="{{asset('css/sidemenuindex.css?ver=1.0')}}" rel="stylesheet"/>
-  <link href="{{asset('css/comment.css?ver=1.0')}}" rel="stylesheet"/>
+@section('module_title')
+  <section class="content-header">
+    <h1> Discussion </h1>
+    <ol class="breadcrumb">
+      <li><i class="fa fa-comments-o"></i> Discussion </li>
+      <li class="active"> Discussion </li>
+    </ol>
+  </section>
   <style type="text/css">
     .ask-qst button{
       border-radius: 0px;
@@ -25,493 +29,391 @@
     }
   </style>
 @stop
-@section('header-js')
-  @include('layouts.home-js')
-  <script src="{{asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
-@stop
-@section('content')
-  @include('header.header_menu')
-  <section id="vchip-background" class="mrgn_60_btm">
-    <div class="vchip-background-single">
-      <div class="vchip-background-img ">
-        <figure class="">
-          <img src="{{ asset('images/discussion.jpg')}}" class="header_img_top_pad" style="vertical-align:top; background-attachment:fixed"/ alt="Vchip Discussion Forum">
-        </figure>
-      </div>
-      <div class="overlay"></div>
-      <div class="vchip-background-content">
-      <h2 class="animated bounceInLeft">Digital Education</h2>
-        </div>
-    </div>
-  </section>
-  <section   class="v_container">
+@section('dashboard_content')
+	<section   class="v_container">
     <div class="container ">
       <div class="row">
-        <div class="col-sm-3 hidden-div" id="sidemenuindex">
-          <h4 class="v_h4_subtitle"> Sort By</h4>
-          <div class="dropdown mrgn_20_top_btm" id="cat">
-            <select id="category" class="form-control" name="category" title="Category" onChange="showPosts(this);" required>
-              <option value = "0"> Select Category</option>
-              @if(count($discussionCategories) > 0)
-                @foreach($discussionCategories as $discussionCategory)
-                  <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
-                @endforeach
-              @endif
-            </select>
-          </div>
-          <h4 class="v_h4_subtitle mrgn_20_top_btm"> Filter By</h4>
-          <div class="panel"></div>
-          <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Others"> Others</p>
-          <div class="panel">
-            <div class="checkbox">
-              <label><input class="search" type="checkbox" value="1" data-filter="recent" onclick="searchDuscussionPosts();">Recent</label>
-            </div>
-            <div class="checkbox">
-              <label><input class="search" type="checkbox" value="1" data-filter="mostpopular" onclick="searchDuscussionPosts();">Most popular</label>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-9 col-sm-push-3">
-          <div class="ask-qst">
-              @if(is_object($currentUser))
-                <a class="btn btn-primary" data-toggle="modal" data-target="#askQuestion">Ask Question</a>
+        <div class="col-sm-9">
+            <div class="ask-qst row">
+              <div class="col-sm-2">
+                <button class="btn btn-primary "  data-toggle="modal" data-target="#askQuestion" style="width: 100px;"> Ask Question</button>
+              </div>
+              <div class="col-sm-3">
+                <select id="category" class="form-control" name="category" title="Category" onChange="showPosts(this);" required>
+                  <option value = "0"> Select Category</option>
+                  @if(count($discussionCategories) > 0)
+                    @foreach($discussionCategories as $discussionCategory)
+                      <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+              @if(is_object(Auth::guard('client')->user()))
+                <a href="{{ url('manageDiscussion')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="Discussion"><i class="fa fa-comments"></i></a>&nbsp;
+                <a href="{{ url('manageQuestions')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="My Questions"><i class="fa fa-question-circle"></i></a>&nbsp;
+                <a href="{{ url('manageReplies')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="My Replies"><i class="fa fa-reply"></i></a>&nbsp;
               @else
-                <a class="btn btn-primary" data-toggle="modal" data-target="#loginUserModel">Ask Question</a>
+                <a href="{{ url('myDiscussion')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="My Discussion"><i class="fa fa-comments"></i></a>&nbsp;
+                <a href="{{ url('myQuestions')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="My Questions"><i class="fa fa-question-circle"></i></a>&nbsp;
+                <a href="{{ url('myReplies')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="My Replies"><i class="fa fa-reply"></i></a>&nbsp;
               @endif
-              <input type="hidden" name="user_id" id="user_id" value="{{ (is_object($currentUser))?$currentUser->id:NULL}}">
-          </div>
-          <div class="post-comments ">
-            <div class="row" id="showAllPosts">
-              @if(count($posts) > 0)
-                @foreach($posts as $post)
-                 <div class="media" id="showPost_{{$post->id}}">
-                    <div class="media-heading" >
-                    <div class="user-block ">
-                      <span class="tital">{{$post->title}} </span>
-                    </div>
-                    <div class="box-tools ">
-                      <button type="button" data-toggle="collapse" data-target="#post{{$post->id}}" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i>
-                      </button>
-                      @if(is_object($currentUser) && $currentUser->id == $post->user_id)
-                      <button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button>
-                      <ul role="menu" class="dropdown-menu dropdown-menu-right">
-                        <li><a id="{{$post->id}}" onclick="confirmPostDelete(this);">Delete</a></li>
-                        <li><a id="{{$post->id}}" onclick="editPost(this);">Edit</a></li>
-                      </ul>
-                      @endif
-                    </div>
-                    </div>
-                    <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
-                    <div class="user-block cmt-left-margin">
-                      @if(is_file($post->getUser($post->user_id)->photo) || (!empty($post->getUser($post->user_id)->photo) && false == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)))
-                        <img src="{{ asset($post->getUser($post->user_id)->photo)}} " class="img-circle" alt="User Image">
-                      @else
-                        <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
-                      @endif
-                      <span class="username">{{ $post->getUser($post->user_id)->name }} </span>
-                      <span class="description">Shared publicly - {{$post->updated_at->diffForHumans()}}</span>
-                    </div>
-                    <div  class="media-body" data-toggle="lightbox">
-                      <br/>
-                      <div class="more img-ckeditor img-responsive cmt-left-margin" id="editPostHide_{{$post->id}}">{!! $post->body !!}
-                      </div>
-                      <br/>
-                      @if($post->answer1 && $post->answer2 && $post->answer && $post->solution)
-                        <div class="cmt-left-margin">
-                          <p id="1" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
-                            1. {!! $post->answer1 !!}
-                            @if(1 == $post->answer)
-                              <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
-                            @endif
-                          </p>
-                          <p id="2" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
-                            2. {!! $post->answer2 !!}
-                            @if(2 == $post->answer)
-                              <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
-                            @endif
-                          </p>
-                          @if($post->answer3)
-                          <p id="3" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
-                            3. {!! $post->answer3 !!}
-                            @if(3 == $post->answer)
-                              <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
-                            @endif
-                          </p>
-                          @endif
-                          @if($post->answer4)
-                          <p id="4" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
-                            4. {!! $post->answer4 !!}
-                            @if(4 == $post->answer)
-                              <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
-                            @endif
-                          </p>
-                          @endif
-                          <p class="hide" id="answer_{{$post->id}}"><b>Answer:</b> Option {{ $post->answer }}</p>
-                          <p class="hide" id="solution_{{$post->id}}"><b>Solution:</b><br/> {!! $post->solution !!}</p>
-                          <input type="hidden" id="right_answer_{{$post->id}}" value="{{$post->answer}}">
-                        </div>
-                      @endif
-                       <br/>
-                        <div class="form-group hide" id="editPostShow_{{$post->id}}" >
-                          <textarea name="update_question" placeholder="Answer 1" type="text" id="updatequestion_{{$post->id}}" required>{!! $post->body !!}</textarea>
-                            <script type="text/javascript">
-                              CKEDITOR.replace('updatequestion_{{$post->id}}', { enterMode: CKEDITOR.ENTER_BR } );
-                              CKEDITOR.config.width="100%";
-                              CKEDITOR.config.height="auto";
-                              CKEDITOR.on('dialogDefinition', function (ev) {
-
-                                  var dialogName = ev.data.name,
-                                      dialogDefinition = ev.data.definition;
-
-                                  if (dialogName == 'image') {
-                                      var onOk = dialogDefinition.onOk;
-
-                                      dialogDefinition.onOk = function (e) {
-                                          var width = this.getContentElement('info', 'txtWidth');
-                                          width.setValue('100%');
-
-                                          var height = this.getContentElement('info', 'txtHeight');
-                                          height.setValue('auto');
-
-                                          onOk && onOk.apply(this, e);
-                                      };
-                                  }
-                              });
-                            </script>
-                          <button class="btn btn-primary" data-post_id="{{$post->id}}"  onclick="updatePost(this);">Update</button>
-                          <button type="button" class="btn btn-default" id="{{$post->id}}" onclick="canclePost(this);">Cancle</button>
-                        </div>
-                      <div class="border-bottom"></div>
-                      <div class="comment-meta main-reply-box cmt-left-margin">
-                          <span id="like_{{$post->id}}" >
-                            @if( isset($likesCount[$post->id]) && is_object($currentUser) && isset($likesCount[$post->id]['user_id'][$currentUser->id]))
-                                 <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                 <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
-                            @else
-                                 <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
-                                 <span id="like1-bs3">@if( isset($likesCount[$post->id])) {{count($likesCount[$post->id]['like_id'])}} @endif</span>
-                            @endif
-                          </span>
-                         <span class="mrgn_5_left">
+             </div>
+                <div class="post-comments ">
+                  <div class="row" id="showAllPosts">
+                    @if(count($posts) > 0)
+                      @foreach($posts as $post)
+                       <div class="media" id="showPost_{{$post->id}}">
+                          <div class="media-heading" >
+                          <div class="user-block ">
+                            <span class="tital">{{$post->title}} </span>
+                          </div>
+                          <div class="box-tools ">
+                            <button type="button" data-toggle="collapse" data-target="#post{{$post->id}}" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i>
+                            </button>
                             @if(is_object($currentUser))
-                              | <a class="" role="button" data-toggle="collapse" href="#replyToPost{{$post->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
-                            @else
-                              | <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">Comment</a>
-                            @endif
-                            @if($post->answer1 && $post->answer2 && $post->answer && $post->solution)
-                              | <a id="{{$post->id}}" onClick="toggleSolution(this);">Solution</a>
-                            @endif
-                          </span>
-                        <div class="collapse replyComment" id="replyToPost{{$post->id}}">
-                            <div class="form-group">
-                              <label for="comment">Your Comment</label>
-                              <textarea name="comment" id="comment_{{$post->id}}" class="form-control" ></textarea>
-                            </div>
-                            <button class="btn btn-default" onclick="confirmSubmitReplytoPost(this);" data-post_id="{{$post->id}}">Send</button>
-                            <button type="button" class="btn btn-default" data-id="replyToPost{{$post->id}}" onclick="cancleReply(this);">Cancle</button>
-                        </div>
-                      </div>
-                      <div class="cmt-bg">
-                        <div class="box-body chat" id="chat-box">
-                          @if(count( $post->descComments) > 0)
-                            @foreach($post->descComments as $comment)
-                              @if(is_object($comment))
-                                <div class="item cmt-left-margin-10" id="showComment_{{$comment->id}}">
-                                  @if(is_file($comment->getUser($comment->user_id)->photo) || (!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)))
-                                    <img src="{{ asset($comment->getUser($comment->user_id)->photo)}} " class="img-circle" alt="User Image">
-                                  @else
-                                    <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
-                                  @endif
-                                  <div class="message">
-                                    @if(is_object($currentUser) && ($currentUser->id == $comment->user_id || $currentUser->id == $post->user_id))
-                                    <div class="dropdown pull-right">
-                                      <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                        <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                                      </button>
-                                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                        @if($currentUser->id == $comment->user_id || $currentUser->id == $post->user_id)
-                                          <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
-                                        @endif
-                                        @if($currentUser->id == $comment->user_id)
-                                          <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
-                                        @endif
-                                      </ul>
-                                    </div>
-                                    @endif
-                                      <a class="SubCommentName">{{ $comment->getUser($comment->user_id)->name }}</a>
-                                      <p class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</p>
-                                        <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
-                                          <textarea class="form-control" name="comment" id="comment_{{$post->id}}_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
-                                          <button class="btn btn-primary" data-post_id="{{$post->id}}" data-comment_id="{{$comment->id}}" onclick="updateComment(this);">Update</button>
-                                          <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
-                                        </div>
-                                    </div>
-                                    <div class="comment-meta reply-1 cmt-left-margin">
-                                      <span id="cmt_like_{{$comment->id}}" >
-                                        @if( isset($commentLikesCount[$comment->id]) &&  is_object($currentUser) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser->id]))
-                                             <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                             <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
-                                        @else
-                                             <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
-                                             <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
-                                        @endif
-                                      </span>
-                                     <span class="mrgn_5_left">
-                                      @if(is_object($currentUser))
-                                        <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$post->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
-                                      @else
-                                        <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
-                                      @endif
-                                    </span>
-                                    <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
-                                    <div class="collapse replyComment" id="replyToComment{{$post->id}}-{{$comment->id}}">
-                                        <div class="form-group">
-                                          <label for="subcomment">Your Sub Comment</label>
-                                            <textarea name="subcomment" id="subcomment_{{$post->id}}_{{$comment->id}}" class="form-control" rows="3"></textarea>
-                                        </div>
-                                        <button class="btn btn-default" data-post_id="{{$post->id}}" data-comment_id="{{$comment->id}}" onclick="confirmSubmitReplytoComment(this);">Send</button>
-                                        <button type="button" class="btn btn-default" data-id="replyToComment{{$post->id}}-{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
-                                    </div>
-                                  </div>
-                                </div>
-                                @if(count( $comment->children ) > 0)
-                                  @include('discussion.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'currentUser' => $currentUser])
-                                @endif
+                              @if((0 != $post->clientuser_id && $currentUser->id == $post->clientuser_id) || (0 == $post->clientuser_id && $currentUser->id == $post->client_id && 1 == $currentUser->admin_approve))
+                                <button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button>
+                                <ul role="menu" class="dropdown-menu dropdown-menu-right">
+                                  <li><a id="{{$post->id}}" onclick="confirmPostDelete(this);">Delete</a></li>
+                                  <li><a id="{{$post->id}}" onclick="editPost(this);">Edit</a></li>
+                                </ul>
                               @endif
-                            @endforeach
+                            @endif
+                          </div>
+                          </div>
+                          <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
+                          <div class="user-block cmt-left-margin">
+                          @if($post->clientuser_id > 0 && (is_file($post->getUser($post->clientuser_id)->photo) || (!empty($post->getUser($post->clientuser_id)->photo) && false == preg_match('/clientUserStorage/',$post->getUser($post->clientuser_id)->photo))))
+                            <img src="{{ asset($post->getUser($post->clientuser_id)->photo)}} " class="img-circle" alt="User Image">
+                          @elseif(0 == $post->clientuser_id && (is_file($post->getClient($post->client_id)->photo) || (!empty($post->getClient($post->client_id)->photo) && false == preg_match('/client_images/',$post->getClient($post->client_id)->photo))))
+                            <img src="{{ asset($post->getClient($post->client_id)->photo)}} " class="img-circle" alt="User Image">
+                          @else
+                            <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
                           @endif
+                            <span class="username">
+                              @if($post->clientuser_id > 0)
+                                {{ $post->getUser($post->clientuser_id)->name }}
+                              @else
+                                {{ $post->getClient($post->client_id)->name }}
+                              @endif
+                            </span>
+                            <span class="description">Shared publicly - {{$post->updated_at->diffForHumans()}}</span>
+                          </div>
+                          <div  class="media-body" data-toggle="lightbox">
+                            <br/>
+                            <div class="more img-ckeditor img-responsive cmt-left-margin" id="editPostHide_{{$post->id}}">{!! $post->body !!}
+                            </div>
+                            <br/>
+                            @if($post->answer1 && $post->answer2 && $post->answer && $post->solution)
+                              <div class="cmt-left-margin">
+                                <p id="1" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                                  1. {!! $post->answer1 !!}
+                                  @if(1 == $post->answer)
+                                    <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                                  @endif
+                                </p>
+                                <p id="2" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                                  2. {!! $post->answer2 !!}
+                                  @if(2 == $post->answer)
+                                    <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                                  @endif
+                                </p>
+                                @if($post->answer3)
+                                <p id="3" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                                  3. {!! $post->answer3 !!}
+                                  @if(3 == $post->answer)
+                                    <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                                  @endif
+                                </p>
+                                @endif
+                                @if($post->answer4)
+                                <p id="4" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                                  4. {!! $post->answer4 !!}
+                                  @if(4 == $post->answer)
+                                    <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                                  @endif
+                                </p>
+                                @endif
+                                <p class="hide" id="answer_{{$post->id}}"><b>Answer:</b> Option {{ $post->answer }}</p>
+                                <p class="hide" id="solution_{{$post->id}}"><b>Solution:</b><br/> {!! $post->solution !!}</p>
+                                <input type="hidden" id="right_answer_{{$post->id}}" value="{{$post->answer}}">
+                              </div>
+                            @endif
+                             <br/>
+                              <div class="form-group hide" id="editPostShow_{{$post->id}}" >
+                                <textarea name="update_question" placeholder="Answer 1" type="text" id="updatequestion_{{$post->id}}" required>{!! $post->body !!}</textarea>
+                                  <script type="text/javascript">
+                                    CKEDITOR.replace('updatequestion_{{$post->id}}', { enterMode: CKEDITOR.ENTER_BR } );
+                                    CKEDITOR.config.width="100%";
+                                    CKEDITOR.config.height="auto";
+                                    CKEDITOR.on('dialogDefinition', function (ev) {
+
+                                        var dialogName = ev.data.name,
+                                            dialogDefinition = ev.data.definition;
+
+                                        if (dialogName == 'image') {
+                                            var onOk = dialogDefinition.onOk;
+
+                                            dialogDefinition.onOk = function (e) {
+                                                var width = this.getContentElement('info', 'txtWidth');
+                                                width.setValue('100%');
+
+                                                var height = this.getContentElement('info', 'txtHeight');
+                                                height.setValue('auto');
+
+                                                onOk && onOk.apply(this, e);
+                                            };
+                                        }
+                                    });
+                                  </script>
+                                <button class="btn btn-primary" data-post_id="{{$post->id}}"  onclick="updatePost(this);">Update</button>
+                                <button type="button" class="btn btn-default" id="{{$post->id}}" onclick="canclePost(this);">Cancle</button>
+                              </div>
+                            <div class="border-bottom"></div>
+                            <div class="comment-meta main-reply-box cmt-left-margin">
+                                <span id="like_{{$post->id}}" >
+                                  @if( isset($likesCount[$post->id]) && is_object($currentUser) && isset($likesCount[$post->id]['user_id'][$currentUser->id]))
+                                       <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                       <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
+                                  @else
+                                       <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                       <span id="like1-bs3">@if( isset($likesCount[$post->id])) {{count($likesCount[$post->id]['like_id'])}} @endif</span>
+                                  @endif
+                                </span>
+                               <span class="mrgn_5_left">
+                                  @if(is_object($currentUser))
+                                    | <a class="" role="button" data-toggle="collapse" href="#replyToPost{{$post->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
+                                  @else
+                                    | <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">Comment</a>
+                                  @endif
+                                  @if($post->answer1 && $post->answer2 && $post->answer && $post->solution)
+                                    | <a id="{{$post->id}}" onClick="toggleSolution(this);">Solution</a>
+                                  @endif
+                                </span>
+                              <div class="collapse replyComment" id="replyToPost{{$post->id}}">
+                                  <div class="form-group">
+                                    <label for="comment">Your Comment</label>
+                                    <textarea name="comment" id="comment_{{$post->id}}" class="form-control" ></textarea>
+                                  </div>
+                                  <button class="btn btn-default" onclick="confirmSubmitReplytoPost(this);" data-post_id="{{$post->id}}">Send</button>
+                                  <button type="button" class="btn btn-default" data-id="replyToPost{{$post->id}}" onclick="cancleReply(this);">Cancle</button>
+                              </div>
+                            </div>
+                            <div class="cmt-bg">
+                              <div class="box-body chat" id="chat-box">
+                                @if(count( $post->descComments) > 0)
+                                  @foreach($post->descComments as $comment)
+                                    @if(is_object($comment))
+                                      <div class="item cmt-left-margin-10" id="showComment_{{$comment->id}}">
+                                        @if($comment->clientuser_id > 0 && (is_file($comment->getUser($comment->clientuser_id)->photo) || (!empty($comment->getUser($comment->clientuser_id)->photo) && false == preg_match('/clientUserStorage/',$comment->getUser($comment->clientuser_id)->photo))))
+                                          <img src="{{ asset($comment->getUser($comment->clientuser_id)->photo)}} " class="img-circle" alt="User Image">
+                                        @elseif(0 == $comment->clientuser_id && (is_file($comment->getClient($comment->client_id)->photo) || (!empty($comment->getClient($comment->client_id)->photo) && false == preg_match('/client_images/',$comment->getClient($comment->client_id)->photo))))
+                                          <img src="{{ asset($comment->getClient($comment->client_id)->photo)}} " class="img-circle" alt="User Image">
+                                        @else
+                                          <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                                        @endif
+
+                                        <div class="message">
+                                          @if(is_object($currentUser))
+                                            @if((0 != $comment->clientuser_id && $currentUser->id == $comment->clientuser_id) || (0 == $comment->clientuser_id && $currentUser->id == $comment->client_id && 1 == $currentUser->admin_approve))
+                                            <div class="dropdown pull-right">
+                                              <button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                              </button>
+                                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                @if(($currentUser->id == $comment->clientuser_id || $currentUser->id == $post->clientuser_id) ||($currentUser->id == $comment->client_id || $currentUser->id == $post->client_id))
+                                                  <li><a id="{{$comment->id}}" onclick="confirmCommentDelete(this);">Delete</a></li>
+                                                @endif
+                                                @if(($currentUser->id == $comment->clientuser_id) || ($currentUser->id == $comment->client_id))
+                                                  <li><a id="{{$comment->id}}" onclick="editComment(this);">Edit</a></li>
+                                                @endif
+                                              </ul>
+                                            </div>
+                                            @endif
+                                          @endif
+                                            <a class="SubCommentName">
+                                              @if(0 != $comment->clientuser_id)
+                                                {{ $comment->getUser($comment->clientuser_id)->name }}
+                                              @else
+                                                {{ $comment->getClient($comment->client_id)->name }}
+                                              @endif
+                                            </a>
+                                            <p class="more" id="editCommentHide_{{$comment->id}}">{!! $comment->body !!}</p>
+                                              <div class="form-group hide" id="editCommentShow_{{$comment->id}}" >
+                                                <textarea class="form-control" name="comment" id="comment_{{$post->id}}_{{$comment->id}}" rows="3">{!! $comment->body !!}</textarea>
+                                                <button class="btn btn-primary" data-post_id="{{$post->id}}" data-comment_id="{{$comment->id}}" onclick="updateComment(this);">Update</button>
+                                                <button type="button" class="btn btn-default" id="{{$comment->id}}" onclick="cancleComment(this);">Cancle</button>
+                                              </div>
+                                          </div>
+                                          <div class="comment-meta reply-1 cmt-left-margin">
+                                            <span id="cmt_like_{{$comment->id}}" >
+                                              @if( isset($commentLikesCount[$comment->id]) &&  is_object($currentUser) && isset($commentLikesCount[$comment->id]['user_id'][$currentUser->id]))
+                                                   <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->client_discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                                   <span id="like1-bs3">{{count($commentLikesCount[$comment->id]['like_id'])}}</span>
+                                              @else
+                                                   <i id="comment_like_{{$comment->id}}" data-post_id="{{$comment->client_discussion_post_id}}" data-comment_id="{{$comment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                                   <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
+                                              @endif
+                                            </span>
+                                           <span class="mrgn_5_left">
+                                            @if(is_object($currentUser))
+                                              <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$post->id}}-{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
+                                            @else
+                                              <a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
+                                            @endif
+                                          </span>
+                                          <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
+                                          <div class="collapse replyComment" id="replyToComment{{$post->id}}-{{$comment->id}}">
+                                              <div class="form-group">
+                                                <label for="subcomment">Your Sub Comment</label>
+                                                  <textarea name="subcomment" id="subcomment_{{$post->id}}_{{$comment->id}}" class="form-control" rows="3"></textarea>
+                                              </div>
+                                              <button class="btn btn-default" data-post_id="{{$post->id}}" data-comment_id="{{$comment->id}}" onclick="confirmSubmitReplytoComment(this);">Send</button>
+                                              <button type="button" class="btn btn-default" data-id="replyToComment{{$post->id}}-{{$comment->id}}" onclick="cancleReply(this);">Cancle</button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      @if(count( $comment->children ) > 0)
+                                        @include('client.discussion.comments', ['comments' => $comment->children, 'parent' => $comment->id, 'currentUser' => $currentUser])
+                                      @endif
+                                    @endif
+                                  @endforeach
+                                @endif
+                              </div>
+                            </div>
+                          </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    </div>
+                      @endforeach
+                    @else
+                      No discussion questions
+                    @endif
                   </div>
-                @endforeach
-              @endif
-            </div>
-          </div>
-          <div class="modal fade" id="askQuestion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <select id="post_category" class="form-control" name="post_category" required>
-                      <option value = ""> Select Category</option>
-                      @if(count($discussionCategories) > 0)
-                        @foreach($discussionCategories as $discussionCategory)
-                          <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
-                        @endforeach
-                      @endif
-                  </select>
-                  <input type="radio" name="type" checked="true" value="discussion" onClick="toggleType('discussion');">Discussion
-                  <input type="radio" name="type" value="mcq" onClick="toggleType('mcq');">MCQ
                 </div>
-                <div class="modal-body" style="padding: 0px;">
-                  <div class="widget-area no-padding blank">
-                    <div class="status-upload">
-                      <div class="input-group">
-                        <span class="input-group-addon">Title</span>
-                        <input id="title" type="text" class="form-control" name="title" placeholder="Add Title Here">
+                <div class="modal fade" id="askQuestion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <select id="post_category" class="form-control" name="post_category" required>
+                            <option value = ""> Select Category</option>
+                            @if(count($discussionCategories) > 0)
+                              @foreach($discussionCategories as $discussionCategory)
+                                <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
+                              @endforeach
+                            @endif
+                        </select>
+                        <input type="radio" name="type" checked="true" value="discussion" onClick="toggleType('discussion');">Discussion
+                        <input type="radio" name="type" value="mcq" onClick="toggleType('mcq');">MCQ
                       </div>
-                      <textarea name="question" placeholder="post here" type="text" id="question" required></textarea>
-                      <script type="text/javascript">
-                        CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
-                        CKEDITOR.config.width="100%";
-                        CKEDITOR.config.height="auto";
-                        CKEDITOR.on('dialogDefinition', function (ev) {
+                      <div class="modal-body" style="padding: 0px;">
+                        <div class="widget-area  blank">
+                              <div class="status-upload">
+                                   <div class="input-group">
+                                      <span class="input-group-addon">Title</span>
+                                      <input id="title" type="text" class="form-control" name="title" placeholder="Add Title Here">
+                                    </div>
+                                     <textarea name="question" placeholder="Answer 1" type="text" id="question" required></textarea>
+                                    <script type="text/javascript">
+                                      CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
+                                      CKEDITOR.config.width="100%";
+                                      CKEDITOR.config.height="auto";
+                                      CKEDITOR.on('dialogDefinition', function (ev) {
 
-                            var dialogName = ev.data.name,
-                                dialogDefinition = ev.data.definition;
+                                          var dialogName = ev.data.name,
+                                              dialogDefinition = ev.data.definition;
 
-                            if (dialogName == 'image') {
-                                var onOk = dialogDefinition.onOk;
+                                          if (dialogName == 'image') {
+                                              var onOk = dialogDefinition.onOk;
 
-                                dialogDefinition.onOk = function (e) {
-                                    var width = this.getContentElement('info', 'txtWidth');
-                                    width.setValue('100%');//Set Default Width
+                                              dialogDefinition.onOk = function (e) {
+                                                  var width = this.getContentElement('info', 'txtWidth');
+                                                  width.setValue('100%');//Set Default Width
 
-                                    var height = this.getContentElement('info', 'txtHeight');
-                                    height.setValue('auto');////Set Default height
+                                                  var height = this.getContentElement('info', 'txtHeight');
+                                                  height.setValue('400');////Set Default height
 
-                                    onOk && onOk.apply(this, e);
-                                };
-                            }
-                        });
-                      </script>
-                      <div id="mcs_options" class="hide">
-                        <div class="form-group row">
-                          <label class="col-sm-3 col-form-label">Option 1:<span class="red-color">*</span></label>
-                          <div class="col-sm-3">
-                            <input type="text" name="answer1" id="answer1" value="" required>
-                          </div>
-                        </div>
-                        <div class="form-group row">
-                          <label class="col-sm-3 col-form-label">Option 2:<span class="red-color">*</span></label>
-                          <div class="col-sm-3">
-                            <input type="text" name="answer2" id="answer2" value="" required>
-                          </div>
-                        </div>
-                        <div class="form-group row">
-                          <label class="col-sm-3 col-form-label">Option 3:</label>
-                          <div class="col-sm-3">
-                            <input type="text" name="answer3" id="answer3" value="">
-                          </div>
-                        </div>
-                        <div class="form-group row">
-                          <label class="col-sm-3 col-form-label">Option 4:</label>
-                          <div class="col-sm-3">
-                            <input type="text" name="answer4" id="answer4" value="">
-                          </div>
-                        </div>
-                        <div class="form-group row">
-                          <label class="col-sm-3 col-form-label">Right Answer:<span class="red-color">*</span></label>
-                          <div class="col-sm-3">
-                            <input type="number" name="answer" id="answer" min="1" max="4" step="1" value="1" pattern="[1-4]{1}">
-                          </div>
-                        </div>
-                        <div class="form-group row">
-                          <label class="col-sm-3 col-form-label">Solution:<span class="red-color">*</span></label>
-                          <div class="col-sm-9">
-                            <textarea name="solution" id="solution" required cols="40" rows="5"></textarea>
-                            <script type="text/javascript">
-                              CKEDITOR.replace( 'solution', { enterMode: CKEDITOR.ENTER_BR } );
-                              CKEDITOR.config.width="100%";
-                              CKEDITOR.config.height="auto";
-                              CKEDITOR.on('dialogDefinition', function (ev) {
+                                                  onOk && onOk.apply(this, e);
+                                              };
+                                          }
+                                      });
+                                    </script>
+                                    <div id="mcs_options" class="hide">
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Option 1:<span class="red-color">*</span></label>
+                                        <div class="col-sm-3">
+                                          <input type="text" name="answer1" id="answer1" value="" required>
+                                        </div>
+                                      </div>
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Option 2:<span class="red-color">*</span></label>
+                                        <div class="col-sm-3">
+                                          <input type="text" name="answer2" id="answer2" value="" required>
+                                        </div>
+                                      </div>
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Option 3:</label>
+                                        <div class="col-sm-3">
+                                          <input type="text" name="answer3" id="answer3" value="">
+                                        </div>
+                                      </div>
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Option 4:</label>
+                                        <div class="col-sm-3">
+                                          <input type="text" name="answer4" id="answer4" value="">
+                                        </div>
+                                      </div>
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Right Answer:<span class="red-color">*</span></label>
+                                        <div class="col-sm-3">
+                                          <input type="number" name="answer" id="answer" min="1" max="4" step="1" value="1" pattern="[1-4]{1}">
+                                        </div>
+                                      </div>
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Solution:<span class="red-color">*</span></label>
+                                        <div class="col-sm-9">
+                                          <textarea name="solution" id="solution" required cols="40" rows="5"></textarea>
+                                          <script type="text/javascript">
+                                            CKEDITOR.replace( 'solution', { enterMode: CKEDITOR.ENTER_BR } );
+                                            CKEDITOR.config.width="100%";
+                                            CKEDITOR.config.height="auto";
+                                            CKEDITOR.on('dialogDefinition', function (ev) {
 
-                                  var dialogName = ev.data.name,
-                                      dialogDefinition = ev.data.definition;
+                                                var dialogName = ev.data.name,
+                                                    dialogDefinition = ev.data.definition;
 
-                                  if (dialogName == 'image') {
-                                      var onOk = dialogDefinition.onOk;
+                                                if (dialogName == 'image') {
+                                                    var onOk = dialogDefinition.onOk;
 
-                                      dialogDefinition.onOk = function (e) {
-                                          var width = this.getContentElement('info', 'txtWidth');
-                                          width.setValue('100%');//Set Default Width
+                                                    dialogDefinition.onOk = function (e) {
+                                                        var width = this.getContentElement('info', 'txtWidth');
+                                                        width.setValue('100%');//Set Default Width
 
-                                          var height = this.getContentElement('info', 'txtHeight');
-                                          height.setValue('auto');////Set Default height
+                                                        var height = this.getContentElement('info', 'txtHeight');
+                                                        height.setValue('auto');////Set Default height
 
-                                          onOk && onOk.apply(this, e);
-                                      };
-                                  }
-                              });
-                            </script>
-                          </div>
-                        </div>
+                                                        onOk && onOk.apply(this, e);
+                                                    };
+                                                }
+                                            });
+                                          </script>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <button type="button" class="btn btn-success btn-circle text-uppercase" onclick="confirmSubmit(this);" id="createPost"><i class="fa fa-share"></i> Share</button>
+                              </div><!-- Status Upload  -->
+                            </div>
                       </div>
-                      <button type="button" class="btn btn-success btn-circle text-uppercase" onclick="confirmSubmit(this);" id="createPost" title="Share"><i class="fa fa-share"></i> Share</button>
-                    </div><!-- Status Upload  -->
-                  </div>
-                </div>
-                <div class="modal-footer ">
-                  <button type="button" class="btn btn-default " data-dismiss="modal" style="margin-top: 10px;">close</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-3 col-sm-pull-9">
-          <div class="hidden-div1" id="sidemenuindex">
-            <h4 class="v_h4_subtitle"> Sort By</h4>
-            <div class="dropdown mrgn_20_top_btm" id="cat">
-              <select id="category" class="form-control" name="category" title="Category" onChange="showPosts(this);" required>
-                <option value = "0"> Select Category</option>
-                @if(count($discussionCategories) > 0)
-                  @foreach($discussionCategories as $discussionCategory)
-                    <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
-                  @endforeach
-                @endif
-              </select>
-            </div>
-            <h4 class="v_h4_subtitle mrgn_20_top_btm"> Filter By</h4>
-            <div class="panel"></div>
-            <p class="v_p_sm v_plus_minus_symbol mrgn_20_top_btm" title="Others"> Others</p>
-            <div class="panel">
-              <div class="checkbox">
-                <label><input class="search" type="checkbox" value="1" data-filter="recent" onclick="searchDuscussionPosts();">Recent</label>
-              </div>
-              <div class="checkbox">
-                <label><input class="search" type="checkbox" value="1" data-filter="mostpopular" onclick="searchDuscussionPosts();">Most popular</label>
-              </div>
-            </div>
-          </div>
-          <div class="advertisement-area">
-            <span class="pull-right create-add"><a href="{{ url('createAd') }}"> Create Ad</a></span>
-          </div>
-            <br/>
-            @if(count($ads) > 0)
-              @foreach($ads as $ad)
-                <div class="add-1">
-                  <div class="course-box">
-                    <a class="img-course-box" href="{{ $ad->website_url }}" target="_blank">
-                      <img src="{{asset($ad->logo)}}" alt="{{ $ad->company }}"  class="img-responsive" />
-                    </a>
-                    <div class="course-box-content">
-                      <h4 class="course-box-title" title="{{ $ad->company }}" data-toggle="tooltip" data-placement="bottom">
-                        <a href="{{ $ad->website_url }}" target="_blank">{{ $ad->company }}</a>
-                      </h4>
-                      <p class="more"> {{ $ad->tag_line }}</p>
+                      <div class="modal-footer ">
+                        <button type="button" class="btn btn-default pull-right" data-dismiss="modal" style="margin-top: 10px;">close</button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              @endforeach
-            @endif
-            @if(count($ads) < 3)
-              @for($i = count($ads)+1; $i <=3; $i++)
-                @if(1 == $i)
-                  <div class="add-1">
-                    <div class="course-box">
-                      <a class="img-course-box" href="http://www.ssgmce.org" target="_blank">
-                        <img src="{{ asset('images/logo/ssgmce-logo.jpg') }}" alt="Shri Sant Gajanan Maharaj College of Engineering"  class="img-responsive" />
-                      </a>
-                      <div class="course-box-content">
-                        <h4 class="course-box-title" title="Shri Sant Gajanan Maharaj College of Engineering" data-toggle="tooltip" data-placement="bottom">
-                          <a href="http://www.ssgmce.org/" target="_blank">Shri Sant Gajanan Maharaj College of Engineering</a>
-                        </h4>
-                        <p class="more"> Shri Sant Gajanan Maharaj College of Engineering</p>
-                      </div>
-                    </div>
-                  </div>
-                @elseif(2 == $i)
-                  <div class="add-1">
-                    <div class="course-box">
-                      <a class="img-course-box" href="http://ghrcema.raisoni.net/" target="_blank">
-                        <img src="{{ asset('images/logo/ghrcema_logo.png') }}" alt="G H RISONI"  class="img-responsive" />
-                      </a>
-                      <div class="course-box-content">
-                        <h4 class="course-box-title" title="G H RISONI" data-toggle="tooltip" data-placement="bottom">
-                          <a href="http://ghrcema.raisoni.net/" target="_blank">G H RISONI</a>
-                        </h4>
-                        <p class="more"> G H RISONI</p>
-                      </div>
-                    </div>
-                  </div>
-                @elseif(3 == $i)
-                  <div class="add-1">
-                    <div class="course-box">
-                      <a class="img-course-box" href="http://hvpmcoet.in/" target="_blank">
-                        <img src="{{ asset('images/logo/hvpm.jpg') }}" alt="HVPM"  class="img-responsive" />
-                      </a>
-                      <div class="course-box-content">
-                        <h4 class="course-box-title" title="HVPM" data-toggle="tooltip" data-placement="bottom">
-                          <a href="http://hvpmcoet.in/" target="_blank">HVPM College of Engineer And Technology</a>
-                        </h4>
-                        <p class="more"> HVPM College of Engineer And Technology</p>
-                      </div>
-                    </div>
-                  </div>
-                @endif
-              @endfor
-            @endif
         </div>
       </div>
     </div>
   </section>
-@stop
-@section('footer')
-  @include('footer.footer')
-  <script type="text/javascript" src="{{ asset('js/togleForFilterBy.js') }}"></script>
-
-<script type="text/javascript">
+  <script type="text/javascript">
   function toggleType(type){
     if('mcq' == type){
       $('#mcs_options').removeClass('hide');
@@ -903,7 +805,12 @@
 
   function renderPosts(msg){
     var userId = parseInt(document.getElementById('user_id').value);
-    if(0 > userId){
+    if(document.getElementById('client_id')){
+      var clientId = parseInt(document.getElementById('client_id').value);
+    } else{
+      var clientId = 0;
+    }
+    if(!userId){
       userId = 0;
     }
     showPostsDiv = document.getElementById('showAllPosts');
@@ -930,7 +837,7 @@
         var boxDiv = document.createElement('div');
         boxDiv.className = 'box-tools';
         boxDivInnerHtml = '<button type="button" data-toggle="collapse" data-target="#post'+ obj.id +'" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i></button>';
-        if(userId == obj.user_id){
+        if((0 != clientId && userId == obj.user_id && true == obj.is_user) || ( 0 == clientId && userId == obj.client_id && false == obj.is_user)){
           boxDivInnerHtml += '<button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button><ul role="menu" class="dropdown-menu dropdown-menu-right"><li><a id="'+obj.id+'" onclick="confirmPostDelete(this);">Delete</a></li><li><a id="'+obj.id+'" onclick="editPost(this);">Edit</a></li></ul>'
         }
         boxDiv.innerHTML = boxDivInnerHtml;
@@ -1108,7 +1015,7 @@
 
               var commentMessageDiv = document.createElement('div');
               commentMessageDiv.className = 'message';
-              if( userId == obj.user_id || userId == postUserId ){
+              if((0 != clientId && userId == obj.user_id && true == obj.is_user) || (0 == clientId && userId == obj.client_id)){
                 var commentEditDeleteDiv = document.createElement('div');
                 commentEditDeleteDiv.className = 'dropdown pull-right';
                 editDeleteInnerHtml = '<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>';
@@ -1191,7 +1098,11 @@
               commentchatDiv.appendChild(mainCommentDiv);
               if( obj.subcomments ){
                 if(false == $.isEmptyObject(obj.subcomments)){
-                  var commentUserId = obj.user_id;
+                  if(0 == obj.clientuser_id){
+                    var commentUserId = obj.client_id;
+                  } else {
+                    var commentUserId = obj.clientuser_id;
+                  }
                   showSubComments(obj.subcomments, commentchatDiv, subcommentLikesCount, userId, commentUserId, postUserId);
                 }
               }
@@ -1226,6 +1137,11 @@
   }
 
   function showSubComments(subcomments, commentchatDiv, subcommentLikesCount, userId, commentUserId, postUserId){
+    if(document.getElementById('client_id')){
+      var clientId = document.getElementById('client_id').value;
+    } else {
+      var clientId = 0;
+    }
     if(false == $.isEmptyObject(subcomments)){
       $.each(subcomments, function(idx, obj) {
         var mainSubCommentDiv = document.createElement('div');
@@ -1244,7 +1160,7 @@
 
         var subCommentMessageDiv = document.createElement('div');
         subCommentMessageDiv.className = 'message';
-        if( userId == obj.user_id || userId == commentUserId || userId == postUserId ){
+        if((0 != clientId && userId == obj.user_id && true == obj.is_user) || (0 == clientId && userId == obj.client_id)){
           var subcommentEditDeleteDiv = document.createElement('div');
           subcommentEditDeleteDiv.className = 'dropdown pull-right';
           editDeleteInnerHtml = '<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>';
@@ -1325,10 +1241,30 @@
         createSubCommenDiv.className = 'collapse replyComment';
         createSubCommenDiv.id = 'replySubComment'+obj.discussion_comment_id+'-'+obj.id;
         createSubCommenDivInnerHTML = '<div class="form-group"><label for="subcomment">Your Sub Comment</label>';
-        if( userId != obj.user_id ){
-          createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" id="create_subcomment_'+ obj.id +'"  rows="3">'+obj.user_name+'</textarea>';
+        // if((userId == obj.client_id && 0 != obj.clientuser_id) || (clientId == obj.client_id && 0 != obj.clientuser_id)){
+        //   createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" id="create_subcomment_'+ obj.id +'"  rows="3">'+obj.user_name+'</textarea>';
+        // } else {
+        //   createSubCommenDivInnerHTML += '<textarea name="subcomment" id="create_subcomment_'+ obj.id +'" class="form-control" rows="3"></textarea>';
+        // }
+
+        if(0 == clientId && userId == obj.client_id){
+          if(true == obj.is_user){
+            createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" id="create_subcomment_'+ obj.id +'"  rows="3">'+obj.client_name+'</textarea>';
+          } else {
+            createSubCommenDivInnerHTML += '<textarea name="subcomment" id="create_subcomment_'+ obj.id +'" class="form-control" rows="3"></textarea>';
+          }
         } else {
-          createSubCommenDivInnerHTML += '<textarea name="subcomment" id="create_subcomment_'+ obj.id +'" class="form-control" rows="3"></textarea>';
+          if(clientId == userId && userId != obj.user_id){
+            if(0 != obj.user_id){
+              createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" id="create_subcomment_'+ obj.id +'"  rows="3">'+obj.user_name+'</textarea>';
+            } else {
+              createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" id="create_subcomment_'+ obj.id +'"  rows="3">'+obj.client_name+'</textarea>';
+            }
+          } else if(clientId != userId && userId != obj.user_id){
+            createSubCommenDivInnerHTML += '<textarea name="subcomment" class="form-control" id="create_subcomment_'+ obj.id +'"  rows="3">'+obj.user_name+'</textarea>';
+          } else {
+            createSubCommenDivInnerHTML += '<textarea name="subcomment" id="create_subcomment_'+ obj.id +'" class="form-control" rows="3"></textarea>';
+          }
         }
         createSubCommenDivInnerHTML += '</div><button class="btn btn-default"  data-post_id="'+ obj.discussion_post_id+'" data-comment_id="'+ obj.discussion_comment_id+'" data-parent_id="'+ obj.id+'" onclick="confirmSubmitReplytoSubComment(this);">Send</button><button type="button" class="btn btn-default" data-id="replySubComment'+obj.discussion_comment_id+'-'+obj.id+'" onclick="cancleReply(this);">Cancle</button>';
         createSubCommenDiv.innerHTML = createSubCommenDivInnerHTML;
@@ -1478,16 +1414,6 @@
     });
 
   $( document ).ready(function() {
-      showSubCommentEle = "{{ Session::get('show_subcomment_area')}}";
-      showCommentEle = "{{ Session::get('show_comment_area')}}";
-      showPostEle = "{{ Session::get('show_post_area')}}";
-      if(showCommentEle > 0 && showPostEle == 0 &&  showSubCommentEle == 0){
-        window.location.hash = '#showComment_'+showCommentEle;
-      } else if(showCommentEle == 0 && showPostEle > 0 &&  showSubCommentEle == 0){
-        window.location.hash = '#showPost_'+showPostEle;
-      } else if(showCommentEle == 0 && showPostEle == 0 &&  showSubCommentEle > 0){
-        window.location.hash = '#subcomment_'+showSubCommentEle;
-      }
       showMore();
   });
 
@@ -1518,5 +1444,4 @@
       });
   }
 </script>
-
 @stop

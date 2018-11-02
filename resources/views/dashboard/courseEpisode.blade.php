@@ -129,9 +129,13 @@
               @foreach($courseVideos as $courseVideo)
                 <li class="list-group-item">
                   @if(true == $isVchipCourse)
-                    <a class="ellipsis" href="{{ url('college/'.Session::get('college_user_url').'/vchipCourseEpisode')}}/{{$courseVideo->id}}" data-toggle="tooltip" title="{{$courseVideo->name}}">
+                    @if('true' == $isCourseRegistered || 1 == $courseVideo->is_free || $videoCoursePrice <= 0)
+                      <a class="ellipsis" href="{{ url('college/'.Session::get('college_user_url').'/vchipCourseEpisode')}}/{{$courseVideo->id}}" title="{{$courseVideo->name}}">
+                    @else
+                      <a>
+                    @endif
                   @else
-                    <a class="ellipsis" href="{{ url('college/'.Session::get('college_user_url').'/collegeCourseEpisode')}}/{{$courseVideo->id}}" data-toggle="tooltip" title="{{$courseVideo->name}}">
+                    <a class="ellipsis" href="{{ url('college/'.Session::get('college_user_url').'/collegeCourseEpisode')}}/{{$courseVideo->id}}" title="{{$courseVideo->name}}">
                   @endif
                   {{$courseVideo->name}} </a>
                   <span class="running-time"> {{ gmdate('H:i:s', $courseVideo->duration)}} </span>
@@ -154,10 +158,10 @@
          <p class="more">{{$video->description}}</p>
           <div class="collapse" id="download_link">
             <div class="download_iteam">
-              <a download data-toggle="tooltip" data-placement="bottom" title="Pdf">
+              <a download data-placement="bottom" title="Pdf">
                 <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
               </a>
-              <a download data-toggle="tooltip" data-placement="bottom" title="Video">
+              <a download data-placement="bottom" title="Video">
                 <i class="fa fa-video-camera" aria-hidden="true"></i>
               </a>
             </div>

@@ -199,7 +199,6 @@
           </ul>
         </li>
         @endif
-        @if(2 == Auth::user()->user_type)
         <li class="treeview">
           <a href="#">
             <i class="fa fa-comments"></i> <span>Discussion</span>
@@ -208,12 +207,12 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ url('college/'.Session::get('college_user_url').'/myQuestions')}}"><i class="fa fa-circle-o"></i> My Questions</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/discussion')}}"><i class="fa fa-circle-o"></i> Discussion</a></li>
+            <!-- <li><a href="{{ url('college/'.Session::get('college_user_url').'/myQuestions')}}"><i class="fa fa-circle-o"></i> My Questions</a></li>
             <li><a href="{{ url('college/'.Session::get('college_user_url').'/myReplies')}}"><i class="fa fa-circle-o"></i> My Replies</a></li>
-            <li><a href="{{ url('discussion')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Discussion</a></li>
+            <li><a href="{{ url('discussion')}}" target="_blank" ><i class="fa fa-circle-o"></i> More Discussion</a></li> -->
           </ul>
         </li>
-        @endif
         @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
         <li class="treeview">
           <a href="#">

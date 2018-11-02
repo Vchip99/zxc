@@ -57,6 +57,17 @@
       font-size: 20px;
       margin: 0px 5px;
     }
+    .pay-now{
+      text-align: right;
+      margin-bottom: 10px;
+    }
+    @media(max-width: 768px){
+      .pay-now{text-align: center;}
+    }
+    .pay-now span{
+      color: #e91e63;
+      font-weight: bold;
+    }
   </style>
 @stop
 @section('module_title')
@@ -72,6 +83,47 @@
   <div class="container">
     @if(count($videos) > 0)
     <div class="col-md-12">
+      <div class="row">
+        @if(Session::has('message'))
+          <div class="alert alert-success" id="message">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+              {{ Session::get('message') }}
+          </div>
+        @endif
+        @if(count($errors) > 0)
+          <div class="alert alert-danger">
+            <ul>
+              @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+              @endforeach
+            </ul>
+          </div>
+        @endif
+      </div>
+      @if(true == $isVchipCourse)
+      <div class="pay-now">
+        <span>Price: {{ $course->price }} Rs.</span>
+        @if($course->price > 0)
+          @if('true' == $isCourseRegistered)
+            <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" title="Paid">Paid</a>
+          @else
+            @if(is_object(Auth::user()))
+              <a data-course_id="{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="purchaseCourse(this);">Pay Now</a>
+              <form id="purchaseCourse_{{$course->id}}" method="POST" action="{{ url('purchaseCourse')}}">
+                {{ csrf_field() }}
+                <input type="hidden" name="course_id" value="{{$course->id}}">
+                <input type="hidden" name="course_category_id" value="{{$course->course_category_id}}">
+                <input type="hidden" name="course_sub_category_id" value="{{$course->course_sub_category_id}}">
+              </form>
+            @else
+              <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" title="Pay Now" onClick="checkLogin();">Pay Now</a>
+            @endif
+          @endif
+        @else
+          <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" title="Free">Free</a>
+        @endif
+      </div>
+      @endif
       <div class=" btn-group btn-group-justified btn-group-lg " role="group" aria-label="...">
         <div class="btn-group" role="group" title="Videos">
           <button type="button" id="stars" class="btn-tab btn btn-primary"  href="#videoLectures" data-toggle="tab" >
@@ -84,10 +136,20 @@
           </button>
         </div>
         <div class="btn-group" role="group" title="Favourite">
-          @if('true' == $isCourseRegistered)
-            <a class="btn btn-default voted-btn" id="favourite" data-favourite="true" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Favourite" style="color: rgb(233, 30, 99);"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+          @if(true == $isVchipCourse)
+            @if(0 == $course->price)
+              @if('true' == $isCourseRegistered)
+                <a class="btn btn-default voted-btn" id="favourite" data-favourite="true" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Favourite" style="color: rgb(233, 30, 99);"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+              @else
+                <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+              @endif
+            @endif
           @else
-            <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+            @if('true' == $isCourseRegistered)
+              <a class="btn btn-default voted-btn" id="favourite" data-favourite="true" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Favourite" style="color: rgb(233, 30, 99);"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+            @else
+              <a class="btn btn-default voted-btn" id="favourite" data-favourite="false" onClick="registerCourse(this);" data-course_id="{{$courseId}}" title="Un Favourite"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+            @endif
           @endif
         </div>
       </div>
@@ -98,11 +160,15 @@
             <div class="row mrgn_30_top border_box padding_10">
               <div class="col-md-3" title="{{$video->name}}">
                 @if(true == $isVchipCourse)
-                  <a href="{{ url('college/'.Session::get('college_user_url').'/vchipCourseEpisode')}}/{{$video->id}}">
+                  @if('true' == $isCourseRegistered || 1 == $video->is_free || $course->price <= 0)
+                    <a href="{{ url('college/'.Session::get('college_user_url').'/vchipCourseEpisode')}}/{{$video->id}}">
+                  @else
+                    <a>
+                  @endif
                 @else
                   <a href="{{ url('college/'.Session::get('college_user_url').'/collegeCourseEpisode')}}/{{$video->id}}">
                 @endif
-                  <h1 class="video_id">{{ $index + 1}}</h1>
+                  <h1 class="video_id">{{ $index + 1}} </h1>
                 </a>
               </div>
               <div class="col-md-9 menu">
@@ -110,7 +176,11 @@
                 <span class="running-time">Run Time- {{ gmdate('H:i:s', $video->duration)}}</span>
                 <h4 class="v_h4_subtitle" title="{{$video->name}}">
                   @if(true == $isVchipCourse)
-                    <a href="{{ url('college/'.Session::get('college_user_url').'/vchipCourseEpisode')}}/{{$video->id}}">
+                    @if('true' == $isCourseRegistered || 1 == $video->is_free || $course->price <= 0)
+                      <a href="{{ url('college/'.Session::get('college_user_url').'/vchipCourseEpisode')}}/{{$video->id}}">
+                    @else
+                      <a>
+                    @endif
                   @else
                     <a href="{{ url('college/'.Session::get('college_user_url').'/collegeCourseEpisode')}}/{{$video->id}}">
                   @endif
@@ -188,6 +258,27 @@
         $(ele).css({'color':'#e91e63'})
       } else {
         $(ele).css({'color':'#000'})
+      }
+    });
+  }
+
+  function purchaseCourse(ele){
+    $.confirm({
+      title: 'Confirmation',
+      content: 'Do you want to purchase this course?',
+      type: 'red',
+      typeAnimated: true,
+      buttons: {
+        Ok: {
+          text: 'Ok',
+          btnClass: 'btn-red',
+          action: function(){
+            var courseId = parseInt($(ele).data('course_id'));
+            document.getElementById('purchaseCourse_'+courseId).submit();
+          }
+        },
+        Cancle: function () {
+        }
       }
     });
   }

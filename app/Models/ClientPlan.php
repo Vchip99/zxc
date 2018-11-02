@@ -59,9 +59,15 @@ class ClientPlan extends Model
             ->orderBy('id', 'desc')->first();
     }
 
-    protected static function getLastClientPlanByPlanId($planId){
+    protected static function getLastClientPlan(){
+        return static::where('client_id', Auth::guard('client')->user()->id)
+            ->orderBy('id', 'desc')->first();
+    }
+
+    protected static function getClientPlanByPlanId($planId){
         return static::where('client_id', Auth::guard('client')->user()->id)
             ->where('plan_id', $planId)
+            ->where('start_date','<=',date('Y-m-d'))->where('end_date','>=',date('Y-m-d'))
             ->orderBy('id', 'desc')->first();
     }
 }

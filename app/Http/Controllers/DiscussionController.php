@@ -52,7 +52,7 @@ class DiscussionController extends Controller
             return DiscussionCategory::all();
         });
         $posts = DiscussionPost::orderBy('id', 'desc')->get();
-        if(false == $posts->isEmpty()){
+        if(is_object($posts) && false == $posts->isEmpty()){
             foreach($posts as $post){
                 $postCategoryIds[] = $post->category_id;
             }
@@ -88,6 +88,7 @@ class DiscussionController extends Controller
                     return redirect()->back()->withErrors('something went wrong.');
                 }
             } else {
+                Session::set('show_post_area', 0);
                 Session::set('show_comment_area', 0);
                 Session::set('show_subcomment_area', 0);
             }
@@ -107,8 +108,9 @@ class DiscussionController extends Controller
         try
         {
             $post = DiscussionPost::createPost($request);
-            $postModuleId = trim($request->get('all_post_module_id'));
-            DB::commit();
+            if(is_object($post)){
+                DB::commit();
+            }
         }
         catch(\Exception $e)
         {
@@ -119,6 +121,26 @@ class DiscussionController extends Controller
     }
 
     /**
+     *  create discussin post
+     */
+    protected function createMyPost(Request $request){
+        DB::beginTransaction();
+        try
+        {
+            $post = DiscussionPost::createPost($request);
+            if(is_object($post)){
+                DB::commit();
+            }
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+            return back()->withErrors('something went wrong.');
+        }
+        return $this->getMyPosts();
+    }
+
+    /**
      *  create discussin post comment
      */
     protected function createComment(Request $request){
@@ -126,7 +148,6 @@ class DiscussionController extends Controller
         try
         {
             $comment = DiscussionComment::createComment($request);
-            $postModuleId = trim($request->get('all_post_module_id'));
             $post = DiscussionPost::find($comment->discussion_post_id);
             if(is_object($post) && is_object($comment)){
                 $string = (strlen($post->body) > 50) ? substr($post->body,0,50).'...' : $post->body;
@@ -162,8 +183,6 @@ class DiscussionController extends Controller
                 $notificationMessage = '<a href="'.$request->root().'/discussion/'.$parentComment->id.'/'.$subcomment->id.'" target="_blank">A reply of your comment: '. trim($string, '<p></p>')  .'</a>';
                 Notification::addCommentNotification($notificationMessage, Notification::USERDISCUSSIONSUBCOMMENTNOTIFICATION, $subcomment->id,$subcomment->user_id,$parentComment->user_id);
             }
-
-            $postModuleId = trim($request->get('all_post_module_id'));
             DB::commit();
         }
         catch(\Exception $e)
@@ -241,24 +260,32 @@ class DiscussionController extends Controller
     protected function getDiscussionPostsByCategoryId(Request $request){
         $allPosts = [];
         $posts = DiscussionPost::where('category_id', $request->get('id'))->orderBy('id', 'desc')->get();
-        foreach ($posts as $post) {
-            $allPosts['posts'][$post->id]['title'] = $post->title;
-            $allPosts['posts'][$post->id]['body'] = $post->body;
-            $allPosts['posts'][$post->id]['id'] = $post->id;
-            $allPosts['posts'][$post->id]['user_id'] = $post->user_id;
-            $allPosts['posts'][$post->id]['user_name'] = $post->getUser($post->user_id)->name;
-            $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
-            $allPosts['posts'][$post->id]['user_image'] = $post->getUser($post->user_id)->photo;
-            if(is_file($post->getUser($post->user_id)->photo) && true == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
-                $isImageExist = 'system';
-            } else if(!empty($post->getUser($post->user_id)->photo) && false == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
-                $isImageExist = 'other';
-            } else {
-                $isImageExist = 'false';
-            }
-            $allPosts['posts'][$post->id]['image_exist'] = $isImageExist;
-            if($post->descComments){
-                $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
+        if(is_object($posts) && false == $posts->isEmpty()){
+            foreach ($posts as $post) {
+                $allPosts['posts'][$post->id]['title'] = $post->title;
+                $allPosts['posts'][$post->id]['body'] = $post->body;
+                $allPosts['posts'][$post->id]['id'] = $post->id;
+                $allPosts['posts'][$post->id]['user_id'] = $post->user_id;
+                $allPosts['posts'][$post->id]['answer1'] = $post->answer1;
+                $allPosts['posts'][$post->id]['answer2'] = $post->answer2;
+                $allPosts['posts'][$post->id]['answer3'] = $post->answer3;
+                $allPosts['posts'][$post->id]['answer4'] = $post->answer4;
+                $allPosts['posts'][$post->id]['answer'] = $post->answer;
+                $allPosts['posts'][$post->id]['solution'] = $post->solution;
+                $allPosts['posts'][$post->id]['user_name'] = $post->getUser($post->user_id)->name;
+                $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
+                $allPosts['posts'][$post->id]['user_image'] = $post->getUser($post->user_id)->photo;
+                if(is_file($post->getUser($post->user_id)->photo) && true == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
+                    $isImageExist = 'system';
+                } else if(!empty($post->getUser($post->user_id)->photo) && false == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
+                    $isImageExist = 'other';
+                } else {
+                    $isImageExist = 'false';
+                }
+                $allPosts['posts'][$post->id]['image_exist'] = $isImageExist;
+                if($post->descComments){
+                    $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
+                }
             }
         }
         $allPosts['likesCount'] = DiscussionPostLike::getLikes();
@@ -271,27 +298,38 @@ class DiscussionController extends Controller
      *  return posts
      */
     protected function getPosts(){
+        Session::set('show_post_area', 0);
+        Session::set('show_comment_area', 0);
+        Session::set('show_subcomment_area', 0);
         $allPosts = [];
         $posts = DiscussionPost::orderBy('id', 'desc')->get();
-        foreach ($posts as $post) {
-            $allPosts['posts'][$post->id]['title'] = $post->title;
-            $allPosts['posts'][$post->id]['body'] = $post->body;
-            $allPosts['posts'][$post->id]['id'] = $post->id;
-            $allPosts['posts'][$post->id]['user_id'] = $post->user_id;
-            $allPosts['posts'][$post->id]['user_name'] = $post->getUser($post->user_id)->name;
-            $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
-            $allPosts['posts'][$post->id]['user_image'] = $post->getUser($post->user_id)->photo;
-            if(is_file($post->getUser($post->user_id)->photo) && true == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
-                $isImageExist = 'system';
-            } else if(!empty($post->getUser($post->user_id)->photo) && false == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
-                $isImageExist = 'other';
-            } else {
-                $isImageExist = 'false';
-            }
-            $allPosts['posts'][$post->id]['image_exist'] = $isImageExist;
+        if(is_object($posts) && false == $posts->isEmpty()){
+            foreach ($posts as $post) {
+                $allPosts['posts'][$post->id]['title'] = $post->title;
+                $allPosts['posts'][$post->id]['body'] = $post->body;
+                $allPosts['posts'][$post->id]['id'] = $post->id;
+                $allPosts['posts'][$post->id]['user_id'] = $post->user_id;
+                $allPosts['posts'][$post->id]['answer1'] = $post->answer1;
+                $allPosts['posts'][$post->id]['answer2'] = $post->answer2;
+                $allPosts['posts'][$post->id]['answer3'] = $post->answer3;
+                $allPosts['posts'][$post->id]['answer4'] = $post->answer4;
+                $allPosts['posts'][$post->id]['answer'] = $post->answer;
+                $allPosts['posts'][$post->id]['solution'] = $post->solution;
+                $allPosts['posts'][$post->id]['user_name'] = $post->getUser($post->user_id)->name;
+                $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
+                $allPosts['posts'][$post->id]['user_image'] = $post->getUser($post->user_id)->photo;
+                if(is_file($post->getUser($post->user_id)->photo) && true == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
+                    $isImageExist = 'system';
+                } else if(!empty($post->getUser($post->user_id)->photo) && false == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
+                    $isImageExist = 'other';
+                } else {
+                    $isImageExist = 'false';
+                }
+                $allPosts['posts'][$post->id]['image_exist'] = $isImageExist;
 
-            if($post->descComments){
-                $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
+                if($post->descComments){
+                    $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
+                }
             }
         }
         $allPosts['likesCount'] = DiscussionPostLike::getLikes();
@@ -301,28 +339,80 @@ class DiscussionController extends Controller
     }
 
     /**
+     *  return posts
+     */
+    protected function getMyPosts(){
+        Session::set('show_post_area', 0);
+        Session::set('show_comment_area', 0);
+        Session::set('show_subcomment_area', 0);
+        $allPosts = [];
+        $currentUser = Auth::user();
+        $posts = DiscussionPost::where('user_id', $currentUser->id)->orderBy('discussion_posts.id', 'desc')->get();
+        if(is_object($posts) && false == $posts->isEmpty()){
+            foreach ($posts as $post) {
+                $allPosts['posts'][$post->id]['title'] = $post->title;
+                $allPosts['posts'][$post->id]['body'] = $post->body;
+                $allPosts['posts'][$post->id]['id'] = $post->id;
+                $allPosts['posts'][$post->id]['user_id'] = $post->user_id;
+                $allPosts['posts'][$post->id]['answer1'] = $post->answer1;
+                $allPosts['posts'][$post->id]['answer2'] = $post->answer2;
+                $allPosts['posts'][$post->id]['answer3'] = $post->answer3;
+                $allPosts['posts'][$post->id]['answer4'] = $post->answer4;
+                $allPosts['posts'][$post->id]['answer'] = $post->answer;
+                $allPosts['posts'][$post->id]['solution'] = $post->solution;
+                $allPosts['posts'][$post->id]['user_name'] = $post->getUser($post->user_id)->name;
+                $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
+                $allPosts['posts'][$post->id]['user_image'] = $post->getUser($post->user_id)->photo;
+                if(is_file($post->getUser($post->user_id)->photo) && true == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
+                    $isImageExist = 'system';
+                } else if(!empty($post->getUser($post->user_id)->photo) && false == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
+                    $isImageExist = 'other';
+                } else {
+                    $isImageExist = 'false';
+                }
+                $allPosts['posts'][$post->id]['image_exist'] = $isImageExist;
+
+                if($post->descComments){
+                    $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
+                }
+            }
+        }
+        $allPosts['likesCount'] = DiscussionPostLike::getLikes();
+        return $allPosts;
+    }
+
+    /**
      *  return discussion post by filter criteria
      */
     protected function getDuscussionPostsBySearchArray(Request $request){
         $allPosts = [];
         $posts = DiscussionPost::getDuscussionPostsBySearchArray($request);
-        foreach ($posts as $post) {
-            $allPosts['posts'][$post->id]['title'] = $post->title;
-            $allPosts['posts'][$post->id]['body'] = $post->body;
-            $allPosts['posts'][$post->id]['id'] = $post->id;
-            $allPosts['posts'][$post->id]['user_name'] = $post->getUser($post->user_id)->name;
-            $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
-            $allPosts['posts'][$post->id]['user_image'] = $post->getUser($post->user_id)->photo;
-            if(is_file($post->getUser($post->user_id)->photo) && true == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
-                $isImageExist = 'system';
-            } else if(!empty($post->getUser($post->user_id)->photo) && false == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
-                $isImageExist = 'other';
-            } else {
-                $isImageExist = 'false';
-            }
-            $allPosts['posts'][$post->id]['image_exist'] = $isImageExist;
-            if($post->descComments){
-                $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
+        if(is_object($posts) && false == $posts->isEmpty()){
+            foreach ($posts as $post) {
+                $allPosts['posts'][$post->id]['title'] = $post->title;
+                $allPosts['posts'][$post->id]['body'] = $post->body;
+                $allPosts['posts'][$post->id]['id'] = $post->id;
+                $allPosts['posts'][$post->id]['user_id'] = $post->user_id;
+                $allPosts['posts'][$post->id]['answer1'] = $post->answer1;
+                $allPosts['posts'][$post->id]['answer2'] = $post->answer2;
+                $allPosts['posts'][$post->id]['answer3'] = $post->answer3;
+                $allPosts['posts'][$post->id]['answer4'] = $post->answer4;
+                $allPosts['posts'][$post->id]['answer'] = $post->answer;
+                $allPosts['posts'][$post->id]['solution'] = $post->solution;
+                $allPosts['posts'][$post->id]['user_name'] = $post->getUser($post->user_id)->name;
+                $allPosts['posts'][$post->id]['updated_at'] = $post->updated_at->diffForHumans();
+                $allPosts['posts'][$post->id]['user_image'] = $post->getUser($post->user_id)->photo;
+                if(is_file($post->getUser($post->user_id)->photo) && true == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
+                    $isImageExist = 'system';
+                } else if(!empty($post->getUser($post->user_id)->photo) && false == preg_match('/userStorage/',$post->getUser($post->user_id)->photo)){
+                    $isImageExist = 'other';
+                } else {
+                    $isImageExist = 'false';
+                }
+                $allPosts['posts'][$post->id]['image_exist'] = $isImageExist;
+                if($post->descComments){
+                    $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments,$post->title);
+                }
             }
         }
         $allPosts['likesCount'] = DiscussionPostLike::getLikes();

@@ -107,6 +107,18 @@
         @if($errors->has('duration')) <p class="help-block">{{ $errors->first('duration') }}</p> @endif
       </div>
     </div>
+    <div class="form-group row">
+      <label for="course" class="col-sm-2 col-form-label">Free Video:</label>
+      <div class="col-sm-3">
+        @if(isset($video->id))
+          <label class="radio-inline"><input type="radio" name="is_free" value="1" @if(1 == $video->is_free) checked=true @endif> Yes</label>
+          <label class="radio-inline"><input type="radio" name="is_free" value="0" @if(0 == $video->is_free) checked=true @endif> No </label>
+        @else
+          <label class="radio-inline"><input type="radio" name="is_free" value="1"> Yes</label>
+          <label class="radio-inline"><input type="radio" name="is_free" value="0" checked> No </label>
+        @endif
+      </div>
+    </div>
     <div class="form-group row @if ($errors->has('video_source')) has-error @endif">
       <label for="course" class="col-sm-2 col-form-label">Video Source:</label>
       <div class="col-sm-3">

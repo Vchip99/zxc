@@ -16,6 +16,11 @@
     <div class="container ">
       <div class="row">
         <div class="col-sm-9">
+          <div class="ask-qst row">
+            <a href="{{ url('college/'.Session::get('college_user_url').'/discussion')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="Discussion"><i class="fa fa-comments"></i></a>&nbsp;
+            <a href="{{ url('college/'.Session::get('college_user_url').'/myQuestions')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="My Questions"><i class="fa fa-question-circle"></i></a>&nbsp;
+            <a href="{{ url('college/'.Session::get('college_user_url').'/myReplies')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="My Replies"><i class="fa fa-reply"></i></a>&nbsp;
+           </div>
           <div class="post-comments ">
             <div class="" id="showAllPosts">
               @if(count($posts) > 0)
@@ -37,7 +42,11 @@
                     <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
                       <div class="user-block cmt-left-margin">
                         @if(!empty($post->user->photo))
-                          <img class="img-circle" src="{{ asset($post->user->photo) }}" alt="User Image" />
+                          @if(is_file($post->user->photo))
+                            <img class="img-circle" src="{{ asset($post->user->photo) }}" alt="User Image" />
+                          @else
+                            <img class="img-circle" src="{{ $post->user->photo }}" alt="User Image" />
+                          @endif
                         @else
                           <img class="img-circle" src="{{ asset('images/user1.png') }}" alt="User Image" />
                         @endif
@@ -46,20 +55,61 @@
                       </div>
                       <div  class="media-body" data-toggle="lightbox">
                         <br/>
-                        <div class="more bold cmt-left-margin" id="editPostHide_{{$post->id}}">{!! $post->body !!}</div>
+                        <div class="more cmt-left-margin" id="editPostHide_{{$post->id}}">{!! $post->body !!}</div>
                         <br/>
+                        @if($post->answer1 && $post->answer2 && $post->answer && $post->solution)
+                          <div class="cmt-left-margin">
+                            <p id="1" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                              1. {!! $post->answer1 !!}
+                              @if(1 == $post->answer)
+                                <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                              @endif
+                            </p>
+                            <p id="2" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                              2. {!! $post->answer2 !!}
+                              @if(2 == $post->answer)
+                                <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                              @endif
+                            </p>
+                            @if($post->answer3)
+                            <p id="3" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                              3. {!! $post->answer3 !!}
+                              @if(3 == $post->answer)
+                                <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                              @endif
+                            </p>
+                            @endif
+                            @if($post->answer4)
+                            <p id="4" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                              4. {!! $post->answer4 !!}
+                              @if(4 == $post->answer)
+                                <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                              @endif
+                            </p>
+                            @endif
+                            <p class="hide" id="answer_{{$post->id}}"><b>Answer:</b> Option {{ $post->answer }}</p>
+                            <p class="hide" id="solution_{{$post->id}}"><b>Solution:</b><br/> {!! $post->solution !!}</p>
+                            <input type="hidden" id="right_answer_{{$post->id}}" value="{{$post->answer}}">
+                          </div>
+                        @endif
+                         <br/>
                         <div class="border-bottom"></div>
                         <div class="comment-meta main-reply-box cmt-left-margin">
-                            <span id="like_{{$post->id}}" >
-                              @if( isset($likesCount[$post->id]) && isset($likesCount[$post->id]['user_id'][$currentUser]))
-                                   <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                   <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
-                              @else
-                                   <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
-                                   <span id="like1-bs3">@if( isset($likesCount[$post->id])) {{count($likesCount[$post->id]['like_id'])}} @endif</span>
-                              @endif
-                            </span>
-                          </div>
+                          <span id="like_{{$post->id}}" >
+                            @if( isset($likesCount[$post->id]) && isset($likesCount[$post->id]['user_id'][$currentUser]))
+                                 <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                 <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
+                            @else
+                                 <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                 <span id="like1-bs3">@if( isset($likesCount[$post->id])) {{count($likesCount[$post->id]['like_id'])}} @endif</span>
+                            @endif
+                          </span>
+                          <span class="mrgn_5_left">
+                            @if($post->answer1 && $post->answer2 && $post->answer && $post->solution)
+                              | <a id="{{$post->id}}" onClick="toggleSolution(this);">Solution</a>
+                            @endif
+                          </span>
+                        </div>
                       </div>
                       <div class="cmt-bg">
                         <div class="box-body chat" id="chat-box">
@@ -67,7 +117,11 @@
                             @foreach($post->comments as $comment)
                               <div class="item cmt-left-margin-10" id="showComment_{{$comment->id}}">
                                 @if(!empty($comment->user->photo))
-                                  <img class="img-circle" src="{{ asset($comment->user->photo) }}" alt="User Image" />
+                                  @if(is_file($comment->user->photo))
+                                    <img class="img-circle" src="{{ asset($comment->user->photo) }}" alt="User Image" />
+                                  @else
+                                    <img class="img-circle" src="{{ $comment->user->photo }}" alt="User Image" />
+                                  @endif
                                 @else
                                   <img class="img-circle" src="{{ asset('images/user1.png') }}" alt="User Image" />
                                 @endif
@@ -102,6 +156,8 @@
                     </div>
                   </div>
                 @endforeach
+              @else
+                No My Replies.
               @endif
             </div>
           </div>
@@ -110,72 +166,31 @@
     </div>
   </section>
   <script type="text/javascript">
-    function confirmSubmit(ele){
-      var userId = parseInt(document.getElementById('user_id').value);
-      var categoryId = parseInt(document.getElementById('post_category').value);
-      var question = document.getElementById('question_text').value;
-
-      if(0 < userId && 0 < categoryId && question){
-          var category = document.getElementById('post_category_id');
-          category.value= categoryId;
-          formId = $(ele).attr('id');
-          form = document.getElementById(formId);
-          form.submit();
-      } else if( isNaN(userId)) {
-        $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
-      }else if( isNaN(categoryId)) {
-        $.alert({
-          title: 'Alert!',
-          content: 'Please select post category.',
-        });
-      } else if( !question){
-        $.alert({
-          title: 'Alert!',
-          content: 'Please enter something in a question. ',
-        });
+    function toggleSolution(ele){
+      var solId = $(ele).attr('id');
+      if($('#answer_'+solId).hasClass('hide')){
+        $('#answer_'+solId).removeClass('hide');
+      } else {
+        $('#answer_'+solId).addClass('hide');
+      }
+      if($('#solution_'+solId).hasClass('hide')){
+        $('#solution_'+solId).removeClass('hide');
+      } else {
+        $('#solution_'+solId).addClass('hide');
       }
     }
 
-    function confirmSubmitReply(ele){
-      var userId = parseInt(document.getElementById('user_id').value);
-      if(0 < userId){
-          formId = $(ele).attr('id');
-          form = document.getElementById(formId);
-          form.submit();
-      } else if( isNaN(userId)) {
-        $.confirm({
-        title: 'Confirmation',
-        content: 'Please login first. Click "Ok" button to login.',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    window.location="{{url('/home')}}";
-                  }
-              },
-              Cancle: function () {
-              }
-          }
-        });
+    function checkAnswer(ele){
+      var answer = $(ele).attr('id');
+      var postId = $(ele).data('post_id');
+      var rightAnswer = $('#right_answer_'+postId).val();
+      if(answer == rightAnswer){
+        $(ele).prop('style', 'color:green;');
+        $('#answer_'+postId).removeClass('hide');
+        $('#solution_'+postId).removeClass('hide');
+        $('#right_answer_image_'+postId).removeClass('hide');
+      } else {
+        $(ele).prop('style', 'color:grey;');
       }
     }
 
@@ -260,10 +275,14 @@
               likeSpan.innerHTML = '';
               if( 1 == dislike ){
                 likeSpan.innerHTML +='<i id="post_like_'+postId+'" data-post_id="'+postId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                if(msg.length > 0){
+                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                }
               } else {
                 likeSpan.innerHTML +='<i id="post_like_'+postId+'" data-post_id="'+postId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                if(msg.length > 0){
+                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                }
               }
             }
           });
@@ -305,10 +324,14 @@
                 likeSpan.innerHTML = '';
                 if( 1 == dislike ){
                   likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-post_id="'+postId+'" data-comment_id="'+commentId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                  if(msg.length > 0){
+                    likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                  }
                 } else {
                   likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-post_id="'+postId+'" data-comment_id="'+commentId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                  if(msg.length > 0){
+                    likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                  }
                 }
           }
           });
@@ -351,10 +374,14 @@
                 likeSpan.innerHTML = '';
                 if( 1 == dislike ){
                   likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-post_id="'+postId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                  if(msg.length > 0){
+                    likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                  }
                 } else {
                   likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-post_id="'+postId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                  if(msg.length > 0){
+                    likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                  }
                 }
           }
           });

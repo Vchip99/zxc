@@ -102,11 +102,27 @@ class ClientBaseController extends BaseController
                 $allPlan[$plan->id] = $plan;
             }
         }
-        return view('client.plansAndBilling.plans', compact('allPlan', 'subdomainName'));
+        $existingAmount = 0;
+        $loginUser = Auth::guard('client')->user();
+        $currentPlan = ClientPlan::getClientPlanByPlanId($loginUser->plan_id);
+        if(is_object($currentPlan)){
+            $dateDiff = date_diff( new DateTime(date('Y-m-d')), new DateTime($currentPlan->start_date));
+            $days = $dateDiff->d + 1;
+            $planTotalDays = date_diff(new DateTime($currentPlan->end_date),new DateTime($currentPlan->start_date))->days;
+            if('Credit' == $currentPlan->payment_status){
+                if($planTotalDays > 0){
+                    $existingAmount = -floor((($planTotalDays - $days)/$planTotalDays)*$currentPlan->plan_amount);
+                } else {
+                    $existingAmount = -$currentPlan->plan_amount;
+                }
+            } else {
+                $existingAmount = +ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
+            }
+        }
+        return view('client.plansAndBilling.plans', compact('allPlan', 'subdomainName','existingAmount'));
     }
 
     protected function manageBillings($subdomainName){
-
         $dueDate = '';
         $clientPlan = ClientPlan::getLastClientPlanForBill();
         if(is_object($clientPlan) && ('Credit' != $clientPlan->payment_status || 'free' != $clientPlan->payment_status)){
@@ -168,16 +184,55 @@ class ClientBaseController extends BaseController
         $name = $loginUser->name;
         $phone = $loginUser->phone;
         $email = $loginUser->email;
-        $plan = Plan::find($request->get('plan_id'));
+
+        $planType = $request->get('plan_type');
+        $planId = (int)$request->get('plan_id');
+        $planMonthlyOrYearly = $request->get('plan_'.$planType.'_'.$planId);
+        $total = $request->get('total');
+        $duration = $request->get('duration');
+
+        $plan = Plan::find($planId);
         $finalAmount = 0;
         if(is_object($plan)){
-            $currentPlan = ClientPlan::find($request->get('client_plan_id'));
+            $currentPlan = ClientPlan::getClientPlanByPlanId(Auth::guard('client')->user()->plan_id);
             if(is_object($currentPlan)){
-                $finalAmount = $currentPlan->final_amount;
+                $dateDiff = date_diff( new DateTime(date('Y-m-d')), new DateTime($currentPlan->start_date));
+                $days = $dateDiff->d + 1;
+                $planTotalDays = date_diff(new DateTime($currentPlan->end_date),new DateTime($currentPlan->start_date))->days;
+                if('Credit' == $currentPlan->payment_status){
+                    if(1 == $planMonthlyOrYearly){
+                        // yearly
+                        $finalAmount = $plan->amount * $duration;
+                    } else {
+                        //monthly
+                        $finalAmount = $plan->monthly_amount * $duration;
+                    }
+                } else {
+                    if($planTotalDays > 0){
+                        if(1 == $planMonthlyOrYearly){
+                            // yearly
+                            $calculatedPlanTotal = $plan->amount * $duration;
+                            $finalAmount = $calculatedPlanTotal + ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
+                        } else {
+                            // monthly
+                            $calculatedPlanTotal = $plan->monthly_amount * $duration;
+                            $finalAmount = $calculatedPlanTotal + ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
+                        }
+                    } else {
+                        if(1 == $planMonthlyOrYearly){
+                            // yearly
+                            $finalAmount = $plan->amount * $duration;
+                        } else {
+                            // monthly
+                            $finalAmount = $plan->monthly_amount * $duration;
+                        }
+                    }
+                }
             }
-
-            if( 0 >= $finalAmount ){
-                return redirect('managePlans')->withErrors('something went wrong.');
+            if( $total != $finalAmount ){
+                return redirect('managePlans')->withErrors('final amount calculation is wrong for continue plan.');
+            } elseif( 0 >= $finalAmount ){
+                return redirect('managePlans')->withErrors('something went wrong for final amount for continue plan.');
             }
         } else {
             return redirect('managePlans')->withErrors('something went wrong.');
@@ -186,6 +241,8 @@ class ClientBaseController extends BaseController
         $purpose = 'register for '.$plan->name;
         Session::put('client_selected_plan_id', $plan->id);
         Session::put('client_selected_plan_price', $finalAmount);
+        Session::put('client_selected_plan_type', $planMonthlyOrYearly);
+        Session::put('client_selected_plan_duration', $duration);
         Session::save();
 
         if('local' == \Config::get('app.env')){
@@ -223,25 +280,54 @@ class ClientBaseController extends BaseController
         $name = $loginUser->name;
         $phone = $loginUser->phone;
         $email = $loginUser->email;
-        $plan = Plan::find($request->get('plan_id'));
+
+        $planType = $request->get('plan_type');
+        $planId = (int)$request->get('plan_id');
+        $planMonthlyOrYearly = $request->get('plan_'.$planType.'_'.$planId);
+        $total = $request->get('total');
+        $duration = $request->get('duration');
+        $plan = Plan::find($planId);
         $finalAmount = 0;
         if(is_object($plan)){
-            $currentPlan = ClientPlan::getLastClientPlanByPlanId(Auth::guard('client')->user()->plan_id);
-
+            $currentPlan = ClientPlan::getClientPlanByPlanId(Auth::guard('client')->user()->plan_id);
             if(is_object($currentPlan)){
                 $dateDiff = date_diff( new DateTime(date('Y-m-d')), new DateTime($currentPlan->start_date));
                 $days = $dateDiff->d + 1;
-
+                $planTotalDays = date_diff(new DateTime($currentPlan->end_date),new DateTime($currentPlan->start_date))->days;
                 if('Credit' == $currentPlan->payment_status){
-                    $finalAmount = $plan->amount;
+                    if(1 == $planMonthlyOrYearly){
+                        // yearly
+                        $finalAmount = $plan->amount * $duration;
+                    } else {
+                        //monthly
+                        $finalAmount = $plan->monthly_amount * $duration;
+                    }
                 } else {
-                    $finalAmount = $plan->amount + ceil(($days*$currentPlan->plan_amount)/365);
-
+                    if($planTotalDays > 0){
+                        if(1 == $planMonthlyOrYearly){
+                            // yearly
+                            $calculatedPlanTotal = $plan->amount * $duration;
+                            $finalAmount = $calculatedPlanTotal + ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
+                        } else {
+                            // monthly
+                            $calculatedPlanTotal = $plan->monthly_amount * $duration;
+                            $finalAmount = $calculatedPlanTotal + ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
+                        }
+                    } else {
+                        if(1 == $planMonthlyOrYearly){
+                            // yearly
+                            $finalAmount = $plan->amount * $duration;
+                        } else {
+                            // monthly
+                            $finalAmount = $plan->monthly_amount * $duration;
+                        }
+                    }
                 }
             }
-
-            if( 0 >= $finalAmount ){
-                return redirect('managePlans')->withErrors('something went wrong.');
+            if( $total != $finalAmount ){
+                return redirect('managePlans')->withErrors('final amount calculation is wrong for degrade plan.');
+            } elseif( 0 >= $finalAmount ){
+                return redirect('managePlans')->withErrors('something went wrong for final amount for degrade plan.');
             }
         } else {
             return redirect('managePlans')->withErrors('something went wrong.');
@@ -249,6 +335,8 @@ class ClientBaseController extends BaseController
         $purpose = 'register for '.$plan->name;
         Session::put('client_selected_plan_id', $plan->id);
         Session::put('client_selected_plan_price', $finalAmount);
+        Session::put('client_selected_plan_type', $planMonthlyOrYearly);
+        Session::put('client_selected_plan_duration', $duration);
         Session::save();
 
         if('local' == \Config::get('app.env')){
@@ -286,21 +374,55 @@ class ClientBaseController extends BaseController
         $name = $loginUser->name;
         $phone = $loginUser->phone;
         $email = $loginUser->email;
-        $plan = Plan::find($request->get('plan_id'));
+        $planType = $request->get('plan_type');
+        $planId = (int)$request->get('plan_id');
+        $planMonthlyOrYearly = $request->get('plan_'.$planType.'_'.$planId);
+        $planTotal = $request->get('plan_total');
+        $existingPlanTotal = $request->get('existing_plan_total');
+        $total = $request->get('total');
+        $duration = $request->get('duration');
+        $plan = Plan::find($planId);
         $finalAmount = 0;
         if(is_object($plan)){
-            $currentPlan = ClientPlan::getLastClientPlanByPlanId($loginUser->plan_id);
+            $currentPlan = ClientPlan::getClientPlanByPlanId($loginUser->plan_id);
             if(is_object($currentPlan)){
                 $dateDiff = date_diff( new DateTime(date('Y-m-d')), new DateTime($currentPlan->start_date));
                 $days = $dateDiff->d + 1;
+                $planTotalDays = date_diff(new DateTime($currentPlan->end_date),new DateTime($currentPlan->start_date))->days;
                 if('Credit' == $currentPlan->payment_status){
-                    $finalAmount = $plan->amount - floor(((365 - $days)/365)*$currentPlan->plan_amount);
+                    if(1 == $planMonthlyOrYearly){
+                        // yearly
+                        $calculatedPlanTotal = $plan->amount * $duration;
+                        if($planTotalDays > 0){
+                            $finalAmount = $calculatedPlanTotal -floor((($planTotalDays - $days)/$planTotalDays)*$currentPlan->plan_amount);
+                        } else {
+                            $finalAmount = $calculatedPlanTotal -$currentPlan->plan_amount;
+                        }
+                    } else {
+                        // monthly
+                        $calculatedPlanTotal = $plan->monthly_amount * $duration;
+                        if($planTotalDays > 0){
+                            $finalAmount = $calculatedPlanTotal -floor((($planTotalDays - $days)/$planTotalDays)*$currentPlan->plan_amount);
+                        } else {
+                            $finalAmount = $calculatedPlanTotal -$currentPlan->plan_amount;
+                        }
+                    }
                 } else {
-                    $finalAmount = $plan->amount + ceil(($days*$currentPlan->plan_amount)/365);
+                    if(1 == $planMonthlyOrYearly){
+                        // yearly
+                        $calculatedPlanTotal = $plan->amount * $duration;
+                    } else {
+                        // monthly
+                        $calculatedPlanTotal = $plan->monthly_amount * $duration;
+                    }
+                    $finalAmount = $calculatedPlanTotal + ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
+                }
+                if($finalAmount < 10){
+                    $finalAmount = 10;
                 }
             }
-            if( 0 >= $finalAmount ){
-                return redirect('managePlans')->withErrors('something went wrong.');
+            if( $total != $finalAmount ){
+                return redirect('managePlans')->withErrors('final amount calculation is wrong.');
             }
         } else {
             return redirect('managePlans')->withErrors('something went wrong.');
@@ -309,6 +431,8 @@ class ClientBaseController extends BaseController
         $purpose = 'register for '.$plan->name;
         Session::put('client_selected_plan_id', $plan->id);
         Session::put('client_selected_plan_price', $finalAmount);
+        Session::put('client_selected_plan_type', $planMonthlyOrYearly);
+        Session::put('client_selected_plan_duration', $duration);
         Session::save();
         if('local' == \Config::get('app.env')){
             $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
@@ -363,6 +487,8 @@ class ClientBaseController extends BaseController
                 $status = $response['payments'][0]['status'];
                 $planId = Session::get('client_selected_plan_id');
                 $finalAmount = Session::get('client_selected_plan_price');
+                $planType = Session::get('client_selected_plan_type');
+                $planDuration = Session::get('client_selected_plan_duration');
 
                 DB::connection('mysql')->beginTransaction();
                 try
@@ -374,7 +500,7 @@ class ClientBaseController extends BaseController
                         if( is_object($client)){
                             // for degrade
                             if($planId < $client->plan_id){
-                                $currentPlan = ClientPlan::getLastClientPlanByPlanId($client->plan_id);
+                                $currentPlan = ClientPlan::getLastClientPlan();
                                 if(is_object($currentPlan)){
                                     if('Credit' == $currentPlan->payment_status){
                                         $planAmount = $finalAmount;
@@ -382,7 +508,12 @@ class ClientBaseController extends BaseController
                                     } else {
                                         $dateDiff = date_diff( new DateTime(date('Y-m-d')), new DateTime($currentPlan->start_date));
                                         $days = $dateDiff->d + 1;
-                                        $currentPlan->final_amount = ceil(($days*$currentPlan->plan_amount)/365);
+                                        $planTotalDays = date_diff(new DateTime($currentPlan->end_date),new DateTime($currentPlan->start_date))->days;
+                                        if($planTotalDays > 0){
+                                            $currentPlan->final_amount = ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
+                                        } else {
+                                            $currentPlan->final_amount = $currentPlan->plan_amount;
+                                        }
                                         $currentPlan->payment_status = 'Credit';
                                         if(date('Y-m-d', strtotime('-1 day')) > $currentPlan->start_date){
                                             $currentPlan->end_date = date('Y-m-d', strtotime('-1 day'));
@@ -391,8 +522,11 @@ class ClientBaseController extends BaseController
                                             $currentPlan->end_date = $currentPlan->start_date;
                                             $currentPlan->degrade_plan = 0;
                                         }
-
-                                        $finalAmount = $finalAmount - ceil(($days*$currentPlan->plan_amount)/365);
+                                        if($planTotalDays > 0){
+                                            $finalAmount = $finalAmount - ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
+                                        } else {
+                                            $finalAmount = $finalAmount;
+                                        }
                                         $planAmount = $finalAmount;
 
                                         $client->plan_id = $planId;
@@ -403,7 +537,11 @@ class ClientBaseController extends BaseController
 
                                     // add new record for degrade
                                     $startDate = date('Y-m-d', strtotime('+1 day', strtotime($currentPlan->end_date)));
-                                    $endDate = date('Y-m-d', strtotime('+1 year', strtotime($startDate)));
+                                    if(1 == $planType){
+                                        $endDate = date('Y-m-d', strtotime('+'.$planDuration.' years', strtotime($startDate)));
+                                    } else {
+                                        $endDate = date('Y-m-d', strtotime('+'.$planDuration.' months', strtotime($startDate)));
+                                    }
                                     $clientPlanArray = [
                                                         'client_id' => $client->id,
                                                         'plan_id' => $planId,
@@ -436,32 +574,48 @@ class ClientBaseController extends BaseController
 
                                 $plan = Plan::find($planId);
                                 if(is_object($plan)){
-                                    $planPrice = $plan->amount;
+                                    if(1 == $planType){
+                                        $planPrice = $plan->amount * $planDuration;
+                                    } else {
+                                        $planPrice = $plan->monthly_amount * $planDuration;
+                                    }
                                 } else {
                                     $planPrice = $finalAmount;
                                 }
 
-                                $currentPlan = ClientPlan::getLastClientPlanByPlanId($lastPlanId);
+                                $currentPlan = ClientPlan::getClientPlanByPlanId($lastPlanId);
                                 if(is_object($currentPlan)){
                                     // -1 day for last plan
                                     $dateDiff = date_diff( new DateTime(date('Y-m-d')), new DateTime($currentPlan->start_date));
                                     $days = $dateDiff->d  + 1;
+                                    $planTotalDays = date_diff(new DateTime($currentPlan->end_date),new DateTime($currentPlan->start_date))->days;
                                     if(date('Y-m-d', strtotime('-1 day')) > $currentPlan->start_date){
                                         $currentPlan->end_date = date('Y-m-d', strtotime('-1 day'));
                                     } else {
                                         $currentPlan->end_date = $currentPlan->start_date;
                                     }
-                                    $currentPlan->final_amount = ceil(($days*$currentPlan->plan_amount)/365);
+
+                                    if($planTotalDays > 0){
+                                        $currentPlan->final_amount = ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
+                                    } else {
+                                        $currentPlan->final_amount = $currentPlan->final_amount;
+                                    }
 
                                     if(('Credit' != $currentPlan->payment_status || 'free' != $currentPlan->payment_status) && 0 > $currentPlan->plan_amount){
-                                        $finalAmount = $finalAmount - ceil(($days*$currentPlan->plan_amount)/365);
+                                        $finalAmount = $finalAmount - ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
                                         $currentPlan->payment_status = 'Credit';
                                     }
                                     $currentPlan->save();
 
                                     // add new record for continue
                                     $startDate = date('Y-m-d');
-                                    $endDate = date('Y-m-d', strtotime('+1 year'));
+                                    if(1 == $planType){
+                                        // yearly
+                                        $endDate = date('Y-m-d', strtotime('+'.$planDuration.' years'));
+                                    } else {
+                                        //monthly
+                                        $endDate = date('Y-m-d', strtotime('+'.$planDuration.' months'));
+                                    }
                                     $clientPlanArray = [
                                                         'client_id' => $client->id,
                                                         'plan_id' => $planId,
@@ -487,26 +641,35 @@ class ClientBaseController extends BaseController
                             } else {
                                 // continue or bill payment
 
-                                $plan = Plan::find($planId);
-                                if(is_object($plan)){
-                                    $planPrice = $plan->amount;
-                                } else {
-                                    $planPrice = $finalAmount;
-                                }
-
-                                $currentPlan = ClientPlan::getLastClientPlanByPlanId($planId);
+                                $currentPlan = ClientPlan::getLastClientPlan();
                                 if(is_object($currentPlan)){
-                                    // -1 day for last plan
-                                    $currentPlan->payment_status = 'Credit';
-                                    $currentPlan->save();
-
-                                    $paymentArray = [
-                                                        'client_plan_id' => $currentPlan->id,
-                                                        'payment_id' => $paymentId,
-                                                        'payment_request_id' => $paymentRequestId,
-                                                        'status' => $status
+                                    // add new record for degrade
+                                    $startDate = date('Y-m-d', strtotime('+1 day', strtotime($currentPlan->end_date)));
+                                    if(1 == $planType){
+                                        $endDate = date('Y-m-d', strtotime('+'.$planDuration.' years', strtotime($startDate)));
+                                    } else {
+                                        $endDate = date('Y-m-d', strtotime('+'.$planDuration.' months', strtotime($startDate)));
+                                    }
+                                    $clientPlanArray = [
+                                                        'client_id' => $client->id,
+                                                        'plan_id' => $planId,
+                                                        'plan_amount' => $finalAmount,
+                                                        'final_amount' => $finalAmount,
+                                                        'start_date' => $startDate,
+                                                        'end_date' => $endDate,
+                                                        'payment_status' => $status,
+                                                        'degrade_plan' => 0
                                                     ];
-                                    Payment::addPayment($paymentArray);
+                                    $clientPlan = ClientPlan::addFirstTimeClientPlan($clientPlanArray);
+                                    if(is_object($clientPlan)){
+                                        $paymentArray = [
+                                                            'client_plan_id' => $currentPlan->id,
+                                                            'payment_id' => $paymentId,
+                                                            'payment_request_id' => $paymentRequestId,
+                                                            'status' => $status
+                                                        ];
+                                        Payment::addPayment($paymentArray);
+                                    }
                                     DB::connection('mysql')->commit();
                                 }
                             }

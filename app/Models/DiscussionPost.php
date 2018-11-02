@@ -17,7 +17,7 @@ class DiscussionPost extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'category_id', 'title', 'body'];
+    protected $fillable = ['user_id', 'category_id', 'title', 'body','answer1','answer2','answer3','answer4','answer','solution'];
 
     /**
      *  comments of discussion post
@@ -35,11 +35,24 @@ class DiscussionPost extends Model
     	$question = $request->get('question');
     	$postCategoryId = strip_tags(trim($request->get('post_category_id')));
 
-    	$post = new DiscussionPost;
+        $answer1 = $request->get('answer1');
+        $answer2 = $request->get('answer2');
+        $answer3 = $request->get('answer3');
+        $answer4 = $request->get('answer4');
+        $answer = $request->get('answer');
+        $solution = $request->get('solution');
+
+    	$post = new static;
     	$post->user_id = \Auth::user()->id;
     	$post->title = $title;
     	$post->category_id = $postCategoryId;
     	$post->body  = $question;
+        $post->answer1  = $answer1;
+        $post->answer2  = $answer2;
+        $post->answer3  = $answer3;
+        $post->answer4  = $answer4;
+        $post->answer  = $answer;
+        $post->solution  = $solution;
     	$post->save();
     	return $post;
     }

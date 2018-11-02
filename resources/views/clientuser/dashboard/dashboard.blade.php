@@ -88,6 +88,7 @@
           </p>
           <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
           <input type="hidden" name="user_id" id="user_id" value="{{ (is_object(Auth::guard('clientuser')->user()))?Auth::guard('clientuser')->user()->id: NULL }}"/>
+          <input type="hidden" name="client_id" id="client_id" value="{{ (is_object(Auth::guard('clientuser')->user()))?Auth::guard('clientuser')->user()->client_id: NULL }}"/>
         </div>
       </div>
       <ul class="sidebar-menu">
@@ -214,6 +215,17 @@
           </ul>
         </li>
         @endif
+        <li class="treeview">
+          <a href="#" title="Discussion">
+            <i class="fa fa-comments-o"></i> <span>Discussion</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Discussion"><a href="{{ url('myDiscussion')}}"><i class="fa fa-circle-o"></i> Discussion</a></li>
+          </ul>
+        </li>
         <li class="header">Logout</li>
         <li title="Logout">
           <a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

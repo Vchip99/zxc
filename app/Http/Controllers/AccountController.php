@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\Instamojo;
+use App\Mail\PaymentReceived;
 use App\Mail\EmailVerification;
 use App\Models\CourseCourse;
 use App\Models\CourseVideo;
@@ -54,6 +56,7 @@ use App\Models\CollegeUserAttendance;
 use App\Models\CollegeOfflinePaper;
 use App\Models\UserData;
 use App\Models\TestSubCategory;
+use App\Models\RegisterPaper;
 use Excel;
 use Auth,Hash,DB, Redirect,Session,Validator,Input,Cache;
 use App\Libraries\InputSanitise;
@@ -97,6 +100,19 @@ class AccountController extends Controller
         'email' => 'required|max:255',
         'password' => 'required',
         'confirm_password' => 'required|same:password'
+    ];
+
+    protected $validatePurchaseTest = [
+        'category_id' => 'required',
+        'subcategory_id' => 'required',
+        'subject_id' => 'required',
+        'paper_id' => 'required',
+    ];
+
+    protected $validatePurchaseCourse = [
+        'course_id' => 'required',
+        'course_category_id' => 'required',
+        'course_sub_category_id' => 'required',
     ];
 
     protected function index(){
@@ -214,7 +230,9 @@ class AccountController extends Controller
             $categoryIds[] = $course->course_category_id;
         }
         $categories = CourseCategory::find($categoryIds);
-        return view('dashboard.myVchipCourses', compact('courses', 'categories', 'subcategories'));
+        $courseController = new CourseController;
+        $userPurchasedCourses = $courseController->getRegisteredCourseIds();
+        return view('dashboard.myVchipCourses', compact('courses', 'categories', 'subcategories','userPurchasedCourses'));
     }
 
     protected function vchipCourseDetails($collegeUrl,$courseId,Request $request){
@@ -266,7 +284,18 @@ class AccountController extends Controller
                 return CourseVideo::getCourseVideoByVideoId($videoId);
             });
             if(is_object($video)){
-                $courseId = $video->course_id;
+                $videoCourse = $video->videoCourse;
+                $courseId = $videoCourse->id;
+                $videoCoursePrice = $videoCourse->price;
+
+                if(0 == $video->is_free && $videoCoursePrice > 0 ){
+                    $isCourseRegistered = RegisterOnlineCourse::isCourseRegistered($courseId);
+                    if( 'false' ==  $isCourseRegistered){
+                        return Redirect::to('/college/'.$collegeUrl.'/myVchipCourses');
+                    }
+                } else {
+                    $isCourseRegistered = RegisterOnlineCourse::isCourseRegistered($courseId);
+                }
                 $courseVideos = Cache::remember('vchip:courses:videos:courseId-'.$courseId,30, function() use ($courseId){
                     return CourseVideo::getCourseVideosByCourseId($courseId);
                 });
@@ -276,7 +305,7 @@ class AccountController extends Controller
                 $subcommentLikesCount = CourseSubCommentLike::getLikesByVideoId($videoId);
                 $currentUser = Auth::user();
                 $isVchipCourse = true;
-                return view('dashboard.courseEpisode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount','isVchipCourse'));
+                return view('dashboard.courseEpisode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount','isVchipCourse','isCourseRegistered','videoCoursePrice'));
             }
         }
         return Redirect::to('/college/'.$collegeUrl.'/myVchipCourses');
@@ -304,7 +333,9 @@ class AccountController extends Controller
                 $subcommentLikesCount = CourseSubCommentLike::getLikesByVideoId($videoId);
                 $currentUser = Auth::user();
                 $isVchipCourse = false;
-                return view('dashboard.courseEpisode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount','isVchipCourse'));
+                $videoCoursePrice = 0;
+                $isCourseRegistered = 'false';
+                return view('dashboard.courseEpisode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount','isVchipCourse','isCourseRegistered','videoCoursePrice'));
             }
         }
         return Redirect::to('/college/'.$collegeUrl.'/myCollegeCourses');
@@ -348,8 +379,9 @@ class AccountController extends Controller
         });
         $alreadyGivenPapers = Score::getTestUserScoreBySubjectIdsByPaperIdsByUserId($testSubjectIds, $testSubjectPaperIds, $userId);
         $currentDate = date('Y-m-d H:i:s');
-        return view('dashboard.myVchipTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate','subcategories'));
-
+        $testController = new TestController;
+        $registeredPaperIds = $testController->getRegisteredPaperIds();
+        return view('dashboard.myVchipTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate','subcategories','registeredPaperIds'));
     }
     protected function myCollegeTest(Request $request){
         if( false == InputSanitise::checkCollegeUrl($request)){
@@ -618,17 +650,44 @@ class AccountController extends Controller
         return Redirect::to('/');
     }
 
+    protected function discussion(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $currentUser = Auth::user();
+        $discussionCategories = Cache::remember('vchip:discussions:discussionCategories',60, function() {
+            return DiscussionCategory::all();
+        });
+        $posts = DiscussionPost::orderBy('id', 'desc')->get();
+        if(false == $posts->isEmpty()){
+            foreach($posts as $post){
+                $postCategoryIds[] = $post->category_id;
+            }
+            $postCategoryIds = array_unique($postCategoryIds);
+        }
+        $user = new User;
+        $likesCount = DiscussionPostLike::getLikes();
+        $commentLikesCount = DiscussionCommentLike::getLiksByPosts($posts);
+        $subcommentLikesCount = DiscussionSubCommentLike::getLiksByPosts($posts);
+        $allPostModuleId = self::AllPostModuleIdForMyQuestions;
+        return view('dashboard.discussion', compact('posts', 'user', 'allPostModuleId', 'likesCount', 'currentUser', 'discussionCategories','commentLikesCount','subcommentLikesCount'));
+    }
+
     protected function myQuestions(Request $request){
         if( false == InputSanitise::checkCollegeUrl($request)){
             return Redirect::to('/');
         }
-        $loginUser = Auth::user();
-        $posts = DiscussionPost::where('user_id', $loginUser->id)->orderBy('discussion_posts.id', 'desc')->get();
+        $currentUser = Auth::user();
+        $posts = DiscussionPost::where('user_id', $currentUser->id)->orderBy('discussion_posts.id', 'desc')->get();
         $user = new User;
         $allPostModuleId = self::AllPostModuleIdForMyQuestions;
         $likesCount = DiscussionPostLike::getLikes();
-        $currentUser = $loginUser->id;
-        $discussionCategories =DiscussionCategory::all();
+        $discussionCategories = Cache::remember('vchip:discussions:discussionCategories',60, function() {
+            return DiscussionCategory::all();
+        });
+        Session::set('show_post_area', 0);
+        Session::set('show_comment_area', 0);
+        Session::set('show_subcomment_area', 0);
         return view('dashboard.myQuestions', compact('posts', 'user', 'allPostModuleId', 'likesCount', 'currentUser', 'discussionCategories'));
     }
 
@@ -652,6 +711,9 @@ class AccountController extends Controller
         $commentLikesCount = DiscussionCommentLike::getLiksByPosts($posts);
         $subcommentLikesCount = DiscussionSubCommentLike::getLiksByPosts($posts);
         $currentUser = $loginUser->id;
+        Session::set('show_post_area', 0);
+        Session::set('show_comment_area', 0);
+        Session::set('show_subcomment_area', 0);
         return view('dashboard.myReplies', compact('posts', 'user', 'allPostModuleId', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount'));
     }
 
@@ -1190,7 +1252,6 @@ class AccountController extends Controller
         return $result;
     }
 
-
     protected function showVchipPlacementVideoByDepartmentByYear(Request $request){
         $user = Auth::user();
         Session::set('selected_vchip_placement_year',$request->year);
@@ -1347,7 +1408,6 @@ class AccountController extends Controller
 
     protected function getSubjectsByCatIdBySubcatId(Request $request){
         return TestSubject::getSubjectsByCatIdBySubcatid($request->catId, $request->subcatId);
-
     }
 
     protected function getPapersBySubjectId(Request $request){
@@ -1364,16 +1424,20 @@ class AccountController extends Controller
             foreach($scores as $score){
                 $ranks[$score->id] = $score->rank($request->college);
                 $marks[$score->id] = $score->totalMarks();
-                if(is_object($score->user->college) && $score->user->college->id > 0){
-                  $colleges[$score->id] = $score->user->college->name;
-                }else if(is_object($score->user) && 'other' == $score->user->college_id){
-                    $colleges[$score->id] = $score->user->other_source;
+                $scoreUser = $score->user;
+                $userCollege = $scoreUser->college;
+                $userDepartment = $scoreUser->department;
+
+                if(is_object($userCollege) && $userCollege->id > 0){
+                  $colleges[$score->id] = $userCollege->name;
+                }else if(is_object($scoreUser) && 'other' == $scoreUser->college_id){
+                    $colleges[$score->id] = $scoreUser->other_source;
                 }else{
                     $colleges[$score->id] = 'Client';
                 }
-                if(is_object($score->user->department) && $score->user->department->id > 0){
-                  $departments[$score->id] = $score->user->department->name;
-                }else if(is_object($score->user) && 'other' == $score->user->college_id){
+                if(is_object($userDepartment) && $userDepartment->id > 0){
+                  $departments[$score->id] = $userDepartment->name;
+                }else if(is_object($scoreUser) && 'other' == $scoreUser->college_id){
                     $departments[$score->id] = 'Other';
                 }else{
                     $departments[$score->id] = 'Client';
@@ -1440,7 +1504,6 @@ class AccountController extends Controller
                     "9" => "September", "10" => "October", "11" => "November", "12" => "December",
                 );
         return view('dashboard.adminNotifications', compact('notifications', 'readNotificationIds','years','months','selectedYear', 'selectedMonth'));
-
     }
 
     protected function downloadExcelResult(Request $request){
@@ -1451,20 +1514,22 @@ class AccountController extends Controller
             foreach($scores as $index => $score){
                 $result = [];
                 $result['Sr. No.'] = $index +1;
-                $result['Name'] = $score->user->name;
-
-                if(is_object($score->user->college) && $score->user->college->id > 0){
-                    $result['college'] = $score->user->college->name;
-                }else if(is_object($score->user) && 'other' == $score->user->college_id){
-                    $result['college'] = $score->user->other_source;
+                $scoreUser = $score->user;
+                $result['Name'] = $scoreUser->name;
+                $userCollege = $scoreUser->college;
+                $userDepartment = $scoreUser->department;
+                if(is_object($userCollege) && $userCollege->id > 0){
+                    $result['college'] = $userCollege->name;
+                }else if(is_object($scoreUser) && 'other' == $scoreUser->college_id){
+                    $result['college'] = $scoreUser->other_source;
                 }else{
                     $result['college'] = 'Client';
                 }
 
-                if(is_object($score->user->college) && $score->user->college->id > 0){
-                    $result['Department'] = $score->user->college->name;
-                }else if(is_object($score->user) && 'other' == $score->user->college_id){
-                    $result['Department'] = $score->user->other_source;
+                if(is_object($userDepartment) && $userDepartment->id > 0){
+                    $result['Department'] = $userDepartment->name;
+                }else if(is_object($scoreUser) && 'other' == $scoreUser->college_id){
+                    $result['Department'] = $scoreUser->other_source;
                 }else{
                     $result['Department'] = 'Client';
                 }
@@ -1487,8 +1552,9 @@ class AccountController extends Controller
             $paperName = $request->get('paper');
         }
 
-        $collegeResult = $collegeName.'_'.$paperName.'_result';
-        $sheetName = $paperName.' Test Result';
+        $collegeResult = substr($collegeName.'_'.$paperName.'_result', 0, 25);
+        $sheetName = substr($paperName.' Test Result', 0, 25);
+
         return \Excel::create($collegeResult, function($excel) use ($sheetName,$resultArray) {
             $excel->sheet($sheetName , function($sheet) use ($resultArray)
             {
@@ -1841,4 +1907,372 @@ class AccountController extends Controller
             return Redirect::to('college/'.Session::get('college_user_url').'/profile')->withErrors('Entered wrong otp.');
         }
     }
+
+    protected function purchaseTest(Request $request){
+        // Laravel validation
+        $validator = Validator::make($request->all(), $this->validatePurchaseTest);
+        if ($validator->fails())
+        {
+            return redirect()->back()->withErrors($validator->errors());
+        }
+        $paperId = $request->get('paper_id');
+        $categoryId = $request->get('category_id');
+        $subcategoryId = $request->get('subcategory_id');
+        $subjectId = $request->get('subject_id');
+        $testPaper = TestSubjectPaper::where('id',$paperId)->where('test_category_id',$categoryId)->where('test_sub_category_id',$subcategoryId)->where('test_subject_id',$subjectId)->first();
+        if(!is_object($testPaper)){
+            return redirect()->back()->withErrors(['something went wrong while test purchase.']);
+        }
+        $loginUser = Auth::user();
+        Session::put('user_id', $loginUser->id);
+        Session::put('user_name', $loginUser->name);
+        Session::put('purchase_paper_id', $testPaper->id);
+        Session::put('purchase_paper_price', $testPaper->price);
+        Session::put('purchase_paper_name', $testPaper->name);
+        Session::save();
+
+        $price = $testPaper->price;
+        $name = $loginUser->name;
+        $phone = $loginUser->phone;
+        $email = $loginUser->email;
+        $purposeStr = substr($testPaper->name.' Purchased', 0, 29) ;
+
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        try {
+            $response = $api->paymentRequestCreate(array(
+                "purpose" => trim($purposeStr),
+                "amount" => $price,
+                "buyer_name" => $name,
+                "phone" => $phone,
+                "send_email" => true,
+                "send_sms" => false,
+                "email" => $email,
+                'allow_repeated_payments' => false,
+                "redirect_url" => url('thankyouPurchaseTest'),
+                "webhook" => url('webhookPurchaseTest')
+                ));
+
+            $pay_ulr = $response['longurl'];
+            header("Location: $pay_ulr");
+            exit();
+        }
+        catch (Exception $e) {
+            return redirect()->back()->withErrors([$e->getMessage()]);
+        }
+    }
+
+    protected function thankyouPurchaseTest(Request $request){
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        $payid = $request->get('payment_request_id');
+
+        try {
+            $response = $api->paymentRequestStatus($payid);
+
+            if( 'Credit' == $response['payments'][0]['status']){
+                // create a client
+                $paymentRequestId = $response['id'];
+                $paymentId = $response['payments'][0]['payment_id'];
+                $email = $response['payments'][0]['buyer_email'];
+                $status = $response['payments'][0]['status'];
+                $price = $response['payments'][0]['amount'];
+
+                $userId = Session::get('user_id');
+                $userName = Session::get('user_name');
+                $paperId = Session::get('purchase_paper_id');
+                $paperPrice = Session::get('purchase_paper_price');
+                $paperName = Session::get('purchase_paper_name');
+
+                DB::beginTransaction();
+                try
+                {
+                    $paymentArray = [
+                                        'user_id' => $userId,
+                                        'test_subject_paper_id' => $paperId,
+                                        'payment_id' => $paymentId,
+                                        'payment_request_id' => $paymentRequestId,
+                                        'price' => $paperPrice
+                                    ];
+                    RegisterPaper::addPurchasedPaper($paymentArray);
+                    DB::commit();
+                }
+                catch(Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors([$e->getMessage()]);
+                }
+                Session::remove('user_id');
+                Session::remove('purchase_paper_id');
+                Session::remove('purchase_paper_price');
+                Session::remove('user_name');
+                Session::remove('purchase_paper_name');
+                // user email
+                $to = $email;
+                if('local' == \Config::get('app.env')){
+                    $subject = 'Successfully purchased test paper-' .$paperName.' on local';
+                } else {
+                    $subject = 'Successfully purchased test paper-' .$paperName.'';
+                }
+                $message = 'Dear '.$userName.',<br>';
+                $message .= "You have successfully purcahsed a test paper -".$paperName;
+                $message .= "<h1>Payment Details</h1>";
+                $message .= "<hr>";
+                $message .= '<p><b>Payment Id:</b> '.$paymentId.'</p>';
+                $message .= '<p><b>Payment Status:</b> '.$status.'</p>';
+                $message .= '<p><b>Amount:</b> '.$price.'</p>';
+                $message .= "<p>Thanks and Regards</p><p>Vchipedu</p>";
+
+                // send email
+                Mail::to($to)->send(new PaymentReceived($message,$subject));
+
+                $to = 'vchipdesign@gmail.com';
+                if('local' == \Config::get('app.env')){
+                    $subject = 'Purchased test paper By:' .$userName.' on local';
+                } else {
+                    $subject = 'Purchased test paper By:' .$userName.'';
+                }
+                $message = "<h1>Payment Details</h1>";
+                $message .= "<hr>";
+                $message .= '<p><b>Payment Id:</b> '.$paymentId.'</p>';
+                $message .= '<p><b>Payment Status:</b> '.$status.'</p>';
+                $message .= '<p><b>Amount:</b> '.$price.'</p>';
+                $message .= "<hr>";
+                $message .= '<p><b>Name:</b> '.$userName.'</p>';
+                $message .= '<p><b>Email:</b> '.$email.'</p>';
+                $message .= '<p><b>Paper:</b> '.$paperName.'</p>';
+                $message .= "<hr>";
+                // send email
+                Mail::to($to)->send(new PaymentReceived($message,$subject));
+                return redirect()->back()->with('message', 'your have successfully purchased test paper. please give test.');
+            } else {
+                return redirect()->back()->with('message', 'Payment is failed.');
+            }
+        }
+        catch (Exception $e) {
+            return redirect()->back()->withErrors([$e->getMessage()]);
+        }
+    }
+
+    public function webhookPurchaseTest(Request $request){
+        $data = $request->all();
+        $mac_provided = $data['mac'];  // Get the MAC from the POST data
+        unset($data['mac']);  // Remove the MAC key from the data.
+        ksort($data, SORT_STRING | SORT_FLAG_CASE);
+
+        if('local' == \Config::get('app.env')){
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "aa7af601d8f946c49653c14e6d88d6c6");
+        } else {
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "adc79e762cf240f49022176bd21f20ce");
+        }
+        if($mac_provided == $mac_calculated){
+            $to = 'vchipdesign@gmail.com';
+            $subject = 'Purchased test paper by ' .$data['buyer_name'].'';
+            $message = "<h1>Payment Details</h1>";
+            $message .= "<hr>";
+            $message .= '<p><b>Payment Id:</b> '.$data['payment_id'].'</p>';
+            $message .= '<p><b>Payment Status:</b> '.$data['status'].'</p>';
+            $message .= '<p><b>Amount:</b> '.$data['amount'].'</p>';
+            $message .= "<hr>";
+            $message .= '<p><b>Name:</b> '.$data['buyer_name'].'</p>';
+            $message .= '<p><b>Email:</b> '.$data['buyer'].'</p>';
+            $message .= "<hr>";
+            $headers .= "MIME-Version: 1.0\r\n";
+            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+            // send email
+            mail($to, $subject, $message, $headers);
+        }
+    }
+
+    protected function purchaseCourse(Request $request){
+        // Laravel validation
+        $validator = Validator::make($request->all(), $this->validatePurchaseCourse);
+        if ($validator->fails())
+        {
+            return redirect()->back()->withErrors($validator->errors());
+        }
+        $courseCategoryId = $request->get('course_category_id');
+        $courseSubcategoryId = $request->get('course_sub_category_id');
+        $courseId = $request->get('course_id');
+        $course = CourseCourse::where('id',$courseId)->where('course_category_id',$courseCategoryId)->where('course_sub_category_id',$courseSubcategoryId)->first();
+        if(!is_object($course)){
+            return redirect()->back()->withErrors(['something went wrong while course purchase.']);
+        }
+        $loginUser = Auth::user();
+        Session::put('user_id', $loginUser->id);
+        Session::put('user_name', $loginUser->name);
+        Session::put('purchase_course_id', $course->id);
+        Session::put('purchase_course_price', $course->price);
+        Session::put('purchase_course_name', $course->name);
+        Session::save();
+
+        $price = $course->price;
+        $name = $loginUser->name;
+        $phone = $loginUser->phone;
+        $email = $loginUser->email;
+        $purposeStr = substr($course->name.' Purchased', 0, 29) ;
+
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        try {
+            $response = $api->paymentRequestCreate(array(
+                "purpose" => trim($purposeStr),
+                "amount" => $price,
+                "buyer_name" => $name,
+                "phone" => $phone,
+                "send_email" => true,
+                "send_sms" => false,
+                "email" => $email,
+                'allow_repeated_payments' => false,
+                "redirect_url" => url('thankyouPurchaseCourse'),
+                "webhook" => url('webhookPurchaseCourse')
+                ));
+
+            $pay_ulr = $response['longurl'];
+            header("Location: $pay_ulr");
+            exit();
+        }
+        catch (Exception $e) {
+            return redirect()->back()->withErrors([$e->getMessage()]);
+        }
+    }
+
+    protected function thankyouPurchaseCourse(Request $request){
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        $payid = $request->get('payment_request_id');
+
+        try {
+            $response = $api->paymentRequestStatus($payid);
+
+            if( 'Credit' == $response['payments'][0]['status']){
+                // create a client
+                $paymentRequestId = $response['id'];
+                $paymentId = $response['payments'][0]['payment_id'];
+                $email = $response['payments'][0]['buyer_email'];
+                $status = $response['payments'][0]['status'];
+                $price = $response['payments'][0]['amount'];
+
+                $userId = Session::get('user_id');
+                $userName = Session::get('user_name');
+                $courseId = Session::get('purchase_course_id');
+                $coursePrice = Session::get('purchase_course_price');
+                $courseName = Session::get('purchase_course_name');
+
+                DB::beginTransaction();
+                try
+                {
+                    $paymentArray = [
+                                        'user_id' => $userId,
+                                        'online_course_id' => $courseId,
+                                        'payment_id' => $paymentId,
+                                        'payment_request_id' => $paymentRequestId,
+                                        'price' => $coursePrice
+                                    ];
+                    RegisterOnlineCourse::addPurchasedCourse($paymentArray);
+                    DB::commit();
+                }
+                catch(Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors([$e->getMessage()]);
+                }
+                Session::remove('user_id');
+                Session::remove('purchase_course_id');
+                Session::remove('purchase_course_price');
+                Session::remove('user_name');
+                Session::remove('purchase_course_name');
+                // user email
+                $to = $email;
+                if('local' == \Config::get('app.env')){
+                    $subject = 'Successfully purchased online course -' .$courseName.' on local';
+                } else {
+                    $subject = 'Successfully purchased online course -' .$courseName.'';
+                }
+                $message = 'Dear '.$userName.',<br>';
+                $message .= "You have successfully purcahsed a online course -".$courseName;
+                $message .= "<h1>Payment Details</h1>";
+                $message .= "<hr>";
+                $message .= '<p><b>Payment Id:</b> '.$paymentId.'</p>';
+                $message .= '<p><b>Payment Status:</b> '.$status.'</p>';
+                $message .= '<p><b>Amount:</b> '.$price.'</p>';
+                $message .= "<p>Thanks and Regards</p><p>Vchipedu</p>";
+
+                // send email
+                Mail::to($to)->send(new PaymentReceived($message,$subject));
+
+                $to = 'vchipdesign@gmail.com';
+                if('local' == \Config::get('app.env')){
+                    $subject = 'Purchased a online course By:' .$userName.' on local';
+                } else {
+                    $subject = 'Purchased a online course By:' .$userName.'';
+                }
+                $message = "<h1>Payment Details</h1>";
+                $message .= "<hr>";
+                $message .= '<p><b>Payment Id:</b> '.$paymentId.'</p>';
+                $message .= '<p><b>Payment Status:</b> '.$status.'</p>';
+                $message .= '<p><b>Amount:</b> '.$price.'</p>';
+                $message .= "<hr>";
+                $message .= '<p><b>Name:</b> '.$userName.'</p>';
+                $message .= '<p><b>Email:</b> '.$email.'</p>';
+                $message .= '<p><b>Course:</b> '.$courseName.'</p>';
+                $message .= "<hr>";
+                // send email
+                Mail::to($to)->send(new PaymentReceived($message,$subject));
+                return redirect()->back()->with('message', 'your have successfully purchased a online course.');
+            } else {
+                return redirect()->back()->with('message', 'Payment is failed.');
+            }
+        }
+        catch (Exception $e) {
+            return redirect()->back()->withErrors([$e->getMessage()]);
+        }
+    }
+
+    public function webhookPurchaseCourse(Request $request){
+        $data = $request->all();
+        $mac_provided = $data['mac'];  // Get the MAC from the POST data
+        unset($data['mac']);  // Remove the MAC key from the data.
+        ksort($data, SORT_STRING | SORT_FLAG_CASE);
+
+        if('local' == \Config::get('app.env')){
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "aa7af601d8f946c49653c14e6d88d6c6");
+        } else {
+            $mac_calculated = hash_hmac("sha1", implode("|", $data), "adc79e762cf240f49022176bd21f20ce");
+        }
+        if($mac_provided == $mac_calculated){
+            $to = 'vchipdesign@gmail.com';
+            $subject = 'Purchased online course by ' .$data['buyer_name'].'';
+            $message = "<h1>Payment Details</h1>";
+            $message .= "<hr>";
+            $message .= '<p><b>Payment Id:</b> '.$data['payment_id'].'</p>';
+            $message .= '<p><b>Payment Status:</b> '.$data['status'].'</p>';
+            $message .= '<p><b>Amount:</b> '.$data['amount'].'</p>';
+            $message .= "<hr>";
+            $message .= '<p><b>Name:</b> '.$data['buyer_name'].'</p>';
+            $message .= '<p><b>Email:</b> '.$data['buyer'].'</p>';
+            $message .= "<hr>";
+            $headers .= "MIME-Version: 1.0\r\n";
+            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+            // send email
+            mail($to, $subject, $message, $headers);
+        }
+    }
+
 }

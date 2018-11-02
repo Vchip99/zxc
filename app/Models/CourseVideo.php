@@ -20,7 +20,7 @@ class CourseVideo extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'description', 'duration', 'video_path','course_id', 'course_category_id', 'course_sub_category_id'];
+    protected $fillable = ['name', 'description', 'duration', 'video_path','course_id', 'course_category_id', 'course_sub_category_id','is_free'];
 
     /**
      *  create/update video
@@ -35,6 +35,7 @@ class CourseVideo extends Model
     	$videoPath = trim($request->get('video_path'));
     	$videoId = InputSanitise::inputInt($request->get('video_id'));
         $videoSource = InputSanitise::inputString($request->get('video_source'));
+        $isFree = InputSanitise::inputString($request->get('is_free'));
 
     	if( $isUpdate && isset($videoId)){
     		$video = static::find($videoId);
@@ -56,6 +57,7 @@ class CourseVideo extends Model
     	$video->course_id = $course;
         $video->course_category_id = $categoryId;
         $video->course_sub_category_id = $subcategoryId;
+        $video->is_free = $isFree;
     	$video->save();
         if('system' == $videoSource && is_object($request->file('video_path')) && !empty($video->id)){
             $originalVideoName = $request->file('video_path')->getClientOriginalName();
@@ -196,6 +198,13 @@ class CourseVideo extends Model
      *  get category of sub category
      */
     public function collegeCourse(){
+        return $this->belongsTo(CourseCourse::class, 'course_id');
+    }
+
+    /**
+     *  get category of sub category
+     */
+    public function videoCourse(){
         return $this->belongsTo(CourseCourse::class, 'course_id');
     }
 

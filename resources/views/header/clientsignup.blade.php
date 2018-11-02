@@ -124,10 +124,31 @@
                             <p class="help-block hide" id="subdomain_exist" style="color: red;">given subdomain is already exist. please enter another subdomain.</p>
                           </div>
                           <br/>
-                          <div>
-                            <label>Price: Rs. {{ $plan->amount }} </label>
-                            <input type="hidden" name="plan_id" value="{{ $plan->id }}">
-                          </div>
+                          @if(0 == $plan->amount && 0 == $plan->monthly_amount)
+                            <div>
+                                <label>Price: Rs. {{ $plan->amount }} </label>
+                                <input type="hidden" name="plan_id" value="{{ $plan->id }}">
+                            </div>
+                          @else
+                            <div>
+                                <label class="col-sm-5 col-form-label">Select Plan</label>
+                                <input type="radio" name="plan_{{$plan->id}}" value="1" checked onclick="changeTotal(this)" data-id="{{$plan->id}}"><label>Rs. <span id="yearly_{{$plan->id}}">{{ $plan->amount }}</span>/Year</label>
+                                <input type="radio" name="plan_{{$plan->id}}" value="0" onclick="changeTotal(this)"  data-id="{{$plan->id}}"><label>Rs. <span id="monthly_{{$plan->id}}">{{ $plan->monthly_amount }}</span>/Month</label>
+                                <input type="hidden" name="plan_id" value="{{ $plan->id }}">
+                            </div>
+                            <div class="form-group row">
+                              <label class="col-sm-6 col-form-label">Select Month/Year</label>
+                              <div class="col-sm-6">
+                                <input type="number" id="duration_{{$plan->id}}" name="duration" value="1" min="1" data-id="{{$plan->id}}" onchange="showTotal(this);" required>
+                              </div>
+                            </div>
+                            <div class="form-group row">
+                              <label class="col-sm-6 col-form-label">Total</label>
+                              <div class="col-sm-6">
+                                <input type="text" name="total" id="total_{{$plan->id}}" value="{{$plan->amount}}" readonly="true" required>
+                              </div>
+                            </div>
+                          @endif
                           <br/>
                           <!-- <button type="submit" value="Register" name="submit" class="btn btn-info btn-block">Register
                           </button><br /> -->
@@ -205,6 +226,29 @@
         document.getElementById('registerBtn').disabled = false;
         return true;
       }
+  }
+
+  function showTotal(ele){
+    var duration = $(ele).val();
+    var plan = $(ele).data('id');
+    var planType = $('input[name="plan_'+plan+'"]:checked').val();
+    if(1 == planType){
+      var price = document.getElementById('yearly_'+plan).innerHTML;
+    } else {
+      var price = document.getElementById('monthly_'+plan).innerHTML;
+    }
+    document.getElementById('total_'+plan).value = parseInt(price) * parseInt(duration);
+  }
+  function changeTotal(ele){
+    var plan = $(ele).data('id');
+    var planType = $(ele).val();
+    if(1 == planType){
+      var price = document.getElementById('yearly_'+plan).innerHTML;
+    } else {
+      var price = document.getElementById('monthly_'+plan).innerHTML;
+    }
+    var duration = document.getElementById('duration_'+plan).value;
+    document.getElementById('total_'+plan).value = parseInt(price) * parseInt(duration);
   }
 </script>
 </body>

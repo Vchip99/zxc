@@ -20,6 +20,23 @@
 @section('dashboard_content')
   <div class="container">
     <div class="row">
+      @if(Session::has('message'))
+        <div class="alert alert-success" id="message">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ Session::get('message') }}
+        </div>
+      @endif
+      @if(count($errors) > 0)
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+      @endif
+    </div>
+    <div class="row">
       <a href="{{ url('college/'.Session::get('college_user_url').'/myVchipCourses')}}" class="btn btn-primary">Vchip Courses</a> &nbsp;
       <a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeCourses')}}" class="btn btn-default">College Courses</a>
     </div>
@@ -75,9 +92,30 @@
                       </div>
                   </div>
                 </div>
-                <div class="course-auther">
-                  <a href="{{ url('college/'.Session::get('college_user_url').'/vchipCourseDetails')}}/{{$course->id}}" target="_blank"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
-                  </a>
+                <div class="course-auther text-center">
+                  <!-- <a href="{{ url('college/'.Session::get('college_user_url').'/vchipCourseDetails')}}/{{$course->id}}" target="_blank"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
+                  </a> -->
+                  @if(is_object(Auth::user()))
+                    @if(in_array($course->id, $userPurchasedCourses))
+                      <a class="btn btn-sm btn-primary pay-width"> Paid </a>
+                    @elseif($course->price > 0)
+                      <a data-course_id="{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="purchaseCourse(this);">Pay Price: {{$course->price}} Rs.</a>
+                      <form id="purchaseCourse_{{$course->id}}" method="POST" action="{{ url('purchaseCourse')}}">
+                        {{ csrf_field() }}
+                        <input type="hidden" name="course_id" value="{{$course->id}}">
+                        <input type="hidden" name="course_category_id" value="{{$course->course_category_id}}">
+                        <input type="hidden" name="course_sub_category_id" value="{{$course->course_sub_category_id}}">
+                      </form>
+                    @else
+                      <a class="btn btn-sm btn-primary pay-width" >Free</a>
+                    @endif
+                  @else
+                    @if($course->price > 0)
+                      <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="checkLogin();">Pay Price: {{$course->price}} Rs.</a>
+                    @else
+                      <a class="btn btn-sm btn-primary pay-width">Free</a>
+                    @endif
+                  @endif
                 </div>
               </div>
             </div>
@@ -94,11 +132,11 @@
     document.getElementById('subcategory').value = 0;
     document.getElementById('addCourses').innerHTML ='';
 
-    if( 0 < id && 0 < userId){
+    if( 0 < id){
       $.ajax({
           method: "POST",
           url: "{{url('getCourseSubCategories')}}",
-          data: {id:id, userId:userId}
+          data: {id:id}
       })
       .done(function( msg ) {
         select = document.getElementById('subcategory');
@@ -121,8 +159,8 @@
 
   function selectSubcategory(ele){
     var id = parseInt($(ele).val());
-    var userId = parseInt(document.getElementById('user_id').value);
-    getCourseSubCategories(id, userId);
+    // var userId = parseInt(document.getElementById('user_id').value);
+    getCourseSubCategories(id);
   }
 
   function renderCourse(msg){
@@ -171,8 +209,18 @@
         secondDiv.appendChild(thirdDiv);
 
         var authorDiv = document.createElement('div');
-        authorDiv.className = "course-auther";
-        authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'" target="_blank">'+ obj.author +'</i></a>';
+        authorDiv.className = "course-auther text-center";
+        if(msg['userPurchasedCourses'].length > 0 && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
+          authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width"> Paid </a>';
+        } else if( obj.price > 0 ){
+          var purchaseCourseUrl = "{{ url('purchaseCourse')}}";
+          var csrfField = '{{ csrf_field() }}';
+          authorDiv.innerHTML = '<a data-course_id="'+obj.id+'" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="purchaseCourse(this);">Pay Price: '+obj.price+' Rs.</a>';
+          authorDiv.innerHTML +='<form id="purchaseCourse_'+obj.id+'" method="POST" action="'+purchaseCourseUrl+'">'+csrfField+'<input type="hidden" name="course_id" value="'+obj.id+'"><input type="hidden" name="course_category_id" value="'+obj.course_category_id+'"><input type="hidden" name="course_sub_category_id" value="'+obj.course_sub_category_id+'"></form>';
+        } else {
+          authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width"> Free </a>';
+        }
+
         secondDiv.appendChild(authorDiv);
         firstDiv.appendChild(secondDiv);
         divCourses.appendChild(firstDiv);
@@ -209,6 +257,27 @@
         renderCourse(msg);
       });
     }
+  }
+
+  function purchaseCourse(ele){
+    $.confirm({
+      title: 'Confirmation',
+      content: 'Do you want to purchase this course?',
+      type: 'red',
+      typeAnimated: true,
+      buttons: {
+        Ok: {
+          text: 'Ok',
+          btnClass: 'btn-red',
+          action: function(){
+            var courseId = parseInt($(ele).data('course_id'));
+            document.getElementById('purchaseCourse_'+courseId).submit();
+          }
+        },
+        Cancle: function () {
+        }
+      }
+    });
   }
 </script>
 @stop

@@ -18,6 +18,7 @@
     }
     .data-sm .btn3d{
       min-width: 150px !important;
+      margin-left: -20px;
     }
    }
    @media screen and (max-width: 527px) {
@@ -54,6 +55,23 @@
 @section('dashboard_content')
   <section class="v_container ">
    <div class="container">
+    <div class="row">
+      @if(Session::has('message'))
+        <div class="alert alert-success" id="message">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ Session::get('message') }}
+        </div>
+      @endif
+      @if(count($errors) > 0)
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+      @endif
+    </div>
     <div class="row">
       <a href="{{ url('college/'.Session::get('college_user_url').'/myVchipTest')}}" class="btn btn-primary"> Vchip Tests</a> &nbsp;<a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeTest')}}" class="btn btn-default"> College Tests</a>
     </div>
@@ -110,15 +128,21 @@
                         <thead>
                           <tr>
                               <th>Test Number</th>
-                              <th>Start test</th>
+                              <th>Start Test</th>
                               <th>Result</th>
                               <th>Date to Active</th>
+                              <th>Price</th>
+                              <th>Purchase Test</th>
                           </tr>
                         </thead>
                         <tbody>
                           @if(isset($testSubjectPapers[$testSubject->id]))
                           @foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
-                            <tr>
+                            @if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+                              <tr style="background-color: #b3c2dc;">
+                            @else
+                              <tr>
+                            @endif
                                 <td class=" ">{{ $testSubjectPaper->name }}</td>
                                 <td id="startTest_{{$testSubjectPaper->id}}">
                                   @if($currentDate < $testSubjectPaper->date_to_active)
@@ -146,6 +170,41 @@
                                   @endif
                                 </td>
                                 <td class=" ">{{ $testSubjectPaper->date_to_active }}</td>
+                                <td class=""><i class="fa fa-inr"></i>{{ $testSubjectPaper->price }}</td>
+                                @if($currentDate < $testSubjectPaper->date_to_active)
+                                  <td>
+                                    <button class="btn-primary" disabled="true" title="Purchase test will be enabled on date to active">
+                                    @if($testSubjectPaper->price > 0)
+                                      Pay Now
+                                    @else
+                                      Free
+                                    @endif
+                                    </button>
+                                  </td>
+                                @else
+                                  @if(in_array($testSubjectPaper->id, $registeredPaperIds))
+                                    @if($testSubjectPaper->price > 0)
+                                      <td>Paid</td>
+                                    @else
+                                      <td>Free</td>
+                                    @endif
+                                  @else
+                                    @if($testSubjectPaper->price > 0)
+                                        <td data-paper="{{$testSubjectPaper->id}}" onClick="purchaseTest(this);">
+                                          <form id="purchaseTest_{{$testSubjectPaper->id}}" method="POST" action="{{ url('purchaseTest') }}">
+                                            {{ csrf_field() }}
+                                            <input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
+                                            <input type="hidden" name="category_id" value="{{$testSubjectPaper->test_category_id}}">
+                                            <input type="hidden" name="subcategory_id" value="{{$testSubjectPaper->test_sub_category_id}}">
+                                            <input type="hidden" name="subject_id" value="{{$testSubject->id}}">
+                                          </form>
+                                          <button class="btn-primary" title="Purchase Test">Pay Now</button>
+                                        </td>
+                                    @else
+                                        <td>Free</td>
+                                    @endif
+                                  @endif
+                                @endif
                             </tr>
                           @endforeach
                           @endif
@@ -154,8 +213,13 @@
                       <div class="data-sm">
                         @if(isset($testSubjectPapers[$testSubject->id]))
                           @foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
-                                <div class=" panel panel-info" >
-                                  <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">{{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
+                              <div class=" panel panel-info" >
+                                @if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+                                  <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}" style="background-color: #b3c2dc;">
+                                @else
+                                  <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">
+                                @endif
+                                  {{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
                                   </div>
                                     <div id="paper{{$testSubjectPaper->id}}" class="panel-body" style="padding:2px 0px;">
                                       <div class="container">
@@ -189,6 +253,41 @@
                                               <li>
                                                 <button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span> {{ $testSubjectPaper->date_to_active }}</button>
                                               </li>
+                                              <li>
+                                                <button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span> {{ $testSubjectPaper->price }} </button>
+                                              </li>
+                                              @if($currentDate < $testSubjectPaper->date_to_active)
+                                                <li><button class="btn-magick btn-sm btn3d" disabled="true" title="Purchase test will be enabled on date to active">
+                                                  @if($testSubjectPaper->price > 0)
+                                                    Pay Now
+                                                  @else
+                                                    Free
+                                                  @endif
+                                                </button></li>
+                                              @else
+                                                @if(in_array($testSubjectPaper->id, $registeredPaperIds))
+                                                  <li><button  disabled="true" class="btn-magick btn-sm btn3d">
+                                                    @if($testSubjectPaper->price > 0)
+                                                      Paid
+                                                    @else
+                                                      Free
+                                                    @endif
+                                                  </button></li>
+                                                @else
+                                                  @if($testSubjectPaper->price > 0)
+                                                    <li data-paper="{{$testSubjectPaper->id}}" onClick="purchaseMobileTest(this);"><button class="btn-magick btn-sm btn3d" title="Purchase Test"> Pay Now</button></li>
+                                                    <form id="purchaseTest_mobile_{{$testSubjectPaper->id}}" method="POST" action="{{ url('purchaseTest') }}">
+                                                      {{ csrf_field() }}
+                                                      <input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
+                                                      <input type="hidden" name="category_id" value="{{$testSubjectPaper->test_category_id}}">
+                                                      <input type="hidden" name="subcategory_id" value="{{$testSubjectPaper->test_sub_category_id}}">
+                                                      <input type="hidden" name="subject_id" value="{{$testSubject->id}}">
+                                                    </form>
+                                                  @else
+                                                    <li><button  disabled="true" class="btn-magick btn-sm btn3d">Free</button></li>
+                                                  @endif
+                                                @endif
+                                              @endif
                                             </ul>
                                           </div>
                                       </div>
@@ -329,256 +428,373 @@
       }
     }
 
-  function selectPanel(argument) {
-    var cat = parseInt($('select#category').val());
-    var subcat = parseInt($('select#subcategory').val());
-    var userId = parseInt(document.getElementById('user_id').value);
-    if( 0 < cat && 0 < subcat ){
-      $.ajax({
-              method: "POST",
-              url: "{{url('getDataByCatSubCat')}}",
-              data: {cat:cat, subcat:subcat, userId:userId}
-          })
-          .done(function( msg ) {
-            divEle = document.getElementById('subjects');
-            divEle.innerHTML = '';
-            if(undefined !== msg['subjects'] && msg['subjects'].length > 0) {
-              $.each(msg['subjects'], function(ind, obj){
-                var subId = obj.id;
-                var mainPanelDiv = document.createElement('div');
-                mainPanelDiv.className = "panel-group";
-                mainPanelDiv.setAttribute('role','tablist');
-                mainPanelDiv.setAttribute('aria-multiselectable','true');
-                mainPanelDiv.id = 'headingOne';
-
-                var defaultPanelDiv = document.createElement('div');
-                defaultPanelDiv.className = "panel panel-default";
-
-                var firstMainDiv = document.createElement('div');
-                firstMainDiv.className = "panel-heading";
-                firstMainDiv.setAttribute('role','tab');
-                firstMainDiv.id = 'headingOne';
-
-                var h4Ele = document.createElement('h4');
-                h4Ele.className = 'panel-title';
-                h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#subject'+ subId +'" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>'+ obj.name + '</a>';
-                firstMainDiv.appendChild(h4Ele);
-                defaultPanelDiv.appendChild(firstMainDiv);
-
-                var secondMainDiv = document.createElement('div');
-                secondMainDiv.id = 'subject'+ subId;
-                secondMainDiv.className = "panel-collapse collapse panel-lg";
-                secondMainDiv.setAttribute('role','tabpanel');
-                secondMainDiv.setAttribute('aria-labelledby','headingOne');
-
-                var tableDiv = document.createElement('div');
-                tableDiv.className = 'panel-body';
-
-                var tableEle = document.createElement('table');
-                tableEle.className = "table data-lg";
-                if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
-                  var tableHead = document.createElement('thead');
-                  var tableTr = document.createElement('tr');
-                  var trInnerhtml = '';
-                  trInnerhtml += '<th>Test Name</th>';
-                  trInnerhtml += '<th>Start Test</th>';
-                  trInnerhtml += '<th>Result</th>';
-                  trInnerhtml += '<th>Date to Active</th>';
-                  tableTr.innerHTML = trInnerhtml;
-                  tableHead.appendChild(tableTr);
-                  tableEle.appendChild(tableHead);
-                }
-                var tableBody = document.createElement('tbody');
-                if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
-                  $.each(msg['papers'][subId], function(ind, obj){
-                    var tbodyTr = document.createElement("tr");
-                    var divInnerHtml = '';
-                    divInnerHtml += '<td class=" ">'+ obj.name+'</td>';
-                    if(msg['currentDate'] < obj.date_to_active){
-                      divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true"  title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
-                    } else {
-                      if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                        divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true"  title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
-                      } else {
-                        divInnerHtml += '<td id="startTest_'+obj.id+'"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'"  title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
-                      }
-                    }
-                    if(msg['currentDate'] < obj.date_to_active){
-                      divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
-                      divInnerHtml += '<button disabled="true"  title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
-                      divInnerHtml += '</td>';
-                    } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                      var testUrl = "{{ url('college/'.Session::get('college_user_url').'/showUserTestResult') }}";
-                      var csrf_token = '{{ csrf_field() }}';
-                      divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
-                      divInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'" target="_blank">';
-                      divInnerHtml += csrf_token;
-                      divInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.test_category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.test_sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.test_subject_id +'"></form>';
-                      divInnerHtml += '<button onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'"  title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
-                      divInnerHtml += '</td>';
-                    } else {
-                      divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
-                      divInnerHtml += '<button disabled="true"  title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
-                      divInnerHtml += '</td>';
-                    }
-                    divInnerHtml += '<td class=" ">'+ obj.date_to_active +'</td>';
-
-                    tbodyTr.innerHTML = divInnerHtml;
-                    tableBody.appendChild(tbodyTr);
-                    tableEle.appendChild(tableBody);
-                  });
-                } else {
-                  tableBody.innerHTML = 'No papers are available..';
-                  tableEle.appendChild(tableBody);
-                }
-                tableDiv.appendChild(tableEle);
-
-                var mainSmallDiv = document.createElement('div');
-                mainSmallDiv.className = "data-sm";
-
-                if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
-                  $.each(msg['papers'][subId], function(ind, obj){
-                    var panelDiv = document.createElement('div');
-                    panelDiv.className = 'panel panel-info';
-
-                    var panelHeadingDiv = document.createElement('div');
-                    panelHeadingDiv.className = 'toggle panel-heading';
-                    panelHeadingDiv.setAttribute('data-toggle','paper'+obj.id);
-                    panelHeadingDiv.innerHTML = obj.name;
-
-                    var spanEle = document.createElement('span');
-                    spanEle.className = 'col-xs-2 pull-right';
-                    spanEle.innerHTML = '<i class="fa fa-chevron-down pull-right"></i>';
-                    panelHeadingDiv.appendChild(spanEle);
-
-                    panelDiv.appendChild(panelHeadingDiv);
-
-                    var panelContentDiv = document.createElement('div');
-                    panelContentDiv.id = 'paper'+obj.id;
-                    panelContentDiv.className = 'panel-body';
-
-                    var containerDiv = document.createElement('div');
-                    containerDiv.className='container';
-
-                    var rowDiv = document.createElement('div');
-                    rowDiv.className = 'fluid-row';
-
-                    var ulDiv = document.createElement('ul');
-                    ulDivInnerHtml = '';
-                    if(msg['currentDate'] < obj.date_to_active){
-                      ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true"  title="Test will be enabled on date to active."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
-                    } else {
-                      if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                        ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true"  title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
-                      } else {
-                        ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'"  title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
-                      }
-                    }
-                    if(msg['currentDate'] < obj.date_to_active){
-                        ulDivInnerHtml += '<li id="showUserResultMobileBtn_'+obj.id+'">';
-                        ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true"  title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
-                        ulDivInnerHtml += '</li>';
-                    } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                        var testUrl = "{{ url('college/'.Session::get('college_user_url').'/showUserTestResult') }}";
-                        var csrf_token = '{{ csrf_field() }}';
-                        ulDivInnerHtml += '<li id="showUserResultMobileBtn_'+obj.id+'">';
-                        ulDivInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'" target="_blank">';
-                        ulDivInnerHtml += csrf_token;
-                        ulDivInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.test_category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.test_sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.test_subject_id +'"></form>';
-                        ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'"  title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
-                        ulDivInnerHtml += '</li>';
-                    } else {
-                      ulDivInnerHtml += '<li id="showUserResultMobileBtn_'+obj.id+'">';
-                      ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true"  title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
-                      ulDivInnerHtml += '</li>';
-                    }
-                    ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li>';
-                    ulDiv.innerHTML = ulDivInnerHtml;
-                    rowDiv.appendChild(ulDiv);
-                    containerDiv.appendChild(rowDiv);
-                    panelContentDiv.appendChild(containerDiv);
-                    panelDiv.appendChild(panelContentDiv);
-                    mainSmallDiv.appendChild(panelDiv);
-                  });
-                }
-                tableDiv.appendChild(mainSmallDiv);
-                secondMainDiv.appendChild(tableDiv);
-                defaultPanelDiv.appendChild(secondMainDiv);
-                mainPanelDiv.appendChild(defaultPanelDiv);
-                divEle.appendChild(mainPanelDiv);
-              });
-            } else {
-                var mainPanelDiv = document.createElement('div');
+    function selectPanel(argument) {
+      var cat = parseInt($('select#category').val());
+      var subcat = parseInt($('select#subcategory').val());
+      var userId = parseInt(document.getElementById('user_id').value);
+      if( 0 < cat && 0 < subcat ){
+        $.ajax({
+                method: "POST",
+                url: "{{url('getDataByCatSubCat')}}",
+                data: {cat:cat, subcat:subcat, userId:userId}
+            })
+            .done(function( msg ) {
+              divEle = document.getElementById('subjects');
+              divEle.innerHTML = '';
+              if(undefined !== msg['subjects'] && msg['subjects'].length > 0) {
+                $.each(msg['subjects'], function(ind, obj){
+                  var subId = obj.id;
+                  var mainPanelDiv = document.createElement('div');
                   mainPanelDiv.className = "panel-group";
                   mainPanelDiv.setAttribute('role','tablist');
                   mainPanelDiv.setAttribute('aria-multiselectable','true');
                   mainPanelDiv.id = 'headingOne';
 
-                var defaultPanelDiv = document.createElement('div');
+                  var defaultPanelDiv = document.createElement('div');
                   defaultPanelDiv.className = "panel panel-default";
 
                   var firstMainDiv = document.createElement('div');
                   firstMainDiv.className = "panel-heading";
                   firstMainDiv.setAttribute('role','tab');
-                  firstMainDiv.id = 'headingOne'
+                  firstMainDiv.id = 'headingOne';
 
                   var h4Ele = document.createElement('h4');
                   h4Ele.className = 'panel-title';
-                  h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
+                  h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#subject'+ subId +'" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>'+ obj.name + '</a>';
                   firstMainDiv.appendChild(h4Ele);
                   defaultPanelDiv.appendChild(firstMainDiv);
+
+                  var secondMainDiv = document.createElement('div');
+                  secondMainDiv.id = 'subject'+ subId;
+                  secondMainDiv.className = "panel-collapse collapse panel-lg";
+                  secondMainDiv.setAttribute('role','tabpanel');
+                  secondMainDiv.setAttribute('aria-labelledby','headingOne');
+
+                  var tableDiv = document.createElement('div');
+                  tableDiv.className = 'panel-body';
+
+                  var tableEle = document.createElement('table');
+                  tableEle.className = "table data-lg";
+                  if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
+                    var tableHead = document.createElement('thead');
+                    var tableTr = document.createElement('tr');
+                    var trInnerhtml = '';
+                    trInnerhtml += '<th>Test Name</th>';
+                    trInnerhtml += '<th>Start Test</th>';
+                    trInnerhtml += '<th>Result</th>';
+                    trInnerhtml += '<th>Date to Active</th>';
+                    trInnerhtml += '<th>Price</th>';
+                    trInnerhtml += '<th>Purchase Test</th>';
+                    tableTr.innerHTML = trInnerhtml;
+                    tableHead.appendChild(tableTr);
+                    tableEle.appendChild(tableHead);
+                  }
+                  var tableBody = document.createElement('tbody');
+                  if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
+                    $.each(msg['papers'][subId], function(ind, obj){
+                      var tbodyTr = document.createElement("tr");
+                      if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                        tbodyTr.setAttribute('style','background-color: #b3c2dc;');
+                      }
+                      var divInnerHtml = '';
+                      divInnerHtml += '<td class=" ">'+ obj.name+'</td>';
+                      if(msg['currentDate'] < obj.date_to_active){
+                        divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true"  title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+                      } else {
+                        if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                          divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true"  title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+                        } else {
+                          divInnerHtml += '<td id="startTest_'+obj.id+'"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'"  title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+                        }
+                      }
+                      if(msg['currentDate'] < obj.date_to_active){
+                        divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
+                        divInnerHtml += '<button disabled="true"  title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+                        divInnerHtml += '</td>';
+                      } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                        var testUrl = "{{ url('college/'.Session::get('college_user_url').'/showUserTestResult') }}";
+                        var csrf_token = '{{ csrf_field() }}';
+                        divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
+                        divInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'" target="_blank">';
+                        divInnerHtml += csrf_token;
+                        divInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.test_category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.test_sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.test_subject_id +'"></form>';
+                        divInnerHtml += '<button onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'"  title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+                        divInnerHtml += '</td>';
+                      } else {
+                        divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
+                        divInnerHtml += '<button disabled="true"  title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+                        divInnerHtml += '</td>';
+                      }
+                      divInnerHtml += '<td class=" ">'+ obj.date_to_active +'</td>';
+                      divInnerHtml += '<td class=""><i class="fa fa-inr"></i>'+ obj.price +'</td>';
+
+                      if(msg['currentDate'] < obj.date_to_active){
+                        if(obj.price > 1){
+                          divInnerHtml += '<td><button class="btn-primary" disabled="true" title="Purchase test will be enabled on date to active">Pay Now</button></td>';
+                        } else {
+                          divInnerHtml += '<td><button disabled="true" title="Purchase test will be enabled on date to active">Free</button></td>';
+                        }
+                      } else {
+                        if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
+                          if(obj.price > 1){
+                            divInnerHtml += '<td>Paid</td>';
+                          } else {
+                            divInnerHtml += '<td>Free</td>';
+                          }
+                        } else {
+                          if(obj.price > 1){
+                            if(true == isNaN(userId)) {
+                              divInnerHtml += '<td><button class="btn-primary" title="Please login to give test." onClick="checkLogin();">Pay Now</button></td>';
+                                  } else{
+                                    var purchaseTestUrl = "{{ url('purchaseTest') }}";
+                                    var csrf_token = '{{ csrf_field() }}';
+                                    divInnerHtml += '<td><form id="purchaseTest_'+obj.id+'" method="POST" action="'+purchaseTestUrl+'">'+csrf_token+'<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.test_category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.test_sub_category_id +'"><input type="hidden" name="subject_id" value="'+ obj.test_subject_id +'"></form><button class="btn-primary" title="Purchase Test" data-paper="'+obj.id+'" onClick="purchaseTest(this);">Pay Now</button></td>';
+                                  }
+                          } else {
+                            if(true == isNaN(userId)) {
+                              divInnerHtml += '<td><button title="Please login to give test." onClick="checkLogin();">Free</button></td>';
+                                  } else {
+                                    divInnerHtml += '<td>Free</td>';
+                                  }
+                          }
+                        }
+                      }
+                      tbodyTr.innerHTML = divInnerHtml;
+                      tableBody.appendChild(tbodyTr);
+                      tableEle.appendChild(tableBody);
+                    });
+                  } else {
+                    tableBody.innerHTML = 'No papers are available..';
+                    tableEle.appendChild(tableBody);
+                  }
+                  tableDiv.appendChild(tableEle);
+
+                  var mainSmallDiv = document.createElement('div');
+                  mainSmallDiv.className = "data-sm";
+
+                  if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
+                    $.each(msg['papers'][subId], function(ind, obj){
+                      var panelDiv = document.createElement('div');
+                      panelDiv.className = 'panel panel-info';
+
+                      var panelHeadingDiv = document.createElement('div');
+                      panelHeadingDiv.className = 'toggle panel-heading';
+                      panelHeadingDiv.setAttribute('data-toggle','paper'+obj.id);
+                      if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                        panelHeadingDiv.setAttribute('style','background-color: #b3c2dc;');
+                      }
+                      panelHeadingDiv.innerHTML = obj.name;
+
+                      var spanEle = document.createElement('span');
+                      spanEle.className = 'col-xs-2 pull-right';
+                      spanEle.innerHTML = '<i class="fa fa-chevron-down pull-right"></i>';
+                      panelHeadingDiv.appendChild(spanEle);
+
+                      panelDiv.appendChild(panelHeadingDiv);
+
+                      var panelContentDiv = document.createElement('div');
+                      panelContentDiv.id = 'paper'+obj.id;
+                      panelContentDiv.className = 'panel-body';
+
+                      var containerDiv = document.createElement('div');
+                      containerDiv.className='container';
+
+                      var rowDiv = document.createElement('div');
+                      rowDiv.className = 'fluid-row';
+
+                      var ulDiv = document.createElement('ul');
+                      ulDivInnerHtml = '';
+                      if(msg['currentDate'] < obj.date_to_active){
+                        ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true"  title="Test will be enabled on date to active."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                      } else {
+                        if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                          ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true"  title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                        } else {
+                          ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.test_subject_id +'" data-category="'+ obj.test_category_id +'" data-subcategory="'+ obj.test_sub_category_id+'"  title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                        }
+                      }
+                      if(msg['currentDate'] < obj.date_to_active){
+                          ulDivInnerHtml += '<li id="showUserResultMobileBtn_'+obj.id+'">';
+                          ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true"  title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
+                          ulDivInnerHtml += '</li>';
+                      } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                          var testUrl = "{{ url('college/'.Session::get('college_user_url').'/showUserTestResult') }}";
+                          var csrf_token = '{{ csrf_field() }}';
+                          ulDivInnerHtml += '<li id="showUserResultMobileBtn_'+obj.id+'">';
+                          ulDivInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'" target="_blank">';
+                          ulDivInnerHtml += csrf_token;
+                          ulDivInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.test_category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.test_sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.test_subject_id +'"></form>';
+                          ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'"  title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
+                          ulDivInnerHtml += '</li>';
+                      } else {
+                        ulDivInnerHtml += '<li id="showUserResultMobileBtn_'+obj.id+'">';
+                        ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true"  title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
+                        ulDivInnerHtml += '</li>';
+                      }
+                      ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-calendar"></span>'+ obj.date_to_active +'</button></li>';
+
+                      ulDivInnerHtml += '<li class=""><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.price +'</button></li>';
+
+                      if(msg['currentDate'] < obj.date_to_active){
+                        if(obj.price > 1){
+                          ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" title="Purchase test will be enabled on date to active">Pay Now</button></li>';
+                        } else {
+                          ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" title="Purchase test will be enabled on date to active">Free</button></li>';
+                        }
+                      } else {
+                        if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
+                          if(obj.price > 1){
+                            ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true">Paid</button></li>';
+                          } else {
+                            ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true">Free</button></li>';
+                          }
+                        } else {
+                          if(obj.price > 1){
+                            if(true == isNaN(userId)) {
+                              ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d"  title="Please login to see result." onClick="checkLogin();">Pay Now</button></li>';
+                            } else {
+                            var purchaseTestUrl = "{{ url('purchaseTest') }}";
+                            var csrf_token = '{{ csrf_field() }}';
+                            ulDivInnerHtml += '<li data-paper="'+obj.id+'" onClick="purchaseTest(this);"><button class="btn-magick btn-sm btn3d"  title="Purchase Test">Pay Now</button></li><form id="purchaseTest_'+obj.id+'" method="POST" action="'+purchaseTestUrl+'">'+csrf_token+'<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.test_category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.test_sub_category_id +'"><input type="hidden" name="subject_id" value="'+ obj.test_subject_id +'"></form>';
+                            }
+                          } else {
+                            if(true == isNaN(userId)) {
+                              ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d"  title="Please login to give test." onClick="checkLogin();">Free</button></li>';
+                            } else {
+                              ulDivInnerHtml += '<li><button disabled="true" class="btn-magick btn-sm btn3d" >Free</button></li>';
+                            }
+                          }
+                        }
+                      }
+
+                      ulDiv.innerHTML = ulDivInnerHtml;
+                      rowDiv.appendChild(ulDiv);
+                      containerDiv.appendChild(rowDiv);
+                      panelContentDiv.appendChild(containerDiv);
+                      panelDiv.appendChild(panelContentDiv);
+                      mainSmallDiv.appendChild(panelDiv);
+                    });
+                  }
+                  tableDiv.appendChild(mainSmallDiv);
+                  secondMainDiv.appendChild(tableDiv);
+                  defaultPanelDiv.appendChild(secondMainDiv);
                   mainPanelDiv.appendChild(defaultPanelDiv);
-                divEle.appendChild(mainPanelDiv);
-            }
-          $('[id^=paper]').hide();
-          $('.toggle').click(function() {
-            $input = $( this );
-            $target = $('#'+$input.attr('data-toggle'));
-            $target.slideToggle();
-            if($input.find('.col-xs-2 i').attr('class')=="fa fa-chevron-down pull-right")
-            {
-             $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
-             $input.find('.col-xs-2 i').addClass('fa-chevron-up');
-           }
-           else if($input.find('.col-xs-2 i').attr('class')=="fa pull-right fa-chevron-up")
-           {
-             $input.find('.col-xs-2 i').removeClass('fa-chevron-up');
-             $input.find('.col-xs-2 i').addClass('fa-chevron-down');
-           }
-           else if($input.find('.col-xs-2 i').attr('class')=="fa pull-right fa-chevron-down")
-           {
-             $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
-             $input.find('.col-xs-2 i').addClass('fa-chevron-up');
-           }
-         });
-      });
-    } else {
-        divEle = document.getElementById('subjects');
-        divEle.innerHTML = '';
+                  divEle.appendChild(mainPanelDiv);
+                });
+              } else {
+                  var mainPanelDiv = document.createElement('div');
+                    mainPanelDiv.className = "panel-group";
+                    mainPanelDiv.setAttribute('role','tablist');
+                    mainPanelDiv.setAttribute('aria-multiselectable','true');
+                    mainPanelDiv.id = 'headingOne';
 
-        var mainPanelDiv = document.createElement('div');
-        mainPanelDiv.className = "panel-group";
-        mainPanelDiv.setAttribute('role','tablist');
-        mainPanelDiv.setAttribute('aria-multiselectable','true');
-        mainPanelDiv.id = 'headingOne';
+                  var defaultPanelDiv = document.createElement('div');
+                    defaultPanelDiv.className = "panel panel-default";
 
-        var defaultPanelDiv = document.createElement('div');
-        defaultPanelDiv.className = "panel panel-default";
+                    var firstMainDiv = document.createElement('div');
+                    firstMainDiv.className = "panel-heading";
+                    firstMainDiv.setAttribute('role','tab');
+                    firstMainDiv.id = 'headingOne'
 
-        var firstMainDiv = document.createElement('div');
-        firstMainDiv.className = "panel-heading";
-        firstMainDiv.setAttribute('role','tab');
-        firstMainDiv.id = 'headingOne'
+                    var h4Ele = document.createElement('h4');
+                    h4Ele.className = 'panel-title';
+                    h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
+                    firstMainDiv.appendChild(h4Ele);
+                    defaultPanelDiv.appendChild(firstMainDiv);
+                    mainPanelDiv.appendChild(defaultPanelDiv);
+                  divEle.appendChild(mainPanelDiv);
+              }
+            $('[id^=paper]').hide();
+            $('.toggle').click(function() {
+              $input = $( this );
+              $target = $('#'+$input.attr('data-toggle'));
+              $target.slideToggle();
+              if($input.find('.col-xs-2 i').attr('class')=="fa fa-chevron-down pull-right")
+              {
+               $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
+               $input.find('.col-xs-2 i').addClass('fa-chevron-up');
+             }
+             else if($input.find('.col-xs-2 i').attr('class')=="fa pull-right fa-chevron-up")
+             {
+               $input.find('.col-xs-2 i').removeClass('fa-chevron-up');
+               $input.find('.col-xs-2 i').addClass('fa-chevron-down');
+             }
+             else if($input.find('.col-xs-2 i').attr('class')=="fa pull-right fa-chevron-down")
+             {
+               $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
+               $input.find('.col-xs-2 i').addClass('fa-chevron-up');
+             }
+           });
+        });
+      } else {
+          divEle = document.getElementById('subjects');
+          divEle.innerHTML = '';
 
-        var h4Ele = document.createElement('h4');
-        h4Ele.className = 'panel-title';
-        h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
-        firstMainDiv.appendChild(h4Ele);
-        defaultPanelDiv.appendChild(firstMainDiv);
-        mainPanelDiv.appendChild(defaultPanelDiv);
-        divEle.appendChild(mainPanelDiv);
+          var mainPanelDiv = document.createElement('div');
+          mainPanelDiv.className = "panel-group";
+          mainPanelDiv.setAttribute('role','tablist');
+          mainPanelDiv.setAttribute('aria-multiselectable','true');
+          mainPanelDiv.id = 'headingOne';
+
+          var defaultPanelDiv = document.createElement('div');
+          defaultPanelDiv.className = "panel panel-default";
+
+          var firstMainDiv = document.createElement('div');
+          firstMainDiv.className = "panel-heading";
+          firstMainDiv.setAttribute('role','tab');
+          firstMainDiv.id = 'headingOne'
+
+          var h4Ele = document.createElement('h4');
+          h4Ele.className = 'panel-title';
+          h4Ele.innerHTML = '<a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapseOne"><i class="more-less glyphicon glyphicon-plus"></i>No subjects are available.</a>';
+          firstMainDiv.appendChild(h4Ele);
+          defaultPanelDiv.appendChild(firstMainDiv);
+          mainPanelDiv.appendChild(defaultPanelDiv);
+          divEle.appendChild(mainPanelDiv);
+      }
     }
-  }
+
+    function purchaseTest(ele){
+      $.confirm({
+          title: 'Confirmation',
+          content: 'Do you want to purchase this test?',
+          type: 'red',
+          typeAnimated: true,
+          buttons: {
+                Ok: {
+                    text: 'Ok',
+                    btnClass: 'btn-red',
+                    action: function(){
+                var paperId = parseInt($(ele).data('paper'));
+                document.getElementById('purchaseTest_'+paperId).submit();
+            }
+              },
+              Cancle: function () {
+              }
+          }
+      });
+    }
+
+    function purchaseMobileTest(ele){
+      $.confirm({
+          title: 'Confirmation',
+          content: 'Do you want to purchase this test?',
+          type: 'red',
+          typeAnimated: true,
+          buttons: {
+                Ok: {
+                    text: 'Ok',
+                    btnClass: 'btn-red',
+                    action: function(){
+                var paperId = parseInt($(ele).data('paper'));
+                document.getElementById('purchaseTest_mobile_'+paperId).submit();
+            }
+              },
+              Cancle: function () {
+              }
+          }
+      });
+    }
   </script>
 <script >
   function toggleIcon(e) {

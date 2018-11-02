@@ -266,7 +266,8 @@ class OnlineClientController extends Controller
             'phone' => 'required|regex:/^[1-9]{1}[0-9]{9}$/',
             'email' => 'required|email|max:255|unique:mysql2.clients',
             'password' => 'required',
-            'confirm_password' => 'required|same:password'
+            'confirm_password' => 'required|same:password',
+            'plan_id' => 'required'
         ]);
     }
 
@@ -281,21 +282,42 @@ class OnlineClientController extends Controller
         {
             $this->throwValidationException($request, $validator);
         }
+        $planId = $request->get('plan_id');
+        $planType = $request->get('plan_'.$planId);
+        $duration = $request->get('duration');
+        $total = $request->get('total');
 
-        $plan = Plan::find($request->get('plan_id'));
+        $plan = Plan::find($planId);
         if(!is_object($plan)){
             return redirect('pricing');
+        }
+        if(1 == $planType){
+            // yearly
+            $calculatedTotal = $duration * $plan->amount;
+            if($total != $calculatedTotal){
+                return redirect('pricing');
+            }
+
+        } else {
+            // monthly
+            $calculatedTotal = $duration * $plan->monthly_amount;
+            if($total != $calculatedTotal){
+                return redirect('pricing');
+            }
         }
 
         Session::put('client_password', $request->get('password'));
         Session::put('client_subdomain', $request->get('subdomain'));
         Session::put('client_plan_id', $request->get('plan_id'));
+        Session::put('client_plan_price', $total);
+        Session::put('client_plan_type', $planType);
+        Session::put('client_plan_duration', $duration);
         Session::save();
         $name = InputSanitise::inputString($request->get('name'));
         $phone = InputSanitise::inputString($request->get('phone'));
         $email = $request->get('email');
-        $planPrice = $plan->amount;
         $planName = 'register for '.$plan->name;
+
 
         if('local' == \Config::get('app.env')){
             $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
@@ -306,7 +328,7 @@ class OnlineClientController extends Controller
         try {
             $response = $api->paymentRequestCreate(array(
                 "purpose" => $planName,
-                "amount" => $planPrice,
+                "amount" => $total,
                 "buyer_name" => $name,
                 "phone" => $phone,
                 "send_email" => true,
@@ -350,14 +372,26 @@ class OnlineClientController extends Controller
                 $password = Session::get('client_password');
                 $subdomain = Session::get('client_subdomain');
                 $plan_id = Session::get('client_plan_id');
+                $planPrice = Session::get('client_plan_price');
+                $planType = Session::get('client_plan_type');
+                $duration = Session::get('client_plan_duration');
 
                 $plan = Plan::find($plan_id);
                 if(is_object($plan)){
                     $planId = $plan->id;
-                    $planPrice = $plan->amount;
+                    $planPrice = $planPrice;
                 } else {
                     $planId = 0;
                     $planPrice = 0;
+                }
+
+                $startDate = date('Y-m-d');
+                if(1 == $planType){
+                    //yearly
+                    $endDate = date('Y-m-d', strtotime('+'.$duration.' years'));
+                } else {
+                    //monthly
+                    $endDate = date('Y-m-d', strtotime('+'.$duration.' months'));
                 }
 
                 DB::connection('mysql2')->beginTransaction();
@@ -565,8 +599,8 @@ class OnlineClientController extends Controller
                                             'plan_id' => $planId,
                                             'plan_amount' => $planPrice,
                                             'final_amount' => $planPrice,
-                                            'start_date' => date('Y-m-d'),
-                                            'end_date' => date('Y-m-d', strtotime('+1 years')),
+                                            'start_date' => $startDate,
+                                            'end_date' => $endDate,
                                             'payment_status' => $status,
                                             'degrade_plan' => 0
                                         ];
@@ -617,6 +651,7 @@ class OnlineClientController extends Controller
                     Session::remove('client_password');
                     Session::remove('client_subdomain');
                     Session::remove('client_plan_id');
+                    Session::remove('client_plan_price');
 
                     return redirect('pricing')->with('message', 'Please check your email and login to your web site.');
                 }

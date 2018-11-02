@@ -13,7 +13,7 @@ class RegisterOnlineCourse extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'online_course_id', 'grade'];
+    protected $fillable = ['user_id', 'online_course_id', 'grade','payment_id','payment_request_id','price'];
 
     protected static function registerCourse(Request $request){
     	$userId = $request->get('user_id');
@@ -24,8 +24,11 @@ class RegisterOnlineCourse extends Model
     			$registeredCourse->save();
                 return 'true';
     		} else {
-                $registeredCourse->delete();
-                return 'false';
+                if(empty($registeredCourse->price) && empty($registeredCourse->payment_id) && empty($registeredCourse->payment_request_id)){
+                    $registeredCourse->delete();
+                    return 'false';
+                }
+                return;
             }
     	}
     }
@@ -54,5 +57,16 @@ class RegisterOnlineCourse extends Model
             }
         }
         return;
+    }
+
+    protected static function addPurchasedCourse($paymentArray){
+        $purchasedCourse = new static;
+        $purchasedCourse->user_id = $paymentArray['user_id'];
+        $purchasedCourse->online_course_id = $paymentArray['online_course_id'];
+        $purchasedCourse->payment_id = $paymentArray['payment_id'];
+        $purchasedCourse->payment_request_id = $paymentArray['payment_request_id'];
+        $purchasedCourse->price = $paymentArray['price'];
+        $purchasedCourse->save();
+        return $purchasedCourse;
     }
 }

@@ -9,14 +9,37 @@
       <li class="active">My Questions</li>
     </ol>
   </section>
+  <style type="text/css">
+    .ask-qst button{
+      border-radius: 0px;
+      margin-bottom: 20px;
+      margin-left: -13px;
+    }
+    @media(max-width: 768px){
+      .ask-qst {
+        text-align: center !important;
+      }
+    }
+    .cmt-left-margin{
+      margin-left: 20px;
+    }
+    .red-color{
+      color: red;
+    }
+  </style>
 @stop
 @section('dashboard_content')
 	<section   class="v_container">
     <div class="container ">
       <div class="row">
         <div class="col-sm-9">
-            <div class="ask-qst">
-              <button class="btn btn-primary "  data-toggle="modal" data-target="#askQuestion" style="width: 100px;"> Ask Question</button>
+            <div class="ask-qst row">
+              <div class="col-sm-2">
+                <button class="btn btn-primary "  data-toggle="modal" data-target="#askQuestion" style="width: 100px;"> Ask Question</button>
+              </div>
+              <a href="{{ url('college/'.Session::get('college_user_url').'/discussion')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="Discussion"><i class="fa fa-comments"></i></a>&nbsp;
+              <a href="{{ url('college/'.Session::get('college_user_url').'/myQuestions')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="My Questions"><i class="fa fa-question-circle"></i></a>&nbsp;
+              <a href="{{ url('college/'.Session::get('college_user_url').'/myReplies')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="My Replies"><i class="fa fa-reply"></i></a>&nbsp;
              </div>
                 <div class="post-comments ">
                   <div class="row" id="showAllPosts">
@@ -48,12 +71,48 @@
                           </div>
                           <div  class="media-body" data-toggle="lightbox">
                             <br/>
-                            <div class="more bold cmt-left-margin" id="editPostHide_{{$post->id}}">{!! $post->body !!}</div>
+                            <div class="more cmt-left-margin" id="editPostHide_{{$post->id}}">{!! $post->body !!}</div>
+                            <br/>
+                            @if($post->answer1 && $post->answer2 && $post->answer && $post->solution)
+                              <div class="cmt-left-margin">
+                                <p id="1" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                                  1. {!! $post->answer1 !!}
+                                  @if(1 == $post->answer)
+                                    <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                                  @endif
+                                </p>
+                                <p id="2" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                                  2. {!! $post->answer2 !!}
+                                  @if(2 == $post->answer)
+                                    <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                                  @endif
+                                </p>
+                                @if($post->answer3)
+                                <p id="3" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                                  3. {!! $post->answer3 !!}
+                                  @if(3 == $post->answer)
+                                    <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                                  @endif
+                                </p>
+                                @endif
+                                @if($post->answer4)
+                                <p id="4" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
+                                  4. {!! $post->answer4 !!}
+                                  @if(4 == $post->answer)
+                                    <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                                  @endif
+                                </p>
+                                @endif
+                                <p class="hide" id="answer_{{$post->id}}"><b>Answer:</b> Option {{ $post->answer }}</p>
+                                <p class="hide" id="solution_{{$post->id}}"><b>Solution:</b><br/> {!! $post->solution !!}</p>
+                                <input type="hidden" id="right_answer_{{$post->id}}" value="{{$post->answer}}">
+                              </div>
+                            @endif
                             <br/>
                             <div class="border-bottom"></div>
                             <div class="comment-meta main-reply-box cmt-left-margin">
                                 <span id="like_{{$post->id}}" >
-                                  @if( isset($likesCount[$post->id]) && isset($likesCount[$post->id]['user_id'][$currentUser]))
+                                  @if( isset($likesCount[$post->id]) && isset($likesCount[$post->id]['user_id'][$currentUser->id]))
                                        <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
                                        <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
                                   @else
@@ -61,11 +120,18 @@
                                        <span id="like1-bs3">@if( isset($likesCount[$post->id])) {{count($likesCount[$post->id]['like_id'])}} @endif</span>
                                   @endif
                                 </span>
+                                <span class="mrgn_5_left">
+                                  @if($post->answer1 && $post->answer2 && $post->answer && $post->solution)
+                                    | <a id="{{$post->id}}" onClick="toggleSolution(this);">Solution</a>
+                                  @endif
+                                </span>
                             </div>
                           </div>
                           </div>
                         </div>
                       @endforeach
+                    @else
+                      No My Questions
                     @endif
                   </div>
                 </div>
@@ -74,13 +140,15 @@
                     <div class="modal-content">
                       <div class="modal-header">
                         <select id="post_category" class="form-control" name="post_category" required>
-                            <option value = "0"> Select Category ...</option>
+                            <option value = ""> Select Category</option>
                             @if(count($discussionCategories) > 0)
                               @foreach($discussionCategories as $discussionCategory)
                                 <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
                               @endforeach
                             @endif
                         </select>
+                        <input type="radio" name="type" checked="true" value="discussion" onClick="toggleType('discussion');">Discussion
+                        <input type="radio" name="type" value="mcq" onClick="toggleType('mcq');">MCQ
                       </div>
                       <div class="modal-body" style="padding: 0px;">
                         <div class="widget-area  blank">
@@ -114,6 +182,68 @@
                                           }
                                       });
                                     </script>
+                                    <div id="mcs_options" class="hide">
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Option 1:<span class="red-color">*</span></label>
+                                        <div class="col-sm-3">
+                                          <input type="text" name="answer1" id="answer1" value="" required>
+                                        </div>
+                                      </div>
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Option 2:<span class="red-color">*</span></label>
+                                        <div class="col-sm-3">
+                                          <input type="text" name="answer2" id="answer2" value="" required>
+                                        </div>
+                                      </div>
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Option 3:</label>
+                                        <div class="col-sm-3">
+                                          <input type="text" name="answer3" id="answer3" value="">
+                                        </div>
+                                      </div>
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Option 4:</label>
+                                        <div class="col-sm-3">
+                                          <input type="text" name="answer4" id="answer4" value="">
+                                        </div>
+                                      </div>
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Right Answer:<span class="red-color">*</span></label>
+                                        <div class="col-sm-3">
+                                          <input type="number" name="answer" id="answer" min="1" max="4" step="1" value="1" pattern="[1-4]{1}">
+                                        </div>
+                                      </div>
+                                      <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label">Solution:<span class="red-color">*</span></label>
+                                        <div class="col-sm-9">
+                                          <textarea name="solution" id="solution" required cols="40" rows="5"></textarea>
+                                          <script type="text/javascript">
+                                            CKEDITOR.replace( 'solution', { enterMode: CKEDITOR.ENTER_BR } );
+                                            CKEDITOR.config.width="100%";
+                                            CKEDITOR.config.height="auto";
+                                            CKEDITOR.on('dialogDefinition', function (ev) {
+
+                                                var dialogName = ev.data.name,
+                                                    dialogDefinition = ev.data.definition;
+
+                                                if (dialogName == 'image') {
+                                                    var onOk = dialogDefinition.onOk;
+
+                                                    dialogDefinition.onOk = function (e) {
+                                                        var width = this.getContentElement('info', 'txtWidth');
+                                                        width.setValue('100%');//Set Default Width
+
+                                                        var height = this.getContentElement('info', 'txtHeight');
+                                                        height.setValue('auto');////Set Default height
+
+                                                        onOk && onOk.apply(this, e);
+                                                    };
+                                                }
+                                            });
+                                          </script>
+                                        </div>
+                                      </div>
+                                    </div>
                                     <button type="button" class="btn btn-success btn-circle text-uppercase" onclick="confirmSubmit(this);" id="createPost"><i class="fa fa-share"></i> Share</button>
                               </div><!-- Status Upload  -->
                             </div>
@@ -129,54 +259,161 @@
     </div>
   </section>
   <script type="text/javascript">
+    function toggleType(type){
+      if('mcq' == type){
+        $('#mcs_options').removeClass('hide');
+      } else {
+        $('#mcs_options').addClass('hide');
+      }
+    }
+
+    function toggleSolution(ele){
+      var solId = $(ele).attr('id');
+      if($('#answer_'+solId).hasClass('hide')){
+        $('#answer_'+solId).removeClass('hide');
+      } else {
+        $('#answer_'+solId).addClass('hide');
+      }
+      if($('#solution_'+solId).hasClass('hide')){
+        $('#solution_'+solId).removeClass('hide');
+      } else {
+        $('#solution_'+solId).addClass('hide');
+      }
+    }
+
+    function checkAnswer(ele){
+      var answer = $(ele).attr('id');
+      var postId = $(ele).data('post_id');
+      var rightAnswer = $('#right_answer_'+postId).val();
+      if(answer == rightAnswer){
+        $(ele).prop('style', 'color:green;');
+        $('#answer_'+postId).removeClass('hide');
+        $('#solution_'+postId).removeClass('hide');
+        $('#right_answer_image_'+postId).removeClass('hide');
+      } else {
+        $(ele).prop('style', 'color:grey;');
+      }
+    }
+
     function confirmSubmit(ele){
       var userId = parseInt(document.getElementById('user_id').value);
       var categoryId = parseInt(document.getElementById('post_category').value);
       var questionLength = CKEDITOR.instances.question.getData().length;
       var title = document.getElementById('title').value;
-      if(0 < userId && 0 < categoryId && questionLength > 0 && title){
-        var question = CKEDITOR.instances.question.getData();
+      var type = $('input[name="type"]:checked').val();
+      var answer1 = document.getElementById('answer1').value;
+      var answer2 = document.getElementById('answer2').value;
+      var answer3 = document.getElementById('answer3').value;
+      var answer4 = document.getElementById('answer4').value;
+      var answer = document.getElementById('answer').value;
+      var solutionLength = CKEDITOR.instances.solution.getData().length;
+
+      if( isNaN(categoryId)) {
+        $.alert({
+          title: 'Alert!',
+          content: 'Please select post category.',
+        });
+        return false;
+      }else if(!title) {
+        $.alert({
+          title: 'Alert!',
+          content: 'Please enter title.',
+        });
+        return false;
+      } else if( 0 == questionLength){
+        $.alert({
+          title: 'Alert!',
+          content: 'Please enter something in a question. ',
+        });
+        return false;
+      } else if('mcq' == type){
+        if(!answer1){
+          $.alert({
+            title: 'Alert!',
+            content: 'Please Enter Option 1.',
+          });
+          return false;
+        } else if(!answer2){
+          $.alert({
+            title: 'Alert!',
+            content: 'Please Enter Option 2.',
+          });
+          return false;
+        } else if(!answer){
+          $.alert({
+            title: 'Alert!',
+            content: 'Please Enter Right Answer.',
+          });
+          return false;
+        } else if(0 == answer){
+          $.alert({
+            title: 'Alert!',
+            content: 'Please enter right answer in between no of entered options.',
+          });
+          return false;
+        } else if(0 == solutionLength){
+          $.alert({
+            title: 'Alert!',
+            content: 'Please Enter Solution.',
+          });
+          return false;
+        }
+        var optionCount = 0;
+        if(answer1){
+          optionCount += 1;
+        }
+        if(answer2){
+          optionCount += 1;
+        }
+        if(answer3){
+          optionCount += 1;
+        }
+        if(answer4){
+          optionCount += 1;
+        }
+        if(answer > optionCount || answer < 1){
+          $.alert({
+            title: 'Alert!',
+            content: 'Please enter right answer in between no of entered options.',
+          });
+          return false;
+        }
+        if(userId > 0 && categoryId > 0 && questionLength > 0 && title && answer1 && answer2 && solutionLength > 0){
+          var question = CKEDITOR.instances.question.getData();
+          var solution = CKEDITOR.instances.solution.getData();
           $.ajax({
               method: "POST",
-              url: "{{url('createPost')}}",
-              data: {title:title,post_category_id:categoryId,question:question}
+              url: "{{url('createMyPost')}}",
+              data: {title:title,post_category_id:categoryId,question:question,answer1:answer1,answer2:answer2,answer3:answer3,answer4:answer4,answer:answer,solution:solution}
           })
           .done(function( msg ) {
             $('#askQuestion').modal('hide');
             document.getElementById('post_category').value = 0;
             document.getElementById('title').value = '';
             CKEDITOR.instances.question.setData('');
+            CKEDITOR.instances.solution.setData('');
             renderPosts(msg);
           });
-      } else if( isNaN(userId)) {
-          $.confirm({
-          title: 'Confirmation',
-          content: 'Please login first. Click "Ok" button to login.',
-          type: 'red',
-          typeAnimated: true,
-          buttons: {
-                Ok: {
-                    text: 'Ok',
-                    btnClass: 'btn-red',
-                    action: function(){
-                      window.location="{{url('/home')}}";
-                    }
-                },
-                Cancle: function () {
-                }
-            }
-          });
-        }else if( isNaN(categoryId)) {
-          $.alert({
-            title: 'Alert!',
-            content: 'Please select post category.',
-          });
-        } else if( questionLength < 0){
-          $.alert({
-            title: 'Alert!',
-            content: 'Please enter something in a question. ',
+        }
+      } else {
+        if(userId > 0 && categoryId > 0 && questionLength > 0 && title){
+          var question = CKEDITOR.instances.question.getData();
+          var solution = CKEDITOR.instances.solution.getData();
+          $.ajax({
+              method: "POST",
+              url: "{{url('createMyPost')}}",
+              data: {title:title,post_category_id:categoryId,question:question,answer1:answer1,answer2:answer2,answer3:answer3,answer4:answer4,answer:answer,solution:solution}
+          })
+          .done(function( msg ) {
+            $('#askQuestion').modal('hide');
+            document.getElementById('post_category').value = 0;
+            document.getElementById('title').value = '';
+            CKEDITOR.instances.question.setData('');
+            CKEDITOR.instances.solution.setData('');
+            renderPosts(msg);
           });
         }
+      }
     }
 
     function renderPosts(msg){
@@ -220,7 +457,11 @@
           var commentBlockDiv = document.createElement('div');
           commentBlockDiv.className = 'user-block cmt-left-margin';
           if(obj.user_image){
-            var userImagePath = "{{ asset('') }}"+obj.user_image;
+            if('system' == obj.image_exist){
+              var userImagePath =  "{{ asset('') }}"+obj.user_image;
+            } else if('other' == obj.image_exist){
+              var userImagePath =  obj.user_image;
+            }
             var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
           } else {
             var userImagePath = "{{ asset('images/user1.png') }}";
@@ -234,10 +475,44 @@
           divMediaBody.setAttribute('data-toggle', 'lightbox');
           divMediaBody.innerHTML = '<br/>';
           var pBody = document.createElement('div');
-          pBody.className = 'more bold img-ckeditor img-responsive cmt-left-margin';
+          pBody.className = 'more img-ckeditor img-responsive cmt-left-margin';
           pBody.id ='editPostHide_'+ obj.id;
           pBody.innerHTML = obj.body + ' <br/>';
           divMediaBody.appendChild(pBody);
+
+          if(obj.answer1 && obj.answer2 && obj.answer && obj.solution){
+            var solutionBody = document.createElement('div');
+            solutionBody.className = 'cmt-left-margin';
+            solutionInnerHtml = '<br/>';
+            successImage = '{{ url('images/accept.png')}}';
+            solutionInnerHtml += '<p id="1" role="button" data-post_id="'+obj.id+'" onClick="checkAnswer(this)">1. '+obj.answer1;
+            if(1 == obj.answer){
+              solutionInnerHtml += '<span class="hide" id="right_answer_image_'+obj.id+'"> <img src="'+successImage+'"></span>';
+            }
+            solutionInnerHtml += '</p>';
+            solutionInnerHtml += '<p id="2" role="button" data-post_id="'+obj.id+'" onClick="checkAnswer(this)">2. '+obj.answer2;
+            if(2 == obj.answer){
+              solutionInnerHtml += '<span class="hide" id="right_answer_image_'+obj.id+'"> <img src="'+successImage+'"></span>';
+            }
+            solutionInnerHtml += '</p>';
+            if(obj.answer3){
+              solutionInnerHtml += '<p id="3" role="button" data-post_id="'+obj.id+'" onClick="checkAnswer(this)">3. '+obj.answer3;
+              if(3 == obj.answer){
+                solutionInnerHtml += '<span class="hide" id="right_answer_image_'+obj.id+'"> <img src="'+successImage+'"></span>';
+              }
+              solutionInnerHtml += '</p>';
+            }
+            if(obj.answer4){
+              solutionInnerHtml += '<p id="4" role="button" data-post_id="'+obj.id+'" onClick="checkAnswer(this)">4. '+obj.answer4;
+              if(4 == obj.answer){
+                solutionInnerHtml += '<span class="hide" id="right_answer_image_'+obj.id+'"> <img src="'+successImage+'"></span>';
+              }
+              solutionInnerHtml += '</p>';
+            }
+            solutionInnerHtml += '<p class="hide" id="answer_'+obj.id+'"><b>Answer:</b> Option '+obj.answer+'</p><p class="hide" id="solution_'+obj.id+'"><b>Solution:</b><br/> '+obj.solution+'</p><input type="hidden" id="right_answer_'+obj.id+'" value="'+obj.answer+'">';
+            solutionBody.innerHTML = solutionInnerHtml;
+            divMediaBody.appendChild(solutionBody);
+          }
 
           var borderDiv = document.createElement('div');
           borderDiv.className = 'border-bottom';
@@ -249,14 +524,25 @@
 
             if( msg['likesCount'][obj.id] && msg['likesCount'][obj.id]['user_id'][userId]){
               commentInnerHtml +='<i id="post_like_'+obj.id+'" data-post_id="'+obj.id+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-              commentInnerHtml +='<span id="like1-bs3">'+ Object.keys(msg['likesCount'][obj.id]['like_id']).length +'</span>';
+              commentInnerHtml +='<span id="like1-bs3">';
+              if(Object.keys(msg['likesCount'][obj.id]['like_id']).length > 0){
+                commentInnerHtml += Object.keys(msg['likesCount'][obj.id]['like_id']).length;
+              }
+              commentInnerHtml +='</span>';
             } else {
               commentInnerHtml +='<i id="post_like_'+obj.id+'" data-post_id="'+obj.id+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
               if(msg['likesCount'][obj.id]){
-                commentInnerHtml +='<span id="like1-bs3">'+ Object.keys(msg['likesCount'][obj.id]['like_id']).length +'</span>';
+                commentInnerHtml +='<span id="like1-bs3">';
+                if(Object.keys(msg['likesCount'][obj.id]['like_id']).length > 0){
+                  commentInnerHtml += Object.keys(msg['likesCount'][obj.id]['like_id']).length;
+                }
+                commentInnerHtml +='</span>';
               }
             }
           commentInnerHtml +='</span>';
+          if(obj.answer1 && obj.answer2 && obj.answer && obj.solution){
+            commentInnerHtml += '<span class="mrgn_5_left">| <a id="'+obj.id+'" onClick="toggleSolution(this);">Solution</a></span>';
+          }
           divComment.innerHTML = commentInnerHtml;
           divMediaBody.appendChild(divComment);
 
@@ -302,13 +588,6 @@
     }
 
     $( document ).ready(function() {
-      // showCommentEle = "{{ Session::get('show_comment_area')}}";
-      // showPostEle = "{{ Session::get('show_post_area')}}";
-      // if(showCommentEle > 0 &&  showPostEle == 0){
-      //   window.location.hash = '#showComment_'+showCommentEle;
-      // } else if(showCommentEle == 0 &&  showPostEle > 0){
-      //   window.location.hash = '#showPost_'+showPostEle;
-      // }
       showMore();
     });
 
@@ -376,10 +655,14 @@
               likeSpan.innerHTML = '';
               if( 1 == dislike ){
                 likeSpan.innerHTML +='<i id="post_like_'+postId+'" data-post_id="'+postId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                if(msg.length > 0){
+                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                }
               } else {
                 likeSpan.innerHTML +='<i id="post_like_'+postId+'" data-post_id="'+postId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                if(msg.length > 0){
+                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+                }
               }
             }
           });

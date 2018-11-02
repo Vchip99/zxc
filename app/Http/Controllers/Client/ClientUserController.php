@@ -49,6 +49,11 @@ use App\Models\ClientExam;
 use App\Models\ClientNotice;
 use App\Models\ClientIndividualMessage;
 use App\Libraries\InputSanitise;
+use App\Models\ClientDiscussionCategory;
+use App\Models\ClientDiscussionPost;
+use App\Models\ClientDiscussionComment;
+use App\Models\ClientDiscussionSubComment;
+use App\Models\ClientDiscussionLike;
 use DateTime;
 
 class ClientUserController extends BaseController
@@ -1600,6 +1605,9 @@ class ClientUserController extends BaseController
 
     protected function myIndividualMessage(Request $request){
         $clientUser = Auth::guard('clientuser')->user();
+        if(!is_object($clientUser)){
+            return Redirect::to('/');
+        }
         $clientUserId = $clientUser->id;
         $clientId = $clientUser->client_id;
         $userBatches = [];
@@ -1633,5 +1641,51 @@ class ClientUserController extends BaseController
             }
         }
         return view('clientuser.dashboard.myIndividualMessage', compact('myMessages'));
+    }
+
+    protected function myDiscussion($subdomainName){
+        $currentUser = Auth::guard('clientuser')->user();
+        if(!is_object($currentUser)){
+            return Redirect::to('/');
+        }
+        $discussionCategories = ClientDiscussionCategory::getCategoriesByClient();
+        $posts = ClientDiscussionPost::getPostsByClient();
+        $likesCount = ClientDiscussionLike::getPostLikes();
+        $commentLikesCount = ClientDiscussionLike::getCommentLikes();
+        $subcommentLikesCount = ClientDiscussionLike::getSubCommentLikes();
+        return view('client.discussion.discussion', compact('subdomainName','posts','discussionCategories','currentUser','likesCount','commentLikesCount','subcommentLikesCount'));
+    }
+
+    protected function myQuestions($subdomainName,Request $request){
+        $currentUser = Auth::guard('clientuser')->user();
+        if(!is_object($currentUser)){
+            return Redirect::to('/');
+        }
+        $posts = ClientDiscussionPost::where('client_id',$currentUser->client_id)->where('clientuser_id',$currentUser->id)->orderBy('id','desc')->get();
+        $discussionCategories = ClientDiscussionCategory::getCategoriesByClient();
+        $likesCount = ClientDiscussionLike::getPostLikes();
+        return view('client.discussion.myQuestions', compact('subdomainName','posts','currentUser','discussionCategories','likesCount'));
+    }
+
+    protected function myReplies($subdomainName,Request $request){
+        $loginUser = Auth::guard('clientuser')->user();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        }
+        $postIds = [];
+        $discussionComments = ClientDiscussionComment::where('client_id',$loginUser->client_id)->where('clientuser_id',$loginUser->id)->select('Client_discussion_post_id')->get();
+        if(false == $discussionComments->isEmpty()){
+            foreach($discussionComments as $discussionComment){
+                $postIds[]= $discussionComment->Client_discussion_post_id;
+            }
+            $postIds = array_unique($postIds);
+        }
+
+        $posts = ClientDiscussionPost::where('client_id',$loginUser->client_id)->whereIn('id', $postIds)->orderBy('id','desc')->get();
+        $currentUser = '';
+        $likesCount = ClientDiscussionLike::getPostLikes();
+        $commentLikesCount = ClientDiscussionLike::getCommentLikes();
+        $subcommentLikesCount = ClientDiscussionLike::getSubCommentLikes();
+        return view('client.discussion.myReplies', compact('subdomainName','posts','currentUser','likesCount','commentLikesCount','subcommentLikesCount'));
     }
 }

@@ -28,6 +28,23 @@
 <section id="sidemenuindex" class="v_container">
   <div class="container ">
     <div class="row">
+      @if(Session::has('message'))
+        <div class="alert alert-success" id="message">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ Session::get('message') }}
+        </div>
+      @endif
+      @if(count($errors) > 0)
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+      @endif
+    </div>
+    <div class="row">
       <div class="col-sm-3 hidden-div">
         <h4 class="v_h4_subtitle"> Sort By</h4>
         <div class="mrgn_20_top_btm" >
@@ -107,9 +124,28 @@
                           </div>
                       </div>
                     </div>
-                    <div class="course-auther ">
-                      <a href="{{ url('courseDetails')}}/{{$course->id}}"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
-                      </a>
+                    <div class="course-auther text-center">
+                      @if(is_object(Auth::user()))
+                        @if(in_array($course->id, $userPurchasedCourses))
+                          <a class="btn btn-sm btn-primary pay-width"> Paid </a>
+                        @elseif($course->price > 0)
+                          <a data-course_id="{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="purchaseCourse(this);">Pay Price: {{$course->price}} Rs.</a>
+                          <form id="purchaseCourse_{{$course->id}}" method="POST" action="{{ url('purchaseCourse')}}">
+                            {{ csrf_field() }}
+                            <input type="hidden" name="course_id" value="{{$course->id}}">
+                            <input type="hidden" name="course_category_id" value="{{$course->course_category_id}}">
+                            <input type="hidden" name="course_sub_category_id" value="{{$course->course_sub_category_id}}">
+                          </form>
+                        @else
+                          <a class="btn btn-sm btn-primary pay-width" >Free</a>
+                        @endif
+                      @else
+                        @if($course->price > 0)
+                          <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="checkLogin();">Pay Price: {{$course->price}} Rs.</a>
+                        @else
+                          <a class="btn btn-sm btn-primary pay-width">Free</a>
+                        @endif
+                      @endif
                     </div>
                   </div>
                 </div>
@@ -242,53 +278,53 @@
   </div>
 </section>
 <section id="education" class="v_container" >
-      <div class="container">
-        <div class="row">
-          <div class="col-md-8 col-md-offset-2 text-center mrgn-60-top"">
-            <h2 class="v_h2_title">Education at Vchip-edu</h2>
-            <hr class="section-dash-dark"/>
-            <h3 class="v_h3_title ">Earn a Professional Certificate, Nano degree course...</p>
-            </div>
-          </div>
-
-          <div class="row text-center mrgn_30_top ">
-            <div class="col-md-4 col-sm-12 mrgn_40_top ">
-              <div class="feature-center">
-                <img src="{{ asset('images/courses/univercity-at-home.png')}}" width="100"
-                height="100"
-                class="img-responsive center-block" alt="University at Home"/>
-                <ul class="vchip_categories list-inline">
-                  <li>
-                    University at Home</li></ul>
-                    <p class="">You can learn as you want at your home.</p>
-                  </div>
-                </div>
-                <div class="col-md-4 col-sm-12 mrgn_40_top ">
-                  <div class="feature-center">
-                    <img src="{{ asset('images/courses/professional-certificate.png')}}"
-                    width="100" height="100"
-                    class="img-responsive center-block" alt="Professional Certificate"/>
-                    <ul class="vchip_categories list-inline">
-                      <li>Professional Certificate</li></ul>
-                      <p class="">After successful completion of certificate course, you will get certificate that will enhance level of your resumes and accelerate your career.</p>
-                    </div>
-                  </div>
-                  <div class="col-md-4 col-sm-12 mrgn_40_top ">
-                    <div class="feature-center">
-                      <img src="{{ asset('images/courses/nano-degree-course.png')}}" width="100"
-                      height="100"
-                      class="img-responsive center-block" alt="Nano degree course"/>
-                      <ul class="vchip_categories list-inline">
-                        <li>Nano degree course</li></ul>
-                        <p class="">Graduate and master level courses that helps to get mastery in that field. </p>
-                      </div>
-                    </div>
-
-                  </div>
-    <!-- /.End Services Row -->
-  </div><!-- /.End Container -->
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2 text-center mrgn-60-top"">
+        <h2 class="v_h2_title">Education at Vchip-edu</h2>
+        <hr class="section-dash-dark"/>
+        <h3 class="v_h3_title ">Earn a Professional Certificate, Nano degree course...</h3>
+      </div>
+    </div>
+    <div class="row text-center mrgn_30_top ">
+      <div class="col-md-4 col-sm-12 mrgn_40_top ">
+        <div class="feature-center">
+          <img src="{{ asset('images/courses/univercity-at-home.png')}}" width="100"
+          height="100"
+          class="img-responsive center-block" alt="University at Home"/>
+          <ul class="vchip_categories list-inline">
+            <li>
+              University at Home
+            </li>
+          </ul>
+            <p class="">You can learn as you want at your home.</p>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12 mrgn_40_top ">
+        <div class="feature-center">
+          <img src="{{ asset('images/courses/professional-certificate.png')}}"
+          width="100" height="100"
+          class="img-responsive center-block" alt="Professional Certificate"/>
+          <ul class="vchip_categories list-inline">
+            <li>Professional Certificate</li>
+          </ul>
+          <p class="">After successful completion of certificate course, you will get certificate that will enhance level of your resumes and accelerate your career.</p>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12 mrgn_40_top ">
+        <div class="feature-center">
+          <img src="{{ asset('images/courses/nano-degree-course.png')}}" width="100"
+          height="100"
+          class="img-responsive center-block" alt="Nano degree course"/>
+          <ul class="vchip_categories list-inline">
+            <li>Nano degree course</li>
+          </ul>
+          <p class="">Graduate and master level courses that helps to get mastery in that field. </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
-
 @stop
 @section('footer')
 	@include('footer.footer')
@@ -353,6 +389,7 @@
     }
   }
   function renderCourse(msg){
+    var userId = parseInt(document.getElementById('user_id').value);
     divCourses = document.getElementById('addCourses');
     divCourses.innerHTML = '';
     document.getElementById('pagination').innerHTML = '';
@@ -398,8 +435,25 @@
           secondDiv.appendChild(thirdDiv);
 
           var authorDiv = document.createElement('div');
-          authorDiv.className = "course-auther";
-          authorDiv.innerHTML = '<a href="'+ url +'"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="'+ obj.author +'">'+ obj.author +'</i></a>';
+          authorDiv.className = "course-auther text-center";
+          if(false == isNaN(userId)){
+            if(msg['userPurchasedCourses'].length > 0 && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width"> Paid </a>';
+            } else if( obj.price > 0 ){
+              var purchaseCourseUrl = "{{ url('purchaseCourse')}}";
+              var csrfField = '{{ csrf_field() }}';
+              authorDiv.innerHTML = '<a data-course_id="'+obj.id+'" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="purchaseCourse(this);">Pay Price: '+obj.price+' Rs.</a>';
+              authorDiv.innerHTML +='<form id="purchaseCourse_'+obj.id+'" method="POST" action="'+purchaseCourseUrl+'">'+csrfField+'<input type="hidden" name="course_id" value="'+obj.id+'"><input type="hidden" name="course_category_id" value="'+obj.course_category_id+'"><input type="hidden" name="course_sub_category_id" value="'+obj.course_sub_category_id+'"></form>';
+            } else {
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width"> Free </a>';
+            }
+          } else {
+            if( obj.price > 0 ){
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="checkLogin();">Pay Price: '+obj.price+' Rs.</a>';
+            } else {
+              authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width"> Free </a>';
+            }
+          }
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           divCourses.appendChild(firstDiv);
@@ -457,7 +511,7 @@
     }
   }
 
- function searchCourse(){
+  function searchCourse(){
     var searches = document.getElementsByClassName('search');
     var arrDifficulty = [];
     var arrCertified = [];
@@ -508,27 +562,6 @@
     }
   }
 
-  function registerCourse(ele){
-    var userId = parseInt(document.getElementById('user_id').value);
-    var courseId = parseInt($(ele).data('course_id'));
-    if( true == isNaN(userId)){
-      alert('please login first and then register course.');
-    } else {
-      $.ajax({
-        method: "POST",
-        url: "{{url('registerCourse')}}",
-        data: {user_id:userId, course_id:courseId}
-      })
-      .done(function( msg ) {
-        var id = 'register-'+courseId;
-        var favEle = document.getElementById(id);
-        favEle.readOnly = true;
-        favEle.innerHTML = 'Registered Course';
-        favEle.removeAttribute('onclick');
-      });
-    }
-  }
-
   $(".toggle").slideUp();
   $(".trigger").click(function(){
     $(this).next(".toggle").slideToggle("slow");
@@ -548,6 +581,30 @@
     }
   }
 
+  function purchaseCourse(ele){
+    $.confirm({
+      title: 'Confirmation',
+      content: 'Do you want to purchase this course?',
+      type: 'red',
+      typeAnimated: true,
+      buttons: {
+        Ok: {
+          text: 'Ok',
+          btnClass: 'btn-red',
+          action: function(){
+            var courseId = parseInt($(ele).data('course_id'));
+            document.getElementById('purchaseCourse_'+courseId).submit();
+          }
+        },
+        Cancle: function () {
+        }
+      }
+    });
+  }
 
+  function checkLogin(){
+    $('#loginUserModel').modal();
+    return false;
+  }
   </script>
 @stop
