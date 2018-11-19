@@ -63,12 +63,14 @@ class PayableClientSubCategory extends Model
             }
             $request->file('subcat_image')->move($subCategoryFolderPath, $subCategoryImage);
             $subCategory->client_image = $subCategoryImagePath;
-            // open image
-            $img = Image::make($subCategory->client_image);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('subcat_image')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                // open image
+                $img = Image::make($subCategory->client_image);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
         }
         $subCategory->save();
         return $subCategory;

@@ -72,12 +72,15 @@ class CourseCourse extends Model
             }
             $request->file('author_image')->move($courseFolderPath, $authorImage);
             $course->author_image = $authorImagePath;
-            // open image
-            $img = Image::make($course->author_image);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+
+            if(in_array($request->file('author_image')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                // open image
+                $img = Image::make($course->author_image);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
         }
 
         if($request->exists('image_path')){
@@ -365,6 +368,21 @@ class CourseCourse extends Model
     /**
      *  get registered online courses for user
      */
+    protected static function myVchipFavouriteCourses(){
+        $userId = Auth::user()->id;
+        return DB::table('course_courses')
+                ->join('register_online_courses', 'register_online_courses.online_course_id', '=', 'course_courses.id')
+                ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
+                ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->where('course_sub_categories.created_for', 1)
+                ->where('register_online_courses.user_id', $userId)
+                ->select('course_courses.*', 'course_categories.name as category', 'course_sub_categories.name as subCategory')->groupBy('course_courses.id')->get();
+    }
+
+    /**
+     *  get registered online courses for user
+     */
     protected static function getRegisteredCollegeOnlineCourses($userId){
         $userId = InputSanitise::inputInt($userId);
         $result = DB::table('course_courses')
@@ -374,6 +392,21 @@ class CourseCourse extends Model
                 ->where('course_sub_categories.created_for', 0);
 
         return $result->select('course_courses.*', 'college_categories.name as category', 'course_sub_categories.name as subCategory')->groupBy('course_courses.id')->get();
+    }
+
+    /**
+     *  get registered online courses for user
+     */
+    protected static function myCollegeFavouriteCourses(){
+        $userId = Auth::user()->id;
+        return DB::table('course_courses')
+                ->join('register_online_courses', 'register_online_courses.online_course_id', '=', 'course_courses.id')
+                ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
+                ->join('college_categories', 'college_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->where('course_sub_categories.created_for', 0)
+                ->where('register_online_courses.user_id', $userId)
+                ->select('course_courses.*', 'college_categories.name as category', 'course_sub_categories.name as subCategory')->groupBy('course_courses.id')->get();
     }
 
     /**

@@ -79,6 +79,10 @@ class CollegeSubject extends Model
         return static::where('college_id', $loginUser->college_id)->where('lecturer_id', $loginUser->id)->whereRaw("find_in_set($department , college_dept_ids)")->whereRaw("find_in_set($year , years)")->select('id','name')->get();
     }
 
+    protected static function getCollegeSubjectsByCollegeIdByDepartmentIdByYear($college,$department,$year){
+        return static::where('college_id', $college)->whereRaw("find_in_set($department , college_dept_ids)")->whereRaw("find_in_set($year , years)")->select('id','name')->get();
+    }
+
     protected static function getCollegeDepartmentsBySubjectId($subjectId){
         $loginUser = Auth::user();
         return static::where('college_id', $loginUser->college_id)->where('id',$subjectId)->first();

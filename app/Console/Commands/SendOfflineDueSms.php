@@ -73,7 +73,7 @@ class SendOfflineDueSms extends Command
                             } else {
                                 foreach($smsUsers as $smsUser){
                                     $result = InputSanitise::sendOfflineDueSms($smsUser['phone'], $smsUser['name'], $smsUser['batch'], $client->name);
-                                    InputSanitise::setSmsCountStats($client);
+                                    InputSanitise::setSmsCountStats($client,2);
                                     $sendCount += 1;
                                     $this->info($result);
                                 }

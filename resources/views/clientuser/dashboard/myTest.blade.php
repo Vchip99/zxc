@@ -115,7 +115,11 @@
                     </thead>
                     <tbody>
                       @foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
-                        <tr>
+                        @if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+                          <tr style="background-color: #b3c2dc;">
+                        @else
+                          <tr>
+                        @endif
                             <td class=" ">{{ $testSubjectPaper->name }}</td>
                             <td class=" ">
                               @if($currentDate < $testSubjectPaper->date_to_active)
@@ -152,7 +156,12 @@
                     @if(isset($testSubjectPapers[$testSubject->id]))
                       @foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
                             <div class=" panel panel-info" >
-                              <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">{{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
+                              @if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+                                <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}" style="background-color: #b3c2dc;">
+                              @else
+                                <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">
+                              @endif
+                              {{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
                               </div>
                                 <div id="paper{{$testSubjectPaper->id}}" class="panel-body" style="padding:2px 0px;">
                                   <div class="container">
@@ -370,6 +379,9 @@
                   if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
                     $.each(msg['papers'][subId], function(ind, obj){
                       var tbodyTr = document.createElement("tr");
+                      if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                        tbodyTr.setAttribute('style','background-color: #b3c2dc;');
+                      }
                       var divInnerHtml = '';
                       divInnerHtml += '<td class=" ">'+ obj.name+'</td>';
                       if(msg['currentDate'] < obj.date_to_active){
@@ -423,6 +435,9 @@
                       var panelHeadingDiv = document.createElement('div');
                       panelHeadingDiv.className = 'toggle panel-heading';
                       panelHeadingDiv.setAttribute('data-toggle','paper'+obj.id);
+                      if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                        panelHeadingDiv.setAttribute('style','background-color: #b3c2dc;');
+                      }
                       panelHeadingDiv.innerHTML = obj.name;
 
                       var spanEle = document.createElement('span');

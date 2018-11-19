@@ -95,7 +95,13 @@ class AssignmentTopic extends Model
     protected static function getAssignmentTopics($subjectId,$year=NULL,$department=NULL){
         $loginUser = Auth::guard('web')->user();
         $subjectId = InputSanitise::inputInt($subjectId);
-        $result = static::join('college_subjects','college_subjects.id', '=', 'assignment_topics.college_subject_id');
+        if(User::Student == $loginUser->user_type){
+            $result = static::join('college_subjects','college_subjects.id', '=', 'assignment_topics.college_subject_id')
+                    ->join('assignment_questions', 'assignment_questions.assignment_topic_id', 'assignment_topics.id')
+                    ->where('assignment_questions.question', '!=',' ');
+        } else {
+            $result = static::join('college_subjects','college_subjects.id', '=', 'assignment_topics.college_subject_id');
+        }
         if($subjectId > 0){
             $result->where('assignment_topics.college_subject_id', $subjectId);
         }
@@ -133,6 +139,63 @@ class AssignmentTopic extends Model
         return $result->select('assignment_topics.id', 'assignment_topics.*')->groupBy('assignment_topics.id')->get();
         // return static::join('college_subjects','college_subjects.id', '=', 'assignment_topics.college_subject_id')
         //         ->where('assignment_topics.college_subject_id', $subjectId)->select('assignment_topics.id', 'assignment_topics.*')->groupBy('assignment_topics.id')->get();
+    }
+
+    protected static function getAssignmentTopicsForStudentAssignment($subjectId,$year=NULL,$department=NULL){
+        $loginUser = Auth::guard('web')->user();
+        $subjectId = InputSanitise::inputInt($subjectId);
+        $result = static::join('college_subjects','college_subjects.id', '=', 'assignment_topics.college_subject_id')
+                ->join('assignment_questions', 'assignment_questions.assignment_topic_id', 'assignment_topics.id')
+                ->where('assignment_questions.question', '!=',' ');
+
+        if($subjectId > 0){
+            $result->where('assignment_topics.college_subject_id', $subjectId);
+        }
+        if(!empty($year) && $year > 0){
+            $result->whereRaw("find_in_set($year , assignment_topics.years)");
+        }
+        if(!empty($department)){
+            if('All' == $department){
+                if(User::Lecturer == $loginUser->user_type || User::Hod == $loginUser->user_type){
+                    $departments = explode(',',$loginUser->assigned_college_depts);
+                    if(count($departments) > 0){
+                        sort($departments);
+                        $result->where(function($query) use($departments) {
+                            foreach($departments as $index => $department){
+                                if(0 == $index){
+                                    $query->whereRaw("find_in_set($department , assignment_topics.college_dept_ids)");
+                                } else {
+                                    $query->orWhereRaw("find_in_set($department , assignment_topics.college_dept_ids)");
+                                }
+                            }
+                        });
+                    }
+                }
+            } elseif($department > 0) {
+                $result->whereRaw("find_in_set($department , assignment_topics.college_dept_ids)");
+            }
+        }
+        if(User::TNP == $loginUser->user_type){
+            $result->where('assignment_topics.lecturer_id', $loginUser->id)->where('assignment_topics.lecturer_type', User::TNP);
+        } elseif(User::Hod == $loginUser->user_type){
+            $result->whereIn('assignment_topics.lecturer_type', [User::Hod,User::Lecturer]);
+        } elseif(User::Lecturer == $loginUser->user_type){
+            $result->where('assignment_topics.lecturer_id', $loginUser->id)->where('assignment_topics.lecturer_type', User::Lecturer);
+        }
+        return $result->select('assignment_topics.id', 'assignment_topics.*')->groupBy('assignment_topics.id')->get();
+    }
+
+    protected static function getAssignDocumentTopics($subjectId){
+        $loginUser = Auth::guard('web')->user();
+        $subjectId = InputSanitise::inputInt($subjectId);
+        return static::join('college_subjects','college_subjects.id', '=', 'assignment_topics.college_subject_id')
+                ->join('assignment_questions', 'assignment_questions.assignment_topic_id', 'assignment_topics.id')
+                ->whereRaw("find_in_set($loginUser->college_dept_id , assignment_topics.college_dept_ids)")
+                ->whereRaw("find_in_set($loginUser->year , assignment_topics.years)")
+                ->where('assignment_topics.college_subject_id', $subjectId)
+                ->where('assignment_questions.question',' ')
+                ->select('assignment_topics.id', 'assignment_topics.*')
+                ->groupBy('assignment_topics.id')->get();
     }
 
     protected static function isAssignmentTopicExist(Request $request){

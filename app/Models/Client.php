@@ -207,12 +207,14 @@ class Client extends Authenticatable
 
             if(!empty($dbUserImagePath)){
                 $client->photo = $dbUserImagePath;
-                // open image
-                $img = Image::make($client->photo);
-                // enable interlacing
-                $img->interlace(true);
-                // save image interlaced
-                $img->save();
+                if(in_array($request->file('photo')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                    // open image
+                    $img = Image::make($client->photo);
+                    // enable interlacing
+                    $img->interlace(true);
+                    // save image interlaced
+                    $img->save();
+                }
             }
             $client->save();
         }

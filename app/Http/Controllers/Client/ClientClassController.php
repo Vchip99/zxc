@@ -62,6 +62,7 @@ class ClientClassController extends ClientBaseController
      *  store class
      */
     protected function store(Request $request){
+
         $v = Validator::make($request->all(), $this->validateClientClass);
 
         if ($v->fails())
@@ -277,7 +278,11 @@ class ClientClassController extends ClientBaseController
             } else {
                 $batchName = 'All';
             }
-            $lecturer = $lecture->user;
+            if(0 == $lecture->clientuser_id){
+                $lecturer = $client;
+            } else {
+                $lecturer = $lecture->user;
+            }
             InputSanitise::sendLectureSms($lecture,$batchName,$lecturer,$client);
         }
         return;

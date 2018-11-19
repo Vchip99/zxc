@@ -63,12 +63,14 @@ class VirtualPlacementDrive extends Model
             }
             $request->file('about_image')->move($virtualPlacementDriveFolderPath, $authorImage);
             $virtualPlacementDrive->about_image = $authorImagePath;
-            // open image
-            $img = Image::make($virtualPlacementDrive->about_image);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('about_image')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                // open image
+                $img = Image::make($virtualPlacementDrive->about_image);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
         }
 
         if($request->exists('program_arrangement_image')){

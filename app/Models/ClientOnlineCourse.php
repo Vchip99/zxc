@@ -78,12 +78,14 @@ class ClientOnlineCourse extends Model
             }
             $request->file('author_image')->move($courseFolderPath, $authorImage);
             $course->author_image = $authorImagePath;
-            // open image
-            $img = Image::make($course->author_image);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('author_image')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                // open image
+                $img = Image::make($course->author_image);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
         }
 
         if($request->exists('image_path')){

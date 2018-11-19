@@ -21,6 +21,21 @@
       <form action="{{url('college/'.Session::get('college_user_url').'/createAssignment')}}" method="POST" enctype="multipart/form-data">
   @endif
     {{ csrf_field() }}
+  <div class="form-group row">
+    <label class="col-sm-2 col-form-label">Type:</label>
+    @if(isset($assignment->id))
+      <input type="radio" name="type_text" value="assignment" @if(!empty($assignment->question)) checked @endif disabled>Assignment
+      <input type="radio" name="type_text" value="document" @if(empty($assignment->question)) checked @endif disabled>Document
+      @if(!empty($assignment->question))
+        <input type="hidden" name="type" value="assignment">
+      @else
+        <input type="hidden" name="type" value="document">
+      @endif
+    @else
+      <input type="radio" name="type" value="assignment" checked onClick="toggleType(this);">Assignment
+      <input type="radio" name="type" value="document" onClick="toggleType(this);">Document
+    @endif
+  </div>
   <div class="form-group row @if ($errors->has('subject')) has-error @endif">
     <label class="col-sm-2 col-form-label">Subject Name:</label>
     <div class="col-sm-3">
@@ -76,23 +91,25 @@
     <label class="col-sm-2 col-form-label">Warning:</label>
     <div class="col-sm-10">
      <p> Assignment is exists for above criteria. Click on edit button to edit assignment. <a href="" id="assignment" class="btn btn-primary" style="width: 120px;">Edit Assignment</a></p>
-
     </div>
   </div>
-  <div class="form-group row @if ($errors->has('question')) has-error @endif">
-    <label for="question" class="col-sm-2 col-form-label">Assignment:</label>
+  <div class="form-group row @if ($errors->has('question')) has-error @endif" id="questionDiv">
+    @if(empty($assignment->id) || !empty($assignment->question))
+      <label for="question" class="col-sm-2 col-form-label">Assignment:</label>
+    @endif
     <div class="col-sm-10">
       @if(!empty($assignment->id) && $assignment->lecturer_id == Auth::user()->id)
-
         @if($errors->has('question')) <p class="help-block">{{ $errors->first('question') }}</p> @endif
-        <textarea name="question" cols="60" rows="4" id="question" placeholder="Enter your Question" required>
-    			@if(isset($assignment->id))
-     				{!! $assignment->question !!}
-     			@endif
-  		  </textarea>
-  	  	<script type="text/javascript">
-  	    	CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
-  	  	</script>
+        @if(!empty($assignment->question))
+          <textarea name="question" cols="60" rows="4" id="question" placeholder="Enter your Question" required>
+      			@if(isset($assignment->id))
+       				{!! $assignment->question !!}
+       			@endif
+    		  </textarea>
+    	  	<script type="text/javascript">
+    	    	CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
+    	  	</script>
+        @endif
       @elseif(empty($assignment->id))
         @if($errors->has('question')) <p class="help-block">{{ $errors->first('question') }}</p> @endif
         <textarea name="question" cols="60" rows="4" id="question" placeholder="Enter your Question" required>
@@ -101,7 +118,9 @@
           CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
         </script>
       @else
-        {!! $assignment->question !!}
+        @if(!empty($assignment->question))
+          {!! $assignment->question !!}
+        @endif
       @endif
     </div>
   </div>
@@ -146,9 +165,9 @@
     <div class="form-group row" id="submit">
       <div class="offset-sm-2 col-sm-3" title="Submit">
         @if(!empty($assignment->id) && $assignment->lecturer_id == Auth::user()->id)
-          <input type="submit" class="btn btn-primary" style="width: 90px !important;" />
+          <button type="submit" class="btn btn-primary" style="width: 90px !important;" >Submit</button>
         @elseif(empty($assignment->id))
-          <input type="submit" class="btn btn-primary" style="width: 90px !important;" />
+          <button type="submit" class="btn btn-primary" style="width: 90px !important;" >Submit</button>
         @endif
       </div>
     </div>
@@ -205,6 +224,14 @@
           document.getElementById('submit').classList.remove('hide');
         }
       });
+    }
+  }
+
+  function toggleType(ele){
+    if('document' ==  $(ele).val()){
+      $('#questionDiv').addClass('hide');
+    } else {
+      $('#questionDiv').removeClass('hide');
     }
   }
     // function selectSubject(ele){

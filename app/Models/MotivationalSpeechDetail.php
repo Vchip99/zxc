@@ -63,12 +63,14 @@ class MotivationalSpeechDetail extends Model
             }
             $request->file('about_image')->move($motivationalSpeechFolderPath, $aboutImage);
             $motivationalSpeechDetails->about_image = $aboutImagePath;
-            // open image
-            $img = Image::make($motivationalSpeechDetails->about_image);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('about_image')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                // open image
+                $img = Image::make($motivationalSpeechDetails->about_image);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
         }
 
     	$motivationalSpeechDetails->save();

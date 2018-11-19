@@ -90,21 +90,25 @@ class VkitProject extends Model
         $vkitProject->microcontroller = $projectMicrocontroller;
         if(isset($dbFrontImagePath)){
             $vkitProject->front_image_path = $dbFrontImagePath;
-             // open image
-            $img = Image::make($vkitProject->front_image_path);
-            // enable interlacing
-            $img->interlace();
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('front_image')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                 // open image
+                $img = Image::make($vkitProject->front_image_path);
+                // enable interlacing
+                $img->interlace();
+                // save image interlaced
+                $img->save();
+            }
         }
         if(isset($dbHeaderImagePath)){
             $vkitProject->header_image_path = $dbHeaderImagePath;
-             // open image
-            $img = Image::make($vkitProject->header_image_path);
-            // enable interlacing
-            $img->interlace();
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('header_image')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                 // open image
+                $img = Image::make($vkitProject->header_image_path);
+                // enable interlacing
+                $img->interlace();
+                // save image interlaced
+                $img->save();
+            }
         }
         if(isset($dbPdfPath)){
             $vkitProject->project_pdf_path = $dbPdfPath;
@@ -117,7 +121,6 @@ class VkitProject extends Model
         }
         $vkitProject->save();
         return $vkitProject;
-
     }
 
     /**
@@ -139,6 +142,33 @@ class VkitProject extends Model
                 ->where('register_projects.user_id', $userId)
                 ->select('vkit_projects.id','vkit_projects.name','vkit_projects.front_image_path','vkit_projects.author','vkit_projects.introduction','vkit_projects.category_id')
                 ->get();
+    }
+
+    protected static function getVchipFavouriteVkitProjectsByUserId($userId){
+        $userId = InputSanitise::inputInt($userId);
+        return DB::table('vkit_projects')
+                ->join('register_projects', 'register_projects.project_id', '=', 'vkit_projects.id')
+                ->join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')
+                ->where('vkit_projects.created_for', 1)
+                ->where('register_projects.user_id', $userId)
+                ->select('vkit_projects.id','vkit_projects.name','vkit_projects.front_image_path','vkit_projects.author','vkit_projects.introduction','vkit_projects.category_id')
+                ->get();
+    }
+
+    protected static function getCollegeFavouriteVkitProjectsByUserId($userId){
+        $userId = InputSanitise::inputInt($userId);
+        $collegeId = Auth::user()->college_id;
+        if($collegeId > 0){
+            return DB::table('vkit_projects')
+                ->join('register_projects', 'register_projects.project_id', '=', 'vkit_projects.id')
+                ->join('college_categories', 'college_categories.id', '=', 'vkit_projects.category_id')
+                ->where('vkit_projects.created_for', 0)
+                ->where('register_projects.user_id', $userId)
+                ->where('college_categories.college_id', $collegeId)
+                ->select('vkit_projects.id','vkit_projects.name','vkit_projects.front_image_path','vkit_projects.author','vkit_projects.introduction','vkit_projects.category_id')
+                ->get();
+        }
+        return;
     }
 
     protected static function getVkitProjectsByCollegeIdByDeptIdWithPagination($collegeId, $deptId=NULL){
@@ -176,6 +206,10 @@ class VkitProject extends Model
 
     protected static function getVkitProjectsWithPagination(){
         return static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')->select('vkit_projects.*','vkit_categories.name as category')->where('vkit_projects.created_for', 1)->paginate();
+    }
+
+    protected static function getVchipVkitProjects(){
+        return static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')->select('vkit_projects.*','vkit_categories.name as category')->where('vkit_projects.created_for', 1)->get();
     }
 
     protected static function getVkitProjectsByCollegeIdByDeptId($collegeId, $deptId=NULL){

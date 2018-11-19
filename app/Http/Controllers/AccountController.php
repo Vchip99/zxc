@@ -57,6 +57,11 @@ use App\Models\CollegeOfflinePaper;
 use App\Models\UserData;
 use App\Models\TestSubCategory;
 use App\Models\RegisterPaper;
+use App\Models\DocumentsCategory;
+use App\Models\RegisterFavouriteDocuments;
+use App\Models\CollegeOfflinePaperMarks;
+use App\Models\CollegeTimeTable;
+use App\Models\CollegePayment;
 use Excel;
 use Auth,Hash,DB, Redirect,Session,Validator,Input,Cache;
 use App\Libraries\InputSanitise;
@@ -172,6 +177,7 @@ class AccountController extends Controller
         $otherDepts = [];
         $obtainedScore = 0;
         $totalScore = 0;
+        $userCollege = '';
         $users = self::Users;
         $loginUser = Auth::user();
         if(User::Student == $loginUser->user_type){
@@ -202,7 +208,10 @@ class AccountController extends Controller
                 }
             }
         }
-        return view('dashboard.profile', compact('users', 'colleges', 'collegeDepts', 'obtainedScore', 'totalScore', 'loginUser','otherDepts'));
+        if(User::Hod == Auth::user()->user_type || User::Directore == Auth::user()->user_type || User::TNP == Auth::user()->user_type){
+            $userCollege = College::find($loginUser->college_id);
+        }
+        return view('dashboard.profile', compact('users', 'colleges', 'collegeDepts', 'obtainedScore', 'totalScore', 'loginUser','otherDepts','userCollege'));
     }
 
     protected function myCollegeCourses(Request $request){
@@ -533,9 +542,16 @@ class AccountController extends Controller
             return Redirect::to('/');
         }
         $userId = Auth::user()->id;
-        $documents = DocumentsDoc::allRegisterDocuments($userId);
-        $categories = RegisterDocuments::getRegisteredCategoriesByUserId($userId);
-        return view('dashboard.myDocuments', compact('documents', 'categories'));
+        $documents = DocumentsDoc::all();
+        $categories = DocumentsCategory::getDocumentsCategoriesAssociatedWithDocs();
+        $favouriteDocIds = [];
+        $favouriteDocuments = RegisterFavouriteDocuments::getRegisteredFavouriteDocumentsByUserId($userId);
+        if(false == $favouriteDocuments->isEmpty()){
+            foreach($favouriteDocuments as $favouriteDocument){
+                $favouriteDocIds[] = $favouriteDocument->documents_docs_id;
+            }
+        }
+        return view('dashboard.myDocuments', compact('documents', 'categories','favouriteDocIds'));
     }
 
     protected function myVchipVkits(Request $request){
@@ -543,8 +559,8 @@ class AccountController extends Controller
             return Redirect::to('/');
         }
         $userId = Auth::user()->id;
-        $projects = RegisterProject::getRegisteredProjectsByUserId($userId);
-        $categories = RegisterProject::getRegisteredCategoriesByUserId($userId);
+        $projects = VkitProject::getVchipVkitProjects();
+        $categories = VkitCategory::getProjectCategoriesAssociatedWithProject();
         return view('dashboard.myVchipVkits', compact('projects', 'categories'));
     }
 
@@ -628,6 +644,7 @@ class AccountController extends Controller
             return VkitProject::getCollegeVkitProjectsById(json_decode($id));
         });
         if(is_object($project)){
+            $registeredProjectIds = [];
             $projects = Cache::remember(Session::get('college_user_url').':projects:projects-'.$project->category_id,60, function() use ($project) {
                 return VkitProject::getCollegeVkitProjectsByCategoryId($project->category_id);
             });
@@ -876,11 +893,7 @@ class AccountController extends Controller
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            // if(4 == $user->user_type){
-            //     $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
-            // } else {
-                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
-            // }
+            $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
 
             $results = Score::getScoresWithCollegeTestCategoriesByCollegeIdByDeptIdByUserId($selectedStudent->college_id,$selectedStudent->college_dept_id,$id);
             Session::set('selected_student', $id);
@@ -1095,11 +1108,8 @@ class AccountController extends Controller
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            // if(4 == $user->user_type){
-            //     $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
-            // } else {
-                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
-            // }
+
+            $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
             $courses = CourseCourse::getRegisteredCollegeOnlineCourses($id);
             Session::set('selected_student', $id);
             Session::set('selected_user_type', $selectedStudent->user_type);
@@ -1169,11 +1179,8 @@ class AccountController extends Controller
             if(!is_object($selectedStudent)){
                 return redirect()->back();
             }
-            // if(4 == $user->user_type){
-            //     $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$user->college_dept_id,$selectedStudent->user_type);
-            // } else {
-                $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
-            // }
+
+            $students = User::getAllStudentsByCollegeIdByDeptId($selectedStudent->college_id,$selectedStudent->college_dept_id,$selectedStudent->user_type);
             $courses = CourseCourse::getRegisteredOnlineCourses($id);
             Session::set('selected_student', $id);
             Session::set('selected_user_type', $selectedStudent->user_type);
@@ -1354,6 +1361,41 @@ class AccountController extends Controller
         return view('dashboard.myCollegeCourseResult', compact('categories', 'courses'));
     }
 
+    protected function myOfflineTestResults(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $collegeSubjectIds = [];
+        $collegeOfflinePaperIds = [];
+        $collegeSubjectNames = [];
+        $collegeOfflinePaperNames = [];
+        $user = Auth::user();
+        $marks = CollegeOfflinePaperMarks::getOfflinePaperMarksByUser();
+        if(is_object($marks) && false == $marks->isEmpty()){
+            foreach($marks as $mark){
+                $collegeSubjectIds[] = $mark->college_subject_id;
+                $collegeOfflinePaperIds[] = $mark->college_offline_paper_id;
+            }
+            if(count($collegeSubjectIds) > 0){
+                $subjects = CollegeSubject::find(array_unique($collegeSubjectIds));
+                if(is_object($subjects) && false == $subjects->isEmpty()){
+                    foreach($subjects as $subject){
+                        $collegeSubjectNames[$subject->id] = $subject->name;
+                    }
+                }
+            }
+            if(count($collegeOfflinePaperIds) > 0){
+                $papers = CollegeOfflinePaper::find($collegeOfflinePaperIds);
+                if(is_object($papers) && false == $papers->isEmpty()){
+                    foreach($papers as $paper){
+                        $collegeOfflinePaperNames[$paper->id] = $paper->name;
+                    }
+                }
+            }
+        }
+        return view('dashboard.myOfflineTestResults', compact('marks','collegeSubjectNames','collegeOfflinePaperNames'));
+    }
+
     protected function myCollegeTestResults(Request $request){
         if( false == InputSanitise::checkCollegeUrl($request)){
             return Redirect::to('/');
@@ -1479,23 +1521,29 @@ class AccountController extends Controller
         $sortIds = [];
         $allIds = [];
         $idsImploded = '';
-        $selectedYear = !empty($request->get('year'))?$request->get('year'): date('Y');
-        $selectedMonth = !empty($request->get('month'))?$request->get('month'): date('m');
+        $selectedYear = !empty($request->get('year'))?$request->get('year'): '';
+        $selectedMonth = !empty($request->get('month'))?$request->get('month'): '';
         $readNotificationIds = ReadNotification::getReadNotificationIdsByUser($selectedYear,$selectedMonth);
-        $allAdminNotifications = Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->orderBy('id', 'desc')->get();
-        if(is_object($allAdminNotifications) && false == $allAdminNotifications->isEmpty()){
-            foreach ($allAdminNotifications as $allAdminNotification) {
-                if(!in_array($allAdminNotification->id, $readNotificationIds)){
-                    $sortIds[] = $allAdminNotification->id;
+        if(!empty($request->get('year')) && !empty($request->get('month'))){
+            $allAdminNotifications = Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->orderBy('id', 'desc')->get();
+            if(is_object($allAdminNotifications) && false == $allAdminNotifications->isEmpty()){
+                foreach ($allAdminNotifications as $allAdminNotification) {
+                    if(!in_array($allAdminNotification->id, $readNotificationIds)){
+                        $sortIds[] = $allAdminNotification->id;
+                    }
                 }
+                $allIds = array_merge($sortIds, $readNotificationIds);
+                $idsImploded = "'" . implode("','", $allIds) . "'";
             }
-            $allIds = array_merge($sortIds, $readNotificationIds);
-            $idsImploded = "'" . implode("','", $allIds) . "'";
         }
         if(!empty($idsImploded)){
             $notifications =  Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->orderByRaw("FIELD(`id`,$idsImploded)")->paginate();
         } else {
-            $notifications =  Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->paginate();
+            if(empty($request->get('year')) && empty($request->get('month'))){
+                $notifications =  Notification::where('admin_id', 1)->paginate(50);
+            } else {
+                $notifications =  Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->paginate();
+            }
         }
         $years = range(2017, 2030);
         $months = array(
@@ -1572,6 +1620,15 @@ class AccountController extends Controller
         return view('dashboard.assignmentLists', compact('assignments', 'assignmentTeachers'));
     }
 
+    protected function myAssignDocuments($collegeUrl,Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $assignments = AssignmentQuestion::getStudentDocuments();
+        $assignmentTeachers = User::getTeachers();
+        return view('dashboard.documentLists', compact('assignments', 'assignmentTeachers'));
+    }
+
     protected function doAssignment($collegeUrl,$id,Request $request){
         if( false == InputSanitise::checkCollegeUrl($request)){
             return Redirect::to('/');
@@ -1634,7 +1691,7 @@ class AccountController extends Controller
             $assignmentSubjects = CollegeSubject::getCollegeSubjectByYear($selectedAssignmentYear);
         }
         if($selectedAssignmentSubject > 0){
-            $assignmentTopics = AssignmentTopic::getAssignmentTopics($selectedAssignmentSubject);
+            $assignmentTopics = AssignmentTopic::getAssignmentTopicsForStudentAssignment($selectedAssignmentSubject);
         }
         if($selectedAssignmentStudent > 0){
             $assignmentUsers = User::getAssignmentUsers($selectedAssignmentYear,$selectedAssignmentDepartment);
@@ -2275,4 +2332,249 @@ class AccountController extends Controller
         }
     }
 
+    protected function myVchipFavouriteCourses(){
+        $result = [];
+        $result['courses'] = [];
+        $result['userPurchasedCourses'] = [];
+        $courses = CourseCourse::myVchipFavouriteCourses();
+        if(is_object($courses) && false == $courses->isEmpty()){
+            $result['courses'] = $courses;
+            foreach($courses as $course){
+                $result['userPurchasedCourses'][] = $course->id;
+            }
+        }
+        return $result;
+    }
+
+    protected function myCollegeFavouriteCourses(){
+        $result = [];
+        $result['courses'] = [];
+        $result['userPurchasedCourses'] = [];
+        $courses = CourseCourse::myCollegeFavouriteCourses();
+        if(is_object($courses) && false == $courses->isEmpty()){
+            $result['courses'] = $courses;
+            foreach($courses as $course){
+                $result['userPurchasedCourses'][] = $course->id;
+            }
+        }
+        return $result;
+    }
+
+    protected function myAttendance(Request $request){
+        $selectedYear = json_decode($request->get('year'));
+        $selectedSubject = json_decode($request->get('subject'));
+
+        $loginUser = Auth::user();
+        $loginUserId = $loginUser->id;
+        $userFirstBatchId = 0;
+        $subjects = CollegeSubject::getCollegeSubjectsByCollegeIdByDepartmentIdByYear($loginUser->college_id,$loginUser->college_dept_id,$loginUser->year);
+        if(!empty($selectedYear) && !empty($selectedSubject)){
+            $result = $this->getAttendanceByCollegeByDeptByYearBySubjectByUser($loginUser->college_id,$loginUser->college_dept_id,$loginUser->year,$selectedSubject,$selectedYear,$loginUserId);
+            $defaultDate = $selectedYear.'-'.date('m').'-'.date('d');
+        } else {
+            $result = $this->getAttendanceByCollegeByDeptByYearBySubjectByUser($loginUser->college_id,$loginUser->college_dept_id,$loginUser->year,$selectedSubject,date('Y'),$loginUserId);
+            $defaultDate = date('Y-m-d');
+        }
+        $attendanceStats = implode(',', $result['attendanceStats']);
+        $allPresentDates = implode(',', $result['allPresentDates']);
+        $allAbsentDates = implode(',', $result['allAbsentDates']);
+        $currnetYear = date('Y');
+        return view('dashboard.myAttendance', compact('subjects','currnetYear','selectedYear','selectedSubject', 'allPresentDates', 'allAbsentDates','attendanceStats','defaultDate'));
+    }
+
+    protected function getAttendanceByCollegeByDeptByYearBySubjectByUser($collegeId,$deptId,$collegeYear,$selectedSubject,$selectedYear,$userId){
+        $attendanceCount = [];
+        $result = [];
+        if($selectedSubject > 0 && $selectedYear > 0){
+            $allAttendance = CollegeUserAttendance::where('college_id','=', $collegeId)->where('college_dept_id','=', $deptId)->where('year','=', $collegeYear)->where('college_subject_id','=', $selectedSubject)->whereYear('attendance_date', $selectedYear)->orderBy('attendance_date')->get();
+
+            if(is_object($allAttendance) && false == $allAttendance->isEmpty()){
+                foreach($allAttendance as $attendance){
+                    $studentIds = explode(',', $attendance->student_ids);
+                    $month =(int) explode('-', $attendance->attendance_date)[1];
+                    // $date = explode('-', $attendance->attendance_date)[2];
+                    if(in_array($userId, $studentIds)){
+                        $attendanceCount[$month]['present_date'][$attendance->id] = $attendance->attendance_date;
+                    } else {
+                        $attendanceCount[$month]['absent_date'][$attendance->id] = $attendance->attendance_date;
+                    }
+                    $attendanceCount[$month]['attendance_date'][$attendance->id] = $attendance->attendance_date;
+                }
+            }
+        }
+        $allAbsentDates = [];
+        $allPresentDates = [];
+        $attendanceStats = [];
+        if(count($attendanceCount) > 0){
+            foreach($attendanceCount as $month => $arr) {
+                if(isset($arr['present_date'])){
+                    $presentDates = $arr['present_date'];
+                } else {
+                    $presentDates = [];
+                }
+                $attendanceDates = $arr['attendance_date'];
+                $noOfPresentDays = count($presentDates);
+                $noOfAttendanceDays = count($attendanceDates);
+                $noOfAbsentDays = $noOfAttendanceDays - $noOfPresentDays;
+                $firstDate = $collegeYear.'-0'.$month.'-01';
+                $attendanceStats[] = $firstDate.':'.$noOfPresentDays.'-'.$noOfAbsentDays.'-'.$noOfAttendanceDays;
+                foreach( $attendanceDates as $id => $date) {
+                    if(isset($presentDates[$id])){
+                        $allPresentDates[] = $date;
+                    } else {
+                        $allAbsentDates[] = $date;
+                    }
+                }
+            }
+        }
+        $result['allPresentDates'] = $allPresentDates;
+        $result['allAbsentDates'] = $allAbsentDates;
+        $result['attendanceStats'] = $attendanceStats;
+        return $result;
+    }
+
+    protected function myTimeTable(Request $request){
+        $loginUser = Auth::user();
+        $collegeCalendar = CollegeTimeTable::getCollegeCalendar();
+        $collegeTimeTable = CollegeTimeTable::getStudentCollegeTimeTable();
+        $examTimeTable = CollegeTimeTable::getStudentExamTimeTable();
+        return view('dashboard.myTimeTable', compact('collegeCalendar','collegeTimeTable','examTimeTable'));
+    }
+
+    protected function manageSettings($collegeUrl,Request $request){
+        $college = College::whereNotNull('url')->where('url',$collegeUrl)->first();
+        if(is_object($college)){
+            return view('dashboard.settings', compact('college'));
+        }
+        return redirect('/');
+    }
+
+    protected function changeCollegeSetting(Request $request){
+        DB::connection('mysql')->beginTransaction();
+        try
+        {
+            College::changeCollegeSetting($request);
+            DB::connection('mysql')->commit();
+            return 'true';
+        }
+        catch(\Exception $e)
+        {
+            DB::connection('mysql')->rollback();
+            return 'false';
+        }
+        return 'false';
+    }
+
+    protected function manageCollegePurchaseSms(){
+        $collegePayments = CollegePayment::orderby('id','desc')->paginate();
+        return view('collegeModule.sms.list',compact('collegePayments'));
+    }
+
+
+    protected function createCollegePurchaseSms(){
+        return view('collegeModule.sms.create');
+    }
+
+    protected function collegePurchaseSms(Request $request){
+        $smsCount = $request->get('sms_count');
+        $total = $request->get('total');
+        if(!empty($smsCount) && !empty($total)){
+            if(!(($total/150) == ($smsCount/1000))){
+                return redirect()->back()->withErrors('something went wrong in sms calculation.');
+            } else {
+                $loginUser = Auth::user();
+                $name = $loginUser->name;
+                $phone = $loginUser->phone;
+                $email = $loginUser->email;
+
+                $purpose = 'purchase '.$smsCount.' sms';
+                Session::put('college_purchase_sms', $smsCount);
+                Session::put('college_total', $total);
+                Session::save();
+                if('local' == \Config::get('app.env')){
+                    $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+                } else {
+                    $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+                }
+                try {
+                    $response = $api->paymentRequestCreate(array(
+                        "purpose" => $purpose,
+                        "amount" => $total,
+                        "buyer_name" => $name,
+                        "phone" => $phone,
+                        "send_email" => true,
+                        "send_sms" => true,
+                        "email" => $email,
+                        'allow_repeated_payments' => false,
+                        "redirect_url" => url('thankyouCollegePurchaseSms'),
+                        "webhook" => url('webhookCollegePurchaseSms')
+                        ));
+
+                    $pay_ulr = $response['longurl'];
+                    header("Location: $pay_ulr");
+                    exit();
+                }
+                catch (Exception $e) {
+                    return Redirect::to('college/'.Session::get('college_user_url').'/manageCollegePurchaseSms')->withErrors([$e->getMessage()]);
+                }
+            }
+        }
+        return redirect()->back();
+    }
+
+    protected function thankyouCollegePurchaseSms(Request $request){
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        $payid = $request->get('payment_request_id');
+
+        try {
+            $response = $api->paymentRequestStatus($payid);
+
+            if( 'Credit' == $response['payments'][0]['status']){
+
+                $paymentRequestId = $response['id'];
+                $paymentId = $response['payments'][0]['payment_id'];
+                $loginUser = Auth::user();
+                $status = $response['payments'][0]['status'];
+                $purchasedSms = Session::get('college_purchase_sms');
+                $total = Session::get('college_total');
+                DB::beginTransaction();
+                try
+                {
+                    $college = College::find($loginUser->college_id);
+                    if( is_object($college)){
+                        $smsArray = [
+                                        'note' => 'purchased '.$purchasedSms.' sms',
+                                        'price' => $total,
+                                        'payment_id' => $paymentId,
+                                        'payment_request_id' => $paymentRequestId,
+                                    ];
+                        CollegePayment::addCollegePurchasedSms($smsArray);
+                        $college->debit_sms_count = ($college->debit_sms_count + $purchasedSms) - $college->credit_sms_count;
+                        $college->credit_sms_count = 0;
+                        $college->save();
+                        DB::commit();
+                        return Redirect::to('college/'.Session::get('college_user_url').'/manageCollegePurchaseSms')->with('message', 'Thank you for purcahseing sms.');
+                    }
+                }
+                catch(Exception $e)
+                {
+                    DB::rollback();
+                    return Redirect::to('college/'.Session::get('college_user_url').'/manageCollegePurchaseSms')->withErrors([$e->getMessage()]);
+                }
+            }
+        }
+        catch (Exception $e) {
+            return Redirect::to('college/'.Session::get('college_user_url').'/manageCollegePurchaseSms')->withErrors([$e->getMessage()]);
+        }
+        return Redirect::to('college/'.Session::get('college_user_url').'/manageCollegePurchaseSms');
+    }
+
+    protected function webhookCollegePurchaseSms(Request $request){
+        return;
+    }
 }

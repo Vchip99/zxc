@@ -86,7 +86,13 @@
           @foreach($assignments as $index => $assignment)
           <tr style="overflow: auto;">
             <td>{{$index + $assignments->firstItem()}}</td>
-            <td>{!! mb_strimwidth($assignment->question, 0, 400, "...") !!}</td>
+            <td>
+              @if(empty($assignment->question))
+                Its a Document
+              @else
+                {!! mb_strimwidth($assignment->question, 0, 400, "...") !!}
+              @endif
+            </td>
             <td>{!! basename($assignment->attached_link) !!}</td>
             <td>{{$allSubjects[$assignment->college_subject_id]}}</td>
             <td>{{$allTopics[$assignment->assignment_topic_id]}}</td>

@@ -54,12 +54,14 @@ class TestSubCategory extends Model
             }
             $request->file('image_path')->move($subCategoryFolderPath, $subCategoryImage);
             $testSubcategory->image_path = $subCategoryImagePath;
-            // open image
-            $img = Image::make($testSubcategory->image_path);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('image_path')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                // open image
+                $img = Image::make($testSubcategory->image_path);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
         }
         if(is_object(Auth::user()) && Auth::user()->college_id > 0){
             $testSubcategory->created_for = 0;

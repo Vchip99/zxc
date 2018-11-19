@@ -6,6 +6,9 @@
     .btn-primary{
       width: 120px;
     }
+    .btn{
+      border-radius: 2px !important;
+    }
   </style>
 @stop
 @section('module_title')
@@ -38,7 +41,8 @@
     </div>
     <div class="row">
       <a href="{{ url('college/'.Session::get('college_user_url').'/myVchipCourses')}}" class="btn btn-primary">Vchip Courses</a> &nbsp;
-      <a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeCourses')}}" class="btn btn-default">College Courses</a>
+      <a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeCourses')}}" class="btn btn-default">College Courses</a>&nbsp;
+      <a class="btn btn-default" id="favourite" data-favourite="false" title="Favourite" onClick="myVchipFavouriteCourses(this);" style="border-radius: 2px;"> <i class="fa fa-star " aria-hidden="true"></i> </a>
     </div>
     <br>
     <div class="row">
@@ -93,11 +97,15 @@
                   </div>
                 </div>
                 <div class="course-auther text-center">
-                  <!-- <a href="{{ url('college/'.Session::get('college_user_url').'/vchipCourseDetails')}}/{{$course->id}}" target="_blank"><i class="fa fa-long-arrow-right block-with-text" aria-hidden="true" title="{{$course->author}}"> {{$course->author}}</i>
-                  </a> -->
                   @if(is_object(Auth::user()))
                     @if(in_array($course->id, $userPurchasedCourses))
-                      <a class="btn btn-sm btn-primary pay-width"> Paid </a>
+                      <a class="btn btn-sm btn-primary pay-width">
+                        @if($course->price > 0)
+                          Paid
+                        @else
+                          Free
+                        @endif
+                      </a>
                     @elseif($course->price > 0)
                       <a data-course_id="{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="purchaseCourse(this);">Pay Price: {{$course->price}} Rs.</a>
                       <form id="purchaseCourse_{{$course->id}}" method="POST" action="{{ url('purchaseCourse')}}">
@@ -211,7 +219,11 @@
         var authorDiv = document.createElement('div');
         authorDiv.className = "course-auther text-center";
         if(msg['userPurchasedCourses'].length > 0 && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
-          authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width"> Paid </a>';
+          if( obj.price > 0 ){
+            authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width"> Paid </a>';
+          } else {
+            authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width"> Free </a>';
+          }
         } else if( obj.price > 0 ){
           var purchaseCourseUrl = "{{ url('purchaseCourse')}}";
           var csrfField = '{{ csrf_field() }}';
@@ -278,6 +290,23 @@
         }
       }
     });
+  }
+
+  function myVchipFavouriteCourses(ele){
+    if(false == $(ele).data('favourite')){
+      $(ele).data('favourite',true);
+      $(ele).prop('style','color: rgb(233, 30, 99);');
+      $(ele).prop('title','All');
+      $.ajax({
+        method: "POST",
+        url: "{{url('myVchipFavouriteCourses')}}"
+      })
+      .done(function( msg ) {
+        renderCourse(msg);
+      });
+    } else {
+      window.location.reload();
+    }
   }
 </script>
 @stop

@@ -333,12 +333,14 @@ class User extends Authenticatable
         }
         if(!empty($dbUserImagePath)){
             $user->photo = $dbUserImagePath;
-            // open image
-            $img = Image::make($user->photo);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('photo')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                // open image
+                $img = Image::make($user->photo);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
         }
         if(!empty($dbUserResumePath)){
             $user->resume = $dbUserResumePath;
@@ -376,12 +378,14 @@ class User extends Authenticatable
             }
             if(!empty($dbUserImagePath)){
                 $user->photo = $dbUserImagePath;
-                // open image
-                $img = Image::make($user->photo);
-                // enable interlacing
-                $img->interlace(true);
-                // save image interlaced
-                $img->save();
+                if(in_array($request->file('photo')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                    // open image
+                    $img = Image::make($user->photo);
+                    // enable interlacing
+                    $img->interlace(true);
+                    // save image interlaced
+                    $img->save();
+                }
             }
             if(!empty($dbUserResumePath)){
                 $user->resume = $dbUserResumePath;
@@ -770,5 +774,62 @@ class User extends Authenticatable
             $result->where('year',$selectedYear);
         }
         return $result->get();
+    }
+
+    protected static function getCollegeUsersByUserTypes($userTypes){
+        $loginUser = Auth::user();
+        return static::where('college_id',$loginUser->college_id)->whereIn('user_type', $userTypes)->get();
+    }
+
+    protected static function getCollegeStudentsByCollegeIdByIdsForSms($collegeId,$ids){
+        return static::where('college_id',$collegeId)->whereIn('id',$ids)->where('user_type', self::Student)->where('admin_approve', 1)->where('verified', 1)->where('number_verified', 1)->select('id','name','phone')->get();
+    }
+
+    protected function getCollegeStudentsByCollegeIdByDeptIdsByYearsForSms($college,$departments,$years){
+        return static::where('college_id', $college)
+            ->whereIn('college_dept_id', $departments)
+            ->whereIn('year', $years)
+            ->where('user_type', self::Student)
+            ->where('admin_approve', 1)
+            ->where('verified', 1)
+            ->where('number_verified', 1)
+            ->select('id','name','phone')->get();
+    }
+
+    protected function getCollegeLecturersByCollegeIdByDeptIdsForSms($college,$departments){
+        return static::where('college_id', $college)
+            ->whereIn('college_dept_id', $departments)
+            ->whereIn('user_type', [self::Lecturer,self::Hod])
+            ->where('admin_approve', 1)
+            ->where('verified', 1)
+            ->where('number_verified', 1)
+            ->select('id','name','phone')->get();
+    }
+
+    protected function getCollegeDirectorAndTnpByCollegeIdForSms($college){
+        return static::where('college_id', $college)
+            ->whereIn('user_type', [self::Directore,self::TNP])
+            ->where('admin_approve', 1)
+            ->where('verified', 1)
+            ->where('number_verified', 1)
+            ->select('id','name','phone')->get();
+    }
+
+    protected function getCollegeStudentsByCollegeIdForSms($college){
+        return static::where('college_id', $college)
+            ->where('user_type', self::Student)
+            ->where('admin_approve', 1)
+            ->where('verified', 1)
+            ->where('number_verified', 1)
+            ->select('id','name','phone')->get();
+    }
+
+    protected function getCollegeLecturersByCollegeIdForSms($college){
+        return static::where('college_id', $college)
+            ->whereIn('user_type', [self::Lecturer,self::Hod])
+            ->where('admin_approve', 1)
+            ->where('verified', 1)
+            ->where('number_verified', 1)
+            ->select('id','name','phone')->get();
     }
 }

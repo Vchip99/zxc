@@ -55,6 +55,11 @@ class CollegeOfflinePaperMarks extends Model
         return static::where('college_id', $loginUser->college_id)->where('college_subject_id',$subjectId)->where('college_offline_paper_id', $paperId)->select('id','marks','total_marks','user_id')->get();
     }
 
+    protected static function getOfflinePaperMarksByUser(){
+        $loginUser = Auth::user();
+        return static::where('college_id', $loginUser->college_id)->where('user_id',$loginUser->id)->where('marks', '!=', ' ')->get();
+    }
+
     protected static function getOfflinePaperMarksByPaperId($paperId){
         $loginUser = Auth::user();
         return static::where('college_id', $loginUser->college_id)->where('college_offline_paper_id', $paperId)->select('id','marks','total_marks','user_id')->get();

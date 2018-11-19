@@ -153,7 +153,7 @@ class ClientHomeController extends Controller
                             } else {
                                 $result['status'] = 'success';
                                 $result['message'] = InputSanitise::sendOtp($mobile);
-                                InputSanitise::setSmsCountStats($client);
+                                InputSanitise::setSmsCountStats($client,4);
                                 $client->save();
                                 DB::connection('mysql2')->commit();
                             }
@@ -170,7 +170,7 @@ class ClientHomeController extends Controller
                             if(1 == $verifiedCount){
                                 $result['status'] = 'success';
                                 $result['message'] = InputSanitise::sendOtp($mobile);
-                                InputSanitise::setSmsCountStats($client);
+                                InputSanitise::setSmsCountStats($client,4);
                                 $client->save();
                                 DB::connection('mysql2')->commit();
                             } else {
@@ -222,7 +222,7 @@ class ClientHomeController extends Controller
                     if(is_object($parent)){
                         $result['status'] = 'success';
                         $result['message'] = InputSanitise::sendOtp($mobile);
-                        InputSanitise::setSmsCountStats($client);
+                        InputSanitise::setSmsCountStats($client,4);
                         $client->save();
                         DB::connection('mysql2')->commit();
                     } else {

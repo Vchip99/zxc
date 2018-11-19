@@ -9,7 +9,7 @@
     </ol>
   </section>
   <style type="text/css">
-    #calendar .fc-day-header{
+  #calendar .fc-day-header{
     background-color: white;
     color: black;
   }
@@ -64,7 +64,7 @@
         <div class="modal todays_data" id="modal_{{$calenderDate}}" role="dialog" style="display: none;">
           <div class="modal-dialog">
             <div class="modal-content">
-              <div class="modal-header">
+              <div class="modal-header" style="overflow-x: auto;">
                 <button type="button" class="close" data-dismiss="modal">×</button>
                 <h4 class="modal-title">Schedule of {{$calenderDate}}</h4>
                 @if(isset($data['emergency_notices']) && count($data['emergency_notices']) > 0)

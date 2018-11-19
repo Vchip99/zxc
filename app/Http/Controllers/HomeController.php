@@ -696,7 +696,7 @@ class HomeController extends Controller
                 return view('header.college', compact('college'));
             } else {
                 $college = College::whereNotNull('url')->where('url',$collegeUrl)->first();
-                if($college){
+                if(is_object($college)){
                     return view('header.college', compact('college'));
                 }
             }

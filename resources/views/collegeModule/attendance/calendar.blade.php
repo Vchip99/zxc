@@ -13,7 +13,7 @@
       background-color: white;
       color: black;
     }
-    .fc td {
+    .fc td, .fc th {
       vertical-align: bottom !important;
     }
 
@@ -32,6 +32,22 @@
     #calendar .fc-day-top {
       opacity: 1 !important;
     }
+    @media only screen and (max-width: 760px), (max-device-width: 1024px) and (min-device-width: 768px) {
+      thead tr,td {
+        position: inherit !important;
+      }
+      tr,td{
+        display: inline-flex;
+        width: 100% !important;
+      }
+      .fc-row, .fc-day-header{
+        width: 100% !important;
+      }
+      .fc-scroller{
+        width: 100%;
+      }
+    }
+
   </style>
 @stop
 @section('dashboard_content')

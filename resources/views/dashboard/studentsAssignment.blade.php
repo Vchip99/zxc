@@ -225,7 +225,7 @@
       if(id){
         $.ajax({
                 method: "POST",
-                url: "{{url('getAssignmentTopics')}}",
+                url: "{{url('getAssignmentTopicsForStudentAssignment')}}",
                 data: {id:id,year:year,department:department}
             })
             .done(function( msg ) {

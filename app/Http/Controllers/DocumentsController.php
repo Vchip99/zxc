@@ -43,7 +43,7 @@ class DocumentsController extends Controller
         $documentsCategories = Cache::remember('vchip:documents:documentsCategories',60, function() {
             return DocumentsCategory::getDocumentsCategoriesAssociatedWithDocs();
         });
-        $registeredDocuments = $this->getRegisteredDocumentIds();
+        // $registeredDocIds = $this->getRegisteredDocumentIds();
         $favouriteDocIds = $this->getFavouritedDocumentIds();
         $loginUser = Auth::user();
         if(is_object($loginUser) && $id > 0){
@@ -65,7 +65,7 @@ class DocumentsController extends Controller
         }
         $date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
-        return view('documents.documents', compact('documents', 'documentsCategories', 'registeredDocIds', 'favouriteDocIds', 'id', 'ads'));
+        return view('documents.documents', compact('documents', 'documentsCategories', 'favouriteDocIds', 'id', 'ads'));
     }
 
     /**
@@ -78,11 +78,11 @@ class DocumentsController extends Controller
             $result['documents'] = Cache::remember('vchip:documents:documents:cat-'.$categoryId,60, function() use ($categoryId){
                 return DocumentsDoc::getDocumentsByCategoryId($categoryId);
             });
-            $result['registeredDocuments'] = [];
             $result['favouriteDocIds'] = [];
         } else {
-            $result['documents'] = DocumentsDoc::getRegisteredDocumentsByCategoryId($categoryId, $userId);
-            $result['registeredDocuments'] = $this->getRegisteredDocumentIds();
+            $result['documents'] = Cache::remember('vchip:documents:documents:cat-'.$categoryId,60, function() use ($categoryId){
+                return DocumentsDoc::getDocumentsByCategoryId($categoryId);
+            });
             $result['favouriteDocIds'] = $this->getFavouritedDocumentIds();
         }
         return $result;
@@ -95,11 +95,9 @@ class DocumentsController extends Controller
         $userId = $request->get('userId');
         if(empty($userId)){
             $result['documents'] = DocumentsDoc::getDocumentsBySearchArray($request);
-            $result['registeredDocuments'] = [];
             $result['favouriteDocIds'] = [];
         } else {
             $result['documents'] = DocumentsDoc::getDocumentsBySearchArray($request);
-            $result['registeredDocuments'] = $this->getRegisteredDocumentIds();
             $result['favouriteDocIds'] = $this->getFavouritedDocumentIds();
         }
         return $result;
@@ -115,6 +113,12 @@ class DocumentsController extends Controller
 
     protected function getFavouriteDocumentsByCategoryId(Request $request){
         return RegisterFavouriteDocuments::getFavouriteDocumentsByCategoryId($request);
+    }
+
+    protected function getFavouriteDocumentsByUserId(Request $request){
+        $result['documents'] = RegisterFavouriteDocuments::getFavouriteDocumentsByUserId($request->user_id);
+        $result['favouriteDocIds'] = $this->getFavouritedDocumentIds();
+        return $result;
     }
 
     protected function getRegisteredDocumentIds(){

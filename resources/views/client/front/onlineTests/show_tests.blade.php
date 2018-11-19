@@ -188,71 +188,75 @@
 					              	<tbody>
 			                      		@if(isset($testSubjectPapers[$testSubject->id]))
 						                	@foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
-						                	<tr>
-						                		@if($paper == $testSubjectPaper->id)
-								                	<td class=" ">{{ $testSubjectPaper->name }} <b style="color: red;">[new]</b></td>
-								                @else
-								                    <td class=" ">{{ $testSubjectPaper->name }}</td>
-								                @endif
-						                    	@if($currentDate < $testSubjectPaper->date_to_active)
-						                    		<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
-						                    	@elseif(!is_object($loginUser))
-						                    		@if(1 == $testSubjectPaper->is_free && 1 == $testSubjectPaper->allowed_unauthorised_user)
-									                	<td id="startTest_{{$testSubjectPaper->id}}"><button onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button></td>
+						                		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+					                              <tr style="background-color: #b3c2dc;">
+					                            @else
+					                              <tr>
+					                            @endif
+							                		@if($paper == $testSubjectPaper->id)
+									                	<td class=" ">{{ $testSubjectPaper->name }} <b style="color: red;">[new]</b></td>
 									                @else
-						                    			<td id="startTest_{{$testSubjectPaper->id}}"><button data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
-						                    		@endif
-						                    	@else
-						                    		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-								                    	<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
-									                @elseif( 'true' == $isTestSubCategoryPurchased || 1 == $testSubjectPaper->is_free || ('false' == $isPayableSubCategory && $selectedSubCategory->price <= 0 && $selectedSubCategory->admin_price > 0))
-									                	<td id="startTest_{{$testSubjectPaper->id}}"><button onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button></td>
-									                @else
-									                	<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
-								                    @endif
-						                    	@endif
-
-							                    <td id="showUserResultBtn_{{$testSubjectPaper->id}}">
+									                    <td class=" ">{{ $testSubjectPaper->name }}</td>
+									                @endif
 							                    	@if($currentDate < $testSubjectPaper->date_to_active)
-							                    		<button disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+							                    		<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
 							                    	@elseif(!is_object($loginUser))
-							                    		<button data-toggle="tooltip" title="Please login to see result" onClick="checkLogin();"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
-							                    	@elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-							                    		<form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}">
-							                    			{{ csrf_field() }}
-							                    			<input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
-							                    			<input type="hidden" name="category_id" value="{{$testSubjectPaper->category_id}}">
-							                    			<input type="hidden" name="subcategory_id" value="{{$testSubjectPaper->sub_category_id}}">
-							                    			<input type="hidden" name="subject_id" value="{{$testSubject->id}}">
-							                    		</form>
-								                    	<button  onClick="showUserTestResult(this);" data-paper_id="{{$testSubjectPaper->id}}" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
-								                    @else
-								                    	<button  disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
-								                    @endif
-							                    </td>
-							                    <td class=" ">{{ date("Y-m-d", strtotime($testSubjectPaper->date_to_active)) }}</td>
-							                    <td class="">{{($testSubjectPaper->is_free)?'Free':'Paid'}}</td>
-							                    @if(is_object($loginUser))
-								                    @if($currentDate < $testSubjectPaper->date_to_active)
-								                    	<td><button disabled="true" data-toggle="tooltip" title="Add to Favourite will be enabled after date to active"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
-								                    @else
-								                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
-									                    	<td><button disabled="true" data-toggle="tooltip" title="Already Added to Favourite!"><i class="fa fa-star" aria-hidden="true" style="color: rgb(233, 30, 99);"></i></button></td>
-									                    @elseif('true' == $isTestSubCategoryPurchased )
-									                    	<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
-									                    @else
-									                    	@if(($selectedSubCategory->admin_price > 0 && $selectedSubCategory->client_user_price > 0) || $selectedSubCategory->price > 0)
-									                    		<td><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to Add to Favourite!"><i class="fa
-									                    		fa-star" aria-hidden="true"></i></button></td>
-									                    	@else
-									                    		<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
-									                    	@endif
+							                    		@if(1 == $testSubjectPaper->is_free && 1 == $testSubjectPaper->allowed_unauthorised_user)
+										                	<td id="startTest_{{$testSubjectPaper->id}}"><button onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button></td>
+										                @else
+							                    			<td id="startTest_{{$testSubjectPaper->id}}"><button data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
+							                    		@endif
+							                    	@else
+							                    		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+									                    	<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
+										                @elseif( 'true' == $isTestSubCategoryPurchased || 1 == $testSubjectPaper->is_free || ('false' == $isPayableSubCategory && $selectedSubCategory->price <= 0 && $selectedSubCategory->admin_price > 0))
+										                	<td id="startTest_{{$testSubjectPaper->id}}"><button onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button></td>
+										                @else
+										                	<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to give test."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
 									                    @endif
-								                    @endif
-								                @else
-								                	<td onClick="checkLogin(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
-								                @endif
-							                </tr>
+							                    	@endif
+
+								                    <td id="showUserResultBtn_{{$testSubjectPaper->id}}">
+								                    	@if($currentDate < $testSubjectPaper->date_to_active)
+								                    		<button disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+								                    	@elseif(!is_object($loginUser))
+								                    		<button data-toggle="tooltip" title="Please login to see result" onClick="checkLogin();"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+								                    	@elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+								                    		<button  onClick="showUserTestResult(this);" data-paper_id="{{$testSubjectPaper->id}}" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+								                    		<form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}">
+								                    			{{ csrf_field() }}
+								                    			<input type="hidden" name="paper_id" value="{{$testSubjectPaper->id}}">
+								                    			<input type="hidden" name="category_id" value="{{$testSubjectPaper->category_id}}">
+								                    			<input type="hidden" name="subcategory_id" value="{{$testSubjectPaper->sub_category_id}}">
+								                    			<input type="hidden" name="subject_id" value="{{$testSubject->id}}">
+								                    		</form>
+									                    @else
+									                    	<button  disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+									                    @endif
+								                    </td>
+								                    <td class=" ">{{ date("Y-m-d", strtotime($testSubjectPaper->date_to_active)) }}</td>
+								                    <td class="">{{($testSubjectPaper->is_free)?'Free':'Paid'}}</td>
+								                    @if(is_object($loginUser))
+									                    @if($currentDate < $testSubjectPaper->date_to_active)
+									                    	<td><button disabled="true" data-toggle="tooltip" title="Add to Favourite will be enabled after date to active"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
+									                    @else
+									                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
+										                    	<td><button disabled="true" data-toggle="tooltip" title="Already Added to Favourite!"><i class="fa fa-star" aria-hidden="true" style="color: rgb(233, 30, 99);"></i></button></td>
+										                    @elseif('true' == $isTestSubCategoryPurchased )
+										                    	<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
+										                    @else
+										                    	@if(($selectedSubCategory->admin_price > 0 && $selectedSubCategory->client_user_price > 0) || $selectedSubCategory->price > 0)
+										                    		<td><button disabled="true" data-toggle="tooltip" title="Please purchase sub category to Add to Favourite!"><i class="fa
+										                    		fa-star" aria-hidden="true"></i></button></td>
+										                    	@else
+										                    		<td id="registerPaper_{{$testSubjectPaper->id}}" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="registerPaper(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
+										                    	@endif
+										                    @endif
+									                    @endif
+									                @else
+									                	<td onClick="checkLogin(this);"><button data-toggle="tooltip" title="Add to Favourite!"><i class="fa fa-star" aria-hidden="true" ></i></button></td>
+									                @endif
+							                	</tr>
 					                		@endforeach
 						                @else
 								        	<tr><td class=" ">No Papers.</td></tr>
@@ -263,7 +267,12 @@
 					            	@if(isset($testSubjectPapers[$testSubject->id]))
 			        					@foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
 					              			<div class=" panel panel-info" >
-					                			<div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">{{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
+					                			@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
+				                                  <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}" style="background-color: #b3c2dc;">
+				                                @else
+				                                  <div class="toggle panel-heading" data-toggle="paper{{$testSubjectPaper->id}}">
+				                                @endif
+					                			{{$testSubjectPaper->name}}<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>
 					                			</div>
 							                  	<div id="paper{{$testSubjectPaper->id}}" class="panel-body" style="padding:2px 0px;">
 								                    <div class="container">
@@ -526,6 +535,9 @@
 			                if (undefined !== msg['papers'][subId] && msg['papers'][subId].length) {
 		                		$.each(msg['papers'][subId], function(ind, obj){
 		                			var tbodyTr = document.createElement("tr");
+		                			if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+				                    	tbodyTr.setAttribute('style','background-color: #b3c2dc;');
+				                    }
 		                			var divInnerHtml = '';
 		                			divInnerHtml += '<td class=" ">'+ obj.name+'</td>';
 		                			if(msg['currentDate'] < obj.date_to_active){
@@ -559,10 +571,10 @@
 								    	var testUrl = "{{ url('showUserTestResult') }}";
 								    	var csrf_token = '{{ csrf_field() }}';
 									    divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
+									    divInnerHtml += '<button onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
 									    divInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
 									    divInnerHtml += csrf_token;
 										divInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.subject_id +'"></form>';
-									    divInnerHtml += '<button onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
 									    divInnerHtml += '</td>';
 									} else {
 										divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
@@ -620,6 +632,9 @@
 		                			var panelHeadingDiv = document.createElement('div');
 		                			panelHeadingDiv.className = 'toggle panel-heading';
 		                			panelHeadingDiv.setAttribute('data-toggle','paper'+obj.id);
+		                			if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+				                    	panelHeadingDiv.setAttribute('style','background-color: #b3c2dc;');
+				                    }
 		                			panelHeadingDiv.innerHTML = obj.name + '<span class="col-xs-2 pull-right"><i class="fa fa-chevron-down pull-right"></i></span>';
 		                			panelDiv.appendChild(panelHeadingDiv);
 

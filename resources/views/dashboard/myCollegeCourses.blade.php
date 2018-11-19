@@ -6,6 +6,9 @@
     .btn-primary{
       width: 120px;
     }
+    .btn{
+      border-radius: 2px !important;
+    }
   </style>
 @stop
 @section('module_title')
@@ -20,7 +23,9 @@
 @section('dashboard_content')
   <div class="container">
     <div class="row">
-      <a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeCourses')}}" class="btn btn-primary">College Courses</a> &nbsp;<a href="{{ url('college/'.Session::get('college_user_url').'/myVchipCourses')}}" class="btn btn-default">Vchip Courses</a>
+      <a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeCourses')}}" class="btn btn-primary">College Courses</a> &nbsp;
+      <a href="{{ url('college/'.Session::get('college_user_url').'/myVchipCourses')}}" class="btn btn-default">Vchip Courses</a>&nbsp;
+      <a class="btn btn-default" id="favourite" data-favourite="false" title="Favourite" onClick="myCollegeFavouriteCourses(this);" style="border-radius: 2px;"> <i class="fa fa-star " aria-hidden="true"></i> </a>
     </div>
     <br>
     <div class="row">
@@ -207,6 +212,23 @@
       .done(function( msg ) {
         renderCourse(msg);
       });
+    }
+  }
+
+  function myCollegeFavouriteCourses(ele){
+    if(false == $(ele).data('favourite')){
+      $(ele).data('favourite',true);
+      $(ele).prop('style','color: rgb(233, 30, 99);');
+      $(ele).prop('title','All');
+      $.ajax({
+        method: "POST",
+        url: "{{url('myCollegeFavouriteCourses')}}"
+      })
+      .done(function( msg ) {
+        renderCourse(msg);
+      });
+    } else {
+      window.location.reload();
     }
   }
 </script>

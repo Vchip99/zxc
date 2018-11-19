@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use Auth,Hash,DB, Redirect,Session,Validator,Input;
+use App\Libraries\InputSanitise;
 use App\Models\CollegeSubject;
 use App\Models\CollegeDept;
 use App\Models\User;
@@ -15,7 +16,9 @@ use App\Models\CollegeOfflinePaperMarks;
 use App\Models\AssignmentTopic;
 use App\Models\AssignmentQuestion;
 use App\Models\AssignmentAnswer;
-use App\Libraries\InputSanitise;
+use App\Models\CollegeExtraClass;
+use App\Models\CollegeClassExam;
+use App\Models\College;
 
 class CollegeSubjectController extends Controller
 {
@@ -54,12 +57,7 @@ class CollegeSubjectController extends Controller
     	    $subjects = CollegeSubject::getCollegeSubjectByCollegeIdWithPagination($loginUser->college_id);
         }
 
-        // if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
-        //     $deptIds = explode(',',$loginUser->assigned_college_depts);
-        //     $departments = CollegeDept::getDepartmentsByCollegeIdByDeptIds($loginUser->college_id,$deptIds);
-        // } else {
-            $departments = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
-        // }
+        $departments = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
         if(is_object($departments) && false == $departments->isEmpty()){
             foreach($departments as $department){
                 $allDepts[$department->id] = $department->name;
@@ -130,12 +128,7 @@ class CollegeSubjectController extends Controller
     		if(is_object($subject)){
                 $loginUser = Auth::user();
                 if($loginUser->id == $subject->lecturer_id || (User::Hod == $loginUser->user_type || User::Directore == $loginUser->user_type)){
-                    // if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
-                    //     $deptIds = explode(',',$loginUser->assigned_college_depts);
-                    //     $departments = CollegeDept::getDepartmentsByCollegeIdByDeptIds($loginUser->college_id,$deptIds);
-                    // } else {
-                        $departments = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
-                    // }
+                    $departments = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
                     $selectedDepts = explode(',',$subject->college_dept_ids);
                     $selectedYears = explode(',',$subject->years);
                     return view('collegeModule.collegeSubject.create', compact('subject','departments','selectedDepts','selectedYears'));
@@ -224,6 +217,10 @@ class CollegeSubjectController extends Controller
                             $assignment->delete();
                         }
                     }
+                    // delete extra classes
+                    CollegeExtraClass::deleteCollegeExtraClassesBySubjectId($subjectId);
+                    // delete class exams
+                    CollegeClassExam::deleteCollegeClassExamsBySubjectId($subjectId);
                     $subject->delete();
                     DB::commit();
                     return Redirect::to('college/'.$collegeUrl.'/manageCollegeSubject')->with('message', 'College Subject deleted successfully!');
@@ -347,6 +344,33 @@ class CollegeSubjectController extends Controller
         {
             $attendance = CollegeUserAttendance::addOrUpdateCollegeUserAttendance($request);
             if(is_object($attendance)){
+                $markAttendance = InputSanitise::inputInt($request->get('mark_attendance'));
+                if($request->get('students')){
+                    $students = $request->get('students');
+                } else {
+                    $students = [];
+                }
+                if($request->get('all_users')){
+                    $allUsers = explode(',', $request->get('all_users'));
+                } else {
+                    $allUsers = [];
+                }
+                $absentStudentIds = [];
+                if(1 == $markAttendance){
+                    if(count(array_diff($allUsers, $students)) > 0){
+                        $absentStudentIds = array_diff($allUsers, $students);
+                    }
+                } else {
+                    $absentStudentIds = $students;
+                }
+                if(count($absentStudentIds) > 0){
+                    $subjectId   = InputSanitise::inputInt($request->get('subject'));
+                    $subject = CollegeSubject::find($subjectId);
+                    $college = College::whereNotNull('url')->where('url',$collegeUrl)->where('id', Auth::user()->college_id)->first();
+                    if(is_object($college) && 1 == $college->absent_sms && is_object($subject)){
+                        InputSanitise::sendCollegeAbsentSms($absentStudentIds,$attendance->attendance_date,$subject->name,$college);
+                    }
+                }
                 DB::commit();
                 return Redirect::to('college/'.$collegeUrl.'/manageCollegeAttendance')->with('message', 'Attendance mark successfully!');
             }

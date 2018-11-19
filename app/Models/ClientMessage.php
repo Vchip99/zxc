@@ -62,12 +62,15 @@ class ClientMessage extends Model
             }
             $request->file('photo')->move($messageImageFolderPath, $messageImage);
             $message->photo = $messageImagePath;
-            // open image
-            $img = Image::make($message->photo);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+
+            if(in_array($request->file('photo')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                // open image
+                $img = Image::make($message->photo);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
             $message->save();
         }
         return $message;

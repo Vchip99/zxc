@@ -51,12 +51,14 @@ class ClientTeam extends Model
                     }
                     $request->file($imageInd)->move($teamImageFolder, $memberImage);
                     $memberArr['image'] = $memberImagePath;
-                    // open image
-                    $img = Image::make($memberImagePath);
-                    // enable interlacing
-                    $img->interlace(true);
-                    // save image interlaced
-                    $img->save();
+                    if(in_array($request->file($imageInd)->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                        // open image
+                        $img = Image::make($memberImagePath);
+                        // enable interlacing
+                        $img->interlace(true);
+                        // save image interlaced
+                        $img->save();
+                    }
                 }
                 if(count($memberArr) > 0){
                     $member->update($memberArr);

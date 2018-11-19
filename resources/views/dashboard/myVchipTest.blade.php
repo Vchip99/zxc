@@ -325,7 +325,13 @@
             })
             .done(function( msg ) {
               if( msg ){
-            window.open("{{ url('instructions')}}", 'My Window', 'height=900px !important,width=1500px !important');
+                var popUp = window.open("{{ url('instructions')}}", 'My Window', 'height=900px !important,width=1500px !important');
+                if (popUp == null || typeof(popUp)=='undefined') {
+                  alert('Please disable your pop-up blocker and click button "Start Test" again.');
+                }
+                else {
+                  popUp.focus();
+                }
               }
             });
       } else {

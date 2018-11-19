@@ -140,6 +140,23 @@ class VkitController extends Controller
     }
 
     /**
+     *  return vkits project by categoryId
+     */
+    protected function getVchipFavouriteVkitProjectsByUserId(Request $request){
+        $userId = $request->get('userId');
+        return VkitProject::getVchipFavouriteVkitProjectsByUserId($userId);
+    }
+
+
+    /**
+     *  return vkits project by categoryId
+     */
+    protected function getCollegeFavouriteVkitProjectsByUserId(Request $request){
+        $userId = $request->get('userId');
+        return VkitProject::getCollegeFavouriteVkitProjectsByUserId($userId);
+    }
+
+    /**
      *  return vkits project by filter array
      */
     protected function getVkitProjectsBySearchArray(Request $request){

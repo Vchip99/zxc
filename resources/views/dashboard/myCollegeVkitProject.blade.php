@@ -60,10 +60,10 @@
 @stop
 @section('module_title')
   <section class="content-header">
-    <h1> Favourite Projects </h1>
+    <h1> All Projects </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-table"></i> Vkits </li>
-      <li class="active"> Favourite Projects </li>
+      <li class="active"> All Projects </li>
     </ol>
   </section>
 @stop

@@ -35,10 +35,10 @@
 @stop
 @section('module_title')
   <section class="content-header">
-    <h1> Read Articles </h1>
+    <h1> All Articles </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-book"></i> Documents</li>
-      <li class="active">Read Articles</li>
+      <li class="active">All Articles</li>
     </ol>
   </section>
 @stop
@@ -47,7 +47,7 @@
   <div class="row ">
     <div class="col-sm-4 mrgn_10_btm">
       <select class="form-control" id="category" name="category" onchange="showDocuments(this);">
-        <option>Select Category ...</option>
+        <option>Select Category</option>
         @if(count($categories) > 0)
           @foreach($categories as $category)
             <option value="{{$category->id}}">{{$category->name}}</option>
@@ -55,6 +55,7 @@
         @endif
       </select>
     </div>
+    <a class="btn btn-default" id="favourite" data-favourite="false" title="Favourite" onClick="myFavouriteDocs(this);" style="border-radius: 2px;"> <i class="fa fa-star " aria-hidden="true"></i> </a>
   </div>
   <br/>
   <div class="row" id="render_documents">
@@ -77,6 +78,11 @@
                 <p class="text-center ">
                   <a data-path="{{asset($document->doc_pdf_path)}}" class="btn btn-primary" data-toggle="modal" data-target="#dynamic-modal-{{$document->id}}" data-document_id="{{$document->id}}"> <i class="fa fa-book" aria-hidden="true"></i> </a>
                   <a href="{{asset($document->doc_pdf_path)}}" download class="btn btn-primary download" id="myBtn"><i class="fa fa-download" aria-hidden="true"></i></a>
+                  @if(in_array($document->id, $favouriteDocIds))
+                    <a class="btn btn-primary voted-btn" id="favourite-{{$document->id}}" data-favourite="true" onClick="registerFavouriteDocuments(this);" data-document_id="{{$document->id}}" title="Favourite Document"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+                  @else
+                    <a class="btn btn-primary vote-btn" id="favourite-{{$document->id}}" data-favourite="false" onClick="registerFavouriteDocuments(this);" data-document_id="{{$document->id}}" title="Favourite Document"> <i class="fa fa-star " aria-hidden="true"></i> </a>
+                  @endif
                 </p>
             </div>
             <div class="course-auther">
@@ -151,6 +157,11 @@
         var docPath = "{{asset('')}}" +obj.doc_pdf_path;
         courseContent += '<a data-path="'+ docPath +'" class="btn btn-primary" data-toggle="modal" data-target="#dynamic-modal-'+ obj.id +'" data-document_id="'+ obj.id +'"> <i class="fa fa-book" aria-hidden="true"></i> </a>';
         courseContent += '&nbsp;<a href="'+ docPath +'" download class="btn btn-primary download" id="myBtn"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;';
+        if(false == (msg['favouriteDocIds'].indexOf(obj.id) > -1)){
+          courseContent += '<a class="btn btn-primary vote-btn" id="favourite-'+ obj.id +'" data-favourite="true" onClick="registerFavouriteDocuments(this);" data-document_id="'+ obj.id +'" title="Favourite Document"> <i class="fa fa-star " aria-hidden="true"></i> </a>';
+        } else {
+          courseContent += '<a class="btn btn-primary voted-btn" id="favourite-'+ obj.id +'" data-favourite="true" onClick="registerFavouriteDocuments(this);" data-document_id="'+ obj.id +'" title="Favourite Document"> <i class="fa fa-star " aria-hidden="true"></i> </a>';
+        }
         courseContent += '</p>';
         thirdDiv.innerHTML = courseContent;
         secondDiv.appendChild(thirdDiv);
@@ -198,6 +209,54 @@
       .done(function( msg ) {
         renderDocuments(msg);
       });
+    }
+  }
+
+  function registerFavouriteDocuments(ele){
+    var userId = parseInt(document.getElementById('user_id').value);
+    var documentId = parseInt($(ele).data('document_id'));
+    if( true == isNaN(userId)){
+      $('#loginUserModel').modal();
+    } else {
+      $.ajax({
+        method: "POST",
+        url: "{{url('registerFavouriteDocuments')}}",
+        data: {user_id:userId, document_id:documentId}
+      })
+      .done(function( msg ) {
+        var id = 'favourite-'+documentId;
+        var favEle = document.getElementById(id);
+        if('false' == msg){
+          favEle.classList.add("vote-btn");
+          favEle.classList.remove("voted-btn");
+        } else {
+          favEle.classList.add("voted-btn");
+          favEle.classList.remove("vote-btn");
+        }
+      });
+    }
+  }
+
+  function myFavouriteDocs(ele){
+    var userId = parseInt(document.getElementById('user_id').value);
+    if( true == isNaN(userId)){
+      $('#loginUserModel').modal();
+    } else {
+      if(false == $(ele).data('favourite')){
+        $(ele).data('favourite',true);
+        $(ele).prop('style','color: rgb(233, 30, 99);');
+        $(ele).prop('title','All');
+        $.ajax({
+          method: "POST",
+          url: "{{url('getFavouriteDocumentsByUserId')}}",
+          data: {user_id:userId}
+        })
+        .done(function( msg ) {
+          renderDocuments(msg);
+        });
+      } else {
+        window.location.reload();
+      }
     }
   }
 

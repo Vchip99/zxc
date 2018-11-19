@@ -47,12 +47,14 @@ class ClientHomePage extends Model
                 // unlink($subDomainHome->background_image);
             }
             $request->file('background_image')->move($backgroundImageFolder, $backgroundImage);
-            // open image
-            $img = Image::make($backgroundImagePath);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('background_image')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                // open image
+                $img = Image::make($backgroundImagePath);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
             $subDomainHomeArr['background_image'] = "background-image: url('".$backgroundImagePath."');background-attachment: fixed;
                   background-position: center;
                   background-size:cover;

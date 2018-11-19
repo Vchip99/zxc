@@ -79,12 +79,14 @@ class DocumentsDoc extends Model
 
         if(isset($dbFrontImagePath)){
             $documentsDoc->doc_image_path = $dbFrontImagePath;
-             // open image
-            $img = Image::make($documentsDoc->doc_image_path);
-            // enable interlacing
-            $img->interlace();
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('doc_image')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                 // open image
+                $img = Image::make($documentsDoc->doc_image_path);
+                // enable interlacing
+                $img->interlace();
+                // save image interlaced
+                $img->save();
+            }
         }
         if(isset($dbPdfPath)){
             $documentsDoc->doc_pdf_path = $dbPdfPath;

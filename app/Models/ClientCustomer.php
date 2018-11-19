@@ -56,12 +56,14 @@ class ClientCustomer extends Model
                     }
                     $request->file($customer_img)->move($customerImageFolder, $customerImage);
                     $customerArr['image'] = $customerImagePath;
-                    // open image
-                    $img = Image::make($customerImagePath);
-                    // enable interlacing
-                    $img->interlace(true);
-                    // save image interlaced
-                    $img->save();
+                    if(in_array($request->file($customer_img)->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                        // open image
+                        $img = Image::make($customerImagePath);
+                        // enable interlacing
+                        $img->interlace(true);
+                        // save image interlaced
+                        $img->save();
+                    }
                 }
                 if(count($customerArr) > 0){
                     $customer->update($customerArr);

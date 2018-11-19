@@ -47,6 +47,15 @@ class RegisterFavouriteDocuments extends Model
         return static::where('user_id', $userId)->get();
     }
 
+    protected static function getFavouriteDocumentsByUserId($userId){
+        return DB::table('documents_docs')
+                ->join('register_favourite_documents', 'register_favourite_documents.documents_docs_id', '=', 'documents_docs.id')
+                ->join('documents_categories', 'documents_categories.id', '=', 'documents_docs.doc_category_id')
+                ->where('register_favourite_documents.user_id', $userId)
+                ->select('documents_docs.*', 'documents_categories.name As category_name')
+                ->get();
+    }
+
     protected static function deleteRegisteredFavouriteDocumentsByUserId($userId){
         $documents = static::where('user_id', $userId)->get();
         if(is_object($documents) && false == $documents->isEmpty()){

@@ -35,7 +35,9 @@
 @section('dashboard_content')
 <div class="container">
   <div class="row">
-    <a href="{{ url('college/'.Session::get('college_user_url').'/myVchipVkits')}}" class="btn btn-primary"> Vchip Vkits</a>&nbsp;<a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeVkits')}}" class="btn btn-default"> College Vkits</a>
+    <a href="{{ url('college/'.Session::get('college_user_url').'/myVchipVkits')}}" class="btn btn-primary"> Vchip Vkits</a>&nbsp;
+    <a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeVkits')}}" class="btn btn-default"> College Vkits</a>&nbsp;
+    <a class="btn btn-default" id="favourite" data-favourite="false" title="Favourite" onClick="myFavouriteVkits(this);" style="border-radius: 2px;"> <i class="fa fa-star " aria-hidden="true"></i> </a>
   </div>
   <br>
   <div class="row">
@@ -87,7 +89,7 @@
         </div>
       @endforeach
     @else
-      No projects are registered as favourite.
+      No projects are created.
     @endif
   </div>
 </div>
@@ -137,8 +139,8 @@
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           projects.appendChild(firstDiv);
-      });
-       $(function(){
+        });
+        $(function(){
           $('.show').on('click',function(){
             id = $(this).data('show')        ;
               $('[id ^=corse-detail-'+id).slideToggle('slow');
@@ -147,7 +149,9 @@
             id = $(this).data('close')
               $('[id ^=corse-detail-'+id).slideToggle('slow');
           });
-      });
+        });
+      } else {
+        projects.innerHTML = 'No Result!';
       }
     }
 
@@ -159,11 +163,33 @@
         $.ajax({
           method: "POST",
           url: "{{url('getVkitProjectsByCategoryId')}}",
-          data: {id:id, userId:userId}
+          data: {id:id}
         })
         .done(function( msg ) {
           renderVkitProjects(msg)
         });
+      }
+    }
+
+    function myFavouriteVkits(ele){
+      var userId = parseInt(document.getElementById('user_id').value);
+      document.getElementById('vkitprojects').innerHTML = '';
+      if(userId > 0){
+        if(false == $(ele).data('favourite')){
+          $(ele).data('favourite',true);
+          $(ele).prop('style','color: rgb(233, 30, 99);');
+          $(ele).prop('title','All');
+          $.ajax({
+            method: "POST",
+            url: "{{url('getVchipFavouriteVkitProjectsByUserId')}}",
+            data: {userId:userId}
+          })
+          .done(function( msg ) {
+            renderVkitProjects(msg)
+          });
+        } else {
+          window.location.reload();
+        }
       }
     }
   </script>

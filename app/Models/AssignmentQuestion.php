@@ -84,6 +84,16 @@ class AssignmentQuestion extends Model
     protected static function getStudentAssignments(){
         $loginUser = Auth::user();
         return static::where('college_id', $loginUser->college_id)
+                ->where('question', '!=', ' ')
+                ->whereRaw("find_in_set($loginUser->college_dept_id , college_dept_ids)")
+                ->whereRaw("find_in_set($loginUser->year , years)")
+                ->paginate();
+    }
+
+    protected static function getStudentDocuments(){
+        $loginUser = Auth::user();
+        return static::where('college_id', $loginUser->college_id)
+                ->where('question', '')
                 ->whereRaw("find_in_set($loginUser->college_dept_id , college_dept_ids)")
                 ->whereRaw("find_in_set($loginUser->year , years)")
                 ->paginate();
@@ -144,6 +154,32 @@ class AssignmentQuestion extends Model
         if(!empty($request->topic) && $request->topic > 0){
             $resultQuery->where('assignment_questions.assignment_topic_id', $request->topic);
         }
+        if(User::Student == $loginUser->user_type){
+            $resultQuery->where('question','!=',' ');
+        }
+        return $resultQuery->select('assignment_questions.*')->groupBy('assignment_questions.id')->get();
+    }
+
+    protected static function getAssignDocuments(Request $request){
+        $loginUser = Auth::user();
+
+        $resultQuery = static::join('users','users.id','=','assignment_questions.lecturer_id')
+            ->where('assignment_questions.college_id', $loginUser->college_id)
+            ->whereRaw("find_in_set($loginUser->college_dept_id , assignment_questions.college_dept_ids)")
+            ->whereRaw("find_in_set($loginUser->year , assignment_questions.years)")
+            ->where('assignment_questions.question', '');
+
+        if(!empty($request->lecturer_id) && $request->lecturer_id > 0){
+            $resultQuery->where('assignment_questions.lecturer_id', $request->lecturer_id);
+        }
+        if(!empty($request->subject) && $request->subject > 0){
+            $resultQuery->where('assignment_questions.college_subject_id', $request->subject);
+        }
+
+        if(!empty($request->topic) && $request->topic > 0){
+            $resultQuery->where('assignment_questions.assignment_topic_id', $request->topic);
+        }
+
         return $resultQuery->select('assignment_questions.*')->groupBy('assignment_questions.id')->get();
     }
 
@@ -154,6 +190,10 @@ class AssignmentQuestion extends Model
         } else {
             return static::where('assignment_topic_id',$topic)->first();
         }
+    }
+
+    protected static function getAssignDocumentByTopic($topic){
+        return static::where('assignment_topic_id',$topic)->where('question', '')->first();
     }
 
     protected static function getAssignmentByDeptIdByYearBySubjectIdByTopicIdForStudent($deptId,$year,$subjectId,$topicId,$student){

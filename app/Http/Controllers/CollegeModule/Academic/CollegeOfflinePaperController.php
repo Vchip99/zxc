@@ -13,6 +13,7 @@ use App\Models\AssignmentQuestion;
 use App\Models\CollegeDept;
 use App\Models\User;
 use App\Models\CollegeOfflinePaperMarks;
+use App\Models\College;
 use App\Libraries\InputSanitise;
 
 class CollegeOfflinePaperController extends Controller
@@ -65,13 +66,7 @@ class CollegeOfflinePaperController extends Controller
                 $allSubjects[$subject->id] = $subject->name;
             }
         }
-
-        // if(User::Hod == $loginUser->user_type || User::Lecturer == $loginUser->user_type){
-        //     $deptIds = explode(',',$loginUser->assigned_college_depts);
-        //     $collegeDepts = CollegeDept::getDepartmentsByCollegeIdByDeptIds($loginUser->college_id,$deptIds);
-        // } else {
-            $collegeDepts = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
-        // }
+        $collegeDepts = CollegeDept::getDepartmentsByCollegeId($loginUser->college_id);
         if(is_object($collegeDepts) && false == $collegeDepts->isEmpty()){
             foreach($collegeDepts as $collegeDept){
                 $allCollegeDepts[$collegeDept->id] = $collegeDept->name;
@@ -275,6 +270,26 @@ class CollegeOfflinePaperController extends Controller
         {
             $result = CollegeOfflinePaperMarks::assignCollegeOfflinePaperMarks($request);
             if('true' == $result){
+                $presentStudentsMark = [];
+                $paperId   = InputSanitise::inputInt($request->get('paper'));
+                $subjectId = InputSanitise::inputInt($request->get('subject'));
+                $totalMarks   = InputSanitise::inputInt($request->get('total_marks'));
+                $studentMarks = $request->except('_token','paper','subject','total_marks');
+                if(count($studentMarks) > 0){
+                    foreach($studentMarks as $studentId => $studentMark){
+                        if(!empty($studentMark)){
+                            $presentStudentsMark[$studentId] = $studentMark;
+                        }
+                    }
+                }
+                if(count($presentStudentsMark) > 0){
+                    $subject = CollegeSubject::find($subjectId);
+                    $paper = CollegeOfflinePaper::find($paperId);
+                    $college = College::whereNotNull('url')->where('url',$collegeUrl)->where('id', Auth::user()->college_id)->first();
+                    if(is_object($college) && 1 == $college->offline_exam_sms && is_object($paper) && is_object($subject)){
+                        InputSanitise::sendCollegeOfflinePaperMarkSms($presentStudentsMark,$paper->name,$totalMarks,$subject->name,$college);
+                    }
+                }
                 DB::commit();
                 return Redirect::to('college/'.$collegeUrl.'/manageCollegeOfflineExam')->with('message', 'Assign marks to student successfully!');
             }

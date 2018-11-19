@@ -25,17 +25,19 @@
 @stop
 @section('module_title')
   <section class="content-header">
-    <h1> Favourite Projects </h1>
+    <h1> All Projects </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-table"></i> Vkits </li>
-      <li class="active"> Favourite Projects </li>
+      <li class="active"> All Projects </li>
     </ol>
   </section>
 @stop
 @section('dashboard_content')
 <div class="container">
   <div class="row">
-    <a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeVkits')}}" class="btn btn-primary"> College Vkits</a>&nbsp;<a href="{{ url('college/'.Session::get('college_user_url').'/myVchipVkits')}}" class="btn btn-default"> Vchip Vkits</a>
+    <a href="{{ url('college/'.Session::get('college_user_url').'/myCollegeVkits')}}" class="btn btn-primary"> College Vkits</a>&nbsp;
+    <a href="{{ url('college/'.Session::get('college_user_url').'/myVchipVkits')}}" class="btn btn-default"> Vchip Vkits</a>&nbsp;
+    <a class="btn btn-default" id="favourite" data-favourite="false" title="Favourite" onClick="myFavouriteVkits(this);" style="border-radius: 2px;"> <i class="fa fa-star " aria-hidden="true"></i> </a>
   </div>
   <br>
   <div class="row">
@@ -100,7 +102,7 @@
       projects.innerHTML = '';
       if( 0 < msg.length){
         $.each(msg, function(idx, obj) {
-        var firstDiv = document.createElement('div');
+          var firstDiv = document.createElement('div');
           firstDiv.className = "col-lg-4 col-md-4 col-sm-6 col-xs-12";
           var secondDiv = document.createElement('div');
           secondDiv.className = "course-box";
@@ -137,8 +139,8 @@
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           projects.appendChild(firstDiv);
-      });
-       $(function(){
+        });
+        $(function(){
           $('.show').on('click',function(){
             id = $(this).data('show')        ;
               $('[id ^=corse-detail-'+id).slideToggle('slow');
@@ -147,7 +149,9 @@
             id = $(this).data('close')
               $('[id ^=corse-detail-'+id).slideToggle('slow');
           });
-      });
+        });
+      } else {
+        projects.innerHTML = 'No Result!';
       }
     }
 
@@ -164,6 +168,28 @@
         .done(function( msg ) {
           renderVkitProjects(msg)
         });
+      }
+    }
+
+    function myFavouriteVkits(ele){
+      var userId = parseInt(document.getElementById('user_id').value);
+      document.getElementById('vkitprojects').innerHTML = '';
+      if(userId > 0){
+        if(false == $(ele).data('favourite')){
+          $(ele).data('favourite',true);
+          $(ele).prop('style','color: rgb(233, 30, 99);');
+          $(ele).prop('title','All');
+          $.ajax({
+            method: "POST",
+            url: "{{url('getCollegeFavouriteVkitProjectsByUserId')}}",
+            data: {userId:userId}
+          })
+          .done(function( msg ) {
+            renderVkitProjects(msg)
+          });
+        } else {
+          window.location.reload();
+        }
       }
     }
   </script>

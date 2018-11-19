@@ -210,12 +210,14 @@ class Clientuser extends Authenticatable
             }
             $request->file('photo')->move($userStoragePath, $userImage);
             $dbUserImagePath = $userStoragePath."/".$userImage;
-            // open image
-            $img = Image::make($dbUserImagePath);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('photo')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                // open image
+                $img = Image::make($dbUserImagePath);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
         }
         if($request->exists('resume')){
             $userResume = $request->file('resume')->getClientOriginalName();

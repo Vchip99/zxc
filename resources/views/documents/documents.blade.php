@@ -115,11 +115,7 @@
                      <h4 class="course-box-title " title="{{$document->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a >{{$document->name}}</a></p></h4>
                      <br/>
                       <p class="text-center ">
-                       @if(in_array($document->id, $registeredDocIds))
-                        <a data-path="{{asset($document->doc_pdf_path)}}" class="btn btn-primary" data-toggle="modal" data-target="#dynamic-modal-{{$document->id}}" title="Read Document"> <i class="fa fa-book" aria-hidden="true"></i> </a>
-                        @else
-                          <a data-path="{{asset($document->doc_pdf_path)}}" class="btn btn-primary" data-toggle="modal" data-target="#dynamic-modal-{{$document->id}}" onClick="registerDocuments(this);" data-document_id="{{$document->id}}"  title="Read Document"> <i class="fa fa-book" aria-hidden="true"></i> </a>
-                        @endif
+                        <a data-path="{{asset($document->doc_pdf_path)}}" class="btn btn-primary" data-toggle="modal" data-target="#dynamic-modal-{{$document->id}}" onClick="registerDocuments(this);" data-document_id="{{$document->id}}"  title="Read Document"> <i class="fa fa-book" aria-hidden="true"></i> </a>
                         <a href="{{asset($document->doc_pdf_path)}}" download class="btn btn-primary download" id="myBtn"><i class="fa fa-download" aria-hidden="true" title="Download Document"></i></a>
                         @if(in_array($document->id, $favouriteDocIds))
                           <a class="btn btn-primary voted-btn" id="favourite-{{$document->id}}" data-favourite="true" onClick="registerFavouriteDocuments(this);" data-document_id="{{$document->id}}" title="Favourite Document"> <i class="fa fa-star " aria-hidden="true"></i> </a>
@@ -322,11 +318,8 @@
 
         courseContent += '<p class="text-center">';
         var docPath = "{{asset('')}}" +obj.doc_pdf_path;
-        if(false == (msg['registeredDocuments'].indexOf(obj.id) > -1)){
-          courseContent += '<a data-path="'+ docPath +'" class="btn btn-primary" data-toggle="modal" data-target="#dynamic-modal-'+ obj.id +'" title="Read Document"> <i class="fa fa-book" aria-hidden="true"></i> </a>';
-        } else {
-          courseContent += '<a data-path="'+ docPath +'" class="btn btn-primary" data-toggle="modal" data-target="#dynamic-modal-'+ obj.id +'" onClick="registerDocuments(this);" data-document_id="'+ obj.id +'" title="Read Document"> <i class="fa fa-book" aria-hidden="true"></i> </a>';
-        }
+        courseContent += '<a data-path="'+ docPath +'" class="btn btn-primary" data-toggle="modal" data-target="#dynamic-modal-'+ obj.id +'" title="Read Document"> <i class="fa fa-book" aria-hidden="true"></i> </a>';
+
         courseContent += '&nbsp;<a href="'+ docPath +'" download class="btn btn-primary download" id="myBtn" title="Download Document"><i class="fa fa-download" aria-hidden="true"></i></a>&nbsp;';
         if(false == (msg['favouriteDocIds'].indexOf(obj.id) > -1)){
           courseContent += '<a class="btn btn-primary vote-btn" id="favourite-'+ obj.id +'" data-favourite="true" onClick="registerFavouriteDocuments(this);" data-document_id="'+ obj.id +'" title="Favourite Document"> <i class="fa fa-star " aria-hidden="true"></i> </a>';

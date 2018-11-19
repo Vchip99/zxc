@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\ClientHomePage;
 use App\Models\Client;
 use App\Models\Clientuser;
+use App\Models\User;
 use DB, Cache, File,LRedis,Auth,Session;
 
 class InputSanitise{
@@ -143,6 +144,7 @@ class InputSanitise{
 
     public static function sendOfflineDueSms($mobile, $userName, $batchName, $clientName){
         $userMessage = 'Dear '.$userName.', Today is your due date for payment of batch- '.$batchName.'. Thanks '.$clientName;
+        $userMessage = substr($userMessage,0,150);
         return self::sendSms($mobile,$userMessage);
     }
 
@@ -170,7 +172,7 @@ class InputSanitise{
                         } else {
                             $result['status'] = 'success';
                             $result['message'] = self::sendOtp($mobile);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,4);
                             $client->save();
                             DB::connection('mysql2')->commit();
                         }
@@ -221,7 +223,7 @@ class InputSanitise{
                             } else {
                                 $result['status'] = 'success';
                                 $result['message'] = self::sendOtp($mobile);
-                                self::setSmsCountStats($client);
+                                self::setSmsCountStats($client,4);
                                 $client->save();
                                 DB::connection('mysql2')->commit();
                             }
@@ -254,16 +256,18 @@ class InputSanitise{
                         $mobile = $student->phone;
                         $message = 'Dear '.$student->name.', You are absent on date '.$attendanceDate.' for batch- '.$batchName.'. Thanks '.$clientName;
                         if(!empty($mobile) && 10 == strlen($mobile)){
+                            $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,1);
                         }
                     }
                     if(Client::Parents == $sendSmsStatus || Client::Both == $sendSmsStatus){
                         $mobile = $student->parent_phone;
                         $message = 'Dear Parent, Your child '.$student->name.', is absent on date '.$attendanceDate.' for batch- '.$batchName.'. Thanks '.$clientName;
                         if(!empty($mobile) && 10 == strlen($mobile)){
+                            $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,1);
                         }
                     }
                 }
@@ -316,8 +320,9 @@ class InputSanitise{
                             }
                         }
                         if(!empty($mobile) && 10 == strlen($mobile)){
+                            $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,1);
                         }
                     }
                     if(Client::Parents == $sendSmsStatus || Client::Both == $sendSmsStatus){
@@ -336,8 +341,9 @@ class InputSanitise{
                             }
                         }
                         if(!empty($mobile) && 10 == strlen($mobile)){
+                            $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,1);
                         }
                     }
                 }
@@ -365,8 +371,18 @@ class InputSanitise{
         return $sendSmsNumbers;
     }
 
-    public static function setSmsCountStats($client){
-        $client->academic_sms_count += 1;
+    public static function setSmsCountStats($client,$smsGroupId){
+        if(1 == $smsGroupId){
+            $client->academic_sms_count += 1;
+        } else if(2 == $smsGroupId){
+            $client->message_sms_count += 1;
+        } else if(3 == $smsGroupId){
+            $client->lecture_sms_count += 1;
+        } else if(4 == $smsGroupId){
+            $client->otp_sms_count += 1;
+        } else {
+            $client->academic_sms_count += 1;
+        }
         if($client->debit_sms_count > 0){
             $client->debit_sms_count -= 1;
         } else {
@@ -391,8 +407,9 @@ class InputSanitise{
                         if($batchId > 0) {
                             $message = 'Dear '.$student->name.', your offline exam\'s mark for paper -'.$paperName.' is '.$presentStudentsMark[$student->id].'/'.$totalMarks.' for batch- '.$batchName.'. Thanks '.$clientName;
                             if(!empty($mobile) && 10 == strlen($mobile)){
+                                $message = substr($message,0,150);
                                 self::sendSms($mobile,$message);
-                                self::setSmsCountStats($client);
+                                self::setSmsCountStats($client,1);
                             }
                         }
                     }
@@ -401,8 +418,9 @@ class InputSanitise{
                         if($batchId > 0) {
                             $message = 'Dear Parent, Your child '.$student->name.', had offline exam and its mark for paper -'.$paperName.' is '.$presentStudentsMark[$student->id].'/'.$totalMarks.' for batch- '.$batchName.'. Thanks '.$clientName;
                             if(!empty($mobile) && 10 == strlen($mobile)){
+                                $message = substr($message,0,150);
                                 self::sendSms($mobile,$message);
-                                self::setSmsCountStats($client);
+                                self::setSmsCountStats($client,1);
                             }
                         }
                     }
@@ -445,7 +463,7 @@ class InputSanitise{
                         if(!empty($mobile) && 10 == strlen($mobile)){
                             $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,2);
                         }
                     }
                     if(Client::Parents == $sendSmsStatus || Client::Both == $sendSmsStatus){
@@ -466,7 +484,7 @@ class InputSanitise{
                         if(!empty($mobile) && 10 == strlen($mobile)){
                             $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,2);
                         }
                     }
                 }
@@ -500,7 +518,7 @@ class InputSanitise{
                         if(!empty($mobile) && 10 == strlen($mobile)){
                             $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,2);
                         }
                     }
                     if(Client::Parents == $sendSmsStatus || Client::Both == $sendSmsStatus){
@@ -513,7 +531,7 @@ class InputSanitise{
                         if(!empty($mobile) && 10 == strlen($mobile)){
                             $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,2);
                         }
                     }
                 }
@@ -547,7 +565,7 @@ class InputSanitise{
                         if(!empty($mobile) && 10 == strlen($mobile)){
                             $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,1);
                         }
                     }
                     if(Client::Parents == $sendSmsStatus || Client::Both == $sendSmsStatus){
@@ -560,7 +578,7 @@ class InputSanitise{
                         if(!empty($mobile) && 10 == strlen($mobile)){
                             $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,1);
                         }
                     }
                 }
@@ -578,13 +596,14 @@ class InputSanitise{
             return self::sendClientCreditSms($client->phone,$clientName);
         }
         if($batchId > 0) {
-            $message = 'Dear '.$lecturer->name.', You have a lecture on topic "' .$lecture->topic.'" on '.$lecture->date.' from '.$lecture->from_time.' to '.$lecture->to_time.' for batch- '.$batchName.'. Thanks '.$clientName;
+            $message = 'Dear '.$lecturer->name.', You have a lecture for topic "' .$lecture->topic.'" on '.$lecture->date.' from '.$lecture->from_time.' to '.$lecture->to_time.' for batch- '.$batchName.'. Thanks '.$clientName;
         } else {
-            $message = 'Dear '.$lecturer->name.', You have a lecture on topic "' .$lecture->topic.'" on '.$lecture->date.' from '.$lecture->from_time.' to '.$lecture->to_time.'. Thanks '.$clientName;
+            $message = 'Dear '.$lecturer->name.', You have a lecture for topic "' .$lecture->topic.'" on '.$lecture->date.' from '.$lecture->from_time.' to '.$lecture->to_time.'. Thanks '.$clientName;
         }
         if(!empty($mobile) && 10 == strlen($mobile)){
+            $message = substr($message,0,150);
             self::sendSms($mobile,$message);
-            self::setSmsCountStats($client);
+            self::setSmsCountStats($client,3);
             $client->save();
         }
         return;
@@ -606,7 +625,7 @@ class InputSanitise{
                         if(!empty($mobile) && 10 == strlen($mobile)){
                             $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,2);
                         }
                     }
                     if(Client::Parents == $sendSmsStatus || Client::Both == $sendSmsStatus){
@@ -615,7 +634,7 @@ class InputSanitise{
                         if(!empty($mobile) && 10 == strlen($mobile)){
                             $message = substr($message,0,150);
                             self::sendSms($mobile,$message);
-                            self::setSmsCountStats($client);
+                            self::setSmsCountStats($client,2);
                         }
                     }
                 }
@@ -624,4 +643,301 @@ class InputSanitise{
         }
         return;
     }
+
+    public static function sendCollegeCreditSms($mobile){
+        $message = 'Dear Sir or Madam , You dont have sufficient sms credit to send sms. please topup.';
+        if(!empty($mobile) && 10 == strlen($mobile)){
+            return self::sendSms($mobile,$message);
+        }
+        return;
+    }
+
+    public static function setCollegeSmsCountStats($college,$smsGroupId){
+        if(1 == $smsGroupId){
+            $college->academic_sms_count += 1;
+        } else if(2 == $smsGroupId){
+            $college->message_sms_count += 1;
+        } else if(3 == $smsGroupId){
+            $college->lecture_sms_count += 1;
+        } else if(4 == $smsGroupId){
+            $college->otp_sms_count += 1;
+        } else {
+            $college->academic_sms_count += 1;
+        }
+        if($college->debit_sms_count > 0){
+            $college->debit_sms_count -= 1;
+        } else {
+            $college->credit_sms_count += 1;
+        }
+        return;
+    }
+
+    public static function sendCollegeAbsentSms($absentStudentIds,$attendanceDate,$subjectName,$college){
+        $students = User::getCollegeStudentsByCollegeIdByIdsForSms($college->id,$absentStudentIds);
+        if(is_object($students) && false == $students->isEmpty()){
+            if(count($students) >  $college->debit_sms_count){
+                return self::sendCollegeCreditSms(Auth::user()->phone);
+            } else {
+                foreach($students as $student){
+                    $mobile = $student->phone;
+                    $message = 'Dear '.$student->name.', You are absent on date '.$attendanceDate.' for subject- '.$subjectName;
+                    if(!empty($mobile) && 10 == strlen($mobile)){
+                        $message = substr($message,0,150);
+                        self::sendSms($mobile,$message);
+                        self::setCollegeSmsCountStats($college,1);
+                    }
+                }
+                $college->save();
+            }
+        }
+        return;
+    }
+
+    public static function sendCollegeOfflinePaperMarkSms($presentStudentsMark,$paperName,$totalMarks,$subjectName,$college){
+        $studentIds = array_keys($presentStudentsMark);
+        $students = User::getCollegeStudentsByCollegeIdByIdsForSms($college->id,$studentIds);
+        if(is_object($students) && false == $students->isEmpty()){
+            if(count($students) >  $college->debit_sms_count){
+                return self::sendCollegeCreditSms(Auth::user()->phone);
+            } else {
+                foreach($students as $student){
+                    $mobile = $student->phone;
+                    $message = 'Dear '.$student->name.', your offline exam\'s mark for paper -'.$paperName.' is '.$presentStudentsMark[$student->id].'/'.$totalMarks.' for subject- '.$subjectName;
+                    if(!empty($mobile) && 10 == strlen($mobile)){
+                        $message = substr($message,0,150);
+                        self::sendSms($mobile,$message);
+                        self::setCollegeSmsCountStats($college,1);
+                    }
+                }
+                $college->save();
+            }
+        }
+        return;
+    }
+
+    public static function sendCollegeExtraClassSms($collegeClass,$subjectName,$college){
+        $classDepts = explode(',',$collegeClass->college_dept_ids);
+        $classyears = explode(',',$collegeClass->years);
+        $topic = $collegeClass->topic;
+        $students = User::getCollegeStudentsByCollegeIdByDeptIdsByYearsForSms($college->id,$classDepts,$classyears);
+        // sms to student
+        if(is_object($students) && false == $students->isEmpty()){
+            if(count($students) >  $college->debit_sms_count){
+                return self::sendCollegeCreditSms(Auth::user()->phone);
+            } else {
+                foreach($students as $student){
+                    $mobile = $student->phone;
+                    $message = 'Dear '.$student->name.', You have a extra class for topic "' .$collegeClass->topic.'" on '.$collegeClass->date.' from '.$collegeClass->from_time.' to '.$collegeClass->to_time.' for subject- '.$subjectName;
+                    if(!empty($mobile) && 10 == strlen($mobile)){
+                        $message = substr($message,0,150);
+                        self::sendSms($mobile,$message);
+                        self::setCollegeSmsCountStats($college,3);
+                    }
+                }
+                $college->save();
+            }
+        }
+        // sms to lecturer
+        if($college->debit_sms_count < 1){
+            return self::sendCollegeCreditSms(Auth::user()->phone);
+        } else {
+            $mobile = Auth::user()->phone;
+            $message = 'Dear '.Auth::user()->name.', You have a extra class for topic "' .$collegeClass->topic.'" on '.$collegeClass->date.' from '.$collegeClass->from_time.' to '.$collegeClass->to_time.' for subject- '.$subjectName;
+            if(!empty($mobile) && 10 == strlen($mobile)){
+                $message = substr($message,0,150);
+                self::sendSms($mobile,$message);
+                self::setCollegeSmsCountStats($college,3);
+            }
+            $college->save();
+        }
+        return;
+    }
+
+    public static function sendCollegeClassExamSms($collegeClassExam,$subjectName,$college){
+        $classDepts = explode(',',$collegeClassExam->college_dept_ids);
+        $classyears = explode(',',$collegeClassExam->years);
+        $topic = $collegeClassExam->topic;
+        $students = User::getCollegeStudentsByCollegeIdByDeptIdsByYearsForSms($college->id,$classDepts,$classyears);
+        // sms to student
+        if(is_object($students) && false == $students->isEmpty()){
+            if(count($students) >  $college->debit_sms_count){
+                return self::sendCollegeCreditSms(Auth::user()->phone);
+            } else {
+                foreach($students as $student){
+                    $mobile = $student->phone;
+                    $message = 'Dear '.$student->name.', You have a class exam for topic "' .$collegeClassExam->topic.'" on '.$collegeClassExam->date.' from '.$collegeClassExam->from_time.' to '.$collegeClassExam->to_time.' for subject- '.$subjectName;
+                    if(!empty($mobile) && 10 == strlen($mobile)){
+                        self::sendSms($mobile,$message);
+                        self::setCollegeSmsCountStats($college,1);
+                    }
+                }
+                $college->save();
+            }
+        }
+        // sms to lecturer
+        if($college->debit_sms_count < 1){
+            return self::sendCollegeCreditSms(Auth::user()->phone);
+        } else {
+            $mobile = Auth::user()->phone;
+            $message = 'Dear '.Auth::user()->name.', You have a class exam for topic "' .$collegeClassExam->topic.'" on '.$collegeClassExam->date.' from '.$collegeClassExam->from_time.' to '.$collegeClassExam->to_time.' for subject- '.$subjectName;
+            if(!empty($mobile) && 10 == strlen($mobile)){
+                self::sendSms($mobile,$message);
+                self::setCollegeSmsCountStats($college,1);
+            }
+            $college->save();
+        }
+        return;
+    }
+
+    public static function sendCollegeNoticeSms($collegeNotice,$college){
+        $classDepts = explode(',',$collegeNotice->college_dept_ids);
+        $classyears = explode(',',$collegeNotice->years);
+
+        if(1 == $collegeNotice->is_emergency){
+            $noticeValues = explode(',', $college->emergency_notice_sms);
+            if(in_array(1, $noticeValues)){
+                $students = User::getCollegeStudentsByCollegeIdByDeptIdsByYearsForSms($college->id,$classDepts,$classyears);
+                // sms to student
+                self::collegeNoticeSmses($students,$college,$collegeNotice->is_emergency,$collegeNotice->notice);
+            }
+            if(in_array(2, $noticeValues)){
+                $lecturers = User::getCollegeLecturersByCollegeIdByDeptIdsForSms($college->id,$classDepts);
+                // sms to lecturer
+                self::collegeNoticeSmses($lecturers,$college,$collegeNotice->is_emergency,$collegeNotice->notice);
+            }
+            if(in_array(3, $noticeValues)){
+                $users = User::getCollegeDirectorAndTnpByCollegeIdForSms($college->id);
+                // sms to users
+                self::collegeNoticeSmses($users,$college,$collegeNotice->is_emergency,$collegeNotice->notice);
+            }
+        } else {
+            $noticeValues = explode(',', $college->notice_sms);
+            if(in_array(1, $noticeValues)){
+                $students = User::getCollegeStudentsByCollegeIdByDeptIdsByYearsForSms($college->id,$classDepts,$classyears);
+                // sms to student
+                self::collegeNoticeSmses($students,$college,$collegeNotice->is_emergency,$collegeNotice->notice);
+            }
+            if(in_array(2, $noticeValues)){
+                $lecturers = User::getCollegeLecturersByCollegeIdByDeptIdsForSms($college->id,$classDepts);
+                // sms to lecturer
+                self::collegeNoticeSmses($lecturers,$college,$collegeNotice->is_emergency,$collegeNotice->notice);
+            }
+            if(in_array(3, $noticeValues)){
+                $users = User::getCollegeDirectorAndTnpByCollegeIdForSms($college->id);
+                // sms to users
+                self::collegeNoticeSmses($users,$college,$collegeNotice->is_emergency,$collegeNotice->notice);
+            }
+        }
+        return;
+    }
+
+    public static function collegeNoticeSmses($students,$college,$isEmergency,$notice){
+        // sms
+        if(is_object($students) && false == $students->isEmpty()){
+            if(count($students) >  $college->debit_sms_count){
+                return self::sendCollegeCreditSms(Auth::user()->phone);
+            } else {
+                foreach($students as $student){
+                    $mobile = $student->phone;
+                    if(1 == $isEmergency){
+                        $message = 'Emergency Notice-'.$notice;
+                    } else {
+                        $message = 'Notice-'.$notice;
+                    }
+                    if(!empty($mobile) && 10 == strlen($mobile)){
+                        $message = substr($message,0,150);
+                        self::sendSms($mobile,$message);
+                        self::setCollegeSmsCountStats($college,2);
+                    }
+                }
+                $college->save();
+            }
+        }
+    }
+
+    public static function sendCollegeHolidaySms($collegeHoliday,$college){
+        $holidayValues = explode(',', $college->holiday_sms);
+        if(in_array(1, $holidayValues)){
+            $students = User::getCollegeStudentsByCollegeIdForSms($college->id);
+            // sms to student
+            self::collegeHolidaySmses($students,$college,$collegeHoliday->note);
+        }
+        if(in_array(2, $holidayValues)){
+            $lecturers = User::getCollegeLecturersByCollegeIdForSms($college->id);
+            // sms to lecturer
+            self::collegeHolidaySmses($lecturers,$college,$collegeHoliday->note);
+        }
+        if(in_array(3, $holidayValues)){
+            $users = User::getCollegeDirectorAndTnpByCollegeIdForSms($college->id);
+            // sms to users
+            self::collegeHolidaySmses($users,$college,$collegeHoliday->note);
+        }
+        return;
+    }
+
+    public static function collegeHolidaySmses($students,$college,$note){
+        // sms
+        if(is_object($students) && false == $students->isEmpty()){
+            if(count($students) >  $college->debit_sms_count){
+                return self::sendCollegeCreditSms(Auth::user()->phone);
+            } else {
+                foreach($students as $student){
+                    $mobile = $student->phone;
+                    $message = 'Holiday-'.$note;
+                    if(!empty($mobile) && 10 == strlen($mobile)){
+                        $message = substr($message,0,150);
+                        self::sendSms($mobile,$message);
+                        self::setCollegeSmsCountStats($college,2);
+                    }
+                }
+                $college->save();
+            }
+        }
+    }
+
+    public static function sendCollegeAssignmentSms($assignment,$subjectName,$topicName,$college){
+        $classDepts = explode(',',$assignment->college_dept_ids);
+        $classyears = explode(',',$assignment->years);
+        $students = User::getCollegeStudentsByCollegeIdByDeptIdsByYearsForSms($college->id,$classDepts,$classyears);
+        // sms to student
+        if(is_object($students) && false == $students->isEmpty()){
+            if(count($students) >  $college->debit_sms_count){
+                return self::sendCollegeCreditSms(Auth::user()->phone);
+            } else {
+                foreach($students as $student){
+                    $mobile = $student->phone;
+                    if(!empty($assignment->question)){
+                        $message = 'Dear '.$student->name.', New Assignment on topic "'.$topicName.'" has been created for subject- '.$subjectName;
+                    } else {
+                        $message = 'Dear '.$student->name.', New Document on topic "'.$topicName.'" has been created for subject- '.$subjectName;
+                    }
+                    if(!empty($mobile) && 10 == strlen($mobile)){
+                        $message = substr($message,0,150);
+                        self::sendSms($mobile,$message);
+                        self::setCollegeSmsCountStats($college,1);
+                    }
+                }
+                $college->save();
+            }
+        }
+        // sms to lecturer
+        if($college->debit_sms_count < 1){
+            return self::sendCollegeCreditSms(Auth::user()->phone);
+        } else {
+            $mobile = Auth::user()->phone;
+            if(!empty($assignment->question)){
+                $message = 'Dear '.Auth::user()->name.', New Assignment on topic "'.$topicName.'" has been created for subject- '.$subjectName;
+            } else {
+                $message = 'Dear '.Auth::user()->name.', New Document on topic "'.$topicName.'" has been created for subject- '.$subjectName;
+            }
+            if(!empty($mobile) && 10 == strlen($mobile)){
+                $message = substr($message,0,150);
+                self::sendSms($mobile,$message);
+                self::setCollegeSmsCountStats($college,1);
+            }
+            $college->save();
+        }
+        return;
+    }
+
 }

@@ -72,12 +72,14 @@ class LiveCourse extends Model
             }
             $request->file('author_image')->move($courseFolderPath, $authorImage);
             $course->author_image = $authorImagePath;
-             // open image
-            $img = Image::make($course->author_image);
-            // enable interlacing
-            $img->interlace();
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('author_image')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                 // open image
+                $img = Image::make($course->author_image);
+                // enable interlacing
+                $img->interlace();
+                // save image interlaced
+                $img->save();
+            }
         }
         if($request->exists('image_path')){
             $imagePath = $request->file('image_path')->getClientOriginalName();
@@ -95,12 +97,14 @@ class LiveCourse extends Model
             }
             $request->file('image_path')->move($courseFolderPath, $imagePath);
             $course->image_path = $LiveCourseImagePath;
-             // open image
-            $img = Image::make($course->image_path);
-            // enable interlacing
-            $img->interlace(true);
-            // save image interlaced
-            $img->save();
+            if(in_array($request->file('image_path')->getClientMimeType(), ['image/jpg', 'image/jpeg', 'image/png'])){
+                 // open image
+                $img = Image::make($course->image_path);
+                // enable interlacing
+                $img->interlace(true);
+                // save image interlaced
+                $img->save();
+            }
         }
     	$course->start_date = $start_date;
     	$course->end_date = $end_date;

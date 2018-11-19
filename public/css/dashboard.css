@@ -355,6 +355,60 @@ only screen and (max-width: 760px),
   #college_offline_paper_marks td:nth-of-type(3):before { content: "Mark";  font-weight: bolder;}
   #college_offline_paper_marks td:nth-of-type(4):before { content: "OutOff";  font-weight: bolder;}
 
+  /* collegeExtraClass*/
+  #collegeExtraClass td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeExtraClass td:nth-of-type(2):before { content: "Subject" ; font-weight: bolder; }
+  #collegeExtraClass td:nth-of-type(3):before { content: "Departments";  font-weight: bolder;}
+  #collegeExtraClass td:nth-of-type(4):before { content: "Years";  font-weight: bolder;}
+  #collegeExtraClass td:nth-of-type(5):before { content: "Topic";  font-weight: bolder;}
+  #collegeExtraClass td:nth-of-type(6):before { content: "Date";  font-weight: bolder;}
+  #collegeExtraClass td:nth-of-type(7):before { content: "From Time";  font-weight: bolder;}
+  #collegeExtraClass td:nth-of-type(8):before { content: "To Time";  font-weight: bolder;}
+  #collegeExtraClass td:nth-of-type(9):before { content: "Edit";  font-weight: bolder;}
+  #collegeExtraClass td:nth-of-type(10):before { content: "Delete";  font-weight: bolder;}
+
+  /* collegeNotice*/
+  #collegeNotice td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeNotice td:nth-of-type(2):before { content: "Departments" ; font-weight: bolder; }
+  #collegeNotice td:nth-of-type(3):before { content: "Years";  font-weight: bolder;}
+  #collegeNotice td:nth-of-type(4):before { content: "Date";  font-weight: bolder;}
+  #collegeNotice td:nth-of-type(5):before { content: "Notice";  font-weight: bolder;}
+  #collegeNotice td:nth-of-type(6):before { content: "Created By";  font-weight: bolder;}
+  #collegeNotice td:nth-of-type(7):before { content: "Emergency Notice";  font-weight: bolder;}
+  #collegeNotice td:nth-of-type(8):before { content: "Edit";  font-weight: bolder;}
+  #collegeNotice td:nth-of-type(9):before { content: "Delete";  font-weight: bolder;}
+
+  /* collegeHoliday*/
+  #collegeHoliday td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeHoliday td:nth-of-type(2):before { content: "Date" ; font-weight: bolder; }
+  #collegeHoliday td:nth-of-type(3):before { content: "Holiday Message";  font-weight: bolder;}
+  #collegeHoliday td:nth-of-type(4):before { content: "Created By";  font-weight: bolder;}
+  #collegeHoliday td:nth-of-type(5):before { content: "Edit";  font-weight: bolder;}
+  #collegeHoliday td:nth-of-type(6):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeTimeTable*/
+  #collegeTimeTable td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeTimeTable td:nth-of-type(2):before { content: "Department" ; font-weight: bolder; }
+  #collegeTimeTable td:nth-of-type(3):before { content: "Year";  font-weight: bolder;}
+  #collegeTimeTable td:nth-of-type(4):before { content: "Image";  font-weight: bolder;}
+  #collegeTimeTable td:nth-of-type(5):before { content: "Created By";  font-weight: bolder;}
+  #collegeTimeTable td:nth-of-type(6):before { content: "Edit";  font-weight: bolder;}
+  #collegeTimeTable td:nth-of-type(7):before { content: "Delete";  font-weight: bolder;}
+
+  /*collegeCalendar*/
+  #collegeCalendar td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #collegeCalendar td:nth-of-type(2):before { content: "Image" ; font-weight: bolder; }
+  #collegeCalendar td:nth-of-type(3):before { content: "Created By";  font-weight: bolder;}
+  #collegeCalendar td:nth-of-type(4):before { content: "Edit";  font-weight: bolder;}
+  #collegeCalendar td:nth-of-type(5):before { content: "Delete";  font-weight: bolder;}
+
+  /*purchaseSms*/
+  #purchaseSms td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
+  #purchaseSms td:nth-of-type(2):before { content: "Purchased By" ; font-weight: bolder; }
+  #purchaseSms td:nth-of-type(3):before { content: "Note";  font-weight: bolder;}
+  #purchaseSms td:nth-of-type(4):before { content: "Price";  font-weight: bolder;}
+  #purchaseSms td:nth-of-type(5):before { content: "Date";  font-weight: bolder;}
+
   /*mobile_client_user_permission*/
   #mobile_client_user_permission td:nth-of-type(1):before { content: "Course Name" ; font-weight: bolder; }
   #mobile_client_user_permission td:nth-of-type(2):before { content: "Test Permission";  font-weight: bolder;}

@@ -233,7 +233,7 @@ p.v_p_sm{
 	text-align: center;
 }
 .btn{
-	border-radius: 60px;
+	border-radius: 2px;
 
 }
 .btn:focus {outline:0 !important;}
@@ -305,4 +305,8 @@ li.divider {
 }
 .header_img_top_pad_online{
 	padding-top: 55px;
+}
+
+.glyphicon {
+    font-family: 'Glyphicons Halflings' !important;
 }
