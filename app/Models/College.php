@@ -35,6 +35,7 @@ class College extends Model
             }
         } else{
             $college = new static;
+            $college->debit_sms_count = 500;
         }
     	$college->name = $collegeName;
       $college->url = $collegeUrl;

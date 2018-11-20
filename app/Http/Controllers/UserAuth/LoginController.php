@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
 use Session,Redirect,Cache;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class LoginController extends Controller
@@ -84,20 +85,58 @@ class LoginController extends Controller
     }
 
     public function userLogin(Request $request){
-        if($this->guard('user')->attempt($this->credentials($request))){
-            if('ceo@vchiptech.com' == $this->guard('user')->user()->email){
-                Cache::put('vchip:chatAdminLive', true, 60);
-            }
-            $request->session()->regenerate();
-            if($this->guard('user')->user()->college_id > 0){
-                $collegeUrl = $this->guard('user')->user()->college->url;
+        // login using mobile
+        $userMobile = $request->get('mobile');
+        $loginOtp = $request->get('login_otp');
+        $email = $request->get('email');
+        $password = $request->get('password');
+        $serverOtp = Cache::get($userMobile);
+        if($userMobile && $loginOtp && !$email && !$password){
+            if($loginOtp == $serverOtp){
+                $user = User::where('number_verified', 1)->whereNotNull('phone')->where('phone','=', $userMobile)->where('admin_approve', 1)->first();
+                if(!is_object($user)){
+                    return Redirect::to('/')->withErrors('User does not exists or not admin approve.');
+                }
+                $this->guard('user')->login($user);
+                if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
+                    Cache::forget($userMobile);
+                    Cache::forget('mobile-'.$userMobile);
+                }
+                if(is_object($this->guard('user')->user())){
+                    if('ceo@vchiptech.com' == $this->guard('user')->user()->email){
+                        Cache::put('vchip:chatAdminLive', true, 60);
+                    }
+                    $request->session()->regenerate();
+                    if($this->guard('user')->user()->college_id > 0){
+                        $collegeUrl = $this->guard('user')->user()->college->url;
+                        if(empty($collegeUrl)){
+                            $collegeUrl = 'vchipedu';
+                        }
+                    } else {
+                        $collegeUrl = 'other';
+                    }
+                    Session::put('college_user_url',$collegeUrl);
+                    return 'true';
+                }
             } else {
-                $collegeUrl = 'other';
+                return 'false';
             }
-            Session::put('college_user_url',$collegeUrl);
-            return 'true';
         } else {
-            return 'false';
+            if($this->guard('user')->attempt($this->credentials($request))){
+                if('ceo@vchiptech.com' == $this->guard('user')->user()->email){
+                    Cache::put('vchip:chatAdminLive', true, 60);
+                }
+                $request->session()->regenerate();
+                if($this->guard('user')->user()->college_id > 0){
+                    $collegeUrl = $this->guard('user')->user()->college->url;
+                } else {
+                    $collegeUrl = 'other';
+                }
+                Session::put('college_user_url',$collegeUrl);
+                return 'true';
+            } else {
+                return 'false';
+            }
         }
     }
 

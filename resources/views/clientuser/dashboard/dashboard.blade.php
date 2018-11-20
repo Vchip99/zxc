@@ -146,7 +146,7 @@
         </li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-tasks"></i> <span>Assignment</span><b style="color: red;">{{Auth::guard('clientuser')->user()->unchecked_assignments}} </b>
+            <i class="fa fa-tasks"></i><b style="color: red;">{{Auth::guard('clientuser')->user()->unchecked_assignments}}</b><span>Assignment</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -168,7 +168,7 @@
         </li>
         <li class="treeview">
           <a href="#" title="Message">
-            <i class="fa fa-envelope"></i> <span>Event/Message</span><b style="color: red;">{{Auth::guard('clientuser')->user()->unread_messages}} </b>
+            <i class="fa fa-envelope"></i><b style="color: red;">{{Auth::guard('clientuser')->user()->unread_messages}}</b><span>Event/Message</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>

@@ -265,4 +265,8 @@ class ClientHomeController extends Controller
             }
         }
     }
+
+    protected function termsandconditions($subdomainName,Request $request){
+        return view('more.clientTermsAndConditions',compact('subdomainName'));
+    }
 }

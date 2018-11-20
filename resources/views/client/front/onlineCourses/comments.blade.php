@@ -44,12 +44,13 @@
                      <span id="like1-bs3">@if( isset($subcommentLikesCount[$subcomment->id])) {{count($subcommentLikesCount[$subcomment->id]['like_id'])}} @endif</span>
                 @endif
      	    </span>
-	     	<span class="mrgn_5_left">
+	     	<span class="mrgn_5_left"><b>|</b>
 	     		@if(is_object($currentUser))
 	      			<a class="" role="button" data-toggle="collapse" href="#replySubComment{{$subcomment->client_course_comment_id}}-{{$subcomment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
 	      		@else
                     <a class="" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
                 @endif
+                <b>|</b>
 	    	</span>
 	    	<span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$subcomment->updated_at->diffForHumans()}}</span>
 		    <div class="collapse replyComment" id="replySubComment{{$subcomment->client_course_comment_id}}-{{$subcomment->id}}">

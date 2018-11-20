@@ -509,6 +509,13 @@ class DiscussionController extends Controller
     protected function updatePost(Request $request){
         $postId = $request->get('post_id');
         $question = $request->get('update_question');
+        $solution = $request->get('updated_solution');
+        $answer1 = $request->get('updated_answer1');
+        $answer2 = $request->get('updated_answer2');
+        $answer3 = $request->get('updated_answer3');
+        $answer4 = $request->get('updated_answer4');
+        $answer = $request->get('updated_answer');
+        $isUpdatedFromDiscussion = $request->get('isUpdatedFromDiscussion');
         if(!empty($postId) && !empty($question)){
             $post = DiscussionPost::find($postId);
             if(is_object($post)){
@@ -516,6 +523,12 @@ class DiscussionController extends Controller
                 try
                 {
                     $post->body = $question;
+                    $post->answer1 = $answer1;
+                    $post->answer2 = $answer2;
+                    $post->answer3 = $answer3;
+                    $post->answer4 = $answer4;
+                    $post->answer = $answer;
+                    $post->solution = $solution;
                     $post->save();
                     DB::commit();
                 }
@@ -525,7 +538,11 @@ class DiscussionController extends Controller
                 }
             }
         }
-        return $this->getPosts();
+        if('true' == $isUpdatedFromDiscussion){
+            return $this->getPosts();
+        } else {
+            return $this->getMyPosts();
+        }
     }
 
     protected function updateComment(Request $request){

@@ -100,27 +100,13 @@ class ClientDiscussionPost extends Model
             foreach($this->comments as $comment){
                 if(is_object($comment->children) && false == $comment->children->isEmpty()){
                     foreach($comment->children as $subcomment){
-                        // if(is_object($subcomment->deleteLikes) && false == $subcomment->deleteLikes->isEmpty()){
-                        //     foreach($subcomment->deleteLikes as $subcommentLike){
-                        //         $subcommentLike->delete();
-                        //     }
-                        // }
+                        ClientDiscussionLike::deleteSubCommentLikeById($subcomment->id);
                         $subcomment->delete();
                     }
                 }
-
-                // if(is_object($comment->commentLikes) && false == $comment->commentLikes->isEmpty()){
-                //     foreach($comment->commentLikes as $commentLike){
-                //         $commentLike->delete();
-                //     }
-                // }
+                ClientDiscussionLike::deleteCommentLikeById($comment->id);
                 $comment->delete();
             }
         }
-        // if(is_object($this->deleteLikes) && false == $this->deleteLikes->isEmpty()){
-        //     foreach($this->deleteLikes as $postLike){
-        //         $postLike->delete();
-        //     }
-        // }
     }
 }

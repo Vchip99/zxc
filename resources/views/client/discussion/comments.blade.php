@@ -8,24 +8,37 @@
           <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
         @endif
 	  	<div class="message" id="subcomment_{{$subcomment->id}}">
-	  		@if(is_object($currentUser))
-                @if((0 != $subcomment->clientuser_id && $currentUser->id == $subcomment->clientuser_id) || (0 == $subcomment->clientuser_id && $currentUser->id == $subcomment->client_id && 1 == $currentUser->admin_approve))
-			    	<div class="dropdown pull-right">
-			      		<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-			        		<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-				      	</button>
-				      	<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-				      		@if($currentUser->id == $subcomment->clientuser_id || $currentUser->id == $post->clientuser_id || $currentUser->id == $comment->client_id)
+	  			@if(is_object($currentUser))
+                    @if(1 == $currentUser->admin_approve)
+                    	<div class="dropdown pull-right">
+				      		<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+				        		<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+					      	</button>
+					      	<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
 						        <li><a id="{{$subcomment->client_discussion_comment_id}}_{{$subcomment->id}}" data-subcomment_id="{{$subcomment->id}}" onclick="confirmSubCommentDelete(this);">Delete</a></li>
 						        </a>
-				            @endif
-				            @if($currentUser->id == $subcomment->clientuser_id || $currentUser->id == $comment->client_id)
 					        	<li><a id="{{$subcomment->id}}" onclick="editSubComment(this);">Edit</a></li>
-					        @endif
-				      	</ul>
-			    	</div>
-		    	@endif
-	    	@endif
+					      	</ul>
+				    	</div>
+                    @else
+                    	@if(0 != $subcomment->clientuser_id && $currentUser->id == $subcomment->clientuser_id)
+					    	<div class="dropdown pull-right">
+					      		<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+					        		<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+						      	</button>
+						      	<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+						      		@if($currentUser->id == $subcomment->clientuser_id || $currentUser->id == $post->clientuser_id)
+								        <li><a id="{{$subcomment->client_discussion_comment_id}}_{{$subcomment->id}}" data-subcomment_id="{{$subcomment->id}}" onclick="confirmSubCommentDelete(this);">Delete</a></li>
+								        </a>
+						            @endif
+						            @if($currentUser->id == $subcomment->clientuser_id)
+							        	<li><a id="{{$subcomment->id}}" onclick="editSubComment(this);">Edit</a></li>
+							        @endif
+						      	</ul>
+					    	</div>
+				    	@endif
+                    @endif
+                @endif
 		    	<p>
 		    		<a class="SubCommentName">
 			    		@if(0 != $subcomment->clientuser_id)
@@ -46,20 +59,33 @@
 		</div>
 	    <div class="comment-meta reply-1">
 	      	<span id="sub_cmt_like_{{$subcomment->id}}" >
-                @if( isset($subcommentLikesCount[$subcomment->id]) &&  is_object($currentUser) && isset($subcommentLikesCount[$subcomment->id]['user_id'][$currentUser->id]))
-                     <i id="sub_comment_like_{{$subcomment->id}}" data-post_id="{{$comment->client_discussion_post_id}}" data-comment_id="{{$comment->id}}" data-sub_comment_id="{{$subcomment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                     <span id="like1-bs3">{{count($subcommentLikesCount[$subcomment->id]['like_id'])}}</span>
+                @if( isset($subcommentLikesCount[$subcomment->id]) &&  is_object($currentUser))
+                    @if(1 == $currentUser->admin_approve)
+                     	@if(isset($subcommentLikesCount[$subcomment->id]['user_id'][$isClient][$currentUser->id]))
+                        	<i id="sub_comment_like_{{$subcomment->id}}" data-post_id="{{$comment->client_discussion_post_id}}" data-comment_id="{{$comment->id}}" data-sub_comment_id="{{$subcomment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                      	@else
+                        	<i id="sub_comment_like_{{$subcomment->id}}" data-post_id="{{$comment->client_discussion_post_id}}" data-comment_id="{{$comment->id}}"  data-sub_comment_id="{{$subcomment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                      	@endif
+                    @else
+                      	@if(isset($subcommentLikesCount[$subcomment->id]['user_id'][$isClient][$currentUser->id]))
+                        	<i id="sub_comment_like_{{$subcomment->id}}" data-post_id="{{$comment->client_discussion_post_id}}" data-comment_id="{{$comment->id}}" data-sub_comment_id="{{$subcomment->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                      	@else
+                        	<i id="sub_comment_like_{{$subcomment->id}}" data-post_id="{{$comment->client_discussion_post_id}}" data-comment_id="{{$comment->id}}"  data-sub_comment_id="{{$subcomment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                      	@endif
+                    @endif
+                    	<span id="like1-bs3">{{count($subcommentLikesCount[$subcomment->id]['like_id'])}}</span>
                 @else
                      <i id="sub_comment_like_{{$subcomment->id}}" data-post_id="{{$comment->client_discussion_post_id}}" data-comment_id="{{$comment->id}}"  data-sub_comment_id="{{$subcomment->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
                      <span id="like1-bs3">@if( isset($subcommentLikesCount[$subcomment->id])) {{count($subcommentLikesCount[$subcomment->id]['like_id'])}} @endif</span>
                 @endif
      	    </span>
-	     	<span class="mrgn_5_left">
+	     	<span class="mrgn_5_left"><b>|</b>
 	      		@if(is_object($currentUser))
 	      			<a class="" role="button" data-toggle="collapse" href="#replySubComment{{$subcomment->client_discussion_comment_id}}-{{$subcomment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
                 @else
                 	<a role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
                 @endif
+                <b>|</b>
 	    	</span>
 	    	<span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$subcomment->updated_at->diffForHumans()}}</span>
 		    <div class="collapse replyComment" id="replySubComment{{$subcomment->client_discussion_comment_id}}-{{$subcomment->id}}">

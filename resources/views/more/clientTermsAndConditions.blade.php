@@ -9,7 +9,7 @@
     @include('layouts.home-js')
 @stop
 @section('content')
-    @include('header.header_menu')
+    @include('client.front.header_menu')
 <section class="v_container" style="margin-top: 80px;">
     <ol>
         <li><b>General</b>
@@ -145,5 +145,5 @@
 </section>
 @stop
 @section('footer')
-    @include('footer.footer')
+    @include('footer.client-footer')
 @stop

@@ -190,7 +190,7 @@ hr{
               @endif
             </span>
             <span class="mrgn_5_left">
-              <i class="fa fa-comment-o" aria-hidden="true"></i>
+              <b>|</b> <i class="fa fa-comment-o" aria-hidden="true"></i>
               @if(is_object($currentUser))
                 <a class="your-cmt" role="button" data-toggle="collapse" href="#replyToEpisode{{$video->id}}" aria-expanded="false" aria-controls="collapseExample">Comment</a>
               @else
@@ -298,12 +298,13 @@ hr{
                                      <span id="like1-bs3">@if( isset($commentLikesCount[$comment->id])) {{count($commentLikesCount[$comment->id]['like_id'])}} @endif</span>
                                 @endif
                               </span>
-                            <span class="mrgn_5_left">
+                            <span class="mrgn_5_left"><b>|</b>
                               @if(is_object($currentUser))
                                 <a class="" role="button" data-toggle="collapse" href="#replyToComment{{$comment->id}}" aria-expanded="false" aria-controls="collapseExample">reply</a>
                               @else
                                 <a class="" role="button" data-toggle="modal" data-placement="bottom" href="#loginUserModel">reply</a>
                               @endif
+                              <b>|</b>
                             </span>
                             <span class="text-muted time-of-reply"><i class="fa fa-clock-o"></i> {{$comment->updated_at->diffForHumans()}}</span>
                             <div class="collapse replyComment" id="replyToComment{{$comment->id}}">
@@ -446,7 +447,7 @@ hr{
 
         var spanCommenReplyButton = document.createElement('span');
         spanCommenReplyButton.className = 'mrgn_5_left';
-        spanCommenReplyButton.innerHTML = '<a class="" role="button" data-toggle="collapse" href="#replyToComment'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a>';
+        spanCommenReplyButton.innerHTML = '<b> | </b><a class="" role="button" data-toggle="collapse" href="#replyToComment'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a><b> | </b>';
         commentReplyDiv.appendChild(spanCommenReplyButton);
 
         var spanCommenReplyDate = document.createElement('span');
@@ -549,7 +550,7 @@ hr{
 
         var spanSubCommenReplyButton = document.createElement('span');
         spanSubCommenReplyButton.className = 'mrgn_5_left';
-        spanSubCommenReplyButton.innerHTML = '<a class="" role="button" data-toggle="collapse" href="#replySubComment'+obj.client_course_comment_id+'-'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a>';
+        spanSubCommenReplyButton.innerHTML = '<b> | </b><a class="" role="button" data-toggle="collapse" href="#replySubComment'+obj.client_course_comment_id+'-'+obj.id+'" aria-expanded="false" aria-controls="collapseExample">reply</a><b> | </b>';
         subcommentReplyDiv.appendChild(spanSubCommenReplyButton);
 
         var spanSubCommenReplyDate = document.createElement('span');
@@ -609,12 +610,11 @@ hr{
 
   function confirmSubmitReplytoSubComment(ele){
     var userId = parseInt(document.getElementById('user_id').value);
-    if(0 < userId){
-        var commentId = $(ele).data('comment_id');
-        var videoId = $(ele).data('video_id');
-        var subcommentId = $(ele).data('subcomment_id');
-        var subcomment = document.getElementById('createSubComment_'+subcommentId).value;
-
+    var commentId = $(ele).data('comment_id');
+    var videoId = $(ele).data('video_id');
+    var subcommentId = $(ele).data('subcomment_id');
+    var subcomment = document.getElementById('createSubComment_'+subcommentId).value;
+    if(userId> 0 && subcomment ){
         $.ajax({
             method: "POST",
             url: "{{url('createClientCourseSubComment')}}",
@@ -625,13 +625,18 @@ hr{
         });
     } else if( isNaN(userId)) {
       $('#loginUserModel').modal();
+    } else if(!subcomment){
+      $.alert({
+        title: 'Alert',
+        content: 'please enter subcomment.'
+      });
     }
   }
   function confirmSubmit(ele){
     var userId = parseInt(document.getElementById('user_id').value);
-    if(userId > 0){
-      var comment = CKEDITOR.instances.comment.getData();
-      var videoId = parseInt(document.getElementById('video_id').value);
+    var comment = CKEDITOR.instances.comment.getData();
+    var videoId = parseInt(document.getElementById('video_id').value);
+    if(userId > 0 && comment && videoId > 0){
       document.getElementById('replyToEpisode'+videoId).classList.remove("in");
       CKEDITOR.instances.comment.setData('');
       $.ajax({
@@ -644,17 +649,21 @@ hr{
           });
     } else if( isNaN(userId)) {
       $('#loginUserModel').modal();
+    } else if(!comment){
+      $.alert({
+        title: 'Alert',
+        content: 'please enter comment.'
+      });
     }
   }
 
   function confirmSubmitReplytoComment(ele){
     var userId = parseInt(document.getElementById('user_id').value);
-    if(0 < userId){
-        var userId = parseInt(document.getElementById('user_id').value);
-        var commentId = $(ele).data('comment_id');
-        var videoId = $(ele).data('video_id');
-        commentid = 'subcomment_'+videoId+'_'+commentId;
-        var subcomment = document.getElementById(commentid).value;
+    var commentId = $(ele).data('comment_id');
+    var videoId = $(ele).data('video_id');
+    commentid = 'subcomment_'+videoId+'_'+commentId;
+    var subcomment = document.getElementById(commentid).value;
+    if(userId > 0 && subcomment){
         $.ajax({
             method: "POST",
             url: "{{url('createClientCourseSubComment')}}",
@@ -663,9 +672,13 @@ hr{
         .done(function( msg ) {
           renderComments(msg, userId);
         });
-
     } else if( isNaN(userId)) {
       $('#loginUserModel').modal();
+    } else if(!subcomment){
+      $.alert({
+        title: 'Alert',
+        content: 'please enter subcomment.'
+      });
     }
   }
 
@@ -791,10 +804,13 @@ hr{
               likeSpan.innerHTML = '';
               if( 1 == dislike ){
                 likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"> Like </i>';
-                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
               } else {
                 likeSpan.innerHTML +='<i id="video_like_'+videoId+'" data-video_id="'+videoId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"> Like </i>';
+              }
+              if(msg.length > 0){
                 likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+              } else {
+                likeSpan.innerHTML +='<span id="like1-bs3"></span>';
               }
             }
           });
@@ -816,16 +832,19 @@ hr{
           })
           .done(function( msg ) {
             if( 'false' != msg ){
-                var likeSpan = document.getElementById('cmt_like_'+commentId);
-                likeSpan.innerHTML = '';
-                if( 1 == dislike ){
-                  likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                } else {
-                  likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                }
-          }
+              var likeSpan = document.getElementById('cmt_like_'+commentId);
+              likeSpan.innerHTML = '';
+              if( 1 == dislike ){
+                likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+              } else {
+                likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+              }
+              if(msg.length > 0){
+                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+              } else {
+                likeSpan.innerHTML +='<span id="like1-bs3"></span>';
+              }
+            }
           });
         }
     });
@@ -846,16 +865,19 @@ hr{
           })
           .done(function( msg ) {
             if( 'false' != msg ){
-                var likeSpan = document.getElementById('sub_cmt_like_'+subCommentId);
-                likeSpan.innerHTML = '';
-                if( 1 == dislike ){
-                  likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                } else {
-                  likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-                  likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-                }
-          }
+              var likeSpan = document.getElementById('sub_cmt_like_'+subCommentId);
+              likeSpan.innerHTML = '';
+              if( 1 == dislike ){
+                likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+              } else {
+                likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-video_id="'+videoId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+              }
+              if(msg.length > 0){
+                likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
+              } else {
+                likeSpan.innerHTML +='<span id="like1-bs3"></span>';
+              }
+            }
           });
         }
     });

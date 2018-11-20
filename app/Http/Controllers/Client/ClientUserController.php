@@ -1650,10 +1650,11 @@ class ClientUserController extends BaseController
         }
         $discussionCategories = ClientDiscussionCategory::getCategoriesByClient();
         $posts = ClientDiscussionPost::getPostsByClient();
+        $isClient = 0;
         $likesCount = ClientDiscussionLike::getPostLikes();
         $commentLikesCount = ClientDiscussionLike::getCommentLikes();
         $subcommentLikesCount = ClientDiscussionLike::getSubCommentLikes();
-        return view('client.discussion.discussion', compact('subdomainName','posts','discussionCategories','currentUser','likesCount','commentLikesCount','subcommentLikesCount'));
+        return view('client.discussion.discussion', compact('subdomainName','posts','discussionCategories','currentUser','isClient','likesCount','commentLikesCount','subcommentLikesCount'));
     }
 
     protected function myQuestions($subdomainName,Request $request){
@@ -1662,18 +1663,19 @@ class ClientUserController extends BaseController
             return Redirect::to('/');
         }
         $posts = ClientDiscussionPost::where('client_id',$currentUser->client_id)->where('clientuser_id',$currentUser->id)->orderBy('id','desc')->get();
+        $isClient = 0;
         $discussionCategories = ClientDiscussionCategory::getCategoriesByClient();
         $likesCount = ClientDiscussionLike::getPostLikes();
-        return view('client.discussion.myQuestions', compact('subdomainName','posts','currentUser','discussionCategories','likesCount'));
+        return view('client.discussion.myQuestions', compact('subdomainName','posts','currentUser','discussionCategories','likesCount','isClient'));
     }
 
     protected function myReplies($subdomainName,Request $request){
-        $loginUser = Auth::guard('clientuser')->user();
-        if(!is_object($loginUser)){
+        $currentUser = Auth::guard('clientuser')->user();
+        if(!is_object($currentUser)){
             return Redirect::to('/');
         }
         $postIds = [];
-        $discussionComments = ClientDiscussionComment::where('client_id',$loginUser->client_id)->where('clientuser_id',$loginUser->id)->select('Client_discussion_post_id')->get();
+        $discussionComments = ClientDiscussionComment::where('client_id',$currentUser->client_id)->where('clientuser_id',$currentUser->id)->select('Client_discussion_post_id')->get();
         if(false == $discussionComments->isEmpty()){
             foreach($discussionComments as $discussionComment){
                 $postIds[]= $discussionComment->Client_discussion_post_id;
@@ -1681,11 +1683,11 @@ class ClientUserController extends BaseController
             $postIds = array_unique($postIds);
         }
 
-        $posts = ClientDiscussionPost::where('client_id',$loginUser->client_id)->whereIn('id', $postIds)->orderBy('id','desc')->get();
-        $currentUser = '';
+        $posts = ClientDiscussionPost::where('client_id',$currentUser->client_id)->whereIn('id', $postIds)->orderBy('id','desc')->get();
+        $isClient = 0;
         $likesCount = ClientDiscussionLike::getPostLikes();
         $commentLikesCount = ClientDiscussionLike::getCommentLikes();
         $subcommentLikesCount = ClientDiscussionLike::getSubCommentLikes();
-        return view('client.discussion.myReplies', compact('subdomainName','posts','currentUser','likesCount','commentLikesCount','subcommentLikesCount'));
+        return view('client.discussion.myReplies', compact('subdomainName','posts','currentUser','isClient','likesCount','commentLikesCount','subcommentLikesCount'));
     }
 }

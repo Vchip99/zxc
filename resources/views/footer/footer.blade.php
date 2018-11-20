@@ -107,16 +107,36 @@
       </div>
       <div class="modal-body">
         <div class="modal-data">
+            <div class="form-group" style="color: white;">
+              <input type="radio" name="signin_type" value="email" checked onClick="toggleModelSignIn(this.value);">Email-id
+              <input type="radio" name="signin_type" value="mobile" onClick="toggleModelSignIn(this.value);">Mobile
+            </div>
             <div class="form-group">
-              <input id="useremail" name="email" type="email" class="form-control" placeholder="vchip@gmail.com" autocomplete="off" required>
+              <input id="useremail" name="email" type="email" class="form-control signInModelEmail" placeholder="vchip@gmail.com" autocomplete="off" required>
               <span class="help-block"></span>
             </div>
             <div class="form-group">
-              <input id="userpassword" name="password" type="password" class="form-control" placeholder="password" data-type="password" autocomplete="off" required >
+              <input id="userpassword" name="password" type="password" class="form-control signInModelEmail" placeholder="password" data-type="password" autocomplete="off" required >
+              <span class="help-block"></span>
+            </div>
+            <div class="form-group hide signInModelMobile">
+              <input type="phone" class="form-control" name="mobile" id="signInModelPhone" value="" placeholder="Mobile number(10 digit)" pattern="[0-9]{10}" />
+              <span class="help-block"></span>
+            </div>
+            <label class="hide" style="color: white;" id="signInModelOtpMessage">Otp sent successfully.</label>
+            <div class="form-group hide" id="signInModelOtpDiv">
+              <input name="login_otp" id="login_model_otp" type="text" class="form-control" placeholder="Enter OTP" >
               <span class="help-block"></span>
             </div>
             <div id="loginErrorMsg" class="hide">Wrong username or password</div>
-            <button type="submit" value="login" name="submit" class="btn btn-info btn-block" onClick="loginUser();">Login</button>
+            <div id="otpErrorMsg" class="hide" style="color: white;">Wrong otp entered</div>
+            <div>
+              <label>
+                <input type="radio" name="terms_condition" checked><a href="{{ url('terms-and-conditions')}}">Accepted Terms and Condition</a>
+              </label>
+            </div>
+            <button type="button" value="login" id="loginModelBtn" name="submit" class="btn btn-info btn-block signInModelEmail" onClick="loginUser();">Login</button>
+            <button title="Send Otp" id="sendSignInModelOtpBtn" class="btn btn-info btn-block hide signInModelMobile" onclick="event.preventDefault(); sendSignInModelOtp();" >Send OTP</button>
             <br />
             <div class="form-group">
               <a href="{{ url('/auth/facebook') }}" class="btn btn-facebook btn-info btn-block" style="background-color: #3B5998; border-color: #3B5998;"><i class="fa fa-facebook"></i> Login </a>
@@ -141,17 +161,29 @@
   function loginUser(){
     var email = document.getElementById('useremail').value;
     var password = document.getElementById('userpassword').value;
-    if(email && password){
+    var signInModelPhone = document.getElementById('signInModelPhone').value;
+    var loginOtp = document.getElementById('login_model_otp').value;
+    if((email && password)||(signInModelPhone && loginOtp)){
       $.ajax({
           method: "POST",
           url: "{{ url('userLogin') }}",
-          data: {email:email, password:password}
+          data: {email:email, password:password,login_otp:loginOtp,mobile:signInModelPhone}
       })
       .done(function( msg ) {
         if('true' == msg){
           window.location.reload(true);
         } else {
-          document.getElementById('loginErrorMsg').classList.remove('hide');
+          if(loginOtp){
+            document.getElementById('otpErrorMsg').classList.remove('hide');
+          } else {
+            document.getElementById('loginErrorMsg').classList.remove('hide');
+          }
+          $('#userpassword').val('');
+          $('#useremail').val('');
+          $('#signInModelPhone').val('');
+          $('#login_model_otp').val('');
+          $('#signInModelOtpMessage').addClass('hide');
+          $('#signInModelOtpDiv').addClass('hide');
         }
       });
     }
@@ -172,4 +204,67 @@
       $('.tab-content > div#tab_4').addClass('active in');
     }
   });
+
+  function toggleModelSignIn(value){
+    if('email' == value){
+      $('.signInModelEmail').removeClass('hide');
+      $('.signInModelMobile').addClass('hide');
+      $('#sendSignInModelOtpBtn').addClass('hide');
+      $('#userpassword').prop('required', true);
+      $('#useremail').prop('required', true);
+      $('#userpassword').val('');
+      $('#useremail').val('');
+      $('#signInModelPhone').val('');
+    } else {
+      $('.signInModelEmail').addClass('hide');
+      $('.signInModelMobile').removeClass('hide');
+      $('#sendSignInModelOtpBtn').removeClass('hide');
+      $('#userpassword').val('');
+      $('#useremail').val('');
+      $('#userpassword').prop('required', false);
+      $('#useremail').prop('required', false);
+      $('#signInModelPhone').val('');
+    }
+  }
+
+  function sendSignInModelOtp(){
+    var mobile = $('#signInModelPhone').val();
+    if(mobile && 10 == mobile.length ){
+    $('#signInModelPhone').prop('readonly', true);
+      $.ajax({
+        method: "POST",
+        url: "{{url('sendVchipUserSignInOtp')}}",
+        data: {mobile:mobile}
+      })
+      .done(function( result ) {
+        var resultObj = JSON.parse(result);
+        if('000' == resultObj.ErrorCode && 'Success' == resultObj.ErrorMessage){
+          $('#signInModelOtpMessage').removeClass('hide');
+          $('#signInModelOtpDiv').removeClass('hide');
+          $('#loginModelBtn').removeClass('hide');
+          $('#sendSignInModelOtpBtn').addClass('hide');
+        } else {
+          $('#sendSignInModelOtpBtn').removeClass('hide');
+          $('#signInModelPhone').prop('readonly', false);
+          $('#signInModelOtpMessage').addClass('hide');
+          $('#signInModelOtpDiv').addClass('hide');
+          $('#loginModelBtn').addClass('hide');
+          $.confirm({
+            title: 'Alert',
+            content: 'Something wrong in otp result.'
+          });
+        }
+      });
+    } else if(!mobile) {
+      $.confirm({
+        title: 'Alert',
+        content: 'Enter mobile no.'
+      });
+    } else if(mobile.length < 10){
+      $.confirm({
+        title: 'Alert',
+        content: 'Enter 10 digit mobile no.'
+      });
+    }
+  }
 </script>

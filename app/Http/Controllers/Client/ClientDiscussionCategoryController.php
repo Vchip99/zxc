@@ -185,10 +185,11 @@ class ClientDiscussionCategoryController extends ClientBaseController
         $discussionCategories = ClientDiscussionCategory::getCategoriesByClient();
         $posts = ClientDiscussionPost::getPostsByClient();
         $currentUser = Auth::guard('client')->user();
+        $isClient = 1;
         $likesCount = ClientDiscussionLike::getPostLikes();
         $commentLikesCount = ClientDiscussionLike::getCommentLikes();
         $subcommentLikesCount = ClientDiscussionLike::getSubCommentLikes();
-        return view('client.discussion.discussion', compact('subdomainName','posts','discussionCategories','currentUser','likesCount','commentLikesCount','subcommentLikesCount'));
+        return view('client.discussion.discussion', compact('subdomainName','posts','discussionCategories','currentUser','isClient','likesCount','commentLikesCount','subcommentLikesCount'));
     }
 
     /**
@@ -585,11 +586,7 @@ class ClientDiscussionCategoryController extends ClientBaseController
             DB::connection('mysql2')->beginTransaction();
             try
             {
-                // if(is_object($subcomment->deleteLikes) && false == $subcomment->deleteLikes->isEmpty()){
-                //     foreach($subcomment->deleteLikes as $subcommentLike){
-                //         $subcommentLike->delete();
-                //     }
-                // }
+                ClientDiscussionLike::deleteSubCommentLikeById($subcomment->id);
                 $subcomment->delete();
                 DB::connection('mysql2')->commit();
             }
@@ -609,19 +606,11 @@ class ClientDiscussionCategoryController extends ClientBaseController
             {
                 if(is_object($comment->children) && false == $comment->children->isEmpty()){
                     foreach($comment->children as $subcomment){
-                        // if(is_object($subcomment->deleteLikes) && false == $subcomment->deleteLikes->isEmpty()){
-                        //     foreach($subcomment->deleteLikes as $subcommentLike){
-                        //         $subcommentLike->delete();
-                        //     }
-                        // }
+                        ClientDiscussionLike::deleteSubCommentLikeById($subcomment->id);
                         $subcomment->delete();
                     }
                 }
-                // if(is_object($comment->commentLikes) && false == $comment->commentLikes->isEmpty()){
-                //     foreach($comment->commentLikes as $commentLike){
-                //         $commentLike->delete();
-                //     }
-                // }
+                ClientDiscussionLike::deleteCommentLikeById($comment->id);
                 $comment->delete();
                 DB::connection('mysql2')->commit();
             }
@@ -641,7 +630,8 @@ class ClientDiscussionCategoryController extends ClientBaseController
         $posts = ClientDiscussionPost::where('client_id',$currentUser->id)->where('clientuser_id',0)->orderBy('id','desc')->get();
         $discussionCategories = ClientDiscussionCategory::getCategoriesByClient();
         $likesCount = ClientDiscussionLike::getPostLikes();
-        return view('client.discussion.myQuestions', compact('subdomainName','posts','currentUser','discussionCategories','likesCount'));
+        $isClient = 1;
+        return view('client.discussion.myQuestions', compact('subdomainName','posts','currentUser','discussionCategories','likesCount','isClient'));
     }
 
      /**
@@ -719,14 +709,20 @@ class ClientDiscussionCategoryController extends ClientBaseController
             }
         }
         $allPosts['likesCount'] = ClientDiscussionLike::getPostLikes();
-        $allPosts['commentLikesCount'] = ClientDiscussionLike::getCommentLikes();
-        $allPosts['subcommentLikesCount'] = ClientDiscussionLike::getSubCommentLikes();
         return $allPosts;
     }
 
     protected function updateMyPost(Request $request){
         $postId = $request->get('post_id');
         $question = $request->get('update_question');
+        $solution = $request->get('updated_solution');
+        $answer1 = $request->get('updated_answer1');
+        $answer2 = $request->get('updated_answer2');
+        $answer3 = $request->get('updated_answer3');
+        $answer4 = $request->get('updated_answer4');
+        $answer = $request->get('updated_answer');
+        $isUpdatedFromDiscussion = $request->get('isUpdatedFromDiscussion');
+
         if(!empty($postId) && !empty($question)){
             $post = ClientDiscussionPost::find($postId);
             if(is_object($post)){
@@ -734,6 +730,12 @@ class ClientDiscussionCategoryController extends ClientBaseController
                 try
                 {
                     $post->body = $question;
+                    $post->answer1 = $answer1;
+                    $post->answer2 = $answer2;
+                    $post->answer3 = $answer3;
+                    $post->answer4 = $answer4;
+                    $post->answer = $answer;
+                    $post->solution = $solution;
                     $post->save();
                     DB::connection('mysql2')->commit();
                 }
@@ -743,7 +745,12 @@ class ClientDiscussionCategoryController extends ClientBaseController
                 }
             }
         }
-        return $this->getMyPosts();
+
+        if('true' == $isUpdatedFromDiscussion){
+            return $this->getPosts();
+        } else {
+            return $this->getMyPosts();
+        }
     }
 
     protected function deleteMyPost(Request $request){
@@ -753,6 +760,7 @@ class ClientDiscussionCategoryController extends ClientBaseController
             try
             {
                 $post->deleteCommantsAndSubComments();
+                ClientDiscussionLike::deletePostLikeById($post->id);
                 $post->delete();
                 DB::connection('mysql2')->commit();
             }
@@ -768,9 +776,9 @@ class ClientDiscussionCategoryController extends ClientBaseController
         if(false == InputSanitise::checkDomain($request)){
             return Redirect::to('/');
         }
-        $loginUser = Auth::guard('client')->user();
+        $currentUser = Auth::guard('client')->user();
         $postIds = [];
-        $discussionComments = ClientDiscussionComment::where('client_id',$loginUser->id)->where('clientuser_id',0)->select('Client_discussion_post_id')->get();
+        $discussionComments = ClientDiscussionComment::where('client_id',$currentUser->id)->where('clientuser_id',0)->select('Client_discussion_post_id')->get();
         if(false == $discussionComments->isEmpty()){
             foreach($discussionComments as $discussionComment){
                 $postIds[]= $discussionComment->Client_discussion_post_id;
@@ -778,12 +786,12 @@ class ClientDiscussionCategoryController extends ClientBaseController
             $postIds = array_unique($postIds);
         }
 
-        $posts = ClientDiscussionPost::where('client_id',$loginUser->id)->whereIn('id', $postIds)->orderBy('id','desc')->get();
-        $currentUser = '';
+        $posts = ClientDiscussionPost::where('client_id',$currentUser->id)->whereIn('id', $postIds)->orderBy('id','desc')->get();
+        $isClient = 1;
         $likesCount = ClientDiscussionLike::getPostLikes();
         $commentLikesCount = ClientDiscussionLike::getCommentLikes();
         $subcommentLikesCount = ClientDiscussionLike::getSubCommentLikes();
-        return view('client.discussion.myReplies', compact('subdomainName','posts','currentUser','likesCount','commentLikesCount','subcommentLikesCount'));
+        return view('client.discussion.myReplies', compact('subdomainName','posts','currentUser','isClient','likesCount','commentLikesCount','subcommentLikesCount'));
     }
 
     protected function discussionLikePost($subdomainName,Request $request){

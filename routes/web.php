@@ -1153,6 +1153,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('client/password/reset', 'ClientAuth\ResetPasswordController@reset');
   	Route::get('parentLogin', 'Client\ClientHomeController@parentLogin');
   	Route::post('parentLogin', 'Client\ClientHomeController@loginParent');
+  	Route::get('terms-and-conditions', 'Client\ClientHomeController@termsandconditions');
 
   	// online client
   	Route::get('digitaleducation', 'Client\OnlineClientController@digitaleducation');

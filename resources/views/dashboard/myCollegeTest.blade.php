@@ -223,6 +223,9 @@
     $('li#onlineTest').addClass('active');
 
     function startTest(ele){
+      var windowHeight = screen.height;
+      var windowWidth = screen.width;
+      var popup_window =window.open("", 'My Window', 'height='+windowHeight+'px !important,width='+windowWidth+'px !important');
       var paper = parseInt($(ele).data('paper'));
       var subject = parseInt($(ele).data('subject'));
       var category = parseInt($(ele).data('category'));
@@ -236,13 +239,8 @@
             })
             .done(function( msg ) {
               if( msg ){
-              var popUp = window.open("{{ url('instructions')}}", 'My Window', 'height=900px !important,width=1500px !important');
-              if (popUp == null || typeof(popUp)=='undefined') {
-                  alert('Please disable your pop-up blocker and click button "Start Test" again.');
-                }
-                else {
-                  popUp.focus();
-                }
+                popup_window.location = "{{ url('instructions')}}";
+                popup_window.focus();
               }
             });
       } else {

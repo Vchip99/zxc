@@ -61,12 +61,20 @@
                             <button type="button" data-toggle="collapse" data-target="#post{{$post->id}}" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i>
                             </button>
                             @if(is_object($currentUser))
-                              @if((0 != $post->clientuser_id && $currentUser->id == $post->clientuser_id) || (0 == $post->clientuser_id && $currentUser->id == $post->client_id && 1 == $currentUser->admin_approve))
+                              @if(1 == $currentUser->admin_approve)
                                 <button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button>
                                 <ul role="menu" class="dropdown-menu dropdown-menu-right">
                                   <li><a id="{{$post->id}}" onclick="confirmPostDelete(this);">Delete</a></li>
                                   <li><a id="{{$post->id}}" onclick="editPost(this);">Edit</a></li>
                                 </ul>
+                              @else
+                                @if(0 != $post->clientuser_id && $currentUser->id == $post->clientuser_id)
+                                  <button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button>
+                                  <ul role="menu" class="dropdown-menu dropdown-menu-right">
+                                    <li><a id="{{$post->id}}" onclick="confirmPostDelete(this);">Delete</a></li>
+                                    <li><a id="{{$post->id}}" onclick="editPost(this);">Edit</a></li>
+                                  </ul>
+                                @endif
                               @endif
                             @endif
                           </div>
@@ -156,17 +164,94 @@
                                         }
                                     });
                                   </script>
+                                @if($post->answer1 && $post->answer2 && $post->answer && $post->solution)
+                                  @if(!empty($post->answer1))
+                                  <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Option 1:<span class="red-color">*</span></label>
+                                    <div class="col-sm-3">
+                                      <input type="text" name="answer1" id="updated_answer1_{{$post->id}}" value="{{$post->answer1}}" required>
+                                    </div>
+                                  </div>
+                                  @endif
+                                  @if(!empty($post->answer2))
+                                  <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Option 2:<span class="red-color">*</span></label>
+                                    <div class="col-sm-3">
+                                      <input type="text" name="answer2" id="updated_answer2_{{$post->id}}" value="{{$post->answer2}}" required>
+                                    </div>
+                                  </div>
+                                  @endif
+                                  @if(!empty($post->answer3))
+                                  <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Option 3:</label>
+                                    <div class="col-sm-3">
+                                      <input type="text" name="answer3" id="updated_answer3_{{$post->id}}" value="{{$post->answer3}}">
+                                    </div>
+                                  </div>
+                                  @endif
+                                  @if(!empty($post->answer4))
+                                  <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Option 4:</label>
+                                    <div class="col-sm-3">
+                                      <input type="text" name="answer4" id="updated_answer4_{{$post->id}}" value="{{$post->answer4}}">
+                                    </div>
+                                  </div>
+                                  @endif
+                                  <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Right Answer:<span class="red-color">*</span></label>
+                                    <div class="col-sm-3">
+                                      <input type="number" name="answer" id="updated_answer_{{$post->id}}" min="1" max="4" step="1" value="{{$post->answer}}" pattern="[1-4]{1}">
+                                    </div>
+                                  </div>
+                                  <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Solution:<span class="red-color">*</span></label>
+                                    <div class="col-sm-9">
+                                      <textarea name="solution" id="updated_solution_{{$post->id}}" required cols="40" rows="5">{{$post->solution}}</textarea>
+                                      <script type="text/javascript">
+                                        CKEDITOR.replace( 'updated_solution_{{$post->id}}', { enterMode: CKEDITOR.ENTER_BR } );
+                                        CKEDITOR.config.width="100%";
+                                        CKEDITOR.config.height="auto";
+                                        CKEDITOR.on('dialogDefinition', function (ev) {
+                                            var dialogName = ev.data.name,
+                                                dialogDefinition = ev.data.definition;
+                                            if (dialogName == 'image') {
+                                                var onOk = dialogDefinition.onOk;
+                                                dialogDefinition.onOk = function (e) {
+                                                    var width = this.getContentElement('info', 'txtWidth');
+                                                    width.setValue('100%');//Set Default Width
+                                                    var height = this.getContentElement('info', 'txtHeight');
+                                                    height.setValue('auto');////Set Default height
+                                                    onOk && onOk.apply(this, e);
+                                                };
+                                            }
+                                        });
+                                      </script>
+                                    </div>
+                                  </div>
+                                @endif
                                 <button class="btn btn-primary" data-post_id="{{$post->id}}"  onclick="updatePost(this);">Update</button>
                                 <button type="button" class="btn btn-default" id="{{$post->id}}" onclick="canclePost(this);">Cancle</button>
                               </div>
                             <div class="border-bottom"></div>
                             <div class="comment-meta main-reply-box cmt-left-margin">
                                 <span id="like_{{$post->id}}" >
-                                  @if( isset($likesCount[$post->id]) && is_object($currentUser) && isset($likesCount[$post->id]['user_id'][$currentUser->id]))
-                                       <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
-                                       <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
+                                  @if( isset($likesCount[$post->id]) && is_object($currentUser))
+                                    @if(1 == $currentUser->admin_approve)
+                                      @if(isset($likesCount[$post->id]['user_id'][$isClient][$currentUser->id]))
+                                        <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                      @else
+                                        <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                      @endif
+                                    @else
+                                      @if(isset($likesCount[$post->id]['user_id'][$isClient][$currentUser->id]))
+                                        <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-dislike='1' class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>
+                                      @else
+                                        <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                      @endif
+                                    @endif
+                                      <span id="like1-bs3">{{count($likesCount[$post->id]['like_id'])}}</span>
                                   @else
-                                       <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-episode_id="{{$post->episode_id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
+                                       <i id="post_like_{{$post->id}}" data-post_id="{{$post->id}}" data-dislike='0' class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>
                                        <span id="like1-bs3">@if( isset($likesCount[$post->id])) {{count($likesCount[$post->id]['like_id'])}} @endif</span>
                                   @endif
                                 </span>
@@ -514,10 +599,41 @@
   function updatePost(ele){
     var postId = $(ele).data('post_id');
     var updateQuestion = CKEDITOR.instances['updatequestion_'+postId].getData();
+    if(document.getElementById('updated_solution_'+postId)){
+      var updateSolution = CKEDITOR.instances['updated_solution_'+postId].getData();
+    } else {
+      var updateSolution = '';
+    }
+    if(document.getElementById('updated_answer1_'+postId)){
+      var updatedAnswer1 = document.getElementById('updated_answer1_'+postId).value;
+    } else {
+      var updatedAnswer1 = '';
+    }
+    if(document.getElementById('updated_answer2_'+postId)){
+      var updatedAnswer2 = document.getElementById('updated_answer2_'+postId).value;
+    } else {
+      var updatedAnswer2 = '';
+    }
+    if(document.getElementById('updated_answer3_'+postId)){
+      var updatedAnswer3 = document.getElementById('updated_answer3_'+postId).value;
+    } else {
+      var updatedAnswer3 = '';
+    }
+    if(document.getElementById('updated_answer4_'+postId)){
+      var updatedAnswer4 = document.getElementById('updated_answer4_'+postId).value;
+    } else {
+      var updatedAnswer4 = '';
+    }
+    if(document.getElementById('updated_answer_'+postId)){
+      var updatedAnswer = document.getElementById('updated_answer_'+postId).value;
+    } else {
+      var updatedAnswer = '';
+    }
+    var isUpdatedFromDiscussion = 'false';
     $.ajax({
         method: "POST",
         url: "{{url('updateMyPost')}}",
-        data: {post_id:postId, update_question:updateQuestion}
+        data: {post_id:postId,update_question:updateQuestion,updated_solution:updateSolution,updated_answer1:updatedAnswer1,updated_answer2:updatedAnswer2,updated_answer3:updatedAnswer3,updated_answer4:updatedAnswer4,updated_answer:updatedAnswer,isUpdatedFromDiscussion:isUpdatedFromDiscussion}
     })
     .done(function( msg ) {
       renderPosts(msg);
@@ -558,8 +674,12 @@
         var boxDiv = document.createElement('div');
         boxDiv.className = 'box-tools';
         boxDivInnerHtml = '<button type="button" data-toggle="collapse" data-target="#post'+ obj.id +'" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i></button>';
-        if((0 != clientId && userId == obj.user_id && true == obj.is_user) || ( 0 == clientId && userId == obj.client_id && false == obj.is_user)){
-          boxDivInnerHtml += '<button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button><ul role="menu" class="dropdown-menu dropdown-menu-right"><li><a id="'+obj.id+'" onclick="confirmPostDelete(this);">Delete</a></li><li><a id="'+obj.id+'" onclick="editPost(this);">Edit</a></li></ul>'
+        if(0 == clientId){
+          boxDivInnerHtml += '<button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button><ul role="menu" class="dropdown-menu dropdown-menu-right"><li><a id="'+obj.id+'" onclick="confirmPostDelete(this);">Delete</a></li><li><a id="'+obj.id+'" onclick="editPost(this);">Edit</a></li></ul>';
+        } else {
+          if(userId == obj.user_id && true == obj.is_user){
+            boxDivInnerHtml += '<button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button><ul role="menu" class="dropdown-menu dropdown-menu-right"><li><a id="'+obj.id+'" onclick="confirmPostDelete(this);">Delete</a></li><li><a id="'+obj.id+'" onclick="editPost(this);">Edit</a></li></ul>';
+          }
         }
         boxDiv.innerHTML = boxDivInnerHtml;
         divMediaHeading.appendChild(boxDiv);
@@ -634,7 +754,7 @@
         divForm.className = 'form-group hide';
         divForm.id = 'editPostShow_'+obj.id;
 
-        divFormInnerHTML = '<textarea name="update_question" placeholder="update here" type="text" id="updatequestion_'+ obj.id +'" required>"'+ obj.body +'"</textarea>';
+        divFormInnerHTML = '<textarea name="update_question" placeholder="update here" type="text" id="updatequestion_'+ obj.id +'" required>'+ obj.body +'</textarea>';
           var formUpdateId = 'updatequestion_'+ obj.id;
           $( document ).ready(function() {
             CKEDITOR.replace( formUpdateId, { enterMode: CKEDITOR.ENTER_BR } );
@@ -655,6 +775,43 @@
                 }
             });
           });
+        if(obj.answer1 && obj.answer2 && obj.answer && obj.solution){
+          if(obj.answer1){
+            divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Option 1:<span class="red-color">*</span></label><div class="col-sm-3"><input type="text" name="answer1" id="updated_answer1_'+obj.id+'" value="'+obj.answer1+'" required></div></div>';
+          }
+          if(obj.answer2){
+            divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Option 2:<span class="red-color">*</span></label><div class="col-sm-3"><input type="text" name="answer1" id="updated_answer2_'+obj.id+'" value="'+obj.answer2+'" required></div></div>';
+          }
+          if(obj.answer3){
+            divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Option 3:</label><div class="col-sm-3"><input type="text" name="answer1" id="updated_answer3_'+obj.id+'" value="'+obj.answer3+'" required></div></div>';
+          }
+          if(obj.answer4){
+            divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Option 4:</label><div class="col-sm-3"><input type="text" name="answer1" id="updated_answer4_'+obj.id+'" value="'+obj.answer4+'" required></div></div>';
+          }
+          divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Right Answer:<span class="red-color">*</span></label><div class="col-sm-3"><input type="text" name="answer1" id="updated_answer_'+obj.id+'" value="'+obj.answer+'" required></div></div>';
+          divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Solution:<span class="red-color">*</span></label><div class="col-sm-9"><textarea name="solution" id="updated_solution_'+obj.id+'" required cols="40" rows="5">'+obj.solution+'</textarea>';
+          var formSolutionId = 'updated_solution_'+ obj.id;
+          $( document ).ready(function() {
+            CKEDITOR.replace( formSolutionId, { enterMode: CKEDITOR.ENTER_BR } );
+            CKEDITOR.config.width="100%";
+            CKEDITOR.config.height="auto";
+            CKEDITOR.on('dialogDefinition', function (ev) {
+                var dialogName = ev.data.name,
+                    dialogDefinition = ev.data.definition;
+                if (dialogName == 'image') {
+                    var onOk = dialogDefinition.onOk;
+                    dialogDefinition.onOk = function (e) {
+                        var width = this.getContentElement('info', 'txtWidth');
+                        width.setValue('100%');
+                        var height = this.getContentElement('info', 'txtHeight');
+                        height.setValue('500');
+                        onOk && onOk.apply(this, e);
+                    };
+                }
+            });
+          });
+          divFormInnerHTML += '</div></div>';
+        }
         divFormInnerHTML += '<button class="btn btn-primary" data-post_id="'+ obj.id +'"  onclick="updatePost(this);">Update</button><button class="btn btn-default" id="'+ obj.id +'" onclick="canclePost(this);">Cancle</button></div></form>';
         divForm.innerHTML = divFormInnerHTML;
         divMediaBody.appendChild(divForm);
@@ -668,7 +825,19 @@
         commentInnerHtml = '<span id="like_'+obj.id+'">';
 
           if( msg['likesCount'][obj.id] && msg['likesCount'][obj.id]['user_id'][userId]){
-            commentInnerHtml +='<i id="post_like_'+obj.id+'" data-post_id="'+obj.id+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+            if(false == msg['likesCount'][obj.id]['is_user']){
+              if(msg['likesCount'][obj.id]['user_id'][1] && msg['likesCount'][obj.id]['user_id'][1][userId]){
+                commentInnerHtml +='<i id="post_like_'+obj.id+'" data-post_id="'+obj.id+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+              } else {
+                commentInnerHtml +='<i id="post_like_'+obj.id+'" data-post_id="'+obj.id+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+              }
+            } else {
+              if(msg['likesCount'][obj.id]['user_id'][0] && msg['likesCount'][obj.id]['user_id'][0][userId]){
+                commentInnerHtml +='<i id="post_like_'+obj.id+'" data-post_id="'+obj.id+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
+              } else {
+                commentInnerHtml +='<i id="post_like_'+obj.id+'" data-post_id="'+obj.id+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
+              }
+            }
             commentInnerHtml +='<span id="like1-bs3">';
               if(Object.keys(msg['likesCount'][obj.id]['like_id']).length > 0){
                 commentInnerHtml += Object.keys(msg['likesCount'][obj.id]['like_id']).length;
@@ -736,73 +905,6 @@
           });
         }
     });
-
-  //  $(document).on("click", "i[id^=comment_like_]", function(e) {
-  //       var postId = $(this).data('post_id');
-  //       var commentId = $(this).data('comment_id');
-  //       var dislike = $(this).data('dislike');
-  //       var userId = parseInt(document.getElementById('user_id').value);
-  //       if( isNaN(userId)) {
-  //         $('#loginUserModel').modal();
-  //       } else {
-  //         $.ajax({
-  //             method: "POST",
-  //             url: "{{url('discussionLikeComment')}}",
-  //             data: {post_id:postId, comment_id:commentId, dis_like:dislike}
-  //         })
-  //         .done(function( msg ) {
-  //           if( 'false' != msg ){
-  //               var likeSpan = document.getElementById('cmt_like_'+commentId);
-  //               likeSpan.innerHTML = '';
-  //               if( 1 == dislike ){
-  //                 likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-post_id="'+postId+'" data-comment_id="'+commentId+'" data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-  //                 if(msg.length > 0){
-  //                   likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-  //                 }
-  //               } else {
-  //                 likeSpan.innerHTML +='<i id="comment_like_'+commentId+'" data-post_id="'+postId+'" data-comment_id="'+commentId+'" data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-  //                 if(msg.length > 0){
-  //                   likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-  //                 }
-  //               }
-  //         }
-  //         });
-  //       }
-  //   });
-
-  // $(document).on("click", "i[id^=sub_comment_like_]", function(e) {
-  //       var postId = $(this).data('post_id');
-  //       var commentId = $(this).data('comment_id');
-  //       var subCommentId = $(this).data('sub_comment_id');
-  //       var dislike = $(this).data('dislike');
-  //       var userId = parseInt(document.getElementById('user_id').value);
-  //       if( isNaN(userId)) {
-  //         $('#loginUserModel').modal();
-  //       } else {
-  //         $.ajax({
-  //             method: "POST",
-  //             url: "{{url('discussionLikeSubComment')}}",
-  //             data: {post_id:postId, comment_id:commentId, sub_comment_id:subCommentId, dis_like:dislike}
-  //         })
-  //         .done(function( msg ) {
-  //           if( 'false' != msg ){
-  //               var likeSpan = document.getElementById('sub_cmt_like_'+subCommentId);
-  //               likeSpan.innerHTML = '';
-  //               if( 1 == dislike ){
-  //                 likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-post_id="'+postId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="0" class="fa fa-thumbs-o-up" aria-hidden="true" data-placement="bottom" title="add like"></i>';
-  //                 if(msg.length > 0){
-  //                   likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-  //                 }
-  //               } else {
-  //                 likeSpan.innerHTML +='<i id="sub_comment_like_'+subCommentId+'" data-post_id="'+postId+'" data-comment_id="'+commentId+'" data-sub_comment_id="'+subCommentId+'"  data-dislike="1" class="fa fa-thumbs-up" aria-hidden="true" data-placement="bottom" title="remove like"></i>';
-  //                 if(msg.length > 0){
-  //                   likeSpan.innerHTML +='<span id="like1-bs3">'+ msg.length +'</span>';
-  //                 }
-  //               }
-  //         }
-  //         });
-  //       }
-  //   });
 
   $( document ).ready(function() {
       showMore();

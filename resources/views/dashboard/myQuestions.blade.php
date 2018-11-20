@@ -57,6 +57,13 @@
                             <div class="box-tools ">
                               <button type="button" data-toggle="collapse" data-target="#post{{$post->id}}" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i>
                               </button>
+                              @if(is_object($currentUser) && $currentUser->id == $post->user_id)
+                                <button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button>
+                                <ul role="menu" class="dropdown-menu dropdown-menu-right">
+                                  <li><a id="{{$post->id}}" onclick="confirmPostDelete(this);">Delete</a></li>
+                                  <li><a id="{{$post->id}}" onclick="editPost(this);">Edit</a></li>
+                                </ul>
+                              @endif
                             </div>
                           </div>
                           <div class="cmt-parent panel-collapse collapse in" id="post{{$post->id}}">
@@ -109,6 +116,100 @@
                               </div>
                             @endif
                             <br/>
+                            <div class="form-group hide" id="editPostShow_{{$post->id}}" >
+                              <textarea name="update_question" placeholder="Answer 1" type="text" id="updatequestion_{{$post->id}}" required>{!! $post->body !!}</textarea>
+                                <script type="text/javascript">
+                                  CKEDITOR.replace('updatequestion_{{$post->id}}', { enterMode: CKEDITOR.ENTER_BR } );
+                                  CKEDITOR.config.width="100%";
+                                  CKEDITOR.config.height="auto";
+                                  CKEDITOR.on('dialogDefinition', function (ev) {
+
+                                      var dialogName = ev.data.name,
+                                          dialogDefinition = ev.data.definition;
+
+                                      if (dialogName == 'image') {
+                                          var onOk = dialogDefinition.onOk;
+
+                                          dialogDefinition.onOk = function (e) {
+                                              var width = this.getContentElement('info', 'txtWidth');
+                                              width.setValue('100%');
+
+                                              var height = this.getContentElement('info', 'txtHeight');
+                                              height.setValue('auto');
+
+                                              onOk && onOk.apply(this, e);
+                                          };
+                                      }
+                                  });
+                                </script>
+                              @if($post->answer1 && $post->answer2 && $post->answer && $post->solution)
+                                @if(!empty($post->answer1))
+                                <div class="form-group row">
+                                  <label class="col-sm-3 col-form-label">Option 1:<span class="red-color">*</span></label>
+                                  <div class="col-sm-3">
+                                    <input type="text" name="answer1" id="updated_answer1_{{$post->id}}" value="{{$post->answer1}}" required>
+                                  </div>
+                                </div>
+                                @endif
+                                @if(!empty($post->answer2))
+                                <div class="form-group row">
+                                  <label class="col-sm-3 col-form-label">Option 2:<span class="red-color">*</span></label>
+                                  <div class="col-sm-3">
+                                    <input type="text" name="answer2" id="updated_answer2_{{$post->id}}" value="{{$post->answer2}}" required>
+                                  </div>
+                                </div>
+                                @endif
+                                @if(!empty($post->answer3))
+                                <div class="form-group row">
+                                  <label class="col-sm-3 col-form-label">Option 3:</label>
+                                  <div class="col-sm-3">
+                                    <input type="text" name="answer3" id="updated_answer3_{{$post->id}}" value="{{$post->answer3}}">
+                                  </div>
+                                </div>
+                                @endif
+                                @if(!empty($post->answer4))
+                                <div class="form-group row">
+                                  <label class="col-sm-3 col-form-label">Option 4:</label>
+                                  <div class="col-sm-3">
+                                    <input type="text" name="answer4" id="updated_answer4_{{$post->id}}" value="{{$post->answer4}}">
+                                  </div>
+                                </div>
+                                @endif
+                                <div class="form-group row">
+                                  <label class="col-sm-3 col-form-label">Right Answer:<span class="red-color">*</span></label>
+                                  <div class="col-sm-3">
+                                    <input type="number" name="answer" id="updated_answer_{{$post->id}}" min="1" max="4" step="1" value="{{$post->answer}}" pattern="[1-4]{1}">
+                                  </div>
+                                </div>
+                                <div class="form-group row">
+                                  <label class="col-sm-3 col-form-label">Solution:<span class="red-color">*</span></label>
+                                  <div class="col-sm-9">
+                                    <textarea name="solution" id="updated_solution_{{$post->id}}" required cols="40" rows="5">{{$post->solution}}</textarea>
+                                    <script type="text/javascript">
+                                      CKEDITOR.replace( 'updated_solution_{{$post->id}}', { enterMode: CKEDITOR.ENTER_BR } );
+                                      CKEDITOR.config.width="100%";
+                                      CKEDITOR.config.height="auto";
+                                      CKEDITOR.on('dialogDefinition', function (ev) {
+                                          var dialogName = ev.data.name,
+                                              dialogDefinition = ev.data.definition;
+                                          if (dialogName == 'image') {
+                                              var onOk = dialogDefinition.onOk;
+                                              dialogDefinition.onOk = function (e) {
+                                                  var width = this.getContentElement('info', 'txtWidth');
+                                                  width.setValue('100%');//Set Default Width
+                                                  var height = this.getContentElement('info', 'txtHeight');
+                                                  height.setValue('auto');////Set Default height
+                                                  onOk && onOk.apply(this, e);
+                                              };
+                                          }
+                                      });
+                                    </script>
+                                  </div>
+                                </div>
+                              @endif
+                              <button class="btn btn-primary" data-post_id="{{$post->id}}" style="width: 100px;" onclick="updatePost(this);">Update</button>
+                              <button type="button" class="btn btn-default" id="{{$post->id}}" onclick="canclePost(this);">Cancle</button>
+                            </div>
                             <div class="border-bottom"></div>
                             <div class="comment-meta main-reply-box cmt-left-margin">
                                 <span id="like_{{$post->id}}" >
@@ -416,6 +517,92 @@
       }
     }
 
+    function editPost(ele){
+      var id = $(ele).attr('id');
+      document.getElementById('editPostHide_'+id).classList.add("hide");
+      document.getElementById('editPostShow_'+id).classList.remove("hide");
+    }
+
+    function canclePost(ele){
+      var id = $(ele).attr('id');
+      document.getElementById('editPostHide_'+id).classList.remove("hide");
+      document.getElementById('editPostShow_'+id).classList.add("hide");
+    }
+
+    function confirmPostDelete(ele){
+      $.confirm({
+        title: 'Confirmation',
+        content: 'If you delete this post, all comments and sub comments of this post will be deleted.',
+        type: 'red',
+        typeAnimated: true,
+        buttons: {
+              Ok: {
+                  text: 'Ok',
+                  btnClass: 'btn-red',
+                  action: function(){
+                    var id = $(ele).attr('id');
+                    if( 0 < id ){
+                       $.ajax({
+                          method: "POST",
+                          url: "{{url('deletePost')}}",
+                          data: {post_id:id}
+                      })
+                      .done(function( msg ) {
+                        renderPosts(msg);
+                      });
+                    }
+                  }
+              },
+              Cancle: function () {
+              }
+          }
+        });
+    }
+
+    function updatePost(ele){
+      var postId = $(ele).data('post_id');
+      var updateQuestion = CKEDITOR.instances['updatequestion_'+postId].getData();
+      if(document.getElementById('updated_solution_'+postId)){
+        var updateSolution = CKEDITOR.instances['updated_solution_'+postId].getData();
+      } else {
+        var updateSolution = '';
+      }
+      if(document.getElementById('updated_answer1_'+postId)){
+        var updatedAnswer1 = document.getElementById('updated_answer1_'+postId).value;
+      } else {
+        var updatedAnswer1 = '';
+      }
+      if(document.getElementById('updated_answer2_'+postId)){
+        var updatedAnswer2 = document.getElementById('updated_answer2_'+postId).value;
+      } else {
+        var updatedAnswer2 = '';
+      }
+      if(document.getElementById('updated_answer3_'+postId)){
+        var updatedAnswer3 = document.getElementById('updated_answer3_'+postId).value;
+      } else {
+        var updatedAnswer3 = '';
+      }
+      if(document.getElementById('updated_answer4_'+postId)){
+        var updatedAnswer4 = document.getElementById('updated_answer4_'+postId).value;
+      } else {
+        var updatedAnswer4 = '';
+      }
+      if(document.getElementById('updated_answer_'+postId)){
+        var updatedAnswer = document.getElementById('updated_answer_'+postId).value;
+      } else {
+        var updatedAnswer = '';
+      }
+      var isUpdatedFromDiscussion = 'false';
+      $.ajax({
+          method: "POST",
+          url: "{{url('updatePost')}}",
+          data: {post_id:postId,update_question:updateQuestion,updated_solution:updateSolution,updated_answer1:updatedAnswer1,updated_answer2:updatedAnswer2,updated_answer3:updatedAnswer3,updated_answer4:updatedAnswer4,updated_answer:updatedAnswer,isUpdatedFromDiscussion:isUpdatedFromDiscussion}
+      })
+      .done(function( msg ) {
+        renderPosts(msg);
+      });
+    }
+
     function renderPosts(msg){
       var userId = parseInt(document.getElementById('user_id').value);
       if(0 > userId){
@@ -446,6 +633,9 @@
           var boxDiv = document.createElement('div');
           boxDiv.className = 'box-tools';
           boxDivInnerHtml = '<button type="button" data-toggle="collapse" data-target="#post'+ obj.id +'" aria-expanded="false" aria-controls="collapseExample" class="btn btn-box-tool clickable-btn" ><i class="fa fa-chevron-up"></i></button>';
+          if(userId == obj.user_id){
+            boxDivInnerHtml += '<button type="button" class="btn btn-box-tool toggle-dropdown" data-toggle="dropdown"><i class="fa fa-cog"></i></button><ul role="menu" class="dropdown-menu dropdown-menu-right"><li><a id="'+obj.id+'" onclick="confirmPostDelete(this);">Delete</a></li><li><a id="'+obj.id+'" onclick="editPost(this);">Edit</a></li></ul>'
+          }
           boxDiv.innerHTML = boxDivInnerHtml;
           divMediaHeading.appendChild(boxDiv);
           divMedia.appendChild(divMediaHeading);
@@ -513,6 +703,72 @@
             solutionBody.innerHTML = solutionInnerHtml;
             divMediaBody.appendChild(solutionBody);
           }
+
+          var divForm = document.createElement('div');
+          divForm.className = 'form-group hide';
+          divForm.id = 'editPostShow_'+obj.id;
+
+          divFormInnerHTML = '<textarea name="update_question" placeholder="update here" type="text" id="updatequestion_'+ obj.id +'" required>'+ obj.body +'</textarea>';
+            var formUpdateId = 'updatequestion_'+ obj.id;
+            $( document ).ready(function() {
+              CKEDITOR.replace( formUpdateId, { enterMode: CKEDITOR.ENTER_BR } );
+              CKEDITOR.config.width="100%";
+              CKEDITOR.config.height="auto";
+              CKEDITOR.on('dialogDefinition', function (ev) {
+                  var dialogName = ev.data.name,
+                      dialogDefinition = ev.data.definition;
+                  if (dialogName == 'image') {
+                      var onOk = dialogDefinition.onOk;
+                      dialogDefinition.onOk = function (e) {
+                          var width = this.getContentElement('info', 'txtWidth');
+                          width.setValue('100%');
+                          var height = this.getContentElement('info', 'txtHeight');
+                          height.setValue('500');
+                          onOk && onOk.apply(this, e);
+                      };
+                  }
+              });
+            });
+          if(obj.answer1 && obj.answer2 && obj.answer && obj.solution){
+            if(obj.answer1){
+              divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Option 1:<span class="red-color">*</span></label><div class="col-sm-3"><input type="text" name="answer1" id="updated_answer1_'+obj.id+'" value="'+obj.answer1+'" required></div></div>';
+            }
+            if(obj.answer2){
+              divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Option 2:<span class="red-color">*</span></label><div class="col-sm-3"><input type="text" name="answer1" id="updated_answer2_'+obj.id+'" value="'+obj.answer2+'" required></div></div>';
+            }
+            if(obj.answer3){
+              divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Option 3:</label><div class="col-sm-3"><input type="text" name="answer1" id="updated_answer3_'+obj.id+'" value="'+obj.answer3+'" required></div></div>';
+            }
+            if(obj.answer4){
+              divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Option 4:</label><div class="col-sm-3"><input type="text" name="answer1" id="updated_answer4_'+obj.id+'" value="'+obj.answer4+'" required></div></div>';
+            }
+            divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Right Answer:<span class="red-color">*</span></label><div class="col-sm-3"><input type="text" name="answer1" id="updated_answer_'+obj.id+'" value="'+obj.answer+'" required></div></div>';
+            divFormInnerHTML += '<div class="form-group row"><label class="col-sm-3 col-form-label">Solution:<span class="red-color">*</span></label><div class="col-sm-9"><textarea name="solution" id="updated_solution_'+obj.id+'" required cols="40" rows="5">'+obj.solution+'</textarea>';
+            var formSolutionId = 'updated_solution_'+ obj.id;
+            $( document ).ready(function() {
+              CKEDITOR.replace( formSolutionId, { enterMode: CKEDITOR.ENTER_BR } );
+              CKEDITOR.config.width="100%";
+              CKEDITOR.config.height="auto";
+              CKEDITOR.on('dialogDefinition', function (ev) {
+                  var dialogName = ev.data.name,
+                      dialogDefinition = ev.data.definition;
+                  if (dialogName == 'image') {
+                      var onOk = dialogDefinition.onOk;
+                      dialogDefinition.onOk = function (e) {
+                          var width = this.getContentElement('info', 'txtWidth');
+                          width.setValue('100%');
+                          var height = this.getContentElement('info', 'txtHeight');
+                          height.setValue('500');
+                          onOk && onOk.apply(this, e);
+                      };
+                  }
+              });
+            });
+            divFormInnerHTML += '</div></div>';
+          }
+          divFormInnerHTML += '<button class="btn btn-primary" data-post_id="'+ obj.id +'" style="width: 100px;" onclick="updatePost(this);">Update</button><button class="btn btn-default" id="'+ obj.id +'" onclick="canclePost(this);">Cancle</button></div></form>';
+          divForm.innerHTML = divFormInnerHTML;
+          divMediaBody.appendChild(divForm);
 
           var borderDiv = document.createElement('div');
           borderDiv.className = 'border-bottom';

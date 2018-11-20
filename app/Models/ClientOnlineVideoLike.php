@@ -53,7 +53,7 @@ class ClientOnlineVideoLike extends Model
 
     protected static function getLikeStatus(Request $request){
         $loginUser = Auth::guard('clientuser')->user();
-        return static::where('client_online_video_id',$request->get('video_id'))->where('client_id', $loginUser->client_id)->where('user_id' ,$loginUser->id)->get();
+        return static::where('client_online_video_id',$request->get('video_id'))->where('client_id', $loginUser->client_id)->get();
     }
 
     protected static function deleteClientOnlineVideoLikesByClientId($clientId){

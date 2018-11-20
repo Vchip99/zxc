@@ -77,6 +77,11 @@
                             <input name="login_otp" id="login_otp" type="text" class="form-control" placeholder="Enter OTP" >
                             <span class="help-block"></span>
                           </div>
+                          <div>
+                            <label>
+                              <input type="radio" name="terms_condition" checked><a href="{{ url('terms-and-conditions')}}">Accepted Terms and Condition</a>
+                            </label>
+                          </div>
                           <button type="submit" id="loginBtn" name="submit" class="btn btn-info btn-block signInEmail" title="Login" onClick="this.form.submit(); this.disabled=true;">Login</button>
                           <button title="Send Otp" id="sendSignInOtpBtn" class="btn btn-info btn-block hide signInMobile" onclick="event.preventDefault(); sendSignInOtp();" >Send OTP</button></br>
                           </br>

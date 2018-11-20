@@ -30,9 +30,9 @@ class ClientDiscussionLike extends Model
         if( false == $likes->isEmpty() ){
             foreach($likes as $like){
             	if(0 == $like->clientuser_id){
-                	$likesCount[$like->client_discussion_post_id]['user_id'][$like->client_id] = $like->client_id;
+                	$likesCount[$like->client_discussion_post_id]['user_id'][1][$like->client_id] = $like->client_id;
             	} else {
-                	$likesCount[$like->client_discussion_post_id]['user_id'][$like->clientuser_id] = $like->clientuser_id;
+                	$likesCount[$like->client_discussion_post_id]['user_id'][0][$like->clientuser_id] = $like->clientuser_id;
             	}
                 $likesCount[$like->client_discussion_post_id]['like_id'][$like->id] = $like->id;
             }
@@ -60,7 +60,7 @@ class ClientDiscussionLike extends Model
                 $likePost->delete();
                 return self::getPostLikeStatus($request);
             } else {
-                static::create(['client_discussion_post_id' => $request->get('post_id'), 'client_discussion_comment_id' => 0, 'client_discussion_sub_comment_id' =>0, 'client_id' => $clientId, 'clientuser_id' => $userId, 'clientuser_id' => $userId, 'created_by' => 1]);
+                static::create(['client_discussion_post_id' => $request->get('post_id'), 'client_discussion_comment_id' => 0, 'client_discussion_sub_comment_id' =>0, 'client_id' => $clientId, 'clientuser_id' => $userId, 'clientuser_id' => $userId, 'created_by' => 0]);
                 return self::getPostLikeStatus($request);
             }
         }
@@ -91,9 +91,9 @@ class ClientDiscussionLike extends Model
         if( false == $likes->isEmpty() ){
             foreach($likes as $like){
             	if(0 == $like->clientuser_id){
-                	$likesCount[$like->client_discussion_comment_id]['user_id'][$like->client_id] = $like->client_id;
+                	$likesCount[$like->client_discussion_comment_id]['user_id'][1][$like->client_id] = $like->client_id;
             	} else {
-                	$likesCount[$like->client_discussion_comment_id]['user_id'][$like->clientuser_id] = $like->clientuser_id;
+                	$likesCount[$like->client_discussion_comment_id]['user_id'][0][$like->clientuser_id] = $like->clientuser_id;
             	}
                 $likesCount[$like->client_discussion_comment_id]['like_id'][$like->id] = $like->id;
             }
@@ -153,9 +153,9 @@ class ClientDiscussionLike extends Model
         if( false == $likes->isEmpty() ){
             foreach($likes as $like){
             	if(0 == $like->clientuser_id){
-                	$likesCount[$like->client_discussion_sub_comment_id]['user_id'][$like->client_id] = $like->client_id;
+                	$likesCount[$like->client_discussion_sub_comment_id]['user_id'][1][$like->client_id] = $like->client_id;
             	} else {
-                	$likesCount[$like->client_discussion_sub_comment_id]['user_id'][$like->clientuser_id] = $like->clientuser_id;
+                	$likesCount[$like->client_discussion_sub_comment_id]['user_id'][0][$like->clientuser_id] = $like->clientuser_id;
             	}
                 $likesCount[$like->client_discussion_sub_comment_id]['like_id'][$like->id] = $like->id;
             }
@@ -200,4 +200,49 @@ class ClientDiscussionLike extends Model
         }
         return static::where('client_discussion_post_id',$request->get('post_id'))->where('client_discussion_comment_id',$request->get('comment_id'))->where('client_discussion_sub_comment_id',$request->get('sub_comment_id'))->where('client_id' ,$clientId)->get();
     }
+
+    protected static function deleteSubCommentLikeById($id){
+        if(Auth::guard('client')->user()){
+            $clientId = Auth::guard('client')->user()->id;
+        } else {
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+        }
+        $subComments =  static::where('client_discussion_sub_comment_id',$id)->where('client_id' ,$clientId)->get();
+        if(is_object($subComments) && false == $subComments->isEmpty()){
+            foreach($subComments as $subComment){
+                $subComment->delete();
+            }
+        }
+        return;
+    }
+    protected static function deleteCommentLikeById($id){
+        if(Auth::guard('client')->user()){
+            $clientId = Auth::guard('client')->user()->id;
+        } else {
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+        }
+        $comments =  static::where('client_discussion_comment_id',$id)->where('client_id' ,$clientId)->get();
+        if(is_object($comments) && false == $comments->isEmpty()){
+            foreach($comments as $comment){
+                $comment->delete();
+            }
+        }
+        return;
+    }
+
+    protected static function deletePostLikeById($id){
+        if(Auth::guard('client')->user()){
+            $clientId = Auth::guard('client')->user()->id;
+        } else {
+            $clientId = Auth::guard('clientuser')->user()->client_id;
+        }
+        $posts =  static::where('client_discussion_post_id',$id)->where('client_id' ,$clientId)->get();
+        if(is_object($posts) && false == $posts->isEmpty()){
+            foreach($posts as $post){
+                $post->delete();
+            }
+        }
+        return;
+    }
+
 }

@@ -86,27 +86,52 @@ class LoginController extends Controller
     }
 
     public function clientUserLogin(Request $request){
-        if($this->guard('clientuser')->attempt($this->credentials($request))){
-            // if free plan and user is not in first 10 user then dont allow to login
-            $clientUser = Auth::guard('clientuser')->user();
-            if(1 == $clientUser->client->plan_id){
-                if( 'false' == $clientUser::isInBetweenFirstTen()){
-                    $data['name'] = $clientUser->name;
-                    $data['email'] = $clientUser->email;
-                    $data['client'] = $clientUser->client->name;
-                    // send mail to client
-                    Mail::to($clientUser->client->email)->send(new ClientUnAuthorisedUser($data));
-
-                    $this->guard('clientuser')->logout();
-                    Session::flush();
-                    Session::regenerate();
-                    return 'Try after some time.';
+        // login using mobile
+        $userMobile = $request->get('mobile');
+        $loginOtp = $request->get('login_otp');
+        $email = $request->get('email');
+        $password = $request->get('password');
+        $serverOtp = Cache::get($userMobile);
+        if($userMobile && $loginOtp && !$email && !$password){
+            if($loginOtp == $serverOtp){
+                $client = Client::where('subdomain', $request->getHost())->first();
+                $clientUser = Clientuser::where('number_verified', 1)->where('phone','=', $userMobile)->whereNotNull('phone')->where('client_id', $client->id)->where('client_approve', 1)->first();
+                if(!is_object($clientUser)){
+                    return Redirect::to('/')->withErrors('User does not exists or not client approve.');
                 }
+                Auth::guard('clientuser')->login($clientUser);
+                if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
+                    Cache::forget($userMobile);
+                    Cache::forget('mobile-'.$userMobile);
+                }
+                $request->session()->regenerate();
+                return 'true';
+            } else {
+                return 'Entered wrong otp';
             }
-            $request->session()->regenerate();
-            return 'true';
         } else {
-            return 'false';
+            if($this->guard('clientuser')->attempt($this->credentials($request))){
+                // if free plan and user is not in first 10 user then dont allow to login
+                $clientUser = Auth::guard('clientuser')->user();
+                if(1 == $clientUser->client->plan_id){
+                    if( 'false' == $clientUser::isInBetweenFirstTen()){
+                        $data['name'] = $clientUser->name;
+                        $data['email'] = $clientUser->email;
+                        $data['client'] = $clientUser->client->name;
+                        // send mail to client
+                        Mail::to($clientUser->client->email)->send(new ClientUnAuthorisedUser($data));
+
+                        $this->guard('clientuser')->logout();
+                        Session::flush();
+                        Session::regenerate();
+                        return 'Try after some time.';
+                    }
+                }
+                $request->session()->regenerate();
+                return 'true';
+            } else {
+                return 'false';
+            }
         }
     }
 }
