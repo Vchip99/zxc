@@ -86,7 +86,7 @@
             <div id="loginErrorMsg" class="hide">Wrong username or password</div>
             <div>
               <label>
-                <input type="radio" name="terms_condition" checked><a href="{{ url('terms-and-conditions')}}">Accepted Terms and Condition</a>
+                <input type="radio" name="terms_condition" checked><a href="https://vchipedu.com/terms-and-conditions" target="_blank">Accepted Terms and Condition</a>
               </label>
             </div>
             <button type="button" value="login" id="loginModelBtn" name="submit" class="btn btn-info btn-block signInModelEmail" onClick="loginUser();">Login</button>

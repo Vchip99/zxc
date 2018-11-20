@@ -79,7 +79,7 @@
                           </div>
                           <div>
                             <label>
-                              <input type="radio" name="terms_condition" checked><a href="{{ url('terms-and-conditions')}}">Accepted Terms and Condition</a>
+                              <input type="radio" name="terms_condition" checked><a href="https://vchipedu.com/terms-and-conditions" target="_blank">Accepted Terms and Condition</a>
                             </label>
                           </div>
                           <button type="submit" id="loginBtn" name="submit" class="btn btn-info btn-block signInEmail" title="Login" onClick="this.form.submit(); this.disabled=true;">Login</button>
