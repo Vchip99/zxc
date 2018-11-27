@@ -20,6 +20,8 @@ class Kernel extends ConsoleKernel
         Commands\GenerateBillAndDeActivatePlan::class,
         Commands\DeActivateClientPayableSubCategory::class,
         Commands\SendOfflineDueSms::class,
+        Commands\DeleteClientEvents::class,
+        Commands\DeleteCollegeEvents::class,
     ];
 
     /**
@@ -37,6 +39,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('generatebillanddeactivateplan:cron');
         $schedule->command('deactivateclientpayablesubcategory:cron');
         $schedule->command('sendofflineduesms:cron');
+        $schedule->command('deleteclientevents:command');
+        $schedule->command('deletecollegeevents:command');
     }
 
     /**

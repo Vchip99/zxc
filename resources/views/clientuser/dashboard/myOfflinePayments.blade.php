@@ -43,6 +43,7 @@
                             <th>Batch</th>
                             <th>Date</th>
 			                      <th>Payment</th>
+                            <th>Receipt</th>
 			                    </tr>
 			                  </thead>
 			                  <tbody  id="payments">
@@ -51,24 +52,25 @@
                               $total = 0;
                             @endphp
 			                      @foreach($payments as $index => $payment)
-			                        <tr>
+			                        <tr style="overflow: auto;">
 			                          <td>{{$index + 1}}</td>
 			                          <td>{{$payment->batch->name}}</td>
                                 <td>{{date('Y-m-d',strtotime($payment->created_at))}}</td>
                                 <td>{{$payment->amount}}</td>
+                                <td><a href="{{ url('offlineReceipt')}}/{{$payment->id}}" target="_blank">Receipt</a></td>
 			                        </tr>
                               @php
                                 $total += $payment->amount;
                               @endphp
 			                      @endforeach
-                            <tr>
+                            <tr style="overflow: auto;">
                               <td colspan="2"></td>
                               <td>Total</td>
-                              <td>{{$total}}</td>
+                              <td colspan="2">{{$total}}</td>
                             </tr>
 			                    @elseif(0 == count($payments))
 			                      <tr>
-			                        <td colspan="4">No Payments.</td>
+			                        <td colspan="5">No Payments.</td>
 			                      </tr>
 			                    @endif
 			                  </tbody>
@@ -111,6 +113,11 @@
           eleAmount.innerHTML = obj.amount;
           eleTr.appendChild(eleAmount);
           total += parseInt(obj.amount);
+
+          var eleReceipt = document.createElement('td');
+          eleReceipt.innerHTML = '<a href="{{url('offlineReceipt')}}/'+obj.id+'" target="_blank">Receipt</a>';
+          eleTr.appendChild(eleReceipt);
+
           body.appendChild(eleTr);
         });
         var eleTr = document.createElement('tr');
@@ -124,6 +131,7 @@
 
         var eleAmount = document.createElement('td');
         eleAmount.innerHTML = total;
+        eleAmount.setAttribute('colspan', '2');
         eleTr.appendChild(eleAmount);
 
         body.appendChild(eleTr);
@@ -131,7 +139,7 @@
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = 'No result!';
-        eleIndex.setAttribute('colspan', '4');
+        eleIndex.setAttribute('colspan', '5');
         eleTr.appendChild(eleIndex);
         body.appendChild(eleTr);
       }

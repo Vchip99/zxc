@@ -54,6 +54,8 @@ use App\Models\ClientDiscussionPost;
 use App\Models\ClientDiscussionComment;
 use App\Models\ClientDiscussionSubComment;
 use App\Models\ClientDiscussionLike;
+use App\Models\ClientGalleryType;
+use App\Models\ClientGalleryImage;
 use DateTime;
 
 class ClientUserController extends BaseController
@@ -376,8 +378,8 @@ class ClientUserController extends BaseController
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
-        $assignments = ClientAssignmentQuestion::where('client_id', $clientId)->select('client_assignment_questions.*')->paginate();
-        $subjects = ClientAssignmentSubject::where('client_id', $clientId)->get();
+        $assignments = ClientAssignmentQuestion::where('client_id', $clientId)->where('question', '!=', '')->select('client_assignment_questions.*')->paginate();
+        $subjects = ClientAssignmentSubject::getAssignmentSubjectsAssociatedWithAssignmentByClientId($clientId);
         if($clientUser->unchecked_assignments > 0){
             DB::connection('mysql2')->beginTransaction();
             try
@@ -394,6 +396,32 @@ class ClientUserController extends BaseController
         return view('clientuser.dashboard.myAssignmentList', compact('assignments', 'subjects'));
     }
 
+    protected function myAssignDocuments($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
+        $assignments = ClientAssignmentQuestion::where('client_id', $clientId)->where('question','')->select('client_assignment_questions.*')->paginate();
+        $subjects = ClientAssignmentSubject::getAssignmentSubjectsAssociatedWithDocumentByClientId($clientId);
+        if($clientUser->unchecked_assignments > 0){
+            DB::connection('mysql2')->beginTransaction();
+            try
+            {
+                $clientUser->unchecked_assignments = 0;
+                $clientUser->save();
+                DB::connection('mysql2')->commit();
+            }
+            catch(\Exception $e)
+            {
+                DB::connection('mysql2')->rollback();
+            }
+        }
+        return view('clientuser.dashboard.myAssignDocumentList', compact('assignments', 'subjects'));
+    }
+
     protected function getAssignmentSubjectsByCourse(Request $request){
         return ClientAssignmentSubject::getAssignmentSubjectsByCourse($request->institute_course_id);
     }
@@ -401,6 +429,11 @@ class ClientUserController extends BaseController
     protected function getAssignmentTopicsBySubject($subdomainName, Request $request){
         $subjectId = $request->subject_id;
         return ClientAssignmentTopic::getAssignmentTopicsBySubject($subjectId);
+    }
+
+    protected function getAssignmentTopicsForDocumentsBySubjectForUser($subdomainName, Request $request){
+        $subjectId = $request->subject_id;
+        return ClientAssignmentTopic::getAssignmentTopicsForDocumentsBySubjectForUser($subjectId);
     }
 
     protected function getAssignments($subdomainName, Request $request){
@@ -420,11 +453,39 @@ class ClientUserController extends BaseController
         }
         $assignments = $query->get();
         if(is_object($assignments) and false == $assignments->isEmpty()){
-            foreach($assignments as $assignment){
-                $results[$assignment->id]['id'] = $assignment->id;
-                $results[$assignment->id]['question'] = mb_strimwidth($assignment->question, 0, 400, "...");
-                $results[$assignment->id]['subject'] = $assignment->subject->name;
-                $results[$assignment->id]['topic'] = $assignment->topic->name;
+            foreach($assignments as $index => $assignment){
+                $results[$index]['id'] = $assignment->id;
+                $results[$index]['question'] = mb_strimwidth($assignment->question, 0, 400, "...");
+                $results[$index]['subject'] = $assignment->subject->name;
+                $results[$index]['topic'] = $assignment->topic->name;
+            }
+        }
+        return $results;
+    }
+
+    protected function getAssignDocuments($subdomainName, Request $request){
+        $results = [];
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $subject = $request->subject;
+        $topic = $request->topic;
+
+        $query = ClientAssignmentQuestion::where('client_id', $clientId)->where('question','');
+        if($subject > 0){
+            $query->where('client_assignment_subject_id', $subject);
+        }
+        if($topic > 0){
+            $query->where('client_assignment_topic_id', $topic);
+        }
+        $assignments = $query->get();
+        if(is_object($assignments) and false == $assignments->isEmpty()){
+            foreach($assignments as $index => $assignment){
+                $results[$index]['id'] = $assignment->id;
+                $results[$index]['attached_link_str'] = $assignment->attached_link;
+                $results[$index]['attached_link'] = basename($assignment->attached_link);
+                $results[$index]['subject'] = $assignment->subject->name;
+                $results[$index]['topic'] = $assignment->topic->name;
             }
         }
         return $results;
@@ -1070,9 +1131,16 @@ class ClientUserController extends BaseController
         $clientUserId = $clientUser->id;
         $clientId = $clientUser->client_id;
         $batchIds = [];
-        $messages = [];
+        $groupMessages = [];
+        $individualMessages = [];
         if(!empty($clientUser->batch_ids)){
             $batchIds = explode(',', $clientUser->batch_ids);
+            $batches = ClientBatch::getBatchesByClientIdByBatchIds($clientId,$batchIds);
+            if(is_object($batches) && false == $batches->isEmpty()){
+                foreach($batches as $batche){
+                    $batchNames[$batche->id] = $batche->name;
+                }
+            }
         } else {
             $batchIds = [0];
         }
@@ -1081,8 +1149,41 @@ class ClientUserController extends BaseController
             return Redirect::away($clientResult);
         }
         if(count($batchIds) > 0){
-            $messages = ClientMessage::getMessagesByBatchIdsByClientId($batchIds,$clientId);
+            $groupMessages = ClientMessage::getMessagesByBatchIdsByClientId($batchIds,$clientId);
+            if(is_object($groupMessages) && false == $groupMessages->isEmpty()){
+                foreach($groupMessages as $groupMessage){
+                    $myMessages[date('Y-m-d h:i:s a', strtotime($groupMessage->updated_at))] = [
+                        'id' => $groupMessage->id,
+                        'message' => $groupMessage->message,
+                        'photo' => $groupMessage->photo,
+                        'date' => date('Y-m-d h:i:s a', strtotime($groupMessage->updated_at)),
+                        'is_group_message' => 1
+                    ];
+                }
+            }
+            $individualMessages = ClientIndividualMessage::getIndividualMessagesByClientIdByBatchIds($clientId,$batchIds);
+            if(is_object($individualMessages) && false == $individualMessages->isEmpty()){
+                foreach($individualMessages as $individualMessage){
+                    if(!empty($individualMessage->messages)){
+                        $allMessages = explode(',', $individualMessage->messages);
+                        if(count($allMessages) > 0){
+                            foreach($allMessages as $userMessages){
+                                $arrMsg = explode(':', $userMessages);
+                                if($clientUserId == $arrMsg[0]){
+                                    $myMessages[date('Y-m-d h:i:s a',strtotime($individualMessage->updated_at))] = [
+                                        'id' => $individualMessage->id,
+                                        'message' => $arrMsg[1],
+                                        'batch' => $batchNames[$individualMessage->client_batch_id],
+                                        'date' => date('Y-m-d h:i:s a',strtotime($individualMessage->updated_at)),
+                                        'is_group_message' => 0];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+        krsort($myMessages);
         if($clientUser->unread_messages > 0){
             DB::connection('mysql2')->beginTransaction();
             try
@@ -1096,7 +1197,31 @@ class ClientUserController extends BaseController
                 DB::connection('mysql2')->rollback();
             }
         }
-        return view('clientuser.dashboard.myMessage', compact('messages'));
+        return view('clientuser.dashboard.myMessage', compact('myMessages'));
+    }
+
+    protected function myEvent($subdomainName,Request $request){
+        $clientUser = Auth::guard('clientuser')->user();
+        $clientUserId = $clientUser->id;
+        $clientId = $clientUser->client_id;
+        $batchIds = [];
+        $events = [];
+        $individualMessages = [];
+        if(!empty($clientUser->batch_ids)){
+            $batchIds = explode(',', $clientUser->batch_ids);
+        } else {
+            $batchIds = [0];
+        }
+
+        $clientResult = InputSanitise::checkUserClient($request, $clientUser);
+        if( !is_object($clientResult)){
+            return Redirect::away($clientResult);
+        }
+        if(count($batchIds) > 0){
+            $events = ClientMessage::getEventsByBatchIdsByClientId($batchIds,$clientId);
+        }
+
+        return view('clientuser.dashboard.myEvent', compact('events'));
     }
 
     protected function addEmail($subdomainName,Request $request){
@@ -1268,6 +1393,7 @@ class ClientUserController extends BaseController
         if(is_object($payments) && false == $payments->isEmpty()){
             foreach($payments as $payment){
                 $result[] = [
+                    'id' => $payment->id,
                     'batch' => $payment->batch->name,
                     'date' => date('Y-m-d',strtotime($payment->created_at)),
                     'amount' => $payment->amount,
@@ -1423,7 +1549,9 @@ class ClientUserController extends BaseController
                         'topic' => $exam->topic,
                         'from' => $exam->from_time,
                         'to' => $exam->to_time,
-                        'batch' => $allBatches[$exam->client_batch_id]
+                        'batch' => $allBatches[$exam->client_batch_id],
+                        'marks' => $exam->marks,
+                        'exam_type' => $exam->exam_type
                     ];
                 }
             }
@@ -1444,7 +1572,9 @@ class ClientUserController extends BaseController
                             'topic' => $exam->topic,
                             'from' => $exam->from_time,
                             'to' => $exam->to_time,
-                            'batch' => $allBatches[$exam->client_batch_id]
+                            'batch' => $allBatches[$exam->client_batch_id],
+                            'marks' => $exam->marks,
+                            'exam_type' => $exam->exam_type
                         ];
                     }
                 }
@@ -1689,5 +1819,25 @@ class ClientUserController extends BaseController
         $commentLikesCount = ClientDiscussionLike::getCommentLikes();
         $subcommentLikesCount = ClientDiscussionLike::getSubCommentLikes();
         return view('client.discussion.myReplies', compact('subdomainName','posts','currentUser','isClient','likesCount','commentLikesCount','subcommentLikesCount'));
+    }
+
+    protected function myGallery(Request $request){
+        $currentUser = Auth::guard('clientuser')->user();
+        if(!is_object($currentUser)){
+            return Redirect::to('/');
+        }
+        $galleryImages = [];
+        $clientGalleryTypes = [];
+        $clientGalleryImages = ClientGalleryImage::where('client_id', $currentUser->client_id)->get();
+        if(is_object($clientGalleryImages) && false == $clientGalleryImages->isEmpty()){
+            foreach($clientGalleryImages as $clientGalleryImage){
+                $galleryImages[$clientGalleryImage->client_gallery_type_id] = $clientGalleryImage->images;
+            }
+            if(count($galleryImages) > 0){
+                $galleryTypeIds = array_keys($galleryImages);
+                $clientGalleryTypes = ClientGalleryType::find(array_unique($galleryTypeIds));
+            }
+        }
+        return view('clientuser.dashboard.myGallery', compact('galleryImages','clientGalleryTypes'));
     }
 }

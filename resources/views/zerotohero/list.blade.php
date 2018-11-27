@@ -37,7 +37,7 @@
       <tbody>
         @if(count($heros) > 0)
           @foreach($heros as $index => $hero)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $heros->firstItem()}}</th>
             <td>{{$hero->name}}</td>
             <td>{{$hero->designation->name}}</td>

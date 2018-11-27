@@ -639,7 +639,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('/college/{college}/myTimeTable', 'AccountController@myTimeTable');
 	Route::get('/college/{college}/manageSettings', 'AccountController@manageSettings');
 	Route::post('changeCollegeSetting', 'AccountController@changeCollegeSetting');
-
+	Route::get('/college/{college}/myMessage', 'AccountController@myMessage');
+	Route::get('/college/{college}/myEvent', 'AccountController@myEvent');
 
 	Route::get('/college/{college}/manageCollegePurchaseSms', 'AccountController@manageCollegePurchaseSms');
 	Route::get('/college/{college}/createCollegePurchaseSms', 'AccountController@createCollegePurchaseSms');
@@ -1046,18 +1047,10 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getCollegeSubjectsByDeptIdByYear', 'CollegeModule\Academic\CollegeSubjectController@getCollegeSubjectsByDeptIdByYear');
 
 	// College Offline Paper
-	Route::get('/college/{college}/manageCollegeOfflinePaper', 'CollegeModule\Academic\CollegeOfflinePaperController@show');
-	Route::get('/college/{college}/createCollegeOfflinePaper', 'CollegeModule\Academic\CollegeOfflinePaperController@create');
-	Route::post('/college/{college}/createCollegeOfflinePaper', 'CollegeModule\Academic\CollegeOfflinePaperController@store');
-	Route::get('/college/{college}/collegeOfflinePaper/{id}/edit', 'CollegeModule\Academic\CollegeOfflinePaperController@edit');
-	Route::put('/college/{college}/updateCollegeOfflinePaper', 'CollegeModule\Academic\CollegeOfflinePaperController@update');
-	Route::post('isCollegeOfflinePaperExist', 'CollegeModule\Academic\CollegeOfflinePaperController@isCollegeOfflinePaperExist');
 	Route::get('/college/{college}/manageCollegeOfflineExam', 'CollegeModule\Academic\CollegeOfflinePaperController@manageCollegeOfflineExam');
-	Route::post('getCollegeOfflinePapersBySubjectId', 'CollegeModule\Academic\CollegeOfflinePaperController@getCollegeOfflinePapersBySubjectId');
-	Route::post('getCollegeStudentsAndMarksBySubjectIdByPaperId', 'CollegeModule\Academic\CollegeOfflinePaperController@getCollegeStudentsAndMarksBySubjectIdByPaperId');
+	Route::post('getCollegeOfflineExamTopicBySubjectIdByDeptByYear', 'CollegeModule\Academic\CollegeOfflinePaperController@getCollegeOfflineExamTopicBySubjectIdByDeptByYear');
+	Route::post('getCollegeStudentsAndMarksBySubjectIdByDeptByYearByExamId', 'CollegeModule\Academic\CollegeOfflinePaperController@getCollegeStudentsAndMarksBySubjectIdByDeptByYearByExamId');
 	Route::post('/college/{college}/assignCollegeOfflinePaperMarks', 'CollegeModule\Academic\CollegeOfflinePaperController@assignCollegeOfflinePaperMarks');
-	Route::delete('/college/{college}/deleteCollegeOfflinePaper', 'CollegeModule\Academic\CollegeOfflinePaperController@delete');
-	Route::post('getCollegeOfflinePapersByDeptIdByYear', 'CollegeModule\Academic\CollegeOfflinePaperController@getCollegeOfflinePapersByDeptIdByYear');
 
 	// college module college category
 	Route::get('/college/{college}/manageCollegeCategory', 'CollegeModule\Academic\CollegeCategoryController@show');
@@ -1127,6 +1120,41 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('/college/{college}/updateCollegeHoliday', 'CollegeModule\Academic\CollegeHolidayController@update');
 	Route::delete('/college/{college}/deleteCollegeHoliday', 'CollegeModule\Academic\CollegeHolidayController@delete');
 	Route::post('isCollegeHolidayExist', 'CollegeModule\Academic\CollegeHolidayController@isCollegeHolidayExist');
+
+	// college gallery type
+	Route::get('/college/{college}/manageCollegeGalleryType', 'CollegeModule\Academic\CollegeGalleryTypeController@show');
+	Route::get('/college/{college}/createCollegeGalleryType', 'CollegeModule\Academic\CollegeGalleryTypeController@create');
+	Route::post('/college/{college}/createCollegeGalleryType', 'CollegeModule\Academic\CollegeGalleryTypeController@store');
+	Route::get('/college/{college}/collegeGalleryType/{id}/edit', 'CollegeModule\Academic\CollegeGalleryTypeController@edit');
+	Route::put('/college/{college}/updateCollegeGalleryType', 'CollegeModule\Academic\CollegeGalleryTypeController@update');
+	Route::delete('/college/{college}/deleteCollegeGalleryType', 'CollegeModule\Academic\CollegeGalleryTypeController@delete');
+	Route::post('isCollegeGalleryTypeExist', 'CollegeModule\Academic\CollegeGalleryTypeController@isCollegeGalleryTypeExist');
+
+	// college gallery image
+	Route::get('/college/{college}/manageCollegeGalleryImage', 'CollegeModule\Academic\CollegeGalleryImageController@show');
+	Route::get('/college/{college}/createCollegeGalleryImage', 'CollegeModule\Academic\CollegeGalleryImageController@create');
+	Route::post('/college/{college}/createCollegeGalleryImage', 'CollegeModule\Academic\CollegeGalleryImageController@store');
+	Route::get('/college/{college}/collegeGalleryImage/{id}/edit', 'CollegeModule\Academic\CollegeGalleryImageController@edit');
+	Route::delete('/college/{college}/deleteCollegeGalleryImage', 'CollegeModule\Academic\CollegeGalleryImageController@delete');
+	Route::get('/college/{college}/manageCollegeGallery', 'CollegeModule\Academic\CollegeGalleryImageController@gallery');
+
+	// college message
+	Route::get('/college/{college}/manageMessage', 'CollegeModule\Academic\CollegeMessageController@show');
+	Route::get('/college/{college}/createMessage', 'CollegeModule\Academic\CollegeMessageController@create');
+	Route::post('/college/{college}/createMessage', 'CollegeModule\Academic\CollegeMessageController@store');
+	Route::get('/college/{college}/message/{id}/edit', 'CollegeModule\Academic\CollegeMessageController@edit');
+	Route::put('/college/{college}/updateMessage', 'CollegeModule\Academic\CollegeMessageController@update');
+	Route::delete('/college/{college}/deleteMessage', 'CollegeModule\Academic\CollegeMessageController@delete');
+
+	// college individual message
+	Route::get('/college/{college}/manageIndividualMessage', 'CollegeModule\Academic\CollegeIndividualMessageController@show');
+	Route::get('/college/{college}/createIndividualMessage', 'CollegeModule\Academic\CollegeIndividualMessageController@create');
+	Route::post('/college/{college}/createIndividualMessage', 'CollegeModule\Academic\CollegeIndividualMessageController@store');
+	Route::get('/college/{college}/individualMessage/{id}/edit', 'CollegeModule\Academic\CollegeIndividualMessageController@edit');
+	Route::delete('/college/{college}/deleteIndividualMessage', 'CollegeModule\Academic\CollegeIndividualMessageController@delete');
+	Route::post('getCollegeStudentsByDeptIdByYear', 'CollegeModule\Academic\CollegeIndividualMessageController@getCollegeStudentsByDeptIdByYear');
+	Route::post('getIndividualMessagesByDate', 'CollegeModule\Academic\CollegeIndividualMessageController@getIndividualMessagesByDate');
+
 });
 
 Route::group(['domain' => '{client}.localvchip.com'], function () {
@@ -1153,7 +1181,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('client/password/reset', 'ClientAuth\ResetPasswordController@reset');
   	Route::get('parentLogin', 'Client\ClientHomeController@parentLogin');
   	Route::post('parentLogin', 'Client\ClientHomeController@loginParent');
-  	Route::get('terms-and-conditions', 'Client\ClientHomeController@termsandconditions');
+  	Route::get('gallery', 'Client\ClientHomeController@gallery');
 
   	// online client
   	Route::get('digitaleducation', 'Client\OnlineClientController@digitaleducation');
@@ -1200,6 +1228,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('addEmailUser', 'Client\ClientUsersInfoController@addEmailUser');
 	Route::post('uploadClientUsers', 'Client\ClientUsersInfoController@uploadClientUsers');
 	Route::post('changeClientSetting', 'Client\ClientUsersInfoController@changeClientSetting');
+	Route::post('getStudentsByBatchId', 'Client\ClientUsersInfoController@getStudentsByBatchId');
 
   	// register client user
   	Route::post('/register', 'ClientuserAuth\RegisterController@register');
@@ -1238,7 +1267,8 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('clientPurchaseSms', 'Client\ClientBaseController@clientPurchaseSms');
 	Route::get('thankyouClientPurchaseSms', 'Client\ClientBaseController@thankyouClientPurchaseSms');
 	Route::post('webhookClientPurchaseSms', 'Client\ClientBaseController@webhookClientPurchaseSms');
-
+	Route::get('onlineReceipt/{type}/{id}', 'Client\ClientBaseController@onlineReceiptShow');
+	Route::get('offlineReceipt/{id}', 'Client\ClientBaseController@offlineReceipt');
 
   	// category
   	Route::get('manageOnlineCategory', 'Client\OnlineCourse\ClientOnlineCategoryController@show');
@@ -1412,9 +1442,11 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('myNotifications', 'Client\ClientUserController@myNotifications');
   	Route::post('showClientMessages', 'Client\ClientUserController@clientMessages');
   	Route::get('myAssignments', 'Client\ClientUserController@myAssignments');
+  	Route::get('myAssignDocuments', 'Client\ClientUserController@myAssignDocuments');
   	Route::post('getAssignmentSubjectsByCourseForUser', 'Client\ClientUserController@getAssignmentSubjectsByCourse');
   	Route::post('getAssignmentTopicsBySubjectForUser', 'Client\ClientUserController@getAssignmentTopicsBySubject');
   	Route::post('getAssignments', 'Client\ClientUserController@getAssignments');
+  	Route::post('getAssignDocuments', 'Client\ClientUserController@getAssignDocuments');
   	Route::get('doAssignment/{id}', 'Client\ClientUserController@doAssignment');
   	Route::post('createAssignmentAnswer', 'Client\ClientUserController@createAssignmentAnswer');
   	Route::get('purchaseCourse/{courseId}', 'Client\ClientUserController@purchaseCourse');
@@ -1448,6 +1480,8 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('myDiscussion', 'Client\ClientUserController@myDiscussion');
   	Route::get('myQuestions', 'Client\ClientUserController@myQuestions');
   	Route::get('myReplies', 'Client\ClientUserController@myReplies');
+  	Route::get('myGallery', 'Client\ClientUserController@myGallery');
+  	Route::get('myEvent', 'Client\ClientUserController@myEvent');
 
 
 	/// client user Post Comment
@@ -1539,16 +1573,10 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('getBatchUsersByBatchId', 'Client\ClientBatchController@getBatchUsersByBatchId');
 	Route::post('getBatchStudentsByBatchId', 'Client\ClientBatchController@getBatchStudentsByBatchId');
 
-	// Offline Paper
-	Route::get('manageOfflinePaper', 'Client\ClientOfflinePaperController@show');
-	Route::get('createOfflinePaper', 'Client\ClientOfflinePaperController@create');
-	Route::post('createOfflinePaper', 'Client\ClientOfflinePaperController@store');
-	Route::get('offlinePaper/{id}/edit', 'Client\ClientOfflinePaperController@edit');
-	Route::put('updateOfflinePaper', 'Client\ClientOfflinePaperController@update');
-	Route::delete('deleteOfflinePaper', 'Client\ClientOfflinePaperController@delete');
-	Route::post('getOfflinePapersByBatchId', 'Client\ClientOfflinePaperController@getOfflinePapersByBatchId');
-	Route::get('manageOfflineExam', 'Client\ClientOfflinePaperController@manageOfflineExam');
-	Route::post('getBatchStudentsAndMarksByBatchIdByPaperId', 'Client\ClientOfflinePaperController@getBatchStudentsAndMarksByBatchIdByPaperId');
+	// // Offline Paper
+	Route::post('getClientExamsByBatchId', 'Client\ClientOfflinePaperController@getClientExamsByBatchId');
+	Route::get('manageExamMarks', 'Client\ClientOfflinePaperController@manageExamMarks');
+	Route::post('getBatchStudentsAndMarksByBatchIdByExamId', 'Client\ClientOfflinePaperController@getBatchStudentsAndMarksByBatchIdByExamId');
 	Route::post('assignOfflinePaperMarks', 'Client\ClientOfflinePaperController@assignOfflinePaperMarks');
 
 	// client message
@@ -1650,4 +1678,25 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('discussionLikePost', 'Client\ClientDiscussionCategoryController@discussionLikePost');
 	Route::post('discussionLikeComment', 'Client\ClientDiscussionCategoryController@discussionLikeComment');
 	Route::post('discussionLikeSubComment', 'Client\ClientDiscussionCategoryController@discussionLikeSubComment');
+
+	// client receipt
+	Route::get('manageReceipt', 'Client\ClientReceiptController@show');
+	Route::post('createReceipt', 'Client\ClientReceiptController@store');
+	Route::put('updateReceipt', 'Client\ClientReceiptController@update');
+
+	// client gallery type
+	Route::get('manageGalleryTypes', 'Client\ClientGalleryTypeController@show');
+	Route::get('createClientGalleryType', 'Client\ClientGalleryTypeController@create');
+	Route::post('createClientGalleryType', 'Client\ClientGalleryTypeController@store');
+	Route::get('galleryType/{id}/edit', 'Client\ClientGalleryTypeController@edit');
+	Route::put('updateClientGalleryType', 'Client\ClientGalleryTypeController@update');
+	Route::delete('deleteGalleryType', 'Client\ClientGalleryTypeController@delete');
+
+	// client gallery image
+	Route::get('manageGalleryImages', 'Client\ClientGalleryImageController@show');
+	Route::get('createClientGalleryImage', 'Client\ClientGalleryImageController@create');
+	Route::post('createClientGalleryImage', 'Client\ClientGalleryImageController@store');
+	Route::get('galleryImage/{id}/edit', 'Client\ClientGalleryImageController@edit');
+	Route::put('updateClientGalleryImage', 'Client\ClientGalleryImageController@update');
+	Route::delete('deleteGalleryImage', 'Client\ClientGalleryImageController@delete');
 });

@@ -36,7 +36,7 @@
       <tbody>
         @if(count($testCategories) > 0)
           @foreach($testCategories as $index => $testCategory)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + 1}}</th>
             @if(in_array($testCategory->id, $isPurchasedSubCategories))
               <td>{{$testCategory->name}}*</td>

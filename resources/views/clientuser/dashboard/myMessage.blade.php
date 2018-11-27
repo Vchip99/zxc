@@ -32,18 +32,30 @@
             My Messages
           </div>
           <div class="panel-body">
-            @if(count($messages) > 0)
-              @foreach($messages as $message)
-                @if(!empty($message->photo))
-                  <div class="form-group row">
-                    <div class="col-md-3">
-                      <img class="img-responsive" src="{{$message->photo}}" alt="">
+            @if(count($myMessages) > 0)
+              @foreach($myMessages as $message)
+                @if(1 == $message['is_group_message'])
+                  @if(!empty($message['photo']))
+                    <div class="form-group row">
+                      <div class="col-md-3">
+                        <img class="img-responsive" src="{{$message['photo']}}" alt="message_img" style="max-height: 300px;width: 100%">
+                      </div>
+                      <div class="col-md-9">
+                        <b>{{$message['date']}}[Group]</b> @ {{$message['message']}}
+                      </div>
                     </div>
-                    <div class="col-md-9"><b>{{date('Y-m-d h:i:s a', strtotime($message->updated_at))}}</b> @ {{$message->message}}</div>
-                  </div>
+                  @else
+                    <div class="form-group row">
+                      <div class="col-md-12">
+                        <b>{{$message['date']}}[Group]</b> @ {{$message['message']}}
+                      </div>
+                    </div>
+                  @endif
                 @else
-                  <div class="form-group row">
-                    <div class=""><b>{{date('Y-m-d h:i:s a', strtotime($message->updated_at))}}</b> @ {{$message->message}}</div>
+                  <div class="form-group row divStyle">
+                    <div class="col-md-12">
+                      <b>{{$message['date']}}-[{{$message['batch']}}][Individual]</b> @ {{$message['message']}}
+                    </div>
                   </div>
                 @endif
               @endforeach

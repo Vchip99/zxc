@@ -35,7 +35,7 @@
       <tbody>
         @if(count($advertisementPages) > 0)
           @foreach($advertisementPages as $index => $advertisementPage)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $advertisementPages->firstItem()}}</th>
             <td>{{$advertisementPage->name}}</td>
             <td>

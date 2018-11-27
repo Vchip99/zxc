@@ -74,7 +74,7 @@
       <tbody id="mobile_client_messages">
         @if(count($notifications) > 0)
           @foreach($notifications as $index => $notification)
-              <tr>
+              <tr style="overflow: auto;">
                 <td>{!! $notification->message !!}
                 </td>
                 <td>@if(in_array($notification->id, $readNotificationIds)) <i class="fa fa-envelope-open"></i> @else <i class="fa fa-envelope"></i> @endif</td>

@@ -15,6 +15,19 @@
       <div class="top mrgn_40_btm">
         <div class="container">
           <div class="row">
+            <div class="col-md-3">
+              <div style="margin-bottom: 10px">
+                  <select class="form-control" name="batch" id="batch" onChange="searchBatchUsers(this.value);">
+                      <option value="">Select Batch</option>
+                      <option value="All">All</option>
+                      @if(count($batches) > 0)
+                          @foreach($batches as $batch)
+                              <option value="{{$batch->id}}">{{$batch->name}}</option>
+                          @endforeach
+                      @endif
+                  </select>
+              </div>
+            </div>
             <div class="col-md-3 mrgn_10_btm" id="student">
               <select class="form-control" id="selected_student" name="student" onChange="showResult();">
                 <option value="0"> Select User </option>
@@ -28,8 +41,9 @@
                   @endforeach
                 @endif
               </select>
-              </select>
             </div>
+            <a href="{{ url('userTestResults')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title=" Test Result"><i class="fa fa-files-o"></i></a>&nbsp;
+            <a href="{{ url('userCourses')}}" class="btn " style="border-radius: 0px !important;border: 1px solid black;" title="Courses"><i class="fa fa-dashboard"></i></a>
           </div>
         </div>
       </div>
@@ -53,7 +67,7 @@
                   <tbody id="course-result">
                     @if(is_object($selectedStudent) && count($courses) > 0)
                       @foreach($courses as $index => $course)
-                        <tr class="">
+                        <tr style="overflow: auto;">
                           <td>{{ $index + 1 }}</td>
                           <td>{{$course->name}}</td>
                           @if(!empty($course->grade))
@@ -128,21 +142,19 @@
         }
     });
   }
-  function showStudents(){
-    var courseId = document.getElementById('course').value;
-    document.getElementById('selected_student').value = 0;
-    document.getElementById('course-result').innerHTML = '';
-    if(courseId > 0){
+
+  function searchBatchUsers(batchId){
+    if(batchId){
       $.ajax({
         method: "POST",
-        url: "{{url('searchUsers')}}",
-        data:{course_id:courseId}
+        url: "{{url('getStudentsByBatchId')}}",
+        data:{batch_id:batchId}
       })
       .done(function( msg ) {
         select = document.getElementById('selected_student');
         select.innerHTML = '';
         var opt = document.createElement('option');
-        opt.value = '0';
+        opt.value = '';
         opt.innerHTML = 'Select User';
         select.appendChild(opt);
         if( 0 < msg['users'].length){

@@ -108,8 +108,8 @@
       <div class="modal-body">
         <div class="modal-data">
             <div class="form-group" style="color: white;">
-              <input type="radio" name="signin_type" value="email" checked onClick="toggleModelSignIn(this.value);">Email-id
-              <input type="radio" name="signin_type" value="mobile" onClick="toggleModelSignIn(this.value);">Mobile
+              <input type="radio" name="signin_model_type" value="email" checked onClick="toggleModelSignIn(this.value);">Email-id
+              <input type="radio" name="signin_model_type" value="mobile" onClick="toggleModelSignIn(this.value);">Mobile
             </div>
             <div class="form-group">
               <input id="useremail" name="email" type="email" class="form-control signInModelEmail" placeholder="vchip@gmail.com" autocomplete="off" required>

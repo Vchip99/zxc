@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\CollegeUserAttendance;
-use App\Models\CollegeOfflinePaper;
 use App\Models\CollegeOfflinePaperMarks;
 use App\Models\AssignmentTopic;
 use App\Models\AssignmentQuestion;
@@ -274,8 +273,6 @@ class CollegeSubject extends Model
             foreach($subjects as $subject){
                 // delete attendance
                 CollegeUserAttendance::deleteAttendanceByUserId($userId);
-                // delete offline paper
-                CollegeOfflinePaper::deleteCollegeOfflinePapersByUserId($userId);
                 // delete offline paper marks
                 CollegeOfflinePaperMarks::deleteCollegeOfflinePaperMarksByUserId($userId);
                 // delete assignment topic

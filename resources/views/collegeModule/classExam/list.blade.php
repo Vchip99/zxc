@@ -28,9 +28,11 @@
         <tr>
           <th>#</th>
           <th>Subject </th>
+          <th>Type </th>
           <th>Departments </th>
           <th>Years </th>
           <th>Topic </th>
+          <th>Mark </th>
           <th>Date </th>
           <th>From Time </th>
           <th>To Time </th>
@@ -44,6 +46,13 @@
           <tr style="overflow: auto;">
             <td>{{$index + $collegeClassExams->firstItem()}}</td>
             <td>{{$allSubjects[$collegeClassExam->college_subject_id]['name']}}</td>
+            <td>
+              @if(1 == $collegeClassExam->exam_type)
+                Online
+              @else
+                Offline
+              @endif
+            </td>
             <td>
               @foreach(explode(',',$collegeClassExam->college_dept_ids) as $index => $collegeDeptId)
                 @if(0 == $index)
@@ -79,6 +88,7 @@
               @endforeach
             </td>
             <td>{{$collegeClassExam->topic}}</td>
+            <td>{{$collegeClassExam->marks}}</td>
             <td>{{$collegeClassExam->date}}</td>
             <td>{{$collegeClassExam->from_time}}</td>
             <td>{{$collegeClassExam->to_time}}</td>

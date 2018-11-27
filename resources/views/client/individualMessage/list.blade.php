@@ -32,7 +32,7 @@
       </div>
     </div>
     <div>
-      <table class="" id="clientBatchTable">
+      <table class="" id="clientIndividualMessages">
         <thead class="thead-inverse">
           <tr>
             <th>#</th>
@@ -45,7 +45,7 @@
         <tbody id="individualMessageList">
           @if(count($messages) > 0)
             @foreach($messages as $index => $message)
-              <tr>
+              <tr style="overflow: auto;">
                 <td>{{$index + 1}}</td>
                 <td>{{$message->batch->name}}</td>
                 <td>{{date('Y-m-d h:i:s a', strtotime($message->created_at))}}</td>

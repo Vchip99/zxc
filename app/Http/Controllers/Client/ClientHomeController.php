@@ -15,6 +15,8 @@ use App\Models\ClientCustomer;
 use App\Models\Clientuser;
 use App\Models\Client;
 use App\Models\ClientChatMessage;
+use App\Models\ClientGalleryType;
+use App\Models\ClientGalleryImage;
 use App\Mail\ClientUserEmailVerification;
 use App\Mail\UnAuthorisedUser;
 use App\Libraries\InputSanitise;
@@ -50,7 +52,6 @@ class ClientHomeController extends Controller
         }
         if( $onlineClientUrl == $request->getHost()){
             return view('client.online.digitaleducation');
-
         } else {
             $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
 
@@ -264,5 +265,25 @@ class ClientHomeController extends Controller
                 return redirect()->back()->withErrors('Entered otp is wrong.');
             }
         }
+    }
+
+    protected function gallery($subdomainName,Request $request){
+        $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
+        if(!is_object($subdomain)){
+            return Request::to('/');
+        }
+        $galleryImages = [];
+        $clientGalleryTypes = [];
+        $clientGalleryImages = ClientGalleryImage::where('client_id', $subdomain->client_id)->get();
+        if(is_object($clientGalleryImages) && false == $clientGalleryImages->isEmpty()){
+            foreach($clientGalleryImages as $clientGalleryImage){
+                $galleryImages[$clientGalleryImage->client_gallery_type_id] = $clientGalleryImage->images;
+            }
+            if(count($galleryImages) > 0){
+                $galleryTypeIds = array_keys($galleryImages);
+                $clientGalleryTypes = ClientGalleryType::find(array_unique($galleryTypeIds));
+            }
+        }
+        return view('client.galleryImage.gallery', compact('galleryImages','clientGalleryTypes','subdomainName'));
     }
 }

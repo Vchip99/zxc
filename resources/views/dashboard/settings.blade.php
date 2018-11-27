@@ -148,6 +148,19 @@
                     </div>
                   </div>
                 </li>
+                <li class="list-group-item">
+                  <div class="row toggle" id="dropdown-detail-1" data-toggle="detail-1">
+                    <div class="col-xs-12">
+                      <div class="row">
+                        <div class="col-xs-8 "><b>Send sms about Individual Message </b></div>
+                        <div class="col-xs-4 pull-left">
+                            <input type="radio" name="individual_sms" value="1" @if(1 == $college->individual_sms) checked @endif onClick="changeSetting(this);"> Yes
+                            <input type="radio" name="individual_sms" value="0" @if(0 == $college->individual_sms) checked @endif onClick="changeSetting(this);"> No
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
               </ul>
             </div>
           </div>

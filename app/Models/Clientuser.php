@@ -104,13 +104,18 @@ class Clientuser extends Authenticatable
 
     protected static function searchUsers($request){
         $results = [];
-        $courseId = InputSanitise::inputInt($request->get('course_id'));
         $resultArr = InputSanitise::getClientIdAndCretedBy();
         $clientId = $resultArr[0];
         $result = static::where('client_id', $clientId)->where('user_type', self::Student);
 
         if(!empty($request->get('student'))){
             $result->where('name', 'LIKE', '%'.$request->get('student').'%');
+        }
+        if(!empty($request->get('batch_id'))){
+            if($request->get('batch_id') > 0){
+                $batchId = $request->get('batch_id');
+                $result->whereRaw("find_in_set($batchId , batch_ids)");
+            }
         }
 
         $results['users'] = $result->select('clientusers.*')->get();
@@ -132,6 +137,16 @@ class Clientuser extends Authenticatable
         } else {
             $results['clientPurchasedSubCategories'] = [];
         }
+        return $results;
+    }
+
+    protected static function getStudentsByClientIdByBatchId($clientId,$batchId){
+        $results = [];
+        $result = static::where('client_id', $clientId)->where('user_type', self::Student);
+        if($batchId > 0){
+            $result->whereRaw("find_in_set($batchId , batch_ids)");
+        }
+        $results['users'] = $result->select('clientusers.*')->get();
         return $results;
     }
 
@@ -521,31 +536,20 @@ class Clientuser extends Authenticatable
     }
 
     protected static function changeClientTeacherModuleStatus(Request $request){
-        $clientId = InputSanitise::inputInt($request->client_id);
         $userId = InputSanitise::inputInt($request->client_user_id);
-        $moduleId = InputSanitise::inputInt($request->module_id);
-        $moduleStatus = $request->module_status;
+        $moduleIds = $request->add_modules;
 
-        $teacher = static::where('id',$userId)->where('client_id',$clientId)->where('user_type', self::Teacher)->first();
+        $teacher = static::where('id',$userId)->where('client_id',Auth::guard('client')->user()->id)->where('user_type', self::Teacher)->first();
         if(is_object($teacher)){
-            if(!empty($teacher->assigned_modules)){
-                $assignedModules = explode(',', $teacher->assigned_modules);
-                if('true' == $moduleStatus){
-                    array_push($assignedModules, $moduleId);
-                    sort($assignedModules);
-                    $teacher->assigned_modules = implode(',', $assignedModules);
-                } else {
-                    $assignedModules = array_diff($assignedModules, [$moduleId]);
-                    sort($assignedModules);
-                    $teacher->assigned_modules = implode(',', $assignedModules);
-                }
+            if(count($moduleIds) > 0){
+                sort($moduleIds);
+                $teacher->assigned_modules = implode(',', $moduleIds);
             } else {
-                $teacher->assigned_modules = $moduleId;
+                $teacher->assigned_modules = '';
             }
             $teacher->save();
-            return 'true';
         }
-        return 'false';
+        return ;
     }
 
     protected static function addParent($request){

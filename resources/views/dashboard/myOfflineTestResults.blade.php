@@ -40,7 +40,7 @@
                         <tr class="">
                           <td>{{$index + 1}}</td>
                           <td>{{$collegeSubjectNames[$mark->college_subject_id]}}</td>
-                          <td>{{$collegeOfflinePaperNames[$mark->college_offline_paper_id]}}</td>
+                          <td>{{$collegeOfflinePaperNames[$mark->college_class_exam_id]}}</td>
                           <td class="center">{{$mark->marks}} / {{$mark->total_marks}}</td>
                         </tr>
                       @endforeach

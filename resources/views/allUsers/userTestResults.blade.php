@@ -127,7 +127,7 @@
                   <tbody id="test-result">
                     @if(is_object($selectedStudent) && count($results) > 0)
                       @foreach($results as $index => $result)
-                        <tr class="">
+                        <tr style="overflow: auto;">
                           <td>{{$index + 1}}</td>
                           <td>{{$result->subject}}</td>
                           <td>{{$result->paper}}</td>

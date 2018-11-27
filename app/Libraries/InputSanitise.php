@@ -391,7 +391,7 @@ class InputSanitise{
         return;
     }
 
-    public static function sendOfflinePaperMarkSms($presentStudentsMark,$sendSmsStatus,$batchId,$batchName,$paperName,$totalMarks,$client){
+    public static function sendOfflinePaperMarkSms($presentStudentsMark,$sendSmsStatus,$batchId,$batchName,$topic,$totalMarks,$client){
         $clientName = $client->name;
         $clientId = $client->id;
         $studentIds = array_keys($presentStudentsMark);
@@ -405,7 +405,7 @@ class InputSanitise{
                     if(Client::Student == $sendSmsStatus || Client::Both == $sendSmsStatus){
                         $mobile = $student->phone;
                         if($batchId > 0) {
-                            $message = 'Dear '.$student->name.', your offline exam\'s mark for paper -'.$paperName.' is '.$presentStudentsMark[$student->id].'/'.$totalMarks.' for batch- '.$batchName.'. Thanks '.$clientName;
+                            $message = 'Dear '.$student->name.', your offline exam\'s mark for topic -'.$topic.' is '.$presentStudentsMark[$student->id].'/'.$totalMarks.' for batch- '.$batchName.'. Thanks '.$clientName;
                             if(!empty($mobile) && 10 == strlen($mobile)){
                                 $message = substr($message,0,150);
                                 self::sendSms($mobile,$message);
@@ -416,7 +416,7 @@ class InputSanitise{
                     if(Client::Parents == $sendSmsStatus || Client::Both == $sendSmsStatus){
                         $mobile = $student->parent_phone;
                         if($batchId > 0) {
-                            $message = 'Dear Parent, Your child '.$student->name.', had offline exam and its mark for paper -'.$paperName.' is '.$presentStudentsMark[$student->id].'/'.$totalMarks.' for batch- '.$batchName.'. Thanks '.$clientName;
+                            $message = 'Dear Parent, Your child '.$student->name.', had offline exam and its mark for topic -'.$topic.' is '.$presentStudentsMark[$student->id].'/'.$totalMarks.' for batch- '.$batchName.'. Thanks '.$clientName;
                             if(!empty($mobile) && 10 == strlen($mobile)){
                                 $message = substr($message,0,150);
                                 self::sendSms($mobile,$message);
@@ -702,7 +702,7 @@ class InputSanitise{
             } else {
                 foreach($students as $student){
                     $mobile = $student->phone;
-                    $message = 'Dear '.$student->name.', your offline exam\'s mark for paper -'.$paperName.' is '.$presentStudentsMark[$student->id].'/'.$totalMarks.' for subject- '.$subjectName;
+                    $message = 'Dear '.$student->name.', your offline exam\'s mark for topic -'.$paperName.' is '.$presentStudentsMark[$student->id].'/'.$totalMarks.' for subject- '.$subjectName;
                     if(!empty($mobile) && 10 == strlen($mobile)){
                         $message = substr($message,0,150);
                         self::sendSms($mobile,$message);
@@ -936,6 +936,28 @@ class InputSanitise{
                 self::setCollegeSmsCountStats($college,1);
             }
             $college->save();
+        }
+        return;
+    }
+
+    public static function sendCollegeIndividualSms($studentsData,$college){
+        $students = User::getCollegeStudentsByCollegeIdByIdsForSms($college->id,array_keys($studentsData));
+        // sms to student
+        if(is_object($students) && false == $students->isEmpty()){
+            if(count($students) >  $college->debit_sms_count){
+                return self::sendCollegeCreditSms(Auth::user()->phone);
+            } else {
+                foreach($students as $student){
+                    $mobile = $student->phone;
+                    $message = 'Dear '.$student->name.', '.$studentsData[$student->id];
+                    if(!empty($mobile) && 10 == strlen($mobile)){
+                        $message = substr($message,0,150);
+                        self::sendSms($mobile,$message);
+                        self::setCollegeSmsCountStats($college,2);
+                    }
+                }
+                $college->save();
+            }
         }
         return;
     }

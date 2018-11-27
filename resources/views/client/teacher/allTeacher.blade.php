@@ -93,7 +93,9 @@
                 </thead>
                 <tbody id="" class="">
                   @if(count($allModules) > 0)
-                    @foreach($allModules as  $moduleId => $moduleName)
+                    <form method="POST" action="{{ url('changeClientTeacherModuleStatus') }}">
+                      {{ csrf_field() }}
+                      @foreach($allModules as  $moduleId => $moduleName)
                       <tr>
                         <td> {{ $moduleId }} </td>
                         <td>{{ $moduleName }}</td>
@@ -106,13 +108,16 @@
                             }
                           @endphp
                           @if(in_array($moduleId, $assignedModules))
-                            <input type="checkbox" value="" data-client_user_id="{{ $clientTeacher->id }}" data-client_id="{{ $clientTeacher->client_id }}" data-module_id="{{$moduleId}}" onclick="changeModuleStatus(this);" checked="checked">
+                            <input type="checkbox" name="add_modules[]" value="{{$moduleId}}" checked="checked">
                           @else
-                            <input type="checkbox" value="" data-client_user_id="{{ $clientTeacher->id }}" data-client_id="{{ $clientTeacher->client_id }}" data-module_id="{{$moduleId}}" onclick="changeModuleStatus(this);">
+                            <input type="checkbox" name="add_modules[]" value="{{$moduleId}}" >
                           @endif
                         </td>
                       </tr>
-                    @endforeach
+                      @endforeach
+                      <input type="hidden" name="client_user_id" value="{{ $clientTeacher->id }}">
+                      <tr><td colspan="3"><input type="submit" name="Submit" style="float: right;"></td></tr>
+                    </form>
                   @endif
                 </tbody>
               </table>
@@ -124,53 +129,7 @@
   @endif
 <script type="text/javascript">
 
-  function changeModuleStatus(ele){
-    var client_user_id = $(ele).data('client_user_id');
-    var client_id = $(ele).data('client_id');
-    var module_id = $(ele).data('module_id');
-    var module_status = $(ele).prop('checked');
-    if(client_id > 0 && client_user_id > 0 && module_id > 0){
-      $.confirm({
-        title: 'Confirmation',
-        content: 'Are you sure. you want to change module approval?',
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-              Ok: {
-                  text: 'Ok',
-                  btnClass: 'btn-red',
-                  action: function(){
-                    $.ajax({
-                      method: "POST",
-                      url: "{{url('changeClientTeacherModuleStatus')}}",
-                      data: {client_id:client_id,client_user_id:client_user_id,module_id:module_id,module_status:module_status}
-                    })
-                    .done(function( msg ) {
-                      if('false' == msg){
-                        if('checked' == $(ele).attr('checked')){
-                          $(ele).prop('checked', 'checked');
-                        } else {
-                          $(ele).prop('checked', '');
-                        }
-                      }
-                      window.location.reload();
-                    });
-                  }
-              },
-              Cancle: function () {
-                if('checked' == $(ele).attr('checked')){
-                  $(ele).prop('checked', 'checked');
-                } else {
-                  $(ele).prop('checked', '');
-                }
-                window.location.reload();
-              }
-          }
-        });
-    }
-  }
-
-  function deleteTeacher(ele){;
+  function deleteTeacher(ele){
     var client_user_id = $(ele).data('client_user_id');
     var client_id = $(ele).data('client_id');
     if(client_user_id > 0 && client_id > 0){

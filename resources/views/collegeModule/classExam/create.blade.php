@@ -30,6 +30,18 @@
       <form action="{{url('college/'.Session::get('college_user_url').'/createCollegeClassExam')}}" method="POST" id="submitForm">
   @endif
     {{ csrf_field() }}
+  <div class="form-group row">
+      <label class="col-sm-2 col-form-label" for="name">Exam Type:</label>
+      <div class="col-sm-3">
+        @if(isset($collegeClassExam->id))
+          <input type="radio" name="exam_type" value="1" @if(1 == $collegeClassExam->exam_type) checked @endif> Online
+          <input type="radio" name="exam_type" value="0" @if(0 == $collegeClassExam->exam_type) checked @endif> Offline
+        @else
+          <input type="radio" name="exam_type" value="1"> Online
+          <input type="radio" name="exam_type" value="0" checked> Offline
+        @endif
+      </div>
+    </div>
   <div class="form-group row @if ($errors->has('subject')) has-error @endif">
     <label class="col-sm-2 col-form-label">Subject:</label>
     <div class="col-sm-3">
@@ -145,7 +157,14 @@
       @if($errors->has('topic')) <p class="help-block">{{ $errors->first('topic') }}</p> @endif
     </div>
   </div>
-      <div class="form-group row">
+  <div class="form-group row  @if ($errors->has('marks')) has-error @endif">
+    <label class="col-sm-2 col-form-label" for="marks">Mark:</label>
+    <div class="col-sm-3">
+      <input type="text" class="form-control" id="marks" name="marks" value="{{($collegeClassExam->marks)?$collegeClassExam->marks:null}}" placeholder="Mark" required>
+      @if($errors->has('marks')) <p class="help-block">{{ $errors->first('marks') }}</p> @endif
+    </div>
+  </div>
+    <div class="form-group row">
       <label for="" class="col-sm-2 col-form-label">Date:</label>
       <div class="col-sm-3">
         <input type="text"  class="form-control" name="date" id="date" @if(isset($collegeClassExam->id)) value="{{$collegeClassExam->date}}" @endif placeholder="Date" required>

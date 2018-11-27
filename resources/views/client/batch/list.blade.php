@@ -36,7 +36,7 @@
         <tbody id="batches">
           @if(count($batches) > 0)
             @foreach($batches as $index => $batch)
-            <tr>
+            <tr style="overflow: auto;">
               <td>{{$index + 1}}</td>
               <td>{{$batch->name}}</td>
               <td>

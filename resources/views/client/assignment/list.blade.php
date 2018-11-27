@@ -39,9 +39,15 @@
       <tbody id="assignmentSubjects">
         @if(count($assignments) > 0)
           @foreach($assignments as $index => $assignment)
-          <tr>
+          <tr style="overflow: auto;">
             <td>{{$index + 1}}</td>
-            <td style="max-width: 800px;">{!! mb_strimwidth($assignment->question, 0, 400, "...") !!}</td>
+            <td style="max-width: 800px;">
+              @if(!empty($assignment->question))
+                {!! mb_strimwidth($assignment->question, 0, 400, "...") !!}
+              @else
+                It a Document
+              @endif
+            </td>
             <td>
               @if(0 == $assignment->client_batch_id || empty($assignment->client_batch_id))
                 All

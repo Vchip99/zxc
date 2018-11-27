@@ -49,9 +49,6 @@ class AddCreatedByColumnToClientTables extends Migration
         Schema::connection('mysql2')->table('client_user_attendances', function (Blueprint $table) {
            $table->integer('created_by')->default(0);
         });
-        Schema::connection('mysql2')->table('client_offline_papers', function (Blueprint $table) {
-           $table->integer('created_by')->default(0);
-        });
         Schema::connection('mysql2')->table('client_offline_paper_marks', function (Blueprint $table) {
            $table->integer('created_by')->default(0);
         });
@@ -114,9 +111,6 @@ class AddCreatedByColumnToClientTables extends Migration
            $table->dropColumn('created_by');
         });
         Schema::connection('mysql2')->table('client_user_attendances', function (Blueprint $table) {
-           $table->dropColumn('created_by');
-        });
-        Schema::connection('mysql2')->table('client_offline_papers', function (Blueprint $table) {
            $table->dropColumn('created_by');
         });
         Schema::connection('mysql2')->table('client_offline_paper_marks', function (Blueprint $table) {

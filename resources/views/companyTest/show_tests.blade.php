@@ -239,7 +239,7 @@
 					                  	<th>Favourite</th>
 			                		</tr>
 			              		</thead>
-				              	<tr>
+				              	<tr style="overflow: auto;">
 					                <td class=" ">{{explode(' ', $companyPaper->date_to_active)[0]}}</td>
 					                <td class=" ">{{date('h:i a', strtotime(explode(' ', $companyPaper->date_to_active)[1]))}} to {{date('h:i a', strtotime(explode(' ', $companyPaper->date_to_inactive)[1]))}}</td>
 					                @if($currentDate < $companyPaper->date_to_active)

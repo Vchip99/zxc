@@ -23,6 +23,7 @@ use App\Models\ClientUserPurchasedCourse;
 use App\Models\ClientUserPurchasedTestSubCategory;
 use App\Models\ClientOnlineTestSubCategory;
 use App\Models\PayableClientSubCategory;
+use App\Models\ClientBatch;
 use Auth, Redirect, View, DB, Session, Validator, Hash,Cache;
 use Excel;
 
@@ -37,7 +38,7 @@ class ClientUsersInfoController extends BaseController
      */
     public function __construct(Request $request)
     {
-        $this->middleware('client');
+        // $this->middleware('client');
         $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
         if(is_object($subdomain)){
             view::share('subdomain', $subdomain);
@@ -76,11 +77,19 @@ class ClientUsersInfoController extends BaseController
         if(count(array_keys($purchasedPayableSubCategories)) > 0){
             $clientPurchasedSubCategories = ClientOnlineTestSubCategory::showPayableSubcategoriesByIdesAssociatedWithQuestion(array_keys($purchasedPayableSubCategories));
         }
-        return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories', 'clientPurchasedSubCategories', 'purchasedPayableSubCategories', 'subdomainName'));
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories', 'clientPurchasedSubCategories', 'purchasedPayableSubCategories', 'subdomainName','batches'));
     }
 
     protected function searchUsers($subdomainName,Request $request){
         return Clientuser::searchUsers($request);
+    }
+
+    protected function getStudentsByBatchId($subdomainName,Request $request){
+        $resultArr = InputSanitise::getClientIdAndCretedBy();
+        $clientId = $resultArr[0];
+        $batchId = $request->get('batch_id');
+        return Clientuser::getStudentsByClientIdByBatchId($clientId,$batchId);
     }
 
     protected function deleteStudent($subdomainName,Request $request){
@@ -155,7 +164,8 @@ class ClientUsersInfoController extends BaseController
         }
 
         $barchartLimits = range(100, 0, 10);
-        return view('client.allUsers.userTestResults', compact('students', 'results', 'selectedStudent','barchartLimits', 'subdomainName','loginUser'));
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        return view('client.allUsers.userTestResults', compact('students', 'results', 'selectedStudent','barchartLimits', 'subdomainName','loginUser','batches'));
     }
 
     protected function showUserTestResults(Request $request){
@@ -212,7 +222,8 @@ class ClientUsersInfoController extends BaseController
         } else {
             $students = Clientuser::getAllStudentsByClientId($clientId);
         }
-        return view('client.allUsers.userCourses', compact('students', 'courses', 'selectedStudent', 'subdomainName','loginUser'));
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        return view('client.allUsers.userCourses', compact('students', 'courses', 'selectedStudent', 'subdomainName','loginUser','batches'));
     }
 
     protected function showUserCourses(Request $request){
@@ -252,7 +263,8 @@ class ClientUsersInfoController extends BaseController
         } else {
             $students = Clientuser::getAllStudentsByClientId($clientId);
         }
-        return view('client.allUsers.userPlacement', compact('students', 'selectedStudent', 'subdomainName','loginUser'));
+        $batches = ClientBatch::getBatchesByClientId($clientId);
+        return view('client.allUsers.userPlacement', compact('students', 'selectedStudent', 'subdomainName','loginUser','batches'));
     }
 
     protected function getStudentById(Request $request){

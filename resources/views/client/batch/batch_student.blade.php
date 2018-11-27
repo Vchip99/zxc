@@ -70,7 +70,7 @@
                 <tbody id="client_batch_users" class="">
                   @if(count($students) > 0)
                     @foreach($students as $index => $student)
-                      <tr class="student" id="div_student_{{$student->id}}" >
+                      <tr class="student" id="div_student_{{$student->id}}" style="overflow: auto;">
                         <td> {{ $index + 1 }} </td>
                         <td>{{$student->name}}</td>
                         <td>{{$student->email}}</td>

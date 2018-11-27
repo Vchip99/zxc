@@ -47,8 +47,8 @@
             </div>
             <div class="col-md-3">
                 <div style="margin-bottom: 10px">
-                    <select class="form-control" name="paper" id="paper" onChange="selectBatchStudent(this);">
-                        <option value="">Select Paper</option>
+                    <select class="form-control" name="client_exam" id="client_exam" onChange="selectBatchStudent(this);">
+                        <option value="">Select Topic</option>
                     </select>
                 </div>
             </div>
@@ -61,7 +61,7 @@
               <span class="">Students</span>
             </div>
             <div class="panel-body">
-              <table  class="" id="">
+              <table  class="" id="college_offline_paper_marks">
                 <thead>
                   <tr>
                     <th>Sr. No.</th>
@@ -92,14 +92,14 @@
     if(batchId){
       $.ajax({
           method:'POST',
-          url: "{{url('getOfflinePapersByBatchId')}}",
+          url: "{{url('getClientExamsByBatchId')}}",
           data:{_token:currentToken,batch_id:batchId}
       }).done(function( msg ) {
-        select = document.getElementById('paper');
+        select = document.getElementById('client_exam');
         select.innerHTML = '';
         var opt = document.createElement('option');
         opt.value = '';
-        opt.innerHTML = 'Select Paper';
+        opt.innerHTML = 'Select Topic';
         select.appendChild(opt);
         if( 0 < msg.length){
           $.each(msg, function(idx, obj) {
@@ -121,17 +121,17 @@
     if(paperId && batchId){
       $.ajax({
           method:'POST',
-          url: "{{url('getBatchStudentsAndMarksByBatchIdByPaperId')}}",
-          data:{_token:currentToken,batch_id:batchId,paper_id:paperId}
+          url: "{{url('getBatchStudentsAndMarksByBatchIdByExamId')}}",
+          data:{_token:currentToken,batch_id:batchId,client_exam_id:paperId}
       }).done(function( result ) {
           var users = document.getElementById('client_offline_paper_marks');
           users.innerHTML = '';
           if(result['batchUsers'].length){
             $.each(result['batchUsers'], function(idx, obj) {
               if(result['studentMarks'][obj.id]){
-                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="number" name="'+obj.id+'" id="student_'+obj.id+'" value="'+result['studentMarks'][obj.id].marks+'" max="'+result['studentMarks'][obj.id].total_marks+'" step="any"></td><td><input type="text" name="total_marks" value="'+result['studentMarks'][obj.id].total_marks+'" readonly></td></tr>';
+                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" style="over-flow:auto;"><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="number" name="'+obj.id+'" id="student_'+obj.id+'" value="'+result['studentMarks'][obj.id].marks+'" max="'+result['studentMarks'][obj.id].total_marks+'" step="any" style="width:100%;"></td><td><input type="text" name="total_marks" value="'+result['studentMarks'][obj.id].total_marks+'" readonly style="width:100%;"></td></tr>';
               } else {
-                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" ><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="number" name="'+obj.id+'" id="student_'+obj.id+'" value="" max="'+paperMarks+'" step="any"></td><td><input type="text" name="total_marks" value="'+paperMarks+'" readonly></td></tr>';
+                users.innerHTML +='<tr class="student" id="div_student_'+obj.id+'" style="over-flow:auto;"><td>'+(idx + 1)+'</td><td>'+obj.name+'</td><td><input type="number" name="'+obj.id+'" id="student_'+obj.id+'" value="" max="'+paperMarks+'" step="any" style="width:100%;"></td><td><input type="text" name="total_marks" value="'+paperMarks+'" readonly style="width:100%;"></td></tr>';
               }
             });
           } else {

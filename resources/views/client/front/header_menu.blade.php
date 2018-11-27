@@ -77,6 +77,10 @@
             <a href="{{ url('online-tests')}}"> Online Tests </a>
             </a>
           </li>
+          <li class="dropdown" title="Gallery">
+            <a href="{{ url('gallery')}}"> Gallery </a>
+            </a>
+          </li>
         </ul>
    </div>
  </div>

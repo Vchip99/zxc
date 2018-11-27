@@ -53,7 +53,6 @@ use App\Models\CourseCategory;
 use App\Models\VkitCategory;
 use App\Models\Skill;
 use App\Models\CollegeUserAttendance;
-use App\Models\CollegeOfflinePaper;
 use App\Models\UserData;
 use App\Models\TestSubCategory;
 use App\Models\RegisterPaper;
@@ -62,6 +61,9 @@ use App\Models\RegisterFavouriteDocuments;
 use App\Models\CollegeOfflinePaperMarks;
 use App\Models\CollegeTimeTable;
 use App\Models\CollegePayment;
+use App\Models\CollegeMessage;
+use App\Models\CollegeIndividualMessage;
+use App\Models\CollegeClassExam;
 use Excel;
 use Auth,Hash,DB, Redirect,Session,Validator,Input,Cache;
 use App\Libraries\InputSanitise;
@@ -845,8 +847,6 @@ class AccountController extends Controller
                 if(count($removedDepts) > 0){
                     // delete attendance by college dept userid
                     CollegeUserAttendance::deleteAttendanceByCollegeIdByDepartmentIdsByUserId($user->college_id,$removedDepts,$user->id);
-                    // delete peper and marks
-                    CollegeOfflinePaper::deleteCollegeOfflinePapersByCollegeIdByDepartmentIdsByUserId($user->college_id,$removedDepts,$user->id);
                     // remove depts for topic
                     AssignmentTopic::removeDepartmentsByCollegeIdByDepartmentIdsByUserId($user->college_id,$removedDepts,$user->id);
                     // remove topics for empty depts
@@ -1374,7 +1374,7 @@ class AccountController extends Controller
         if(is_object($marks) && false == $marks->isEmpty()){
             foreach($marks as $mark){
                 $collegeSubjectIds[] = $mark->college_subject_id;
-                $collegeOfflinePaperIds[] = $mark->college_offline_paper_id;
+                $collegeOfflinePaperIds[] = $mark->college_class_exam_id;
             }
             if(count($collegeSubjectIds) > 0){
                 $subjects = CollegeSubject::find(array_unique($collegeSubjectIds));
@@ -1385,10 +1385,10 @@ class AccountController extends Controller
                 }
             }
             if(count($collegeOfflinePaperIds) > 0){
-                $papers = CollegeOfflinePaper::find($collegeOfflinePaperIds);
+                $papers = CollegeClassExam::find($collegeOfflinePaperIds);
                 if(is_object($papers) && false == $papers->isEmpty()){
                     foreach($papers as $paper){
-                        $collegeOfflinePaperNames[$paper->id] = $paper->name;
+                        $collegeOfflinePaperNames[$paper->id] = $paper->topic;
                     }
                 }
             }
@@ -2470,7 +2470,6 @@ class AccountController extends Controller
         return view('collegeModule.sms.list',compact('collegePayments'));
     }
 
-
     protected function createCollegePurchaseSms(){
         return view('collegeModule.sms.create');
     }
@@ -2576,5 +2575,59 @@ class AccountController extends Controller
 
     protected function webhookCollegePurchaseSms(Request $request){
         return;
+    }
+
+    protected function myMessage(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $loginUser = Auth::user();
+        $myMessages = [];
+        $groupMessages = CollegeMessage::getMessagesByCollegeIdByDeptByYear($loginUser->college_id,$loginUser->college_dept_id,$loginUser->year);
+        if(is_object($groupMessages) && false == $groupMessages->isEmpty()){
+            foreach($groupMessages as $groupMessage){
+                $myMessages[date('Y-m-d h:i:s a', strtotime($groupMessage->updated_at))] = [
+                    'id' => $groupMessage->id,
+                    'message' => $groupMessage->message,
+                    'photo' => $groupMessage->photo,
+                    'date' => date('Y-m-d h:i:s a', strtotime($groupMessage->updated_at)),
+                    'is_group_message' => 1
+                ];
+            }
+        }
+        $individualMessages = CollegeIndividualMessage::getIndividualMessagesByCollegeIdByDeptIdByYear($loginUser->college_id,$loginUser->college_dept_id,$loginUser->year);
+        if(is_object($individualMessages) && false == $individualMessages->isEmpty()){
+            foreach($individualMessages as $individualMessage){
+                if(!empty($individualMessage->messages)){
+                    $allMessages = explode(',', $individualMessage->messages);
+                    if(count($allMessages) > 0){
+                        foreach($allMessages as $userMessages){
+                            $arrMsg = explode(':', $userMessages);
+                            if($loginUser->id == $arrMsg[0]){
+                                $myMessages[date('Y-m-d h:i:s a',strtotime($individualMessage->updated_at))] = [
+                                    'id' => $individualMessage->id,
+                                    'message' => $arrMsg[1],
+                                    'date' => date('Y-m-d h:i:s a',strtotime($individualMessage->updated_at)),
+                                    'is_group_message' => 0];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        krsort($myMessages);
+        return view('dashboard.myMessage', compact('myMessages'));
+    }
+
+    protected function myEvent(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $loginUser = Auth::user();
+        $events = [];
+
+        $events = CollegeMessage::getEventsByCollegeIdByDept($loginUser->college_id,$loginUser->college_dept_id);
+
+        return view('dashboard.myEvent', compact('events'));
     }
 }

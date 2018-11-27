@@ -153,6 +153,7 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="{{ url('myAssignments')}}"><i class="fa fa-circle-o"></i> My Assignments </a></li>
+            <li><a href="{{ url('myAssignDocuments')}}"><i class="fa fa-circle-o"></i> Documents </a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -174,8 +175,9 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li title="My Event/Message"><a href="{{ url('myMessage')}}"><i class="fa fa-circle-o"></i> My Event/Message</a></li>
-            <li title="My Individual Message"><a href="{{ url('myIndividualMessage')}}"><i class="fa fa-circle-o"></i> My Individual Message</a></li>
+            <li title="My Message"><a href="{{ url('myMessage')}}"><i class="fa fa-circle-o"></i> My Message</a></li>
+            <!-- <li title="My Event"><a href="{{ url('myIndividualMessage')}}"><i class="fa fa-circle-o"></i> My Individual Message</a></li> -->
+            <li title="My Event"><a href="{{ url('myEvent')}}"><i class="fa fa-circle-o"></i> My Event</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -224,6 +226,17 @@
           </a>
           <ul class="treeview-menu">
             <li title="Discussion"><a href="{{ url('myDiscussion')}}"><i class="fa fa-circle-o"></i> Discussion</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="Gallery">
+            <i class="fa fa-picture-o"></i> <span>Gallery</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="My Gallery"><a href="{{ url('myGallery')}}"><i class="fa fa-circle-o"></i> My Gallery</a></li>
           </ul>
         </li>
         <li class="header">Logout</li>

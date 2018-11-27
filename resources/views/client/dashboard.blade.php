@@ -238,10 +238,8 @@
           <ul class="treeview-menu">
             <li title="Manage Batch"><a href="{{ url('manageBatch')}}"><i class="fa fa-circle-o"></i> Manage Batch</a></li>
             <li title="Batch Students"><a href="{{ url('associateBatchStudents')}}"><i class="fa fa-circle-o"></i> Batch Students</a></li>
-            <!-- <li title="Manage Attendance"><a href="{{ url('manageAttendance')}}"><i class="fa fa-circle-o"></i> Manage Attendance</a></li> -->
             <li title="Attendance Calendar"><a href="{{ url('manageAttendanceCalendar')}}"><i class="fa fa-circle-o"></i> Attendance Calendar</a></li>
-            <li title="Manage Offline Paper"><a href="{{ url('manageOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
-            <li title="Manage Offline Exam"><a href="{{ url('manageOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
+            <li title="Update Offline Marks"><a href="{{ url('manageExamMarks')}}"><i class="fa fa-circle-o"></i> Update Offline Marks</a></li>
           </ul>
         </li>
         <li class="treeview ">
@@ -384,6 +382,7 @@
             <li title="Bank Details"><a href="{{ url('manageBankDetails')}}"><i class="fa fa-circle-o"></i> Bank Details </a></li>
             <li title="User Payments"><a href="{{ url('manageUserPayments')}}"><i class="fa fa-circle-o"></i> User Payments </a></li>
             <li title="Purchase Sms"><a href="{{ url('managePurchaseSms')}}"><i class="fa fa-circle-o"></i> Purchase Sms </a></li>
+            <li title="Receipt Details"><a href="{{ url('manageReceipt')}}"><i class="fa fa-circle-o"></i> Receipt Details </a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -421,6 +420,18 @@
           </a>
           <ul class="treeview-menu">
             <li title="Manage Settings"><a href="{{ url('manageSettings')}}"><i class="fa fa-circle-o"></i> Manage Settings</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#" title="Gallery">
+            <i class="fa fa-picture-o"></i> <span>Gallery</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="Manage Gallery Types"><a href="{{ url('manageGalleryTypes')}}"><i class="fa fa-circle-o"></i> Manage Gallery Types</a></li>
+            <li title="Manage Gallery Images"><a href="{{ url('manageGalleryImages')}}"><i class="fa fa-circle-o"></i> Manage Gallery Images</a></li>
           </ul>
         </li>
         <li class="header">Logout</li>

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCollegeOfflinePapersTable extends Migration
+class CreateCollegeGalleryImagesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,11 @@ class CreateCollegeOfflinePapersTable extends Migration
      */
     public function up()
     {
-        Schema::create('college_offline_papers', function (Blueprint $table) {
+        Schema::create('college_gallery_images', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
             $table->integer('college_id');
-            $table->integer('college_dept_id');
-            $table->integer('college_subject_id');
-            $table->integer('year');
-            $table->string('marks');
+            $table->integer('college_gallery_type_id');
+            $table->text('images');
             $table->integer('created_by');
             $table->timestamps();
         });
@@ -33,6 +30,6 @@ class CreateCollegeOfflinePapersTable extends Migration
      */
     public function down()
     {
-        Schema::drop('college_offline_papers');
+        Schema::drop('college_gallery_images');
     }
 }

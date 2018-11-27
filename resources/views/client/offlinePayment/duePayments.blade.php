@@ -76,7 +76,7 @@
                     @foreach($dueUsers as $batchId => $users)
                       @if(count($users) > 0)
                         @foreach($users as $user)
-                          <tr>
+                          <tr style="overflow: auto;">
                             <td>{{$index++}}</td>
                             <td>{{$user['user']}}</td>
                             <td>{{$user['batch']}}</td>

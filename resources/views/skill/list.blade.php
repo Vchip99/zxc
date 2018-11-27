@@ -35,7 +35,7 @@
       <tbody>
         @if(count($skills) > 0)
           @foreach($skills as $index => $skill)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $skills->firstItem()}}</th>
             <td>{{$skill->name}}</td>
             <td>

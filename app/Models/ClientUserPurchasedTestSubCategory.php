@@ -45,6 +45,12 @@ class ClientUserPurchasedTestSubCategory extends Model
         return $userTestSubCategories;
     }
 
+    protected static function getUserPurchasedTestSubCategoryByClientIdById($clientId, $id){
+        return static::join('client_user_payments', 'client_user_payments.payment_id', '=', 'client_user_purchased_test_sub_categories.payment_id')
+                ->where('client_user_purchased_test_sub_categories.client_id', $clientId)
+                ->where('client_user_purchased_test_sub_categories.id', $id)->select('client_user_purchased_test_sub_categories.*', 'client_user_payments.updated_at')->first();
+    }
+
     protected static function getClientUserPurchasedTestSubCategories($clientId, $userId){
         $result = static::join('client_user_payments', 'client_user_payments.payment_id', '=', 'client_user_purchased_test_sub_categories.payment_id')
                 ->where('client_user_purchased_test_sub_categories.client_id', $clientId);

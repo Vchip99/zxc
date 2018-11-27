@@ -36,7 +36,7 @@
       <tbody>
         @if(count($colleges) > 0)
           @foreach($colleges as $index => $college)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + 1}}</th>
             <td>{{$college->name}}</td>
             <td>{{$college->url}}</td>

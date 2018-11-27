@@ -21,6 +21,21 @@
    <form action="{{url('createAssignment')}}" method="POST" enctype="multipart/form-data">
   @endif
     {{ csrf_field() }}
+    <div class="form-group row">
+    <label class="col-sm-2 col-form-label">Type:</label>
+    @if(isset($assignment->id))
+      <input type="radio" name="type_text" value="assignment" @if(!empty($assignment->question)) checked @endif disabled>Assignment
+      <input type="radio" name="type_text" value="document" @if(empty($assignment->question)) checked @endif disabled>Document
+      @if(!empty($assignment->question))
+        <input type="hidden" name="type" value="assignment">
+      @else
+        <input type="hidden" name="type" value="document">
+      @endif
+    @else
+      <input type="radio" name="type" value="assignment" checked onClick="toggleType(this);">Assignment
+      <input type="radio" name="type" value="document" onClick="toggleType(this);">Document
+    @endif
+  </div>
     <div class="form-group row  @if ($errors->has('batch')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="batch">Batch Name:</label>
       <div class="col-sm-3">
@@ -100,31 +115,77 @@
 
     </div>
   </div>
-  <div class="form-group row @if ($errors->has('question')) has-error @endif">
-    <label for="question" class="col-sm-2 col-form-label">Assignment:</label>
+  <div class="form-group row @if ($errors->has('question')) has-error @endif" id="questionDiv">
+    @if(empty($assignment->id) || !empty($assignment->question))
+      <label for="question" class="col-sm-2 col-form-label">Assignment:</label>
+    @endif
     <div class="col-sm-10">
         @if($errors->has('question')) <p class="help-block">{{ $errors->first('question') }}</p> @endif
-        <textarea name="question" cols="60" rows="4" id="question" placeholder="Enter your Question" required>
-          @if(!empty($assignment->id))
+        @if(!empty($assignment->id) && $assignment->created_by == $loginUser->id)
+          <textarea name="question" cols="60" rows="4" id="question" placeholder="Enter your Question" required>
+            @if(!empty($assignment->id))
+              {!! $assignment->question !!}
+            @endif
+          </textarea>
+          <script type="text/javascript">
+            CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
+          </script>
+        @elseif(empty($assignment->id))
+          <textarea name="question" cols="60" rows="4" id="question" placeholder="Enter your Question" required>
+          </textarea>
+          <script type="text/javascript">
+            CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
+          </script>
+        @else
+          @if(!empty($assignment->question))
             {!! $assignment->question !!}
           @endif
-        </textarea>
-        <script type="text/javascript">
-          CKEDITOR.replace( 'question', { enterMode: CKEDITOR.ENTER_BR } );
-        </script>
+        @endif
     </div>
   </div>
   <div class="form-group row @if ($errors->has('attached_link')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="attached_link">Attachment:</label>
       <div class="col-sm-3">
-           <input type="file" class="form-control"  name="attached_link" id="attached_link">
-            @if($errors->has('attached_link')) <p class="has-error">{{ $errors->first('attached_link') }}</p> @endif
-            <b><span>Existing Attachment: {!! basename($assignment->attached_link) !!}</span></b>
+        @if(!empty($assignment->id) && $assignment->created_by == $loginUser->id)
+          <input type="file" class="form-control"  name="attached_link" id="attached_link">
+          @if($errors->has('attached_link')) <p class="has-error">{{ $errors->first('attached_link') }}</p> @endif
+          <b><span>Existing Attachment: {!! basename($assignment->attached_link) !!}</span></b>
+        @elseif(empty($assignment->id))
+          <input type="file" class="form-control"  name="attached_link" id="attached_link">
+          @if($errors->has('attached_link')) <p class="has-error">{{ $errors->first('attached_link') }}</p> @endif
+          <b><span>Existing Attachment: {!! basename($assignment->attached_link) !!}</span></b>
+        @else
+          @if(!empty($assignment->attached_link))
+            <a data-path="{{asset($assignment->attached_link)}}" class="btn btn-primary" data-toggle="modal" data-target="#dynamic-modal-{{$assignment->id}}" data-document_id="{{$assignment->id}}" style="width: 120px !important;"> {{basename($assignment->attached_link)}} </a>
+            <div id="dynamic-modal-{{$assignment->id}}" class="modal fade" role="dialog">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button class="close" data-dismiss="modal">×</button>
+                    <h2  class="modal-title">{{basename($assignment->attached_link)}}</h2>
+                  </div>
+                  <div class="modal-body">
+                      <div class="iframe-container">
+                        <iframe src="{{asset($assignment->attached_link)}}" frameborder="0"></iframe>
+                      </div>
+                  </div>
+                  <div class="modal-footer ">
+                    <a href="{{asset($assignment->attached_link)}}" download class="btn btn-primary download" id="myBtn" style="width: 90px !important;"><i class="fa fa-download" aria-hidden="true"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          @endif
+      @endif
       </div>
     </div>
     <div class="form-group row" id="submit">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        <button type="submit" class="btn btn-primary" style="width: 90px !important;">Submit</button>
+        @if(!empty($assignment->id) && $assignment->created_by == $loginUser->id)
+          <button type="submit" class="btn btn-primary" style="width: 90px !important;" >Submit</button>
+        @elseif(empty($assignment->id))
+          <button type="submit" class="btn btn-primary" style="width: 90px !important;" >Submit</button>
+        @endif
       </div>
     </div>
     </form>
@@ -202,6 +263,14 @@
           document.getElementById('submit').classList.remove('hide');
         }
       });
+    }
+  }
+
+  function toggleType(ele){
+    if('document' ==  $(ele).val()){
+      $('#questionDiv').addClass('hide');
+    } else {
+      $('#questionDiv').removeClass('hide');
     }
   }
 </script>

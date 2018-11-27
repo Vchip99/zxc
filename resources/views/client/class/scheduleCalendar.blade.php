@@ -93,7 +93,7 @@
                   </thead>
                   <tbody>
                     @foreach($data['classes'] as $class)
-                      <tr>
+                      <tr style="overflow: auto;">
                         <td>{{$class['batch']}}</td>
                         <td>{{$class['subject']}}</td>
                         <td>{{$class['topic']}}</td>
@@ -112,19 +112,29 @@
                     <tr>
                       <th>Batch</th>
                       <th>Name</th>
+                      <th>Type</th>
                       <th>Subject</th>
                       <th>Topic</th>
+                      <th>Marks</th>
                       <th>From</th>
                       <th>To</th>
                     </tr>
                   </thead>
                   <tbody>
                     @foreach($data['exams'] as $exam)
-                      <tr>
+                      <tr style="overflow: auto;">
                         <td>{{$exam['batch']}}</td>
                         <td>{{$exam['title']}}</td>
+                        <td>
+                          @if(1 == $exam['exam_type'])
+                            Online
+                          @else
+                            Offline
+                          @endif
+                        </td>
                         <td>{{$exam['subject']}}</td>
                         <td>{{$exam['topic']}}</td>
+                        <td>{{$exam['marks']}}</td>
                         <td>{{$exam['from']}}</td>
                         <td>{{$exam['to']}}</td>
                       </tr>

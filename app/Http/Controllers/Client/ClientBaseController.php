@@ -27,7 +27,10 @@ use App\Models\ClientUserPurchasedCourse;
 use App\Models\ClientUserPurchasedTestSubCategory;
 use App\Models\PayableClientSubCategory;
 use App\Models\ClientChatMessage;
+use App\Models\ClientReceipt;
+use App\Models\ClientOfflinePayment;
 use Illuminate\Http\Request;
+use App\Libraries\InputSanitise;
 use Auth, Redirect, View, DB, Session;
 use App\Http\Controllers\Instamojo;
 use DateTime;
@@ -151,6 +154,7 @@ class ClientBaseController extends BaseController
         if(is_object($userCourses) && false == $userCourses->isEmpty()){
             foreach($userCourses as $userCourse){
                 $results['purchased'][] = [
+                                'id' => $userCourse->id,
                                 'user' => $userCourse->clientUser(),
                                 'type' => 'Course',
                                 'name' => $userCourse->course,
@@ -165,6 +169,7 @@ class ClientBaseController extends BaseController
         if(is_object($userTestSubCategories) && false == $userTestSubCategories->isEmpty()){
             foreach($userTestSubCategories as $userTestSubCategory){
                 $results['purchased'][] = [
+                                'id' => $userTestSubCategory->id,
                                 'user' => $userTestSubCategory->clientUser(),
                                 'type' => 'SubCategory',
                                 'name' => $userTestSubCategory->test_sub_category,
@@ -855,7 +860,18 @@ class ClientBaseController extends BaseController
             } else {
                 $results = json_decode($response, true);
                 if(!empty($results['account_number']) && !empty($results['ifsc_code'])){
-                    BankDetail::updateBankDetails($request);
+                    DB::connection('mysql2')->beginTransaction();
+                    try
+                    {
+                        BankDetail::updateBankDetails($request);
+                        DB::connection('mysql2')->commit();
+                        return redirect('manageBankDetails')->with('message', 'Bank Details updated successfully.');
+                    }
+                    catch(Exception $e)
+                    {
+                        DB::connection('mysql2')->rollback();
+                        return redirect('manageBankDetails')->withErrors([$e->getMessage()]);
+                    }
                 } else {
                     if(count($results) > 0){
                         $instamojoErrors.= '--------application_auth_error--------';
@@ -867,6 +883,7 @@ class ClientBaseController extends BaseController
             }
             if(!empty($instamojoErrors)){
                 Mail::to('vchipdesigng8@gmail.com')->send(new PaymentGatewayErrors($instamojoErrors));
+                return redirect('manageBankDetails')->withErrors(['error while update bank detials']);
             }
         }
         return redirect('manageBankDetails');
@@ -1011,5 +1028,342 @@ class ClientBaseController extends BaseController
 
     protected function webhookClientPurchaseSms(Request $request){
         return;
+    }
+
+    protected function onlineReceiptShow($subdomainName,$type,$id){
+        if(is_object(Auth::guard('client')->user())){
+            $loginUser = Auth::guard('client')->user();
+            $clientId = $loginUser->id;
+            $clientName = $loginUser->name;
+        } else {
+            $loginUser = Auth::guard('clientuser')->user();
+            $client = $loginUser->client;
+            $clientId = $client->id;
+            $clientName = $client->name;
+        }
+        if('Course' == $type){
+            $userCourse = ClientUserPurchasedCourse::getUserPurchasedCourseByClientIdById($clientId, $id);
+            if(is_object($userCourse)){
+                $onlineReceipt= [
+                        'id' => $userCourse->id,
+                        'user' => $userCourse->clientUser(),
+                        'user_id' => $userCourse->user_id,
+                        'type' => 'Course',
+                        'name' => $userCourse->course,
+                        'amount' => $userCourse->price,
+                        'date' => (!empty($userCourse->updated_at))?$userCourse->updated_at:date('Y-m-d'),
+                    ];
+            }
+        } elseif('SubCategory' == $type){
+            $userTestSubCategory = ClientUserPurchasedTestSubCategory::getUserPurchasedTestSubCategoryByClientIdById($clientId, $id);
+            if(is_object($userTestSubCategory)){
+                $onlineReceipt = [
+                        'id' => $userTestSubCategory->id,
+                        'user' => $userTestSubCategory->clientUser(),
+                        'user_id' => $userTestSubCategory->user_id,
+                        'type' => 'SubCategory',
+                        'name' => $userTestSubCategory->test_sub_category,
+                        'amount' => $userTestSubCategory->price,
+                        'date' => (!empty($userTestSubCategory->updated_at))?$userTestSubCategory->updated_at:date('Y-m-d'),
+                    ];
+            }
+        } else {
+            return Redirect::to('manageUserPayments');
+        }
+        $clientReceipt = ClientReceipt::find($clientId);
+        if(is_object($clientReceipt)){
+            if(1 == $clientReceipt->is_same_details){
+                $onLineReceiptBy = $clientReceipt->offline_receipt_by;
+                $onLineGstin = $clientReceipt->offline_gstin;
+                $onLineCin = $clientReceipt->offline_cin;
+                $onLinePan = $clientReceipt->offline_pan;
+                $isOnlineGstApplied = $clientReceipt->is_offline_gst_applied;
+                $onLineAddress = $clientReceipt->offline_address;
+            } else {
+                $onLineReceiptBy = $clientReceipt->online_receipt_by;
+                $onLineGstin = $clientReceipt->online_gstin;
+                $onLineCin = $clientReceipt->online_cin;
+                $onLinePan = $clientReceipt->online_pan;
+                $isOnlineGstApplied = $clientReceipt->is_online_gst_applied;
+                $onLineAddress = $clientReceipt->online_address;
+            }
+            $hsnSac = (!empty($clientReceipt->hsn_sac))?$clientReceipt->hsn_sac:'NA';
+        } else {
+            $onLineGstin = '';
+            $onLineReceiptBy = $clientName;
+            $onLineCin = '';
+            $onLinePan = '';
+            $isOnlineGstApplied = 0;
+            $onLineAddress = '';
+            $hsnSac = 'NA';
+        }
+
+        if(is_array($onlineReceipt)){
+            $onlineReceiptArr = [
+                'receipt_id' => $onlineReceipt['id'],
+                'name' => $onlineReceipt['user'],
+                'user_id' => $onlineReceipt['user_id'],
+                'batch' => $onlineReceipt['name'],
+                'amount' => $onlineReceipt['amount'],
+                'type' => $onlineReceipt['type'],
+                'is_online_gst_applied' => $isOnlineGstApplied,
+                'receipt_by' => $onLineReceiptBy,
+                'date' => date('d-m-Y',strtotime($onlineReceipt['date'])),
+                'gstin' => $onLineGstin,
+                'cin' =>  $onLineCin,
+                'pan' =>  $onLinePan,
+                'address' =>  $onLineAddress,
+                'hsnSac' =>  $hsnSac
+            ];
+
+            $html = $this->createOnlinePdfHtml($onlineReceiptArr);
+            $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8','tempDir' => __DIR__ . '/../mpdfFont']);
+            $mpdf->autoScriptToLang = true;
+            $mpdf->autoLangToFont = true;
+            $mpdf->WriteHTML($html, 2);
+            return  $mpdf->Output("receipt-".$onlineReceiptArr['receipt_id'].".pdf", "I");
+        }
+    }
+
+    protected function createOnlinePdfHtml($onlineReceiptArr){
+        $numberFormatter = new \NumberFormatter( locale_get_default(), \NumberFormatter::SPELLOUT );
+        $amountInWords = $numberFormatter->format($onlineReceiptArr['amount']);
+
+        $tbl = '<table border="1" cellpadding="0" cellspacing="0" width="100%">';
+        $tbl .= '<thead>
+                <tr>
+                    <td colspan="12" align="center"><b>Tax Invoice</b></td>
+                </tr>
+            </thead>
+            <tr>
+                <td colspan="6" align="center"><h3>&nbsp;<u>'.$onlineReceiptArr['receipt_by'].'</u></h3><br/>&nbsp;'.$onlineReceiptArr['address'].'</td>
+                <td colspan="6" align="center">Receipt No: Online '.$onlineReceiptArr['type'].'-'.$onlineReceiptArr['receipt_id'].'<br/>Date: '.$onlineReceiptArr['date'].'</td>
+            </tr>';
+        if(1 == $onlineReceiptArr['is_online_gst_applied']){
+            $tbl .= '
+                    <tr>
+                        <td colspan="4" align="center">GSTIN: '.$onlineReceiptArr['gstin'].'</td>
+                        <td colspan="3" align="center">CIN: '.$onlineReceiptArr['cin'].'</td>
+                        <td colspan="5" align="center">PAN: '.$onlineReceiptArr['pan'].'</td>
+                    </tr>';
+        }
+        $tbl .= '
+            <tr>
+                <td colspan="6" align="left">&nbsp;&nbsp;Billed To: '.$onlineReceiptArr['name'].' '.'<br> &nbsp;&nbsp;User Id: '.$onlineReceiptArr['user_id'].'<br> &nbsp;&nbsp;State Code: </td>
+                <td colspan="6" align="left">&nbsp;&nbsp;Shipped To: '.$onlineReceiptArr['name'].' '.'<br> &nbsp;&nbsp;User Id: '.$onlineReceiptArr['user_id'].'<br> &nbsp;&nbsp;State Code: </td>
+            </tr>
+            <tr>
+                <td colspan="12" align="left">&nbsp;&nbsp;Remarks:<br></td>
+            </tr>';
+        if(1 == $onlineReceiptArr['is_online_gst_applied']){
+                $tbl .= '<tr>
+                    <td colspan="1" align="center">Sr.No</td>
+                    <td colspan="2" align="center">Service Supplied</td>
+                    <td colspan="1" align="center">HSN/<br>SAC</td>
+                    <td colspan="1" align="center">Qty</td>
+                    <td colspan="1" align="center">Unit</td>
+                    <td colspan="1" align="center">Rate Per Item</td>
+                    <td colspan="2" align="center">Taxable Value (Rs.)</td>
+                    <td colspan="3" align="center">'.round($onlineReceiptArr['amount']/1.18,2).'</td>
+                </tr>
+                <tr>
+                    <td rowspan="3" align="center">1</td>
+                    <td rowspan="3" colspan="2" align="center">Coaching for '.$onlineReceiptArr['batch'].'</td>
+                    <td rowspan="3" colspan="1" align="center">'.$onlineReceiptArr['hsnSac'].'</td>
+                    <td rowspan="3" colspan="1" align="center">NA</td>
+                    <td rowspan="3" colspan="1" align="center">NA</td>
+                    <td rowspan="3" colspan="1" align="center">'.round($onlineReceiptArr['amount']/1.18,2).'</td>
+                    <td colspan="2" align="center">Add:CGST @9% (Rs.)</td>
+                    <td colspan="3" align="center">'.round(($onlineReceiptArr['amount']/1.18) * 0.09,2).'</td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">Add:SGST @9% (Rs.)</td>
+                    <td colspan="3" align="center">'.round(($onlineReceiptArr['amount']/1.18) * 0.09,2).'</td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">Total(Rs.)</td>
+                    <td colspan="3" align="center">'.$onlineReceiptArr['amount'].'</td>
+                </tr>';
+        } else {
+            $tbl .= '<tr>
+                <td colspan="1" align="center">Sr.No</td>
+                <td colspan="6" align="center">Service Supplied</td>
+                <td colspan="1" align="center">Qty</td>
+                <td colspan="1" align="center">Unit</td>
+                <td colspan="3" align="center">Total</td>
+            </tr>
+            <tr>
+                <td align="center">1</td>
+                <td colspan="6" align="center">Coaching for '.$onlineReceiptArr['batch'].'</td>
+                <td colspan="1" align="center">NA</td>
+                <td colspan="1" align="center">NA</td>
+                <td colspan="3" align="center">'.$onlineReceiptArr['amount'].'</td>
+            </tr>';
+        }
+        $tbl .= '<tr>
+                <td colspan="12" align="left" style="text-transform:uppercase;">&nbsp;&nbsp;Ruppes: '.$amountInWords.' only </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align="left"><br/><br/><br/>&nbsp;&nbsp;Customer Signature</td>
+                        <td colspan="6" align="right"><br/><br/><br/>Authorised Signature &nbsp;&nbsp;</td>
+                    </tr>';
+        $tbl .= '
+                </table>';
+        return $tbl;
+    }
+
+    /**
+     *  offline payment receipt
+     */
+    protected function offlineReceipt($subdomainName, $id){
+        $id = InputSanitise::inputInt(json_decode($id));
+        if(isset($id)){
+            if(is_object(Auth::guard('client')->user())){
+                $loginUser = Auth::guard('client')->user();
+                $clientId = $loginUser->id;
+                $clientName = $loginUser->name;
+            } else {
+                $loginUser = Auth::guard('clientuser')->user();
+                $client = $loginUser->client;
+                $clientId = $client->id;
+                $clientName = $client->name;
+            }
+            $payment = ClientOfflinePayment::where('id',$id)->where('client_id',$clientId)->first();
+            if(!is_object($payment)){
+                return Redirect::to('manageOfflinePayments');
+            }
+            $clientReceipt = ClientReceipt::find($clientId);
+            if(is_object($clientReceipt)){
+                $offLineReceiptBy = $clientReceipt->offline_receipt_by;
+                $offLineGstin = $clientReceipt->offline_gstin;
+                $offLineCin = $clientReceipt->offline_cin;
+                $offLinePan = $clientReceipt->offline_pan;
+                $isOfflineGstApplied = $clientReceipt->is_offline_gst_applied;
+                $offLineAddress = $clientReceipt->offline_address;
+                $hsnSac = (!empty($clientReceipt->hsn_sac))?$clientReceipt->hsn_sac:'NA';
+            } else {
+                $offLineReceiptBy = $clientName;
+                $offLineGstin = '';
+                $offLineCin = '';
+                $offLinePan = '';
+                $isOfflineGstApplied = 0;
+                $offLineAddress = '';
+                $hsnSac = 'NA';
+            }
+            if(is_object($payment)){
+                $paymentUser = $payment->user;
+                $userBatch = $payment->batch;
+                $offlineReceiptArr = [
+                    'receipt_id' => $payment->id,
+                    'name' => $paymentUser->name,
+                    'user_id' => $payment->clientuser_id,
+                    'batch' => $userBatch->name,
+                    'amount' => $payment->amount,
+                    'is_offline_gst_applied' => $isOfflineGstApplied,
+                    'receipt_by' => $offLineReceiptBy,
+                    'date' => date('d-m-Y',strtotime($payment->created_at)),
+                    'gstin' => $offLineGstin,
+                    'cin' =>  $offLineCin,
+                    'pan' =>  $offLinePan,
+                    'address' =>  $offLineAddress,
+                    'hsnSac' =>  $hsnSac
+                ];
+
+                $html = $this->createOfflinePdfHtml($offlineReceiptArr);
+                $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8','tempDir' => __DIR__ . '/../mpdfFont']);
+                $mpdf->autoScriptToLang = true;
+                $mpdf->autoLangToFont = true;
+                $mpdf->WriteHTML($html, 2);
+                return  $mpdf->Output("receipt-".$payment->id.".pdf", "I");
+            }
+        }
+        return Redirect::to('manageOfflinePayments');
+    }
+
+    protected function createOfflinePdfHtml($offlineReceiptArr){
+        $numberFormatter = new \NumberFormatter( locale_get_default(), \NumberFormatter::SPELLOUT );
+        $amountInWords = $numberFormatter->format($offlineReceiptArr['amount']);
+
+        $tbl = '<table border="1" cellpadding="0" cellspacing="0" width="100%">';
+        $tbl .= '<thead>
+                <tr>
+                    <td colspan="12" align="center"><b>Tax Invoice</b></td>
+                </tr>
+            </thead>
+            <tr>
+                <td colspan="6" align="center"><h3>&nbsp;<u>'.$offlineReceiptArr['receipt_by'].'</u></h3><br/>&nbsp;'.$offlineReceiptArr['address'].'</td>
+                <td colspan="6" align="center">Receipt No: Offline Receipt-'.$offlineReceiptArr['receipt_id'].'<br/>Date: '.$offlineReceiptArr['date'].'</td>
+            </tr>';
+        if(1 == $offlineReceiptArr['is_offline_gst_applied']){
+            $tbl .= '
+                    <tr>
+                        <td colspan="4" align="center">GSTIN: '.$offlineReceiptArr['gstin'].'</td>
+                        <td colspan="3" align="center">CIN: '.$offlineReceiptArr['cin'].'</td>
+                        <td colspan="5" align="center">PAN: '.$offlineReceiptArr['pan'].'</td>
+                    </tr>';
+        }
+        $tbl .= '
+            <tr>
+                <td colspan="6" align="left">&nbsp;&nbsp;Billed To: '.$offlineReceiptArr['name'].' '.'<br> &nbsp;User Id: '.$offlineReceiptArr['user_id'].'<br> &nbsp;State Code: </td>
+                <td colspan="6" align="left">&nbsp;&nbsp;Shipped To: '.$offlineReceiptArr['name'].' '.'<br> &nbsp;User Id: '.$offlineReceiptArr['user_id'].'<br> &nbsp;State Code: </td>
+            </tr>
+            <tr>
+                <td colspan="12" align="left">&nbsp;&nbsp;Remarks:<br></td>
+            </tr>';
+        if(1 == $offlineReceiptArr['is_offline_gst_applied']){
+                $tbl .= '<tr>
+                    <td colspan="1" align="center">Sr.No</td>
+                    <td colspan="2" align="center">Service Supplied</td>
+                    <td colspan="1" align="center">HSN/<br>SAC</td>
+                    <td colspan="1" align="center">Qty</td>
+                    <td colspan="1" align="center">Unit</td>
+                    <td colspan="1" align="center">Rate Per Item</td>
+                    <td colspan="2" align="center">Taxable Value (Rs.)</td>
+                    <td colspan="3" align="center">'.round($offlineReceiptArr['amount']/1.18,2).'</td>
+                </tr>
+                <tr>
+                    <td rowspan="3" align="center">1</td>
+                    <td rowspan="3" colspan="2" align="center">Coaching for '.$offlineReceiptArr['batch'].'</td>
+                    <td rowspan="3" colspan="1" align="center">'.$offlineReceiptArr['hsnSac'].'</td>
+                    <td rowspan="3" colspan="1" align="center">NA</td>
+                    <td rowspan="3" colspan="1" align="center">NA</td>
+                    <td rowspan="3" colspan="1" align="center">'.round($offlineReceiptArr['amount']/1.18,2).'</td>
+                    <td colspan="2" align="center">Add:CGST @9% (Rs.)</td>
+                    <td colspan="3" align="center">'.round(($offlineReceiptArr['amount']/1.18) * 0.09,2).'</td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">Add:SGST @9% (Rs.)</td>
+                    <td colspan="3" align="center">'.round(($offlineReceiptArr['amount']/1.18) * 0.09,2).'</td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">Total(Rs.)</td>
+                    <td colspan="3" align="center">'.$offlineReceiptArr['amount'].'</td>
+                </tr>';
+        } else {
+            $tbl .= '<tr>
+                <td colspan="1" align="center">Sr.No</td>
+                <td colspan="6" align="center">Service Supplied</td>
+                <td colspan="1" align="center">Qty</td>
+                <td colspan="1" align="center">Unit</td>
+                <td colspan="3" align="center">Total</td>
+            </tr>
+            <tr>
+                <td align="center">1</td>
+                <td colspan="6" align="center">Coaching for '.$offlineReceiptArr['batch'].'</td>
+                <td colspan="1" align="center">NA</td>
+                <td colspan="1" align="center">NA</td>
+                <td colspan="3" align="center">'.$offlineReceiptArr['amount'].'</td>
+            </tr>';
+        }
+        $tbl .= '<tr>
+                <td colspan="12" align="left" style="text-transform:uppercase;">&nbsp;&nbsp;Ruppes: '.$amountInWords.' only </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align="left"><br/><br/><br/>&nbsp;&nbsp;Customer Signature</td>
+                        <td colspan="6" align="right"><br/><br/><br/>Authorised Signature &nbsp;&nbsp;</td>
+                    </tr>';
+        $tbl .= '
+                </table>';
+        return $tbl;
     }
 }

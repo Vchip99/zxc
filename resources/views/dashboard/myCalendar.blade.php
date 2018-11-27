@@ -91,7 +91,7 @@
         <div class="modal todays_data" id="modal_{{$calenderDate}}" role="dialog" style="display: none;">
           <div class="modal-dialog">
             <div class="modal-content">
-              <div class="modal-header">
+              <div class="modal-header" style="overflow: auto;">
                 <button type="button" class="close" data-dismiss="modal">×</button>
                 <h4 class="modal-title">Schedule of {{$calenderDate}}</h4>
                 @if(isset($data['emergency_notices']) && count($data['emergency_notices']) > 0)
@@ -121,7 +121,7 @@
                   </thead>
                   <tbody>
                     @foreach($data['classes'] as $class)
-                      <tr>
+                      <tr style="overflow: auto;">
                         <td>{{$class['dept']}}</td>
                         <td>{{$class['year']}}</td>
                         <td>{{$class['subject']['name']}}</td>
@@ -141,19 +141,23 @@
                     <tr>
                       <th>Departments</th>
                       <th>Years</th>
+                      <th>Type</th>
                       <th>Subject</th>
                       <th>Topic</th>
+                      <th>Mark</th>
                       <th>From</th>
                       <th>To</th>
                     </tr>
                   </thead>
                   <tbody>
                     @foreach($data['exams'] as $exam)
-                      <tr>
+                      <tr style="overflow: auto;">
                         <td>{{$exam['dept']}}</td>
                         <td>{{$exam['year']}}</td>
+                        <td>{{$exam['type']}}</td>
                         <td>{{$exam['subject']['name']}}</td>
                         <td>{{$exam['topic']}}</td>
+                        <td>{{$exam['marks']}}</td>
                         <td>{{$exam['from']}}</td>
                         <td>{{$exam['to']}}</td>
                       </tr>

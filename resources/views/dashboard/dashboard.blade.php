@@ -130,8 +130,7 @@
             @endif
             <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject</a></li>
             <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeAttendance')}}"><i class="fa fa-circle-o"></i> Manage Attendance</a></li>
-            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
-            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
+            <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeOfflineExam')}}"><i class="fa fa-circle-o"></i> Update Offline Marks</a></li>
             <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeExtraClass')}}"><i class="fa fa-circle-o"></i> Manage Extra Class</a></li>
             <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeClassExam')}}"><i class="fa fa-circle-o"></i> Manage Class Exam</a></li>
             <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeNotice')}}"><i class="fa fa-circle-o"></i> Manage College Notice</a></li>
@@ -257,6 +256,23 @@
             @endif
           </ul>
         </li>
+        <li class="treeview">
+          <a href="#" title="Event/Message">
+            <i class="fa fa-envelope"></i> <span>Event/Message</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type|| 6 == Auth::user()->user_type)
+              <li title="Manage Event/Message"><a href="{{ url('college/'.Session::get('college_user_url').'/manageMessage')}}"><i class="fa fa-circle-o"></i> Manage Event/Message</a></li>
+              <li title="Individual Message"><a href="{{ url('college/'.Session::get('college_user_url').'/manageIndividualMessage')}}"><i class="fa fa-circle-o"></i> Individual Message</a></li>
+            @else
+              <li title=" My Message"><a href="{{ url('college/'.Session::get('college_user_url').'/myMessage')}}"><i class="fa fa-circle-o"></i> My Message</a></li>
+              <li title="My Event"><a href="{{ url('college/'.Session::get('college_user_url').'/myEvent')}}"><i class="fa fa-circle-o"></i> My Event</a></li>
+            @endif
+          </ul>
+        </li>
         @if(2 == Auth::user()->user_type)
           <li class="treeview">
             <a href="#">
@@ -369,6 +385,25 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegePurchaseSms')}}"><i class="fa fa-circle-o"></i> Purchase Sms </a></li>
+          </ul>
+        </li>
+        @endif
+        @if(2 == Auth::user()->user_type || 3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+        <li class="treeview">
+          <a href="#" title="Gallery">
+            <i class="fa fa-picture-o"></i> <span>Gallery</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            @if(3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+              <li title="Manage Gallery Types"><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeGalleryType')}}"><i class="fa fa-circle-o"></i> Manage Gallery Types</a></li>
+              <li title="Manage Gallery Images"><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeGalleryImage')}}"><i class="fa fa-circle-o"></i> Manage Gallery Images</a></li>
+            @endif
+            @if(2 == Auth::user()->user_type || 3 == Auth::user()->user_type || 4 == Auth::user()->user_type || 5 == Auth::user()->user_type || 6 == Auth::user()->user_type)
+              <li title="Gallery"><a href="{{ url('college/'.Session::get('college_user_url').'/manageCollegeGallery')}}"><i class="fa fa-circle-o"></i> Gallery</a></li>
+            @endif
           </ul>
         </li>
         @endif

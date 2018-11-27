@@ -10,6 +10,7 @@ use App\Models\Client;
 use App\Models\Clientuser;
 use App\Models\ClientBatch;
 use App\Models\ClientExam;
+use App\Models\ClientOfflinePaperMark;
 
 class ClientExamController extends ClientBaseController
 {
@@ -29,10 +30,12 @@ class ClientExamController extends ClientBaseController
      * the controller to reuse the rules.
      */
     protected $validateClientExam = [
+        'exam_type' => 'required',
         'batch' => 'required',
         'name' => 'required',
         'subject' => 'required',
         'topic' => 'required',
+        'marks' => 'required',
         'date' => 'required',
         'from_time' => 'required',
         'to_time' => 'required',

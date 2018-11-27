@@ -36,7 +36,7 @@
       <tbody>
         @if(count($userDatas) > 0)
           @foreach($userDatas as $index => $userData)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $userDatas->firstItem()}}</th>
             <td>{{$userData->user->name}}</td>
             <td>{{$userData->paper->name}}</td>

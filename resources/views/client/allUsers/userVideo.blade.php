@@ -20,27 +20,28 @@
                 {{ Session::get('message') }}
             </div>
           @endif
-          <div class="row">
-            <div class="col-md-3 mrgn_10_btm" id="student">
-              <select class="form-control" id="selected_student" name="student" onChange="showResult();">
-                <option value="0"> Select User </option>
-                 @if(count($students) > 0)
-                  @foreach($students as $student)
-                    @if(is_object($selectedStudent) && $selectedStudent->id == $student->id)
-                      <option value="{{$student->id}}" selected="true"> {{$student->name}} </option>
-                    @else
-                      <option value="{{$student->id}}"> {{$student->name}} </option>
-                    @endif
-                  @endforeach
-                @endif
-              </select>
-            </div>
-          </div>
         </div>
       </div>
       <div class="container">
         <div class="row">
           <div class="container admin_div">
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="category">User:</label>
+              <div class="col-md-3 mrgn_10_btm" id="student">
+                <select class="form-control" id="selected_student" name="student" onChange="showResult();">
+                  <option value="0"> Select User </option>
+                   @if(count($students) > 0)
+                    @foreach($students as $student)
+                      @if(is_object($selectedStudent) && $selectedStudent->id == $student->id)
+                        <option value="{{$student->id}}" selected="true"> {{$student->name}} </option>
+                      @else
+                        <option value="{{$student->id}}"> {{$student->name}} </option>
+                      @endif
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+            </div>
               <form action="{{url('updateUserVideo')}}" method="POST">
               {{ method_field('PUT') }}
               <input type="hidden" id="student_id" name="student_id" value="{{($selectedStudent)?$selectedStudent->id:null}}">

@@ -35,7 +35,7 @@
       <tbody>
         @if(count($virtualPlacementDrives) > 0)
           @foreach($virtualPlacementDrives as $index => $virtualPlacementDrive)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + 1}}</th>
             <td>{{$virtualPlacementDrive->name}}</td>
             <td>

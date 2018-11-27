@@ -34,7 +34,7 @@
               $totalBatchAmount = 0;
             @endphp
             @foreach($batchPayments as $batchId => $batchPayment)
-              <tr>
+              <tr style="overflow: auto;">
                 <td>{{ $index++}}</td>
                 <td><a href="#batchModal_{{$batchId}}" data-toggle="modal">{{$batchPayment['batch']}}</a></td>
                 <td>{{$batchPayment['amount']}}</td>
@@ -43,7 +43,7 @@
                 @endphp
               </tr>
             @endforeach
-            <tr>
+            <tr style="overflow: auto;">
               <td></td>
               <td> Total</td>
               <td>{{$totalBatchAmount}}</td>
@@ -78,7 +78,7 @@
                     <tbody>
                       @if(count($batchUsers[$batchId]) > 0)
                         @foreach($batchUsers[$batchId] as $userId => $batchUser)
-                          <tr>
+                          <tr style="overflow: auto;">
                             <td>{{$batchIndex++}}</td>
                             <td><a href="#batchUser_{{$batchId}}_{{$userId}}" data-toggle="modal">{{$batchUser['user']}}</a></td>
                             <td>{{$batchUser['email']}}</td>
@@ -89,7 +89,7 @@
                             @endphp
                           </tr>
                         @endforeach
-                        <tr>
+                        <tr style="overflow: auto;">
                           <td colspan="3"></td>
                           <td>Total</td>
                           <td>{{$batchAmount}}</td>
@@ -129,7 +129,7 @@
                               $userTotal = 0;
                             @endphp
                             @foreach($usersPayment[$batchId][$userId] as $index => $payment)
-                              <tr>
+                              <tr style="overflow: auto;">
                                 <td>{{$index + 1}}</td>
                                 <td>{{$payment['date']}}</td>
                                 <td>{{$payment['due_date']}}</td>
@@ -140,7 +140,7 @@
                                 @endphp
                               </tr>
                             @endforeach
-                              <tr>
+                              <tr style="overflow: auto;">
                                 <td colspan="3"></td>
                                 <td>Total</td>
                                 <td>{{$userTotal}}</td>

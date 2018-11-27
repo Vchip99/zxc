@@ -53,7 +53,7 @@
         <tbody id="">
           @if(count($transactions) > 0)
             @foreach($transactions as $index => $transaction)
-            <tr>
+            <tr style="overflow: auto;">
               <td>{{$index + 1}}</td>
               <td><img class="img-box" src="{{$transaction->image}}" alt=""></td>
               <td>{{$transaction->batch->name}}</td>

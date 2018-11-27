@@ -54,6 +54,18 @@ class ClientAssignmentSubject extends Model
         }
     }
 
+    protected static function getAssignmentSubjectsAssociatedWithAssignmentByClientId($clientId){
+        return static::join('client_assignment_questions','client_assignment_questions.client_assignment_subject_id','=','client_assignment_subjects.id')
+            ->where('client_assignment_subjects.client_id',$clientId)
+            ->where('client_assignment_questions.question' , '!=', '')->select('client_assignment_subjects.*')->groupBy('client_assignment_subjects.id')->get();
+    }
+
+    protected static function getAssignmentSubjectsAssociatedWithDocumentByClientId($clientId){
+        return static::join('client_assignment_questions','client_assignment_questions.client_assignment_subject_id','=','client_assignment_subjects.id')
+            ->where('client_assignment_subjects.client_id',$clientId)
+            ->where('client_assignment_questions.question',' ')->select('client_assignment_subjects.*')->groupBy('client_assignment_subjects.id')->get();
+    }
+
     protected static function deleteClientAssignmentSubjectByClientId($clientId){
         $subjects = static::where('client_id', $clientId)->get();
         if(is_object($subjects) && false == $subjects->isEmpty()){

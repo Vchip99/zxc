@@ -36,7 +36,7 @@
       <tbody>
         @if(count($areas) > 0)
           @foreach($areas as $index => $area)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $areas->firstItem()}}</th>
             <td>{{$area->name}}</td>
             <td>{{$area->designation->name}}</td>

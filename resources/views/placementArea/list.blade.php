@@ -35,7 +35,7 @@
       <tbody>
         @if(count($placementAreas) > 0)
           @foreach($placementAreas as $index => $placementArea)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $placementAreas->firstItem()}}</th>
             <td>{{$placementArea->name}}</td>
             <td>

@@ -35,7 +35,7 @@
       <tbody>
         @if(count($blogCategories) > 0)
         @foreach($blogCategories as $index => $blogCategory)
-        <tr>
+        <tr style="overflow: auto;">
           <th scope="row">{{$index + $blogCategories->firstItem()}}</th>
           <td>{{$blogCategory->name}}</td>
           <td>

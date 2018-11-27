@@ -37,7 +37,7 @@
       <tbody>
         @if(count($courseCourses) > 0)
           @foreach($courseCourses as $index => $courseCourse)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $courseCourses->firstItem()}}</th>
             <td>{{$courseCourse->name}}</td>
             <td>{{$courseCourse->subcategory}}</td>

@@ -11,7 +11,6 @@ use App\Models\CollegeSubject;
 use App\Models\CollegeDept;
 use App\Models\User;
 use App\Models\CollegeUserAttendance;
-use App\Models\CollegeOfflinePaper;
 use App\Models\CollegeOfflinePaperMarks;
 use App\Models\AssignmentTopic;
 use App\Models\AssignmentQuestion;
@@ -194,8 +193,6 @@ class CollegeSubjectController extends Controller
                 if($loginUser->id == $subject->lecturer_id || (User::Hod == $loginUser->user_type || User::Directore == $loginUser->user_type)){
                     // delete attendance
                     CollegeUserAttendance::deleteAttendanceBySubjectId($subjectId);
-                    // delete offline paper
-                    CollegeOfflinePaper::deleteCollegeOfflinePapersBySubjectId($subjectId);
                     // delete offline paper marks
                     CollegeOfflinePaperMarks::deleteCollegeOfflinePaperMarksBySubjectId($subjectId);
                     // delete assignment topic

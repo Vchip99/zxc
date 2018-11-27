@@ -24,14 +24,16 @@
       </div>
     </div>
     <div>
-      <table class="" id="">
+      <table class="" id="clientExams">
         <thead class="thead-inverse">
           <tr>
             <th>#</th>
             <th>Batch</th>
+            <th>Type</th>
             <th>Exam</th>
             <th>Subject</th>
             <th>Topic</th>
+            <th>Mark</th>
             <th>Date</th>
             <th>From</th>
             <th>To</th>
@@ -42,7 +44,7 @@
         <tbody id="">
           @if(count($exams) > 0)
             @foreach($exams as $index => $exam)
-            <tr>
+            <tr style="overflow: auto;">
               <td>{{$index + 1}}</td>
               <td>
                 @if(0 == $exam->client_batch_id)
@@ -51,9 +53,17 @@
                   {{$exam->batch->name}}
                 @endif
               </td>
+              <td>
+                @if(1 == $exam->exam_type)
+                  Online
+                @else
+                  Offline
+                @endif
+              </td>
               <td>{{$exam->name}}</td>
               <td>{{$exam->subject}}</td>
               <td>{{$exam->topic}}</td>
+              <td>{{$exam->marks}}</td>
               <td>{{$exam->date}}</td>
               <td>{{$exam->from_time}}</td>
               <td>{{$exam->to_time}}</td>

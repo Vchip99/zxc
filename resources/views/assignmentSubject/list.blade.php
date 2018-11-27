@@ -37,7 +37,7 @@
       <tbody id="assignmentSubject">
         @if(count($subjects) > 0)
           @foreach($subjects as $index => $subject)
-          <tr>
+          <tr style="overflow: auto;">
             <td>{{$index + $subjects->firstItem()}}</td>
             <td>{{$subject->name}}</td>
             <td>

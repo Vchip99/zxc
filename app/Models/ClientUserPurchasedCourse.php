@@ -42,6 +42,13 @@ class ClientUserPurchasedCourse extends Model
         return $userCourses;
     }
 
+    protected static function getUserPurchasedCourseByClientIdById($clientId, $id){
+        return static::join('client_user_payments', 'client_user_payments.payment_id', '=', 'client_user_purchased_courses.payment_id')
+                ->where('client_user_purchased_courses.client_id', $clientId)
+                ->where('client_user_purchased_courses.id', $id)
+                ->select('client_user_purchased_courses.*', 'client_user_payments.updated_at')->first();
+    }
+
     protected static function getClientUserPurchasedCourses($clientId, $userId){
         $result = static::join('client_user_payments', 'client_user_payments.payment_id', '=', 'client_user_purchased_courses.payment_id')
                 ->where('client_user_purchased_courses.client_id', $clientId);

@@ -36,7 +36,7 @@
       <tbody>
         @if(count($workshopDetails) > 0)
           @foreach($workshopDetails as $index => $workshopDetail)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + 1}}</th>
             <td>{{$workshopDetail->name}}</td>
             <td>{{$workshopDetail->category->name}}</td>

@@ -50,7 +50,7 @@
                   <tbody id="students" class="">
                     @if(count($upApproveUsers) > 0)
                       @foreach($upApproveUsers as $index => $upApproveUser)
-                        <tr>
+                        <tr style="overflow: auto;">
                           <td>{{ $index + 1}}</td>
                           @if($upApproveUser->college_id > 0)
                             <td>{{ $upApproveUser->college->name }}</td>

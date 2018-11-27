@@ -40,7 +40,7 @@
       <tbody>
         @if(count($testPapers) > 0)
           @foreach($testPapers as $index => $testPaper)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $testPapers->firstItem()}}</th>
             <td>{{$testPaper->name}}</td>
             <td>{{$testPaper->category}}</td>

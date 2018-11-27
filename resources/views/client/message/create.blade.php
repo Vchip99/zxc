@@ -11,6 +11,9 @@
 @stop
 @section('dashboard_content')
   &nbsp;
+    <script src="{{asset('js/moment-with-locales.min.js?ver=1.0')}}" type="text/javascript"></script>
+    <script src="{{asset('js/bootstrap-datetimepicker.min.js?ver=1.0')}}" type="text/javascript"></script>
+    <link href="{{asset('css/bootstrap-datetimepicker.min.css?ver=1.0')}}" rel="stylesheet"/>
   <div class="container admin_div">
   @if(isset($message->id))
     <form action="{{url('updateMessage')}}" method="POST" enctype="multipart/form-data">
@@ -20,6 +23,13 @@
    <form action="{{url('createMessage')}}" method="POST" enctype="multipart/form-data">
   @endif
     {{ csrf_field() }}
+    <div class="form-group row  @if ($errors->has('photo')) has-error @endif">
+      <label class="col-sm-2 col-form-label" for="photo">Type:</label>
+      <div class="col-sm-3">
+        <input type="radio" name="type" value="1" checked onClick="toggleType(this.value)"> Message
+        <input type="radio" name="type" value="0" onClick="toggleType(this.value)"> Event
+      </div>
+    </div>
     <div class="form-group row  @if ($errors->has('batch')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="batch">Batch Name:</label>
       <div class="col-sm-3">
@@ -72,6 +82,38 @@
         @if($errors->has('message')) <p class="help-block">{{ $errors->first('message') }}</p> @endif
       </div>
     </div>
+    @if(!empty($message->start_date) && !empty($message->end_date))
+      <div id="dateDiv" class="">
+    @else
+      <div id="dateDiv" class="hide">
+    @endif
+      <div class="form-group row  @if ($errors->has('start_date')) has-error @endif">
+        <label class="col-sm-2 col-form-label" for="start_date">Start Date:</label>
+        <div class="col-sm-3">
+          <input type="text"  class="form-control" name="start_date" id="start_date" @if(isset($message->id)) value="{{$message->start_date}}" @endif placeholder="Start Date">
+        </div>
+        <script type="text/javascript">
+            $(function () {
+                $('#start_date').datetimepicker({
+                  format: 'YYYY-MM-DD HH:mm'
+                });
+            });
+        </script>
+      </div>
+      <div class="form-group row  @if ($errors->has('end_date')) has-error @endif">
+        <label class="col-sm-2 col-form-label" for="end_date">End Date:</label>
+        <div class="col-sm-3">
+          <input type="text"  class="form-control" name="end_date" id="end_date" @if(isset($message->id)) value="{{$message->end_date}}" @endif placeholder="End Date">
+        </div>
+        <script type="text/javascript">
+            $(function () {
+                $('#end_date').datetimepicker({
+                  format: 'YYYY-MM-DD HH:mm'
+                });
+            });
+        </script>
+      </div>
+    </div>
     <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
         <button type="submit" class="btn btn-primary" style="width: 90px !important;">Submit</button>
@@ -79,4 +121,17 @@
     </div>
     </form>
   </div>
+<script type="text/javascript">
+  function toggleType(type){
+    if(1 == type){
+      $('#dateDiv').addClass('hide');
+      $('#start_date').prop('required', false);
+      $('#end_date').prop('required', false);
+    } else {
+      $('#dateDiv').removeClass('hide');
+      $('#start_date').prop('required', true);
+      $('#end_date').prop('required', true);
+    }
+  }
+</script>
 @stop

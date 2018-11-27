@@ -104,7 +104,13 @@
                   @if(is_object($assignment))
                     <tr>
                       <td>1</td>
-                      <td>{!! mb_strimwidth($assignment->question, 0, 400, "...") !!}</td>
+                      <td>
+                        @if(!empty($assignment->question))
+                          {!! mb_strimwidth($assignment->question, 0, 400, "...") !!}
+                        @else
+                          Its a Document
+                        @endif
+                      </td>
                       <td>
                         @if(0 == $assignment->client_batch_id || empty($assignment->client_batch_id))
                           All
@@ -240,7 +246,11 @@
           eleTr.appendChild(eleIndex);
 
           var eleQuestion = document.createElement('td');
-          eleQuestion.innerHTML = msg['question'];
+          if(msg['question']){
+            eleQuestion.innerHTML = msg['question'];
+          } else {
+            eleQuestion.innerHTML = 'Its a Document';
+          }
           eleTr.appendChild(eleQuestion);
 
           var eleSubject = document.createElement('td');

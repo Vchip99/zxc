@@ -35,7 +35,7 @@
       <tbody>
         @if(count($subadmins) > 0)
         @foreach($subadmins as $index => $subadmin)
-        <tr>
+        <tr style="overflow: auto;">
           <th scope="row">{{$subadmin->id}}</th>
           <td>{{$subadmin->name}}</td>
           <td>

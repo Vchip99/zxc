@@ -49,7 +49,7 @@
 			                  <tbody  id="test-result">
 			                    @if(count($results) > 0)
 			                      @foreach($results as $index => $result)
-			                        <tr class="">
+			                        <tr class="" style="overflow: auto;">
 			                          <td>{{$index + 1}}</td>
 			                          <td>{{$result->batch->name}}</td>
 			                          <td>{{$result->paper->name}}</td>

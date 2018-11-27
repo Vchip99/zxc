@@ -94,7 +94,11 @@
             <div class="form-group row ">
               <label for="topic" class="col-sm-2 col-form-label">Assignment:</label>
               <div class="col-sm-10">
+                @if(!empty($assignment->question))
                   {!! $assignment->question !!}
+                @else
+                  Its a Document
+                @endif
               </div>
             </div>
               <div class="form-group row ">

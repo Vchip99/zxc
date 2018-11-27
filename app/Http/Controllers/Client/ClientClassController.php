@@ -203,7 +203,9 @@ class ClientClassController extends ClientBaseController
                     'topic' => $exam->topic,
                     'from' => $exam->from_time,
                     'to' => $exam->to_time,
-                    'batch' => $allBatches[$exam->client_batch_id]
+                    'batch' => $allBatches[$exam->client_batch_id],
+                    'marks' => $exam->marks,
+                    'exam_type' => $exam->exam_type,
                 ];
             }
         }

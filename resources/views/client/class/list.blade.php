@@ -24,7 +24,7 @@
       </div>
     </div>
     <div>
-      <table class="" id="">
+      <table class="" id="clientClasses">
         <thead class="thead-inverse">
           <tr>
             <th>#</th>
@@ -42,7 +42,7 @@
         <tbody id="">
           @if(count($classes) > 0)
             @foreach($classes as $index => $class)
-            <tr>
+            <tr style="overflow: auto;">
               <td>{{$index + 1}}</td>
               <td>
                 @if(0 == $class->client_batch_id)

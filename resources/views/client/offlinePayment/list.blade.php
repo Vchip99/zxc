@@ -32,6 +32,7 @@
           <th>User</th>
           <th>Amount</th>
           <th>Date</th>
+          <th>Recepit</th>
           <th>Edit</th>
           <th>Delete</th>
         </tr>
@@ -39,12 +40,16 @@
       <tbody id="">
         @if(count($payments) > 0)
           @foreach($payments as $index => $payment)
-          <tr>
+          <tr style="overflow: auto;">
             <td>{{$index + $payments->firstItem()}}</td>
             <td>{{$payment->batch->name}}</td>
             <td>{{$payment->user->name}}</td>
             <td>{{$payment->amount}}</td>
             <td>{{$payment->updated_at}}</td>
+            <td>
+              <a href="{{url('offlineReceipt')}}/{{$payment->id}}" target="_blank">Receipt
+                </a>
+            </td>
             <td>
               <a href="{{url('offlinePayment')}}/{{$payment->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit" />
                 </a>
@@ -61,7 +66,7 @@
           </tr>
           @endforeach
         @else
-          <tr><td colspan="6">No Offline Payments.</td></tr>
+          <tr><td colspan="7">No Offline Payments.</td></tr>
         @endif
       </tbody>
     </table>

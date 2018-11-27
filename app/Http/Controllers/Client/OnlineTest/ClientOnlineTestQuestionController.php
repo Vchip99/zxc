@@ -594,7 +594,7 @@ class ClientOnlineTestQuestionController extends ClientBaseController
     }
 
     protected function uploadClientTestImages($subdomainName, Request $request){
-        $allowedImageTypes = ['image/png','image/jpeg'];
+        $allowedImageTypes = ['image/png','image/jpeg','image/jpg'];
         if($request->exists('images')){
             foreach($request->file('images') as $file){
                 if(in_array($file->getClientMimeType(), $allowedImageTypes)){

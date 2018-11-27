@@ -139,9 +139,9 @@
                           @if(isset($testSubjectPapers[$testSubject->id]))
                           @foreach($testSubjectPapers[$testSubject->id] as $testSubjectPaper)
                             @if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
-                              <tr style="background-color: #b3c2dc;">
+                              <tr style="background-color: #b3c2dc;overflow: auto;">
                             @else
-                              <tr>
+                              <tr style="overflow: auto;">
                             @endif
                                 <td class=" ">{{ $testSubjectPaper->name }}</td>
                                 <td id="startTest_{{$testSubjectPaper->id}}">

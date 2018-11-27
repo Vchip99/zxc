@@ -17,7 +17,7 @@ class ClientMessage extends Model
      *
      * @var array
      */
-    protected $fillable = ['client_batch_id','photo','message','client_id','created_by'];
+    protected $fillable = ['client_batch_id','photo','message','client_id','created_by','start_date','end_date'];
 
     /**
      *  add/update client message
@@ -26,6 +26,8 @@ class ClientMessage extends Model
         $messageString = $request->get('message');
         $batchId   = InputSanitise::inputInt($request->get('batch'));
         $messageId   = InputSanitise::inputInt($request->get('message_id'));
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
         $resultArr = InputSanitise::getClientIdAndCretedBy();
         $clientId = $resultArr[0];
         $createdBy = $resultArr[1];
@@ -42,6 +44,8 @@ class ClientMessage extends Model
         $message->client_id = $clientId;
         $message->client_batch_id = $batchId;
         $message->created_by = $createdBy;
+        $message->start_date = $startDate;
+        $message->end_date = $endDate;
         $message->save();
 
         $clientName = $subdomainName;
@@ -83,7 +87,13 @@ class ClientMessage extends Model
     protected static function getMessagesByBatchIdsByClientId($batchIds,$clientId){
         return static::where('client_id', $clientId)->where(function($query) use($batchIds){
             $query->whereIn('client_batch_id', $batchIds)->orWhere('client_batch_id', 0);
-        })->orderBy('updated_at','desc')->get();
+        })->where('start_date','')->where('end_date','')->orderBy('updated_at','desc')->get();
+    }
+
+    protected static function getEventsByBatchIdsByClientId($batchIds,$clientId){
+        return static::where('client_id', $clientId)->where(function($query) use($batchIds){
+            $query->whereIn('client_batch_id', $batchIds)->orWhere('client_batch_id', 0);
+        })->where('start_date','!=','')->where('end_date','!=','')->orderBy('start_date','asc')->get();
     }
 
     protected static function deleteMessagesByBatchIdsByClientId($batchId,$clientId){

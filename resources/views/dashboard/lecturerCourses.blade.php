@@ -96,7 +96,7 @@
                   <tbody  id="course-result">
                   @if(count($results) > 0)
                     @foreach($results as $index => $result)
-                      <tr class="">
+                      <tr class="" style="overflow: auto;">
                         <td>{{$index + 1}}</td>
                         <td>{{$result->category}}</td>
                         <td>{{$result->subcategory}}</td>

@@ -39,7 +39,7 @@
                   <tbody id="clients">
                     @if(count($clients) > 0)
                       @foreach($clients as $index => $client)
-                        <tr>
+                        <tr style="overflow: auto;">
                           <td>{{$index + 1}}</td>
                           <td>{{$client->name}}</td>
                           <td>{{$client->subdomain}}</td>

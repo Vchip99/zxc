@@ -25,7 +25,7 @@
   <div>
     <table class="table admin_table">
       <thead class="thead-inverse">
-        <tr>
+        <tr style="overflow: auto;">
           <th>#</th>
           <th>Video </th>
           <th>Category </th>

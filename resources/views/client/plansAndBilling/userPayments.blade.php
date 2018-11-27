@@ -119,10 +119,11 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
                         <th>Name</th>
                         <th>Amount</th>
                         <th>Date</th>
+                        <th>Receipt</th>
                     </tr>
                 </thead>
                 <tbody id="client_history">
-                <tr><td colspan="6">please select user</td></tr>
+                <tr><td colspan="7">please select user</td></tr>
                 </tbody>
             </table>
           </div>
@@ -167,6 +168,11 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
             eleDate.innerHTML = format_time(new Date(obj['date']['date']));
             eleTr.appendChild(eleDate);
 
+            var eleReceipt = document.createElement('td');
+            eleReceipt.innerHTML = '<a href="{{url('onlineReceipt')}}/'+obj['type']+'/'+obj['id']+'" target="_blank">Receipt</a>';
+            eleTr.appendChild(eleReceipt);
+
+
             body.appendChild(eleTr);
         });
 
@@ -186,6 +192,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
 
         var eleStatus = document.createElement('td');
         eleStatus.innerHTML = '';
+        eleStatus.setAttribute('colspan', '2');
         eleTr.appendChild(eleStatus);
 
         body.appendChild(eleTr);
@@ -193,7 +200,7 @@ text-shadow: 0px 3px 0px rgba(50,50,50, .3);}
         var eleTr = document.createElement('tr');
         var eleIndex = document.createElement('td');
         eleIndex.innerHTML = 'No result!';
-        eleIndex.setAttribute('colspan', '6');
+        eleIndex.setAttribute('colspan', '7');
         eleTr.appendChild(eleIndex);
         body.appendChild(eleTr);
       }

@@ -10,7 +10,6 @@ use App\Models\Client;
 use App\Models\ClientBatch;
 use App\Models\Clientuser;
 use App\Models\ClientUserAttendance;
-use App\Models\ClientOfflinePaper;
 use App\Models\ClientOfflinePaperMark;
 use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
@@ -184,7 +183,6 @@ class ClientBatchController extends ClientBaseController
                     }
                 }
                 ClientUserAttendance::deleteAttendanceByBtachIdByClientId($batch->id,$batch->client_id);
-                ClientOfflinePaper::deleteOfflinePaperseByBtachIdByClientId($batch->id,$batch->client_id);
                 ClientOfflinePaperMark::deleteClientOfflinePaperMarkByBatchIdByClientId($batch->id,$batch->client_id);
                 ClientAssignmentSubject::deleteAssignmentSubjectsByBatchIdByClientId($batch->id,$batch->client_id);
                 ClientAssignmentTopic::deleteAssignmentTopicsByBatchIdByClientId($batch->id,$batch->client_id);

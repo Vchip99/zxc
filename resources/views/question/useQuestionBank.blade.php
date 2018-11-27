@@ -235,7 +235,7 @@
 					      		@if(count($questions) > 0)
 							        @foreach($questions as $index => $question)
 							        	@if(isset($question->id))
-									        <tr>
+									        <tr style="overflow: auto;">
 									          	<th scope="row">{{$index + 1}}</th>
 									          	<td>
 									          			{!! $question->name !!}

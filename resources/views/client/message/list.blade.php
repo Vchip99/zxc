@@ -24,12 +24,13 @@
       </div>
     </div>
   <div>
-    <table class="" id="clientBatchTable">
+    <table class="" id="clientMessages">
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
           <th>Message</th>
           <th>Batch</th>
+          <th>Event/Message</th>
           <th>Edit</th>
           <th>Delete</th>
         </tr>
@@ -37,7 +38,7 @@
       <tbody id="batches">
         @if(count($messages) > 0)
           @foreach($messages as $index => $message)
-          <tr>
+          <tr style="overflow: auto;">
             <td>{{$index + 1}}</td>
             <td>{!! mb_strimwidth($message->message, 0, 400, "...") !!}</td>
             <td>
@@ -45,6 +46,13 @@
                 All
               @else
                 {{$message->batch->name}}
+              @endif
+            </td>
+            <td>
+              @if(!empty($message->start_date) && !empty($message->end_date))
+                Event
+              @else
+                Message
               @endif
             </td>
             <td>

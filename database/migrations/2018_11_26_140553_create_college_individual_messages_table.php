@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateClientOfflinePapersTable extends Migration
+class CreateCollegeIndividualMessagesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreateClientOfflinePapersTable extends Migration
      */
     public function up()
     {
-        Schema::connection('mysql2')->create('client_offline_papers', function (Blueprint $table) {
+        Schema::create('college_individual_messages', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('client_batch_id');
-            $table->string('name');
-            $table->string('marks');
-            $table->integer('client_id');
+            $table->integer('college_id');
+            $table->integer('college_dept_id');
+            $table->integer('year');
+            $table->text('messages');
+            $table->integer('created_by');
             $table->timestamps();
         });
     }
@@ -30,6 +31,6 @@ class CreateClientOfflinePapersTable extends Migration
      */
     public function down()
     {
-        Schema::connection('mysql2')->drop('client_offline_papers');
+        Schema::drop('college_individual_messages');
     }
 }

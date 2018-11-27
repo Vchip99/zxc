@@ -37,7 +37,7 @@
       <tbody>
         @if(count($motivationalSpeechVideos) > 0)
           @foreach($motivationalSpeechVideos as $index => $motivationalSpeechVideo)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $motivationalSpeechVideos->firstItem()}}</th>
             <td>{{$motivationalSpeechVideo->name}}</td>
             <td>{{$motivationalSpeechVideo->motivationalspeaker->name}}</td>

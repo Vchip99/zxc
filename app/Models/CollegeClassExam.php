@@ -14,7 +14,7 @@ class CollegeClassExam extends Model
      *
      * @var array
      */
-    protected $fillable = ['college_id','college_dept_ids','years','college_subject_id','created_by','topic','date','from_time','to_time'];
+    protected $fillable = ['college_id','college_dept_ids','years','college_subject_id','created_by','topic','date','from_time','to_time','marks','exam_type'];
 
     /**
      *  add/update course category
@@ -48,6 +48,8 @@ class CollegeClassExam extends Model
         $date   = InputSanitise::inputString($request->get('date'));
         $fromTime   = InputSanitise::inputString($request->get('from_time'));
         $toTime   = InputSanitise::inputString($request->get('to_time'));
+        $marks   = InputSanitise::inputString($request->get('marks'));
+        $examType   = InputSanitise::inputInt($request->get('exam_type'));
         $examId   = InputSanitise::inputInt($request->get('exam_id'));
         if( $isUpdate && isset($examId)){
             $collegeClassExam = static::find($examId);
@@ -67,6 +69,8 @@ class CollegeClassExam extends Model
         $collegeClassExam->date = $date;
         $collegeClassExam->from_time = $fromTime;
         $collegeClassExam->to_time = $toTime;
+        $collegeClassExam->marks = $marks;
+        $collegeClassExam->exam_type = $examType;
         $collegeClassExam->save();
         return $collegeClassExam;
     }
@@ -117,5 +121,13 @@ class CollegeClassExam extends Model
         } else {
             return static::where('college_id', $collegeId)->orderBy('date','desc')->get();
         }
+    }
+
+    protected static function getCollegeOfflineExamsByCollegeIdByDeptIdByYear($subjectId,$departmentId,$year){
+        return static::where('college_id', Auth::user()->college_id)
+            ->where('college_subject_id', $subjectId)
+            ->whereRaw("find_in_set($departmentId , college_dept_ids)")
+            ->whereRaw("find_in_set($year , years)")
+            ->where('exam_type', 0)->get();
     }
 }

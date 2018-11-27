@@ -32,6 +32,7 @@
                           <th>Type</th>
                           <th>Date</th>
                           <th>Payment</th>
+                          <th>Receipt</th>
                         </tr>
                       </thead>
                       <tbody >
@@ -40,12 +41,13 @@
                         @endphp
                         @if(count($userPurchasedCourses) > 0)
                           @foreach($userPurchasedCourses as $index => $userPurchasedCourse)
-                            <tr>
+                            <tr style="overflow: auto;">
                               <td>{{$index + 1}}</td>
                               <td>{{$userPurchasedCourse->course->name}}</td>
                               <td>Course</td>
                               <td>{{date('Y-m-d',strtotime($userPurchasedCourse->updated_at))}}</td>
                               <td>{{$userPurchasedCourse->price}}</td>
+                              <td><a href="{{ url('onlineReceipt')}}/Course/{{$userPurchasedCourse->id}}" target="_blank">Receipt</a></td>
                             </tr>
                             @php
                               $total += $userPurchasedCourse->price;
@@ -54,12 +56,13 @@
                         @endif
                         @if(count($userPurchasedSubCategories) > 0)
                           @foreach($userPurchasedSubCategories as $index => $userPurchasedSubCategory)
-                            <tr>
+                            <tr style="overflow: auto;">
                               <td>{{$index + 1}}</td>
                               <td>{{$userPurchasedSubCategory->testSubCategory->name}}</td>
                               <td>SubCategory</td>
                               <td>{{date('Y-m-d',strtotime($userPurchasedSubCategory->updated_at))}}</td>
                               <td>{{$userPurchasedSubCategory->price}}</td>
+                              <td><a href="{{ url('onlineReceipt')}}/SubCategory/{{$userPurchasedSubCategory->id}}" target="_blank">Receipt</a></td>
                             </tr>
                             @php
                               $total += $userPurchasedSubCategory->price;
@@ -70,11 +73,11 @@
                           <tr>
                             <td colspan="3"></td>
                             <td>Total</td>
-                            <td>{{$total}}</td>
+                            <td colspan="2">{{$total}}</td>
                           </tr>
                         @else
                           <tr>
-                            <td colspan="5">No Payments.</td>
+                            <td colspan="6">No Payments.</td>
                           </tr>
                         @endif
                       </tbody>

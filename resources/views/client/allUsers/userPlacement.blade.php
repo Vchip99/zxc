@@ -26,6 +26,19 @@
       <div class="top mrgn_40_btm"">
         <div class="container">
           <div class="row">
+            <div class="col-md-3">
+              <div style="margin-bottom: 10px">
+                  <select class="form-control" name="batch" id="batch" onChange="searchBatchUsers(this.value);">
+                      <option value="">Select Batch</option>
+                      <option value="All">All</option>
+                      @if(count($batches) > 0)
+                          @foreach($batches as $batch)
+                              <option value="{{$batch->id}}">{{$batch->name}}</option>
+                          @endforeach
+                      @endif
+                  </select>
+              </div>
+            </div>
             <div class="col-md-3 mrgn_10_btm" id="student">
               <select class="form-control" id="selected_student" name="student" onChange="showResult();">
                 <option value="0"> Select User </option>
@@ -168,6 +181,32 @@
   }
   $('#student_video').on('hide.bs.modal', function (e) {
     toggleVideo('hide')
-  })
+  });
+
+  function searchBatchUsers(batchId){
+    if(batchId){
+      $.ajax({
+        method: "POST",
+        url: "{{url('getStudentsByBatchId')}}",
+        data:{batch_id:batchId}
+      })
+      .done(function( msg ) {
+        select = document.getElementById('selected_student');
+        select.innerHTML = '';
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = 'Select User';
+        select.appendChild(opt);
+        if( 0 < msg['users'].length){
+          $.each(msg['users'], function(idx, obj) {
+              var opt = document.createElement('option');
+              opt.value = obj.id;
+              opt.innerHTML = obj.name;
+              select.appendChild(opt);
+          });
+        }
+      });
+    }
+  }
 </script>
 @stop

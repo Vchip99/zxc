@@ -76,7 +76,7 @@
           <tbody id="mobile_admin_messages">
             @if(count($notifications) > 0)
               @foreach($notifications as $index => $notification)
-              <tr>
+              <tr style="overflow: auto;">
                 <td scope="row">{{$index + $notifications->firstItem()}}</td>
                 <td>{!! $notification->message !!}
                 </td>

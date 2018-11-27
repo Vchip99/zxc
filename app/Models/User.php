@@ -739,17 +739,6 @@ class User extends Authenticatable
         return;
     }
 
-    protected static function getCollegeStudentsByPaperIdByDeptIdByYear($paperId,$deptId,$year){
-        $loginUser = Auth::user();
-        return static::join('college_offline_papers','college_offline_papers.college_id','=','users.college_id')
-            ->where('college_offline_papers.id', $paperId)
-            ->where('users.college_dept_id', $deptId)
-            ->where('users.year', $year)
-            ->where('college_offline_papers.college_id', $loginUser->college_id)
-            ->where('users.user_type', self::Student)->where('users.admin_approve', 1)
-            ->select('users.id','users.name','college_offline_papers.marks')->get();
-    }
-
     protected static function getUserByUserIdByCollegeByDeptByYear(Request $request){
         $college = $request->get('college');
         $department = $request->get('department');
@@ -830,6 +819,16 @@ class User extends Authenticatable
             ->where('admin_approve', 1)
             ->where('verified', 1)
             ->where('number_verified', 1)
+            ->select('id','name','phone')->get();
+    }
+
+    protected function getCollegeStudentsByCollegeIdByDeptIdByYear($college,$department,$year){
+        return static::where('college_id', $college)
+            ->where('college_dept_id', $department)
+            ->where('year', $year)
+            ->where('user_type', self::Student)
+            ->where('admin_approve', 1)
+            ->where('verified', 1)
             ->select('id','name','phone')->get();
     }
 }

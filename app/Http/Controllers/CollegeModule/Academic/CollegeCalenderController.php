@@ -284,6 +284,11 @@ class CollegeCalenderController extends Controller
                         }
                     }
                 }
+                if(1 == $exam->exam_type){
+                    $examType = 'Online';
+                } else {
+                    $examType = 'Offline';
+                }
                 $calendarData[$exam->date]['exams'][] = [
                     'subject' => $allSubjects[$exam->college_subject_id],
                     'topic' => $exam->topic,
@@ -291,6 +296,8 @@ class CollegeCalenderController extends Controller
                     'to' => $exam->to_time,
                     'dept' => $collegeDeptName,
                     'year' => $yearStr,
+                    'marks' => $exam->marks,
+                    'type' => $examType,
                 ];
             }
         }

@@ -53,7 +53,7 @@
       <tbody id="studentAssignment">
         @if(count($assignments) > 0)
           @foreach($assignments as $index => $assignment)
-          <tr>
+          <tr style="overflow: auto;">
             <td>{{$index + 1}}</td>
             <td>{!! basename($assignment->attached_link) !!}</td>
             <td>{{$assignment->topic->name}}</td>

@@ -15,23 +15,23 @@ class CollegeOfflinePaperMarks extends Model
      *
      * @var array
      */
-    protected $fillable = ['college_id','college_subject_id','college_offline_paper_id','user_id','marks','total_marks','created_by'];
+    protected $fillable = ['college_id','college_subject_id','college_class_exam_id','user_id','marks','total_marks','created_by'];
 
     protected static function assignCollegeOfflinePaperMarks($request){
-    	$paperId   = InputSanitise::inputInt($request->get('paper'));
+    	$paperId   = InputSanitise::inputInt($request->get('topic'));
         $subjectId = InputSanitise::inputInt($request->get('subject'));
         $totalMarks   = InputSanitise::inputInt($request->get('total_marks'));
-        $studentMarks = $request->except('_token','paper','subject','total_marks');
+        $studentMarks = $request->except('_token','topic','subject','year','department','total_marks');
         $loginUser = Auth::user();
 
         if(count($studentMarks) > 0){
         	foreach($studentMarks as $studentId => $studentMark){
-     			$student = static::where('college_id', $loginUser->college_id)->where('college_subject_id',$subjectId)->where('college_offline_paper_id', $paperId)->where('user_id', $studentId)->first();
+     			$student = static::where('college_id', $loginUser->college_id)->where('college_subject_id',$subjectId)->where('college_class_exam_id', $paperId)->where('user_id', $studentId)->first();
      			if(!is_object($student)){
      				$student = new static;
      			}
      			$student->college_id = $loginUser->college_id;
-     			$student->college_offline_paper_id = $paperId;
+     			$student->college_class_exam_id = $paperId;
      			$student->user_id = $studentId;
                 if('' == $studentMark){
      			    $student->marks = '';
@@ -48,11 +48,11 @@ class CollegeOfflinePaperMarks extends Model
         return 'false';
     }
 
-    protected static function getOfflinePaperMarksBySubjectIdByPaperId(Request $request){
-    	$paperId   = InputSanitise::inputInt($request->get('paper_id'));
+    protected static function getOfflineMarksBySubjectIdByExamId(Request $request){
+    	$paperId   = InputSanitise::inputInt($request->get('exam_id'));
         $subjectId = InputSanitise::inputInt($request->get('subject_id'));
         $loginUser = Auth::user();
-        return static::where('college_id', $loginUser->college_id)->where('college_subject_id',$subjectId)->where('college_offline_paper_id', $paperId)->select('id','marks','total_marks','user_id')->get();
+        return static::where('college_id', $loginUser->college_id)->where('college_subject_id',$subjectId)->where('college_class_exam_id', $paperId)->select('id','marks','total_marks','user_id')->get();
     }
 
     protected static function getOfflinePaperMarksByUser(){
@@ -62,7 +62,7 @@ class CollegeOfflinePaperMarks extends Model
 
     protected static function getOfflinePaperMarksByPaperId($paperId){
         $loginUser = Auth::user();
-        return static::where('college_id', $loginUser->college_id)->where('college_offline_paper_id', $paperId)->select('id','marks','total_marks','user_id')->get();
+        return static::where('college_id', $loginUser->college_id)->where('college_class_exam_id', $paperId)->select('id','marks','total_marks','user_id')->get();
     }
 
     protected static function deleteCollegeOfflinePaperMarksBySubjectId($subjectId){
@@ -77,7 +77,7 @@ class CollegeOfflinePaperMarks extends Model
     }
 
     protected static function deleteCollegeOfflinePaperMarksByCollegeByPaperIdByUserId($collegeId,$paperId,$userId){
-        $offlinePaperMarks = static::where('college_id', $collegeId)->where('college_offline_paper_id', $paperId)->where('created_by', $userId)->get();
+        $offlinePaperMarks = static::where('college_id', $collegeId)->where('college_class_exam_id', $paperId)->where('created_by', $userId)->get();
         if(is_object($offlinePaperMarks) && false == $offlinePaperMarks->isEmpty()){
             foreach($offlinePaperMarks as $offlinePaperMark){
                 $offlinePaperMark->delete();

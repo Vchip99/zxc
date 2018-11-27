@@ -35,7 +35,7 @@
       <tbody>
         @if(count($designations) > 0)
           @foreach($designations as $index => $designation)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $designations->firstItem()}}</th>
             <td>{{$designation->name}}</td>
             <td>

@@ -36,7 +36,7 @@
       <tbody id="mobile_user_messages">
         @if(count($notifications) > 0)
           @foreach($notifications as $index => $notification)
-          <tr>
+          <tr style="overflow: auto;">
             <td>{!! $notification->message !!}
             </td>
           </tr>

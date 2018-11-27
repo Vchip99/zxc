@@ -37,7 +37,7 @@ class ClientIndividualMessage extends Model
     }
 
     protected static function getIndividualMessagesByClientIdByDate($clientId,$date){
-    	return static::where('client_id', $clientId)->whereDate('created_at', $date)->select('id','client_batch_id','created_at')->orderBy('id','desc')->get();
+    	return static::where('client_id', $clientId)->whereDate('created_at', $date)->select('*')->orderBy('created_at','desc')->get();
     }
 
     protected static function getIndividualMessagesByClientIdByBatchIds($clientId,$batchIds){

@@ -300,10 +300,13 @@
       var eleIndex = document.createElement('td');
       eleIndex.innerHTML = idx;
       eleTr.appendChild(eleIndex);
-
-      var text = msg['question'];
-      var count = 400;
-      var resultString = text.slice(0, count) + (text.length > count ? "..." : "");
+      if(msg['question']){
+        var text = msg['question'];
+        var count = 400;
+        var resultString = text.slice(0, count) + (text.length > count ? "..." : "");
+      } else {
+        var resultString = 'Its a Document';
+      }
 
       var eleQuestion = document.createElement('td');
       eleQuestion.innerHTML = resultString;

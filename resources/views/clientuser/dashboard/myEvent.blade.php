@@ -15,10 +15,10 @@
 @stop
 @section('module_title')
   <section class="content-header">
-    <h1> My Individual Message  </h1>
+    <h1> My Event  </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-envelope"></i> Message </li>
-      <li class="active"> My Individual Message </li>
+      <li class="active"> My Event </li>
     </ol>
   </section>
 @stop
@@ -29,14 +29,21 @@
       <div class="col-lg-12" id="my-message">
         <div class="panel panel-info">
           <div class="panel-heading text-center">
-            Individual Messages
+            My Events
           </div>
           <div class="panel-body">
-            @if(count($myMessages) > 0)
-              @foreach($myMessages as $message)
-                <div class="form-group row divStyle">
-                  <div class=""><b>{{$message['date']}}-[{{$message['batch']}}]</b> @ {{$message['message']}}</div>
-                </div>
+            @if(count($events) > 0)
+              @foreach($events as $message)
+                @if(!empty($message->photo))
+                  <div class="form-group row">
+                    <img class="img-responsive" src="{{url($message->photo)}}" alt="message_img" style="max-height: 500px;width: 100%;float: center;">
+                  </div>
+                  <div class="form-group row"><b>Event From {{date('Y-m-d h:i:s a', strtotime($message->start_date))}} To {{date('Y-m-d h:i:s a', strtotime($message->end_date))}} </b> @ {{$message->message}}
+                  </div>
+                @else
+                  <div class="form-group row"><b>Event From {{date('Y-m-d h:i:s a', strtotime($message->start_date))}} To {{date('Y-m-d h:i:s a', strtotime($message->end_date))}} </b> @ {{$message->message}}
+                  </div>
+                @endif
               @endforeach
             @endif
           </div>

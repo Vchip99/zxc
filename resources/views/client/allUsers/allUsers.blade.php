@@ -21,6 +21,19 @@
       <div class="top mrgn_40_btm">
         <div class="container">
           <div class="row">
+            <div class="col-md-3">
+              <div style="margin-bottom: 10px">
+                  <select class="form-control" name="batch" id="batch" onChange="searchBatchUsers(this.value);">
+                      <option value="">Select Batch</option>
+                      <option value="All">All</option>
+                      @if(count($batches) > 0)
+                          @foreach($batches as $batch)
+                              <option value="{{$batch->id}}">{{$batch->name}}</option>
+                          @endforeach
+                      @endif
+                  </select>
+              </div>
+            </div>
             <div class="col-md-3 " id="search">
               <div class="input-group">
                 <input type="text" id="search_student" name="student" class="form-control" placeholder="Search..." onkeyup="searchUsers(this.value);">
@@ -55,7 +68,7 @@
                   <tbody id="mobile_client_users" class="">
                     @if(count($clientusers) > 0)
                       @foreach($clientusers as  $index => $clientuser)
-                        <tr>
+                        <tr style="overflow: auto;">
                           <td> {{ $index + 1 }} </td>
                           <td>  <a href="#studentModal_{{$clientuser->id}}" data-toggle="modal">{{ $clientuser->name }}</a></td>
                           <td>
@@ -201,19 +214,32 @@
   </div>
 
 <script type="text/javascript">
-  function searchUsers(student){
-    if(student.length > 0){
+  function searchBatchUsers(batchId){
+    if(batchId){
       $.ajax({
-          method: "POST",
-          url: "{{url('searchUsers')}}",
-          data:{student:student}
-        })
-        .done(function( msg ) {
-          body = document.getElementById('mobile_client_users');
-          body.innerHTML = '';
-          renderRecords(msg, body);
-        });
+        method: "POST",
+        url: "{{url('searchUsers')}}",
+        data:{batch_id:batchId}
+      })
+      .done(function( msg ) {
+        body = document.getElementById('mobile_client_users');
+        body.innerHTML = '';
+        renderRecords(msg, body);
+      });
     }
+  }
+
+  function searchUsers(student){
+    $.ajax({
+      method: "POST",
+      url: "{{url('searchUsers')}}",
+      data:{student:student}
+    })
+    .done(function( msg ) {
+      body = document.getElementById('mobile_client_users');
+      body.innerHTML = '';
+      renderRecords(msg, body);
+    });
   }
 
   function renderRecords(msg, body){

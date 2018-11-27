@@ -236,13 +236,7 @@ only screen and (max-width: 760px),
   #studentAttendance td:nth-of-type(2):before { content: "Month" ; font-weight: bolder; }
   #studentAttendance td:nth-of-type(3):before { content: "Present Dates";  font-weight: bolder;}
   #studentAttendance td:nth-of-type(4):before { content: "Absent Days/No. of Days";  font-weight: bolder;}
-    /*  clientOfflinePapers */
-  #clientOfflinePapers td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
-  #clientOfflinePapers td:nth-of-type(2):before { content: "Paper" ; font-weight: bolder; }
-  #clientOfflinePapers td:nth-of-type(3):before { content: "Marks" ; font-weight: bolder; }
-  #clientOfflinePapers td:nth-of-type(4):before { content: "Batch" ; font-weight: bolder; }
-  #clientOfflinePapers td:nth-of-type(5):before { content: "Edit";  font-weight: bolder;}
-  #clientOfflinePapers td:nth-of-type(6):before { content: "Delete";  font-weight: bolder;}
+
 
   /* collegeTestCategory */
   #collegeTestCategory td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
@@ -338,17 +332,6 @@ only screen and (max-width: 760px),
   #college_attendance_users td:nth-of-type(3):before { content: "Email";  font-weight: bolder;}
   #college_attendance_users td:nth-of-type(4):before { content: "Status";  font-weight: bolder;}
 
-  /*collegeOfflinePaper*/
-  #collegeOfflinePaper td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
-  #collegeOfflinePaper td:nth-of-type(2):before { content: "Paper" ; font-weight: bolder; }
-  #collegeOfflinePaper td:nth-of-type(3):before { content: "Subject";  font-weight: bolder;}
-  #collegeOfflinePaper td:nth-of-type(4):before { content: "Department";  font-weight: bolder;}
-  #collegeOfflinePaper td:nth-of-type(5):before { content: "Year";  font-weight: bolder;}
-  #collegeOfflinePaper td:nth-of-type(6):before { content: "Marks";  font-weight: bolder;}
-  #collegeOfflinePaper td:nth-of-type(7):before { content: "Created By";  font-weight: bolder;}
-  #collegeOfflinePaper td:nth-of-type(8):before { content: "Edit";  font-weight: bolder;}
-  #collegeOfflinePaper td:nth-of-type(9):before { content: "Delete";  font-weight: bolder;}
-
   /*college_offline_paper_marks*/
   #college_offline_paper_marks td:nth-of-type(1):before { content: "Sr. No." ; font-weight: bolder; }
   #college_offline_paper_marks td:nth-of-type(2):before { content: "Email";  font-weight: bolder;}
@@ -418,6 +401,84 @@ only screen and (max-width: 760px),
     position: relative;
     padding-left: 0px;
   }
+
+  /*  clientExams */
+  #clientExams td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
+  #clientExams td:nth-of-type(2):before { content: "Batch" ; font-weight: bolder; }
+  #clientExams td:nth-of-type(3):before { content: "Type" ; font-weight: bolder; }
+  #clientExams td:nth-of-type(4):before { content: "Exam" ; font-weight: bolder; }
+  #clientExams td:nth-of-type(5):before { content: "Subject";  font-weight: bolder;}
+  #clientExams td:nth-of-type(6):before { content: "Topic";  font-weight: bolder;}
+  #clientExams td:nth-of-type(7):before { content: "Mark"; font-weight: bolder; }
+  #clientExams td:nth-of-type(8):before { content: "Date" ; font-weight: bolder; }
+  #clientExams td:nth-of-type(9):before { content: "From" ; font-weight: bolder; }
+  #clientExams td:nth-of-type(10):before { content: "To" ; font-weight: bolder; }
+  #clientExams td:nth-of-type(11):before { content: "Edit";  font-weight: bolder;}
+  #clientExams td:nth-of-type(12):before { content: "Delete";  font-weight: bolder;}
+
+  /*  clientClasses */
+  #clientClasses td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
+  #clientClasses td:nth-of-type(2):before { content: "Batch" ; font-weight: bolder; }
+  #clientClasses td:nth-of-type(3):before { content: "Subject" ; font-weight: bolder; }
+  #clientClasses td:nth-of-type(4):before { content: "Topic" ; font-weight: bolder; }
+  #clientClasses td:nth-of-type(5):before { content: "Teacher";  font-weight: bolder;}
+  #clientClasses td:nth-of-type(6):before { content: "Date" ; font-weight: bolder; }
+  #clientClasses td:nth-of-type(7):before { content: "From" ; font-weight: bolder; }
+  #clientClasses td:nth-of-type(8):before { content: "To" ; font-weight: bolder; }
+  #clientClasses td:nth-of-type(9):before { content: "Edit";  font-weight: bolder;}
+  #clientClasses td:nth-of-type(10):before { content: "Delete";  font-weight: bolder;}
+
+  /*  clientHolidays */
+  #clientHolidays td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
+  #clientHolidays td:nth-of-type(2):before { content: "Batch" ; font-weight: bolder; }
+  #clientHolidays td:nth-of-type(3):before { content: "Date" ; font-weight: bolder; }
+  #clientHolidays td:nth-of-type(4):before { content: "Edit";  font-weight: bolder;}
+  #clientHolidays td:nth-of-type(5):before { content: "Delete";  font-weight: bolder;}
+
+  /*  collegeMessages */
+  #collegeMessages td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
+  #collegeMessages td:nth-of-type(2):before { content: "Departments" ; font-weight: bolder; }
+  #collegeMessages td:nth-of-type(3):before { content: "Years" ; font-weight: bolder; }
+  #collegeMessages td:nth-of-type(4):before { content: "Message" ; font-weight: bolder; }
+  #collegeMessages td:nth-of-type(5):before { content: "Event/Message";  font-weight: bolder;}
+  #collegeMessages td:nth-of-type(6):before { content: "Edit" ; font-weight: bolder; }
+  #collegeMessages td:nth-of-type(7):before { content: "Delete" ; font-weight: bolder; }
+
+  /*  collegeIndividualMessages */
+  #collegeIndividualMessages td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
+  #collegeIndividualMessages td:nth-of-type(2):before { content: "Department" ; font-weight: bolder; }
+  #collegeIndividualMessages td:nth-of-type(3):before { content: "Year" ; font-weight: bolder; }
+  #collegeIndividualMessages td:nth-of-type(4):before { content: "Date" ; font-weight: bolder; }
+  #collegeIndividualMessages td:nth-of-type(5):before { content: "Edit";  font-weight: bolder;}
+  #collegeIndividualMessages td:nth-of-type(6):before { content: "Delete" ; font-weight: bolder; }
+
+  /*  collegeGalleryType */
+  #collegeGalleryType td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
+  #collegeGalleryType td:nth-of-type(2):before { content: "Type" ; font-weight: bolder; }
+  #collegeGalleryType td:nth-of-type(3):before { content: "Edit";  font-weight: bolder;}
+  #collegeGalleryType td:nth-of-type(4):before { content: "Delete" ; font-weight: bolder; }
+
+  /*  collegeGalleryImage */
+  #collegeGalleryImage td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
+  #collegeGalleryImage td:nth-of-type(2):before { content: "Type" ; font-weight: bolder; }
+  #collegeGalleryImage td:nth-of-type(3):before { content: "Images" ; font-weight: bolder; }
+  #collegeGalleryImage td:nth-of-type(4):before { content: "Edit";  font-weight: bolder;}
+  #collegeGalleryImage td:nth-of-type(5):before { content: "Delete" ; font-weight: bolder; }
+
+  /*  clientMessages */
+  #clientMessages td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
+  #clientMessages td:nth-of-type(2):before { content: "Message" ; font-weight: bolder; }
+  #clientMessages td:nth-of-type(3):before { content: "Batch" ; font-weight: bolder; }
+  #clientMessages td:nth-of-type(4):before { content: "Event/Messag" ; font-weight: bolder; }
+  #clientMessages td:nth-of-type(5):before { content: "Edit";  font-weight: bolder;}
+  #clientMessages td:nth-of-type(6):before { content: "Delete" ; font-weight: bolder; }
+
+  /*  clientIndividualMessages */
+  #clientIndividualMessages td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
+  #clientIndividualMessages td:nth-of-type(2):before { content: "Batch" ; font-weight: bolder; }
+  #clientIndividualMessages td:nth-of-type(3):before { content: "Date" ; font-weight: bolder; }
+  #clientIndividualMessages td:nth-of-type(4):before { content: "Edit";  font-weight: bolder;}
+  #clientIndividualMessages td:nth-of-type(5):before { content: "Delete" ; font-weight: bolder; }
 }
 
 table.inner-table-border{

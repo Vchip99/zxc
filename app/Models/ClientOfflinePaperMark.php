@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Redirect, DB, Auth;
 use App\Libraries\InputSanitise;
 use App\Models\ClientBatch;
-use App\Models\ClientOfflinePaper;
+use App\Models\ClientExam;
 
 class ClientOfflinePaperMark extends Model
 {
@@ -17,34 +17,34 @@ class ClientOfflinePaperMark extends Model
      *
      * @var array
      */
-    protected $fillable = ['client_batch_id','client_offline_paper_id','clientuser_id','marks','total_marks','client_id','created_by' ];
+    protected $fillable = ['client_batch_id','client_exam_id','clientuser_id','marks','total_marks','client_id','created_by' ];
 
-    protected static function getOfflinePaperMarksByBatchIdByPaperId(Request $request){
-    	$paperId   = InputSanitise::inputInt($request->get('paper_id'));
+    protected static function getOfflinePaperMarksByBatchIdByExamId(Request $request){
+    	$paperId   = InputSanitise::inputInt($request->get('client_exam_id'));
         $clientBatchId = InputSanitise::inputInt($request->get('batch_id'));
         $resultArr = InputSanitise::getClientIdAndCretedBy();
         $clientId = $resultArr[0];
         $createdBy = $resultArr[1];
-        return static::where('client_batch_id', $clientBatchId)->where('client_offline_paper_id', $paperId)->where('client_id', $clientId)->get();
+        return static::where('client_batch_id', $clientBatchId)->where('client_exam_id', $paperId)->where('client_id', $clientId)->get();
     }
 
     protected static function assignOfflinePaperMarks($request){
-    	$paperId   = InputSanitise::inputInt($request->get('paper'));
+    	$paperId   = InputSanitise::inputInt($request->get('client_exam'));
         $clientBatchId = InputSanitise::inputInt($request->get('batch'));
         $totalMarks   = InputSanitise::inputInt($request->get('total_marks'));
-        $studentMarks = $request->except('_token','paper','batch','total_marks');
+        $studentMarks = $request->except('_token','client_exam','batch','total_marks');
         $resultArr = InputSanitise::getClientIdAndCretedBy();
         $clientId = $resultArr[0];
         $createdBy = $resultArr[1];
 
         if(count($studentMarks) > 0){
         	foreach($studentMarks as $studentId => $studentMark){
-     			$student = static::where('client_batch_id', $clientBatchId)->where('client_offline_paper_id', $paperId)->where('clientuser_id', $studentId)->where('client_id',$clientId)->first();
+     			$student = static::where('client_batch_id', $clientBatchId)->where('client_exam_id', $paperId)->where('clientuser_id', $studentId)->where('client_id',$clientId)->first();
      			if(!is_object($student)){
      				$student = new static;
      			}
      			$student->client_batch_id = $clientBatchId;
-     			$student->client_offline_paper_id = $paperId;
+     			$student->client_exam_id = $paperId;
      			$student->clientuser_id = $studentId;
                 if(empty($studentMark)){
      			    $student->marks = '';
@@ -59,10 +59,6 @@ class ClientOfflinePaperMark extends Model
             return 'true';
         }
         return 'false';
-    }
-
-    protected static function deleteClientOfflinePaperMarkByBatchIdByPaperIdByClientId($clientBatchId,$paperId,$clientId){
-    	return static::where('client_batch_id', $clientBatchId)->where('client_offline_paper_id', $paperId)->where('client_id', $clientId)->delete();
     }
 
     protected static function deleteClientOfflinePaperMarkByBatchIdByClientId($clientBatchId,$clientId){
@@ -82,21 +78,21 @@ class ClientOfflinePaperMark extends Model
     }
 
     public function paper(){
-        return $this->belongsTo(ClientOfflinePaper::class, 'client_offline_paper_id');
+        return $this->belongsTo(ClientExam::class, 'client_exam_id');
     }
 
     public function rank(){
-        $rank =$this::getUserRankByBatchIdByPaperByClientId($this->client_batch_id,$this->client_offline_paper_id,$this->client_id,$this->marks);
-        $totalRank =$this::getTotalRankByBatchIdByPaperByClientId($this->client_batch_id,$this->client_offline_paper_id,$this->client_id);
+        $rank =$this::getUserRankByBatchIdByExamByClientId($this->client_batch_id,$this->client_exam_id,$this->client_id,$this->marks);
+        $totalRank =$this::getTotalRankByBatchIdByExamByClientId($this->client_batch_id,$this->client_exam_id,$this->client_id);
         return ($rank + 1).'/'.$totalRank;
     }
 
-    public static function getUserRankByBatchIdByPaperByClientId($clientBatchId,$paper,$clientId,$marks){
-        return static::where('client_batch_id', $clientBatchId)->where('client_offline_paper_id', $paper)->where('client_id', $clientId)->where('marks', '!=', '')->where('marks', '>', DB::raw($marks))->count();
+    public static function getUserRankByBatchIdByExamByClientId($clientBatchId,$exam,$clientId,$marks){
+        return static::where('client_batch_id', $clientBatchId)->where('client_exam_id', $exam)->where('client_id', $clientId)->where('marks', '!=', '')->where('marks', '>', DB::raw($marks))->count();
     }
 
-    public static function getTotalRankByBatchIdByPaperByClientId($clientBatchId,$paper,$clientId){
-        return static::where('client_batch_id', $clientBatchId)->where('client_offline_paper_id', $paper)->where('client_id', $clientId)->where('marks', '!=', '')->count();
+    public static function getTotalRankByBatchIdByExamByClientId($clientBatchId,$exam,$clientId){
+        return static::where('client_batch_id', $clientBatchId)->where('client_exam_id', $exam)->where('client_id', $clientId)->where('marks', '!=', '')->count();
     }
 
     protected static function deleteMarksByClientIdByBatchIdByClientUsers($clientId,$clientBatchId,$clientUserIds){

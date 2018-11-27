@@ -24,7 +24,6 @@ use App\Models\ClientOnlinePaperSection;
 use App\Models\ClientOnlineTestQuestion;
 use App\Models\ClientBatch;
 use App\Models\ClientUserAttendance;
-use App\Models\ClientOfflinePaper;
 use App\Models\ClientOfflinePaperMark;
 use App\Models\ClientAssignmentSubject;
 use App\Models\ClientAssignmentTopic;
@@ -200,7 +199,8 @@ class ClientTeacherController extends BaseController
     }
 
     protected function changeClientTeacherModuleStatus($subdomainName,Request $request){
-        return Clientuser::changeClientTeacherModuleStatus($request);
+        Clientuser::changeClientTeacherModuleStatus($request);
+        return Redirect::to('allTeachers');
     }
 
     /**
@@ -232,7 +232,6 @@ class ClientTeacherController extends BaseController
                     if(in_array(Clientuser::BatchModule, $assignmentModules)){
                         ClientBatch::assignClientBatchesToClientByClientIdByTeacherId($clientTeacher->client_id,$clientTeacher->id);
                         ClientUserAttendance::assignClientUserAttendanceToClientByClientIdByTeacherId($clientTeacher->client_id,$clientTeacher->id);
-                        ClientOfflinePaper::assignClientOfflinePapersToClientByClientIdByTeacherId($clientTeacher->client_id,$clientTeacher->id);
                         ClientOfflinePaperMark::assignClientOfflinePaperMarksToClientByClientIdByTeacherId($clientTeacher->client_id,$clientTeacher->id);
                     }
                     if(in_array(Clientuser::AssignmentModule, $assignmentModules)){

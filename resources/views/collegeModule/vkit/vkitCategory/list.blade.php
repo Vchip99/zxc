@@ -41,7 +41,7 @@
       <tbody>
         @if(count($vkitCategories) > 0)
           @foreach($vkitCategories as $index => $vkitCategory)
-          <tr>
+          <tr style="overflow: auto;">
             <td>{{$index + $vkitCategories->firstItem()}}</th>
             <td>{{$vkitCategory->name}}</td>
             <td>

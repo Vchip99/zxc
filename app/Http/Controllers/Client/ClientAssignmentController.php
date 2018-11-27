@@ -93,7 +93,7 @@ class ClientAssignmentController extends ClientBaseController
         {
             return redirect()->back()->withErrors($v->errors());
         }
-        if(empty($request->get('question')) && empty($request->get('attached_link'))){
+        if(empty($request->get('question')) && empty($request->file('attached_link'))){
             return Redirect::to('manageAssignment')->with('message', 'please enter questions or select attachment.');
         }
 

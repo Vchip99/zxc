@@ -168,8 +168,7 @@
             <li title="Manage Batch"><a href="{{ url('manageBatch')}}"><i class="fa fa-circle-o"></i> Manage Batch</a></li>
             <li title="Batch Students"><a href="{{ url('associateBatchStudents')}}"><i class="fa fa-circle-o"></i> Batch Students</a></li>
             <li title="Attendance Calendar"><a href="{{ url('manageAttendanceCalendar')}}"><i class="fa fa-circle-o"></i> Attendance Calendar</a></li>
-            <li title="Manage Offline Paper"><a href="{{ url('manageOfflinePaper')}}"><i class="fa fa-circle-o"></i> Manage Offline Paper</a></li>
-            <li title="Manage Offline Exam"><a href="{{ url('manageOfflineExam')}}"><i class="fa fa-circle-o"></i> Manage Offline Exam</a></li>
+            <li title="Update Offline Marks"><a href="{{ url('manageExamMarks')}}"><i class="fa fa-circle-o"></i> Update Offline Marks</a></li>
           </ul>
         </li>
         @endif

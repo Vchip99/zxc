@@ -58,7 +58,7 @@
       <tbody id="studentAssignment">
         @if(count($assignments) > 0)
           @foreach($assignments as $index => $assignment)
-          <tr>
+          <tr style="overflow: auto;">
             <td>{{$index + 1}}</td>
             <td>{!! mb_strimwidth($assignment->question, 0, 400, "...") !!}</td>
             <td>{{$assignment->subject->name}}</td>
@@ -161,7 +161,7 @@
       $.ajax({
         method: "POST",
         url: "{{url('getAssignments')}}",
-        data: {subject:id,topic:topic}
+        data: {subject:id}
       })
       .done(function( msgs ) {
         body = document.getElementById('studentAssignment');
@@ -198,7 +198,7 @@
           var eleTr = document.createElement('tr');
 
           var eleQuestion = document.createElement('td');
-          eleQuestion.innerHTML = 'No Assignment for this course';
+          eleQuestion.innerHTML = 'No Assignment for selected';
           eleQuestion.setAttribute('colspan', 6);
           eleTr.appendChild(eleQuestion);
           body.appendChild(eleTr);
@@ -212,7 +212,7 @@
       var eleTr = document.createElement('tr');
 
       var eleIndex = document.createElement('td');
-      eleIndex.innerHTML = idx;
+      eleIndex.innerHTML = idx + 1;
       eleTr.appendChild(eleIndex);
 
       var eleQuestion = document.createElement('td');

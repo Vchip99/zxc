@@ -35,7 +35,7 @@
       <tbody>
         @if(count($motivationalSpeechCategories) > 0)
           @foreach($motivationalSpeechCategories as $index => $motivationalSpeechCategory)
-          <tr>
+          <tr style="overflow: auto;">
             <th scope="row">{{$index + $motivationalSpeechCategories->firstItem()}}</th>
             <td>{{$motivationalSpeechCategory->name}}</td>
             <td>
