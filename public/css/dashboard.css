@@ -479,6 +479,15 @@ only screen and (max-width: 760px),
   #clientIndividualMessages td:nth-of-type(3):before { content: "Date" ; font-weight: bolder; }
   #clientIndividualMessages td:nth-of-type(4):before { content: "Edit";  font-weight: bolder;}
   #clientIndividualMessages td:nth-of-type(5):before { content: "Delete" ; font-weight: bolder; }
+
+    /*  allTeachers */
+  #allTeachers td:nth-of-type(1):before { content: "Sr. No."; font-weight: bolder; }
+  #allTeachers td:nth-of-type(2):before { content: "Name" ; font-weight: bolder; }
+  #allTeachers td:nth-of-type(3):before { content: "Phone" ; font-weight: bolder; }
+  #allTeachers td:nth-of-type(4):before { content: "Email/User Id" ; font-weight: bolder; }
+  #allTeachers td:nth-of-type(5):before { content: "Client Approve";  font-weight: bolder;}
+  #allTeachers td:nth-of-type(6):before { content: "Assigned Modules" ; font-weight: bolder; }
+  #allTeachers td:nth-of-type(7):before { content: "Delete" ; font-weight: bolder; }
 }
 
 table.inner-table-border{

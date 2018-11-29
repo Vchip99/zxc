@@ -40,6 +40,7 @@
         <div class="col-sm-2 mrgn_10_btm">
           <select id="year" class="form-control" name="year" required>
             <option value="">Select Year</option>
+            <option value="All" @if('All' == $selectedYear) selected @endif>All</option>
             @foreach($years as $year)
               @if($selectedYear == $year)
                 <option value="{{$year}}" selected>{{$year}}</option>
@@ -52,6 +53,7 @@
         <div class="col-sm-2 mrgn_10_btm">
           <select id="month" class="form-control" name="month" onChange="search();" required>
             <option value="">Select Month</option>
+            <option value="All" @if('All' == $selectedMonth) selected @endif>All</option>
             @foreach($months as $index => $month)
               @if($selectedMonth == $index)
                 <option value="{{$index}}" selected>{{$month}}</option>

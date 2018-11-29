@@ -4,7 +4,7 @@
 @stop
 @section('header-css')
   @include('layouts.home-css')
-  <link href="{{ asset('css/placement.css?ver=1.0')}}" rel="stylesheet"/>
+  <!-- <link href="{{ asset('css/placement.css?ver=1.0')}}" rel="stylesheet"/> -->
   <link href="{{ asset('css/comment.css?ver=1.0')}}" rel="stylesheet"/>
   <style type="text/css">
   .advertisement {
@@ -115,9 +115,9 @@ only screen and (max-width: 760px),
 (min-device-width: 768px) and (max-device-width: 1024px)  {
 
   /* Force table to not be like tables anymore */
-  table, thead, tbody, th, td, tr {
+  /*table, thead, tbody, th, td, tr {
     display: block;
-  }
+  }*/
 
   /* Hide table headers (but not display: none;, for accessibility) */
   thead tr {
@@ -219,51 +219,37 @@ ul.table_list{ margin-left: -30px; }
 <section>
   <div class="container ">
     <div class="row">
-      <div class="col-sm-9 col-sm-push-3 data" id="placement-box">
-         <div class="portlet box grey-cascade" style="border: 1px solid grey;">
-            <div class="portlet-body">
-              <div class="tabbable">
-                <div class="tab-content">
-                  <div id="tab_4" class="">
-                     <div class="panel panel-default">
-                        <div class="panel-body" style="padding: 0px;">
-                          <table  class="" id="student-record">
-                            <thead>
-                              <tr>
-                                <th>Company Name</th>
-                                <th>Job Description</th>
-                                <th>Mock Test</th>
-                                <th>Apply</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              @if(count($applyJobs) > 0)
-                                @foreach($applyJobs as $applyJob)
-                                  <tr>
-                                    <td class="name"><b>{{ $applyJob->company }}</b></td>
-                                    <td> {!! mb_strimwidth( $applyJob->job_description , 0, 400, '...') !!}</br>
-                                         <a type="button" class="btn btn-info btn-circle btn-xs" title="Read" data-toggle="modal" data-placement="bottom" href="#company_{{$applyJob->id }}">Read More</a>
-                                    </td>
-                                    <td>
-                                      <a class="btn btn-primary btn-xs delet-bt delet-btn" href="{{ $applyJob->mock_test }}">Mock Test</a>
-                                    </td>
-                                    <td>
-                                     <a class="btn btn-primary btn-xs delet-bt delet-btn" href="{{ $applyJob->job_url }}" target="_blank">Apply</a>
-                                    </td>
-                                  </tr>
-                                @endforeach
-                              @else
-                                <tr><td colspan="4">No data available.</td></tr>
-                              @endif
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-         </div>
+      <div class="col-sm-9 col-sm-push-3 data">
+        <table class="" style="overflow: auto;">
+          <thead>
+            <tr>
+              <th>Company Name</th>
+              <th>Job Description</th>
+              <th>Mock Test</th>
+              <th>Apply</th>
+            </tr>
+          </thead>
+          <tbody >
+            @if(count($applyJobs) > 0)
+              @foreach($applyJobs as $applyJob)
+                <tr style="overflow: auto;">
+                  <td class=""><b>{{ $applyJob->company }}</b></td>
+                  <td> {!! mb_strimwidth( $applyJob->job_description , 0, 400, '...') !!}</br>
+                       <a type="button" class="btn btn-info btn-circle btn-xs" title="Read" data-toggle="modal" data-placement="bottom" href="#company_{{$applyJob->id }}">Read More</a>
+                  </td>
+                  <td>
+                    <a class="btn btn-primary btn-xs delet-bt delet-btn" href="{{ $applyJob->mock_test }}">Mock Test</a>
+                  </td>
+                  <td>
+                   <a class="btn btn-primary btn-xs delet-bt delet-btn" href="{{ $applyJob->job_url }}" target="_blank">Apply</a>
+                  </td>
+                </tr>
+              @endforeach
+            @else
+              <tr><td colspan="4">No data available.</td></tr>
+            @endif
+          </tbody>
+        </table>
       </div>
       @if(count($applyJobs) > 0)
         @foreach($applyJobs as $applyJob)

@@ -297,28 +297,50 @@ class ClientUserController extends BaseController
         $clientUser = Auth::guard('clientuser')->user();
         $clientUserId = $clientUser->id;
         $clientId = $clientUser->client_id;
-        $selectedYear = !empty($request->get('year'))?$request->get('year'): date('Y');
-        $selectedMonth = !empty($request->get('month'))?$request->get('month'): date('m');
+        $selectedYear = $request->get('year');
+        $selectedMonth = $request->get('month');
         $clientResult = InputSanitise::checkUserClient($request, $clientUser);
         if( !is_object($clientResult)){
             return Redirect::away($clientResult);
         }
 
         $readNotificationIds = ClientReadNotification::getReadNotificationIdsByUser($selectedYear,$selectedMonth);
-
-        $queryForTestPapers = ClientNotification::where('client_id', $clientId)
+        if($selectedYear > 0 || $selectedMonth > 0){
+            $queryFirst = ClientNotification::where('client_id', $clientId)
                         ->where('notification_module', 2)
-                        ->where('created_by',0)->where('created_to',0)
-                        ->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth);
+                        ->where('created_by',0)->where('created_to',0);
+            if($selectedYear > 0){
+                $queryFirst->whereYear('created_at', $selectedYear);
+            }
+            if($selectedMonth > 0){
+                $queryFirst->whereMonth('created_at', $selectedMonth);
+            }
 
-        $allAdminNotifications = ClientNotification::where('client_id', $clientId)
+        } else {
+            $queryFirst = ClientNotification::where('client_id', $clientId)
+                        ->where('notification_module', 2)
+                        ->where('created_by',0)->where('created_to',0);
+        }
+
+        if($selectedYear > 0 || $selectedMonth > 0){
+            $querySecond = ClientNotification::where('client_id', $clientId)
+                        ->where('notification_module', 1)
+                        ->where('created_by',0)->where('created_to',0);
+            if($selectedYear > 0){
+                $querySecond->whereYear('created_at', $selectedYear);
+            }
+            if($selectedMonth > 0){
+                $querySecond->whereMonth('created_at', $selectedMonth);
+            }
+            $allAdminNotifications = $querySecond->union($queryFirst)->orderBy('id', 'desc')->get();
+        } else {
+            $allAdminNotifications = ClientNotification::where('client_id', $clientId)
                         ->where('notification_module', 1)
                         ->where('created_by',0)->where('created_to',0)
-                        ->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)
-                        ->union($queryForTestPapers)->orderBy('id', 'desc')->get();
-
+                        ->union($queryFirst)->orderBy('id', 'desc')->get();
+        }
         if(is_object($allAdminNotifications) && false == $allAdminNotifications->isEmpty()){
-            foreach ($allAdminNotifications as $allAdminNotification) {
+            foreach($allAdminNotifications as $allAdminNotification) {
                 if(!in_array($allAdminNotification->id, $readNotificationIds)){
                     $sortIds[] = $allAdminNotification->id;
                 }
@@ -326,12 +348,23 @@ class ClientUserController extends BaseController
             $allIds = array_merge($sortIds, $readNotificationIds);
             $idsImploded = "'" . implode("','", $allIds) . "'";
         }
+
         $result =  ClientNotification::where('client_id', $clientId);
         if( count($allIds) > 0 && !empty($idsImploded)){
             $result->whereIn('id', $allIds)->orderByRaw("FIELD(`id`,$idsImploded)");
         }
-        $notifications = $result->where('created_by',0)->where('created_to',0)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->orderBy('id', 'desc')->paginate();
-
+        if($selectedYear > 0 || $selectedMonth > 0){
+            $result->where('created_by',0)->where('created_to',0);
+            if($selectedYear > 0){
+                $result->whereYear('created_at', $selectedYear);
+            }
+            if($selectedMonth > 0){
+                $result->whereMonth('created_at', $selectedMonth);
+            }
+            $notifications = $result->orderBy('id', 'desc')->paginate(50);
+        } else {
+            $notifications = $result->where('created_by',0)->where('created_to',0)->orderBy('id', 'desc')->paginate(50);
+        }
         $years = range(2017, 2030);
         $months = array(
                     "1" => "January", "2" => "February", "3" => "March", "4" => "April",

@@ -52,7 +52,14 @@ class QuizController extends Controller
             $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId);
             if(is_object($questions) && false == $questions->isEmpty()){
                 foreach($questions->shuffle() as $question){
-                    $results['questions'][$question->section_type][] = $question;
+                    if(empty($question->common_data)){
+                        $results['questions'][$question->section_type][] = $question;
+                    }
+                }
+                foreach($questions as $question){
+                    if(!empty($question->common_data)){
+                        $results['questions'][$question->section_type][] = $question;
+                    }
                 }
             }
             if(count(array_keys($results['questions'])) > 0){

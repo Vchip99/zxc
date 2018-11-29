@@ -1521,11 +1521,18 @@ class AccountController extends Controller
         $sortIds = [];
         $allIds = [];
         $idsImploded = '';
-        $selectedYear = !empty($request->get('year'))?$request->get('year'): '';
-        $selectedMonth = !empty($request->get('month'))?$request->get('month'): '';
+        $selectedYear = $request->get('year');
+        $selectedMonth = $request->get('month');
         $readNotificationIds = ReadNotification::getReadNotificationIdsByUser($selectedYear,$selectedMonth);
-        if(!empty($request->get('year')) && !empty($request->get('month'))){
-            $allAdminNotifications = Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->orderBy('id', 'desc')->get();
+        if($selectedYear > 0 || $selectedMonth > 0){
+            $queryFirst = Notification::where('admin_id', 1);
+            if($selectedYear > 0){
+                $queryFirst->whereYear('created_at', $selectedYear);
+            }
+            if($selectedMonth > 0){
+                $queryFirst->whereMonth('created_at', $selectedMonth);
+            }
+            $allAdminNotifications = $queryFirst->orderBy('id', 'desc')->get();
             if(is_object($allAdminNotifications) && false == $allAdminNotifications->isEmpty()){
                 foreach ($allAdminNotifications as $allAdminNotification) {
                     if(!in_array($allAdminNotification->id, $readNotificationIds)){
@@ -1537,12 +1544,26 @@ class AccountController extends Controller
             }
         }
         if(!empty($idsImploded)){
-            $notifications =  Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->orderByRaw("FIELD(`id`,$idsImploded)")->paginate();
+            $querySecond = Notification::where('admin_id', 1);
+            if($selectedYear > 0){
+                $querySecond->whereYear('created_at', $selectedYear);
+            }
+            if($selectedMonth > 0){
+                $querySecond->whereMonth('created_at', $selectedMonth);
+            }
+            $notifications =  $querySecond->orderByRaw("FIELD(`id`,$idsImploded)")->paginate(50);
         } else {
-            if(empty($request->get('year')) && empty($request->get('month'))){
-                $notifications =  Notification::where('admin_id', 1)->paginate(50);
+            if($selectedYear > 0 || $selectedMonth > 0){
+                $querySecond = Notification::where('admin_id', 1);
+                if($selectedYear > 0){
+                    $querySecond->whereYear('created_at', $selectedYear);
+                }
+                if($selectedMonth > 0){
+                    $querySecond->whereMonth('created_at', $selectedMonth);
+                }
+                $notifications =  $querySecond->paginate(50);
             } else {
-                $notifications =  Notification::where('admin_id', 1)->whereYear('created_at', $selectedYear)->whereMonth('created_at', $selectedMonth)->paginate();
+                $notifications =  Notification::where('admin_id', 1)->paginate(50);
             }
         }
         $years = range(2017, 2030);

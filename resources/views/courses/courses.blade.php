@@ -127,7 +127,7 @@
                     <div class="course-auther text-center">
                       @if(is_object(Auth::user()))
                         @if(in_array($course->id, $userPurchasedCourses))
-                          <a class="btn btn-sm btn-primary pay-width"> Paid </a>
+                            <a class="btn btn-sm btn-primary pay-width"> @if($course->price > 0) Paid @else Free @endif</a>
                         @elseif($course->price > 0)
                           <a data-course_id="{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="purchaseCourse(this);">Pay Price: {{$course->price}} Rs.</a>
                           <form id="purchaseCourse_{{$course->id}}" method="POST" action="{{ url('purchaseCourse')}}">

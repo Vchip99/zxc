@@ -69,7 +69,7 @@
       <div class="user-panel">
         <div class="pull-left image">
           <a href="{{ url('profile')}}">
-          @if(!empty(Auth::guard('clientuser')->user()->photo) && is_file(Auth::guard('clientuser')->user()->photo))
+          @if(is_file(Auth::guard('clientuser')->user()->photo) || (!empty(Auth::guard('clientuser')->user()->photo) && false == preg_match('/clientUserStorage/',Auth::guard('clientuser')->user()->photo)))
             <img src="{{ asset(Auth::guard('clientuser')->user()->photo)}}" class="img-circle" alt="User Image" >
           @else
             <img src="{{ asset('images/user1.png')}}" class="img-circle" alt="User Image">

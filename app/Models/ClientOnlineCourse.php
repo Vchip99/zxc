@@ -157,6 +157,25 @@ class ClientOnlineCourse extends Model
         return $query->where('client_online_courses.release_date','<=', date('Y-m-d H:i'))->select('client_online_courses.*', 'client_online_sub_categories.name as subcategory', 'client_online_categories.name as category')->groupBy('client_online_courses.id')->get();
     }
 
+    protected static function getPaidCourseAssocaitedWithVideos($subdomain=NULL){
+        $query = DB::connection('mysql2')->table('client_online_courses')
+                    ->join('client_online_videos', 'client_online_videos.course_id', '=', 'client_online_courses.id')
+                    ->join('client_online_categories', 'client_online_categories.id', '=', 'client_online_courses.category_id')
+                    ->join('client_online_sub_categories', 'client_online_sub_categories.id', '=', 'client_online_courses.sub_category_id')
+                    ->join('clients', function($join){
+                        $join->on('clients.id', '=', 'client_online_courses.client_id');
+                        $join->on('clients.id', '=', 'client_online_videos.client_id');
+                        $join->on('clients.id', '=', 'client_online_sub_categories.client_id');
+                    });
+        $loginUser = Auth::guard('client')->user();
+        if(is_object($loginUser)){
+            $query->where('clients.id', $loginUser->id);
+        } else if(!empty($subdomain)) {
+            $query->where('clients.subdomain', $subdomain);
+        }
+        return $query->where('client_online_courses.release_date','<=', date('Y-m-d H:i'))->where('client_online_courses.price','>', 0)->select('client_online_courses.*', 'client_online_sub_categories.name as subcategory', 'client_online_categories.name as category')->groupBy('client_online_courses.id')->get();
+    }
+
     /**
      *  return courses by categoryId by sub categoryId
      */

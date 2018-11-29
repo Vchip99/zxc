@@ -119,9 +119,9 @@ class Clientuser extends Authenticatable
         }
 
         $results['users'] = $result->select('clientusers.*')->get();
-        $results['courses'] = ClientOnlineCourse::getCourseAssocaitedWithVideos();
+        $results['courses'] = ClientOnlineCourse::getPaidCourseAssocaitedWithVideos();
         $results['userPurchasedCourses'] = ClientUserPurchasedCourse::getClientUserCourses($clientId);
-        $results['testSubCategories'] = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
+        $results['testSubCategories'] = ClientOnlineTestSubCategory::showPaidSubCategoriesAssociatedWithQuestion($request);
         $results['userPurchasedTestSubCategories'] = ClientUserPurchasedTestSubCategory::getClientUserTestSubCategories($clientId);
 
         $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId($clientId);

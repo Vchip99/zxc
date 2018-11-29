@@ -29,7 +29,7 @@
 	</style>
 @stop
 @section('content')
-	<div class="content" oncontextmenu="return false;" >
+	<div class="content">
      	<div class="container">
 			<div class="row">
 				<form class="form-horizontal" role="form" id='quiz_form' method="post" action="{{ url('quiz-result') }}">
@@ -583,6 +583,17 @@
 		    }
         }
     });
+$(document).ready(function () {
+    //Disable cut copy paste
+    $('body').bind('cut copy paste', function (e) {
+        e.preventDefault();
+    });
+
+    //Disable mouse right click
+    $("body").on("contextmenu",function(e){
+        return false;
+    });
+});
 </script>
 
 @stop

@@ -38,7 +38,7 @@
             @foreach($batches as $index => $batch)
             <tr style="overflow: auto;">
               <td>{{$index + 1}}</td>
-              <td>{{$batch->name}}</td>
+              <td><a href="#batchModal_{{ $batch->id }}" data-toggle="modal">{{$batch->name}}</a></td>
               <td>
                 @if(($batch->created_by > 0 && empty($loginUser->subdomain) && $loginUser->id == $batch->created_by) || (!empty($loginUser->subdomain) &&  $loginUser->id == $batch->client_id))
                   <a href="{{url('batch')}}/{{$batch->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$batch->name}}" /></a>
@@ -62,6 +62,46 @@
           @endif
         </tbody>
       </table>
+      @if(count($batches) > 0)
+        @foreach($batches as $index => $batch)
+          <div class="modal" id="batchModal_{{ $batch->id }}" role="dialog" style="display: none;">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">×</button>
+                  <h4 class="modal-title">Batch Users </h4>
+                </div>
+                <div class="modal-body">
+                  <table class="">
+                    <thead>
+                      <tr>
+                        <th>Sr. No.</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                      </tr>
+                    </thead>
+                    <tbody id="" class="">
+                      @if(isset($batchUsers[$batch->id]) && count($batchUsers[$batch->id]) > 0)
+                        @foreach($batchUsers[$batch->id] as  $index => $batchUser)
+                          <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $batchUser['name'] }}</td>
+                            <td>{{ $batchUser['email'] }}</td>
+                            <td>{{ $batchUser['phone'] }}</td>
+                          </tr>
+                        @endforeach
+                      @else
+                        <tr><td colspan="4">No students in this batch</td></tr>
+                      @endif
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        @endforeach
+      @endif
       <div style="float: right;">
         {{ $batches->links() }}
       </div>

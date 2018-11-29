@@ -5,7 +5,6 @@
 @section('header-css')
 	@include('layouts.home-css')
   	<link href="{{asset('css/exam.css?ver=1.0')}}" rel="stylesheet"/>
-
 	<style type="text/css">
 		.padding-body{
 			padding: 15px !important;
@@ -42,7 +41,6 @@
 @stop
 @section('header-js')
   	@include('layouts.home-js')
-
 @stop
 @section('content')
   	@include('client.front.header_menu')
@@ -352,8 +350,8 @@
 			@endif
 	  	</div>
 	</section>
-
-	@section('footer')
+@stop
+@section('footer')
 	@include('footer.client-footer')
 	<script>
 	function checkLogin(){
@@ -735,6 +733,7 @@
 					if( userId > 0 ){
 						if('true' == msg['isTestSubCategoryPurchased']){
 							document.getElementById('paidStatus').text = 'Paid';
+							document.getElementById('paidStatus').removeAttribute('href');
 						}
 					}
 		    	} else {

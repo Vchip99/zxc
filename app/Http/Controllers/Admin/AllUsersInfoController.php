@@ -88,7 +88,8 @@ class AllUsersInfoController extends Controller
         {
             DB::rollback();
         }
-        return User::searchUsers($request);
+        $result['users'] = User::searchUsers($request);
+        return $result;
     }
 
     protected function searchUsers(Request $request){

@@ -25,28 +25,32 @@
           </div>
         @endif
         <div class="row">
-          <div class="col-lg-12" id="all-result">
+          <div class="col-lg-12">
             <div class="panel panel-info">
               <div class="panel-heading text-center">
                 All Teachers
               </div>
               <div class="panel-body">
-                <table>
+                <table id="allTeachers">
                   <thead>
                     <tr>
                       <th>Sr. No.</th>
                       <th>Name</th>
+                      <th>Phone</th>
+                      <th>Email/User Id</th>
                       <th>Client Approve</th>
-                      <th>Assignd Modules</th>
+                      <th>Assigned Modules</th>
                       <th>Delete</th>
                     </tr>
                   </thead>
                   <tbody>
                     @if(count($clientTeachers) > 0)
                       @foreach($clientTeachers as  $index => $clientTeacher)
-                        <tr>
+                        <tr style="overflow: auto;">
                           <td> {{ $index + 1 }} </td>
                           <td>{{ $clientTeacher->name }}</td>
+                          <td>{{ $clientTeacher->phone }}</td>
+                          <td>{{ $clientTeacher->email }}</td>
                           <td>
                             @if(1 == $clientTeacher->client_approve)
                               <input type="checkbox" value="" data-client_user_id="{{ $clientTeacher->id }}" data-client_id="{{ $clientTeacher->client_id }}" onclick="changeApproveStatus(this);" checked="checked">

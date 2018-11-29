@@ -46,15 +46,19 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
 
         if(!empty($subcategoryId) && !empty($subjectId) && !empty($paperId)){
             $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperId($categoryId, $subcategoryId, $subjectId, $paperId, $request);
-
             if(is_object($questions) && true == $questions->isEmpty()){
                 return Redirect::to('/');
             }
-
             foreach($questions->shuffle() as $question){
-                $results['questions'][$question->section_type][] = $question;
+                if(empty($question->common_data)){
+                    $results['questions'][$question->section_type][] = $question;
+                }
             }
-
+            foreach($questions as $question){
+                if(!empty($question->common_data)){
+                    $results['questions'][$question->section_type][] = $question;
+                }
+            }
             if(count(array_keys($results['questions'])) > 0){
                 $clientUser = Auth::guard('clientuser')->user();
                 if(is_object($clientUser)){

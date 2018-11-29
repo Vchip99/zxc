@@ -905,6 +905,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('companyTest/{id?}', 'CompanyTestController@index');
 	Route::get('mockInterview', 'CompanyTestController@mockInterview');
 	Route::post('getSelectedStudentBySkillId', 'CompanyTestController@getSelectedStudentBySkillId');
+	Route::post('giveRating', 'CompanyTestController@giveRating');
 
 	// Skills
 	Route::get('admin/manageSkill', 'Admin\SkillController@show');

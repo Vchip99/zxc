@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"/>
-
+<html lang="en">
 <head>
   <link rel="SHORTCUT ICON" href="{{ asset('images/logo/vedu.png') }}"/>
   @yield('header-title')

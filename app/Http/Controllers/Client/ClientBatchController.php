@@ -58,10 +58,27 @@ class ClientBatchController extends ClientBaseController
         } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
             return Redirect::to('/');
         }
+        $batchUsers = [];
         $resultArr = InputSanitise::getClientIdAndCretedBy();
         $clientId = $resultArr[0];
         $batches = ClientBatch::where('client_id', $clientId)->paginate();
-        return view('client.batch.list', compact('batches','subdomainName','loginUser'));
+        $clientUsers = Clientuser::getAllStudentsByClientId($clientId);
+        if(is_object($clientUsers) && false == $clientUsers->isEmpty()){
+            foreach($clientUsers as $clientUser){
+                $userBatches = explode(',', $clientUser->batch_ids);
+                if(count($userBatches) > 0){
+                    foreach($userBatches as $userBatch){
+                        $batchUsers[$userBatch][] = [
+                            'name' => $clientUser->name,
+                            'email' => $clientUser->email,
+                            'phone' => $clientUser->phone,
+                        ];
+                    }
+                }
+
+            }
+        }
+        return view('client.batch.list', compact('batches','subdomainName','loginUser','batchUsers'));
     }
 
     /**

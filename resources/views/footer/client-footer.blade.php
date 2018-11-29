@@ -80,7 +80,7 @@
             </div>
             <label class="hide" style="color: white;" id="signInModelOtpMessage">Otp sent successfully.</label>
             <div class="form-group hide" id="signInModelOtpDiv">
-              <input name="login_otp" id="login_otp" type="text" class="form-control" placeholder="Enter OTP" >
+              <input name="login_otp" id="login_model_otp" type="text" class="form-control" placeholder="Enter OTP" >
               <span class="help-block"></span>
             </div>
             <div id="loginErrorMsg" class="hide">Wrong username or password</div>
@@ -156,7 +156,7 @@
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
     var signInModelPhone = document.getElementById('signInModelPhone').value;
-    var loginOtp = document.getElementById('login_otp').value;
+    var loginOtp = document.getElementById('login_model_otp').value;
     if((email && password)||(signInModelPhone && login_otp)){
       $.ajax({
           method: "POST",
@@ -176,7 +176,7 @@
           $('#password').val('');
           $('#email').val('');
           $('#signInModelPhone').val('');
-          $('#login_otp').val('');
+          $('#login_model_otp').val('');
           $('#signInModelOtpMessage').addClass('hide');
           $('#signInModelOtpDiv').addClass('hide');
         }

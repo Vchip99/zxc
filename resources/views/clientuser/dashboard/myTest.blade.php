@@ -381,42 +381,43 @@
                       var tbodyTr = document.createElement("tr");
                       if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
                         tbodyTr.setAttribute('style','background-color: #b3c2dc;');
-                      }
-                      var divInnerHtml = '';
-                      divInnerHtml += '<td class=" ">'+ obj.name+'</td>';
-                      if(msg['currentDate'] < obj.date_to_active){
-                        divInnerHtml += '<td id="startTest"><button disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
-                      } else {
-                        if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                          divInnerHtml += '<td id="startTest"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
-                        } else {
-                          divInnerHtml += '<td id="startTest"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
-                        }
-                      }
-                      if(msg['currentDate'] < obj.date_to_active){
-                        divInnerHtml += '<td class=" ">';
-                        divInnerHtml += '<button disabled="true" data-toggle="tooltip" title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
-                        divInnerHtml += '</td>';
-                      } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                        var testUrl = "{{ url('showUserTestResult') }}";
-                        var csrf_token = '{{ csrf_field() }}';
-                        divInnerHtml += '<td class=" ">';
-                        divInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
-                        divInnerHtml += csrf_token;
-                        divInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.subject_id +'"></form>';
-                        divInnerHtml += '<button onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
-                        divInnerHtml += '</td>';
-                      } else {
-                        divInnerHtml += '<td class=" ">';
-                        divInnerHtml += '<button disabled="true" data-toggle="tooltip" title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
-                        divInnerHtml += '</td>';
-                      }
-                      divInnerHtml += '<td class=" ">'+ obj.date_to_active +'</td>';
-                      divInnerHtml += '<td class=" ">'+ obj.date_to_inactive +'</td>';
 
-                      tbodyTr.innerHTML = divInnerHtml;
-                      tableBody.appendChild(tbodyTr);
-                      tableEle.appendChild(tableBody);
+                        var divInnerHtml = '';
+                        divInnerHtml += '<td class=" ">'+ obj.name+'</td>';
+                        if(msg['currentDate'] < obj.date_to_active){
+                          divInnerHtml += '<td id="startTest"><button disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+                        } else {
+                          if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                            divInnerHtml += '<td id="startTest"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+                          } else {
+                            divInnerHtml += '<td id="startTest"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+                          }
+                        }
+                        if(msg['currentDate'] < obj.date_to_active){
+                          divInnerHtml += '<td class=" ">';
+                          divInnerHtml += '<button disabled="true" data-toggle="tooltip" title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+                          divInnerHtml += '</td>';
+                        } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                          var testUrl = "{{ url('showUserTestResult') }}";
+                          var csrf_token = '{{ csrf_field() }}';
+                          divInnerHtml += '<td class=" ">';
+                          divInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
+                          divInnerHtml += csrf_token;
+                          divInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.subject_id +'"></form>';
+                          divInnerHtml += '<button onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+                          divInnerHtml += '</td>';
+                        } else {
+                          divInnerHtml += '<td class=" ">';
+                          divInnerHtml += '<button disabled="true" data-toggle="tooltip" title="Result will display after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+                          divInnerHtml += '</td>';
+                        }
+                        divInnerHtml += '<td class=" ">'+ obj.date_to_active +'</td>';
+                        divInnerHtml += '<td class=" ">'+ obj.date_to_inactive +'</td>';
+
+                        tbodyTr.innerHTML = divInnerHtml;
+                        tableBody.appendChild(tbodyTr);
+                        tableEle.appendChild(tableBody);
+                      }
                     });
                   } else {
                     tableBody.innerHTML = 'No papers are available..';
@@ -437,62 +438,63 @@
                       panelHeadingDiv.setAttribute('data-toggle','paper'+obj.id);
                       if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
                         panelHeadingDiv.setAttribute('style','background-color: #b3c2dc;');
-                      }
-                      panelHeadingDiv.innerHTML = obj.name;
 
-                      var spanEle = document.createElement('span');
-                      spanEle.className = 'col-xs-2 pull-right';
-                      spanEle.innerHTML = '<i class="fa fa-chevron-down pull-right"></i>';
-                      panelHeadingDiv.appendChild(spanEle);
+                        panelHeadingDiv.innerHTML = obj.name;
 
-                      panelDiv.appendChild(panelHeadingDiv);
+                        var spanEle = document.createElement('span');
+                        spanEle.className = 'col-xs-2 pull-right';
+                        spanEle.innerHTML = '<i class="fa fa-chevron-down pull-right"></i>';
+                        panelHeadingDiv.appendChild(spanEle);
 
-                      var panelContentDiv = document.createElement('div');
-                      panelContentDiv.id = 'paper'+obj.id;
-                      panelContentDiv.className = 'panel-body';
+                        panelDiv.appendChild(panelHeadingDiv);
 
-                      var containerDiv = document.createElement('div');
-                      containerDiv.className='container';
+                        var panelContentDiv = document.createElement('div');
+                        panelContentDiv.id = 'paper'+obj.id;
+                        panelContentDiv.className = 'panel-body';
 
-                      var rowDiv = document.createElement('div');
-                      rowDiv.className = 'fluid-row';
+                        var containerDiv = document.createElement('div');
+                        containerDiv.className='container';
 
-                      var ulDiv = document.createElement('ul');
-                      ulDivInnerHtml = '';
-                      if(msg['currentDate'] < obj.date_to_active){
-                        ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
-                      } else {
-                        if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                          ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                        var rowDiv = document.createElement('div');
+                        rowDiv.className = 'fluid-row';
+
+                        var ulDiv = document.createElement('ul');
+                        ulDivInnerHtml = '';
+                        if(msg['currentDate'] < obj.date_to_active){
+                          ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Test will be enabled on date to active."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
                         } else {
-                          ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                          if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                            ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                          } else {
+                            ulDivInnerHtml += '<li id="startTest"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+                          }
                         }
-                      }
-                      if(msg['currentDate'] < obj.date_to_active){
+                        if(msg['currentDate'] < obj.date_to_active){
+                            ulDivInnerHtml += '<li class=" ">';
+                            ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
+                            ulDivInnerHtml += '</li>';
+                        } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
+                            var testUrl = "{{ url('showUserTestResult') }}";
+                            var csrf_token = '{{ csrf_field() }}';
+                            ulDivInnerHtml += '<li class=" ">';
+                            ulDivInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
+                            ulDivInnerHtml += csrf_token;
+                            ulDivInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.subject_id +'"></form>';
+                            ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
+                            ulDivInnerHtml += '</li>';
+                        } else {
                           ulDivInnerHtml += '<li class=" ">';
                           ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
                           ulDivInnerHtml += '</li>';
-                      } else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
-                          var testUrl = "{{ url('showUserTestResult') }}";
-                          var csrf_token = '{{ csrf_field() }}';
-                          ulDivInnerHtml += '<li class=" ">';
-                          ulDivInnerHtml += '<form id="showUserTestResult_'+obj.id+'" method="POST" action="'+testUrl+'">';
-                          ulDivInnerHtml += csrf_token;
-                          ulDivInnerHtml +='<input type="hidden" name="paper_id" value="'+obj.id+'"><input type="hidden" name="category_id" value="'+ obj.category_id +'"><input type="hidden" name="subcategory_id" value="'+ obj.sub_category_id+'"><input type="hidden" name="subject_id" value="'+ obj.subject_id +'"></form>';
-                          ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+obj.id+'" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
-                          ulDivInnerHtml += '</li>';
-                      } else {
-                        ulDivInnerHtml += '<li class=" ">';
-                        ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will display after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
-                        ulDivInnerHtml += '</li>';
+                        }
+                        ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li><li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_inactive +'</button></li>';
+                        ulDiv.innerHTML = ulDivInnerHtml;
+                        rowDiv.appendChild(ulDiv);
+                        containerDiv.appendChild(rowDiv);
+                        panelContentDiv.appendChild(containerDiv);
+                        panelDiv.appendChild(panelContentDiv);
+                        mainSmallDiv.appendChild(panelDiv);
                       }
-                      ulDivInnerHtml += '<li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_active +'</button></li><li class=" "><button type="button" class="btn-magick btn-sm btn3d" disabled="true"><span class="fa fa-inr"></span>'+ obj.date_to_inactive +'</button></li>';
-                      ulDiv.innerHTML = ulDivInnerHtml;
-                      rowDiv.appendChild(ulDiv);
-                      containerDiv.appendChild(rowDiv);
-                      panelContentDiv.appendChild(containerDiv);
-                      panelDiv.appendChild(panelContentDiv);
-                      mainSmallDiv.appendChild(panelDiv);
                     });
                   }
                   tableDiv.appendChild(mainSmallDiv);

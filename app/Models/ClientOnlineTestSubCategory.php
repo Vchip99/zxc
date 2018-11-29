@@ -317,6 +317,44 @@ class ClientOnlineTestSubCategory extends Model
                 ->get();
     }
 
+    protected static function showPaidSubCategoriesAssociatedWithQuestion($request){
+        $loginClient = Auth::guard('client')->user();
+        if(is_object($loginClient)){
+            $clientId = $loginClient->id;
+        } else{
+            $client = InputSanitise::getCurrentClient($request);
+        }
+
+        $result = DB::connection('mysql2')->table('client_online_test_sub_categories')
+                ->join('client_online_test_subjects', function($join){
+                    $join->on('client_online_test_subjects.sub_category_id', '=', 'client_online_test_sub_categories.id');
+                })
+                ->join('client_online_test_subject_papers', function($join){
+                    $join->on('client_online_test_subject_papers.sub_category_id', '=', 'client_online_test_sub_categories.id');
+                    $join->on('client_online_test_subject_papers.subject_id', '=', 'client_online_test_subjects.id');
+                })
+                ->join('client_online_test_questions', function($join){
+                    $join->on('client_online_test_questions.subcat_id', '=', 'client_online_test_sub_categories.id');
+                    $join->on('client_online_test_questions.subject_id', '=', 'client_online_test_subjects.id');
+                    $join->on('client_online_test_questions.paper_id', '=', 'client_online_test_subject_papers.id');
+                })
+                ->join('clients', function($join){
+                    $join->on('clients.id', '=', 'client_online_test_questions.client_id');
+                    $join->on('clients.id', '=', 'client_online_test_sub_categories.client_id');
+                    $join->on('clients.id', '=', 'client_online_test_subject_papers.client_id');
+                    $join->on('clients.id', '=', 'client_online_test_subjects.client_id');
+                });
+
+        if(!empty($clientId)){
+            $result->where('clients.id', $clientId);
+        } else {
+            $result->where('clients.subdomain', $client);
+        }
+        return  $result->where('client_online_test_subject_papers.date_to_inactive', '>=',date('Y-m-d H:i:s'))->where('client_online_test_sub_categories.price', '>',0)
+                ->select('client_online_test_sub_categories.*')->groupBy('client_online_test_sub_categories.id')
+                ->get();
+    }
+
     protected static function showPayableSubCategoriesAssociatedWithQuestion(){
         return DB::connection('mysql2')->table('client_online_test_sub_categories')
                 ->join('client_online_test_subjects', function($join){

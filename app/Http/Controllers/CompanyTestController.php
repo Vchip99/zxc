@@ -17,6 +17,7 @@ use App\Models\UserData;
 use App\Models\Skill;
 use Session, Redirect, Auth, DB,Cache;
 use App\Models\Add;
+use App\Models\MockInterviewReview;
 
 class CompanyTestController extends Controller
 {
@@ -136,7 +137,34 @@ class CompanyTestController extends Controller
 		}
     	$date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
-    	return view('companyTest.mock_interview', compact('userDatas','userSkills','testUsers','ads'));
+        $reviewData = [];
+        $ratingUsers = [];
+        $userNames = [];
+        $allReviews = MockInterviewReview::all();
+        if(is_object($allReviews) && false == $allReviews->isEmpty()){
+        	foreach($allReviews as $review){
+        		$reviewData[$review->user_data_id]['rating'][$review->user_id] = [ 'rating' => $review->rating,'review' => $review->review, 'review_id' => $review->id];
+        		$ratingUsers[] = $review->user_id;
+        	}
+        	foreach($reviewData as $dataId => $rating){
+        		$ratingSum = 0.0;
+        		foreach($rating as $userRatings){
+        			foreach($userRatings as $userId => $userRating){
+        				$ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+        			}
+        			$reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
+        		}
+        	}
+        }
+        if(count($ratingUsers) > 0){
+        	$users = User::find($ratingUsers);
+        	if(is_object($users) && false == $users->isEmpty()){
+        		foreach($users as $user){
+        			$userNames[$user->id] = $user->name;
+        		}
+        	}
+        }
+    	return view('companyTest.mock_interview', compact('userDatas','userSkills','testUsers','ads','reviewData','userNames'));
     }
 
     protected function getSelectedStudentBySkillId(Request $request){
@@ -206,6 +234,24 @@ class CompanyTestController extends Controller
         	}
         }
         return $results;
+    }
+
+    protected function giveRating(Request $request){
+        DB::connection('mysql')->beginTransaction();
+        try {
+
+            $review = MockInterviewReview::addOrUpdateMockInterviewReview($request);
+            if(is_object($review)){
+                DB::commit();
+                return redirect('mockInterview')->with('message', 'Review given successfully.');
+            }
+        }
+        catch(Exception $e)
+        {
+            DB::connection('mysql')->rollback();
+            return redirect('mockInterview')->withErrors([$e->getMessage()]);
+        }
+        return redirect('mockInterview');
     }
 
 }

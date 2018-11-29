@@ -5,7 +5,19 @@
 @section('header-css')
   @include('layouts.home-css')
   <link href="{{ asset('css/sidemenuindex.css?ver=1.0')}}" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ asset('css/star-rating.css') }}" />
+
 <style>
+  .fa {
+    font-size: medium !important;
+  }
+  .rating-container .filled-stars{
+    color: #e7711b;
+    border-color: #e7711b;
+  }
+  .rating-xs {
+      font-size: 0em;
+  }
     .memberinfotop{
       margin-top: 100px;
     }
@@ -111,6 +123,21 @@
   <section id="sidemenuindex" class="v_container">
     <div class="container ">
       <div class="row">
+        @if(Session::has('message'))
+          <div class="alert alert-success" id="message">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+              {{ Session::get('message') }}
+          </div>
+        @endif
+        @if(count($errors) > 0)
+          <div class="alert alert-danger">
+              <ul>
+                  @foreach ($errors->all() as $error)
+                      <li>{{ $error }}</li>
+                  @endforeach
+              </ul>
+          </div>
+        @endif
         <div class="col-sm-3 hidden-div">
           <h4 class="v_h4_subtitle"> Sort By</h4>
           <div class="mrgn_20_top_btm" >
@@ -170,10 +197,100 @@
                   @if(!empty($userData->resume) && is_file($userData->resume))
                   <div style="padding-left: 10px;"><a href="{{asset($userData->resume)}}" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>
                   @endif
+                  <div class="row">
+                    <div  style="display: inline-block;">
+                      @if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif
+                    </div>
+                    <div  style="display: inline-block;">
+                      <input id="rating_input{{$userData->id}}" name="input-{{$userData->id}}" class="rating rating-loading" value="@if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                    </div>
+                    <div  style="display: inline-block;">
+                      <a data-toggle="modal" data-target="#review-model-{{$userData->id}}">
+                      @if(isset($reviewData[$userData->id]))
+                        {{count($reviewData[$userData->id]['rating'])}} <i class="fa fa-group"></i>
+                      @else
+                        0 <i class="fa fa-group"></i>
+                      @endif
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             <br>
+            <div id="review-model-{{$userData->id}}" class="modal fade" role="dialog">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="close" data-dismiss="modal">×</button>
+                    <div class="form-group row ">
+                      <div  style="display: inline-block;">
+                        @if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif
+                      </div>
+                      <div  style="display: inline-block;">
+                        <input name="input-{{$userData->id}}" class="rating rating-loading" value="@if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                      </div>
+                      <div  style="display: inline-block;">
+                        @if(isset($reviewData[$userData->id]))
+                          {{count($reviewData[$userData->id]['rating'])}} <i class="fa fa-group"></i>
+                        @else
+                          0 <i class="fa fa-group"></i>
+                        @endif
+                      </div>
+                      @if(is_object(Auth::user()))
+                        <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$userData->id}}">
+                        @if(isset($reviewData[$userData->id]) && isset($reviewData[$userData->id]['rating'][Auth::user()->id]))
+                          Edit Rating
+                        @else
+                          Give Rating
+                        @endif
+                        </button>
+                      @else
+                        <button class="pull-right" onClick="giveRating({{$userData->user_id}})">Give Rating</button>
+                      @endif
+                    </div>
+                  </div>
+                  <div class="modal-body row">
+                    <div class="form-group row" style="overflow: auto;">
+                      @if(isset($reviewData[$userData->id]))
+                        @foreach($reviewData[$userData->id]['rating'] as $userId => $review)
+                          {{$userNames[$userId]}}:
+                          <input id="rating_input-{{$userData->id}}-{{$userId}}" name="input-{{$userData->id}}" class="rating rating-loading" value="{{$review['rating']}}" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                          {{$review['review']}}
+                          <hr>
+                        @endforeach
+                      @else
+                        Please give ratings
+                      @endif
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="rating-model-{{$userData->id}}" class="modal fade" role="dialog">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button class="close" data-dismiss="modal">×</button>
+                    Rate and Review
+                  </div>
+                  <div class="modal-body row">
+                    <form action="{{ url('giveRating')}}" method="POST">
+                      <div class="form-group row ">
+                        {{ csrf_field() }}
+                        <input id="rating_input-{{$userData->id}}" name="input-{{$userData->id}}" class="rating rating-loading" value="@if(isset($reviewData[$userData->id]) && is_object(Auth::user()) && isset($reviewData[$userData->id]['rating'][Auth::user()->id])) {{$reviewData[$userData->id]['rating'][Auth::user()->id]['rating']}} @else 0 @endif" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                        Review:<input type="text" name="review-text" class="form-control" value="@if(isset($reviewData[$userData->id])  && is_object(Auth::user()) && isset($reviewData[$userData->id]['rating'][Auth::user()->id])) {{$reviewData[$userData->id]['rating'][Auth::user()->id]['review']}} @endif">
+                        <br>
+                        <input type="hidden" name="user_data_id" value="{{$userData->id}}">
+                        <input type="hidden" name="review_id" value="@if(isset($reviewData[$userData->id]) && is_object(Auth::user()) && isset($reviewData[$userData->id]['rating'][Auth::user()->id])) {{$reviewData[$userData->id]['rating'][Auth::user()->id]['review_id']}} @endif">
+                        <button type="submit" class="pull-right">Submit</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
             @endforeach
           @else
             No Data
@@ -270,6 +387,7 @@
 	@include('footer.footer')
   <script type="text/javascript" src="{{ asset('js/togleForFilterBy.js')}}"></script>
   <script type="text/javascript" src="{{ asset('js/read_info.js')}}"></script>
+  <script src="{{ asset('js/star-rating.js') }}"></script>
   <script type="text/javascript">
 
   function selectUsers(){
@@ -347,6 +465,14 @@
       });
     } else {
       divUsers.innerHTML = 'No Result!';
+    }
+  }
+
+  function giveRating(dataUser){
+    var userId = parseInt(document.getElementById('user_id').value);
+    if(isNaN(userId)) {
+      $('#loginUserModel').modal();
+      return false;
     }
   }
   </script>

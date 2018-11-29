@@ -64,10 +64,10 @@ class ClientUsersInfoController extends BaseController
         $clientPurchasedSubCategories = [];
         $clientId = Auth::guard('client')->user()->id;
         $clientusers = Clientuser::getAllStudentsByClientId($clientId);
-        $courses = ClientOnlineCourse::getCourseAssocaitedWithVideos();
+        $courses = ClientOnlineCourse::getPaidCourseAssocaitedWithVideos($subdomainName);
         $userPurchasedCourses = ClientUserPurchasedCourse::getClientUserCourses($clientId);
         $userPurchasedTestSubCategories = ClientUserPurchasedTestSubCategory::getClientUserTestSubCategories($clientId);
-        $testSubCategories = ClientOnlineTestSubCategory::showSubCategoriesAssociatedWithQuestion($request);
+        $testSubCategories = ClientOnlineTestSubCategory::showPaidSubCategoriesAssociatedWithQuestion($request);
         $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId($clientId);
         if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
             foreach($payableSubCategories as $payableSubCategory){
