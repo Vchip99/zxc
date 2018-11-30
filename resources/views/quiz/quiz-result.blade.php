@@ -465,19 +465,19 @@
 		             </div>
 		          </div>
 		        <div class="col-md-4 sol-btn" >
-		           	@if(1 == $score->paper->show_solution)
-				    	<form class="form-horizontal" role="form" id='solution' method="post" action="{{url('solutions')}}">
-						{{ csrf_field() }}
-							  <input type="hidden" id="category_id" name="category_id" value="{{$result['category_id']}}">
-						    <input type="hidden" id="sub_category_id" name="sub_category_id" value="{{$result['subcat_id']}}">
-						    <input type="hidden" id="subject_id" name="subject_id" value="{{$result['subject_id']}}">
-						    <input type="hidden" id="paper_id" name="paper_id" value="{{$result['paper_id']}}">
+                <form class="form-horizontal" role="form" id='solution' method="post" action="{{url('solutions')}}">
+                  {{ csrf_field() }}
+                    <input type="hidden" id="category_id" name="category_id" value="{{$result['category_id']}}">
+                    <input type="hidden" id="sub_category_id" name="sub_category_id" value="{{$result['subcat_id']}}">
+                    <input type="hidden" id="subject_id" name="subject_id" value="{{$result['subject_id']}}">
+                    <input type="hidden" id="paper_id" name="paper_id" value="{{$result['paper_id']}}">
 
-					    	<div class="col-md-4 sol-btn" >
-					     		<span><button class="btn btn-info  btn-sm" type="submit" >Solution</button></span>
-					    	</div>
-				    	</form>
-				    @endif
+		           	    @if(1 == $score->paper->show_solution)
+      					    	<div class="col-md-4 sol-btn" >
+      					     		<button class="btn btn-info  btn-sm" type="submit" >Solution</button>
+      					    	</div>
+    				        @endif
+                </form>
 				    	<div class="col-md-4 sol-btn" >
 					     	<span><button type="submit" class="btn btn-success btn-sm" onclick="window.close();" title="Close">Close</button></span>
 					    </div>

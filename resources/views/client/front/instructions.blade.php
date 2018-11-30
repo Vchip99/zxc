@@ -9,7 +9,7 @@
   <script src="{{asset('js/jquery.min.js?ver=1.0')}}"></script>
   <script src="{{asset('js/bootstrap.min.js?ver=1.0')}}"></script>
   <script src="{{asset('js/jquery-confirm.min.js?ver=1.0')}}"></script>
-</head>
+
 <style type="text/css">
 body{font-family:  Century Gothic, serif}
 	#instr .panel{border-radius: 0px;}
@@ -84,6 +84,7 @@ body{font-family:  Century Gothic, serif}
 			}
 			h3{color: #c00000; font-size: 15px; font-weight: bolder;}
 </style>
+</head>
 <body>
 	<div class="container-fluid" id="instr">
 		<div class="row">

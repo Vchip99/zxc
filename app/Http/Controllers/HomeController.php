@@ -41,6 +41,8 @@ use App\Models\AdvertisementPage;
 use DateTime;
 use App\Models\AdvertisementPayment;
 use App\Models\WebdevelopmentPayment;
+use App\Models\StudyMaterialTopic;
+use App\Models\StudyMaterialSubject;
 
 class HomeController extends Controller
 {
@@ -702,5 +704,74 @@ class HomeController extends Controller
             }
         }
         return redirect('/');
+    }
+
+    protected function studyMaterial(){
+        $categories = [];
+        $subcategories = [];
+        $results = StudyMaterialTopic::getCategoriesAndSubcategoriesAssocaitedWithStudyMaterialTopics();
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                if(!isset($categories[$result->course_category_id])){
+                    $categories[$result->course_category_id] = $result->category;
+                }
+                if(!isset($subcategories[$result->course_category_id][$result->course_sub_category_id])){
+                    $subcategories[$result->course_category_id][$result->course_sub_category_id] = ['name'=>$result->subcategory,'subject'=>$result->subject,'topic_id'=>$result->id];
+                }
+            }
+        }
+        return view('studyMaterial.studyMaterial', compact('categories','subcategories'));
+    }
+
+    protected function studyMaterialDetails($subcategoryId,$subjectName,$topicId){
+        $categories = [];
+        $subcategories = [];
+        $subjects = [];
+        $topics = [];
+        $topicContent = '';
+        $topicName = '';
+        $subcategoryName = '';
+        $isSubcategoryTrue = false;
+        $isSubjectTrue = false;
+        $isTopicTrue = false;
+
+        $menuResults = StudyMaterialTopic::getCategoriesAndSubcategoriesAssocaitedWithStudyMaterialTopics();
+        if(is_object($menuResults) && false == $menuResults->isEmpty()){
+            foreach($menuResults as $result){
+                if(!isset($categories[$result->course_category_id])){
+                    $categories[$result->course_category_id] = $result->category;
+                }
+                if(!isset($subcategories[$result->course_category_id][$result->course_sub_category_id])){
+                    $subcategories[$result->course_category_id][$result->course_sub_category_id] = ['name'=>$result->subcategory,'subject'=>$result->subject,'topic_id'=>$result->id];
+                }
+                if($subcategoryId == $result->course_sub_category_id){
+                    $isSubcategoryTrue = true;
+                    $subcategoryName = $result->subcategory;
+                }
+            }
+        }
+        $results = StudyMaterialTopic::getStudymMaterialTopicsBySubCategoryId($subcategoryId);
+        if(is_object($results) && false == $results->isEmpty()){
+            foreach($results as $result){
+                if(!isset($subjects[$result->study_material_subject_id])){
+                    $subjects[$result->study_material_subject_id] = $result->subject;
+                }
+                if($subjectName == $result->subject){
+                    $isSubjectTrue = true;
+                }
+                if(!isset($topics[$result->study_material_subject_id][$result->id])){
+                    $topics[$result->study_material_subject_id][$result->id] = $result->name;
+                }
+                if($topicId == $result->id){
+                    $topicContent = $result->content;
+                    $topicName = $result->name;
+                    $isTopicTrue = true;
+                }
+            }
+        }
+        if(true == $isSubcategoryTrue && true == $isSubjectTrue && true == $isSubjectTrue){
+            return view('studyMaterial.studyMaterialDetails', compact('categories','subcategories','subjects','topics','topicContent','subcategoryId','topicName','subcategoryName'));
+        }
+        return redirect('study-material');
     }
 }

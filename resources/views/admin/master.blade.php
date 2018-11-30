@@ -405,6 +405,18 @@
               <li title="Upload Excel File"><a href="{{ url('admin/uploadPayableQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
             </ul>
           </li>
+          <li class="treeview">
+            <a href="#" title="Study Material">
+              <i class="fa fa-file-pdf-o"></i> <span>Study Material</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Manage Subject"><a href="{{ url('admin/manageStudyMaterialSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
+              <li title="Manage Topic"><a href="{{ url('admin/manageStudyMaterialTopic')}}"><i class="fa fa-circle-o"></i> Manage Topic </a></li>
+            </ul>
+          </li>
         @endif
         <li class="header">LABELS</li>
         <li>

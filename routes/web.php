@@ -330,6 +330,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('terms-and-conditions', 'HomeController@termsandconditions');
 	Route::get('privacy-policy', 'HomeController@privacypolicy');
 	Route::get('faq', 'HomeController@faq');
+	Route::get('study-material', 'HomeController@studyMaterial');
+	Route::get('study-material/{subcategoryId}/{subjectName}/{topicId}', 'HomeController@studyMaterialDetails');
 
 	// online courses front
 	Route::get('courses', 'CourseController@courses');
@@ -1155,6 +1157,27 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('/college/{college}/deleteIndividualMessage', 'CollegeModule\Academic\CollegeIndividualMessageController@delete');
 	Route::post('getCollegeStudentsByDeptIdByYear', 'CollegeModule\Academic\CollegeIndividualMessageController@getCollegeStudentsByDeptIdByYear');
 	Route::post('getIndividualMessagesByDate', 'CollegeModule\Academic\CollegeIndividualMessageController@getIndividualMessagesByDate');
+
+	// admin study material subject
+	Route::get('admin/manageStudyMaterialSubject', 'StudyMaterial\StudyMaterialSubjectController@show');
+	Route::get('admin/createStudyMaterialSubject', 'StudyMaterial\StudyMaterialSubjectController@create');
+	Route::post('admin/createStudyMaterialSubject', 'StudyMaterial\StudyMaterialSubjectController@store');
+	Route::get('admin/studyMaterialSubject/{id}/edit', 'StudyMaterial\StudyMaterialSubjectController@edit');
+	Route::put('admin/updateStudyMaterialSubject', 'StudyMaterial\StudyMaterialSubjectController@update');
+	Route::delete('admin/deleteStudyMaterialSubject', 'StudyMaterial\StudyMaterialSubjectController@delete');
+	Route::post('admin/isStudyMaterialSubjectExist', 'StudyMaterial\StudyMaterialSubjectController@isStudyMaterialSubjectExist');
+	Route::post('admin/getStudyMaterialSubjectsByCategoryIdBySubCategoryId', 'StudyMaterial\StudyMaterialSubjectController@getStudyMaterialSubjectsByCategoryIdBySubCategoryId');
+
+	// admin study material topic
+	Route::get('admin/manageStudyMaterialTopic', 'StudyMaterial\StudyMaterialTopicController@show');
+	Route::get('admin/createStudyMaterialTopic', 'StudyMaterial\StudyMaterialTopicController@create');
+	Route::post('admin/createStudyMaterialTopic', 'StudyMaterial\StudyMaterialTopicController@store');
+	Route::get('admin/studyMaterialTopic/{id}/edit', 'StudyMaterial\StudyMaterialTopicController@edit');
+	Route::put('admin/updateStudyMaterialTopic', 'StudyMaterial\StudyMaterialTopicController@update');
+	Route::delete('admin/deleteStudyMaterialTopic', 'StudyMaterial\StudyMaterialTopicController@delete');
+	Route::post('admin/isStudyMaterialTopicExist', 'StudyMaterial\StudyMaterialTopicController@isStudyMaterialTopicExist');
+
+
 
 });
 

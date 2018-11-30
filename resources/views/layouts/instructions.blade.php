@@ -17,7 +17,7 @@
         }
     });
   </script>
-</head>
+
 <style type="text/css">
 	body{font-family:  Century Gothic, serif}
 	#instr .panel{border-radius: 0px;}
@@ -93,6 +93,7 @@
 			h3{color: #c00000; font-size: 15px; font-weight: bolder;}
 
 </style>
+</head>
 <body>
 
 <div class="container-fluid" id="instr">

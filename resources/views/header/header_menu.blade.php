@@ -111,9 +111,8 @@
               <ul class="dropdown-menu" role="menu">
                 <div class="navbar-content">
                  <li><a href="{{ url('courses')}}" title="Online Courses">Online Courses</a></li>
-                 <!-- <li><a href="{{ url('liveCourse')}}" title="Live Courses">Live Courses</a></li> -->
-                 <!-- <li class="divider"></li> -->
-                 <!-- <li><a href="{{ url('workshops') }}" title="Workshop">Workshop</a></li> -->
+                 <li class="divider"></li>
+                 <li><a href="{{ url('study-material') }}" title="Study Material">Study Material</a></li>
                  <li class="divider"></li>
                  <li><a href="{{url('vkits')}}" title="Hobby Project">Hobby Project</a></li>
                  <li class="divider"></li>

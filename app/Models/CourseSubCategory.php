@@ -114,7 +114,7 @@ class CourseSubCategory extends Model
     }
 
     /**
-     *  return course sub category by collegeId by deptId
+     *  return course sub category
      */
     protected static function getCourseSubCategoriesWithPagination(){
         return static::join('course_categories', 'course_categories.id', '=', 'course_sub_categories.course_category_id')
