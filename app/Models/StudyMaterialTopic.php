@@ -112,4 +112,34 @@ class StudyMaterialTopic extends Model
             ->where('study_material_topics.course_sub_category_id',$subCategoryId)
             ->get();
     }
+
+    protected static function deleteStudyMaterialTopicsBySubjectId($subjectId){
+        $topics =  static::where('study_material_subject_id', $subjectId)->get();
+        if(is_object($topics) && false == $topics->isEmpty()){
+            foreach($topics as $topic){
+                $topic->delete();
+            }
+        }
+        return;
+    }
+
+    protected static function deleteStudyMaterialTopicsBySubCategoryId($subCategoryId){
+        $topics =  static::where('course_sub_category_id', $subCategoryId)->get();
+        if(is_object($topics) && false == $topics->isEmpty()){
+            foreach($topics as $topic){
+                $topic->delete();
+            }
+        }
+        return;
+    }
+
+    protected static function deleteStudyMaterialTopicsByCategoryId($categoryId){
+        $topics =  static::where('course_category_id', $categoryId)->get();
+        if(is_object($topics) && false == $topics->isEmpty()){
+            foreach($topics as $topic){
+                $topic->delete();
+            }
+        }
+        return;
+    }
 }

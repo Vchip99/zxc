@@ -2455,7 +2455,6 @@ class AccountController extends Controller
     }
 
     protected function myTimeTable(Request $request){
-        $loginUser = Auth::user();
         $collegeCalendar = CollegeTimeTable::getCollegeCalendar();
         $collegeTimeTable = CollegeTimeTable::getStudentCollegeTimeTable();
         $examTimeTable = CollegeTimeTable::getStudentExamTimeTable();

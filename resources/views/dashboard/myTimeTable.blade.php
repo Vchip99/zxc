@@ -27,22 +27,34 @@
     </div>
     <br>
     <div id="collegeTT" class="row" style="max-height: 600px; width: 100%; overflow-x: auto;">
-      <img src="{{asset($collegeTimeTable->image_path)}}">
+      @if(is_object($collegeTimeTable))
+        <img src="{{asset($collegeTimeTable->image_path)}}">
+      @else
+        No College Time Table
+      @endif
     </div>
     <br>
     <div id="examTT" class="row hide" style="max-height: 600px; width: 100%; overflow-x: auto;">
-      <img src="{{asset($examTimeTable->image_path)}}">
+      @if(is_object($examTimeTable))
+        <img src="{{asset($examTimeTable->image_path)}}">
+      @else
+        No Exam Time Table
+      @endif
     </div>
     <br>
-    @if(preg_match('/(\.jpg|\.png|\.jpeg)$/', $collegeCalendar->image_path))
+    @if(is_object($collegeCalendar) && preg_match('/(\.jpg|\.png|\.jpeg)$/', $collegeCalendar->image_path))
       <div id="calender" class="row hide" style="max-height: 600px; width: 100%; overflow-x: auto;">
         <img src="{{asset($collegeCalendar->image_path)}}"  width="100%" height="100%">
       </div>
     @else
       <div id="calender" class="row hide">
-         <object data="{{asset($collegeCalendar->image_path)}}" type="application/pdf" width="100%" height="1000">
-          <a href="{{asset($collegeCalendar->image_path)}}"></a>
-         </object>
+        @if(is_object($collegeCalendar))
+          <object data="{{asset($collegeCalendar->image_path)}}" type="application/pdf" width="100%" height="1000">
+            <a href="{{asset($collegeCalendar->image_path)}}"></a>
+          </object>
+        @else
+          No Calendar
+        @endif
       </div>
     @endif
   </div>

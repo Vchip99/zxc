@@ -161,10 +161,10 @@ class ClientOnlineTestFrontController extends ClientHomeController
                 return Redirect::away($clientResult);
             }
         }
-		if(isset($subcatId)){
-			$subcategory = ClientOnlineTestSubCategory::find($subcatId);
+        $subdomain = InputSanitise::checkDomain($request);
+        if(is_object($subdomain) && isset($subcatId)){
+            $subcategory = ClientOnlineTestSubCategory::find($subcatId);
 			if(is_object($subcategory)){
-
 				$testCategories = ClientOnlineTestCategory::getOnlineTestCategoriesAssociatedWithQuestion($request);
                 if(is_object($testCategories) && false == $testCategories->isEmpty()){
                     foreach($testCategories as $testCategory){
@@ -176,8 +176,11 @@ class ClientOnlineTestFrontController extends ClientHomeController
 				$purchasedPayableSubCategories = [];
 				if( 0 == $subcategory->client_id && 0 == $subcategory->category_id){
 					$isPayableSubCategory = 'true';
-					$subdomain = InputSanitise::checkDomain($request);
+
 					$selectedPayableSubCategory = PayableClientSubCategory::getPayableSubCategoryByClientIdBySubCategoryId($subdomain->client_id, $subcategory->id);
+                    if(!is_object($selectedPayableSubCategory)){
+                        return Redirect::to('online-tests');
+                    }
 					$catId = $selectedPayableSubCategory->category_id;
 					$selectedSubCategory = $selectedPayableSubCategory;
 					$payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientIdByCategoryId($subdomain->client_id, $catId);
@@ -258,7 +261,6 @@ class ClientOnlineTestFrontController extends ClientHomeController
                 	$alreadyGivenPapers = [];
                 }
 
-
 				return view('client.front.onlineTests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'isTestSubCategoryPurchased','subject','paper', 'selectedSubCategory', 'loginUser', 'isPayableSubCategory', 'payableTestSubCategories', 'purchasedPayableSubCategories', 'payableTestCategories', 'subdomainName'));
 			}
 		}
@@ -331,7 +333,6 @@ class ClientOnlineTestFrontController extends ClientHomeController
 
 				$result['papers'] = ClientOnlineTestSubjectPaper::getOnlineSubjectPapersByCatIdBySubCatIdWithQuestion($catId, $subcatId, $request);
 			}
-
 			if(is_object($loginUser)){
 		        $clientId = $loginUser->client_id;
 		        $userId = $loginUser->id;
@@ -346,11 +347,11 @@ class ClientOnlineTestFrontController extends ClientHomeController
 					}
 					$testSubjectPaperIds = array_values($testSubjectPaperIds);
 				}
-
 				$result['alreadyGivenPapers'] = $this->getClientTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 				$result['currentDate'] = date('Y-m-d H:i:s');
 			} else {
 				$result['registeredPaperIds'] = [];
+                $result['alreadyGivenPapers'] = [];
 			}
 			return $result;
 		}

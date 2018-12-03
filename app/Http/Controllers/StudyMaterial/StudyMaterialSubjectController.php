@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CourseSubCategory;
 use App\Models\CourseCategory;
 use App\Models\StudyMaterialSubject;
+use App\Models\StudyMaterialTopic;
 use Redirect;
 use Validator, Auth, DB;
 use App\Libraries\InputSanitise;
@@ -138,6 +139,7 @@ class StudyMaterialSubjectController extends Controller
 				DB::beginTransaction();
 		        try
 		        {
+		        	StudyMaterialTopic::deleteStudyMaterialTopicsBySubjectId($subject->id);
 					$subject->delete();
 					DB::commit();
 					return Redirect::to('admin/manageStudyMaterialSubject')->with('message', 'Subject deleted successfully!');

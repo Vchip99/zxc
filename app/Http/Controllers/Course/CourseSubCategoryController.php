@@ -8,6 +8,8 @@ use Redirect;
 use App\Models\CourseSubCategory;
 use App\Models\CourseCategory;
 use App\Models\CourseCourse;
+use App\Models\StudyMaterialSubject;
+use App\Models\StudyMaterialTopic;
 use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 
@@ -161,6 +163,8 @@ class CourseSubCategoryController extends Controller
                             $course->delete();
                         }
                     }
+                    StudyMaterialSubject::deleteStudyMaterialSubjectsBySubCategoryId($courseSubcategory->id);
+                    StudyMaterialTopic::deleteStudyMaterialTopicsBySubCategoryId($courseSubcategory->id);
         			$courseSubcategory->delete();
                     DB::commit();
         			return Redirect::to('admin/manageCourseSubCategory')->with('message', 'Course sub category deleted successfully!');

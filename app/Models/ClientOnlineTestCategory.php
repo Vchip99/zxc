@@ -133,6 +133,8 @@ class ClientOnlineTestCategory extends Model
         if(count($categoryIds) > 0){
             $result->whereNotIn('client_online_test_categories.id', $categoryIds);
         }
+        $result->where('payable_client_sub_categories.start_date', '<=',date('Y-m-d H:i:s'));
+        $result->where('payable_client_sub_categories.end_date', '>=',date('Y-m-d H:i:s'));
         return $result->select('client_online_test_categories.id', 'client_online_test_categories.name')
             ->groupBy('client_online_test_categories.id')->get();
     }

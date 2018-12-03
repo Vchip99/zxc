@@ -158,9 +158,13 @@ class CourseCategoryController extends Controller
                                     $course->delete();
                                 }
                             }
+                            StudyMaterialSubject::deleteStudyMaterialSubjectsBySubCategoryId($subcategory->id);
+                            StudyMaterialTopic::deleteStudyMaterialTopicsBySubCategoryId($subcategory->id);
                             $subcategory->delete();
                         }
                     }
+                    StudyMaterialSubject::deleteStudyMaterialSubjectsByCategoryId($courseCategory->id);
+                    StudyMaterialTopic::deleteStudyMaterialTopicsByCategoryId($courseCategory->id);
         			$courseCategory->delete();
                     DB::commit();
         			return Redirect::to('admin/manageCourseCategory')->with('message', 'Course category deleted successfully!');

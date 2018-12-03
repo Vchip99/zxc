@@ -83,4 +83,24 @@ class StudyMaterialSubject extends Model
     protected static function getStudyMaterialSubjectsByCategoryIdBySubCategoryId($categoryId,$subcategoryId){
     	return static::where('course_category_id',$categoryId)->where('course_sub_category_id',$subcategoryId)->get();
     }
+
+    protected static function deleteStudyMaterialSubjectsBySubCategoryId($subCategoryId){
+        $subjects =  static::where('course_sub_category_id', $subCategoryId)->get();
+        if(is_object($subjects) && false == $subjects->isEmpty()){
+            foreach($subjects as $subject){
+                $subject->delete();
+            }
+        }
+        return;
+    }
+
+    protected static function deleteStudyMaterialSubjectsByCategoryId($categoryId){
+        $subjects =  static::where('course_category_id', $categoryId)->get();
+        if(is_object($subjects) && false == $subjects->isEmpty()){
+            foreach($subjects as $subject){
+                $subject->delete();
+            }
+        }
+        return;
+    }
 }
