@@ -214,8 +214,7 @@ class ClientAssignmentSubjectController extends ClientBaseController
     }
 
     protected function getAssignmentSubjectsByBatchId(Request $request){
-        $clientBatchId = InputSanitise::inputInt($request->get('batch_id'));
-        return ClientAssignmentSubject::getAssignmentSubjectsByBatchId($clientBatchId);
+        return ClientAssignmentSubject::getAssignmentSubjectsByBatchId($request->get('batch_id'));
     }
 
 }

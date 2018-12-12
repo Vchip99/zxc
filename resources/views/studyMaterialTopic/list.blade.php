@@ -50,13 +50,15 @@
                 </a>
             </td>
             <td>
-            <a id="{{$topic->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$topic->name}}" />
+              @if($topic->admin_id == Auth::guard('admin')->user()->id)
+                <a id="{{$topic->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$topic->name}}" />
                 </a>
                 <form id="deleteStudyMaterialTopic_{{$topic->id}}" action="{{url('admin/deleteStudyMaterialTopic')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="topic_id" value="{{$topic->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach

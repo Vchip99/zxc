@@ -21,7 +21,7 @@ class StudyMaterialSubjectController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin')){
+                if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin')){
                     return $next($request);
                 }
             }
@@ -43,7 +43,7 @@ class StudyMaterialSubjectController extends Controller
      *	show all subjects
      */
 	public function show(){
-		$subjects = StudyMaterialSubject::paginate();
+		$subjects = StudyMaterialSubject::getStudyMaterialSubjectsWithPagination();
 		return view('studyMaterialSubject.list', compact('subjects'));
 	}
 
@@ -136,19 +136,21 @@ class StudyMaterialSubjectController extends Controller
 		if(isset($subjectId)){
 			$subject = StudyMaterialSubject::find($subjectId);
 			if(is_object($subject)){
-				DB::beginTransaction();
-		        try
-		        {
-		        	StudyMaterialTopic::deleteStudyMaterialTopicsBySubjectId($subject->id);
-					$subject->delete();
-					DB::commit();
-					return Redirect::to('admin/manageStudyMaterialSubject')->with('message', 'Subject deleted successfully!');
-				}
-		        catch(\Exception $e)
-		        {
-		            DB::rollback();
-		            return back()->withErrors('something went wrong.');
-		        }
+				if($subject->admin_id == Auth::guard('admin')->user()->id){
+					DB::beginTransaction();
+			        try
+			        {
+			        	StudyMaterialTopic::deleteStudyMaterialTopicsBySubjectId($subject->id);
+						$subject->delete();
+						DB::commit();
+						return Redirect::to('admin/manageStudyMaterialSubject')->with('message', 'Subject deleted successfully!');
+					}
+			        catch(\Exception $e)
+			        {
+			            DB::rollback();
+			            return back()->withErrors('something went wrong.');
+			        }
+			    }
 			}
 		}
 		return Redirect::to('admin/manageStudyMaterialSubject');

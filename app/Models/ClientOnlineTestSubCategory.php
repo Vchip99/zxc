@@ -451,4 +451,8 @@ class ClientOnlineTestSubCategory extends Model
             }
         }
     }
+
+    protected static function getClientOnlineTestSubCategoriesByUpdatedDate($searchDate){
+        return static::whereDate('updated_at','>=',$searchDate)->get();
+    }
 }

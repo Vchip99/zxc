@@ -407,8 +407,17 @@
           </ul>
         </li>
         @endif
-        <!-- <li><a href="{{ url('profile')}}"><i class="fa fa-user"></i> <span>Profile</span></a></li>
-        <li><a href="{{ url('/')}}"><i class="fa fa-home"></i> <span>Home</span></a></li> -->
+        <li class="treeview">
+          <a href="#" title="Message">
+            <i class="fa fa-inr"></i> <span>Payments</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li title="My Payments"><a href="{{ url('college/'.Session::get('college_user_url').'/myPayments')}}"><i class="fa fa-circle-o"></i>My Payments</a></li>
+          </ul>
+        </li>
         <li class="header">LABELS</li>
         <li>
           <a href="{{ url('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

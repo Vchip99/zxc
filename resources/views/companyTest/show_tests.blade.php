@@ -589,10 +589,7 @@
 @section('footer')
 	@include('footer.footer')
 <script>
-	function checkLogin(){
-	    $('#loginUserModel').modal();
-	    return false;
-	}
+
 	function startTest(ele){
 		var windowHeight = screen.height;
 		var windowWidth = screen.width;

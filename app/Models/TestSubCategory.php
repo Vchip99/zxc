@@ -67,6 +67,10 @@ class TestSubCategory extends Model
             $testSubcategory->created_for = 0;
             $testSubcategory->created_by = Auth::user()->id;
             $testSubcategory->created_by_name = Auth::user()->name;
+        } else {
+            $testSubcategory->created_for = 1;
+            $testSubcategory->created_by = Auth::guard('admin')->user()->id;
+            $testSubcategory->created_by_name = Auth::guard('admin')->user()->name;
         }
         $testSubcategory->save();
         return $testSubcategory;
@@ -108,6 +112,20 @@ class TestSubCategory extends Model
      *  return test sub categories  by categoryId
      */
     protected static function getSubcategoriesByCategoryIdForAdmin($categoryId){
+        $categoryId = InputSanitise::inputInt($categoryId);
+        return DB::table('test_sub_categories')
+                ->join('test_categories', 'test_categories.id', '=', 'test_sub_categories.test_category_id')
+                ->where('test_sub_categories.created_for', 1)
+                ->where('test_sub_categories.test_category_id', $categoryId)
+                ->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id)
+                ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path')
+                ->groupBy('test_sub_categories.id')->get();
+    }
+
+    /**
+     *  return test sub categories  by categoryId
+     */
+    protected static function getSubcategoriesByCategoryIdForAdminForList($categoryId){
         $categoryId = InputSanitise::inputInt($categoryId);
         return DB::table('test_sub_categories')
                 ->join('test_categories', 'test_categories.id', '=', 'test_sub_categories.test_category_id')
@@ -161,9 +179,12 @@ class TestSubCategory extends Model
      *  return test sub categories
      */
     protected static function getSubcategoriesWithPagination(){
-        return static::join('test_categories', 'test_categories.id', '=', 'test_sub_categories.test_category_id')
-            ->where('test_sub_categories.created_for', 1)
-            ->select('test_sub_categories.*','test_categories.name as category')
+        $result = static::join('test_categories', 'test_categories.id', '=', 'test_sub_categories.test_category_id')
+            ->where('test_sub_categories.created_for', 1);
+        if(Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id);
+        }
+        return $result->select('test_sub_categories.*','test_categories.name as category')
             ->groupBy('test_sub_categories.id')->paginate();
     }
 

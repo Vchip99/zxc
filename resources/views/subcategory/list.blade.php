@@ -45,17 +45,19 @@
                 </a>
             </td>
             <td>
+              @if(1 == $testSubCategory->created_for && $testSubCategory->created_by == Auth::guard('admin')->user()->id)
                 <a id="{{$testSubCategory->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testSubCategory->name}}" />
                 <form id="deleteSubCategory_{{$testSubCategory->id}}" action="{{url('admin/deleteSubCategory')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="subcat_id" value="{{$testSubCategory->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach
         @else
-          <tr><td>No sub category is created.</td></tr>
+          <tr><td colspan="5">No sub category is created.</td></tr>
         @endif
       </tbody>
     </table>

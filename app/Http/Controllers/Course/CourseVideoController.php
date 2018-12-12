@@ -25,7 +25,7 @@ class CourseVideoController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineCourse')){
+                if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin')){
                     return $next($request);
                 }
             }
@@ -73,7 +73,8 @@ class CourseVideoController extends Controller
         $courseSubCategories = [];
         $courseCourses= [];
     	$video = new CourseVideo;
-    	return view('courseVideo.create', compact('courseCategories','courseSubCategories','courseCourses', 'video'));
+        $videoCourse = '';
+    	return view('courseVideo.create', compact('courseCategories','courseSubCategories','courseCourses', 'video','videoCourse'));
     }
 
     /**
@@ -133,8 +134,8 @@ class CourseVideoController extends Controller
     			$courseCategories = CourseCategory::getCourseCategoriesForAdmin();
                 $courseSubCategories = CourseSubCategory::getCourseSubCategoriesByCategoryId($video->course_category_id);
                 $courseCourses= CourseCourse::getCourseByCatIdBySubCatIdForAdmin($video->course_category_id,$video->course_sub_category_id);
-    			return view('courseVideo.create', compact('courseCategories','courseSubCategories','courseCourses', 'video'));
-
+                $videoCourse = $video->videoCourse;
+    			return view('courseVideo.create', compact('courseCategories','courseSubCategories','courseCourses', 'video','videoCourse'));
     		}
     	}
     	return Redirect::to('admin/manageCourseVideo');
@@ -180,7 +181,8 @@ class CourseVideoController extends Controller
                 try
                 {
                     $videoCategory = $video->videoCategory;
-                    if(0 == $videoCategory->college_id && 0 == $videoCategory->user_id){
+                    $videoCourse = $video->videoCourse;
+                    if(0 == $videoCategory->college_id && 0 == $videoCategory->user_id && $videoCourse->admin_id == Auth::guard('admin')->user()->id){
                         $video->deleteCommantsAndSubComments();
                         if(true == preg_match('/courseVideos/',$video->video_path)){
                             $courseVideoFolder = "courseVideos/".$video->course_id."/".$video->id;

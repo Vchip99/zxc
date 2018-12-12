@@ -4,6 +4,19 @@
 @stop
 @section('header-css')
 	@include('layouts.home-css')
+  <link rel="stylesheet" href="{{ asset('css/star-rating.css') }}" />
+  <style type="text/css">
+    .fa {
+      font-size: medium !important;
+    }
+    .rating-container .filled-stars{
+      color: #e7711b;
+      border-color: #e7711b;
+    }
+    .rating-xs {
+        font-size: 0em;
+    }
+  </style>
   <style >
 .video_id{font-weight: 900px;
   font-size: 90px;
@@ -102,7 +115,22 @@ margin: 0px 5px;
           @endif
         </div>
         <div class="pay-now">
-          <span>Price: {{ $course->price }} Rs.</span>
+          <div style="display: inline-block;">
+            @if(isset($reviewData[$course->id])) {{$reviewData[$course->id]['avg']}} @else 0 @endif
+          </div>
+          <div style="display: inline-block;">
+            <input id="rating_input{{$course->id}}" name="input-{{$course->id}}" class="rating rating-loading" value="@if(isset($reviewData[$course->id])) {{$reviewData[$course->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+          </div>
+          <div style="display: inline-block;">
+            <a data-toggle="modal" data-target="#review-model-{{$course->id}}">
+              @if(isset($reviewData[$course->id]))
+                {{count($reviewData[$course->id]['rating'])}} <i class="fa fa-group"></i>
+              @else
+                0 <i class="fa fa-group"></i>
+              @endif
+            </a>
+          </div>
+          <span> &nbsp;&nbsp;Price: {{ $course->price }} Rs.</span>
           @if($course->price > 0)
             @if('true' == $isCourseRegistered)
               <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" title="Paid">Paid</a>
@@ -230,6 +258,84 @@ margin: 0px 5px;
           </div>
         </div>
       </div>
+      <div id="review-model-{{$course->id}}" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              &nbsp;&nbsp;&nbsp;
+              <button class="close" data-dismiss="modal">×</button>
+              <div class="form-group row ">
+                <div  style="display: inline-block;">
+                  @if(isset($reviewData[$course->id])) {{$reviewData[$course->id]['avg']}} @else 0 @endif
+                </div>
+                <div  style="display: inline-block;">
+                  <input name="input-{{$course->id}}" class="rating rating-loading" value="@if(isset($reviewData[$course->id])) {{$reviewData[$course->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                </div>
+                <div  style="display: inline-block;">
+                  @if(isset($reviewData[$course->id]))
+                    {{count($reviewData[$course->id]['rating'])}} <i class="fa fa-group"></i>
+                  @else
+                    0 <i class="fa fa-group"></i>
+                  @endif
+                </div>
+                @if(is_object(Auth::user()))
+                  <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$course->id}}">
+                  @if(isset($reviewData[$course->id]) && isset($reviewData[$course->id]['rating'][Auth::user()->id]))
+                    Edit Rating
+                  @else
+                    Give Rating
+                  @endif
+                  </button>
+                @else
+                  <button class="pull-right" onClick="checkLogin();">Give Rating</button>
+                @endif
+              </div>
+            </div>
+            <div class="modal-body row">
+              <div class="form-group row" style="overflow: auto;">
+                @if(isset($reviewData[$course->id]))
+                  @foreach($reviewData[$course->id]['rating'] as $userId => $review)
+                    {{$userNames[$userId]}}:
+                    <input id="rating_input-{{$course->id}}-{{$userId}}" name="input-{{$course->id}}" class="rating rating-loading" value="{{$review['rating']}}" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                    {{$review['review']}}
+                    <hr>
+                  @endforeach
+                @else
+                  Please give ratings
+                @endif
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="rating-model-{{$course->id}}" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button class="close" data-dismiss="modal">×</button>
+              Rate and Review
+            </div>
+            <div class="modal-body row">
+              <form action="{{ url('giveRating')}}" method="POST">
+                <div class="form-group row ">
+                  {{ csrf_field() }}
+                  @if(isset($reviewData[$course->id]) && is_object(Auth::user()) && isset($reviewData[$course->id]['rating'][Auth::user()->id]))
+                    <input id="rating_input-{{$course->id}}" name="input-{{$course->id}}" class="rating rating-loading" value="{{$reviewData[$course->id]['rating'][Auth::user()->id]['rating']}}" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                  @else
+                    <input id="rating_input-{{$course->id}}" name="input-{{$course->id}}" class="rating rating-loading" value="0" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                  @endif
+                  Review:<input type="text" name="review-text" class="form-control" value="@if(isset($reviewData[$course->id])  && is_object(Auth::user()) && isset($reviewData[$course->id]['rating'][Auth::user()->id])) {{trim($reviewData[$course->id]['rating'][Auth::user()->id]['review'])}} @endif">
+                  <br>
+                  <input type="hidden" name="module_id" value="{{$course->id}}">
+                  <input type="hidden" name="module_type" value="1">
+                  <input type="hidden" name="rating_id" value="@if(isset($reviewData[$course->id]) && is_object(Auth::user()) && isset($reviewData[$course->id]['rating'][Auth::user()->id])) {{$reviewData[$course->id]['rating'][Auth::user()->id]['review_id']}} @endif">
+                  <button type="submit" class="pull-right">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     @else
       <ul class="nav nav-tabs nav-tabsVcourse">
         <li><a href="{{ url('courses')}}">Back</a></li>
@@ -241,12 +347,8 @@ margin: 0px 5px;
 @stop
 @section('footer')
 	@include('footer.footer')
+  <script src="{{ asset('js/star-rating.js') }}"></script>
   <script type="text/javascript">
-  function checkLogin(){
-    $('#loginUserModel').modal();
-    return false;
-  }
-
   function purchaseCourse(ele){
     $.confirm({
       title: 'Confirmation',

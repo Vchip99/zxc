@@ -125,4 +125,8 @@ class ClientAssignmentQuestion extends Model
             }
         }
     }
+
+    protected static function getClientAssignmentQuestionsByUpdatedDate($searchDate){
+        return static::whereDate('updated_at','>=',$searchDate)->get();
+    }
 }

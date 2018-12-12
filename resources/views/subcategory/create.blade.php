@@ -68,7 +68,13 @@
     </div>
   <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
+      @if(!empty($testSubcategory->id) && $testSubcategory->created_by == Auth::guard('admin')->user()->id)
         <button type="button" class="btn btn-primary" onclick="searchSubCategory();">Submit</button>
+      @elseif(empty($testSubcategory->id))
+        <button type="button" class="btn btn-primary" onclick="searchSubCategory();">Submit</button>
+      @else
+        <a href="{{ url('admin/manageSubCategory') }}" class="btn btn-primary">Back</a>
+      @endif
       </div>
     </div>
   </div>

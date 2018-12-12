@@ -81,32 +81,32 @@
 														<p class="questions" id="qname{{$result->id}}">
 															@if(!empty($result->common_data))
 																<b>Common Data:</b><br/>
-																<span style="padding-left: 5px;">{!! $result->common_data !!}</span><hr/>
+																<span style="padding-left: 5px;">{!! trim($result->common_data) !!}</span><hr/>
 															@endif
 															<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
-															{!! $result->name !!}
+															{!! trim($result->name) !!}
 														</p>
 														@if( 1 == $result->question_type )
 															<div class="row answer">A.<input type="radio" value="1" class="radio1 radio1_{{$result->id}}" id="radio1_{{$result->id}}" name="{{$result->id}}" />
-																{!! $result->answer1 !!}
+																{!! trim($result->answer1) !!}
 															</div>
 															<div class="row answer">B.<input type="radio" value="2" class="radio1 radio1_{{$result->id}}" id="radio2_{{$result->id}}" name="{{$result->id}}" />
-																{!! $result->answer2 !!}
+																{!! trim($result->answer2) !!}
 															</div>
 															<div class="row answer">C.<input type="radio" value="3" class="radio1 radio1_{{$result->id}}" id="radio3_{{$result->id}}" name="{{$result->id}}" />
-																{!! $result->answer3 !!}
+																{!! trim($result->answer3) !!}
 															</div>
 															<div class="row answer">D.<input type="radio" value="4" class="radio1 radio1_{{$result->id}}" id="radio4_{{$result->id}}" name="{{$result->id}}" />
-																{!! $result->answer4 !!}
+																{!! trim($result->answer4) !!}
 															</div>
 															@if(5 == $paper->option_count)
 																<div class="row answer">E.<input type="radio" value="5" class="radio1 radio1_{{$result->id}}" id="radio5_{{$result->id}}" name="{{$result->id}}" />
-																{!! $result->answer5 !!}
+																{!! trim($result->answer5) !!}
 																</div>
 															@endif
 															@if(isset( $result->answer6 ) && !empty( $result->answer6 ))
 																<div class="row">F.<input type="radio" value="6" class="radio1 radio1_{{$result->id}}" id="radio6_{{$result->id}}" name="{{$result->id}}" />
-																{!! $result->answer6 !!}
+																{!! trim($result->answer6) !!}
 																</div>
 															@endif
 															<input type="radio" checked='checked' style='display:none' value="unsolved" id='radio7_{{$result->id}}' name='{{$result->id}}' />

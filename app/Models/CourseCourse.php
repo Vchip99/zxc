@@ -21,7 +21,7 @@ class CourseCourse extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'course_category_id', 'course_sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path','release_date','created_by'];
+    protected $fillable = ['name', 'course_category_id', 'course_sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path','release_date','created_by','admin_id'];
 
     /**
      *  create/update course
@@ -108,6 +108,11 @@ class CourseCourse extends Model
         }
         if(is_object(Auth::user()) && Auth::user()->college_id > 0){
             $course->created_by = Auth::user()->id;
+            $course->admin_id = '';
+        }
+        if(is_object(Auth::guard('admin')->user())){
+            $course->created_by = 0;
+            $course->admin_id = Auth::guard('admin')->user()->id;
         }
         $course->release_date = $release_date;
     	$course->save();
@@ -194,12 +199,55 @@ class CourseCourse extends Model
      *  couses
      */
     protected static function getCoursesWithPagination(){
-        return static::join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+        $result = static::join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
                 ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
-                ->where('course_sub_categories.created_for', 1)
-                ->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category')
+                ->where('course_sub_categories.created_for', 1);
+        if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('course_courses.admin_id', Auth::guard('admin')->user()->id);
+        }
+        return $result->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category')
                 ->groupBy('course_courses.id')
                 ->paginate();
+    }
+
+    /**
+     *  purchased couses
+     */
+    protected static function getPurchasedCourses($adminId = NULL){
+        $result = static::join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->join('register_online_courses', 'register_online_courses.online_course_id','=','course_courses.id')
+                ->where('course_sub_categories.created_for', 1)
+                ->where('register_online_courses.price','>', 0);
+        if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('course_courses.admin_id', Auth::guard('admin')->user()->id);
+        } else {
+            if($adminId > 0){
+                $result->where('course_courses.admin_id', $adminId);
+            }
+        }
+        return $result->select('register_online_courses.id','course_courses.name','course_courses.price', 'course_sub_categories.name as subcategory', 'course_categories.name as category','register_online_courses.updated_at','register_online_courses.user_id','course_courses.admin_id')
+                ->groupBy('register_online_courses.id')
+                ->get();
+    }
+
+    /**
+     *  purchased couse by id
+     */
+    protected static function getPurchasedCourseById($courseId){
+        $result = static::join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->join('register_online_courses', 'register_online_courses.online_course_id','=','course_courses.id')
+                ->where('course_sub_categories.created_for', 1)
+                ->where('register_online_courses.price','>', 0)
+                ->whereNotNull('register_online_courses.payment_id')
+                ->whereNotNull('register_online_courses.payment_request_id')
+                ->where('register_online_courses.id',$courseId);
+        if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('course_courses.admin_id', Auth::guard('admin')->user()->id);
+        }
+        return $result->select('register_online_courses.id','course_courses.name','course_courses.price','register_online_courses.updated_at','register_online_courses.user_id')
+                ->first();
     }
 
     /**
@@ -480,6 +528,17 @@ class CourseCourse extends Model
         return $this->hasMany(CourseVideo::class, 'course_id');
     }
 
+    /**
+     *  get user
+     */
+    public function getUser(){
+        $user = User::find($this->user_id);
+        if(is_object($user)){
+            return $user->name;
+        }
+        return;
+    }
+
     public function deleteRegisteredCourses(){
         $registeredCourses = RegisterOnlineCourse::where('online_course_id', $this->id)->get();
         if(is_object($registeredCourses) && false == $registeredCourses->isEmpty()){
@@ -534,7 +593,7 @@ class CourseCourse extends Model
     }
 
     protected static function getCourseByCatIdBySubCatIdForAdmin($categoryId,$subcategoryId){
-        return static::where('course_category_id', $categoryId)->where('course_sub_category_id', $subcategoryId)->get();
+        return static::where('course_category_id', $categoryId)->where('course_sub_category_id', $subcategoryId)->where('admin_id', Auth::guard('admin')->user()->id)->get();
     }
 
     protected static function getCourseByCatIdBySubCatIdByUser($categoryId,$subcategoryId){

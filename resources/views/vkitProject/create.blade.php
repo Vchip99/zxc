@@ -154,8 +154,30 @@
       </div>
     </div>
     <div class="form-group row">
+      <label class="col-sm-2 col-form-label" for="price">Component Price:</label>
+      <div class="col-sm-3">
+        <input class="form-control" id="price" name="price" value="{{($project->price)?$project->price:NULL}}">
+        @if($errors->has('price')) <p class="has-error">{{ $errors->first('price') }}</p> @endif
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label" for="items">Component List:</label>
+      <div class="col-sm-5">
+        <textarea class="form-control" id="items" name="items" rows="5">{{($project->items)?$project->items:NULL}}</textarea>
+        @if($errors->has('items')) <p class="has-error">{{ $errors->first('items') }}</p> @endif
+      </div>
+      add compont list like as below<br>
+      <b>Ex. item1(5),item2(1),...</b>
+    </div>
+    <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        <button type="button" class="btn btn-primary" onclick="searchProject();">Submit</button>
+        @if(!empty($project->id) && $project->created_by == Auth::guard('admin')->user()->id)
+          <button type="button" class="btn btn-primary" onclick="searchProject();">Submit</button>
+        @elseif(empty($project->id))
+          <button type="button" class="btn btn-primary" onclick="searchProject();">Submit</button>
+        @else
+          <a href="{{ url('admin/manageVkitProject') }}" class="btn btn-primary">Back</a>
+        @endif
       </div>
     </div>
   </div>

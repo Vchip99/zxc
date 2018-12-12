@@ -9,6 +9,7 @@ use App\Models\TestSubCategory;
 use App\Models\TestSubject;
 use App\Models\Question;
 use App\Models\PaperSection;
+use App\Models\User;
 use App\Libraries\InputSanitise;
 use DB,Auth;
 
@@ -451,6 +452,17 @@ class TestSubjectPaper extends Model
         return $this->hasMany(Question::class, 'paper_id');
     }
 
+    /**
+     *  get user
+     */
+    public function getUser(){
+        $user = User::find($this->user_id);
+        if(is_object($user)){
+            return $user->name;
+        }
+        return;
+    }
+
     public function deleteRegisteredPaper(){
         $registerPapers = RegisterPaper::where('test_subject_paper_id', $this->id)->get();
         if(is_object($registerPapers) && false == $registerPapers->isEmpty()){
@@ -619,11 +631,55 @@ class TestSubjectPaper extends Model
      *  return test papers
      */
     protected static function getPapersWithPagination(){
-        return static::join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+        $result = static::join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
                 ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
                 ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
-                ->where('test_sub_categories.created_for', 1)
-                ->select('test_subject_papers.*','test_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject')
+                ->where('test_sub_categories.created_for', 1);
+        if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id);
+        }
+        return $result->select('test_subject_papers.*','test_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject','test_sub_categories.created_by as subcategory_by')
                 ->groupBy('test_subject_papers.id')->paginate();
+    }
+
+    /**
+     *  return purchased test papers
+     */
+    protected static function getPurchasedPapers($adminId = NULL){
+        $result = static::join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+                ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                ->join('register_papers','register_papers.test_subject_paper_id','=','test_subject_papers.id')
+                ->where('test_sub_categories.created_for', 1)
+                ->where('register_papers.price','>', 0);
+        if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id);
+        } else {
+            if($adminId > 0){
+                $result->where('test_sub_categories.created_by', $adminId);
+            }
+        }
+        return $result->select('register_papers.id','test_subject_papers.name','test_subject_papers.price','test_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject','register_papers.user_id','register_papers.updated_at','test_sub_categories.created_by')
+                ->groupBy('register_papers.id')->get();
+    }
+
+    /**
+     *  return purchased test paper by id
+     */
+    protected static function getPurchasedPaperById($paperId){
+        $result = static::join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+                ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+                ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                ->join('register_papers','register_papers.test_subject_paper_id','=','test_subject_papers.id')
+                ->where('test_sub_categories.created_for', 1)
+                ->where('register_papers.price','>', 0)
+                ->whereNotNull('register_papers.payment_id')
+                ->whereNotNull('register_papers.payment_request_id')
+                ->where('register_papers.id',$paperId);
+        if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id);
+        }
+        return $result->select('register_papers.id','test_subject_papers.name','test_subject_papers.price','register_papers.user_id','register_papers.updated_at')
+                ->first();
     }
 }

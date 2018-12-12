@@ -20,6 +20,7 @@ use App\Models\CourseSubCommentLike;
 use App\Models\Notification;
 use App\Models\ReadNotification;
 use App\Models\Add;
+use App\Models\Rating;
 
 class CourseController extends Controller
 {
@@ -62,7 +63,35 @@ class CourseController extends Controller
         $date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
         $userPurchasedCourses = $this->getRegisteredCourseIds();
-        return view('courses.courses', compact('courseCategories', 'courses', 'ads','userPurchasedCourses'));
+
+        $reviewData = [];
+        $ratingUsers = [];
+        $userNames = [];
+        $allRatings = Rating::getRatingsByModuleType(Rating::Course);
+        if(is_object($allRatings) && false == $allRatings->isEmpty()){
+            foreach($allRatings as $rating){
+                $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                $ratingUsers[] = $rating->user_id;
+            }
+            foreach($reviewData as $dataId => $rating){
+                $ratingSum = 0.0;
+                foreach($rating as $userRatings){
+                    foreach($userRatings as $userId => $userRating){
+                        $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+                    }
+                    $reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
+                }
+            }
+        }
+        if(count($ratingUsers) > 0){
+            $users = User::find($ratingUsers);
+            if(is_object($users) && false == $users->isEmpty()){
+                foreach($users as $user){
+                    $userNames[$user->id] = $user->name;
+                }
+            }
+        }
+        return view('courses.courses', compact('courseCategories', 'courses', 'ads','userPurchasedCourses','reviewData','userNames'));
     }
 
     /**
@@ -73,6 +102,7 @@ class CourseController extends Controller
         $categoryId = $request->get('catId');
         $subcategoryId = $request->get('subcatId');
         $userId = $request->get('userId');
+        $rating = $request->get('rating');
         if(isset($categoryId) && isset($subcategoryId) && empty($userId)){
             $result['courses'] = Cache::remember('vchip:courses:courses:cat-'.$categoryId.':subcat-'.$subcategoryId,30, function() use ($categoryId,$subcategoryId){
                 return CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId);
@@ -81,6 +111,33 @@ class CourseController extends Controller
         } else {
             $result['courses'] = CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId,$userId);
             $result['userPurchasedCourses'] = $this->getRegisteredCourseIds();
+        }
+        if(true == $rating){
+            $ratingUsers = [];
+            $allRatings = Rating::getRatingsByModuleType(Rating::Course);
+            if(is_object($allRatings) && false == $allRatings->isEmpty()){
+                foreach($allRatings as $rating){
+                    $result['ratingData'][$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                    $ratingUsers[] = $rating->user_id;
+                }
+                foreach($result['ratingData'] as $dataId => $rating){
+                    $ratingSum = 0.0;
+                    foreach($rating as $userRatings){
+                        foreach($userRatings as $userId => $userRating){
+                            $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+                        }
+                        $result['ratingData'][$dataId]['avg']  = $ratingSum/count($userRatings);
+                    }
+                }
+            }
+            if(count($ratingUsers) > 0){
+                $users = User::find($ratingUsers);
+                if(is_object($users) && false == $users->isEmpty()){
+                    foreach($users as $user){
+                        $result['userNames'][$user->id] = $user->name;
+                    }
+                }
+            }
         }
         return $result;
     }
@@ -114,7 +171,35 @@ class CourseController extends Controller
                 return CourseVideo::getCourseVideosByCourseId($courseId);
             });
             $isCourseRegistered = RegisterOnlineCourse::isCourseRegistered($courseId);
-            return view('courses.course_details', compact('videos', 'isCourseRegistered', 'courseId', 'course'));
+
+            $reviewData = [];
+            $ratingUsers = [];
+            $userNames = [];
+            $allRatings = Rating::getRatingsByModuleIdByModuleType($courseId,Rating::Course);
+            if(is_object($allRatings) && false == $allRatings->isEmpty()){
+                foreach($allRatings as $rating){
+                    $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                    $ratingUsers[] = $rating->user_id;
+                }
+                foreach($reviewData as $dataId => $rating){
+                    $ratingSum = 0.0;
+                    foreach($rating as $userRatings){
+                        foreach($userRatings as $userId => $userRating){
+                            $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+                        }
+                        $reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
+                    }
+                }
+            }
+            if(count($ratingUsers) > 0){
+                $users = User::find($ratingUsers);
+                if(is_object($users) && false == $users->isEmpty()){
+                    foreach($users as $user){
+                        $userNames[$user->id] = $user->name;
+                    }
+                }
+            }
+            return view('courses.course_details', compact('videos', 'isCourseRegistered', 'courseId', 'course','reviewData','userNames'));
         }
         return Redirect::to('courses');
     }
@@ -210,7 +295,38 @@ class CourseController extends Controller
      *  return course by search criteria
      */
     protected function getOnlineCourseBySearchArray(Request $request){
+        $searchFilter = json_decode($request->get('arr'),true);
+        $rating = $searchFilter['rating'];
         $result['courses'] = CourseCourse::getOnlineCourseBySearchArray($request);
+        if(true == $rating){
+            $reviewData = [];
+            $ratingUsers = [];
+            $userNames = [];
+            $allRatings = Rating::getRatingsByModuleType(Rating::Course);
+            if(is_object($allRatings) && false == $allRatings->isEmpty()){
+                foreach($allRatings as $rating){
+                    $result['ratingData'][$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                    $ratingUsers[] = $rating->user_id;
+                }
+                foreach($result['ratingData'] as $dataId => $rating){
+                    $ratingSum = 0.0;
+                    foreach($rating as $userRatings){
+                        foreach($userRatings as $userId => $userRating){
+                            $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+                        }
+                        $result['ratingData'][$dataId]['avg']  = $ratingSum/count($userRatings);
+                    }
+                }
+            }
+            if(count($ratingUsers) > 0){
+                $users = User::find($ratingUsers);
+                if(is_object($users) && false == $users->isEmpty()){
+                    foreach($users as $user){
+                        $result['userNames'][$user->id] = $user->name;
+                    }
+                }
+            }
+        }
         return $result;
     }
 

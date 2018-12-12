@@ -89,7 +89,7 @@
                 <input type="radio" name="terms_condition" checked><a href="https://vchipedu.com/terms-and-conditions" target="_blank">Accepted Terms and Condition</a>
               </label>
             </div>
-            <button type="button" value="login" id="loginModelBtn" name="submit" class="btn btn-info btn-block signInModelEmail" onClick="loginUser();">Login</button>
+            <button type="button" value="login" id="loginModelBtn" name="submit" class="btn btn-info btn-block signInModelEmail" onClick="loginUser(this);">Login</button>
             <button title="Send Otp" id="sendSignInModelOtpBtn" class="btn btn-info btn-block hide signInModelMobile" onclick="event.preventDefault(); sendSignInModelOtp();" >Send OTP</button>
             <br />
             <div class="form-group">
@@ -152,20 +152,41 @@
   var parts = full.split('.')
   var subdomain = parts[0];
 
-  function loginUser(){
+  function loginUser(ele){
+    var paper = parseInt($(ele).data('paper'));
+    var subject = parseInt($(ele).data('subject'));
+    var category = parseInt($(ele).data('category'));
+    var subcategory = parseInt($(ele).data('subcategory'));
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
     var signInModelPhone = document.getElementById('signInModelPhone').value;
     var loginOtp = document.getElementById('login_model_otp').value;
-    if((email && password)||(signInModelPhone && login_otp)){
+    if((email && password)||(signInModelPhone && loginOtp)){
       $.ajax({
           method: "POST",
           url: "{{ url('clientUserLogin') }}",
-          data: {email:email, password:password,login_otp:loginOtp,mobile:signInModelPhone}
+          async: false,
+          data: {email:email, password:password,login_otp:loginOtp,mobile:signInModelPhone,category:category,subcategory:subcategory,subject:subject,paper:paper}
       })
       .done(function( msg ) {
-        if('true' == msg){
+        if('true' == msg || 'testGiven' == msg){
           window.location.reload(true);
+        } else if('startExam' == msg){
+          window.location.reload(true);
+          var windowHeight = screen.height;
+          var windowWidth = screen.width;
+          var popup_window = window.open("", 'My Window', 'height='+windowHeight+'px !important,width='+windowWidth+'px !important');
+          $.ajax({
+              method: "POST",
+              url: "{{url('setClientUserSessions')}}",
+              data: {paper:paper, subject:subject, category:category, subcategory:subcategory}
+          })
+          .done(function( msg ) {
+            if( msg ){
+              popup_window.location = "{{ url('instructions')}}";
+              popup_window.focus();
+            }
+          });
         } else {
           document.getElementById('loginErrorMsg').classList.remove('hide');
           if('Try after some time.' == msg || 'Entered wrong otp' == msg){
@@ -253,6 +274,7 @@
   }
 
   $(window).on('load', function(e){
+
     $('.top-bar').click();
     if (window.location.hash == '#_=_') {
       window.location.hash = ''; // for older browsers, leaves a # behind

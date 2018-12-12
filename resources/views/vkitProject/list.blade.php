@@ -45,19 +45,20 @@
                 </a>
             </td>
             <td>
-            <a id="{{$project->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$project->name}}" />
+            @if($project->created_by == Auth::guard('admin')->user()->id)
+              <a id="{{$project->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$project->name}}" />
                 </a>
                 <form id="deleteProject_{{$project->id}}" action="{{url('admin/deleteVkitProject')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="project_id" value="{{$project->id}}">
                 </form>
-
+            @endif
             </td>
           </tr>
           @endforeach
         @else
-          <tr><td>No project is created.</td></tr>
+          <tr><td colspan="5">No project is created.</td></tr>
         @endif
       </tbody>
     </table>

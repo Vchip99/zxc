@@ -10,6 +10,7 @@ use App\Mail\ClientUnAuthorisedUser;
 use App\Models\Clientuser;
 use App\Models\Client;
 use App\Models\User;
+use App\Models\ClientLoginActivity;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Session,Cache,Redirect;
@@ -166,6 +167,11 @@ trait AuthenticatesUsers
         } else {
             if($request->is('client/login')){
                 if ($this->guard('client')->attempt($credentials, $request->has('remember'))) {
+                    $sessionId = str_random(10);
+                    if(!Session::has('client_session_id')){
+                        Session::put('client_session_id',$sessionId);
+                    }
+                    ClientLoginActivity::addOrUpdateClientLoginActivity($sessionId, false);
                     return $this->sendLoginResponse($request);
                 } else {
                     if (! $lockedOut) {

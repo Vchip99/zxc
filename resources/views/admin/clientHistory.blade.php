@@ -4,7 +4,7 @@
   <section class="content-header">
     <h1> Client Billing History </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-inr"></i> Plans & Billing </li>
+      <li><i class="fa fa-inr"></i> Payments </li>
       <li class="active"> Client Billing History </li>
     </ol>
   </section>

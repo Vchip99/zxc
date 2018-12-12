@@ -108,7 +108,7 @@ class StudyMaterialTopic extends Model
         return static::join('course_categories', 'course_categories.id','=','study_material_topics.course_category_id')
             ->join('course_sub_categories', 'course_sub_categories.id','=','study_material_topics.course_sub_category_id')
             ->join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
-            ->select('study_material_topics.course_category_id','study_material_topics.course_sub_category_id','course_categories.name as category','course_sub_categories.name as subcategory','study_material_topics.study_material_subject_id','study_material_subjects.name as subject','study_material_topics.id','study_material_topics.name','study_material_topics.content')
+            ->select('study_material_topics.course_category_id','study_material_topics.course_sub_category_id','course_categories.name as category','course_sub_categories.name as subcategory','study_material_topics.study_material_subject_id','study_material_subjects.name as subject','study_material_topics.id','study_material_topics.name','study_material_topics.content','study_material_subjects.admin_id')
             ->where('study_material_topics.course_sub_category_id',$subCategoryId)
             ->get();
     }
@@ -141,5 +141,20 @@ class StudyMaterialTopic extends Model
             }
         }
         return;
+    }
+
+    protected static function getStudyMaterialTopicsWithPagination(){
+        if(Auth::guard('admin')->user()->hasRole('sub-admin')){
+            return static::join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
+                ->where('study_material_subjects.admin_id',Auth::guard('admin')->user()->id)
+                ->select('study_material_topics.*','study_material_subjects.admin_id')
+                ->groupBy('study_material_topics.id')
+                ->paginate();
+        } else {
+            return static::join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
+                ->select('study_material_topics.*','study_material_subjects.admin_id')
+                ->groupBy('study_material_topics.id')
+                ->paginate();
+        }
     }
 }

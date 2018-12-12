@@ -116,9 +116,32 @@ class TestSubject extends Model
         $testSubjects = [];
         $subjects = DB::table('test_subjects')
                         ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subjects.test_sub_category_id')
-                        ->join('test_categories', 'test_categories.id', '=', 'test_sub_categories.test_category_id')
+                        ->join('test_categories', 'test_categories.id', '=', 'test_subjects.test_category_id')
                         ->where('test_sub_categories.created_for', 1)
-                        ->where('test_sub_categories.test_category_id', $catId)
+                        ->where('test_subjects.test_category_id', $catId)
+                        ->where('test_subjects.test_sub_category_id', $subcatId)
+                        ->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id)
+                        ->select('test_subjects.id','test_subjects.*')
+                        ->groupBy('test_subjects.id')
+                        ->get();
+        foreach($subjects as $subject){
+            $testSubjects[] = $subject;
+        }
+        return $testSubjects;
+    }
+
+    /**
+     *  return subjects by categoryId by sub categoryId for admin
+     */
+    protected static function getSubjectsByCatIdBySubcatidForAdminForList($catId, $subcatId){
+        $catId = InputSanitise::inputInt($catId);
+        $subcatId = InputSanitise::inputInt($subcatId);
+        $testSubjects = [];
+        $subjects = DB::table('test_subjects')
+                        ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subjects.test_sub_category_id')
+                        ->join('test_categories', 'test_categories.id', '=', 'test_subjects.test_category_id')
+                        ->where('test_sub_categories.created_for', 1)
+                        ->where('test_subjects.test_category_id', $catId)
                         ->where('test_subjects.test_sub_category_id', $subcatId)
                         ->select('test_subjects.id','test_subjects.*')
                         ->groupBy('test_subjects.id')
@@ -376,9 +399,13 @@ class TestSubject extends Model
      *  return test subjects
      */
     protected static function getSubjectsWithPagination(){
-        return static::join('test_categories', 'test_categories.id', '=', 'test_subjects.test_category_id')
+        $result = static::join('test_categories', 'test_categories.id', '=', 'test_subjects.test_category_id')
                 ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subjects.test_sub_category_id')
-                ->where('test_sub_categories.created_for', 1)->select('test_subjects.*','test_categories.name as category','test_sub_categories.name as subcategory')
+                ->where('test_sub_categories.created_for', 1);
+        if(Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id);
+        }
+        return $result->select('test_subjects.*','test_categories.name as category','test_sub_categories.name as subcategory','test_sub_categories.created_by as subcategory_by')
                 ->groupBy('test_subjects.id')->paginate();
     }
 

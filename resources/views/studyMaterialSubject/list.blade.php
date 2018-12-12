@@ -48,13 +48,15 @@
                 </a>
             </td>
             <td>
-            <a id="{{$subject->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$subject->name}}" />
+              @if($subject->admin_id == Auth::guard('admin')->user()->id)
+                <a id="{{$subject->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$subject->name}}" />
                 </a>
                 <form id="deleteStudyMaterialSubject_{{$subject->id}}" action="{{url('admin/deleteStudyMaterialSubject')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="subject_id" value="{{$subject->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach

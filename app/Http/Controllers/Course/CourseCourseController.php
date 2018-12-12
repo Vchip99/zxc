@@ -20,7 +20,7 @@ class CourseCourseController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineCourse')){
+                if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin')){
                     return $next($request);
                 }
             }
@@ -148,7 +148,7 @@ class CourseCourseController extends Controller
                 try
                 {
                     $courseCategory = $course->category;
-                    if(0 == $courseCategory->college_id && 0 == $courseCategory->user_id){
+                    if(0 == $courseCategory->college_id && 0 == $courseCategory->user_id && $course->admin_id == Auth::guard('admin')->user()->id){
                         if(true == is_object($course->videos) && false == $course->videos->isEmpty()){
                             foreach($course->videos as $video){
                                 $video->deleteCommantsAndSubComments();

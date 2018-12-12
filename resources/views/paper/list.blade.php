@@ -28,13 +28,13 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Paper Name</th>
-          <th>Category Name</th>
-          <th>Sub Category Name</th>
-          <th>Subject Name</th>
+          <th>Paper </th>
+          <th>Category </th>
+          <th>Sub Category </th>
+          <th>Subject </th>
           <th>Verification Code</th>
-          <th>Edit Paper</th>
-          <th>Delete Paper</th>
+          <th>Edit </th>
+          <th>Delete </th>
         </tr>
       </thead>
       <tbody>
@@ -76,17 +76,19 @@
                 </a>
             </td>
             <td>
+              @if($testPaper->subcategory_by == Auth::guard('admin')->user()->id)
                 <a id="{{$testPaper->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testPaper->name}}" />
                 <form id="deletePaper_{{$testPaper->id}}" action="{{url('admin/deletePaper')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="paper_id" value="{{$testPaper->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach
         @else
-          <tr><td>No subject is created.</td></tr>
+          <tr><td colspan="8">No paper is created.</td></tr>
         @endif
       </tbody>
     </table>

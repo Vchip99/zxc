@@ -23,7 +23,7 @@ class SubjectController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineTest')){
+                if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin')){
                     return $next($request);
                 }
             }
@@ -56,7 +56,8 @@ class SubjectController extends Controller
 		$testCategories = TestCategory::getAllTestCategories();
 		$testSubCategories = [];
 		$subject = new TestSubject;
-		return view('subject.create', compact('testCategories','testSubCategories','subject'));
+		$subjectSubcategory = '';
+		return view('subject.create', compact('testCategories','testSubCategories','subject','subjectSubcategory'));
 	}
 
 	/**
@@ -96,7 +97,8 @@ class SubjectController extends Controller
 			if(is_object($subject)){
 				$testCategories = TestCategory::getAllTestCategories();
 				$testSubCategories = TestSubCategory::getSubjectSubcategoriesByCategoryId($subject->test_category_id);
-				return view('subject.create', compact('testCategories','testSubCategories','subject'));
+				$subjectSubcategory = $subject->subcategory;
+				return view('subject.create', compact('testCategories','testSubCategories','subject','subjectSubcategory'));
 			}
 		}
 		return Redirect::to('admin/manageSubject');
@@ -141,35 +143,38 @@ class SubjectController extends Controller
 		if(isset($subjectId)){
 			$testSubject = TestSubject::find($subjectId);
 			if(is_object($testSubject)){
-				DB::beginTransaction();
-		        try
-		        {
-		        	$subjectCategory = $testSubject->category;
-                    if(0 == $subjectCategory->college_id && 0 == $subjectCategory->user_id){
-						if(true == is_object($testSubject->papers) && false == $testSubject->papers->isEmpty()){
-							foreach($testSubject->papers as $paper){
-								if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
-									foreach($paper->questions as $question){
-										UserSolution::deleteUserSolutionsByQuestionId($question->id);
-										$question->delete();
+				$subjectSubcategory = $testSubject->subcategory;
+				if($subjectSubcategory->created_by == Auth::guard('admin')->user()->id){
+					DB::beginTransaction();
+			        try
+			        {
+			        	$subjectCategory = $testSubject->category;
+	                    if(0 == $subjectCategory->college_id && 0 == $subjectCategory->user_id){
+							if(true == is_object($testSubject->papers) && false == $testSubject->papers->isEmpty()){
+								foreach($testSubject->papers as $paper){
+									if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
+										foreach($paper->questions as $question){
+											UserSolution::deleteUserSolutionsByQuestionId($question->id);
+											$question->delete();
+										}
 									}
+									Score::deleteUserScoresByPaperId($paper->id);
+									PaperSection::deletePaperSectionsByPaperId($paper->id);
+		                    		$paper->deleteRegisteredPaper();
+									$paper->delete();
 								}
-								Score::deleteUserScoresByPaperId($paper->id);
-								PaperSection::deletePaperSectionsByPaperId($paper->id);
-	                    		$paper->deleteRegisteredPaper();
-								$paper->delete();
 							}
+							$testSubject->delete();
+							DB::commit();
+							return Redirect::to('admin/manageSubject')->with('message', 'Subject deleted successfully!');
 						}
-						$testSubject->delete();
-						DB::commit();
-						return Redirect::to('admin/manageSubject')->with('message', 'Subject deleted successfully!');
 					}
-				}
-		        catch(\Exception $e)
-		        {
-		            DB::rollback();
-		            return back()->withErrors('something went wrong.');
-		        }
+			        catch(\Exception $e)
+			        {
+			            DB::rollback();
+			            return back()->withErrors('something went wrong.');
+			        }
+			    }
 			}
 		}
 		return Redirect::to('admin/manageSubject');

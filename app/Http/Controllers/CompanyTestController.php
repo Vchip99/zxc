@@ -17,7 +17,7 @@ use App\Models\UserData;
 use App\Models\Skill;
 use Session, Redirect, Auth, DB,Cache;
 use App\Models\Add;
-use App\Models\MockInterviewReview;
+use App\Models\Rating;
 
 class CompanyTestController extends Controller
 {
@@ -140,29 +140,29 @@ class CompanyTestController extends Controller
         $reviewData = [];
         $ratingUsers = [];
         $userNames = [];
-        $allReviews = MockInterviewReview::all();
-        if(is_object($allReviews) && false == $allReviews->isEmpty()){
-        	foreach($allReviews as $review){
-        		$reviewData[$review->user_data_id]['rating'][$review->user_id] = [ 'rating' => $review->rating,'review' => $review->review, 'review_id' => $review->id];
-        		$ratingUsers[] = $review->user_id;
-        	}
-        	foreach($reviewData as $dataId => $rating){
-        		$ratingSum = 0.0;
-        		foreach($rating as $userRatings){
-        			foreach($userRatings as $userId => $userRating){
-        				$ratingSum = (double) $ratingSum + (double) $userRating['rating'];
-        			}
-        			$reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
-        		}
-        	}
+        $allRatings = Rating::getRatingsByModuleType(Rating::MockInterview);
+        if(is_object($allRatings) && false == $allRatings->isEmpty()){
+            foreach($allRatings as $rating){
+                $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                $ratingUsers[] = $rating->user_id;
+            }
+            foreach($reviewData as $dataId => $rating){
+                $ratingSum = 0.0;
+                foreach($rating as $userRatings){
+                    foreach($userRatings as $userId => $userRating){
+                        $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+                    }
+                    $reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
+                }
+            }
         }
         if(count($ratingUsers) > 0){
-        	$users = User::find($ratingUsers);
-        	if(is_object($users) && false == $users->isEmpty()){
-        		foreach($users as $user){
-        			$userNames[$user->id] = $user->name;
-        		}
-        	}
+            $users = User::find($ratingUsers);
+            if(is_object($users) && false == $users->isEmpty()){
+                foreach($users as $user){
+                    $userNames[$user->id] = $user->name;
+                }
+            }
         }
     	return view('companyTest.mock_interview', compact('userDatas','userSkills','testUsers','ads','reviewData','userNames'));
     }
@@ -172,22 +172,50 @@ class CompanyTestController extends Controller
     	$testUsers = [];
     	$userSkills = [];
     	$results = [];
+    	$userDataIds = [];
+    	$reviewData = [];
         $skillId = $request->get('skill_id');
         $userDatas = UserData::getSelectedStudentBySkillId($skillId);
         if(is_object($userDatas) && false == $userDatas->isEmpty()){
 			foreach($userDatas as $userData){
-				if(!isset($testUserIds[$userData->user_id])){
-					$testUserIds[$userData->user_id] = $userData->user_id;
-				}
+				$testUserIds[] = $userData->user_id;
+				$userDataIds[] = $userData->id;
 			}
 		}
 		if(count($testUserIds) > 0){
-			$users = User::find($testUserIds);
+			$users = User::find(array_unique($testUserIds));
 			if(is_object($users) && false == $users->isEmpty()){
 				foreach($users as $user){
 					$testUsers[$user->id] = $user;
 				}
 			}
+		}
+		if(count($userDataIds) > 0){
+	        $allReviews = Rating::whereIn('module_id',$userDataIds)->where('module_type',Rating::MockInterview)->get();
+	        if(is_object($allReviews) && false == $allReviews->isEmpty()){
+	        	foreach($allReviews as $review){
+	        		$reviewData[$review->module_id]['rating'][$review->user_id] = [ 'rating' => $review->rating,'review' => $review->review, 'review_id' => $review->id];
+	        		$testUserIds[] = $review->user_id;
+	        	}
+	        	if(count($testUserIds) > 0){
+					$users = User::find(array_unique($testUserIds));
+					if(is_object($users) && false == $users->isEmpty()){
+						foreach($users as $user){
+							$testUsers[$user->id] = $user;
+						}
+					}
+				}
+	        	foreach($reviewData as $dataId => $rating){
+	        		$ratingSum = 0.0;
+	        		foreach($rating as $userRatings){
+	        			foreach($userRatings as $userId => $userRating){
+	        				$ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+	        				$reviewData[$dataId]['rating'][$userId]['user_name'] =  $testUsers[$userId]->name;
+	        			}
+	        			$reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
+	        		}
+	        	}
+	        }
 		}
     	$allSkills = Skill::all();
     	if(is_object($allSkills) && false == $allSkills->isEmpty()){
@@ -231,6 +259,9 @@ class CompanyTestController extends Controller
                 $results[$userData->id]['twitter'] = $userData->twitter;
                 $results[$userData->id]['google'] = $userData->google;
                 $results[$userData->id]['facebook'] = $userData->facebook;
+                if(isset($reviewData[$userData->id])){
+                	$results[$userData->id]['ratingData'] = $reviewData[$userData->id];
+                }
         	}
         }
         return $results;
@@ -239,19 +270,18 @@ class CompanyTestController extends Controller
     protected function giveRating(Request $request){
         DB::connection('mysql')->beginTransaction();
         try {
-
-            $review = MockInterviewReview::addOrUpdateMockInterviewReview($request);
-            if(is_object($review)){
+            $rating = Rating::addOrUpdateRating($request);
+            if(is_object($rating)){
                 DB::commit();
-                return redirect('mockInterview')->with('message', 'Review given successfully.');
+                return redirect()->back()->with('message', 'Rating given successfully.');;
             }
         }
         catch(Exception $e)
         {
             DB::connection('mysql')->rollback();
-            return redirect('mockInterview')->withErrors([$e->getMessage()]);
+            return redirect()->back()->withErrors([$e->getMessage()]);
         }
-        return redirect('mockInterview');
+        return redirect()->back();
     }
 
 }

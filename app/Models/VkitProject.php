@@ -19,7 +19,7 @@ class VkitProject extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'author', 'introduction', 'category_id', 'gateway', 'microcontroller', 'front_image_path', 'header_image_path', 'project_pdf_path', 'date', 'description','created_for','created_by'];
+    protected $fillable = ['name', 'author', 'introduction', 'category_id', 'gateway', 'microcontroller', 'front_image_path', 'header_image_path', 'project_pdf_path', 'date', 'description','created_for','created_by','price','items'];
 
     /**
      *  add/update project
@@ -35,6 +35,8 @@ class VkitProject extends Model
 
         $projectDate = strip_tags(trim($request->get('date')));
         $projectDescription = trim($request->get('description'));
+        $price = trim($request->get('price'));
+        $items = trim($request->get('items'));
         $projectId = InputSanitise::inputInt($request->get('project_id'));
         if( $isUpdate && isset($projectId)){
             $vkitProject = static::find($projectId);
@@ -118,7 +120,12 @@ class VkitProject extends Model
         if(is_object(Auth::user()) && Auth::user()->college_id > 0){
             $vkitProject->created_for = 0;
             $vkitProject->created_by = Auth::user()->id;
+        } else {
+            $vkitProject->created_for = 1;
+            $vkitProject->created_by = Auth::guard('admin')->user()->id;
         }
+        $vkitProject->price = $price;
+        $vkitProject->items = $items;
         $vkitProject->save();
         return $vkitProject;
     }
@@ -205,7 +212,42 @@ class VkitProject extends Model
     }
 
     protected static function getVkitProjectsWithPagination(){
-        return static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')->select('vkit_projects.*','vkit_categories.name as category')->where('vkit_projects.created_for', 1)->paginate();
+        $result = static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')
+            ->where('vkit_projects.created_for', 1);
+        if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('vkit_projects.created_by', Auth::guard('admin')->user()->id);
+        }
+        return $result->select('vkit_projects.*','vkit_categories.name as category')
+                ->groupBy('vkit_projects.id')->paginate();
+    }
+
+    protected static function getPurchasedVkitProjects($adminId = NULL){
+        $result = static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')
+                ->join('register_projects','register_projects.project_id','=','vkit_projects.id')
+                ->where('vkit_projects.created_for', 1)
+                ->where('register_projects.price','>',0);
+        if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('vkit_projects.created_by', Auth::guard('admin')->user()->id);
+        } else {
+            if($adminId > 0){
+                $result->where('vkit_projects.created_by', $adminId);
+            }
+        }
+        return $result->select('register_projects.id','register_projects.price','register_projects.user_id','vkit_categories.name as category','vkit_projects.created_by','vkit_projects.name','register_projects.updated_at')->groupBy('register_projects.id')->get();
+    }
+
+    protected static function getPurchasedVkitProjectById($projectId = NULL){
+        $result = static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')
+                ->join('register_projects','register_projects.project_id','=','vkit_projects.id')
+                ->where('vkit_projects.created_for', 1)
+                ->where('register_projects.price','>',0)
+                ->whereNotNull('register_projects.payment_id')
+                ->whereNotNull('register_projects.payment_request_id')
+                ->where('register_projects.id',$projectId);
+        if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('vkit_projects.created_by', Auth::guard('admin')->user()->id);
+        }
+        return $result->select('register_projects.id','register_projects.price','register_projects.user_id','vkit_projects.name','register_projects.updated_at')->first();
     }
 
     protected static function getVchipVkitProjects(){
@@ -388,6 +430,17 @@ class VkitProject extends Model
                 $project->deleteProjectImageFolder();
                 $project->delete();
             }
+        }
+        return;
+    }
+
+    /**
+     *  get user
+     */
+    public function getUser(){
+        $user = User::find($this->user_id);
+        if(is_object($user)){
+            return $user->name;
         }
         return;
     }

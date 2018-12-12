@@ -78,7 +78,13 @@
   </div>
   <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        <button type="button" class="btn btn-primary" onclick="searchSubject();">Submit</button>
+        @if(is_object($subjectSubcategory) && $subjectSubcategory->created_by == Auth::guard('admin')->user()->id)
+          <button type="button" class="btn btn-primary" onclick="searchSubject();">Submit</button>
+        @elseif(!is_object($subjectSubcategory))
+          <button type="button" class="btn btn-primary" onclick="searchSubject();">Submit</button>
+        @else
+          <a href="{{ url('admin/manageSubject') }}" class="btn btn-primary">Back</a>
+        @endif
       </div>
     </div>
   </div>

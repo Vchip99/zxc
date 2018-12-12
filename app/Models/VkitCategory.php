@@ -32,7 +32,6 @@ class VkitCategory extends Model
             $vkitCategory = new static;
         }
         $vkitCategory->name = $categoryName;
-        $loginUser = Auth::guard('web')->user();
         $vkitCategory->save();
         return $vkitCategory;
     }

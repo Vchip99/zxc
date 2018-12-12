@@ -6,7 +6,18 @@
 @include('layouts.home-css')
   <link href="{{asset('css/solution.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{asset('css/comment.css?ver=1.0')}}" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ asset('css/star-rating.css') }}" />
   <style type="text/css">
+    .fa {
+      font-size: medium !important;
+    }
+    .rating-container .filled-stars{
+      color: #e7711b;
+      border-color: #e7711b;
+    }
+    .rating-xs {
+        font-size: 0em;
+    }
     .download_iteam .fa{
       font-size: 20px;
       margin: 0px 5px;
@@ -84,10 +95,28 @@
 <section id="" class="v_container v_bg_grey">
   <div class="container ">
     <div class="row">
+      @if(Session::has('message'))
+        <div class="alert alert-success" id="message">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            {{ Session::get('message') }}
+        </div>
+      @endif
+      @if(count($errors) > 0)
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+      @endif
+    </div>
+    <div class="row">
       <div class="col-md-9">
-       <div class="box-border" ">
-       <h2 class="v_h2_title text-center">Study Material</h2>
-          <hr class="section-dash-dark"/>
+       <div class="box-border">
+       <img id="adImage" width="100%" style="max-width: 600px;" src="">
+       <h2 class="v_h2_title text-center">{{$project->name}}</h2>
+        <br>
         <div class="" style="border: 2px solid #ddd; padding: 10px;">
           <div class="v_kit-single">
               <figure class="v_kit-img">
@@ -119,7 +148,45 @@
         @endif
       </div>
     </div>
-    <div class="vchip-right-sidebar ">
+    @if($project->price > 0 && !empty($project->items))
+      @if('false' == $isPurchasedProjectItems)
+      <div class="vchip-right-sidebar text-center">
+        <a class="text-center" data-toggle="modal" data-target="#model_{{$project->id}}">Purchase Vkit (Items)</a>
+        @if(is_object(Auth::user()))
+          <a data-project_id="{{$project->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="purchaseVkitComponents(this);">Pay Price: {{$project->price}} Rs.</a>
+          <form id="purchaseVkitComponent_{{$project->id}}" method="POST" action="{{ url('purchaseVkitComponents')}}">
+            {{ csrf_field() }}
+            <input type="hidden" name="project_id" value="{{$project->id}}">
+          </form>
+        @else
+          <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="checkLogin();">Pay Price: {{$project->price}} Rs.</a>
+        @endif
+      </div>
+      <div class="modal fade" id="model_{{$project->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title text-center" id="exampleModalLabel">Project Components</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" style="overflow-x: auto;">
+              <ul class="custom-list-style" style="align-items: left;">
+                @foreach(explode(',',$project->items) as $item)
+                  <li>{{$item}}</li>
+                @endforeach
+              </ul>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      @endif
+    @endif
+    <div class="vchip-right-sidebar">
       <h3 class="v_h3_title text-center">Study Material</h3>
       <div class="text-center download_iteam">
         <a href="{{asset($project->project_pdf_path)}}" download data-toggle="tooltip" data-placement="bottom" title="{{basename($project->project_pdf_path)}}" >
@@ -127,11 +194,106 @@
         </a>
       </div>
     </div>
-    <div class="vchip-right-sidebar mrgn_30_top_btm">
+    <div class="vchip-right-sidebar mrgn_10_top_btm text-center">
+      <div style="display: inline-block;">
+        @if(isset($reviewData[$project->id])) {{$reviewData[$project->id]['avg']}} @else 0 @endif
+      </div>
+      <div style="display: inline-block;">
+        <input id="rating_input{{$project->id}}" name="input-{{$project->id}}" class="rating rating-loading" value="@if(isset($reviewData[$project->id])) {{$reviewData[$project->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+      </div>
+      <div style="display: inline-block;">
+        <a data-toggle="modal" data-target="#review-model-{{$project->id}}">
+          @if(isset($reviewData[$project->id]))
+            {{count($reviewData[$project->id]['rating'])}} <i class="fa fa-group"></i>
+          @else
+            0 <i class="fa fa-group"></i>
+          @endif
+        </a>
+      </div>
+    </div>
+    <div id="review-model-{{$project->id}}" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            &nbsp;&nbsp;&nbsp;
+            <button class="close" data-dismiss="modal">×</button>
+            <div class="form-group row ">
+              <div  style="display: inline-block;">
+                @if(isset($reviewData[$project->id])) {{$reviewData[$project->id]['avg']}} @else 0 @endif
+              </div>
+              <div  style="display: inline-block;">
+                <input name="input-{{$project->id}}" class="rating rating-loading" value="@if(isset($reviewData[$project->id])) {{$reviewData[$project->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+              </div>
+              <div  style="display: inline-block;">
+                @if(isset($reviewData[$project->id]))
+                  {{count($reviewData[$project->id]['rating'])}} <i class="fa fa-group"></i>
+                @else
+                  0 <i class="fa fa-group"></i>
+                @endif
+              </div>
+              @if(is_object(Auth::user()))
+                <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$project->id}}">
+                @if(isset($reviewData[$project->id]) && isset($reviewData[$project->id]['rating'][Auth::user()->id]))
+                  Edit Rating
+                @else
+                  Give Rating
+                @endif
+                </button>
+              @else
+                <button class="pull-right" onClick="checkLogin();">Give Rating</button>
+              @endif
+            </div>
+          </div>
+          <div class="modal-body row">
+            <div class="form-group row" style="overflow: auto;">
+              @if(isset($reviewData[$project->id]))
+                @foreach($reviewData[$project->id]['rating'] as $userId => $review)
+                  {{$userNames[$userId]}}:
+                  <input id="rating_input-{{$project->id}}-{{$userId}}" name="input-{{$project->id}}" class="rating rating-loading" value="{{$review['rating']}}" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                  {{$review['review']}}
+                  <hr>
+                @endforeach
+              @else
+                Please give ratings
+              @endif
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="rating-model-{{$project->id}}" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button class="close" data-dismiss="modal">×</button>
+            Rate and Review
+          </div>
+          <div class="modal-body row">
+            <form action="{{ url('giveRating')}}" method="POST">
+              <div class="form-group row ">
+                {{ csrf_field() }}
+                @if(isset($reviewData[$project->id]) && is_object(Auth::user()) && isset($reviewData[$project->id]['rating'][Auth::user()->id]))
+                  <input id="rating_input-{{$project->id}}" name="input-{{$project->id}}" class="rating rating-loading" value="{{$reviewData[$project->id]['rating'][Auth::user()->id]['rating']}}" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                @else
+                  <input id="rating_input-{{$project->id}}" name="input-{{$project->id}}" class="rating rating-loading" value="0" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                @endif
+                Review:<input type="text" name="review-text" class="form-control" value="@if(isset($reviewData[$project->id])  && is_object(Auth::user()) && isset($reviewData[$project->id]['rating'][Auth::user()->id])) {{trim($reviewData[$project->id]['rating'][Auth::user()->id]['review'])}} @endif">
+                <br>
+                <input type="hidden" name="module_id" value="{{$project->id}}">
+                <input type="hidden" name="module_type" value="3">
+                <input type="hidden" name="rating_id" value="@if(isset($reviewData[$project->id]) && is_object(Auth::user()) && isset($reviewData[$project->id]['rating'][Auth::user()->id])) {{$reviewData[$project->id]['rating'][Auth::user()->id]['review_id']}} @endif">
+                <button type="submit" class="pull-right">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="vchip-right-sidebar mrgn_20_top_btm">
       <h3 class="v_h3_title text-center">Projects</h3>
       @if(count($projects) > 0)
         @foreach($projects as $vKitProject)
-          <div class="right-sidebar">
+          <div class="right-sidebar" style="margin-bottom: 5px;">
             <div class="media project-media" style="border:none; box-shadow: none;" title="{{$vKitProject->name }}">
               <div class=" media-left">
                 <a>
@@ -307,9 +469,11 @@
     </div>
   </section>
 <span>&nbsp;</span>
+<input type="hidden" id="images" value="{{$images}}">
 @stop
 @section('footer')
 @include('footer.footer')
+ <script src="{{ asset('js/star-rating.js') }}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
       showCommentEle = "{{ Session::get('project_comment_area')}}";
@@ -319,9 +483,45 @@
       } else if(showsubCommentEle > 0){
         window.location.hash = '#subcomment_'+showsubCommentEle;
       }
+      if($('#images').val()){
+        // change image after 10 sec
+        setInterval(imageCycle, 10000);
+        var count = 0;
+        var images = $('#images').val().split(',');
+        var imagePath = "{{ url('') }}/";
+        function imageCycle(){
+          if((count + 1) == images.length){
+            count = 0;
+          } else {
+            count = count + 1;
+          }
+          $('#adImage').prop('src',imagePath+images[count]);
+        }
+      }
   });
 </script>
 <script type="text/javascript">
+  function purchaseVkitComponents(ele){
+    $.confirm({
+      title: 'Confirmation',
+      content: 'Do you want to purchase vkit items?',
+      type: 'red',
+      typeAnimated: true,
+      buttons: {
+        Ok: {
+          text: 'Ok',
+          btnClass: 'btn-red',
+          action: function(){
+            var projectId = parseInt($(ele).data('project_id'));
+            document.getElementById('purchaseVkitComponent_'+projectId).submit();
+          }
+        },
+        Cancle: function () {
+        }
+      }
+    });
+  }
+
   function registerProject(ele){
     var userId = parseInt(document.getElementById('user_id').value);
     var projectId = parseInt($(ele).data('project_id'));

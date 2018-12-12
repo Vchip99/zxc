@@ -175,7 +175,7 @@
   <section class="content-header">
     <h1> Placement </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-dashboard"></i> Users Info</li>
+      <li><i class="fa fa-group"></i> Users Info</li>
       <li class="active">Placement </li>
     </ol>
   </section>

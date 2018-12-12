@@ -22,7 +22,7 @@ class SubCategoryController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineTest')){
+                if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin')){
                     return $next($request);
                 }
             }
@@ -143,37 +143,39 @@ class SubCategoryController extends Controller
     	if(isset($subcat_id)){
     		$testSubcategory = TestSubCategory::find($subcat_id);
     		if(is_object($testSubcategory)){
-                DB::beginTransaction();
-                try
-                {
-                    if(true == is_object($testSubcategory->subjects) && false == $testSubcategory->subjects->isEmpty()){
-                        foreach($testSubcategory->subjects as $subject){
-                            if(true == is_object($subject->papers) && false == $subject->papers->isEmpty()){
-                                foreach($subject->papers as $paper){
-                                    if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
-                                        foreach($paper->questions as $question){
-                                            UserSolution::deleteUserSolutionsByQuestionId($question->id);
-                                            $question->delete();
+                if($testSubcategory->created_by == Auth::guard('admin')->user()->id){
+                    DB::beginTransaction();
+                    try
+                    {
+                        if(true == is_object($testSubcategory->subjects) && false == $testSubcategory->subjects->isEmpty()){
+                            foreach($testSubcategory->subjects as $subject){
+                                if(true == is_object($subject->papers) && false == $subject->papers->isEmpty()){
+                                    foreach($subject->papers as $paper){
+                                        if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
+                                            foreach($paper->questions as $question){
+                                                UserSolution::deleteUserSolutionsByQuestionId($question->id);
+                                                $question->delete();
+                                            }
                                         }
+                                        Score::deleteUserScoresByPaperId($paper->id);
+                                        PaperSection::deletePaperSectionsByPaperId($paper->id);
+                                        $paper->deleteRegisteredPaper();
+                                        $paper->delete();
                                     }
-                                    Score::deleteUserScoresByPaperId($paper->id);
-                                    PaperSection::deletePaperSectionsByPaperId($paper->id);
-                                    $paper->deleteRegisteredPaper();
-                                    $paper->delete();
                                 }
+                                $subject->delete();
                             }
-                            $subject->delete();
                         }
+                        $testSubcategory->deleteSubCategoryImageFolder();
+            			$testSubcategory->delete();
+                        DB::commit();
+                        return Redirect::to('admin/manageSubCategory')->with('message', 'Sub Category deleted successfully!');
                     }
-                    $testSubcategory->deleteSubCategoryImageFolder();
-        			$testSubcategory->delete();
-                    DB::commit();
-                    return Redirect::to('admin/manageSubCategory')->with('message', 'Sub Category deleted successfully!');
-                }
-                catch(\Exception $e)
-                {
-                    DB::rollback();
-                    return redirect()->back()->withErrors('something went wrong.');
+                    catch(\Exception $e)
+                    {
+                        DB::rollback();
+                        return redirect()->back()->withErrors('something went wrong.');
+                    }
                 }
             }
         }

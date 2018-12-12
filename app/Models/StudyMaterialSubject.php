@@ -16,7 +16,7 @@ class StudyMaterialSubject extends Model
      *
      * @var array
      */
-    protected $fillable = ['course_category_id', 'course_sub_category_id','name'];
+    protected $fillable = ['course_category_id', 'course_sub_category_id','name','admin_id'];
 
     /**
      *  add/update subject
@@ -38,6 +38,7 @@ class StudyMaterialSubject extends Model
         $subject->name = $subjectName;
         $subject->course_category_id = $categoryId;
         $subject->course_sub_category_id = $subcategoryId;
+        $subject->admin_id = Auth::guard('admin')->user()->id;
         $subject->save();
         return $subject;
     }
@@ -81,7 +82,16 @@ class StudyMaterialSubject extends Model
     }
 
     protected static function getStudyMaterialSubjectsByCategoryIdBySubCategoryId($categoryId,$subcategoryId){
-    	return static::where('course_category_id',$categoryId)->where('course_sub_category_id',$subcategoryId)->get();
+    	return static::where('course_category_id',$categoryId)
+            ->where('course_sub_category_id',$subcategoryId)
+            ->where('admin_id',Auth::guard('admin')->user()->id)
+            ->get();
+    }
+
+    protected static function getStudyMaterialSubjectsByCategoryIdBySubCategoryIdForList($categoryId,$subcategoryId){
+        return static::where('course_category_id',$categoryId)
+            ->where('course_sub_category_id',$subcategoryId)
+            ->get();
     }
 
     protected static function deleteStudyMaterialSubjectsBySubCategoryId($subCategoryId){
@@ -102,5 +112,13 @@ class StudyMaterialSubject extends Model
             }
         }
         return;
+    }
+
+    protected static function getStudyMaterialSubjectsWithPagination(){
+        if(Auth::guard('admin')->user()->hasRole('sub-admin')){
+            return static::where('admin_id',Auth::guard('admin')->user()->id)->paginate();
+        } else {
+            return static::paginate();
+        }
     }
 }

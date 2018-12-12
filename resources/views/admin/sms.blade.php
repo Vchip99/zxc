@@ -3,7 +3,7 @@
   <section class="content-header">
     <h1> Paid Sms For Client </h1>
     <ol class="breadcrumb">
-      <li><i class="fa fa-inr"></i> Plans & Billing </li>
+      <li><i class="fa fa-inr"></i> Payments </li>
       <li class="active"> Paid Sms For Client </li>
     </ol>
   </section>

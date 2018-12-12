@@ -267,4 +267,9 @@
       });
     }
   }
+
+  function checkLogin(){
+    $('#loginUserModel').modal();
+    return false;
+  }
 </script>

@@ -11,24 +11,24 @@
 							<p class="questions">
 								@if(!empty($question->common_data))
 									<b>Common Data:</b><br/>
-									<span style="padding-left: 5px;">{!! $question->common_data !!}</span><br/>
+									<span style="padding-left: 5px;">{!! trim($question->common_data) !!}</span><br/>
 								@endif
 								<br/>
 								<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
-								{!! $question->name !!}
+								{!! trim($question->name) !!}
 							</p>
 							<p>
 							@if( 1 == $question->question_type )
-								<div class="row answer">A. {!! $question->answer1 !!}
+								<div class="row answer">A. {!! trim($question->answer1) !!}
 								</div>
-								<div class="row answer">B. {!! $question->answer2 !!}
+								<div class="row answer">B. {!! trim($question->answer2) !!}
 								</div>
-								<div class="row answer">C. {!! $question->answer3 !!}
+								<div class="row answer">C. {!! trim($question->answer3) !!}
 								</div>
-								<div class="row answer">D. {!! $question->answer4 !!}
+								<div class="row answer">D. {!! trim($question->answer4) !!}
 								</div>
 								@if(!empty($question->answer5) && $optionCount > 4)
-								<div class="row answer">E. {!! $question->answer5 !!}
+								<div class="row answer">E. {!! trim($question->answer5) !!}
 								</div>
 								@endif
 							@else

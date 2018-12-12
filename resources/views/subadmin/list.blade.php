@@ -35,24 +35,26 @@
       <tbody>
         @if(count($subadmins) > 0)
         @foreach($subadmins as $index => $subadmin)
-        <tr style="overflow: auto;">
-          <th scope="row">{{$subadmin->id}}</th>
-          <td>{{$subadmin->name}}</td>
-          <td>
-            <a href="{{url('admin/subadmin')}}/{{$subadmin->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$subadmin->name}}" />
-              </a>
-          </td>
-         <!--  <td>
-          <a id="{{$subadmin->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30'/>
-              </a>
-              <form id="deleteSubadmin_{{$subadmin->id}}" action="{{url('admin/deleteSubadmin')}}" method="POST" style="display: none;">
-                  {{ csrf_field() }}
-                  {{ method_field('DELETE') }}
-                  <input type="hidden" name="subadmin_id" value="{{$subadmin->id}}">
-              </form>
+          @if(1 != $subadmin->id)
+            <tr style="overflow: auto;">
+              <th scope="row">{{$subadmin->id}}</th>
+              <td>{{$subadmin->name}}</td>
+              <td>
+                <a href="{{url('admin/subadmin')}}/{{$subadmin->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$subadmin->name}}" />
+                  </a>
+              </td>
+             <!--  <td>
+              <a id="{{$subadmin->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30'/>
+                  </a>
+                  <form id="deleteSubadmin_{{$subadmin->id}}" action="{{url('admin/deleteSubadmin')}}" method="POST" style="display: none;">
+                      {{ csrf_field() }}
+                      {{ method_field('DELETE') }}
+                      <input type="hidden" name="subadmin_id" value="{{$subadmin->id}}">
+                  </form>
 
-          </td> -->
-        </tr>
+              </td> -->
+            </tr>
+          @endif
         @endforeach
         @endif
       </tbody>

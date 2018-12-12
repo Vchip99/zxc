@@ -81,6 +81,14 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/manageWebDevelopments', 'Admin\AdminController@manageWebDevelopments');
 	Route::get('admin/manageClientPaidSms', 'Admin\AdminController@manageClientPaidSms');
 	Route::post('admin/clientPurchaseSms', 'Admin\AdminController@clientPurchaseSms');
+	Route::get('admin/clientsActivity', 'Admin\AdminController@clientsActivity');
+	Route::get('admin/manageAdminPayments', 'Admin\AdminController@manageAdminPayments');
+	Route::post('admin/getAdminPaymentsById', 'Admin\AdminController@getAdminPaymentsById');
+		// admin receipt
+	Route::get('admin/manageReceipt', 'Admin\AdminController@showReceipt');
+	Route::post('admin/createReceipt', 'Admin\AdminController@storeReceipt');
+	Route::put('admin/updateReceipt', 'Admin\AdminController@updateReceipt');
+	Route::get('admin/receipt/{type}/{id}', 'Admin\AdminController@showOnlineReceipt');
 
 	// Admin all users
 	Route::get('admin/allUsers', 'Admin\AllUsersInfoController@allUsers');
@@ -110,7 +118,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/showVchipPlacementVideoByCollegeIdByDeptIdByYear', 'Admin\AllUsersInfoController@showVchipPlacementVideoByCollegeIdByDeptIdByYear');
 	Route::post('admin/searchCollegeStudentByCollegeByDeptByYearByName', 'Admin\AllUsersInfoController@searchCollegeStudentByCollegeByDeptByYearByName');
 	Route::post('admin/searchVchipStudentByCollegeByDeptByYearByName', 'Admin\AllUsersInfoController@searchVchipStudentByCollegeByDeptByYearByName');
-
 
 	// admin college info
 	Route::get('admin/manageCollegeInfo', 'Test\CollegeInfoController@manageCollegeInfo');
@@ -408,6 +415,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getCollegeVkitProjectsByCategoryId', 'VkitController@getCollegeVkitProjectsByCategoryId');
 	Route::post('getVchipFavouriteVkitProjectsByUserId', 'VkitController@getVchipFavouriteVkitProjectsByUserId');
 	Route::post('getCollegeFavouriteVkitProjectsByUserId', 'VkitController@getCollegeFavouriteVkitProjectsByUserId');
+	Route::post('purchaseVkitComponents', 'VkitController@purchaseVkitComponents');
+	Route::get('thankyouPurchaseVkitComponents', 'VkitController@thankyouPurchaseVkitComponents');
+	Route::post('webhookPurchaseVkitComponents', 'VkitController@webhookPurchaseVkitComponents');
 
 	// blog
 	Route::get('blog', 'BlogController@show');
@@ -643,12 +653,13 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('changeCollegeSetting', 'AccountController@changeCollegeSetting');
 	Route::get('/college/{college}/myMessage', 'AccountController@myMessage');
 	Route::get('/college/{college}/myEvent', 'AccountController@myEvent');
-
 	Route::get('/college/{college}/manageCollegePurchaseSms', 'AccountController@manageCollegePurchaseSms');
 	Route::get('/college/{college}/createCollegePurchaseSms', 'AccountController@createCollegePurchaseSms');
 	Route::post('/college/{college}/collegePurchaseSms', 'AccountController@collegePurchaseSms');
 	Route::get('thankyouCollegePurchaseSms', 'AccountController@thankyouCollegePurchaseSms');
 	Route::post('webhookCollegePurchaseSms', 'AccountController@webhookCollegePurchaseSms');
+	Route::get('/college/{college}/myPayments', 'AccountController@myPayments');
+	Route::get('/college/{college}/receipt/{type}/{id}', 'AccountController@showMyReceipt');
 
 	// like- dis-like count front
 	Route::post('likePost', 'CourseController@likePost');
@@ -902,6 +913,14 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/advertisementPage/{id}/edit', 'AdvertisementPage\AdvertisementPageController@edit');
 	Route::put('admin/updateAdvertisementPage', 'AdvertisementPage\AdvertisementPageController@update');
 	Route::delete('admin/deleteAdvertisementPage', 'AdvertisementPage\AdvertisementPageController@delete');
+
+	// admin advertisement
+	Route::get('admin/manageAdvertisements', 'AdvertisementPage\AdvertisementController@show');
+	Route::get('admin/createAdvertisement', 'AdvertisementPage\AdvertisementController@create');
+	Route::post('admin/createAdvertisement', 'AdvertisementPage\AdvertisementController@store');
+	Route::get('admin/advertisement/{id}/edit', 'AdvertisementPage\AdvertisementController@edit');
+	Route::put('admin/updateAdvertisement', 'AdvertisementPage\AdvertisementController@update');
+	Route::delete('admin/deleteAdvertisement', 'AdvertisementPage\AdvertisementController@delete');
 
 	// company test
 	Route::get('companyTest/{id?}', 'CompanyTestController@index');
@@ -1176,9 +1195,6 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateStudyMaterialTopic', 'StudyMaterial\StudyMaterialTopicController@update');
 	Route::delete('admin/deleteStudyMaterialTopic', 'StudyMaterial\StudyMaterialTopicController@delete');
 	Route::post('admin/isStudyMaterialTopicExist', 'StudyMaterial\StudyMaterialTopicController@isStudyMaterialTopicExist');
-
-
-
 });
 
 Route::group(['domain' => '{client}.localvchip.com'], function () {
@@ -1406,7 +1422,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::post('getQuestionBankSubCategories', 'Client\OnlineTest\ClientOnlineTestQuestionController@getQuestionBankSubCategories');
   	Route::post('exportQuestionBank', 'Client\OnlineTest\ClientOnlineTestQuestionController@exportQuestionBank');
 
-
   	// online courses front
 	Route::get('online-courses', 'Client\Front\ClientOnlineCourseFrontController@courses');
 	Route::post('getOnlineCourseByCatIdBySubCatId', 'Client\Front\ClientOnlineCourseFrontController@getOnlineCourseByCatIdBySubCatId');
@@ -1425,7 +1440,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('likeClientCourseVideo', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideo');
 	Route::post('likeClientCourseVideoComment', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideoComment');
 	Route::post('likeClientCourseVideoSubComment', 'Client\Front\ClientOnlineCourseFrontController@likeClientCourseVideoSubComment');
-
 
   	// online tests front
 	Route::get('online-tests', 'Client\Front\ClientOnlineTestFrontController@tests');
@@ -1449,7 +1463,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('getQuestions', 'Client\Front\ClientOnlineQuestionFrontController@getAllQuestions');
 	Route::post('showUserTestSolution', 'Client\Front\ClientOnlineQuestionFrontController@showUserTestSolution');
 	Route::get('downloadQuestions/{category}/{subcategory}/{subject}/{paper}', 'Client\Front\ClientOnlineQuestionFrontController@downloadQuestions');
-
 
 	// client user dashboard
 	Route::get('dashboard', 'Client\ClientUserController@showClientUserDashBoard');
@@ -1507,7 +1520,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
   	Route::get('myGallery', 'Client\ClientUserController@myGallery');
   	Route::get('myEvent', 'Client\ClientUserController@myEvent');
 
-
 	/// client user Post Comment
 	Route::post('createClientAllPost',  'Client\ClientPostCommentController@createAllPost');
 	Route::post('createClientAllPostComment',  'Client\ClientPostCommentController@createAllPostComment');
@@ -1543,7 +1555,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('getAssignmentTopicsBySubject', 'Client\ClientAssignmentTopicController@getAssignmentTopicsBySubject');
 	Route::delete('deleteAssignmentTopic', 'Client\ClientAssignmentTopicController@delete');
 
-
 	// manage assignment
 	Route::get('manageAssignment', 'Client\ClientAssignmentController@show');
 	Route::get('createAssignment', 'Client\ClientAssignmentController@create');
@@ -1552,7 +1563,6 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::put('updateAssignment', 'Client\ClientAssignmentController@update');
 	Route::post('checkAssignmentExist', 'Client\ClientAssignmentController@checkAssignmentExist');
 	Route::delete('deleteAssignment', 'Client\ClientAssignmentController@delete');
-
 
 	Route::get('studentsAssignment', 'Client\ClientAssignmentController@studentsAssignment');
 	Route::post('searchStudentForAssignment', 'Client\ClientAssignmentController@searchStudentForAssignment');

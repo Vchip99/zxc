@@ -40,26 +40,28 @@
           <tr style="overflow: auto;">
             <th scope="row">{{$index + $courseCourses->firstItem()}}</th>
             <td>{{$courseCourse->name}}</td>
-            <td>{{$courseCourse->subcategory}}</td>
             <td>{{$courseCourse->category}}</td>
+            <td>{{$courseCourse->subcategory}}</td>
             <td>
               <a href="{{url('admin/courseCourse')}}/{{$courseCourse->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$courseCourse->name}}" />
                 </a>
             </td>
             <td>
-            <a id="{{$courseCourse->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$courseCourse->name}}" />
+              @if($courseCourse->admin_id == Auth::guard('admin')->user()->id)
+                <a id="{{$courseCourse->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$courseCourse->name}}" />
                 </a>
                 <form id="deleteCourse_{{$courseCourse->id}}" action="{{url('admin/deleteCourseCourse')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="course_id" value="{{$courseCourse->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach
         @else
-            <tr><td>No course is created.</td></tr>
+            <tr><td colspan="6">No course is created.</td></tr>
         @endif
       </tbody>
     </table>

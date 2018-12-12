@@ -36,7 +36,6 @@ class ClientReceiptController extends ClientBaseController
 
     protected function show($subdomainName){
         $receipt = ClientReceipt::where('client_id', Auth::guard('client')->user()->id)->first();
-        // dd($receipt);
         if(!is_object($receipt)){
             $receipt = new ClientReceipt;
         }

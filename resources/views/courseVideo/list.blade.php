@@ -48,13 +48,15 @@
                 </a>
             </td>
             <td>
-            <a id="{{$courseVideo->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$courseVideo->name}}" />
+              @if($courseVideo->admin_id == Auth::guard('admin')->user()->id)
+                <a id="{{$courseVideo->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$courseVideo->name}}" />
                 </a>
                 <form id="deleteVideo_{{$courseVideo->id}}" action="{{url('admin/deleteCourseVideo')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="video_id" value="{{$courseVideo->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach

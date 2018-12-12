@@ -43,6 +43,8 @@ use App\Models\AdvertisementPayment;
 use App\Models\WebdevelopmentPayment;
 use App\Models\StudyMaterialTopic;
 use App\Models\StudyMaterialSubject;
+use App\Models\Advertisement;
+use App\Models\Rating;
 
 class HomeController extends Controller
 {
@@ -734,6 +736,7 @@ class HomeController extends Controller
         $isSubcategoryTrue = false;
         $isSubjectTrue = false;
         $isTopicTrue = false;
+        $images = '';
 
         $menuResults = StudyMaterialTopic::getCategoriesAndSubcategoriesAssocaitedWithStudyMaterialTopics();
         if(is_object($menuResults) && false == $menuResults->isEmpty()){
@@ -758,6 +761,16 @@ class HomeController extends Controller
                 }
                 if($subjectName == $result->subject){
                     $isSubjectTrue = true;
+                    $advertisements = Advertisement::where('admin_id',$result->admin_id)->get();
+                    if(is_object($advertisements) && false == $advertisements->isEmpty()){
+                        foreach($advertisements as $index => $advertisement){
+                            if(0 == $index){
+                                $images = $advertisement->image;
+                            } else {
+                                $images .= ','.$advertisement->image;
+                            }
+                        }
+                    }
                 }
                 if(!isset($topics[$result->study_material_subject_id][$result->id])){
                     $topics[$result->study_material_subject_id][$result->id] = $result->name;
@@ -770,7 +783,34 @@ class HomeController extends Controller
             }
         }
         if(true == $isSubcategoryTrue && true == $isSubjectTrue && true == $isSubjectTrue){
-            return view('studyMaterial.studyMaterialDetails', compact('categories','subcategories','subjects','topics','topicContent','subcategoryId','topicName','subcategoryName'));
+            $reviewData = [];
+            $ratingUsers = [];
+            $userNames = [];
+            $allRatings = Rating::getRatingsByModuleIdByModuleType($subcategoryId,Rating::StudyMaterial);
+            if(is_object($allRatings) && false == $allRatings->isEmpty()){
+                foreach($allRatings as $rating){
+                    $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                    $ratingUsers[] = $rating->user_id;
+                }
+                foreach($reviewData as $dataId => $rating){
+                    $ratingSum = 0.0;
+                    foreach($rating as $userRatings){
+                        foreach($userRatings as $userId => $userRating){
+                            $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+                        }
+                        $reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
+                    }
+                }
+            }
+            if(count($ratingUsers) > 0){
+                $users = User::find($ratingUsers);
+                if(is_object($users) && false == $users->isEmpty()){
+                    foreach($users as $user){
+                        $userNames[$user->id] = $user->name;
+                    }
+                }
+            }
+            return view('studyMaterial.studyMaterialDetails', compact('categories','subcategories','subjects','topics','topicContent','subcategoryId','topicName','subcategoryName','images','reviewData','userNames'));
         }
         return redirect('study-material');
     }

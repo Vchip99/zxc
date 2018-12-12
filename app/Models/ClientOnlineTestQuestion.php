@@ -80,17 +80,17 @@ class ClientOnlineTestQuestion extends Model
         } else{
             $testQuestion = new static;
         }
-        $testQuestion->name = $question;
-        $testQuestion->answer1 = $ans1;
-        $testQuestion->answer2 = $ans2;
-        $testQuestion->answer3 = $ans3;
-        $testQuestion->answer4 = $ans4;
-        $testQuestion->answer5 = $ans5;
+        $testQuestion->name = trim($question);
+        $testQuestion->answer1 = trim($ans1);
+        $testQuestion->answer2 = trim($ans2);
+        $testQuestion->answer3 = trim($ans3);
+        $testQuestion->answer4 = trim($ans4);
+        $testQuestion->answer5 = trim($ans5);
         $testQuestion->answer6 = 0;
         $testQuestion->category_id = $categoryId;
         $testQuestion->subcat_id = $subcategoryId;
-        $testQuestion->answer = $answer;
-        $testQuestion->solution = $solution;
+        $testQuestion->answer = trim($answer);
+        $testQuestion->solution = trim($solution);
         if(empty($min)){
             $testQuestion->min = 0.00;
         } else {
@@ -108,7 +108,7 @@ class ClientOnlineTestQuestion extends Model
         $testQuestion->paper_id = $paperId;
         $testQuestion->question_type = $question_type;
         $testQuestion->client_id = $clientId;
-        $testQuestion->common_data = $commonData;
+        $testQuestion->common_data = trim($commonData);
         $testQuestion->created_by = $createdBy;
         $testQuestion->save();
         return $testQuestion;
@@ -169,17 +169,17 @@ class ClientOnlineTestQuestion extends Model
         } else{
             $testQuestion = new static;
         }
-        $testQuestion->name = $question;
-        $testQuestion->answer1 = $ans1;
-        $testQuestion->answer2 = $ans2;
-        $testQuestion->answer3 = $ans3;
-        $testQuestion->answer4 = $ans4;
-        $testQuestion->answer5 = $ans5;
+        $testQuestion->name = trim($question);
+        $testQuestion->answer1 = trim($ans1);
+        $testQuestion->answer2 = trim($ans2);
+        $testQuestion->answer3 = trim($ans3);
+        $testQuestion->answer4 = trim($ans4);
+        $testQuestion->answer5 = trim($ans5);
         $testQuestion->answer6 = 0;
         $testQuestion->category_id = 0;
         $testQuestion->subcat_id = $subcategoryId;
-        $testQuestion->answer = $answer;
-        $testQuestion->solution = $solution;
+        $testQuestion->answer = trim($answer);
+        $testQuestion->solution = trim($solution);
         if(empty($min)){
             $testQuestion->min = 0.00;
         } else {
@@ -197,7 +197,7 @@ class ClientOnlineTestQuestion extends Model
         $testQuestion->paper_id = $paperId;
         $testQuestion->question_type = $question_type;
         $testQuestion->client_id = 0;
-        $testQuestion->common_data = $commonData;
+        $testQuestion->common_data = trim($commonData);
         $testQuestion->created_by = 0;
         $testQuestion->save();
         return $testQuestion;

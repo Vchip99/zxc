@@ -64,6 +64,7 @@ use App\Models\CollegePayment;
 use App\Models\CollegeMessage;
 use App\Models\CollegeIndividualMessage;
 use App\Models\CollegeClassExam;
+use App\Models\AdminReceipt;
 use Excel;
 use Auth,Hash,DB, Redirect,Session,Validator,Input,Cache;
 use App\Libraries\InputSanitise;
@@ -2644,10 +2645,245 @@ class AccountController extends Controller
             return Redirect::to('/');
         }
         $loginUser = Auth::user();
-        $events = [];
-
         $events = CollegeMessage::getEventsByCollegeIdByDept($loginUser->college_id,$loginUser->college_dept_id);
 
         return view('dashboard.myEvent', compact('events'));
+    }
+
+    protected function myPayments(Request $request){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $total = 0;
+        $results = [];
+        $loginUser = Auth::user();
+        $registerdPapers = RegisterPaper::getRegisteredPapersByUserIdForPayments($loginUser->id);
+        if(is_object($registerdPapers) && false == $registerdPapers->isEmpty()){
+            foreach($registerdPapers as $registerdPaper){
+                $results[] = [
+                    'id' => $registerdPaper->id,
+                    'type' => 'Paper',
+                    'name' => $registerdPaper->name,
+                    'price' => $registerdPaper->price,
+                    'updated_at' => date('Y-m-d H:i:s', strtotime($registerdPaper->updated_at)),
+                ];
+                $total += $registerdPaper->price;
+            }
+        }
+        $registerdCourses = RegisterOnlineCourse::getRegisteredOnlineCoursesByUserIdForPayments($loginUser->id);
+        if(is_object($registerdCourses) && false == $registerdCourses->isEmpty()){
+            foreach($registerdCourses as $registerdCourse){
+                $results[] = [
+                    'id' => $registerdCourse->id,
+                    'type' => 'Course',
+                    'name' => $registerdCourse->name,
+                    'price' => $registerdCourse->price,
+                    'updated_at' => date('Y-m-d H:i:s', strtotime($registerdCourse->updated_at)),
+                ];
+                $total += $registerdCourse->price;
+            }
+        }
+        $registerdProjects = RegisterProject::getPurchasedProjectsByUserIdForPayments($loginUser->id);
+        if(is_object($registerdProjects) && false == $registerdProjects->isEmpty()){
+            foreach($registerdProjects as $registerdProject){
+                $results[] = [
+                    'id' => $registerdProject->id,
+                    'type' => 'Vkit Project',
+                    'name' => $registerdProject->name,
+                    'price' => $registerdProject->price,
+                    'updated_at' => date('Y-m-d H:i:s', strtotime($registerdProject->updated_at)),
+                ];
+                $total += $registerdProject->price;
+            }
+        }
+        return view('dashboard.myPayments', compact('results','total'));
+    }
+
+    protected function showMyReceipt(Request $request,$collegeUrl,$type,$id){
+        if( false == InputSanitise::checkCollegeUrl($request)){
+            return Redirect::to('/');
+        }
+        $onlineReceipt = '';
+        if('paper' == $type){
+            $registerdPaper = TestSubjectPaper::getPurchasedPaperById($id);
+            if(is_object($registerdPaper)){
+                $onlineReceipt= [
+                        'id' => $registerdPaper->id,
+                        'user' => $registerdPaper->getUser(),
+                        'user_id' => $registerdPaper->user_id,
+                        'type' => 'Paper',
+                        'name' => $registerdPaper->name,
+                        'amount' => $registerdPaper->price,
+                        'date' => $registerdPaper->updated_at,
+                    ];
+            }
+        } elseif('course' == $type){
+            $registerdCourse = CourseCourse::getPurchasedCourseById($id);
+            if(is_object($registerdCourse)){
+                $onlineReceipt= [
+                        'id' => $registerdCourse->id,
+                        'user' => $registerdCourse->getUser(),
+                        'user_id' => $registerdCourse->user_id,
+                        'type' => 'Course',
+                        'name' => $registerdCourse->name,
+                        'amount' => $registerdCourse->price,
+                        'date' => $registerdCourse->updated_at,
+                    ];
+            }
+        } elseif('vkit' == $type){
+            $registerdProject = VkitProject::getPurchasedVkitProjectById($id);
+            if(is_object($registerdProject)){
+                $onlineReceipt= [
+                        'id' => $registerdProject->id,
+                        'user' => $registerdProject->getUser(),
+                        'user_id' => $registerdProject->user_id,
+                        'type' => 'Vkit',
+                        'name' => $registerdProject->name,
+                        'amount' => $registerdProject->price,
+                        'date' => $registerdProject->updated_at,
+                    ];
+            }
+        } else {
+            return Redirect::to('college/'.Session::get('college_user_url').'/myPayments');
+        }
+
+        $adminReceipt = AdminReceipt::first();
+        if(is_object($adminReceipt)){
+            $receiptBy = $adminReceipt->receipt_by;
+            $address = $adminReceipt->address;
+            $gstin = $adminReceipt->gstin;
+            $cin = $adminReceipt->cin;
+            $pan = $adminReceipt->pan;
+            $isGstTestApplied = $adminReceipt->is_gst_test_applied;
+            $isGstCourseApplied = $adminReceipt->is_gst_course_applied;
+            $isGstVkitApplied = $adminReceipt->is_gst_vkit_applied;
+            $hsnSac = (!empty($adminReceipt->hsn_sac))?$adminReceipt->hsn_sac:'NA';
+        } else {
+            $receiptBy = 'VCHIP TECHNOLOGY PVT LTD';
+            $address = '';
+            $gstin = '';
+            $cin = '';
+            $pan = '';
+            $isGstTestApplied = 0;
+            $isGstCourseApplied = 0;
+            $isGstVkitApplied = 0;
+            $hsnSac = 'NA';
+        }
+
+        if(is_array($onlineReceipt)){
+            $onlineReceiptArr = [
+                'receipt_id' => $onlineReceipt['id'],
+                'name' => $onlineReceipt['user'],
+                'user_id' => $onlineReceipt['user_id'],
+                'batch' => $onlineReceipt['name'],
+                'amount' => $onlineReceipt['amount'],
+                'type' => $onlineReceipt['type'],
+                'is_gst_test_applied' => $isGstTestApplied,
+                'is_gst_course_applied' => $isGstCourseApplied,
+                'is_gst_vkit_applied' => $isGstVkitApplied,
+                'receipt_by' => $receiptBy,
+                'date' => date('d-m-Y',strtotime($onlineReceipt['date'])),
+                'gstin' => $gstin,
+                'cin' =>  $cin,
+                'pan' =>  $pan,
+                'address' =>  $address,
+                'hsnSac' =>  $hsnSac
+            ];
+
+            $html = $this->createOnlinePdfHtml($onlineReceiptArr);
+            $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8','tempDir' => __DIR__ . '/mpdfFont']);
+            $mpdf->autoScriptToLang = true;
+            $mpdf->autoLangToFont = true;
+            $mpdf->WriteHTML($html, 2);
+            return  $mpdf->Output("receipt-".$onlineReceiptArr['receipt_id'].".pdf", "I");
+        }
+        return Redirect::to('college/'.Session::get('college_user_url').'/myPayments');
+    }
+
+    protected function createOnlinePdfHtml($onlineReceiptArr){
+        $numberFormatter = new \NumberFormatter( locale_get_default(), \NumberFormatter::SPELLOUT );
+        $amountInWords = $numberFormatter->format($onlineReceiptArr['amount']);
+
+        $tbl = '<table border="1" cellpadding="0" cellspacing="0" width="100%">';
+        $tbl .= '<thead>
+                <tr>
+                    <td colspan="12" align="center"><b>Tax Invoice</b></td>
+                </tr>
+            </thead>
+            <tr>
+                <td colspan="6" align="center"><h3>&nbsp;<u>'.$onlineReceiptArr['receipt_by'].'</u></h3><br/>&nbsp;'.$onlineReceiptArr['address'].'</td>
+                <td colspan="6" align="center">Receipt No: Online '.$onlineReceiptArr['type'].'-'.$onlineReceiptArr['receipt_id'].'<br/>Date: '.$onlineReceiptArr['date'].'</td>
+            </tr>';
+        if(!empty($onlineReceiptArr['gstin']) && !empty($onlineReceiptArr['cin']) && !empty($onlineReceiptArr['pan']) && (('Paper' == $onlineReceiptArr['type'] && 1 == $onlineReceiptArr['is_gst_test_applied']) || ('Course' == $onlineReceiptArr['type'] && 1 == $onlineReceiptArr['is_gst_course_applied']) || ('Vkit' == $onlineReceiptArr['type'] && 1 == $onlineReceiptArr['is_gst_vkit_applied']))){
+            $tbl .= '
+                    <tr>
+                        <td colspan="4" align="center">GSTIN: '.$onlineReceiptArr['gstin'].'</td>
+                        <td colspan="3" align="center">CIN: '.$onlineReceiptArr['cin'].'</td>
+                        <td colspan="5" align="center">PAN: '.$onlineReceiptArr['pan'].'</td>
+                    </tr>';
+        }
+        $tbl .= '
+            <tr>
+                <td colspan="6" align="left">&nbsp;&nbsp;Billed To: '.$onlineReceiptArr['name'].' '.'<br> &nbsp;&nbsp;User Id: '.$onlineReceiptArr['user_id'].'<br> &nbsp;&nbsp;State Code: </td>
+                <td colspan="6" align="left">&nbsp;&nbsp;Shipped To: '.$onlineReceiptArr['name'].' '.'<br> &nbsp;&nbsp;User Id: '.$onlineReceiptArr['user_id'].'<br> &nbsp;&nbsp;State Code: </td>
+            </tr>
+            <tr>
+                <td colspan="12" align="left">&nbsp;&nbsp;Remarks:<br></td>
+            </tr>';
+        if(!empty($onlineReceiptArr['gstin']) && !empty($onlineReceiptArr['cin']) && !empty($onlineReceiptArr['pan']) && (('Paper' == $onlineReceiptArr['type'] && 1 == $onlineReceiptArr['is_gst_test_applied']) || ('Course' == $onlineReceiptArr['type'] && 1 == $onlineReceiptArr['is_gst_course_applied']) || ('Vkit' == $onlineReceiptArr['type'] && 1 == $onlineReceiptArr['is_gst_vkit_applied']))){
+                $tbl .= '<tr>
+                    <td colspan="1" align="center">Sr.No</td>
+                    <td colspan="2" align="center">Service Supplied</td>
+                    <td colspan="1" align="center">HSN/<br>SAC</td>
+                    <td colspan="1" align="center">Qty</td>
+                    <td colspan="1" align="center">Unit</td>
+                    <td colspan="1" align="center">Rate Per Item</td>
+                    <td colspan="2" align="center">Taxable Value (Rs.)</td>
+                    <td colspan="3" align="center">'.round($onlineReceiptArr['amount']/1.18,2).'</td>
+                </tr>
+                <tr>
+                    <td rowspan="3" align="center">1</td>
+                    <td rowspan="3" colspan="2" align="center">Coaching for '.$onlineReceiptArr['batch'].'</td>
+                    <td rowspan="3" colspan="1" align="center">'.$onlineReceiptArr['hsnSac'].'</td>
+                    <td rowspan="3" colspan="1" align="center">NA</td>
+                    <td rowspan="3" colspan="1" align="center">NA</td>
+                    <td rowspan="3" colspan="1" align="center">'.round($onlineReceiptArr['amount']/1.18,2).'</td>
+                    <td colspan="2" align="center">Add:CGST @9% (Rs.)</td>
+                    <td colspan="3" align="center">'.round(($onlineReceiptArr['amount']/1.18) * 0.09,2).'</td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">Add:SGST @9% (Rs.)</td>
+                    <td colspan="3" align="center">'.round(($onlineReceiptArr['amount']/1.18) * 0.09,2).'</td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">Total(Rs.)</td>
+                    <td colspan="3" align="center">'.$onlineReceiptArr['amount'].'</td>
+                </tr>';
+        } else {
+            $tbl .= '<tr>
+                <td colspan="1" align="center">Sr.No</td>
+                <td colspan="6" align="center">Service Supplied</td>
+                <td colspan="1" align="center">Qty</td>
+                <td colspan="1" align="center">Unit</td>
+                <td colspan="3" align="center">Total</td>
+            </tr>
+            <tr>
+                <td align="center">1</td>
+                <td colspan="6" align="center">Coaching for '.$onlineReceiptArr['batch'].'</td>
+                <td colspan="1" align="center">NA</td>
+                <td colspan="1" align="center">NA</td>
+                <td colspan="3" align="center">'.$onlineReceiptArr['amount'].'</td>
+            </tr>';
+        }
+        $tbl .= '<tr>
+                <td colspan="12" align="left" style="text-transform:uppercase;">&nbsp;&nbsp;Ruppes: '.$amountInWords.' only </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align="left"><br/><br/><br/>&nbsp;&nbsp;Customer Signature</td>
+                        <td colspan="6" align="right"><br/><br/><br/>Authorised Signature &nbsp;&nbsp;</td>
+                    </tr>';
+        $tbl .= '
+                </table>';
+        return $tbl;
     }
 }

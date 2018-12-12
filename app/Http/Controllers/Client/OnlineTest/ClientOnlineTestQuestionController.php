@@ -548,31 +548,32 @@ class ClientOnlineTestQuestionController extends ClientBaseController
                     } else {
                         $solutionStr = $question->solution;
                     }
-
-                    $allQuestions[] = [
-                        'name' => $questionStr,
-                        'answer1' => $optionAStr,
-                        'answer2' => $optionBStr,
-                        'answer3' => $optionCStr,
-                        'answer4' => $optionDStr,
-                        'answer5' => $optionEStr,
-                        'answer6' => 0,
-                        'answer' => $question->right_answer,
-                        'min' => ($question->min)?:0,
-                        'max' => ($question->max)?:0,
-                        'question_type' => (int) $question->question_type,
-                        'solution' => $solutionStr,
-                        'positive_marks' => $question->positive_mark,
-                        'negative_marks' => $question->negative_mark,
-                        'common_data' => ($question->common_data)?:'',
-                        'category_id' => $request->get('category'),
-                        'subcat_id' =>  $request->get('subcategory'),
-                        'subject_id' => $request->get('subject'),
-                        'paper_id' => $request->get('paper'),
-                        'section_type' => $request->get('section_type'),
-                        'client_id' => $clientId,
-                        'created_by' => $createdBy,
-                    ];
+                    if((1 == $question->question_type && !empty($questionStr) && !empty($optionAStr) && !empty($optionBStr) && !empty($optionCStr) && !empty($optionDStr) && !empty($question->right_answer)) || (0 == $question->question_type && !empty($question->min) && !empty($question->max) && !empty($question->right_answer)) ){
+                        $allQuestions[] = [
+                            'name' => $questionStr,
+                            'answer1' => $optionAStr,
+                            'answer2' => $optionBStr,
+                            'answer3' => $optionCStr,
+                            'answer4' => $optionDStr,
+                            'answer5' => $optionEStr,
+                            'answer6' => 0,
+                            'answer' => $question->right_answer,
+                            'min' => ($question->min)?:0,
+                            'max' => ($question->max)?:0,
+                            'question_type' => (int) $question->question_type,
+                            'solution' => $solutionStr,
+                            'positive_marks' => $question->positive_mark,
+                            'negative_marks' => $question->negative_mark,
+                            'common_data' => ($question->common_data)?:'',
+                            'category_id' => $request->get('category'),
+                            'subcat_id' =>  $request->get('subcategory'),
+                            'subject_id' => $request->get('subject'),
+                            'paper_id' => $request->get('paper'),
+                            'section_type' => $request->get('section_type'),
+                            'client_id' => $clientId,
+                            'created_by' => $createdBy,
+                        ];
+                    }
                 }
                 if(!empty($allQuestions)){
                     DB::connection('mysql2')->beginTransaction();

@@ -22,54 +22,65 @@
     <div class="form-group row @if ($errors->has('category')) has-error @endif">
       <label class="col-sm-2 col-form-label">Category Name:</label>
       <div class="col-sm-3">
-        <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
-            <option value="">Select Category</option>
-            @if(count($courseCategories) > 0)
-              @foreach($courseCategories as $category)
-                @if( !empty($video->id) && $video->course_category_id == $category->id)
-                  <option value="{{$category->id}}" selected="true">{{$category->name}}</option>
-                @else
-                  <option value="{{$category->id}}">{{$category->name}}</option>
-                @endif
-              @endforeach
-            @endif
-        </select>
+        @if(isset($video->id))
+          @if(count($courseCategories) > 0)
+            @foreach($courseCategories as $courseCategory)
+              @if( isset($video->id) && $video->course_category_id == $courseCategory->id)
+                <input type="text" class="form-control" name="category_text" value="{{$courseCategory->name}}" readonly>
+                <input type="hidden" name="category" id="category" value="{{$courseCategory->id}}">
+              @endif
+            @endforeach
+          @endif
+        @else
+          <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
+              <option value="">Select Category</option>
+              @if(count($courseCategories) > 0)
+                @foreach($courseCategories as $category)
+                  @if( !empty($video->id) && $video->course_category_id == $category->id)
+                    <option value="{{$category->id}}" selected="true">{{$category->name}}</option>
+                  @else
+                    <option value="{{$category->id}}">{{$category->name}}</option>
+                  @endif
+                @endforeach
+              @endif
+          </select>
+        @endif
         @if($errors->has('category')) <p class="help-block">{{ $errors->first('category') }}</p> @endif
       </div>
     </div>
     <div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
       <label class="col-sm-2 col-form-label">Sub Category Name:</label>
       <div class="col-sm-3">
-        <select id="subcategory" class="form-control" name="subcategory" onChange="selectCourse(this);" required title="Sub Category">
-          <option value="">Select Sub Category</option>
-          @if(!empty($video->id) && count($courseSubCategories) > 0 )
-            @foreach($courseSubCategories as $subCategory)
-              @if( $video->course_sub_category_id == $subCategory->id )
-                <option value="{{ $subCategory->id }}" selected> {{ $subCategory->name }} </option>
-              @else
-                <option value="{{ $subCategory->id }}"> {{ $subCategory->name }} </option>
+        @if(isset($video->id) && count($courseSubCategories) > 0)
+            @foreach($courseSubCategories as $courseSubCategory)
+              @if($video->course_sub_category_id == $courseSubCategory->id)
+                <input type="text" class="form-control" name="subcategory_text" value="{{$courseSubCategory->name}}" readonly>
+                <input type="hidden" name="subcategory" id="subcategory" value="{{$courseSubCategory->id}}">
               @endif
             @endforeach
-          @endif
-        </select>
+        @else
+          <select id="subcategory" class="form-control" name="subcategory" onChange="selectCourse(this);" required title="Sub Category">
+            <option value="">Select Sub Category</option>
+          </select>
+        @endif
         @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
       </div>
     </div>
     <div class="form-group row @if ($errors->has('course')) has-error @endif">
       <label class="col-sm-2 col-form-label">Course Name</label>
       <div class="col-sm-3">
-        <select id="course" class="form-control" name="course" required title="Course">
-            <option value="">Select Course ...</option>
-            @if(!empty($video->id) && count($courseCourses) > 0)
-              @foreach($courseCourses as $courseCourse)
-                @if( isset($video->id) && $video->course_id == $courseCourse->id)
-                  <option value="{{$courseCourse->id}}" selected="true">{{$courseCourse->name}}</option>
-                @else
-                  <option value="{{$courseCourse->id}}">{{$courseCourse->name}}</option>
-                @endif
-              @endforeach
+        @if(!empty($video->id) && count($courseCourses) > 0)
+          @foreach($courseCourses as $courseCourse)
+            @if( isset($video->id) && $video->course_id == $courseCourse->id)
+              <input type="text" class="form-control" name="course_text" value="{{$courseCourse->name}}" readonly>
+              <input type="hidden" name="course" id="course" value="{{$courseCourse->id}}">
             @endif
-        </select>
+          @endforeach
+        @else
+          <select id="course" class="form-control" name="course" required title="Course">
+            <option value="">Select Course</option>
+          </select>
+        @endif
         @if($errors->has('course')) <p class="help-block">{{ $errors->first('course') }}</p> @endif
       </div>
     </div>
@@ -161,7 +172,13 @@
     </div>
     <div class="form-group row">
         <div class="offset-sm-2 col-sm-3" title="Submit">
-          <button id="submitBtn" type="button" class="btn btn-primary" onclick="searchCourseVideo();">Submit</button>
+          @if(!empty($video->id) && is_object($videoCourse) && $videoCourse->admin_id == Auth::guard('admin')->user()->id)
+            <button id="submitBtn" type="button" class="btn btn-primary" onclick="searchCourseVideo();">Submit</button>
+          @elseif(empty($video->id))
+            <button id="submitBtn" type="button" class="btn btn-primary" onclick="searchCourseVideo();">Submit</button>
+          @else
+            <a href="{{ url('admin/manageCourseVideo') }}" class="btn btn-primary">Back</a>
+          @endif
         </div>
       </div>
   </div>

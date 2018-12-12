@@ -195,16 +195,16 @@
                     @endif
                   </p>
                   @if(!empty($userData->resume) && is_file($userData->resume))
-                  <div style="padding-left: 10px;"><a href="{{asset($userData->resume)}}" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>
+                  <div style="padding-left: 10px;"><a href="{{asset($userData->resume)}}" download><button type="button" class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>
                   @endif
                   <div class="row">
-                    <div  style="display: inline-block;">
+                    <div style="display: inline-block;">
                       @if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif
                     </div>
-                    <div  style="display: inline-block;">
+                    <div style="display: inline-block;">
                       <input id="rating_input{{$userData->id}}" name="input-{{$userData->id}}" class="rating rating-loading" value="@if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
                     </div>
-                    <div  style="display: inline-block;">
+                    <div style="display: inline-block;">
                       <a data-toggle="modal" data-target="#review-model-{{$userData->id}}">
                       @if(isset($reviewData[$userData->id]))
                         {{count($reviewData[$userData->id]['rating'])}} <i class="fa fa-group"></i>
@@ -279,11 +279,16 @@
                     <form action="{{ url('giveRating')}}" method="POST">
                       <div class="form-group row ">
                         {{ csrf_field() }}
-                        <input id="rating_input-{{$userData->id}}" name="input-{{$userData->id}}" class="rating rating-loading" value="@if(isset($reviewData[$userData->id]) && is_object(Auth::user()) && isset($reviewData[$userData->id]['rating'][Auth::user()->id])) {{$reviewData[$userData->id]['rating'][Auth::user()->id]['rating']}} @else 0 @endif" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
-                        Review:<input type="text" name="review-text" class="form-control" value="@if(isset($reviewData[$userData->id])  && is_object(Auth::user()) && isset($reviewData[$userData->id]['rating'][Auth::user()->id])) {{$reviewData[$userData->id]['rating'][Auth::user()->id]['review']}} @endif">
+                        @if(isset($reviewData[$userData->id]) && is_object(Auth::user()) && isset($reviewData[$userData->id]['rating'][Auth::user()->id]))
+                          <input id="rating_input-{{$userData->id}}" name="input-{{$userData->id}}" class="rating rating-loading" value="{{$reviewData[$userData->id]['rating'][Auth::user()->id]['rating']}}" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                        @else
+                          <input id="rating_input-{{$userData->id}}" name="input-{{$userData->id}}" class="rating rating-loading" value="0" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                        @endif
+                        Review:<input type="text" name="review-text" class="form-control" value="@if(isset($reviewData[$userData->id])  && is_object(Auth::user()) && isset($reviewData[$userData->id]['rating'][Auth::user()->id])) {{trim($reviewData[$userData->id]['rating'][Auth::user()->id]['review'])}} @endif">
                         <br>
-                        <input type="hidden" name="user_data_id" value="{{$userData->id}}">
-                        <input type="hidden" name="review_id" value="@if(isset($reviewData[$userData->id]) && is_object(Auth::user()) && isset($reviewData[$userData->id]['rating'][Auth::user()->id])) {{$reviewData[$userData->id]['rating'][Auth::user()->id]['review_id']}} @endif">
+                        <input type="hidden" name="module_id" value="{{$userData->id}}">
+                        <input type="hidden" name="module_type" value="5">
+                        <input type="hidden" name="rating_id" value="@if(isset($reviewData[$userData->id]) && is_object(Auth::user()) && isset($reviewData[$userData->id]['rating'][Auth::user()->id])) {{$reviewData[$userData->id]['rating'][Auth::user()->id]['review_id']}} @endif">
                         <button type="submit" class="pull-right">Submit</button>
                       </div>
                     </form>
@@ -419,50 +424,165 @@
   }
 
   function renderData(msg){
+    var userId = parseInt(document.getElementById('user_id').value);
+
     divUsers = document.getElementById('allUsers');
     divUsers.innerHTML = '';
     if(Object.keys(msg).length) {
       $.each(msg, function(id, data) {
-          var firstDiv = document.createElement('div');
-          firstDiv.setAttribute('style', 'border:1px solid black;');
+        var firstDiv = document.createElement('div');
+        firstDiv.setAttribute('style', 'border:1px solid black;');
 
-          var secondDiv = document.createElement('div');
-          secondDiv.className = 'row memberinfo';
+        var secondDiv = document.createElement('div');
+        secondDiv.className = 'row memberinfo';
 
-          var thirdDiv = document.createElement('div');
-          thirdDiv.className = 'col-md-5';
-          if(data['youtube']){
-            thirdDiv.innerHTML = '<div class="vid">'+data['youtube']+'</div>';
-          } else {
-            thirdDiv.innerHTML = '<div class="vid"></div>';
-          }
-          secondDiv.appendChild(thirdDiv);
+        var thirdDiv = document.createElement('div');
+        thirdDiv.className = 'col-md-5';
+        if(data['youtube']){
+          thirdDiv.innerHTML = '<div class="vid">'+data['youtube']+'</div>';
+        } else {
+          thirdDiv.innerHTML = '<div class="vid"></div>';
+        }
+        secondDiv.appendChild(thirdDiv);
 
-          var fourthDiv = document.createElement('div');
-          fourthDiv.className = 'col-md-7 topcontent';
-          fourthDivInnerHtml = '';
-          fourthDivInnerHtml += '<h4><strong>'+data['name']+'</strong></h4><p><strong>Experience:</strong>'+data['experience']+'</p><p><strong>Company Name:</strong>'+data['company']+'</p><p><strong>Education:</strong>'+data['education']+'</p><p><strong>Skills:</strong>'+data['skill']+'</p>';
-          fourthDivInnerHtml += '<p class="bottom">';
-          if(data['twitter']){
-            fourthDivInnerHtml += '<a class="btn btn-primary btn-twitter btn-sm" target="_blank" href="'+data['twitter']+'"><i class="fa fa-twitter"></i></a>';
-          }
-          if(data['google']){
-            fourthDivInnerHtml += ' <a class="btn btn-danger btn-sm" rel="publisher" target="_blank" href="'+data['google']+'"><i class="fa fa-google-plus"></i></a>';
-          }
-          if(data['facebook']){
-            fourthDivInnerHtml += ' <a class="btn btn-primary btn-sm" rel="publisher" target="_blank" href="'+data['facebook']+'"><i class="fa fa-facebook"></i></a>';
-          }
-          fourthDivInnerHtml += '</p>';
-          if(data['is_file_resume']){
-            fourthDivInnerHtml += '<div style="padding-left: 30px;"><a href="'+ data['resume'] +'" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>';
-          }
-          fourthDiv.innerHTML = fourthDivInnerHtml;
-          secondDiv.appendChild(fourthDiv);
-          firstDiv.appendChild(secondDiv);
-          divUsers.appendChild(firstDiv);
-          var brEle = document.createElement('br');
-          divUsers.appendChild(brEle);
+        var fourthDiv = document.createElement('div');
+        fourthDiv.className = 'col-md-7 topcontent';
+        fourthDivInnerHtml = '';
+        var h4Ele = document.createElement('h4');
+        h4Ele.innerHTML = '<strong>'+data['name']+'</strong>';
+        fourthDiv.appendChild(h4Ele);
+
+        var pExp = document.createElement('p');
+        pExp.innerHTML = '<strong>Experience:</strong>'+data['experience'];
+        fourthDiv.appendChild(pExp);
+
+        var pCmp = document.createElement('p');
+        pCmp.innerHTML = '<strong>Company Name:</strong>'+data['company'];
+        fourthDiv.appendChild(pCmp);
+
+        var pEdu = document.createElement('p');
+        pEdu.innerHTML = '<strong>Education:</strong>'+data['education'];
+        fourthDiv.appendChild(pEdu);
+
+        var pSkill = document.createElement('p');
+        pSkill.innerHTML = '<strong>Skills:</strong>'+data['skill'];
+        fourthDiv.appendChild(pSkill);
+
+        var pBottom = document.createElement('p');
+        pBottom.innerHTML = '';
+        if(data['twitter']){
+          pBottom.innerHTML += '<a class="btn btn-primary btn-twitter btn-sm" target="_blank" href="'+data['twitter']+'"><i class="fa fa-twitter"></i></a>';
+        }
+        if(data['google']){
+          pBottom.innerHTML += ' <a class="btn btn-danger btn-sm" rel="publisher" target="_blank" href="'+data['google']+'"><i class="fa fa-google-plus"></i></a>';
+        }
+        if(data['facebook']){
+          pBottom.innerHTML += ' <a class="btn btn-primary btn-sm" rel="publisher" target="_blank" href="'+data['facebook']+'"><i class="fa fa-facebook"></i></a>';
+        }
+        fourthDiv.appendChild(pBottom);
+
+        if(data['is_file_resume']){
+          var resumeDiv = document.createElement('div');
+          resumeDiv.setAttribute('style','padding-left: 30px;');
+          resumeDiv.innerHTML = '<a href="'+ data['resume'] +'" download><button type="button"  class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a>';
+          fourthDiv.appendChild(resumeDiv);
+        }
+
+        var rowDiv = document.createElement('div');
+        if(data['ratingData'] && data['ratingData']['avg']){
+          var avgDiv = document.createElement('div');
+          avgDiv.setAttribute('style','display: inline-block;');
+          avgDiv.innerHTML = data['ratingData']['avg'];
+          rowDiv.appendChild(avgDiv);
+
+          var starDiv = document.createElement('div');
+          starDiv.setAttribute('style','display: inline-block;');
+
+          var ratingInput = document.createElement('input');
+          ratingInput.setAttribute('id','rating_input'+id);
+          ratingInput.setAttribute('name','input-'+id);
+          ratingInput.setAttribute('class','rating rating-loading');
+          ratingInput.setAttribute('value',data['ratingData']['avg']);
+          ratingInput.setAttribute('data-min',0);
+          ratingInput.setAttribute('data-max',5);
+          ratingInput.setAttribute('data-step','0.1');
+          ratingInput.setAttribute('data-size','xs');
+          ratingInput.setAttribute('data-show-clear','false');
+          ratingInput.setAttribute('data-show-caption','false');
+          ratingInput.setAttribute('readonly','true');
+
+          starDiv.appendChild(ratingInput);
+          rowDiv.appendChild(starDiv);
+
+          var grpDiv = document.createElement('div');
+          grpDiv.setAttribute('style','display: inline-block;');
+          grpDiv.innerHTML = '<a data-toggle="modal" data-target="#review-model-'+id+'">'+Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i></a>';
+          rowDiv.appendChild(grpDiv);
+        }
+        fourthDiv.appendChild(rowDiv);
+        secondDiv.appendChild(fourthDiv);
+        firstDiv.appendChild(secondDiv);
+        divUsers.appendChild(firstDiv);
+        var brEle = document.createElement('br');
+        divUsers.appendChild(brEle);
       });
+      $.each(msg, function(id, data) {
+        var reviewModel = document.createElement('div');
+        reviewModel.setAttribute('id','review-model-'+id);
+        reviewModel.setAttribute('class','modal fade');
+        reviewModel.setAttribute('role','dialog');
+
+        reviewModelInnerHTML = '';
+        reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">'+data['ratingData']['avg']+'</div><div  style="display: inline-block;"><input name="input-'+id+'" class="rating rating-loading" value="'+data['ratingData']['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> '+Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i></div>';
+        if(userId > 0){
+          reviewModelInnerHTML += '<button class="pull-right" data-toggle="modal" data-target="#rating-model-'+id+'">';
+          if(data['ratingData']['rating'][userId]){
+            reviewModelInnerHTML += 'Edit Rating';
+          } else {
+            reviewModelInnerHTML += 'Give Rating';
+          }
+          reviewModelInnerHTML += '</button>';
+        } else {
+          reviewModelInnerHTML += '<button class="pull-right" onClick="giveRating('+userId+')">Give Rating</button>';
+        }
+        reviewModelInnerHTML += '</div></div>';
+
+        reviewModelInnerHTML += '<div class="modal-body row">';
+        if(data['ratingData']['rating']){
+          $.each(data['ratingData']['rating'], function(userId, reviewData) {
+            reviewModelInnerHTML += reviewData.user_name +':';
+            reviewModelInnerHTML += '<input id="rating_input-'+id+'-'+userId+'" name="input-'+id+'" class="rating rating-loading" value="'+reviewData.rating+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>'+reviewData.review+'<hr>';
+          });
+        } else {
+          reviewModelInnerHTML += 'Please give ratings';
+        }
+        reviewModelInnerHTML += '</div></div></div></div></div>';
+        reviewModel.innerHTML = reviewModelInnerHTML;
+        divUsers.appendChild(reviewModel);
+
+        var ratingModel = document.createElement('div');
+        ratingModel.setAttribute('id','rating-model-'+id);
+        ratingModel.setAttribute('class','modal fade');
+        ratingModel.setAttribute('role','dialog');
+        var ratingUrl = "{{ url('giveRating')}}";
+        var csrfField = '{{ csrf_field() }}';
+        ratingModelInnerHTML = '';
+        ratingModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button>Rate and Review</div><div class="modal-body row"><form action="'+ratingUrl+'" method="POST"><div class="form-group row ">'+csrfField+'<input id="rating_input-'+id+'" name="input-'+id+'" class="rating rating-loading" value="'+Object.keys(data['ratingData']['rating']).length+'" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">Review:';
+        if(data['ratingData']['rating'][userId]){
+          ratingModelInnerHTML += '<input type="text" name="review-text" class="form-control" value="'+data['ratingData']['rating'][userId]['review']+'">';
+          ratingModelInnerHTML += '<br><input type="hidden" name="module_id" value="'+id+'"><input type="hidden" name="module_type" value="5"><input type="hidden" name="rating_id" value="'+data['ratingData']['rating'][userId]['review_id']+'"><button type="submit" class="pull-right">Submit</button></div></form></div></div></div>';
+        } else {
+          ratingModelInnerHTML += '<input type="text" name="review-text" class="form-control" value="">';
+          ratingModelInnerHTML += '<br><input type="hidden" name="module_id" value="'+id+'"><input type="hidden" name="module_type" value="5"><input type="hidden" name="rating_id" value=""><button type="submit" class="pull-right">Submit</button></div></form></div></div></div>';
+        }
+
+        ratingModel.innerHTML = ratingModelInnerHTML;
+        divUsers.appendChild(ratingModel);
+      });
+      var inputRating = $('input.rating');
+      if(inputRating.length) {
+        inputRating.removeClass('rating-loading').addClass('rating-loading').rating();
+      }
     } else {
       divUsers.innerHTML = 'No Result!';
     }

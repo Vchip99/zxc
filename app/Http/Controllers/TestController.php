@@ -15,6 +15,8 @@ use App\Models\ReadNotification;
 use App\Models\UserSolution;
 use Session, Redirect, Auth, DB,Cache;
 use App\Models\Add;
+use App\Models\Rating;
+use App\Models\User;
 
 class TestController extends Controller
 {
@@ -31,7 +33,34 @@ class TestController extends Controller
 		$catId = 0;
 		$date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
-		return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads'));
+        $reviewData = [];
+        $ratingUsers = [];
+        $userNames = [];
+        $allRatings = Rating::getRatingsByModuleType(Rating::SubCategory);
+        if(is_object($allRatings) && false == $allRatings->isEmpty()){
+            foreach($allRatings as $rating){
+                $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                $ratingUsers[] = $rating->user_id;
+            }
+            foreach($reviewData as $dataId => $rating){
+                $ratingSum = 0.0;
+                foreach($rating as $userRatings){
+                    foreach($userRatings as $userId => $userRating){
+                        $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+                    }
+                    $reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
+                }
+            }
+        }
+        if(count($ratingUsers) > 0){
+            $users = User::find($ratingUsers);
+            if(is_object($users) && false == $users->isEmpty()){
+                foreach($users as $user){
+                    $userNames[$user->id] = $user->name;
+                }
+            }
+        }
+		return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads','reviewData','userNames'));
 	}
 
 	/**
@@ -52,7 +81,34 @@ class TestController extends Controller
 		        });
 				$date = date('Y-m-d');
         		$ads = Add::getAdds($request->url(),$date);
-				return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads'));
+        		$reviewData = [];
+		        $ratingUsers = [];
+		        $userNames = [];
+		        $allRatings = Rating::getRatingsByModuleType(Rating::SubCategory);
+		        if(is_object($allRatings) && false == $allRatings->isEmpty()){
+		            foreach($allRatings as $rating){
+		                $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+		                $ratingUsers[] = $rating->user_id;
+		            }
+		            foreach($reviewData as $dataId => $rating){
+		                $ratingSum = 0.0;
+		                foreach($rating as $userRatings){
+		                    foreach($userRatings as $userId => $userRating){
+		                        $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+		                    }
+		                    $reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
+		                }
+		            }
+		        }
+		        if(count($ratingUsers) > 0){
+		            $users = User::find($ratingUsers);
+		            if(is_object($users) && false == $users->isEmpty()){
+		                foreach($users as $user){
+		                    $userNames[$user->id] = $user->name;
+		                }
+		            }
+		        }
+				return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads','reviewData','userNames'));
 			}
 		}
 		return Redirect::to('/');
@@ -114,7 +170,34 @@ class TestController extends Controller
                     }
                 }
 				$currentDate = date('Y-m-d H:i:s');
-				return view('tests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'subject', 'paper'));
+				$reviewData = [];
+		        $ratingUsers = [];
+		        $userNames = [];
+		        $allRatings = Rating::getRatingsByModuleIdByModuleType($subcatId,Rating::SubCategory);
+		        if(is_object($allRatings) && false == $allRatings->isEmpty()){
+		            foreach($allRatings as $rating){
+		                $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+		                $ratingUsers[] = $rating->user_id;
+		            }
+		            foreach($reviewData as $dataId => $rating){
+		                $ratingSum = 0.0;
+		                foreach($rating as $userRatings){
+		                    foreach($userRatings as $userId => $userRating){
+		                        $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+		                    }
+		                    $reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
+		                }
+		            }
+		        }
+		        if(count($ratingUsers) > 0){
+		            $users = User::find($ratingUsers);
+		            if(is_object($users) && false == $users->isEmpty()){
+		                foreach($users as $user){
+		                    $userNames[$user->id] = $user->name;
+		                }
+		            }
+		        }
+				return view('tests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'subject', 'paper','reviewData','userNames'));
 			}
 		}
 		return Redirect::to('/');
@@ -152,20 +235,41 @@ class TestController extends Controller
 	 */
 	public function getSubCategories(Request $request){
 		if($request->ajax()){
+			$result = [];
 			$categoryId = $request->get('id');
 			$userId = $request->get('userId');
-			// if(isset($categoryId) && empty($userId)){
-				// return Cache::remember('vchip:tests:testSubCategories:cat-'.$categoryId,30, function() use ($categoryId) {
-		            return TestSubCategory::getSubcategoriesByCategoryId($categoryId);
-		        // });
-			// } else {
-			// 	// $subCategories = TestSubCategory::getTestSubCategoriesByRegisteredSubjectPapersByCategoryIdByUserId($categoryId,$userId);
-			// 	$result['subCategories'] = Cache::remember('vchip:tests:testSubCategories:cat-'.$categoryId,30, function() use ($categoryId) {
-		 //            return TestSubCategory::getSubcategoriesByCategoryId($categoryId);
-		 //        });
-			// 	$result['registerPapers'] = RegisterPaper::getRegisteredPapersByUserId($userId);
-			// 	return $result;
-			// }
+			$rating = $request->get('rating');
+		    if(true == $rating){
+			    $result['subcategories'] = TestSubCategory::getSubcategoriesByCategoryId($categoryId);
+	            $ratingUsers = [];
+	            $allRatings = Rating::getRatingsByModuleType(Rating::SubCategory);
+	            if(is_object($allRatings) && false == $allRatings->isEmpty()){
+	                foreach($allRatings as $rating){
+	                    $result['ratingData'][$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+	                    $ratingUsers[] = $rating->user_id;
+	                }
+	                foreach($result['ratingData'] as $dataId => $rating){
+	                    $ratingSum = 0.0;
+	                    foreach($rating as $userRatings){
+	                        foreach($userRatings as $userId => $userRating){
+	                            $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+	                        }
+	                        $result['ratingData'][$dataId]['avg']  = $ratingSum/count($userRatings);
+	                    }
+	                }
+	            }
+	            if(count($ratingUsers) > 0){
+	                $users = User::find($ratingUsers);
+	                if(is_object($users) && false == $users->isEmpty()){
+	                    foreach($users as $user){
+	                        $result['userNames'][$user->id] = $user->name;
+	                    }
+	                }
+	            }
+	        	return $result;
+	        } else {
+	        	return TestSubCategory::getSubcategoriesByCategoryId($categoryId);
+	        }
 		}
 	}
 
@@ -213,6 +317,32 @@ class TestController extends Controller
 
 		$result['alreadyGivenPapers'] = $this->getTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 		$result['currentDate'] = date('Y-m-d H:i:s');
+
+        $ratingUsers = [];
+        $allRatings = Rating::getRatingsByModuleIdByModuleType($subcatId,Rating::SubCategory);
+        if(is_object($allRatings) && false == $allRatings->isEmpty()){
+            foreach($allRatings as $rating){
+                $result['ratingData'][$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                $ratingUsers[] = $rating->user_id;
+            }
+            foreach($result['ratingData'] as $dataId => $rating){
+                $ratingSum = 0.0;
+                foreach($rating as $userRatings){
+                    foreach($userRatings as $userId => $userRating){
+                        $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+                    }
+                    $result['ratingData'][$dataId]['avg']  = $ratingSum/count($userRatings);
+                }
+            }
+        }
+        if(count($ratingUsers) > 0){
+            $users = User::find($ratingUsers);
+            if(is_object($users) && false == $users->isEmpty()){
+                foreach($users as $user){
+                    $result['userNames'][$user->id] = $user->name;
+                }
+            }
+        }
 		return $result;
 	}
 

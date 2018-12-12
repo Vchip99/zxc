@@ -121,7 +121,7 @@
     @endif
     <div class="col-sm-10">
         @if($errors->has('question')) <p class="help-block">{{ $errors->first('question') }}</p> @endif
-        @if(!empty($assignment->id) && $assignment->created_by == $loginUser->id)
+        @if(!empty($assignment->id) && ($assignment->created_by == $loginUser->id  || 1 == $loginUser->admin_approve))
           <textarea name="question" cols="60" rows="4" id="question" placeholder="Enter your Question" required>
             @if(!empty($assignment->id))
               {!! $assignment->question !!}
@@ -146,7 +146,7 @@
   <div class="form-group row @if ($errors->has('attached_link')) has-error @endif">
       <label class="col-sm-2 col-form-label" for="attached_link">Attachment:</label>
       <div class="col-sm-3">
-        @if(!empty($assignment->id) && $assignment->created_by == $loginUser->id)
+        @if(!empty($assignment->id) && ($assignment->created_by == $loginUser->id || 1 == $loginUser->admin_approve))
           <input type="file" class="form-control"  name="attached_link" id="attached_link">
           @if($errors->has('attached_link')) <p class="has-error">{{ $errors->first('attached_link') }}</p> @endif
           <b><span>Existing Attachment: {!! basename($assignment->attached_link) !!}</span></b>
@@ -181,7 +181,7 @@
     </div>
     <div class="form-group row" id="submit">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        @if(!empty($assignment->id) && $assignment->created_by == $loginUser->id)
+        @if(!empty($assignment->id) && ($assignment->created_by == $loginUser->id || 1 == $loginUser->admin_approve))
           <button type="submit" class="btn btn-primary" style="width: 90px !important;" >Submit</button>
         @elseif(empty($assignment->id))
           <button type="submit" class="btn btn-primary" style="width: 90px !important;" >Submit</button>

@@ -32,11 +32,10 @@ class QuestionController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineTest')){
+                if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin')){
                     return $next($request);
                 }
             }
-
             return Redirect::to('admin/home');
         });
     }
@@ -263,7 +262,8 @@ class QuestionController extends Controller
     		$testQuestion = Question::find($id);
     		if(is_object($testQuestion)){
                 $testCategory = $testQuestion->category;
-                if(0 == $testCategory->college_id && 0 == $testCategory->user_id){
+                $testSubCategory = $testQuestion->subcategory;
+                if(0 == $testCategory->college_id && 0 == $testCategory->user_id && $testSubCategory->created_by == Auth::guard('admin')->user()->id){
                     $testCategories = TestCategory::getAllTestCategories();
                     $testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($testQuestion->category_id);
                     $testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($testQuestion->category_id, $testQuestion->subcat_id);
@@ -347,18 +347,22 @@ class QuestionController extends Controller
     	if(isset($questionId)){
     		$testQuestion = Question::find($questionId);
     		if(is_object($testQuestion)){
-                DB::beginTransaction();
-                try
-                {
-                    UserSolution::deleteUserSolutionsByQuestionId($testQuestion->id);
-        			$testQuestion->delete();
-                    DB::commit();
-                    return Redirect::to('admin/manageQuestions')->with('message', 'Question deleted successfully!');
-                }
-                catch(\Exception $e)
-                {
-                    DB::rollback();
-                    return redirect()->back()->withErrors('something went wrong.');
+                $testCategory = $testQuestion->category;
+                $testSubCategory = $testQuestion->subcategory;
+                if(0 == $testCategory->college_id && 0 == $testCategory->user_id && $testSubCategory->created_by == Auth::guard('admin')->user()->id){
+                    DB::beginTransaction();
+                    try
+                    {
+                        UserSolution::deleteUserSolutionsByQuestionId($testQuestion->id);
+            			$testQuestion->delete();
+                        DB::commit();
+                        return Redirect::to('admin/manageQuestions')->with('message', 'Question deleted successfully!');
+                    }
+                    catch(\Exception $e)
+                    {
+                        DB::rollback();
+                        return redirect()->back()->withErrors('something went wrong.');
+                    }
                 }
     		}
     	}
@@ -509,31 +513,32 @@ class QuestionController extends Controller
                     } else {
                         $solutionStr = $question->solution;
                     }
-
-                    $allQuestions[] = [
-                        'name' => $questionStr,
-                        'answer1' => $optionAStr,
-                        'answer2' => $optionBStr,
-                        'answer3' => $optionCStr,
-                        'answer4' => $optionDStr,
-                        'answer5' => $optionEStr,
-                        'answer6' => 0,
-                        'answer' => $question->right_answer,
-                        'min' => ($question->min)?:0,
-                        'max' => ($question->max)?:0,
-                        'question_type' => (int) $question->question_type,
-                        'solution' => $solutionStr,
-                        'positive_marks' => $question->positive_mark,
-                        'negative_marks' => $question->negative_mark,
-                        'common_data' => ($question->common_data)?:'',
-                        'category_id' => $request->get('category'),
-                        'subcat_id' =>  $request->get('subcategory'),
-                        'subject_id' => $request->get('subject'),
-                        'paper_id' => $request->get('paper'),
-                        'section_type' => $request->get('section_type'),
-                        'created_at' => date('Y-m-d h:i:s'),
-                        'updated_at' => date('Y-m-d h:i:s')
-                    ];
+                    if((1 == $question->question_type && !empty($questionStr) && !empty($optionAStr) && !empty($optionBStr) && !empty($optionCStr) && !empty($optionDStr) && !empty($question->right_answer)) || (0 == $question->question_type && !empty($question->min) && !empty($question->max) && !empty($question->right_answer)) ){
+                        $allQuestions[] = [
+                            'name' => $questionStr,
+                            'answer1' => $optionAStr,
+                            'answer2' => $optionBStr,
+                            'answer3' => $optionCStr,
+                            'answer4' => $optionDStr,
+                            'answer5' => $optionEStr,
+                            'answer6' => 0,
+                            'answer' => $question->right_answer,
+                            'min' => ($question->min)?:0,
+                            'max' => ($question->max)?:0,
+                            'question_type' => (int) $question->question_type,
+                            'solution' => $solutionStr,
+                            'positive_marks' => $question->positive_mark,
+                            'negative_marks' => $question->negative_mark,
+                            'common_data' => ($question->common_data)?:'',
+                            'category_id' => $request->get('category'),
+                            'subcat_id' =>  $request->get('subcategory'),
+                            'subject_id' => $request->get('subject'),
+                            'paper_id' => $request->get('paper'),
+                            'section_type' => $request->get('section_type'),
+                            'created_at' => date('Y-m-d h:i:s'),
+                            'updated_at' => date('Y-m-d h:i:s')
+                        ];
+                    }
                 }
 
                 if(!empty($allQuestions)){

@@ -61,17 +61,17 @@ width: 100% !important;
         <div >
           <p class="questions" >
             <span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
-            {!! $question->name !!}
+            {!! trim($question->name) !!}
           </p>
           <p>
           @if( 1 == $question->question_type )
-            <div class="row">A. {!! $question->answer1 !!}
+            <div class="row">A. {!! trim($question->answer1) !!}
             </div>
-            <div class="row">B. {!! $question->answer2 !!}
+            <div class="row">B. {!! trim($question->answer2) !!}
             </div>
-            <div class="row">C. {!! $question->answer3 !!}
+            <div class="row">C. {!! trim($question->answer3) !!}
             </div>
-            <div class="row">D. {!! $question->answer4 !!}
+            <div class="row">D. {!! trim($question->answer4) !!}
             </div>
           @else<br/>
           <div class="panel panel-default">
@@ -90,17 +90,17 @@ width: 100% !important;
         <div >
           <p class="questions" >
             <span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
-            {!! $question->name !!}
+            {!! trim($question->name) !!}
           </p>
           <p>
           @if( 1 == $question->question_type )
-            <div class="row">A. {!! $question->answer1 !!}
+            <div class="row">A. {!! trim($question->answer1) !!}
             </div>
-            <div class="row">B. {!! $question->answer2 !!}
+            <div class="row">B. {!! trim($question->answer2) !!}
             </div>
-            <div class="row">C. {!! $question->answer3 !!}
+            <div class="row">C. {!! trim($question->answer3) !!}
             </div>
-            <div class="row">D. {!! $question->answer4 !!}
+            <div class="row">D. {!! trim($question->answer4) !!}
             </div>
           @else<br/>
           <div class="panel panel-default">

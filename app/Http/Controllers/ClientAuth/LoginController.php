@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Hesto\MultiAuth\Traits\LogsoutGuard;
 use Illuminate\Http\Request;
 use App\Models\Client;
+use App\Models\ClientLoginActivity;
 use Session,Redirect;
 
 class LoginController extends Controller
@@ -77,6 +78,9 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
+        if(Session::has('client_session_id')){
+            ClientLoginActivity::addOrUpdateClientLoginActivity(Session::get('client_session_id'), true);
+        }
         $this->guard()->logout();
 
         Session::flush();

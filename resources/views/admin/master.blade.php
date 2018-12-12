@@ -77,7 +77,6 @@
       </div>
       <ul class="sidebar-menu">
         <li class="header">Vchip Technology - Admin</li>
-         @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineCourse'))
           <li class="treeview ">
             <a href="#" title="Online Courses">
               <i class="fa fa-dashboard"></i> <span>Online Courses</span>
@@ -86,15 +85,17 @@
               </span>
             </a>
             <ul class="treeview-menu">
-              <li title="Manage All"><a href="{{ url('admin/manageCourseAll')}}"><i class="fa fa-circle-o"></i> Manage All </a></li>
-              <li title="Manage Category"><a href="{{ url('admin/manageCourseCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
-              <li title="Manage Sub Category"><a href="{{ url('admin/manageCourseSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
-              <li title="Manage Course"><a href="{{ url('admin/manageCourseCourse')}}"><i class="fa fa-circle-o"></i> Manage Course </a></li>
-              <li title="Manage Video"><a href="{{ url('admin/manageCourseVideo')}}"><i class="fa fa-circle-o"></i> Manage Video </a></li>
+              @if($adminUser->hasRole('admin'))
+                <li title="Manage All"><a href="{{ url('admin/manageCourseAll')}}"><i class="fa fa-circle-o"></i> Manage All </a></li>
+                <li title="Manage Category"><a href="{{ url('admin/manageCourseCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
+                <li title="Manage Sub Category"><a href="{{ url('admin/manageCourseSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
+              @endif
+              @if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin'))
+                  <li title="Manage Course"><a href="{{ url('admin/manageCourseCourse')}}"><i class="fa fa-circle-o"></i> Manage Course </a></li>
+                  <li title="Manage Video"><a href="{{ url('admin/manageCourseVideo')}}"><i class="fa fa-circle-o"></i> Manage Video </a></li>
+              @endif
             </ul>
           </li>
-         @endif
-         @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineTest'))
           <li class="treeview">
             <a href="#" title="Online Test">
               <i class="fa fa-files-o"></i>
@@ -104,18 +105,23 @@
               </span>
             </a>
             <ul class="treeview-menu">
-              <li title="Manage All"><a href="{{ url('admin/manageTestAll')}}"><i class="fa fa-circle-o"></i> Manage All </a></li>
-              <li title="Manage Category"><a href="{{ url('admin/manageCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
-              <li title="Manage Sub Category"><a href="{{ url('admin/manageSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
-              <li title="Manage Subject"><a href="{{ url('admin/manageSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
-              <li title="Manage Paper"><a href="{{ url('admin/managePaper')}}"><i class="fa fa-circle-o"></i> Manage Paper </a></li>
-              <li title="Manage Question"><a href="{{ url('admin/manageQuestions')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
-              <li title="Question Bank"><a href="{{ url('admin/showQuestionBank')}}"><i class="fa fa-circle-o"></i> Question Bank </a></li>
-              <li title="Upload Excel File"><a href="{{ url('admin/uploadQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
-              <li title="Associate Session to Question"><a href="{{ url('admin/associateSession')}}"><i class="fa fa-circle-o"></i> Associate Session </a></li>
+              @if($adminUser->hasRole('admin'))
+                <li title="Manage All"><a href="{{ url('admin/manageTestAll')}}"><i class="fa fa-circle-o"></i> Manage All </a></li>
+                <li title="Manage Category"><a href="{{ url('admin/manageCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
+              @endif
+              @if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin'))
+                <li title="Manage Sub Category"><a href="{{ url('admin/manageSubCategory')}}"><i class="fa fa-circle-o"></i> Manage Sub Category </a></li>
+                <li title="Manage Subject"><a href="{{ url('admin/manageSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
+                <li title="Manage Paper"><a href="{{ url('admin/managePaper')}}"><i class="fa fa-circle-o"></i> Manage Paper </a></li>
+                <li title="Manage Question"><a href="{{ url('admin/manageQuestions')}}"><i class="fa fa-circle-o"></i> Manage Question </a></li>
+                <li title="Question Bank"><a href="{{ url('admin/showQuestionBank')}}"><i class="fa fa-circle-o"></i> Question Bank </a></li>
+                <li title="Upload Excel File"><a href="{{ url('admin/uploadQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
+              @endif
+              @if($adminUser->hasRole('admin'))
+                <li title="Associate Session to Question"><a href="{{ url('admin/associateSession')}}"><i class="fa fa-circle-o"></i> Associate Session </a></li>
+              @endif
             </ul>
           </li>
-        @endif
         @if($adminUser->hasRole('admin'))
           <li class="treeview">
             <a href="#" title="Question Bank">
@@ -133,7 +139,7 @@
             </ul>
           </li>
         @endif
-        @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageLiveCourse'))
+        @if($adminUser->hasRole('admin'))
           <li class="treeview">
             <a href="#" title="Live Courses">
               <i class="fa fa-pie-chart"></i>
@@ -148,7 +154,7 @@
             </ul>
           </li>
         @endif
-        @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageDocument'))
+        @if($adminUser->hasRole('admin'))
           <li class="treeview">
             <a href="#" title="Documents">
               <i class="fa fa-book"></i> <span>Documents</span>
@@ -162,7 +168,6 @@
             </ul>
           </li>
         @endif
-        @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageVkit'))
         <li class="treeview">
           <a href="#" title="Vkit">
             <i class="fa fa-table"></i> <span>Vkit</span>
@@ -171,12 +176,15 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li title="Manage Category"><a href="{{ url('admin/manageVkitCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
-            <li title="Manage Project"><a href="{{ url('admin/manageVkitProject')}}"><i class="fa fa-circle-o"></i> Manage Project </a></li>
+            @if($adminUser->hasRole('admin'))
+              <li title="Manage Category"><a href="{{ url('admin/manageVkitCategory')}}"><i class="fa fa-circle-o"></i> Manage Category </a></li>
+            @endif
+            @if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin'))
+              <li title="Manage Project"><a href="{{ url('admin/manageVkitProject')}}"><i class="fa fa-circle-o"></i> Manage Project </a></li>
+            @endif
           </ul>
         </li>
-        @endif
-        @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageDiscussion'))
+        @if($adminUser->hasRole('admin'))
           <li class="treeview">
             <a href="#" title="Discussion">
               <i class="fa fa-comments-o"></i> <span>Discussion</span>
@@ -189,7 +197,7 @@
             </ul>
           </li>
         @endif
-        @if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageBlog'))
+        @if($adminUser->hasRole('admin'))
           <li class="treeview">
             <a href="#" title="Blog">
               <i class="fa fa-newspaper-o"></i> <span>Blog</span>
@@ -275,20 +283,30 @@
             </a>
             <ul class="treeview-menu">
               <li title="Manage Subdomains/Clients"><a href="{{ url('admin/manageClients')}}"><i class="fa fa-circle-o"></i> Manage Clients </a></li>
+              <li title="Clients Activity"><a href="{{ url('admin/clientsActivity')}}"><i class="fa fa-circle-o"></i> Clients Activity</a></li>
             </ul>
           </li>
+          @endif
           <li class="treeview">
-            <a href="#" title="Subdomains/Clients Info">
-              <i class="fa fa-inr"></i> <span>Plans & Billing</span>
+            <a href="#" title="Payments">
+              <i class="fa fa-inr"></i> <span>Payments</span>
               <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
             </a>
             <ul class="treeview-menu">
-              <li title="Manage History"><a href="{{ url('admin/manageClientHistory')}}"><i class="fa fa-circle-o"></i> History </a></li>
-              <li title="Paid Sms For Client"><a href="{{ url('admin/manageClientPaidSms')}}"><i class="fa fa-circle-o"></i> Paid Sms For Client </a></li>
+              @if($adminUser->hasRole('admin'))
+                <li title="Payment Receipt"><a href="{{ url('admin/manageReceipt')}}"><i class="fa fa-circle-o"></i> Payment Receipt </a></li>
+                <li title="Manage History"><a href="{{ url('admin/manageClientHistory')}}"><i class="fa fa-circle-o"></i> History </a></li>
+                <li title="Paid Sms For Client"><a href="{{ url('admin/manageClientPaidSms')}}"><i class="fa fa-circle-o"></i> Paid Sms For Client </a></li>
+                <li title="Web Development"><a href="{{ url('admin/manageWebDevelopments')}}"><i class="fa fa-circle-o"></i> Web Development </a></li>
+              @endif
+              @if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin'))
+                <li title="Admin Payments"><a href="{{ url('admin/manageAdminPayments')}}"><i class="fa fa-circle-o"></i> Admin Payments </a></li>
+              @endif
             </ul>
           </li>
+          @if($adminUser->hasRole('admin'))
           <li class="treeview">
             <a href="#" title="Zero to Hero">
               <i class="fa fa-asterisk"></i> <span>Zero to Hero</span>
@@ -367,6 +385,8 @@
               <li title="Virtual Placement Drive"><a href="{{ url('admin/manageVirtualPlacementDrive')}}"><i class="fa fa-circle-o"></i> Virtual Placement </a></li>
             </ul>
           </li>
+          @endif
+          @if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin'))
           <li class="treeview">
             <a href="#" title="Advertisement">
               <i class="fa fa-television"></i><span>Advertisement</span>
@@ -375,20 +395,14 @@
               </span>
             </a>
             <ul class="treeview-menu">
-              <li title="Advertisement Pages"><a href="{{ url('admin/manageAdvertisementPages')}}"><i class="fa fa-circle-o"></i> Advertisement Pages </a></li>
+              @if($adminUser->hasRole('admin'))
+                <li title="Advertisement Pages"><a href="{{ url('admin/manageAdvertisementPages')}}"><i class="fa fa-circle-o"></i> Advertisement Pages </a></li>
+              @endif
+              <li title="Advertisements"><a href="{{ url('admin/manageAdvertisements')}}"><i class="fa fa-circle-o"></i> Advertisements </a></li>
             </ul>
           </li>
-          <li class="treeview">
-            <a href="#" title="Web Development">
-              <i class="fa fa-sitemap"></i><span>Web Development</span>
-              <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
-            </a>
-            <ul class="treeview-menu">
-              <li title="Web Development"><a href="{{ url('admin/manageWebDevelopments')}}"><i class="fa fa-circle-o"></i> Web Development </a></li>
-            </ul>
-          </li>
+          @endif
+          @if($adminUser->hasRole('admin'))
           <li class="treeview">
             <a href="#" title="Payable Test">
               <i class="fa fa-credit-card-alt"></i>
@@ -405,6 +419,8 @@
               <li title="Upload Excel File"><a href="{{ url('admin/uploadPayableQuestions')}}"><i class="fa fa-circle-o"></i> Upload Excel File </a></li>
             </ul>
           </li>
+        @endif
+        @if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin'))
           <li class="treeview">
             <a href="#" title="Study Material">
               <i class="fa fa-file-pdf-o"></i> <span>Study Material</span>

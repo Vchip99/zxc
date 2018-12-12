@@ -21,7 +21,7 @@ class TestAllController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineTest')){
+                if($adminUser->hasRole('admin')){
                     return $next($request);
                 }
             }

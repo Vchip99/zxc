@@ -5,6 +5,19 @@
 @section('header-css')
   @include('layouts.home-css')
    <link href="{{ asset('css/box.css')}}" rel="stylesheet"/>
+   <link rel="stylesheet" href="{{ asset('css/star-rating.css') }}" />
+  <style type="text/css">
+    .fa {
+      font-size: medium !important;
+    }
+    .rating-container .filled-stars{
+      color: #e7711b;
+      border-color: #e7711b;
+    }
+    .rating-xs {
+        font-size: 0em;
+    }
+  </style>
 @stop
 @section('header-js')
   @include('layouts.home-js')
@@ -58,12 +71,107 @@
                     <ul class="vchip_categories list-inline">
                       <li>{{$testSubCategory->name}}</li>
                     </ul>
+                    <div class="row text-center">
+                      <div style="display: inline-block;">
+                        @if(isset($reviewData[$testSubCategory->id])) {{$reviewData[$testSubCategory->id]['avg']}} @else 0 @endif
+                      </div>
+                      <div style="display: inline-block;">
+                        <input name="input-{{$testSubCategory->id}}" class="rating rating-loading" value="@if(isset($reviewData[$testSubCategory->id])) {{$reviewData[$testSubCategory->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                      </div>
+                      <div style="display: inline-block;">
+                        <a data-toggle="modal" data-target="#review-model-{{$testSubCategory->id}}">
+                          @if(isset($reviewData[$testSubCategory->id]))
+                            {{count($reviewData[$testSubCategory->id]['rating'])}} <i class="fa fa-group"></i>
+                          @else
+                            0 <i class="fa fa-group"></i>
+                          @endif
+                        </a>
+                      </div>
+                    </div>
                     <div class="vchip_product_content">
                       <p class="mrgn_20_top">Start Test <i class="fa fa-angle-right" aria-hidden="true"></i>
                       </p>
                     </div>
                   </div>
                 </a>
+              </div>
+              <div id="review-model-{{$testSubCategory->id}}" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      &nbsp;&nbsp;&nbsp;
+                      <button class="close" data-dismiss="modal">×</button>
+                      <div class="form-group row ">
+                        <div  style="display: inline-block;">
+                          @if(isset($reviewData[$testSubCategory->id])) {{$reviewData[$testSubCategory->id]['avg']}} @else 0 @endif
+                        </div>
+                        <div  style="display: inline-block;">
+                          <input name="input-{{$testSubCategory->id}}" class="rating rating-loading" value="@if(isset($reviewData[$testSubCategory->id])) {{$reviewData[$testSubCategory->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                        </div>
+                        <div  style="display: inline-block;">
+                          @if(isset($reviewData[$testSubCategory->id]))
+                            {{count($reviewData[$testSubCategory->id]['rating'])}} <i class="fa fa-group"></i>
+                          @else
+                            0 <i class="fa fa-group"></i>
+                          @endif
+                        </div>
+                        @if(is_object(Auth::user()))
+                          <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$testSubCategory->id}}">
+                          @if(isset($reviewData[$testSubCategory->id]) && isset($reviewData[$testSubCategory->id]['rating'][Auth::user()->id]))
+                            Edit Rating
+                          @else
+                            Give Rating
+                          @endif
+                          </button>
+                        @else
+                          <button class="pull-right" onClick="checkLogin();">Give Rating</button>
+                        @endif
+                      </div>
+                    </div>
+                    <div class="modal-body row">
+                      <div class="form-group row" style="overflow: auto;">
+                        @if(isset($reviewData[$testSubCategory->id]))
+                          @foreach($reviewData[$testSubCategory->id]['rating'] as $userId => $review)
+                            {{$userNames[$userId]}}:
+                            <input id="rating_input-{{$testSubCategory->id}}-{{$userId}}" name="input-{{$testSubCategory->id}}" class="rating rating-loading" value="{{$review['rating']}}" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                            {{$review['review']}}
+                            <hr>
+                          @endforeach
+                        @else
+                          Please give ratings
+                        @endif
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="rating-model-{{$testSubCategory->id}}" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button class="close" data-dismiss="modal">×</button>
+                      Rate and Review
+                    </div>
+                    <div class="modal-body row">
+                      <form action="{{ url('giveRating')}}" method="POST">
+                        <div class="form-group row ">
+                          {{ csrf_field() }}
+                          @if(isset($reviewData[$testSubCategory->id]) && is_object(Auth::user()) && isset($reviewData[$testSubCategory->id]['rating'][Auth::user()->id]))
+                            <input id="rating_input-{{$testSubCategory->id}}" name="input-{{$testSubCategory->id}}" class="rating rating-loading" value="{{$reviewData[$testSubCategory->id]['rating'][Auth::user()->id]['rating']}}" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                          @else
+                            <input id="rating_input-{{$testSubCategory->id}}" name="input-{{$testSubCategory->id}}" class="rating rating-loading" value="0" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                          @endif
+                          Review:<input type="text" name="review-text" class="form-control" value="@if(isset($reviewData[$testSubCategory->id])  && is_object(Auth::user()) && isset($reviewData[$testSubCategory->id]['rating'][Auth::user()->id])) {{trim($reviewData[$testSubCategory->id]['rating'][Auth::user()->id]['review'])}} @endif">
+                          <br>
+                          <input type="hidden" name="module_id" value="{{$testSubCategory->id}}">
+                          <input type="hidden" name="module_type" value="2">
+                          <input type="hidden" name="rating_id" value="@if(isset($reviewData[$testSubCategory->id]) && is_object(Auth::user()) && isset($reviewData[$testSubCategory->id]['rating'][Auth::user()->id])) {{$reviewData[$testSubCategory->id]['rating'][Auth::user()->id]['review_id']}} @endif">
+                          <button type="submit" class="pull-right">Submit</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
               </div>
               @endforeach
           @else
@@ -165,6 +273,7 @@
     @stop
     @section('footer')
     @include('footer.footer')
+    <script src="{{ asset('js/star-rating.js') }}"></script>
     <script type="text/javascript">
       function showSubCategories(ele){
         id = parseInt($(ele).val());
@@ -172,13 +281,14 @@
           $.ajax({
             method: "POST",
             url: "{{url('getSubCategories')}}",
-            data: {id:id}
+            data: {id:id,rating:true}
           })
           .done(function( msg ) {
+            var userId = parseInt(document.getElementById('user_id').value);
             var subcatDiv = document.getElementById('testSubCategories');
             subcatDiv.innerHTML = '';
-            if( 0 < msg.length){
-              $.each(msg, function(idx, obj) {
+            if( 0 < msg['subcategories'].length){
+              $.each(msg['subcategories'], function(idx, obj) {
                 var mainDiv = document.createElement('div');
                 mainDiv.className = 'col-lg-6 col-md-6 col-sm-6 small-img';
 
@@ -203,6 +313,15 @@
                 eleUl.innerHTML='<li>'+ obj.name +'</li>';
                 productDiv.appendChild(eleUl);
 
+                var ratingDiv = document.createElement('div');
+                ratingDiv.className = "row text-center";
+                if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['avg']){
+                  ratingDiv.innerHTML = '<div style="display: inline-block;">'+msg['ratingData'][obj.id]['avg']+'</div><div style="display: inline-block;"><input id="rating_input'+obj.id+'" name="input-" class="rating rating-loading" value="'+msg['ratingData'][obj.id]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;"><a data-toggle="modal" data-target="#review-model-'+obj.id+'">'+Object.keys(msg['ratingData'][obj.id]['rating']).length+' <i class="fa fa-group"></i></a></div>';
+                } else {
+                  ratingDiv.innerHTML = '<div style="display: inline-block;">0</div><div style="display: inline-block;"><input id="rating_input'+obj.id+'" name="input-" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;"><a data-toggle="modal" data-target="#review-model-'+obj.id+'">0 <i class="fa fa-group"></i></a></div>';
+                }
+                productDiv.appendChild(ratingDiv);
+
                 var contentDiv = document.createElement('div');
                 contentDiv.className ='vchip_product_content';
                 // contentUrl = "{{url('getTest')}}/"+obj.id;
@@ -210,8 +329,74 @@
                 productDiv.appendChild(contentDiv);
                 ancDiv.appendChild(productDiv);
                 mainDiv.appendChild(ancDiv);
+
+                var reviewModel = document.createElement('div');
+                reviewModel.setAttribute('id','review-model-'+obj.id);
+                reviewModel.setAttribute('class','modal fade');
+                reviewModel.setAttribute('role','dialog');
+
+                reviewModelInnerHTML = '';
+                if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['avg']){
+                  reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">'+msg['ratingData'][obj.id]['avg']+'</div><div  style="display: inline-block;"><input name="input-'+obj.id+'" class="rating rating-loading" value="'+msg['ratingData'][obj.id]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> '+Object.keys(msg['ratingData'][obj.id]['rating']).length+' <i class="fa fa-group"></i></div>';
+                } else {
+                  reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">0</div><div  style="display: inline-block;"><input name="input-'+obj.id+'" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> 0 <i class="fa fa-group"></i></div>';
+                }
+                if(userId > 0){
+                  reviewModelInnerHTML += '<button class="pull-right" data-toggle="modal" data-target="#rating-model-'+obj.id+'">';
+                  if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['rating'][userId]){
+                    reviewModelInnerHTML += 'Edit Rating';
+                  } else {
+                    reviewModelInnerHTML += 'Give Rating';
+                  }
+                  reviewModelInnerHTML += '</button>';
+                } else {
+                  reviewModelInnerHTML += '<button class="pull-right" onClick="checkLogin()">Give Rating</button>';
+                }
+                reviewModelInnerHTML += '</div></div>';
+
+                reviewModelInnerHTML += '<div class="modal-body row">';
+                if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['rating']){
+                  $.each(msg['ratingData'][obj.id]['rating'], function(userId, reviewData) {
+                    reviewModelInnerHTML += msg['userNames'][userId] +':';
+                    reviewModelInnerHTML += '<input id="rating_input-'+obj.id+'-'+userId+'" name="input-'+obj.id+'" class="rating rating-loading" value="'+reviewData.rating+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>'+reviewData.review+'<hr>';
+                  });
+                } else {
+                  reviewModelInnerHTML += 'Please give ratings';
+                }
+                reviewModelInnerHTML += '</div></div></div></div></div>';
+                reviewModel.innerHTML = reviewModelInnerHTML;
+                mainDiv.appendChild(reviewModel);
+
+                var ratingModel = document.createElement('div');
+                ratingModel.setAttribute('id','rating-model-'+obj.id);
+                ratingModel.setAttribute('class','modal fade');
+                ratingModel.setAttribute('role','dialog');
+                var ratingUrl = "{{ url('giveRating')}}";
+                var csrfField = '{{ csrf_field() }}';
+                ratingModelInnerHTML = '';
+                ratingModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button>Rate and Review</div><div class="modal-body row"><form action="'+ratingUrl+'" method="POST"><div class="form-group row ">'+csrfField;
+                if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['rating'][userId]){
+                  ratingModelInnerHTML += '<input id="rating_input-'+obj.id+'" name="input-'+obj.id+'" class="rating rating-loading" value="'+msg['ratingData'][obj.id]['rating'][userId]['rating']+'" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">Review:';
+                } else {
+                  ratingModelInnerHTML += '<input id="rating_input-'+obj.id+'" name="input-'+obj.id+'" class="rating rating-loading" value="" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">Review:';
+                }
+                if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['rating'][userId]){
+                  ratingModelInnerHTML += '<input type="text" name="review-text" class="form-control" value="'+msg['ratingData'][obj.id]['rating'][userId]['review']+'">';
+                  ratingModelInnerHTML += '<br><input type="hidden" name="module_id" value="'+obj.id+'"><input type="hidden" name="module_type" value="2"><input type="hidden" name="rating_id" value="'+msg['ratingData'][obj.id]['rating'][userId]['review_id']+'"><button type="submit" class="pull-right">Submit</button></div></form></div></div></div>';
+                } else {
+                  ratingModelInnerHTML += '<input type="text" name="review-text" class="form-control" value="">';
+                  ratingModelInnerHTML += '<br><input type="hidden" name="module_id" value="'+obj.id+'"><input type="hidden" name="module_type" value="2"><input type="hidden" name="rating_id" value=""><button type="submit" class="pull-right">Submit</button></div></form></div></div></div>';
+                }
+
+                ratingModel.innerHTML = ratingModelInnerHTML;
+                mainDiv.appendChild(ratingModel);
+
                 subcatDiv.appendChild(mainDiv);
-                });
+              });
+              var inputRating = $('input.rating');
+              if(inputRating.length) {
+                inputRating.removeClass('rating-loading').addClass('rating-loading').rating();
+              }
             }
           });
         }

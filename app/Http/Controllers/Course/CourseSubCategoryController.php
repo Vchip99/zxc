@@ -22,7 +22,7 @@ class CourseSubCategoryController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineCourse')){
+                if($adminUser->hasRole('admin')){
                     return $next($request);
                 }
             }

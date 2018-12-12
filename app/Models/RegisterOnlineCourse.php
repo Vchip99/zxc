@@ -69,4 +69,16 @@ class RegisterOnlineCourse extends Model
         $purchasedCourse->save();
         return $purchasedCourse;
     }
+
+    protected static function getRegisteredOnlineCoursesByUserIdForPayments($userId){
+        return static::join('course_courses','course_courses.id','=','register_online_courses.online_course_id')
+            ->whereNotNull('register_online_courses.payment_id')
+            ->whereNotNull('register_online_courses.payment_request_id')
+            ->where('register_online_courses.price', '>', 0)
+            ->whereNotNull('register_online_courses.payment_id')
+            ->whereNotNull('register_online_courses.payment_request_id')
+            ->where('register_online_courses.user_id', $userId)
+            ->select('register_online_courses.id','register_online_courses.updated_at','register_online_courses.price','course_courses.name')
+            ->groupBy('register_online_courses.id')->get();
+    }
 }

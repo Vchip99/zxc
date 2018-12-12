@@ -18,7 +18,7 @@ class AddColumnToTable extends Migration
             $table->string('created_by_name');
         });
         Schema::table('test_sub_categories', function (Blueprint $table) {
-            $table->integer('created_by')->default(0);
+            $table->integer('created_by')->default(1);
             $table->string('created_by_name');
         });
         Schema::table('course_courses', function (Blueprint $table) {

@@ -138,4 +138,8 @@ class PayableClientSubCategory extends Model
         $sms->sub_category = 'purchased '.$data['purcahsed_sms'].' sms';
         $sms->save();
     }
+
+    protected static function getPayableClientSubCategoryByUpdatedDate($searchDate){
+        return static::whereDate('updated_at','>=',$searchDate)->get();
+    }
 }

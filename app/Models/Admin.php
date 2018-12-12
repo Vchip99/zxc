@@ -46,8 +46,6 @@ class Admin extends Authenticatable
         $email = $request->get('email');
         $password = $request->get('password');
         $subadminId = $request->get('subadmin_id');
-        $isSubadmin = $request->get('is_subadmin');
-        $permissions = $request->get('permissions');
         if($isUpdate && !empty($subadminId)){
             $subadmin = Admin::find($subadminId);
             if(!empty($password)){
@@ -64,17 +62,6 @@ class Admin extends Authenticatable
         $subadmin->email = $email;
         $subadmin->save();
         $subadmin->attachRole(2);
-
-        if(is_array($permissions)){
-            $allPermissions = $subadmin->getAllPermissions();
-            foreach($allPermissions as $permission) {
-                if(true == in_array($permission->id, $permissions)){
-                    $subadmin->attachPermission($permission->id);
-                } else {
-                    $subadmin->detachPermission($permission->id);
-                }
-            }
-        }
         return $subadmin;
     }
 

@@ -108,7 +108,7 @@
 		  	<div class="form-group row">
 		    	<label class="col-sm-2 col-form-label">Upload File:</label>
 			    <div class="col-sm-3">
-			    	<input type="file" name="questions" class="form-control" />
+			    	<input type="file" name="questions" class="form-control" required/>
 			    </div>
 		    </div>
 		  	<div class="form-group row" style="margin-left: 20px;">

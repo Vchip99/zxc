@@ -5,7 +5,18 @@
 @section('header-css')
 	@include('layouts.home-css')
 	<link href="{{asset('css/exam.css?ver=1.0')}}" rel="stylesheet"/>
-	<style type="text/css">
+	<link rel="stylesheet" href="{{ asset('css/star-rating.css') }}" />
+  	<style type="text/css">
+	    .fa {
+	      font-size: medium !important;
+	    }
+	    .rating-container .filled-stars{
+	      color: #e7711b;
+	      border-color: #e7711b;
+	    }
+	    .rating-xs {
+	        font-size: 0em;
+	    }
 		.padding-body{
 			padding: 15px !important;
 		}
@@ -55,21 +66,38 @@
   	<section class="v_container ">
 	 <div class="container">
 	 	<div class="row">
-	      @if(Session::has('message'))
-	        <div class="alert alert-success" id="message">
-	          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-	            {{ Session::get('message') }}
-	        </div>
-	      @endif
-	      @if(count($errors) > 0)
-	        <div class="alert alert-danger">
-	            <ul>
-	                @foreach ($errors->all() as $error)
-	                  <li>{{ $error }}</li>
-	                @endforeach
-	            </ul>
-	        </div>
-	      @endif
+	      	@if(Session::has('message'))
+	        	<div class="alert alert-success" id="message">
+	          		<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+	            	{{ Session::get('message') }}
+        		</div>
+	      	@endif
+	      	@if(count($errors) > 0)
+	        	<div class="alert alert-danger">
+	            	<ul>
+	                	@foreach ($errors->all() as $error)
+	                  	<li>{{ $error }}</li>
+	                	@endforeach
+	            	</ul>
+	        	</div>
+	      	@endif
+	    </div>
+	    <div class="row pull-right" id="ratingDiv">
+	      	<div style="display: inline-block;">
+            	@if(isset($reviewData[$subcatId])) {{$reviewData[$subcatId]['avg']}} @else 0 @endif
+          	</div>
+          	<div style="display: inline-block;">
+            	<input id="rating_input{{$subcatId}}" name="input-{{$subcatId}}" class="rating rating-loading" value="@if(isset($reviewData[$subcatId])) {{$reviewData[$subcatId]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+          	</div>
+          	<div style="display: inline-block;">
+            	<a data-toggle="modal" data-target="#review-model-{{$subcatId}}">
+              	@if(isset($reviewData[$subcatId]))
+                	{{count($reviewData[$subcatId]['rating'])}} <i class="fa fa-group"></i>
+              	@else
+                	0 <i class="fa fa-group"></i>
+              	@endif
+            	</a>
+          	</div>
 	    </div>
 	   <h2 class="v_h2_title text-center"> Exam</h2>
 	   <hr class="section-dash-dark"/>
@@ -356,16 +384,89 @@
 			@endif
 	  	</div>
 	</section>
+	<div id="review-model-{{$subcatId}}" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              &nbsp;&nbsp;&nbsp;
+              <button class="close" data-dismiss="modal">×</button>
+              <div class="form-group row ">
+                <div  style="display: inline-block;">
+                  @if(isset($reviewData[$subcatId])) {{$reviewData[$subcatId]['avg']}} @else 0 @endif
+                </div>
+                <div  style="display: inline-block;">
+                  <input name="input-{{$subcatId}}" class="rating rating-loading" value="@if(isset($reviewData[$subcatId])) {{$reviewData[$subcatId]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                </div>
+                <div  style="display: inline-block;">
+                  @if(isset($reviewData[$subcatId]))
+                    {{count($reviewData[$subcatId]['rating'])}} <i class="fa fa-group"></i>
+                  @else
+                    0 <i class="fa fa-group"></i>
+                  @endif
+                </div>
+                @if(is_object(Auth::user()))
+                  <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$subcatId}}">
+                  @if(isset($reviewData[$subcatId]) && isset($reviewData[$subcatId]['rating'][Auth::user()->id]))
+                    Edit Rating
+                  @else
+                    Give Rating
+                  @endif
+                  </button>
+                @else
+                  <button class="pull-right" onClick="checkLogin();">Give Rating</button>
+                @endif
+              </div>
+            </div>
+            <div class="modal-body row">
+              <div class="form-group row" style="overflow: auto;">
+                @if(isset($reviewData[$subcatId]))
+                  @foreach($reviewData[$subcatId]['rating'] as $userId => $review)
+                    {{$userNames[$userId]}}:
+                    <input id="rating_input-{{$subcatId}}-{{$userId}}" name="input-{{$subcatId}}" class="rating rating-loading" value="{{$review['rating']}}" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                    {{$review['review']}}
+                    <hr>
+                  @endforeach
+                @else
+                  Please give ratings
+                @endif
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="rating-model-{{$subcatId}}" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button class="close" data-dismiss="modal">×</button>
+              Rate and Review
+            </div>
+            <div class="modal-body row">
+              <form action="{{ url('giveRating')}}" method="POST">
+                <div class="form-group row ">
+                  {{ csrf_field() }}
+                  @if(isset($reviewData[$subcatId]) && is_object(Auth::user()) && isset($reviewData[$subcatId]['rating'][Auth::user()->id]))
+                    <input id="rating_input-{{$subcatId}}" name="input-{{$subcatId}}" class="rating rating-loading" value="{{$reviewData[$subcatId]['rating'][Auth::user()->id]['rating']}}" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                  @else
+                    <input id="rating_input-{{$subcatId}}" name="input-{{$subcatId}}" class="rating rating-loading" value="0" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                  @endif
+                  Review:<input type="text" name="review-text" class="form-control" value="@if(isset($reviewData[$subcatId])  && is_object(Auth::user()) && isset($reviewData[$subcatId]['rating'][Auth::user()->id])) {{trim($reviewData[$subcatId]['rating'][Auth::user()->id]['review'])}} @endif">
+                  <br>
+                  <input type="hidden" name="module_id" value="{{$subcatId}}">
+                  <input type="hidden" name="module_type" value="2">
+                  <input type="hidden" name="rating_id" value="@if(isset($reviewData[$subcatId]) && is_object(Auth::user()) && isset($reviewData[$subcatId]['rating'][Auth::user()->id])) {{$reviewData[$subcatId]['rating'][Auth::user()->id]['review_id']}} @endif">
+                  <button type="submit" class="pull-right">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
 @stop
 @section('footer')
 	@include('footer.footer')
+	<script src="{{ asset('js/star-rating.js') }}"></script>
 	<script>
-
-	function checkLogin(){
-	    $('#loginUserModel').modal();
-	    return false;
-	}
-
 	function startTest(ele){
 		var windowHeight = screen.height;
 		var windowWidth = screen.width;
@@ -726,6 +827,7 @@
 							defaultPanelDiv.appendChild(secondMainDiv);
 							mainPanelDiv.appendChild(defaultPanelDiv);
 							divEle.appendChild(mainPanelDiv);
+
 			        	}
 			        });
 		    	} else {
@@ -771,9 +873,80 @@
 			       $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
 			       $input.find('.col-xs-2 i').addClass('fa-chevron-up');
 			     }
-
 			   });
+		    	var ratingDiv = document.getElementById('ratingDiv');
+                ratingDiv.className = "row pull-right";
+                ratingDiv.innerHTML = '';
+                if(msg['ratingData'][subcat] && msg['ratingData'][subcat]['avg']){
+                  ratingDiv.innerHTML = '<div style="display: inline-block;">'+msg['ratingData'][subcat]['avg']+'</div><div style="display: inline-block;"><input id="rating_input'+subcat+'" name="input-" class="rating rating-loading" value="'+msg['ratingData'][subcat]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;"><a data-toggle="modal" data-target="#review-model-'+subcat+'">'+Object.keys(msg['ratingData'][subcat]['rating']).length+' <i class="fa fa-group"></i></a></div>';
+                } else {
+                  ratingDiv.innerHTML = '<div style="display: inline-block;">0</div><div style="display: inline-block;"><input id="rating_input'+subcat+'" name="input-" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;"><a data-toggle="modal" data-target="#review-model-'+subcat+'">0 <i class="fa fa-group"></i></a></div>';
+                }
 
+                var reviewModel = document.createElement('div');
+                reviewModel.setAttribute('id','review-model-'+subcat);
+                reviewModel.setAttribute('class','modal fade');
+                reviewModel.setAttribute('role','dialog');
+
+                reviewModelInnerHTML = '';
+                if(msg['ratingData'][subcat] && msg['ratingData'][subcat]['avg']){
+                  reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">'+msg['ratingData'][subcat]['avg']+'</div><div  style="display: inline-block;"><input name="input-'+subcat+'" class="rating rating-loading" value="'+msg['ratingData'][subcat]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> '+Object.keys(msg['ratingData'][subcat]['rating']).length+' <i class="fa fa-group"></i></div>';
+                } else {
+                  reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">0</div><div  style="display: inline-block;"><input name="input-'+subcat+'" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> 0 <i class="fa fa-group"></i></div>';
+                }
+                if(userId > 0){
+                  reviewModelInnerHTML += '<button class="pull-right" data-toggle="modal" data-target="#rating-model-'+subcat+'">';
+                  if(msg['ratingData'][subcat] && msg['ratingData'][subcat]['rating'][userId]){
+                    reviewModelInnerHTML += 'Edit Rating';
+                  } else {
+                    reviewModelInnerHTML += 'Give Rating';
+                  }
+                  reviewModelInnerHTML += '</button>';
+                } else {
+                  reviewModelInnerHTML += '<button class="pull-right" onClick="checkLogin()">Give Rating</button>';
+                }
+                reviewModelInnerHTML += '</div></div>';
+
+                reviewModelInnerHTML += '<div class="modal-body row">';
+                if(msg['ratingData'][subcat] && msg['ratingData'][subcat]['rating']){
+                  $.each(msg['ratingData'][subcat]['rating'], function(userId, reviewData) {
+                    reviewModelInnerHTML += msg['userNames'][userId] +':';
+                    reviewModelInnerHTML += '<input id="rating_input-'+subcat+'-'+userId+'" name="input-'+subcat+'" class="rating rating-loading" value="'+reviewData.rating+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>'+reviewData.review+'<hr>';
+                  });
+                } else {
+                  reviewModelInnerHTML += 'Please give ratings';
+                }
+                reviewModelInnerHTML += '</div></div></div></div></div>';
+                reviewModel.innerHTML = reviewModelInnerHTML;
+                divEle.appendChild(reviewModel);
+
+                var ratingModel = document.createElement('div');
+                ratingModel.setAttribute('id','rating-model-'+subcat);
+                ratingModel.setAttribute('class','modal fade');
+                ratingModel.setAttribute('role','dialog');
+                var ratingUrl = "{{ url('giveRating')}}";
+                var csrfField = '{{ csrf_field() }}';
+                ratingModelInnerHTML = '';
+                ratingModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button>Rate and Review</div><div class="modal-body row"><form action="'+ratingUrl+'" method="POST"><div class="form-group row ">'+csrfField;
+                if(msg['ratingData'][subcat] && msg['ratingData'][subcat]['rating'][userId]){
+                  ratingModelInnerHTML += '<input id="rating_input-'+subcat+'" name="input-'+subcat+'" class="rating rating-loading" value="'+msg['ratingData'][subcat]['rating'][userId]['rating']+'" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">Review:';
+                } else {
+                  ratingModelInnerHTML += '<input id="rating_input-'+subcat+'" name="input-'+subcat+'" class="rating rating-loading" value="" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">Review:';
+                }
+                if(msg['ratingData'][subcat] && msg['ratingData'][subcat]['rating'][userId]){
+                  ratingModelInnerHTML += '<input type="text" name="review-text" class="form-control" value="'+msg['ratingData'][subcat]['rating'][userId]['review']+'">';
+                  ratingModelInnerHTML += '<br><input type="hidden" name="module_id" value="'+subcat+'"><input type="hidden" name="module_type" value="2"><input type="hidden" name="rating_id" value="'+msg['ratingData'][subcat]['rating'][userId]['review_id']+'"><button type="submit" class="pull-right">Submit</button></div></form></div></div></div>';
+                } else {
+                  ratingModelInnerHTML += '<input type="text" name="review-text" class="form-control" value="">';
+                  ratingModelInnerHTML += '<br><input type="hidden" name="module_id" value="'+subcat+'"><input type="hidden" name="module_type" value="2"><input type="hidden" name="rating_id" value=""><button type="submit" class="pull-right">Submit</button></div></form></div></div></div>';
+                }
+
+                ratingModel.innerHTML = ratingModelInnerHTML;
+                divEle.appendChild(ratingModel);
+                var inputRating = $('input.rating');
+		        if(inputRating.length) {
+		        	inputRating.removeClass('rating-loading').addClass('rating-loading').rating();
+		        }
 	        });
 		} else {
 			divEle = document.getElementById('subjects');

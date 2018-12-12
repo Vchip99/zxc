@@ -351,4 +351,8 @@ class ClientOnlineCourse extends Model
             }
         }
     }
+
+    protected static function getClientOnlineCoursesByUpdatedDate($searchDate){
+        return static::whereDate('updated_at','>=',$searchDate)->get();
+    }
 }

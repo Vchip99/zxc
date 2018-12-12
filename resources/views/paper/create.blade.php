@@ -285,7 +285,13 @@
   @endif
   <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
-        <button type="button" class="btn btn-primary" onclick="searchPaper();">Submit</button>
+        @if(is_object($paperSubcategory) && $paperSubcategory->created_by == Auth::guard('admin')->user()->id)
+          <button type="button" class="btn btn-primary" onclick="searchPaper();">Submit</button>
+        @elseif(!is_object($paperSubcategory))
+          <button type="button" class="btn btn-primary" onclick="searchPaper();">Submit</button>
+        @else
+          <a href="{{ url('admin/managePaper') }}" class="btn btn-primary">Back</a>
+        @endif
       </div>
     </div>
   </div>

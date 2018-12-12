@@ -83,4 +83,8 @@ class ClientBatch extends Model
         }
     }
 
+    protected static function getClientBatchesByUpdatedDate($searchDate){
+        return static::whereDate('updated_at','>=',$searchDate)->get();
+    }
+
 }

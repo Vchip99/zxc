@@ -450,7 +450,19 @@ class ClientUsersInfoController extends BaseController
         return;
     }
 
-    protected function profile($subdomainName){
+    protected function profile($subdomainName,Request $request){
+        if(false == InputSanitise::checkDomain($request)){
+            return Redirect::to('/');
+        }
+        if(false == InputSanitise::getCurrentGuard()){
+            return Redirect::to('/');
+        }
+        $loginUser = InputSanitise::getLoginUserByGuardForClient();
+        if(!is_object($loginUser)){
+            return Redirect::to('/');
+        } elseif(is_object($loginUser) && 'clientuser' == InputSanitise::getCurrentGuard() && 2 != $loginUser->user_type){
+            return Redirect::to('/');
+        }
         return view('client.clientLogin.profile', compact('subdomainName'));
     }
 

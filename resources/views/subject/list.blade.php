@@ -47,17 +47,19 @@
                 </a>
             </td>
             <td>
+              @if($testSubject->subcategory_by == Auth::guard('admin')->user()->id)
                 <a id="{{$testSubject->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testSubject->name}}" />
                 <form id="deleteSubject_{{$testSubject->id}}" action="{{url('admin/deleteSubject')}}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                     {{ method_field('DELETE') }}
                     <input type="hidden" name="subject_id" value="{{$testSubject->id}}">
                 </form>
+              @endif
             </td>
           </tr>
           @endforeach
         @else
-          <tr><td>No subject is created.</td></tr>
+          <tr><td colspan="6">No subject is created.</td></tr>
         @endif
       </tbody>
     </table>

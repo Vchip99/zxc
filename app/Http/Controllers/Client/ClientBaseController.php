@@ -1041,6 +1041,7 @@ class ClientBaseController extends BaseController
             $clientId = $client->id;
             $clientName = $client->name;
         }
+        $onlineReceipt = '';
         if('Course' == $type){
             $userCourse = ClientUserPurchasedCourse::getUserPurchasedCourseByClientIdById($clientId, $id);
             if(is_object($userCourse)){
@@ -1123,6 +1124,7 @@ class ClientBaseController extends BaseController
             $mpdf->WriteHTML($html, 2);
             return  $mpdf->Output("receipt-".$onlineReceiptArr['receipt_id'].".pdf", "I");
         }
+        return Redirect::to('manageUserPayments');
     }
 
     protected function createOnlinePdfHtml($onlineReceiptArr){

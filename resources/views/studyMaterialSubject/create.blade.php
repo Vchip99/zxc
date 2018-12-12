@@ -75,7 +75,13 @@
     </div>
     <div class="form-group row">
         <div class="offset-sm-2 col-sm-3" title="Submit">
-          <button type="button" class="btn btn-primary" onclick="searchSubject();">Submit</button>
+          @if(!empty($subject->id) && $subject->admin_id == Auth::guard('admin')->user()->id)
+            <button type="button" class="btn btn-primary" onclick="searchSubject();">Submit</button>
+          @elseif(empty($subject->id))
+            <button type="button" class="btn btn-primary" onclick="searchSubject();">Submit</button>
+          @else
+            <a href="{{ url('admin/manageStudyMaterialSubject') }}" class="btn btn-primary">Back</a>
+          @endif
         </div>
       </div>
   </form>

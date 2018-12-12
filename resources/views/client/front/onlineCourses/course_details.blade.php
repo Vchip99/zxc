@@ -228,11 +228,6 @@
 	@include('footer.client-footer')
   <script type="text/javascript">
 
-  function checkLogin(){
-    $('#loginUserModel').modal();
-    return false;
-  }
-
   function purchaseCourse(){
     $.alert({
         title: 'Alert!',

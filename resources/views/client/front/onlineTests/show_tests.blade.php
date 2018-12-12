@@ -132,7 +132,7 @@
 						@endif
 					@else
 						@if(($selectedSubCategory->admin_price > 0 && $selectedSubCategory->client_user_price > 0) || $selectedSubCategory->price > 0)
-							<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" onClick="checkLogin();">Pay Now</a>
+							<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" onClick="checkLogin(this);">Pay Now</a>
 						@else
 							<a id="paidStatus" class="btn btn-sm btn-default" style="cursor: pointer;" >Free</a>
 						@endif
@@ -202,7 +202,7 @@
 							                    		@if(1 == $testSubjectPaper->is_free && 1 == $testSubjectPaper->allowed_unauthorised_user)
 										                	<td id="startTest_{{$testSubjectPaper->id}}"><button onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></button></td>
 										                @else
-							                    			<td id="startTest_{{$testSubjectPaper->id}}"><button data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
+							                    			<td id="startTest_{{$testSubjectPaper->id}}"><button data-toggle="tooltip" title="Please login to give test." data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="checkLogin(this);"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
 							                    		@endif
 							                    	@else
 							                    		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
@@ -218,7 +218,7 @@
 								                    	@if($currentDate < $testSubjectPaper->date_to_active)
 								                    		<button disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
 								                    	@elseif(!is_object($loginUser))
-								                    		<button data-toggle="tooltip" title="Please login to see result" onClick="checkLogin();"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+								                    		<button data-toggle="tooltip" title="Please login to see result" onClick="checkLogin(this);"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
 								                    	@elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 								                    		<button  onClick="showUserTestResult(this);" data-paper_id="{{$testSubjectPaper->id}}" data-toggle="tooltip" title="Result!"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
 								                    		<form id="showUserTestResult_{{$testSubjectPaper->id}}" method="POST" action="{{ url('showUserTestResult') }}">
@@ -282,7 +282,7 @@
 										                    		@if(1 == $testSubjectPaper->is_free && 1 == $testSubjectPaper->allowed_unauthorised_user)
 													                	<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}"  data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true"></span>Start</button></li>
 													                @else
-										                    			<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
+										                    			<li id="startTest_mobile_{{$testSubjectPaper->id}}"><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to give test." data-paper="{{$testSubjectPaper->id}}" data-subject="{{$testSubject->id}}" data-category="{{$testSubjectPaper->category_id}}" data-subcategory="{{$testSubjectPaper->sub_category_id}}" onClick="checkLogin(this);"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
 										                    		@endif
 										                    	@else
 										                    		@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
@@ -298,7 +298,7 @@
 									                           		@if($currentDate < $testSubjectPaper->date_to_active)
 											                    		<button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Result will enabled after test given"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
 											                    	@elseif(!is_object($loginUser))
-											                    		<button class="btn-magick btn-sm btn3d" data-toggle="Please login to see result" onClick="checkLogin();"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
+											                    		<button class="btn-magick btn-sm btn3d" data-toggle="Please login to see result" onClick="checkLogin(this);"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
 											                    	@elseif(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 												                    	<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="{{$testSubjectPaper->id}}" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>
 												                    @else
@@ -353,9 +353,19 @@
 @stop
 @section('footer')
 	@include('footer.client-footer')
-	<script>
-	function checkLogin(){
+<script>
+	function checkLogin(ele){
+		var paper = $(ele).data('paper');
+		var subject = $(ele).data('subject');
+		var category = $(ele).data('category');
+		var subcategory = $(ele).data('subcategory');
 	    $('#loginUserModel').modal();
+	    if(category > 0 && subcategory > 0 && subject > 0 && paper > 0){
+			$('#loginModelBtn').attr('data-paper',parseInt(paper));
+			$('#loginModelBtn').attr('data-subject',parseInt(subject));
+			$('#loginModelBtn').attr('data-category',parseInt(category));
+			$('#loginModelBtn').attr('data-subcategory',parseInt(subcategory));
+		}
 	    return false;
 	}
 
@@ -459,7 +469,7 @@
 				document.getElementById('paidStatus').setAttribute('href', url);
 				document.getElementById('paidStatus').text = 'Pay Now';
 			} else {
-				document.getElementById('paidStatus').setAttribute('onClick', 'checkLogin();');
+				document.getElementById('paidStatus').setAttribute('onClick', 'checkLogin(this);');
 				document.getElementById('paidStatus').text = 'Pay Now';
 			}
 		} else {
@@ -544,7 +554,7 @@
 		                				if(1 == obj.is_free && 1 == obj.allowed_unauthorised_user){
 		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 										} else {
-		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
+		                					divInnerHtml += '<td id="startTest_'+obj.id+'"><button data-toggle="tooltip" title="Please login to give test." data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" onClick="checkLogin(this);"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 										}
 		                			} else {
 	                					if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
@@ -563,7 +573,7 @@
 									} else if(true == isNaN(userId)) {
 
 		                				divInnerHtml += '<td id="showUserResultBtn_'+obj.id+'">';
-									    divInnerHtml += '<button data-toggle="tooltip" title="Please login to see result" onClick="checkLogin();"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
+									    divInnerHtml += '<button data-toggle="tooltip" title="Please login to see result" onClick="checkLogin(this);"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>';
 									    divInnerHtml += '</td>';
 		                			} else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
 								    	var testUrl = "{{ url('showUserTestResult') }}";
@@ -655,7 +665,7 @@
 		                				if(1 == obj.is_free && 1 == obj.allowed_unauthorised_user){
 		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" onClick="startTest(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'" data-toggle="tooltip" title="Start Test!"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 										} else {
-		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
+		                					ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to give test." onClick="checkLogin(this);" data-paper="'+ obj.id +'" data-subject="'+ obj.subject_id +'" data-category="'+ obj.category_id +'" data-subcategory="'+ obj.sub_category_id+'"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 		                				}
 		                			} else {
 	                					if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
@@ -673,7 +683,7 @@
 									    ulDivInnerHtml += '</li>';
 									} else if(true == isNaN(userId)) {
 		                				ulDivInnerHtml += '<li id="showUserResultMobileBtn_'+obj.id+'">';
-									    ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to see result" onClick="checkLogin();"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
+									    ulDivInnerHtml += '<button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to see result" onClick="checkLogin(this);"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
 									    ulDivInnerHtml += '</li>';
 		                			} else if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
 								    	var testUrl = "{{ url('showUserTestResult') }}";
@@ -943,8 +953,7 @@
 	       $input.find('.col-xs-2 i').removeClass('fa-chevron-down');
 	       $input.find('.col-xs-2 i').addClass('fa-chevron-up');
 	     }
-
-	   });
+	   	});
   	});
 </script>
 @stop

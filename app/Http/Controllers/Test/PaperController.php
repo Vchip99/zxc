@@ -27,7 +27,7 @@ class PaperController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin') || $adminUser->hasPermission('manageOnlineTest')){
+                if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin')){
                     return $next($request);
                 }
             }
@@ -66,7 +66,8 @@ class PaperController extends Controller
         $testSubCategories = [];
         $testSubjects = [];
         $paper = new TestSubjectPaper;
-    	return view('paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
+        $paperSubcategory = '';
+    	return view('paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions','paperSubcategory'));
     }
 
     /**
@@ -105,10 +106,11 @@ class PaperController extends Controller
     		$paper = TestSubjectPaper::find($id);
     		if(is_object($paper)){
     			$testCategories = TestCategory::getAllTestCategories();
-				$testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdmin($paper->test_category_id);
-				$testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdmin($paper->test_category_id, $paper->test_sub_category_id);
+				$testSubCategories = TestSubCategory::getSubcategoriesByCategoryIdForAdminForList($paper->test_category_id);
+				$testSubjects = TestSubject::getSubjectsByCatIdBySubcatidForAdminForList($paper->test_category_id, $paper->test_sub_category_id);
                 $allSessions = PaperSection::where('test_subject_paper_id', $paper->id)->get();
-		    	return view('paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions'));
+                $paperSubcategory =$paper->subcategory;
+		    	return view('paper.create', compact('testCategories','testSubCategories','testSubjects', 'paper', 'allSessions','paperSubcategory'));
     		}
     	}
 		return Redirect::to('admin/managePaper');
@@ -153,26 +155,29 @@ class PaperController extends Controller
     	if(isset($paperId)){
     		$paper = TestSubjectPaper::find($paperId);
     		if(is_object($paper)){
-                DB::beginTransaction();
-                try
-                {
-                    if( true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
-                        foreach($paper->questions as $question){
-                            UserSolution::deleteUserSolutionsByQuestionId($question->id);
-                            $question->delete();
+                $paperSubcategory = $paper->subcategory;
+                if($paperSubcategory->created_by == Auth::guard('admin')->user()->id){
+                    DB::beginTransaction();
+                    try
+                    {
+                        if( true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
+                            foreach($paper->questions as $question){
+                                UserSolution::deleteUserSolutionsByQuestionId($question->id);
+                                $question->delete();
+                            }
                         }
+                        Score::deleteUserScoresByPaperId($paper->id);
+                        PaperSection::deletePaperSectionsByPaperId($paper->id);
+                        $paper->deleteRegisteredPaper();
+        	    		$paper->delete();
+                        DB::commit();
+                        return Redirect::to('admin/managePaper')->with('message', 'Paper deleted successfully!');
                     }
-                    Score::deleteUserScoresByPaperId($paper->id);
-                    PaperSection::deletePaperSectionsByPaperId($paper->id);
-                    $paper->deleteRegisteredPaper();
-    	    		$paper->delete();
-                    DB::commit();
-                    return Redirect::to('admin/managePaper')->with('message', 'Paper deleted successfully!');
-                }
-                catch(\Exception $e)
-                {
-                    DB::rollback();
-                    return back()->withErrors('something went wrong.');
+                    catch(\Exception $e)
+                    {
+                        DB::rollback();
+                        return back()->withErrors('something went wrong.');
+                    }
                 }
     		}
     	}

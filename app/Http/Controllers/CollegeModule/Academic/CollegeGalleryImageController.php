@@ -88,7 +88,7 @@ class CollegeGalleryImageController extends Controller
             }
         }
         catch(\Exception $e)
-        {   dd($e);
+        {
             DB::rollback();
             return back()->withErrors('something went wrong.');
         }

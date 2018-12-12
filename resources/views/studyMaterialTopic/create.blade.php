@@ -67,7 +67,7 @@
       <div class="col-sm-3">
         @if(isset($topic->id) && count($subjects) > 0)
             @foreach($subjects as $subject)
-              @if($topic->course_sub_category_id == $subject->id)
+              @if($topic->study_material_subject_id == $subject->id)
                 <input type="text" class="form-control" name="subject_text" value="{{$subject->name}}" readonly>
                 <input type="hidden" name="subject" id="subject" value="{{$subject->id}}">
               @endif
@@ -121,7 +121,13 @@
     </div>
     <div class="form-group row">
         <div class="offset-sm-2 col-sm-3" title="Submit">
-          <button type="button" class="btn btn-primary" onclick="searchTopic();">Submit</button>
+          @if(!empty($topic->id) && $topicSubject->admin_id == Auth::guard('admin')->user()->id)
+            <button type="button" class="btn btn-primary" onclick="searchTopic();">Submit</button>
+          @elseif(empty($topic->id) )
+            <button type="button" class="btn btn-primary" onclick="searchTopic();">Submit</button>
+          @else
+            <a href="{{ url('admin/manageStudyMaterialTopic') }}" class="btn btn-primary">Back</a>
+          @endif
         </div>
       </div>
   </form>

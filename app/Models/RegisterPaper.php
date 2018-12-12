@@ -29,6 +29,10 @@ class RegisterPaper extends Model
         return static::where('user_id', $userId)->get();
     }
 
+    protected static function getRegisteredPapers(){
+        return static::all();
+    }
+
     protected static function deleteRegisteredPapersByUserId($userId){
         $papers = static::where('user_id', $userId)->get();
         if(is_object($papers) && false == $papers->isEmpty()){
@@ -48,5 +52,17 @@ class RegisterPaper extends Model
         $purchasedPaper->price = $paymentArray['price'];
         $purchasedPaper->save();
         return $purchasedPaper;
+    }
+
+    protected static function getRegisteredPapersByUserIdForPayments($userId){
+        return static::join('test_subject_papers','test_subject_papers.id','=','register_papers.test_subject_paper_id')
+            ->whereNotNull('register_papers.payment_id')
+            ->whereNotNull('register_papers.payment_request_id')
+            ->where('register_papers.price', '>', 0)
+            ->whereNotNull('register_papers.payment_id')
+            ->whereNotNull('register_papers.payment_request_id')
+            ->where('register_papers.user_id', $userId)
+            ->select('register_papers.id','register_papers.updated_at','register_papers.price','test_subject_papers.name')
+            ->groupBy('register_papers.id')->get();
     }
 }

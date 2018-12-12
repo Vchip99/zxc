@@ -75,27 +75,27 @@
 												<div id='question{{$result->id}}' >
 													<p class="questions" id="qname{{$result->id}}">
 														@if(!empty($result->common_data))
-															<span style="padding-left: 5px;">{!! $result->common_data !!}</span></br>
+															<span style="padding-left: 5px;">{!! trim($result->common_data) !!}</span></br>
 														@endif
 														<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
-														{!! $result->name !!}
+														{!! trim($result->name) !!}
 													</p>
 													@if( 1 == $result->question_type )
 														<div class="row answer">A.<input type="radio" value="1" class="radio1 radio1_{{$result->id}}" id="radio1_{{$result->id}}" name="{{$result->id}}" />
-															{!! $result->answer1 !!}
+															{!! trim($result->answer1) !!}
 														</div>
 														<div class="row answer">B.<input type="radio" value="2" class="radio1 radio1_{{$result->id}}" id="radio2_{{$result->id}}" name="{{$result->id}}" />
-															{!! $result->answer2 !!}
+															{!! trim($result->answer2) !!}
 														</div>
 														<div class="row answer">C.<input type="radio" value="3" class="radio1 radio1_{{$result->id}}" id="radio3_{{$result->id}}" name="{{$result->id}}" />
-															{!! $result->answer3 !!}
+															{!! trim($result->answer3) !!}
 														</div>
 														<div class="row answer">D.<input type="radio" value="4" class="radio1 radio1_{{$result->id}}" id="radio4_{{$result->id}}" name="{{$result->id}}" />
-															{!! $result->answer4 !!}
+															{!! trim($result->answer4) !!}
 														</div>
 														@if(!empty($result->answer5))
 														<div class="row answer">E.<input type="radio" value="5" class="radio1 radio1_{{$result->id}}" id="radio5_{{$result->id}}" name="{{$result->id}}" />
-															{!! $result->answer5 !!}
+															{!! trim($result->answer5) !!}
 														</div>
 														@endif
 														<input type="radio" checked='checked' style='display:none' value="unsolved" id='radio7_{{$result->id}}' name='{{$result->id}}' />
@@ -131,7 +131,7 @@
 						                	<b><h4>Your Answer:
 											@if(0 == $result->question_type)
 												@if( isset($userResults[$result->id]))
-													{!! $userResults[$result->id]->user_answer !!}
+													{!! trim($userResults[$result->id]->user_answer) !!}
 							                    @elseif(!isset($userResults[$result->id]))
 													unsolved(New Question)
 							                    @else
@@ -155,7 +155,7 @@
 							                    @endif
 							                @endif
 						                	</h4></b><br/>
-										  <b><h4>Solution: </h4></b><br/><br/> {!! $result->solution !!}
+										  <b><h4>Solution: </h4></b><br/><br/> {!! trim($result->solution) !!}
 						                  <br/>
 									    </div>
 										</div>

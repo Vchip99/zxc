@@ -8,6 +8,7 @@ use App\Libraries\InputSanitise;
 use DB,Cache;
 use App\Models\TestSubjectPaper;
 use App\Models\TestCategory;
+use App\Models\TestSubCategory;
 use App\Models\CollegeCategory;
 
 class Question extends Model
@@ -74,17 +75,17 @@ class Question extends Model
         } else{
             $testQuestion = new static;
         }
-        $testQuestion->name = $question;
-        $testQuestion->answer1 = $ans1;
-        $testQuestion->answer2 = $ans2;
-        $testQuestion->answer3 = $ans3;
-        $testQuestion->answer4 = $ans4;
-        $testQuestion->answer5 = $ans5;
+        $testQuestion->name = trim($question);
+        $testQuestion->answer1 = trim($ans1);
+        $testQuestion->answer2 = trim($ans2);
+        $testQuestion->answer3 = trim($ans3);
+        $testQuestion->answer4 = trim($ans4);
+        $testQuestion->answer5 = trim($ans5);
         $testQuestion->answer6 = 0;
         $testQuestion->category_id = $categoryId;
         $testQuestion->subcat_id = $subcategoryId;
-        $testQuestion->answer = $answer;
-        $testQuestion->solution = $solution;
+        $testQuestion->answer = trim($answer);
+        $testQuestion->solution = trim($solution);
         if(empty($min)){
             $testQuestion->min = 0.00;
         } else {
@@ -96,12 +97,12 @@ class Question extends Model
             $testQuestion->max = $max ;
         }
         $testQuestion->section_type = $section_type;
-        $testQuestion->positive_marks = $pos_marks;
-        $testQuestion->negative_marks = $neg_marks;
+        $testQuestion->positive_marks = trim($pos_marks);
+        $testQuestion->negative_marks = trim($neg_marks);
         $testQuestion->subject_id = $subjectId;
         $testQuestion->paper_id = $paperId;
         $testQuestion->question_type = $question_type;
-        $testQuestion->common_data = $commonData;
+        $testQuestion->common_data = trim($commonData);
         $testQuestion->save();
         return $testQuestion;
     }
@@ -259,6 +260,13 @@ class Question extends Model
      */
     public function category(){
         return $this->belongsTo(TestCategory::class, 'category_id');
+    }
+
+    /**
+     *  get sub category of question
+     */
+    public function subcategory(){
+        return $this->belongsTo(TestSubCategory::class, 'subcat_id');
     }
 
     /**

@@ -6,6 +6,19 @@
   @include('layouts.home-css')
   <link href="{{ asset('css/sidemenuindex.css?ver=1.0')}}" rel="stylesheet"/>
   <link href="{{ asset('css/v_courses.css?ver=1.0')}}" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ asset('css/star-rating.css') }}" />
+  <style type="text/css">
+    .fa {
+      font-size: medium !important;
+    }
+    .rating-container .filled-stars{
+      color: #e7711b;
+      border-color: #e7711b;
+    }
+    .rating-xs {
+        font-size: 0em;
+    }
+  </style>
 @stop
 @section('header-js')
   @include('layouts.home-js')
@@ -105,50 +118,145 @@
                   <div class="topleft">@if( 1 == $course->certified )Certified @else Non Certified @endif</div>
                   <div class="topright">{{($course->price > 0)? 'Paid' : 'Free' }}</div>
                   <div class="course-box-content" >
-                     <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
-                     <div class="categoery">
-                       <a  href="{{ url('courseDetails')}}/{{$course->id}}" data-toggle="tooltip" title="{{$course->category}}"> {{$course->category}}</a>
-                     </div>
-                     <br/>
+                    <h4 class="course-box-title " title="{{$course->name}}" data-toggle="tooltip" data-placement="bottom"> <p class="block-with-text"><a href="{{ url('courseDetails')}}/{{$course->id}}">{{$course->name}}</a></p></h4>
+                    <div class="categoery">
+                      <a  href="{{ url('courseDetails')}}/{{$course->id}}" data-toggle="tooltip" title="{{$course->category}}"> {{$course->category}}</a>
+                    </div>
+                    <br/>
                     <p class="block-with-text">
                       {{$course->description}}
                       <a type="button" class="show " data-show={{$course->id}}>Read More</a>
                     </p>
                     <div class="corse-detail" id="corse-detail-{{$course->id}}">
-                        <div class="corse-detail-heder">
-                          <span class="card-title"><b>{{$course->name}}</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="{{$course->id}}"><span aria-hidden="true">×</span></button>
-                        </div><br/>
-                          <p>{{$course->description}}</p>
-                          <div class="text-center corse-detail-footer" >
-                            <a href="{{ url('courseDetails')}}/{{$course->id}}" class="btn btn-primary btn-default" > Start Course</a>
-                          </div>
+                      <div class="corse-detail-heder">
+                        <span class="card-title"><b>{{$course->name}}</b></span> <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-close="{{$course->id}}"><span aria-hidden="true">×</span></button>
+                      </div><br/>
+                        <p>{{$course->description}}</p>
+                        <div class="text-center corse-detail-footer" >
+                          <a href="{{ url('courseDetails')}}/{{$course->id}}" class="btn btn-primary btn-default" > Start Course</a>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="row text-center">
+                    <div style="display: inline-block;">
+                      @if(isset($reviewData[$course->id])) {{$reviewData[$course->id]['avg']}} @else 0 @endif
+                    </div>
+                    <div style="display: inline-block;">
+                      <input id="rating_input{{$course->id}}" name="input-{{$course->id}}" class="rating rating-loading" value="@if(isset($reviewData[$course->id])) {{$reviewData[$course->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                    </div>
+                    <div style="display: inline-block;">
+                      <a data-toggle="modal" data-target="#review-model-{{$course->id}}">
+                        @if(isset($reviewData[$course->id]))
+                          {{count($reviewData[$course->id]['rating'])}} <i class="fa fa-group"></i>
+                        @else
+                          0 <i class="fa fa-group"></i>
+                        @endif
+                      </a>
+                    </div>
+                  </div>
+                  <div class="course-auther text-center">
+                    @if(is_object(Auth::user()))
+                      @if(in_array($course->id, $userPurchasedCourses))
+                          <a class="btn btn-sm btn-primary pay-width"> @if($course->price > 0) Paid @else Free @endif</a>
+                      @elseif($course->price > 0)
+                        <a data-course_id="{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="purchaseCourse(this);">Pay Price: {{$course->price}} Rs.</a>
+                        <form id="purchaseCourse_{{$course->id}}" method="POST" action="{{ url('purchaseCourse')}}">
+                          {{ csrf_field() }}
+                          <input type="hidden" name="course_id" value="{{$course->id}}">
+                          <input type="hidden" name="course_category_id" value="{{$course->course_category_id}}">
+                          <input type="hidden" name="course_sub_category_id" value="{{$course->course_sub_category_id}}">
+                        </form>
+                      @else
+                        <a class="btn btn-sm btn-primary pay-width" >Free</a>
+                      @endif
+                    @else
+                      @if($course->price > 0)
+                        <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="checkLogin();">Pay Price: {{$course->price}} Rs.</a>
+                      @else
+                        <a class="btn btn-sm btn-primary pay-width">Free</a>
+                      @endif
+                    @endif
+                  </div>
+                </div>
+              </div>
+              <div id="review-model-{{$course->id}}" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      &nbsp;&nbsp;&nbsp;
+                      <button class="close" data-dismiss="modal">×</button>
+                      <div class="form-group row ">
+                        <div  style="display: inline-block;">
+                          @if(isset($reviewData[$course->id])) {{$reviewData[$course->id]['avg']}} @else 0 @endif
+                        </div>
+                        <div  style="display: inline-block;">
+                          <input name="input-{{$course->id}}" class="rating rating-loading" value="@if(isset($reviewData[$course->id])) {{$reviewData[$course->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                        </div>
+                        <div  style="display: inline-block;">
+                          @if(isset($reviewData[$course->id]))
+                            {{count($reviewData[$course->id]['rating'])}} <i class="fa fa-group"></i>
+                          @else
+                            0 <i class="fa fa-group"></i>
+                          @endif
+                        </div>
+                        @if(is_object(Auth::user()))
+                          <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$course->id}}">
+                          @if(isset($reviewData[$course->id]) && isset($reviewData[$course->id]['rating'][Auth::user()->id]))
+                            Edit Rating
+                          @else
+                            Give Rating
+                          @endif
+                          </button>
+                        @else
+                          <button class="pull-right" onClick="checkLogin();">Give Rating</button>
+                        @endif
                       </div>
                     </div>
-                    <div class="course-auther text-center">
-                      @if(is_object(Auth::user()))
-                        @if(in_array($course->id, $userPurchasedCourses))
-                            <a class="btn btn-sm btn-primary pay-width"> @if($course->price > 0) Paid @else Free @endif</a>
-                        @elseif($course->price > 0)
-                          <a data-course_id="{{$course->id}}" class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="purchaseCourse(this);">Pay Price: {{$course->price}} Rs.</a>
-                          <form id="purchaseCourse_{{$course->id}}" method="POST" action="{{ url('purchaseCourse')}}">
-                            {{ csrf_field() }}
-                            <input type="hidden" name="course_id" value="{{$course->id}}">
-                            <input type="hidden" name="course_category_id" value="{{$course->course_category_id}}">
-                            <input type="hidden" name="course_sub_category_id" value="{{$course->course_sub_category_id}}">
-                          </form>
+                    <div class="modal-body row">
+                      <div class="form-group row" style="overflow: auto;">
+                        @if(isset($reviewData[$course->id]))
+                          @foreach($reviewData[$course->id]['rating'] as $userId => $review)
+                            {{$userNames[$userId]}}:
+                            <input id="rating_input-{{$course->id}}-{{$userId}}" name="input-{{$course->id}}" class="rating rating-loading" value="{{$review['rating']}}" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                            {{$review['review']}}
+                            <hr>
+                          @endforeach
                         @else
-                          <a class="btn btn-sm btn-primary pay-width" >Free</a>
+                          Please give ratings
                         @endif
-                      @else
-                        @if($course->price > 0)
-                          <a class="btn btn-sm btn-primary pay-width" style="cursor: pointer;" onClick="checkLogin();">Pay Price: {{$course->price}} Rs.</a>
-                        @else
-                          <a class="btn btn-sm btn-primary pay-width">Free</a>
-                        @endif
-                      @endif
+                      </div>
                     </div>
                   </div>
                 </div>
+              </div>
+              <div id="rating-model-{{$course->id}}" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button class="close" data-dismiss="modal">×</button>
+                      Rate and Review
+                    </div>
+                    <div class="modal-body row">
+                      <form action="{{ url('giveRating')}}" method="POST">
+                        <div class="form-group row ">
+                          {{ csrf_field() }}
+                          @if(isset($reviewData[$course->id]) && is_object(Auth::user()) && isset($reviewData[$course->id]['rating'][Auth::user()->id]))
+                            <input id="rating_input-{{$course->id}}" name="input-{{$course->id}}" class="rating rating-loading" value="{{$reviewData[$course->id]['rating'][Auth::user()->id]['rating']}}" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                          @else
+                            <input id="rating_input-{{$course->id}}" name="input-{{$course->id}}" class="rating rating-loading" value="0" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                          @endif
+                          Review:<input type="text" name="review-text" class="form-control" value="@if(isset($reviewData[$course->id])  && is_object(Auth::user()) && isset($reviewData[$course->id]['rating'][Auth::user()->id])) {{trim($reviewData[$course->id]['rating'][Auth::user()->id]['review'])}} @endif">
+                          <br>
+                          <input type="hidden" name="module_id" value="{{$course->id}}">
+                          <input type="hidden" name="module_type" value="1">
+                          <input type="hidden" name="rating_id" value="@if(isset($reviewData[$course->id]) && is_object(Auth::user()) && isset($reviewData[$course->id]['rating'][Auth::user()->id])) {{$reviewData[$course->id]['rating'][Auth::user()->id]['review_id']}} @endif">
+                          <button type="submit" class="pull-right">Submit</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
             @endforeach
             @else
               No courses are available.
@@ -330,6 +438,7 @@
 	@include('footer.footer')
   <script type="text/javascript" src="{{ asset('js/togleForFilterBy.js')}}"></script>
   <script type="text/javascript" src="{{ asset('js/read_info.js')}}"></script>
+  <script src="{{ asset('js/star-rating.js') }}"></script>
   <script type="text/javascript">
   function getCourseSubCategories(id){
     if( 0 < id ){
@@ -434,10 +543,19 @@
           thirdDiv.innerHTML = courseContent;
           secondDiv.appendChild(thirdDiv);
 
+          var ratingDiv = document.createElement('div');
+          ratingDiv.className = "row text-center";
+          if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['avg']){
+            ratingDiv.innerHTML = '<div style="display: inline-block;">'+msg['ratingData'][obj.id]['avg']+'</div><div style="display: inline-block;"><input id="rating_input'+obj.id+'" name="input-" class="rating rating-loading" value="'+msg['ratingData'][obj.id]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;"><a data-toggle="modal" data-target="#review-model-'+obj.id+'">'+Object.keys(msg['ratingData'][obj.id]['rating']).length+' <i class="fa fa-group"></i></a></div>';
+          } else {
+            ratingDiv.innerHTML = '<div style="display: inline-block;">0</div><div style="display: inline-block;"><input id="rating_input'+obj.id+'" name="input-" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;"><a data-toggle="modal" data-target="#review-model-'+obj.id+'">0 <i class="fa fa-group"></i></a></div>';
+          }
+          secondDiv.appendChild(ratingDiv);
+
           var authorDiv = document.createElement('div');
           authorDiv.className = "course-auther text-center";
           if(false == isNaN(userId)){
-            if(msg['userPurchasedCourses'].length > 0 && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
+            if(msg['userPurchasedCourses'] && msg['userPurchasedCourses'].length > 0 && true == msg['userPurchasedCourses'].indexOf(obj.id) > -1){
               authorDiv.innerHTML = '<a class="btn btn-sm btn-primary pay-width"> Paid </a>';
             } else if( obj.price > 0 ){
               var purchaseCourseUrl = "{{ url('purchaseCourse')}}";
@@ -457,6 +575,72 @@
           secondDiv.appendChild(authorDiv);
           firstDiv.appendChild(secondDiv);
           divCourses.appendChild(firstDiv);
+
+          var reviewModel = document.createElement('div');
+          reviewModel.setAttribute('id','review-model-'+obj.id);
+          reviewModel.setAttribute('class','modal fade');
+          reviewModel.setAttribute('role','dialog');
+
+          reviewModelInnerHTML = '';
+          if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['avg']){
+            reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">'+msg['ratingData'][obj.id]['avg']+'</div><div  style="display: inline-block;"><input name="input-'+obj.id+'" class="rating rating-loading" value="'+msg['ratingData'][obj.id]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> '+Object.keys(msg['ratingData'][obj.id]['rating']).length+' <i class="fa fa-group"></i></div>';
+          } else {
+            reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">0</div><div  style="display: inline-block;"><input name="input-'+obj.id+'" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> 0 <i class="fa fa-group"></i></div>';
+          }
+          if(userId > 0){
+            reviewModelInnerHTML += '<button class="pull-right" data-toggle="modal" data-target="#rating-model-'+obj.id+'">';
+            if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['rating'][userId]){
+              reviewModelInnerHTML += 'Edit Rating';
+            } else {
+              reviewModelInnerHTML += 'Give Rating';
+            }
+            reviewModelInnerHTML += '</button>';
+          } else {
+            reviewModelInnerHTML += '<button class="pull-right" onClick="checkLogin()">Give Rating</button>';
+          }
+          reviewModelInnerHTML += '</div></div>';
+
+          reviewModelInnerHTML += '<div class="modal-body row">';
+          if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['rating']){
+            $.each(msg['ratingData'][obj.id]['rating'], function(userId, reviewData) {
+              reviewModelInnerHTML += msg['userNames'][userId] +':';
+              reviewModelInnerHTML += '<input id="rating_input-'+obj.id+'-'+userId+'" name="input-'+obj.id+'" class="rating rating-loading" value="'+reviewData.rating+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>'+reviewData.review+'<hr>';
+            });
+          } else {
+            reviewModelInnerHTML += 'Please give ratings';
+          }
+          reviewModelInnerHTML += '</div></div></div></div></div>';
+          reviewModel.innerHTML = reviewModelInnerHTML;
+          divCourses.appendChild(reviewModel);
+
+          var ratingModel = document.createElement('div');
+          ratingModel.setAttribute('id','rating-model-'+obj.id);
+          ratingModel.setAttribute('class','modal fade');
+          ratingModel.setAttribute('role','dialog');
+          var ratingUrl = "{{ url('giveRating')}}";
+          var csrfField = '{{ csrf_field() }}';
+          ratingModelInnerHTML = '';
+          ratingModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button>Rate and Review</div><div class="modal-body row"><form action="'+ratingUrl+'" method="POST"><div class="form-group row ">'+csrfField;
+          if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['rating'][userId]){
+            ratingModelInnerHTML += '<input id="rating_input-'+obj.id+'" name="input-'+obj.id+'" class="rating rating-loading" value="'+msg['ratingData'][obj.id]['rating'][userId]['rating']+'" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">Review:';
+          } else {
+            ratingModelInnerHTML += '<input id="rating_input-'+obj.id+'" name="input-'+obj.id+'" class="rating rating-loading" value="" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">Review:';
+          }
+          if(msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['rating'][userId]){
+            ratingModelInnerHTML += '<input type="text" name="review-text" class="form-control" value="'+msg['ratingData'][obj.id]['rating'][userId]['review']+'">';
+            ratingModelInnerHTML += '<br><input type="hidden" name="module_id" value="'+obj.id+'"><input type="hidden" name="module_type" value="1"><input type="hidden" name="rating_id" value="'+msg['ratingData'][obj.id]['rating'][userId]['review_id']+'"><button type="submit" class="pull-right">Submit</button></div></form></div></div></div>';
+          } else {
+            ratingModelInnerHTML += '<input type="text" name="review-text" class="form-control" value="">';
+            ratingModelInnerHTML += '<br><input type="hidden" name="module_id" value="'+obj.id+'"><input type="hidden" name="module_type" value="1"><input type="hidden" name="rating_id" value=""><button type="submit" class="pull-right">Submit</button></div></form></div></div></div>';
+          }
+
+          ratingModel.innerHTML = ratingModelInnerHTML;
+          divCourses.appendChild(ratingModel);
+
+          var inputRating = $('input.rating');
+          if(inputRating.length) {
+            inputRating.removeClass('rating-loading').addClass('rating-loading').rating();
+          }
       });
        $(function(){
           $('.show').on('click',function(){
@@ -480,7 +664,7 @@
       $.ajax({
         method: "POST",
         url: "{{url('getCourseByCatIdBySubCatId')}}",
-        data: {catId:catId, subcatId:subcatId}
+        data: {catId:catId, subcatId:subcatId,rating:true}
       })
       .done(function( msg ) {
         renderCourse(msg);
@@ -499,7 +683,7 @@
       $.ajax({
         method: "POST",
         url: "{{url('getCourseByCatIdBySubCatId')}}",
-        data: {catId:catId, subcatId:subcatId}
+        data: {catId:catId, subcatId:subcatId,rating:true}
       })
       .done(function( msg ) {
         renderCourse(msg);
@@ -550,7 +734,7 @@
     if(arr instanceof Array ){
       categoryId = document.getElementById('category').value;
       subcategoryId = document.getElementById('subcategory').value;
-      var arrJson = {'difficulty' : arrDifficulty, 'certified' : arrCertified, 'fees' : arrFees, 'startingsoon' : startingsoon, 'latest' : latest, 'categoryId' : categoryId, 'subcategoryId' : subcategoryId };
+      var arrJson = {'difficulty' : arrDifficulty, 'certified' : arrCertified, 'fees' : arrFees, 'startingsoon' : startingsoon, 'latest' : latest, 'categoryId' : categoryId, 'subcategoryId' : subcategoryId,rating:true };
       $.ajax({
         method: "POST",
         url: "{{url('getOnlineCourseBySearchArray')}}",
@@ -600,11 +784,6 @@
         }
       }
     });
-  }
-
-  function checkLogin(){
-    $('#loginUserModel').modal();
-    return false;
   }
   </script>
 @stop

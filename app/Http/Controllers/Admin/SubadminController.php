@@ -55,10 +55,8 @@ class SubadminController extends Controller
      * show create admin UI with all permissions
      */
     protected function create(){
-        $subadminPermissions = [];
         $subadmin = new Admin;
-        $allPermissions = Admin::getAllPermissions();
-        return view('subadmin.create', compact('subadmin', 'allPermissions', 'subadminPermissions'));
+        return view('subadmin.create', compact('subadmin'));
     }
 
     /**
@@ -92,16 +90,10 @@ class SubadminController extends Controller
      */
     protected function edit($id){
         $id = json_decode($id);
-        $subadminPermissions = [];
         if(isset($id)){
             $subadmin = Admin::find($id);
             if(is_object($subadmin)){
-                $allPermissions = Admin::getAllPermissions();
-                $subadminPermissionsArray = Admin::getSubAdminPermissions($id);
-                foreach($subadminPermissionsArray as $subadminPermission){
-                    $subadminPermissions[] =  $subadminPermission['id'];
-                }
-                return view('subadmin.create', compact('subadmin','allPermissions', 'subadminPermissions'));
+                return view('subadmin.create', compact('subadmin'));
             }
         }
         return Redirect::to('admin/manageSubadminUser');

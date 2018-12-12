@@ -86,7 +86,7 @@ class ClientAssignmentSubject extends Model
         if($clientBatchId > 0){
             return static::where('client_id', $clientId)->where('client_batch_id', $clientBatchId)->get();
         } else {
-            return static::where('client_id', $clientId)->where('client_batch_id','<=',0)->get();
+            return static::where('client_id', $clientId)->get();
         }
     }
 

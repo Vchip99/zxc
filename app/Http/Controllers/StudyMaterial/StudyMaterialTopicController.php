@@ -21,7 +21,7 @@ class StudyMaterialTopicController extends Controller
         $this->middleware(function ($request, $next) {
             $adminUser = Auth::guard('admin')->user();
             if(is_object($adminUser)){
-                if($adminUser->hasRole('admin')){
+                if($adminUser->hasRole('admin') || $adminUser->hasRole('sub-admin')){
                     return $next($request);
                 }
             }
@@ -44,7 +44,7 @@ class StudyMaterialTopicController extends Controller
      *	show all topics
      */
 	public function show(){
-		$topics = StudyMaterialTopic::paginate();
+		$topics = StudyMaterialTopic::getStudyMaterialTopicsWithPagination();
 		return view('studyMaterialTopic.list', compact('topics'));
 	}
 
@@ -96,8 +96,9 @@ class StudyMaterialTopicController extends Controller
 			if(is_object($topic)){
 				$courseCategories = CourseCategory::getCourseCategoriesForAdmin();
 				$courseSubCategories = CourseSubCategory::getCourseSubCategoriesByCategoryId($topic->course_category_id);
-				$subjects = StudyMaterialSubject::getStudyMaterialSubjectsByCategoryIdBySubCategoryId($topic->course_category_id,$topic->course_sub_category_id);
-				return view('studyMaterialTopic.create', compact('courseCategories','courseSubCategories','subjects','topic'));
+				$subjects = StudyMaterialSubject::getStudyMaterialSubjectsByCategoryIdBySubCategoryIdForList($topic->course_category_id,$topic->course_sub_category_id);
+				$topicSubject = $topic->subject;
+				return view('studyMaterialTopic.create', compact('courseCategories','courseSubCategories','subjects','topic','topicSubject'));
 			}
 		}
 		return Redirect::to('admin/manageStudyMaterialTopic');
@@ -140,18 +141,21 @@ class StudyMaterialTopicController extends Controller
 		if(isset($topicId)){
 			$topic = StudyMaterialTopic::find($topicId);
 			if(is_object($topic)){
-				DB::beginTransaction();
-		        try
-		        {
-					$topic->delete();
-					DB::commit();
-					return Redirect::to('admin/manageStudyMaterialTopic')->with('message', 'Topic deleted successfully!');
-				}
-		        catch(\Exception $e)
-		        {
-		            DB::rollback();
-		            return back()->withErrors('something went wrong.');
-		        }
+				$topicSubject = $topic->subject;
+				if($topicSubject->admin_id == Auth::guard('admin')->user()->id){
+					DB::beginTransaction();
+			        try
+			        {
+						$topic->delete();
+						DB::commit();
+						return Redirect::to('admin/manageStudyMaterialTopic')->with('message', 'Topic deleted successfully!');
+					}
+			        catch(\Exception $e)
+			        {
+			            DB::rollback();
+			            return back()->withErrors('something went wrong.');
+			        }
+			    }
 			}
 		}
 		return Redirect::to('admin/manageStudyMaterialTopic');
@@ -160,6 +164,4 @@ class StudyMaterialTopicController extends Controller
 	protected function isStudyMaterialTopicExist(Request $request){
 		return StudyMaterialTopic::isStudyMaterialTopicExist($request);
 	}
-
-
 }

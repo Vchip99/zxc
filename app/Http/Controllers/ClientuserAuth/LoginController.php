@@ -11,6 +11,7 @@ use Hesto\MultiAuth\Traits\LogsoutGuard;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\Clientuser;
+use App\Models\ClientScore;
 use Session,Cache,Redirect;
 
 class LoginController extends Controller
@@ -92,6 +93,11 @@ class LoginController extends Controller
         $email = $request->get('email');
         $password = $request->get('password');
         $serverOtp = Cache::get($userMobile);
+
+        $category = $request->get('category');
+        $subcategory = $request->get('subcategory');
+        $subject = $request->get('subject');
+        $paper = $request->get('paper');
         if($userMobile && $loginOtp && !$email && !$password){
             if($loginOtp == $serverOtp){
                 $client = Client::where('subdomain', $request->getHost())->first();
@@ -104,7 +110,13 @@ class LoginController extends Controller
                     Cache::forget($userMobile);
                     Cache::forget('mobile-'.$userMobile);
                 }
-                $request->session()->regenerate();
+                if($category > 0 && $subcategory > 0 && $subject > 0 && $paper > 0){
+                    $userScore = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($category,$subcategory,$paper,$subject,$clientUser->id);
+                    if(is_object($userScore)){
+                        return 'testGiven';
+                    }
+                    return 'startExam';
+                }
                 return 'true';
             } else {
                 return 'Entered wrong otp';
@@ -127,7 +139,13 @@ class LoginController extends Controller
                         return 'Try after some time.';
                     }
                 }
-                $request->session()->regenerate();
+                if($category > 0 && $subcategory > 0 && $subject > 0 && $paper > 0){
+                    $userScore = ClientScore::getClientUserTestResultByCategoryIdBySubcategoryIdBySubjectIdByPaperId($category,$subcategory,$paper,$subject,$clientUser->id);
+                    if(is_object($userScore)){
+                        return 'testGiven';
+                    }
+                    return 'startExam';
+                }
                 return 'true';
             } else {
                 return 'false';
