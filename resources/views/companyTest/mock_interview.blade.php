@@ -512,42 +512,53 @@
         }
 
         var rowDiv = document.createElement('div');
+        var ancTag = document.createElement('a');
+        ancTag.setAttribute('data-toggle','modal');
+        ancTag.setAttribute('data-target','#review-model-'+id);
+        ancTag.setAttribute('style',"cursor: pointer;");
+
+        var avgDiv = document.createElement('div');
+        avgDiv.setAttribute('style','display: inline-block;');
         if(data['ratingData'] && data['ratingData']['avg']){
-          var ancTag = document.createElement('a');
-          ancTag.setAttribute('data-toggle','modal');
-          ancTag.setAttribute('data-target','#review-model-'+id);
-          ancTag.setAttribute('style',"cursor: pointer;");
-
-          var avgDiv = document.createElement('div');
-          avgDiv.setAttribute('style','display: inline-block;');
           avgDiv.innerHTML = data['ratingData']['avg'];
-          ancTag.appendChild(avgDiv);
-
-          var starDiv = document.createElement('div');
-          starDiv.setAttribute('style','display: inline-block;');
-
-          var ratingInput = document.createElement('input');
-          ratingInput.setAttribute('id','rating_input'+id);
-          ratingInput.setAttribute('name','input-'+id);
-          ratingInput.setAttribute('class','rating rating-loading');
-          ratingInput.setAttribute('value',data['ratingData']['avg']);
-          ratingInput.setAttribute('data-min',0);
-          ratingInput.setAttribute('data-max',5);
-          ratingInput.setAttribute('data-step','0.1');
-          ratingInput.setAttribute('data-size','xs');
-          ratingInput.setAttribute('data-show-clear','false');
-          ratingInput.setAttribute('data-show-caption','false');
-          ratingInput.setAttribute('readonly','true');
-
-          starDiv.appendChild(ratingInput);
-          ancTag.appendChild(starDiv);
-
-          var grpDiv = document.createElement('div');
-          grpDiv.setAttribute('style','display: inline-block;');
-          grpDiv.innerHTML = Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i>';
-          ancTag.appendChild(grpDiv);
-          rowDiv.appendChild(ancTag);
+        } else {
+          avgDiv.innerHTML = 0;
         }
+        ancTag.appendChild(avgDiv);
+
+        var starDiv = document.createElement('div');
+        starDiv.setAttribute('style','display: inline-block;');
+
+        var ratingInput = document.createElement('input');
+        ratingInput.setAttribute('id','rating_input'+id);
+        ratingInput.setAttribute('name','input-'+id);
+        ratingInput.setAttribute('class','rating rating-loading');
+        if(data['ratingData'] && data['ratingData']['avg']){
+          ratingInput.setAttribute('value',data['ratingData']['avg']);
+        } else {
+          ratingInput.setAttribute('value',0);
+        }
+        ratingInput.setAttribute('data-min',0);
+        ratingInput.setAttribute('data-max',5);
+        ratingInput.setAttribute('data-step','0.1');
+        ratingInput.setAttribute('data-size','xs');
+        ratingInput.setAttribute('data-show-clear','false');
+        ratingInput.setAttribute('data-show-caption','false');
+        ratingInput.setAttribute('readonly','true');
+
+        starDiv.appendChild(ratingInput);
+        ancTag.appendChild(starDiv);
+
+        var grpDiv = document.createElement('div');
+        grpDiv.setAttribute('style','display: inline-block;');
+        if(data['ratingData'] && data['ratingData']['rating']){
+          grpDiv.innerHTML = Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i>';
+        } else {
+          grpDiv.innerHTML = '0 <i class="fa fa-group"></i>';
+        }
+        ancTag.appendChild(grpDiv);
+        rowDiv.appendChild(ancTag);
+
         fourthDiv.appendChild(rowDiv);
         secondDiv.appendChild(fourthDiv);
         firstDiv.appendChild(secondDiv);
@@ -562,7 +573,11 @@
         reviewModel.setAttribute('role','dialog');
 
         reviewModelInnerHTML = '';
-        reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">'+data['ratingData']['avg']+'</div><div  style="display: inline-block;"><input name="input-'+id+'" class="rating rating-loading" value="'+data['ratingData']['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> '+Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i></div>';
+        if(data['ratingData'] && data['ratingData']['rating']){
+          reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">'+data['ratingData']['avg']+'</div><div  style="display: inline-block;"><input name="input-'+id+'" class="rating rating-loading" value="'+data['ratingData']['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> '+Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i></div>';
+        } else {
+          reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">0</div><div  style="display: inline-block;"><input name="input-'+id+'" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> 0 <i class="fa fa-group"></i></div>';
+        }
         if(userId > 0){
           reviewModelInnerHTML += '<button class="pull-right" data-toggle="modal" data-target="#rating-model-'+id+'">';
           if(data['ratingData']['rating'][userId]){
@@ -577,7 +592,7 @@
         reviewModelInnerHTML += '</div></div>';
 
         reviewModelInnerHTML += '<div class="modal-body row">';
-        if(data['ratingData']['rating']){
+        if(data['ratingData'] && data['ratingData']['rating']){
           $.each(data['ratingData']['rating'], function(userId, reviewData) {
             if('system' == reviewData.image_exist){
               var userImagePath = "{{ asset('') }}"+reviewData.user_photo;
@@ -607,8 +622,12 @@
         var ratingUrl = "{{ url('giveRating')}}";
         var csrfField = '{{ csrf_field() }}';
         ratingModelInnerHTML = '';
-        ratingModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button>Rate and Review</div><div class="modal-body row"><form action="'+ratingUrl+'" method="POST"><div class="form-group row ">'+csrfField+'<input id="rating_input-'+id+'" name="input-'+id+'" class="rating rating-loading" value="'+Object.keys(data['ratingData']['rating']).length+'" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">Review:';
-        if(data['ratingData']['rating'][userId]){
+        if(data['ratingData'] && data['ratingData']['rating']){
+          ratingModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button>Rate and Review</div><div class="modal-body row"><form action="'+ratingUrl+'" method="POST"><div class="form-group row ">'+csrfField+'<input id="rating_input-'+id+'" name="input-'+id+'" class="rating rating-loading" value="'+Object.keys(data['ratingData']['rating']).length+'" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">Review:';
+        } else {
+          ratingModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal">×</button>Rate and Review</div><div class="modal-body row"><form action="'+ratingUrl+'" method="POST"><div class="form-group row ">'+csrfField+'<input id="rating_input-'+id+'" name="input-'+id+'" class="rating rating-loading" value="0" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">Review:';
+        }
+        if(data['ratingData'] && data['ratingData']['rating'] && data['ratingData']['rating'][userId]){
           ratingModelInnerHTML += '<input type="text" name="review-text" class="form-control" value="'+data['ratingData']['rating'][userId]['review']+'">';
           ratingModelInnerHTML += '<br><input type="hidden" name="module_id" value="'+id+'"><input type="hidden" name="module_type" value="5"><input type="hidden" name="rating_id" value="'+data['ratingData']['rating'][userId]['review_id']+'"><button type="submit" class="pull-right">Submit</button></div></form></div></div></div>';
         } else {

@@ -77,14 +77,15 @@
           @if(count($testSubCategories) > 0)
             @foreach($testSubCategories as $testSubCategory)
               <div class="col-lg-6 col-md-6 col-sm-6 small-img">
-                <a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">
                   <div class="vchip_product_itm text-left">
-                    <figure title="{{$testSubCategory->name}}">
-                        <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
-                    </figure>
-                    <ul class="vchip_categories list-inline">
-                      <li>{{$testSubCategory->name}}</li>
-                    </ul>
+                    <a href="{{url('getTest')}}/{{ $testSubCategory->id }}" class="btn-link" title="Start Test">
+                      <figure title="{{$testSubCategory->name}}">
+                          <img src="{{ asset($testSubCategory->image_path) }}" alt="exam" class="img-responsive " />
+                      </figure>
+                      <ul class="vchip_categories list-inline">
+                        <li>{{$testSubCategory->name}}</li>
+                      </ul>
+                    </a>
                     <div class="row text-center">
                       <a data-toggle="modal" data-target="#review-model-{{$testSubCategory->id}}" style="cursor: pointer;">
                         <div style="display: inline-block;">
@@ -102,12 +103,7 @@
                         </div>
                       </a>
                     </div>
-                    <div class="vchip_product_content">
-                      <p class="mrgn_20_top">Start Test <i class="fa fa-angle-right" aria-hidden="true"></i>
-                      </p>
-                    </div>
                   </div>
-                </a>
               </div>
               <div id="review-model-{{$testSubCategory->id}}" class="modal fade" role="dialog">
                 <div class="modal-dialog">
@@ -315,13 +311,13 @@
                 var mainDiv = document.createElement('div');
                 mainDiv.className = 'col-lg-6 col-md-6 col-sm-6 small-img';
 
+                var productDiv = document.createElement('div');
+                productDiv.className = "vchip_product_itm text-left";
+
                 var ancDiv = document.createElement('a');
                 contentUrl = "{{url('getTest')}}/"+obj.id;
                 ancDiv.className = 'btn-link';
                 ancDiv.setAttribute('href', contentUrl);
-
-                var productDiv = document.createElement('div');
-                productDiv.className = "vchip_product_itm text-left";
 
                 var figureDiv = document.createElement('figure');
                 figureDiv.setAttribute('title', obj.name);
@@ -329,12 +325,14 @@
                 imageUrl = "{{asset('')}}"+ obj.image_path;
                 imageDiv.innerHTML = '<img src="'+ imageUrl +'"class="img-responsive" width="800"height="400" alt="test "/>';
                 figureDiv.appendChild(imageDiv);
-                productDiv.appendChild(figureDiv);
+                ancDiv.appendChild(figureDiv);
 
                 var eleUl = document.createElement('ul');
                 eleUl.className="mrgn_5_top vchip_categories list-inline";
                 eleUl.innerHTML='<li>'+ obj.name +'</li>';
-                productDiv.appendChild(eleUl);
+                ancDiv.appendChild(eleUl);
+
+                productDiv.appendChild(ancDiv);
 
                 var ratingDiv = document.createElement('div');
                 ratingDiv.className = "row text-center";
@@ -344,14 +342,8 @@
                   ratingDiv.innerHTML = '<a data-toggle="modal" data-target="#review-model-'+obj.id+'" style="cursor: pointer;"><div style="display: inline-block;">0</div><div style="display: inline-block;"><input id="rating_input'+obj.id+'" name="input-" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;"> 0 <i class="fa fa-group"></i></div></a>';
                 }
                 productDiv.appendChild(ratingDiv);
-
-                var contentDiv = document.createElement('div');
-                contentDiv.className ='vchip_product_content';
-                // contentUrl = "{{url('getTest')}}/"+obj.id;
-                contentDiv.innerHTML = '<p class="mrgn_20_top">Start Test <i class="fa fa-angle-right"aria-hidden="true"></i></p>';
-                productDiv.appendChild(contentDiv);
-                ancDiv.appendChild(productDiv);
-                mainDiv.appendChild(ancDiv);
+                mainDiv.appendChild(productDiv);
+                subcatDiv.appendChild(mainDiv);
 
                 var reviewModel = document.createElement('div');
                 reviewModel.setAttribute('id','review-model-'+obj.id);
@@ -398,7 +390,7 @@
                 }
                 reviewModelInnerHTML += '</div></div></div></div></div>';
                 reviewModel.innerHTML = reviewModelInnerHTML;
-                mainDiv.appendChild(reviewModel);
+                subcatDiv.appendChild(reviewModel);
 
                 var ratingModel = document.createElement('div');
                 ratingModel.setAttribute('id','rating-model-'+obj.id);
@@ -422,9 +414,7 @@
                 }
 
                 ratingModel.innerHTML = ratingModelInnerHTML;
-                mainDiv.appendChild(ratingModel);
-
-                subcatDiv.appendChild(mainDiv);
+                subcatDiv.appendChild(ratingModel);
               });
               var inputRating = $('input.rating');
               if(inputRating.length) {

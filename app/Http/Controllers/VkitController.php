@@ -232,6 +232,8 @@ class VkitController extends Controller
                         $result['ratingData'][$dataId]['avg']  = $ratingSum/count($userRatings);
                     }
                 }
+            } else {
+                $result['ratingData'] = [];
             }
             if(count($ratingUsers) > 0){
                 $users = User::find($ratingUsers);
@@ -247,6 +249,8 @@ class VkitController extends Controller
                         $result['userNames'][$user->id] = [ 'name' => $user->name,'photo' => $user->photo,'image_exist' => $isImageExist];
                     }
                 }
+            } else {
+                $result['userNames'] = [];
             }
             return $result;
         }
@@ -302,6 +306,8 @@ class VkitController extends Controller
                     $result['ratingData'][$dataId]['avg']  = $ratingSum/count($userRatings);
                 }
             }
+        } else {
+            $result['ratingData'] = [];
         }
         if(count($ratingUsers) > 0){
             $users = User::find($ratingUsers);
@@ -317,6 +323,8 @@ class VkitController extends Controller
                         $result['userNames'][$user->id] = [ 'name' => $user->name,'photo' => $user->photo,'image_exist' => $isImageExist];
                 }
             }
+        } else {
+            $result['userNames'] = [];
         }
         return $result;
     }

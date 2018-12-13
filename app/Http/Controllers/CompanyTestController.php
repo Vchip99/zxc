@@ -270,6 +270,8 @@ class CompanyTestController extends Controller
                 $results[$userData->id]['facebook'] = $userData->facebook;
                 if(isset($reviewData[$userData->id])){
                 	$results[$userData->id]['ratingData'] = $reviewData[$userData->id];
+                } else {
+                	$results[$userData->id]['ratingData'] = [];
                 }
         	}
         }
