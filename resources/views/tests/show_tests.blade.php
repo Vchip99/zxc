@@ -17,6 +17,20 @@
 	    .rating-xs {
 	        font-size: 0em;
 	    }
+	    .user-block img {
+	      width: 40px;
+	      height: 40px;
+	      float: left;
+	      border: 2px solid #d2d6de;
+	      padding: 1px;
+	    }
+	    .img-circle {
+	      border-radius: 50%;
+	    }
+	    .user-block .username, .user-block .description{
+	        display: block;
+	        margin-left: 50px;
+	    }
 		.padding-body{
 			padding: 15px !important;
 		}
@@ -83,21 +97,21 @@
 	      	@endif
 	    </div>
 	    <div class="row pull-right" id="ratingDiv">
-	      	<div style="display: inline-block;">
-            	@if(isset($reviewData[$subcatId])) {{$reviewData[$subcatId]['avg']}} @else 0 @endif
-          	</div>
-          	<div style="display: inline-block;">
-            	<input id="rating_input{{$subcatId}}" name="input-{{$subcatId}}" class="rating rating-loading" value="@if(isset($reviewData[$subcatId])) {{$reviewData[$subcatId]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
-          	</div>
-          	<div style="display: inline-block;">
-            	<a data-toggle="modal" data-target="#review-model-{{$subcatId}}">
-              	@if(isset($reviewData[$subcatId]))
-                	{{count($reviewData[$subcatId]['rating'])}} <i class="fa fa-group"></i>
-              	@else
-                	0 <i class="fa fa-group"></i>
-              	@endif
-            	</a>
-          	</div>
+	    	<a data-toggle="modal" data-target="#review-model-{{$subcatId}}" style="cursor: pointer;">
+		      	<div style="display: inline-block;">
+	            	@if(isset($reviewData[$subcatId])) {{$reviewData[$subcatId]['avg']}} @else 0 @endif
+	          	</div>
+	          	<div style="display: inline-block;">
+	            	<input id="rating_input{{$subcatId}}" name="input-{{$subcatId}}" class="rating rating-loading" value="@if(isset($reviewData[$subcatId])) {{$reviewData[$subcatId]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+	          	</div>
+	          	<div style="display: inline-block;">
+	              	@if(isset($reviewData[$subcatId]))
+	                	{{count($reviewData[$subcatId]['rating'])}} <i class="fa fa-group"></i>
+	              	@else
+	                	0 <i class="fa fa-group"></i>
+	              	@endif
+	          	</div>
+	        </a>
 	    </div>
 	   <h2 class="v_h2_title text-center"> Exam</h2>
 	   <hr class="section-dash-dark"/>
@@ -421,7 +435,16 @@
               <div class="form-group row" style="overflow: auto;">
                 @if(isset($reviewData[$subcatId]))
                   @foreach($reviewData[$subcatId]['rating'] as $userId => $review)
-                    {{$userNames[$userId]}}:
+                    <div class="user-block cmt-left-margin">
+                      @if(is_file($userNames[$userId]['photo']) || (!empty($userNames[$userId]['photo']) && false == preg_match('/userStorage/',$userNames[$userId]['photo'])))
+                        <img src="{{ asset($userNames[$userId]['photo'])}} " class="img-circle" alt="User Image">
+                      @else
+                        <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                      @endif
+                      <span class="username">{{ $userNames[$userId]['name'] }} </span>
+                      <span class="description">Shared publicly - {{$review['updated_at']}}</span>
+                    </div>
+                    <br>
                     <input id="rating_input-{{$subcatId}}-{{$userId}}" name="input-{{$subcatId}}" class="rating rating-loading" value="{{$review['rating']}}" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
                     {{$review['review']}}
                     <hr>
@@ -878,9 +901,9 @@
                 ratingDiv.className = "row pull-right";
                 ratingDiv.innerHTML = '';
                 if(msg['ratingData'][subcat] && msg['ratingData'][subcat]['avg']){
-                  ratingDiv.innerHTML = '<div style="display: inline-block;">'+msg['ratingData'][subcat]['avg']+'</div><div style="display: inline-block;"><input id="rating_input'+subcat+'" name="input-" class="rating rating-loading" value="'+msg['ratingData'][subcat]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;"><a data-toggle="modal" data-target="#review-model-'+subcat+'">'+Object.keys(msg['ratingData'][subcat]['rating']).length+' <i class="fa fa-group"></i></a></div>';
+                  ratingDiv.innerHTML = '<a data-toggle="modal" data-target="#review-model-'+subcat+'" style="cursor: pointer;"><div style="display: inline-block;">'+msg['ratingData'][subcat]['avg']+'</div><div style="display: inline-block;"><input id="rating_input'+subcat+'" name="input-" class="rating rating-loading" value="'+msg['ratingData'][subcat]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;">'+Object.keys(msg['ratingData'][subcat]['rating']).length+' <i class="fa fa-group"></i></div></a>';
                 } else {
-                  ratingDiv.innerHTML = '<div style="display: inline-block;">0</div><div style="display: inline-block;"><input id="rating_input'+subcat+'" name="input-" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;"><a data-toggle="modal" data-target="#review-model-'+subcat+'">0 <i class="fa fa-group"></i></a></div>';
+                  ratingDiv.innerHTML = '<a data-toggle="modal" data-target="#review-model-'+subcat+'" style="cursor: pointer;"><div style="display: inline-block;">0</div><div style="display: inline-block;"><input id="rating_input'+subcat+'" name="input-" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;"> 0 <i class="fa fa-group"></i></div></a>';
                 }
 
                 var reviewModel = document.createElement('div');
@@ -910,7 +933,17 @@
                 reviewModelInnerHTML += '<div class="modal-body row">';
                 if(msg['ratingData'][subcat] && msg['ratingData'][subcat]['rating']){
                   $.each(msg['ratingData'][subcat]['rating'], function(userId, reviewData) {
-                    reviewModelInnerHTML += msg['userNames'][userId] +':';
+                    if('system' == msg['userNames'][userId]['image_exist']){
+	                	var userImagePath = "{{ asset('') }}"+msg['userNames'][userId]['photo'];
+		                var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
+              		} else if('other' == obj.image_exist){
+		                var userImagePath = msg['userNames'][userId]['photo'];
+		                var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
+	              	} else {
+		                var userImagePath = "{{ asset('images/user1.png') }}";
+		                var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
+	              	}
+	              	reviewModelInnerHTML += '<div class="user-block cmt-left-margin">'+userImage+'<span class="username">'+msg['userNames'][userId]['name']+'</span><span class="description">Shared publicly - '+reviewData.updated_at+'</span></div><br/>';
                     reviewModelInnerHTML += '<input id="rating_input-'+subcat+'-'+userId+'" name="input-'+subcat+'" class="rating rating-loading" value="'+reviewData.rating+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>'+reviewData.review+'<hr>';
                   });
                 } else {

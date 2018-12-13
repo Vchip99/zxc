@@ -18,88 +18,102 @@
   .rating-xs {
       font-size: 0em;
   }
-    .memberinfotop{
-      margin-top: 100px;
-    }
-    .memberinfo{
-      margin:10px;
-    }
-    .image{
-      height:150px;
-      width:150px;
-    }
-    .topcontent{
-      padding-top:20px;
-    }
-    .content{
-      /*padding-top: 20px;*/
-    }
+  .user-block img {
+    width: 40px;
+    height: 40px;
+    float: left;
+    border: 2px solid #d2d6de;
+    padding: 1px;
+  }
+  .img-circle {
+    border-radius: 50%;
+  }
+  .user-block .username, .user-block .description{
+      display: block;
+      margin-left: 50px;
+  }
+  .memberinfotop{
+    margin-top: 100px;
+  }
+  .memberinfo{
+    margin:10px;
+  }
+  .image{
+    height:150px;
+    width:150px;
+  }
+  .topcontent{
+    padding-top:20px;
+  }
+  .content{
+    /*padding-top: 20px;*/
+  }
 
-    .button{
-      float:right;
+  .button{
+    float:right;
 
+  }
+  .button1{
+    float:left;
+  }
+  @media only screen and (max-width: 418px){
+    body{
+      font-size: 13px;
     }
-    .button1{
-      float:left;
+  }
+  @media only screen and (max-width: 386px){
+    body{
+      font-size: 12px;
     }
-    @media only screen and (max-width: 418px){
-      body{
-        font-size: 13px;
-      }
+  }
+  @media only screen and (max-width: 375px){
+    body{
+      font-size: 11px;
     }
-    @media only screen and (max-width: 386px){
-      body{
-        font-size: 12px;
-      }
-    }
-    @media only screen and (max-width: 375px){
-      body{
-        font-size: 11px;
-      }
-    }
+  }
 
-    @media (max-width: 1190px) {
-      .navbar-header {
-          float: none;
-      }
-      .navbar-left,.navbar-right {
-          float: none !important;
-      }
-      .navbar-toggle {
-          display: block;
-      }
-      .navbar-collapse {
-          border-top: 1px solid transparent;
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-          min-height: 410px;
-      }
-      .navbar-fixed-top {
-          top: 0;
-          border-width: 0 0 1px;
-      }
-      .navbar-collapse.collapse {
-          display: none!important;
-      }
-      .navbar-nav {
-          float: none!important;
-          margin-top: 7.5px;
-      }
-      .navbar-nav>li {
-          float: none;
-      }
-      .navbar-nav>li>a {
-          padding-top: 10px;
-          padding-bottom: 10px;
-      }
-      .collapse.in{
-          display:block !important;
-      }
+  @media (max-width: 1190px) {
+    .navbar-header {
+        float: none;
     }
-    .iframe-container iframe{
-      width: 100% !important;
+    .navbar-left,.navbar-right {
+        float: none !important;
     }
-    .vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; }
-    .vid iframe, .vid object,.vid embed {position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
+    .navbar-toggle {
+        display: block;
+    }
+    .navbar-collapse {
+        border-top: 1px solid transparent;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        min-height: 410px;
+    }
+    .navbar-fixed-top {
+        top: 0;
+        border-width: 0 0 1px;
+    }
+    .navbar-collapse.collapse {
+        display: none!important;
+    }
+    .navbar-nav {
+        float: none!important;
+        margin-top: 7.5px;
+    }
+    .navbar-nav>li {
+        float: none;
+    }
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .collapse.in{
+        display:block !important;
+    }
+  }
+  .iframe-container iframe{
+    width: 100% !important;
+  }
+  .vid {position: relative; padding-bottom: 56.25%; padding-top: 30px; height: 0; overflow: hidden; }
+  .vid iframe, .vid object,.vid embed {position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
 </style>
 @stop
 @section('header-js')
@@ -198,21 +212,21 @@
                   <div style="padding-left: 10px;"><a href="{{asset($userData->resume)}}" download><button type="button" class="btn btn-success ">Resume <i class="fa fa-download"></i></button></a></div>
                   @endif
                   <div class="row">
-                    <div style="display: inline-block;">
-                      @if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif
-                    </div>
-                    <div style="display: inline-block;">
-                      <input id="rating_input{{$userData->id}}" name="input-{{$userData->id}}" class="rating rating-loading" value="@if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
-                    </div>
-                    <div style="display: inline-block;">
-                      <a data-toggle="modal" data-target="#review-model-{{$userData->id}}">
-                      @if(isset($reviewData[$userData->id]))
-                        {{count($reviewData[$userData->id]['rating'])}} <i class="fa fa-group"></i>
-                      @else
-                        0 <i class="fa fa-group"></i>
-                      @endif
-                      </a>
-                    </div>
+                    <a data-toggle="modal" data-target="#review-model-{{$userData->id}}" style="cursor: pointer;">
+                      <div style="display: inline-block;">
+                        @if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif
+                      </div>
+                      <div style="display: inline-block;">
+                        <input id="rating_input{{$userData->id}}" name="input-{{$userData->id}}" class="rating rating-loading" value="@if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                      </div>
+                      <div style="display: inline-block;">
+                        @if(isset($reviewData[$userData->id]))
+                          {{count($reviewData[$userData->id]['rating'])}} <i class="fa fa-group"></i>
+                        @else
+                          0 <i class="fa fa-group"></i>
+                        @endif
+                      </div>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -255,7 +269,16 @@
                     <div class="form-group row" style="overflow: auto;">
                       @if(isset($reviewData[$userData->id]))
                         @foreach($reviewData[$userData->id]['rating'] as $userId => $review)
-                          {{$userNames[$userId]}}:
+                          <div class="user-block cmt-left-margin">
+                            @if(is_file($userNames[$userId]['photo']) || (!empty($userNames[$userId]['photo']) && false == preg_match('/userStorage/',$userNames[$userId]['photo'])))
+                              <img src="{{ asset($userNames[$userId]['photo'])}} " class="img-circle" alt="User Image">
+                            @else
+                              <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                            @endif
+                            <span class="username">{{ $userNames[$userId]['name'] }} </span>
+                            <span class="description">Shared publicly - {{$review['updated_at']}}</span>
+                          </div>
+                          <br>
                           <input id="rating_input-{{$userData->id}}-{{$userId}}" name="input-{{$userData->id}}" class="rating rating-loading" value="{{$review['rating']}}" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
                           {{$review['review']}}
                           <hr>
@@ -490,10 +513,15 @@
 
         var rowDiv = document.createElement('div');
         if(data['ratingData'] && data['ratingData']['avg']){
+          var ancTag = document.createElement('a');
+          ancTag.setAttribute('data-toggle','modal');
+          ancTag.setAttribute('data-target','#review-model-'+id);
+          ancTag.setAttribute('style',"cursor: pointer;");
+
           var avgDiv = document.createElement('div');
           avgDiv.setAttribute('style','display: inline-block;');
           avgDiv.innerHTML = data['ratingData']['avg'];
-          rowDiv.appendChild(avgDiv);
+          ancTag.appendChild(avgDiv);
 
           var starDiv = document.createElement('div');
           starDiv.setAttribute('style','display: inline-block;');
@@ -512,12 +540,13 @@
           ratingInput.setAttribute('readonly','true');
 
           starDiv.appendChild(ratingInput);
-          rowDiv.appendChild(starDiv);
+          ancTag.appendChild(starDiv);
 
           var grpDiv = document.createElement('div');
           grpDiv.setAttribute('style','display: inline-block;');
-          grpDiv.innerHTML = '<a data-toggle="modal" data-target="#review-model-'+id+'">'+Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i></a>';
-          rowDiv.appendChild(grpDiv);
+          grpDiv.innerHTML = Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i>';
+          ancTag.appendChild(grpDiv);
+          rowDiv.appendChild(ancTag);
         }
         fourthDiv.appendChild(rowDiv);
         secondDiv.appendChild(fourthDiv);
@@ -550,7 +579,18 @@
         reviewModelInnerHTML += '<div class="modal-body row">';
         if(data['ratingData']['rating']){
           $.each(data['ratingData']['rating'], function(userId, reviewData) {
-            reviewModelInnerHTML += reviewData.user_name +':';
+            if('system' == reviewData.image_exist){
+              var userImagePath = "{{ asset('') }}"+reviewData.user_photo;
+              var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
+            } else if('other' == reviewData.image_exist){
+              var userImagePath = reviewData.user_photo;
+              var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
+            } else {
+              var userImagePath = "{{ asset('images/user1.png') }}";
+              var userImage = '<img class="img-circle" src="'+userImagePath+'" alt="User Image" />';
+            }
+            reviewModelInnerHTML += '<div class="user-block cmt-left-margin">'+userImage+'<span class="username">'+reviewData.user_name+'</span><span class="description">Shared publicly - '+reviewData.updated_at+'</span></div><br/>';
+
             reviewModelInnerHTML += '<input id="rating_input-'+id+'-'+userId+'" name="input-'+id+'" class="rating rating-loading" value="'+reviewData.rating+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>'+reviewData.review+'<hr>';
           });
         } else {

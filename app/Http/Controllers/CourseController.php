@@ -70,7 +70,7 @@ class CourseController extends Controller
         $allRatings = Rating::getRatingsByModuleType(Rating::Course);
         if(is_object($allRatings) && false == $allRatings->isEmpty()){
             foreach($allRatings as $rating){
-                $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id, 'updated_at' => $rating->updated_at->diffForHumans()];
                 $ratingUsers[] = $rating->user_id;
             }
             foreach($reviewData as $dataId => $rating){
@@ -87,7 +87,7 @@ class CourseController extends Controller
             $users = User::find($ratingUsers);
             if(is_object($users) && false == $users->isEmpty()){
                 foreach($users as $user){
-                    $userNames[$user->id] = $user->name;
+                    $userNames[$user->id] = [ 'name' => $user->name,'photo' => $user->photo];
                 }
             }
         }
@@ -117,7 +117,7 @@ class CourseController extends Controller
             $allRatings = Rating::getRatingsByModuleType(Rating::Course);
             if(is_object($allRatings) && false == $allRatings->isEmpty()){
                 foreach($allRatings as $rating){
-                    $result['ratingData'][$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                    $result['ratingData'][$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id, 'updated_at' => $rating->updated_at->diffForHumans()];
                     $ratingUsers[] = $rating->user_id;
                 }
                 foreach($result['ratingData'] as $dataId => $rating){
@@ -134,7 +134,14 @@ class CourseController extends Controller
                 $users = User::find($ratingUsers);
                 if(is_object($users) && false == $users->isEmpty()){
                     foreach($users as $user){
-                        $result['userNames'][$user->id] = $user->name;
+                        if(is_file($user->photo) && true == preg_match('/userStorage/',$user->photo)){
+                            $isImageExist = 'system';
+                        } else if(!empty($user->photo) && false == preg_match('/userStorage/',$user->photo)){
+                            $isImageExist = 'other';
+                        } else {
+                            $isImageExist = 'false';
+                        }
+                        $result['userNames'][$user->id] = [ 'name' => $user->name,'photo' => $user->photo,'image_exist' => $isImageExist];
                     }
                 }
             }
@@ -178,7 +185,7 @@ class CourseController extends Controller
             $allRatings = Rating::getRatingsByModuleIdByModuleType($courseId,Rating::Course);
             if(is_object($allRatings) && false == $allRatings->isEmpty()){
                 foreach($allRatings as $rating){
-                    $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                    $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id, 'updated_at' => $rating->updated_at->diffForHumans()];
                     $ratingUsers[] = $rating->user_id;
                 }
                 foreach($reviewData as $dataId => $rating){
@@ -195,7 +202,7 @@ class CourseController extends Controller
                 $users = User::find($ratingUsers);
                 if(is_object($users) && false == $users->isEmpty()){
                     foreach($users as $user){
-                        $userNames[$user->id] = $user->name;
+                        $userNames[$user->id] = [ 'name' => $user->name,'photo' => $user->photo];
                     }
                 }
             }

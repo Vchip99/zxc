@@ -70,10 +70,20 @@ trait ResetsPasswords
         // return $request->only(
         //     'password', 'password_confirmation', 'token'
         // );
-
-        return $request->only(
-            'email', 'password', 'password_confirmation', 'token'
-        );
+        if(!empty($request->route()->getParameter('client'))){
+            $client = Client::where('subdomain', $request->getHost())->first();
+            return  [
+                        'email' => $request->get('email'),
+                        'password' => $request->get('password'),
+                        'password_confirmation' => $request->get('password_confirmation'),
+                        'token' => $request->get('token'),
+                        'client_id' => $client->id,
+                    ];
+        } else {
+            return $request->only(
+                'email', 'password', 'password_confirmation', 'token'
+            );
+        }
     }
 
     /**

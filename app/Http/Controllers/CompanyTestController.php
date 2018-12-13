@@ -143,7 +143,7 @@ class CompanyTestController extends Controller
         $allRatings = Rating::getRatingsByModuleType(Rating::MockInterview);
         if(is_object($allRatings) && false == $allRatings->isEmpty()){
             foreach($allRatings as $rating){
-                $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id];
+                $reviewData[$rating->module_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id, 'updated_at' => $rating->updated_at->diffForHumans()];
                 $ratingUsers[] = $rating->user_id;
             }
             foreach($reviewData as $dataId => $rating){
@@ -160,7 +160,7 @@ class CompanyTestController extends Controller
             $users = User::find($ratingUsers);
             if(is_object($users) && false == $users->isEmpty()){
                 foreach($users as $user){
-                    $userNames[$user->id] = $user->name;
+                    $userNames[$user->id] = [ 'name' => $user->name,'photo' => $user->photo];
                 }
             }
         }
@@ -194,7 +194,7 @@ class CompanyTestController extends Controller
 	        $allReviews = Rating::whereIn('module_id',$userDataIds)->where('module_type',Rating::MockInterview)->get();
 	        if(is_object($allReviews) && false == $allReviews->isEmpty()){
 	        	foreach($allReviews as $review){
-	        		$reviewData[$review->module_id]['rating'][$review->user_id] = [ 'rating' => $review->rating,'review' => $review->review, 'review_id' => $review->id];
+	        		$reviewData[$review->module_id]['rating'][$review->user_id] = [ 'rating' => $review->rating,'review' => $review->review, 'review_id' => $review->id, 'updated_at' => $review->updated_at->diffForHumans()];
 	        		$testUserIds[] = $review->user_id;
 	        	}
 	        	if(count($testUserIds) > 0){
@@ -211,6 +211,15 @@ class CompanyTestController extends Controller
 	        			foreach($userRatings as $userId => $userRating){
 	        				$ratingSum = (double) $ratingSum + (double) $userRating['rating'];
 	        				$reviewData[$dataId]['rating'][$userId]['user_name'] =  $testUsers[$userId]->name;
+	        				$reviewData[$dataId]['rating'][$userId]['user_photo'] =  $testUsers[$userId]->photo;
+	        				if(is_file($testUsers[$userId]->photo) && true == preg_match('/userStorage/',$testUsers[$userId]->photo)){
+	                            $isImageExist = 'system';
+	                        } else if(!empty($testUsers[$userId]->photo) && false == preg_match('/userStorage/',$testUsers[$userId]->photo)){
+	                            $isImageExist = 'other';
+	                        } else {
+	                            $isImageExist = 'false';
+	                        }
+	                        $reviewData[$dataId]['rating'][$userId]['image_exist'] = $isImageExist;
 	        			}
 	        			$reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
 	        		}

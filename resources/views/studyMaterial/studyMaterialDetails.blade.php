@@ -18,13 +18,27 @@
     .rating-xs {
         font-size: 0em;
     }
-  a.list-group-item:hover{
-    color: #f4645f;
-  }
-  h1 {
-    font-size: 48px;
-    font-weight: 200;
-  }
+    .user-block img {
+      width: 40px;
+      height: 40px;
+      float: left;
+      border: 2px solid #d2d6de;
+      padding: 1px;
+    }
+    .img-circle {
+      border-radius: 50%;
+    }
+    .user-block .username, .user-block .description{
+        display: block;
+        margin-left: 50px;
+    }
+    a.list-group-item:hover{
+      color: #f4645f;
+    }
+    h1 {
+      font-size: 48px;
+      font-weight: 200;
+    }
 </style>
 @stop
 @section('header-js')
@@ -35,21 +49,21 @@
 <div class="container_fluid" style="padding-top: 100px; padding-bottom: 50px;">
   <div class="row ">
     <div style="margin-left: 35px;">
-      <div style="display: inline-block;">
-        @if(isset($reviewData[$subcategoryId])) {{$reviewData[$subcategoryId]['avg']}} @else 0 @endif
-      </div>
-      <div style="display: inline-block;">
-        <input id="rating_input{{$subcategoryId}}" name="input-{{$subcategoryId}}" class="rating rating-loading" value="@if(isset($reviewData[$subcategoryId])) {{$reviewData[$subcategoryId]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
-      </div>
-      <div style="display: inline-block;">
-        <a data-toggle="modal" data-target="#review-model-{{$subcategoryId}}">
+      <a data-toggle="modal" data-target="#review-model-{{$subcategoryId}}" style="cursor: pointer;">
+        <div style="display: inline-block;">
+          @if(isset($reviewData[$subcategoryId])) {{$reviewData[$subcategoryId]['avg']}} @else 0 @endif
+        </div>
+        <div style="display: inline-block;">
+          <input id="rating_input{{$subcategoryId}}" name="input-{{$subcategoryId}}" class="rating rating-loading" value="@if(isset($reviewData[$subcategoryId])) {{$reviewData[$subcategoryId]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+        </div>
+        <div style="display: inline-block;">
           @if(isset($reviewData[$subcategoryId]))
             {{count($reviewData[$subcategoryId]['rating'])}} <i class="fa fa-group"></i>
           @else
             0 <i class="fa fa-group"></i>
           @endif
-        </a>
-      </div>
+        </div>
+      </a>
     </div>
     <div id="review-model-{{$subcategoryId}}" class="modal fade" role="dialog">
       <div class="modal-dialog">
@@ -88,7 +102,16 @@
             <div class="form-group row" style="overflow: auto;">
               @if(isset($reviewData[$subcategoryId]))
                 @foreach($reviewData[$subcategoryId]['rating'] as $userId => $review)
-                  {{$userNames[$userId]}}:
+                  <div class="user-block cmt-left-margin">
+                    @if(is_file($userNames[$userId]['photo']) || (!empty($userNames[$userId]['photo']) && false == preg_match('/userStorage/',$userNames[$userId]['photo'])))
+                      <img src="{{ asset($userNames[$userId]['photo'])}} " class="img-circle" alt="User Image">
+                    @else
+                      <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                    @endif
+                    <span class="username">{{ $userNames[$userId]['name'] }} </span>
+                    <span class="description">Shared publicly - {{$review['updated_at']}}</span>
+                  </div>
+                  <br>
                   <input id="rating_input-{{$subcategoryId}}-{{$userId}}" name="input-{{$subcategoryId}}" class="rating rating-loading" value="{{$review['rating']}}" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
                   {{$review['review']}}
                   <hr>
