@@ -145,7 +145,11 @@
       @endif
     </div>
   </div>
-  <div class="form-group row @if ($errors->has('time_out_by')) has-error @endif " id="paperTimeOut">
+  @if(1 == $paper->paper_pattern)
+    <div class="form-group row @if ($errors->has('time_out_by')) has-error @endif hide" id="paperTimeOut">
+  @else
+    <div class="form-group row @if ($errors->has('time_out_by')) has-error @endif " id="paperTimeOut">
+  @endif
     <label for="paper" class="col-sm-2 col-form-label">Total Time Out By:</label>
     <div class="col-sm-3">
       @if(isset($paper->id))
