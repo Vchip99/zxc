@@ -8,6 +8,9 @@ use App\Libraries\InputSanitise;
 use App\Models\TestSubject;
 use App\Models\TestCategory;
 use App\Models\CollegeCategory;
+use App\Models\UserSolution;
+use App\Models\Score;
+use App\Models\PaperSection;
 use DB,File,Auth;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -18,7 +21,7 @@ class TestSubCategory extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'test_category_id', 'image_path','created_for','created_by','created_by_name'];
+    protected $fillable = ['name', 'test_category_id', 'image_path','created_for','created_by','created_by_name','admin_approve','price'];
 
     /**
      *  add/update sub category
@@ -27,6 +30,7 @@ class TestSubCategory extends Model
         $subcatId = InputSanitise::inputInt($request->get('subcat_id'));
         $catId = InputSanitise::inputInt($request->get('category'));
         $name = InputSanitise::inputString($request->get('name'));
+        $price = InputSanitise::inputString($request->get('price'));
 
         if( $isUpdate && isset($subcatId)){
             $testSubcategory = static::find($subcatId);
@@ -72,6 +76,7 @@ class TestSubCategory extends Model
             $testSubcategory->created_by = Auth::guard('admin')->user()->id;
             $testSubcategory->created_by_name = Auth::guard('admin')->user()->name;
         }
+        $testSubcategory->price = $price;
         $testSubcategory->save();
         return $testSubcategory;
     }
@@ -93,19 +98,38 @@ class TestSubCategory extends Model
      */
     protected static function getSubcategoriesByCategoryId($categoryId){
         $categoryId = InputSanitise::inputInt($categoryId);
-        return DB::table('test_sub_categories')
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            return DB::table('test_sub_categories')
+                ->join('test_subjects', 'test_subjects.test_sub_category_id', '=', 'test_sub_categories.id')
                 ->join('test_subject_papers', 'test_subject_papers.test_sub_category_id', 'test_sub_categories.id')
                 ->join('questions', 'questions.subcat_id', 'test_sub_categories.id')
                 ->join('test_categories', function($join){
                     $join->on('test_categories.id', '=', 'test_sub_categories.test_category_id');
                     $join->on('test_categories.id', '=', 'questions.category_id');
                 })
-                ->join('test_subjects', 'test_subjects.id', '=', 'questions.subject_id')
                 ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
                 ->where('test_sub_categories.test_category_id', $categoryId)
+                ->where('test_categories.category_for', 1)
                 ->where('test_sub_categories.created_for', 1)
-                ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path')
+                ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path', 'test_sub_categories.price','test_sub_categories.test_category_id')
                 ->groupBy('test_sub_categories.id')->get();
+        } else {
+            return DB::table('test_sub_categories')
+                ->join('test_subjects', 'test_subjects.test_sub_category_id', '=', 'test_sub_categories.id')
+                ->join('test_subject_papers', 'test_subject_papers.test_sub_category_id', 'test_sub_categories.id')
+                ->join('questions', 'questions.subcat_id', 'test_sub_categories.id')
+                ->join('test_categories', function($join){
+                    $join->on('test_categories.id', '=', 'test_sub_categories.test_category_id');
+                    $join->on('test_categories.id', '=', 'questions.category_id');
+                })
+                ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
+                ->where('test_sub_categories.test_category_id', $categoryId)
+                ->where('test_categories.category_for', 1)
+                ->where('test_sub_categories.created_for', 1)
+                ->where('test_sub_categories.admin_approve', 1)
+                ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path', 'test_sub_categories.price','test_sub_categories.test_category_id')
+                ->groupBy('test_sub_categories.id')->get();
+        }
     }
 
     /**
@@ -118,7 +142,7 @@ class TestSubCategory extends Model
                 ->where('test_sub_categories.created_for', 1)
                 ->where('test_sub_categories.test_category_id', $categoryId)
                 ->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id)
-                ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path')
+                ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path', 'test_sub_categories.price')
                 ->groupBy('test_sub_categories.id')->get();
     }
 
@@ -180,11 +204,12 @@ class TestSubCategory extends Model
      */
     protected static function getSubcategoriesWithPagination(){
         $result = static::join('test_categories', 'test_categories.id', '=', 'test_sub_categories.test_category_id')
+            ->join('admins','admins.id','=','test_sub_categories.created_by')
             ->where('test_sub_categories.created_for', 1);
         if(Auth::guard('admin')->user()->hasRole('sub-admin')){
             $result->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id);
         }
-        return $result->select('test_sub_categories.*','test_categories.name as category')
+        return $result->select('test_sub_categories.*','test_categories.name as category','admins.name as admin')
             ->groupBy('test_sub_categories.id')->paginate();
     }
 
@@ -242,7 +267,8 @@ class TestSubCategory extends Model
     }
 
     protected static function getTestSubCategoriesAssociatedWithQuestion(){
-        return DB::table('test_sub_categories')
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            return DB::table('test_sub_categories')
                 ->join('test_subjects', 'test_subjects.test_sub_category_id', '=', 'test_sub_categories.id')
                 ->join('test_subject_papers', 'test_subject_papers.test_sub_category_id', 'test_sub_categories.id')
                 ->join('questions', 'questions.subcat_id', 'test_sub_categories.id')
@@ -250,11 +276,27 @@ class TestSubCategory extends Model
                     $join->on('test_categories.id', '=', 'test_sub_categories.test_category_id');
                     $join->on('test_categories.id', '=', 'questions.category_id');
                 })
-                ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d'))
+                ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
                 ->where('test_categories.category_for', 1)
                 ->where('test_sub_categories.created_for', 1)
-                ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path')
+                ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path', 'test_sub_categories.price','test_sub_categories.test_category_id')
                 ->groupBy('test_sub_categories.id')->get();
+        } else {
+            return DB::table('test_sub_categories')
+                ->join('test_subjects', 'test_subjects.test_sub_category_id', '=', 'test_sub_categories.id')
+                ->join('test_subject_papers', 'test_subject_papers.test_sub_category_id', 'test_sub_categories.id')
+                ->join('questions', 'questions.subcat_id', 'test_sub_categories.id')
+                ->join('test_categories', function($join){
+                    $join->on('test_categories.id', '=', 'test_sub_categories.test_category_id');
+                    $join->on('test_categories.id', '=', 'questions.category_id');
+                })
+                ->where('test_subject_papers.date_to_inactive', '>=', date('Y-m-d H:i:s'))
+                ->where('test_categories.category_for', 1)
+                ->where('test_sub_categories.created_for', 1)
+                ->where('test_sub_categories.admin_approve', 1)
+                ->select('test_sub_categories.id', 'test_sub_categories.name', 'test_sub_categories.image_path', 'test_sub_categories.price','test_sub_categories.test_category_id')
+                ->groupBy('test_sub_categories.id')->get();
+        }
     }
 
     public function subjects(){
@@ -299,5 +341,73 @@ class TestSubCategory extends Model
             return 'false';
         }
         return 'false';
+    }
+
+    /**
+     *  return sub admin sub categories
+     */
+    protected static function getSubAdminSubcategoriesWithPagination(){
+        return static::join('test_categories', 'test_categories.id', '=', 'test_sub_categories.test_category_id')
+            ->join('admins','admins.id','=', 'test_sub_categories.created_by')
+            ->where('test_sub_categories.created_for', 1)
+            ->where('test_sub_categories.created_by','!=', 1)
+            ->select('test_sub_categories.*','test_categories.name as category','admins.name as admin')
+            ->groupBy('test_sub_categories.id')->paginate();
+    }
+
+    /**
+     *  return sub admin sub categories
+     */
+    protected static function getSubAdminSubCategories($adminId){
+        return static::join('test_categories', 'test_categories.id', '=', 'test_sub_categories.test_category_id')
+            ->join('admins','admins.id','=', 'test_sub_categories.created_by')
+            ->where('test_sub_categories.created_for', 1)
+            ->where('test_sub_categories.created_by', $adminId)
+            ->select('test_sub_categories.*','test_categories.name as category','admins.name as admin')
+            ->groupBy('test_sub_categories.id')->get();
+    }
+
+    protected static function changeSubAdminSubCategoryApproval($request){
+        $subcategoryId = $request->get('sub_category_id');
+        $subcategory = static::find($subcategoryId);
+        if(is_object($subcategory)){
+            if(1 == $subcategory->admin_approve){
+                $subcategory->admin_approve = 0;
+            } else {
+                $subcategory->admin_approve = 1;
+            }
+            $subcategory->save();
+            return 'true';
+        }
+        return 'false';
+    }
+
+    protected static function deleteSubAdminSubCategoriesAndSubjectsAndPapersAndQuestionsByAdminId($adminId){
+        $subCategories = static::where('created_by', $adminId)->where('created_for', 1)->get();
+        if(is_object($subCategories) && false == $subCategories->isEmpty()){
+            foreach($subCategories as $testSubcategory){
+                if(true == is_object($testSubcategory->subjects) && false == $testSubcategory->subjects->isEmpty()){
+                    foreach($testSubcategory->subjects as $subject){
+                        if(true == is_object($subject->papers) && false == $subject->papers->isEmpty()){
+                            foreach($subject->papers as $paper){
+                                if(true == is_object($paper->questions) && false == $paper->questions->isEmpty()){
+                                    foreach($paper->questions as $question){
+                                        UserSolution::deleteUserSolutionsByQuestionId($question->id);
+                                        $question->delete();
+                                    }
+                                }
+                                Score::deleteUserScoresByPaperId($paper->id);
+                                PaperSection::deletePaperSectionsByPaperId($paper->id);
+                                $paper->deleteRegisteredPaper();
+                                $paper->delete();
+                            }
+                        }
+                        $subject->delete();
+                    }
+                }
+                $testSubcategory->deleteSubCategoryImageFolder();
+                $testSubcategory->delete();
+            }
+        }
     }
 }

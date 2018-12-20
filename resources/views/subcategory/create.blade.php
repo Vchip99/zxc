@@ -47,7 +47,7 @@
   <div class="form-group row @if ($errors->has('name')) has-error @endif">
     <label for="name" class="col-sm-2 col-form-label">Sub Category Name:</label>
     <div class="col-sm-3">
-      @if(isset($testSubcategory))
+      @if(isset($testSubcategory->id))
         <input type="text" class="form-control" name="name" id="subcategory" value="{{$testSubcategory->name}}" required="true">
       @else
         <input type="text" class="form-control" name="name" id="subcategory" value="" required="true">
@@ -57,15 +57,25 @@
     </div>
   </div>
   <div class="form-group row @if ($errors->has('image_path')) has-error @endif">
-      <label class="col-sm-2 col-form-label" for="image_path">Sub Category Image:</label>
-      <div class="col-sm-3">
-        <input type="file" class="form-control"  name="image_path" id="image_path" >
-        @if($errors->has('image_path')) <p class="has-error">{{ $errors->first('image_path') }}</p> @endif
-        @if(isset($testSubcategory->image_path))
-          <b><span>Existing Image: {!! basename($testSubcategory->image_path) !!}</span></b>
-        @endif
-      </div>
+    <label class="col-sm-2 col-form-label" for="image_path">Sub Category Image:</label>
+    <div class="col-sm-3">
+      <input type="file" class="form-control"  name="image_path" id="image_path" >
+      @if($errors->has('image_path')) <p class="has-error">{{ $errors->first('image_path') }}</p> @endif
+      @if(isset($testSubcategory->image_path))
+        <b><span>Existing Image: {!! basename($testSubcategory->image_path) !!}</span></b>
+      @endif
     </div>
+  </div>
+  <div class="form-group row @if ($errors->has('price')) has-error @endif">
+    <label for="price" class="col-sm-2 col-form-label">Price:</label>
+    <div class="col-sm-3">
+      @if(isset($testSubcategory->id))
+        <input type="text" class="form-control" name="price" id="price" value="{{$testSubcategory->price}}" required="true">
+      @else
+        <input type="text" class="form-control" name="price" id="price" value="0" required="true">
+      @endif
+    </div>
+  </div>
   <div class="form-group row">
       <div class="offset-sm-2 col-sm-3" title="Submit">
       @if(!empty($testSubcategory->id) && $testSubcategory->created_by == Auth::guard('admin')->user()->id)

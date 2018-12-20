@@ -30,6 +30,7 @@
           <th>Subject </th>
           <th>Category </th>
           <th>Sub Category </th>
+          <th>Created By </th>
           <th>Edit </th>
           <th>Delete </th>
         </tr>
@@ -40,28 +41,27 @@
           <tr style="overflow: auto;">
             <th scope="row">{{$index + $subjects->firstItem()}}</th>
             <td>{{$subject->name}}</td>
-            <td>{{$subject->category->name}}</td>
-            <td>{{$subject->subcategory->name}}</td>
+            <td>{{$subject->category}}</td>
+            <td>{{$subject->subcategory}}</td>
+            <td>{{$subject->admin}}</td>
             <td>
               <a href="{{url('admin/studyMaterialSubject')}}/{{$subject->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$subject->name}}" />
                 </a>
             </td>
             <td>
-              @if($subject->admin_id == Auth::guard('admin')->user()->id)
-                <a id="{{$subject->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$subject->name}}" />
-                </a>
-                <form id="deleteStudyMaterialSubject_{{$subject->id}}" action="{{url('admin/deleteStudyMaterialSubject')}}" method="POST" style="display: none;">
-                    {{ csrf_field() }}
-                    {{ method_field('DELETE') }}
-                    <input type="hidden" name="subject_id" value="{{$subject->id}}">
-                </form>
-              @endif
+              <a id="{{$subject->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$subject->name}}" />
+              </a>
+              <form id="deleteStudyMaterialSubject_{{$subject->id}}" action="{{url('admin/deleteStudyMaterialSubject')}}" method="POST" style="display: none;">
+                {{ csrf_field() }}
+                {{ method_field('DELETE') }}
+                <input type="hidden" name="subject_id" value="{{$subject->id}}">
+              </form>
             </td>
           </tr>
           @endforeach
         @else
-            <tr><td colspan="6">No subject is created.</td></tr>
+          <tr><td colspan="6">No subject is created.</td></tr>
         @endif
       </tbody>
     </table>

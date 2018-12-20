@@ -19,7 +19,7 @@ class VkitProject extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'author', 'introduction', 'category_id', 'gateway', 'microcontroller', 'front_image_path', 'header_image_path', 'project_pdf_path', 'date', 'description','created_for','created_by','price','items'];
+    protected $fillable = ['name', 'author', 'introduction', 'category_id', 'gateway', 'microcontroller', 'front_image_path', 'header_image_path', 'project_pdf_path', 'date', 'description','created_for','created_by','price','items','admin_approve'];
 
     /**
      *  add/update project
@@ -135,7 +135,11 @@ class VkitProject extends Model
      */
     protected static function getVkitProjectsByCategoryId($categoryId){
         $categoryId = InputSanitise::inputInt($categoryId);
-        return DB::table('vkit_projects')->where('created_for', 1)->where('category_id', $categoryId)->get();
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            return DB::table('vkit_projects')->where('created_for', 1)->where('category_id', $categoryId)->get();
+        } else {
+            return DB::table('vkit_projects')->where('created_for', 1)->where('admin_approve', 1)->where('category_id', $categoryId)->get();
+        }
     }
 
     protected static function getRegisteredVkitProjectsByUserIdByCategoryId($userId, $categoryId){
@@ -211,14 +215,33 @@ class VkitProject extends Model
             ->paginate();
     }
 
-    protected static function getVkitProjectsWithPagination(){
+    protected static function getVkitProjectsWithPaginationForAdmin(){
         $result = static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')
+            ->join('admins','admins.id','=', 'vkit_projects.created_by')
             ->where('vkit_projects.created_for', 1);
         if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
             $result->where('vkit_projects.created_by', Auth::guard('admin')->user()->id);
         }
-        return $result->select('vkit_projects.*','vkit_categories.name as category')
+        return $result->select('vkit_projects.*','vkit_categories.name as category','admins.name as admin')
                 ->groupBy('vkit_projects.id')->paginate();
+    }
+
+    protected static function getVkitProjectsWithPagination(){
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            return static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')
+                    ->where('vkit_projects.created_for', 1)
+                    ->select('vkit_projects.*','vkit_categories.name as category')
+                    ->groupBy('vkit_projects.id')->paginate();
+        } else {
+            $result = static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')
+                ->where('vkit_projects.created_for', 1)
+                ->where('vkit_projects.admin_approve', 1);
+            if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+                $result->where('vkit_projects.created_by', Auth::guard('admin')->user()->id);
+            }
+            return $result->select('vkit_projects.*','vkit_categories.name as category')
+                ->groupBy('vkit_projects.id')->paginate();
+        }
     }
 
     protected static function getPurchasedVkitProjects($adminId = NULL){
@@ -276,8 +299,11 @@ class VkitProject extends Model
         $microcontroller = $searchFilter['microcontroller'];
         $upcoming = InputSanitise::inputInt($searchFilter['upcoming']);
         $categoryId = InputSanitise::inputInt($searchFilter['categoryId']);
-
-        $results = DB::table('vkit_projects');
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            $results = DB::table('vkit_projects');
+        } else {
+            $results = DB::table('vkit_projects')->where('admin_approve', 1);
+        }
 
         if(count($gateway) > 0){
             $results->whereIn('gateway', $gateway);
@@ -341,10 +367,10 @@ class VkitProject extends Model
     }
 
     public function deleteRegisteredProjects(){
-        $registeredPtojects = RegisterProject::where('project_id', $this->id)->get();
-        if(is_object($registeredPtojects) && false == $registeredPtojects->isEmpty()){
-            foreach($registeredPtojects as $registeredPtoject){
-                $registeredPtoject->delete();
+        $registeredProjects = RegisterProject::where('project_id', $this->id)->get();
+        if(is_object($registeredProjects) && false == $registeredProjects->isEmpty()){
+            foreach($registeredProjects as $registeredProject){
+                $registeredProject->delete();
             }
         }
     }
@@ -443,5 +469,50 @@ class VkitProject extends Model
             return $user->name;
         }
         return;
+    }
+
+    protected static function getSubAdminProjectsWithPagination(){
+        return static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')
+            ->join('admins','admins.id','=', 'vkit_projects.created_by')
+            ->where('vkit_projects.created_for', 1)
+            ->where('vkit_projects.created_by','!=', 1)
+            ->select('vkit_projects.*','vkit_categories.name as category','admins.name as admin')
+                ->groupBy('vkit_projects.id')->paginate();
+    }
+
+    protected static function getSubAdminProjects($adminId){
+        return static::join('vkit_categories', 'vkit_categories.id', '=', 'vkit_projects.category_id')
+            ->join('admins','admins.id','=', 'vkit_projects.created_by')
+            ->where('vkit_projects.created_for', 1)
+            ->where('vkit_projects.created_by', $adminId)
+            ->select('vkit_projects.*','vkit_categories.name as category','admins.name as admin')
+                ->groupBy('vkit_projects.id')->get();
+    }
+
+    protected static function changeSubAdminProjectApproval($request){
+        $projectId = $request->get('project_id');
+        $project = static::find($projectId);
+        if(is_object($project)){
+            if(1 == $project->admin_approve){
+                $project->admin_approve = 0;
+            } else {
+                $project->admin_approve = 1;
+            }
+            $project->save();
+            return 'true';
+        }
+        return 'false';
+    }
+
+    protected static function deleteSubAdminProjectsByAdminId($adminId){
+        $projects = static::where('created_by', $adminId)->where('created_for', 1)->get();
+        if(is_object($projects) && false == $projects->isEmpty()){
+            foreach($projects as $project){
+                $project->deleteCommantsAndSubComments();
+                $project->deleteRegisteredProjects();
+                $project->deleteProjectImageFolder();
+                $project->delete();
+            }
+        }
     }
 }

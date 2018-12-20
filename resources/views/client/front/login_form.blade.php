@@ -82,7 +82,7 @@
                               <input type="radio" name="terms_condition" checked><a href="https://vchipedu.com/terms-and-conditions" target="_blank">Accepted Terms and Condition</a>
                             </label>
                           </div>
-                          <button type="submit" id="loginBtn" name="submit" class="btn btn-info btn-block signInEmail" title="Login" onClick="this.form.submit(); this.disabled=true;">Login</button>
+                          <button id="loginBtn" name="submitBtn" class="btn btn-info btn-block signInEmail" title="Login" onClick="this.form.submit(); this.disabled=true;">Login</button>
                           <button title="Send Otp" id="sendSignInOtpBtn" class="btn btn-info btn-block hide signInMobile" onclick="event.preventDefault(); sendSignInOtp();" >Send OTP</button></br>
                           </br>
                         </form>

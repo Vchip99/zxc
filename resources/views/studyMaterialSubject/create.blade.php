@@ -19,7 +19,7 @@
   @endif
     {{ csrf_field() }}
     <div class="form-group row @if ($errors->has('category')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Category Name:</label>
+      <label class="col-sm-2 col-form-label">Category:</label>
       <div class="col-sm-3">
       @if(isset($subject->id))
         @if(count($courseCategories) > 0)
@@ -44,7 +44,7 @@
       </div>
     </div>
     <div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Sub Category Name:</label>
+      <label class="col-sm-2 col-form-label">Sub Category:</label>
       <div class="col-sm-3">
         @if(isset($subject->id) && count($courseSubCategories) > 0)
             @foreach($courseSubCategories as $courseSubCategory)
@@ -62,7 +62,7 @@
       </div>
     </div>
     <div class="form-group row @if ($errors->has('subject')) has-error @endif">
-      <label for="subject" class="col-sm-2 col-form-label">Subject Name:</label>
+      <label for="subject" class="col-sm-2 col-form-label">Subject:</label>
       <div class="col-sm-3">
         @if(isset($subject->id))
           <input type="text" class="form-control" name="subject" id="subject" value="{{$subject->name}}" required="true">

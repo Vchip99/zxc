@@ -8,8 +8,8 @@ use App\Models\CourseSubCategory;
 use App\Models\CourseCategory;
 use App\Models\StudyMaterialSubject;
 use App\Models\StudyMaterialTopic;
-use Redirect;
-use Validator, Auth, DB;
+use App\Models\Admin;
+use Redirect,Validator, Auth, DB;
 use App\Libraries\InputSanitise;
 
 class StudyMaterialSubjectController extends Controller
@@ -61,6 +61,7 @@ class StudyMaterialSubjectController extends Controller
 	 *	store subject
 	 */
 	protected function store(Request $request){
+		InputSanitise::deleteCacheByString('vchip:studyMaterial*');
 		$v = Validator::make($request->all(), $this->validateCreateSubject);
         if ($v->fails())
         {
@@ -103,6 +104,7 @@ class StudyMaterialSubjectController extends Controller
 	 *	update subject
 	 */
 	protected function update(Request $request){
+		InputSanitise::deleteCacheByString('vchip:studyMaterial*');
 		$v = Validator::make($request->all(), $this->validateCreateSubject);
         if ($v->fails())
         {
@@ -132,6 +134,7 @@ class StudyMaterialSubjectController extends Controller
 	 *	delete subject
 	 */
 	protected function delete(Request $request){
+		InputSanitise::deleteCacheByString('vchip:studyMaterial*');
 		$subjectId = InputSanitise::inputInt($request->get('subject_id'));
 		if(isset($subjectId)){
 			$subject = StudyMaterialSubject::find($subjectId);
@@ -165,4 +168,19 @@ class StudyMaterialSubjectController extends Controller
 		$subcategoryId = $request->get('subcategory');
 		return StudyMaterialSubject::getStudyMaterialSubjectsByCategoryIdBySubCategoryId($categoryId,$subcategoryId);
 	}
+
+	protected function manageSubadminSubjects(Request $request){
+        $subjects = StudyMaterialSubject::getSubAdminSubjectsWithPagination();
+        $admins = Admin::getSubAdmins();
+        return view('subadmin.subadminSubjects', compact('subjects','admins'));
+    }
+
+    protected function getSubAdminSubjects(Request $request){
+        return StudyMaterialSubject::getSubAdminSubjects($request->get('admin_id'));
+    }
+
+    protected function changeSubAdminSubjectApproval(Request $request){
+        InputSanitise::deleteCacheByString('vchip:studyMaterial*');
+        return StudyMaterialSubject::changeSubAdminSubjectApproval($request);
+    }
 }

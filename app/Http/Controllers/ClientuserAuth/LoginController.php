@@ -106,6 +106,20 @@ class LoginController extends Controller
                     return Redirect::to('/')->withErrors('User does not exists or not client approve.');
                 }
                 Auth::guard('clientuser')->login($clientUser);
+                if(1 == $client->plan_id){
+                    if( 'false' == $clientUser::isInBetweenFirstTen()){
+                        $data['name'] = $clientUser->name;
+                        $data['email'] = $clientUser->email;
+                        $data['client'] = $client->name;
+                        // send mail to client
+                        Mail::to($client->email)->send(new ClientUnAuthorisedUser($data));
+
+                        $this->guard('clientuser')->logout();
+                        Session::flush();
+                        Session::regenerate();
+                        return 'Try after some time.';
+                    }
+                }
                 if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
                     Cache::forget($userMobile);
                     Cache::forget('mobile-'.$userMobile);
@@ -125,13 +139,14 @@ class LoginController extends Controller
             if($this->guard('clientuser')->attempt($this->credentials($request))){
                 // if free plan and user is not in first 10 user then dont allow to login
                 $clientUser = Auth::guard('clientuser')->user();
-                if(1 == $clientUser->client->plan_id){
+                $client = $clientUser->client;
+                if(1 == $client->plan_id){
                     if( 'false' == $clientUser::isInBetweenFirstTen()){
                         $data['name'] = $clientUser->name;
                         $data['email'] = $clientUser->email;
-                        $data['client'] = $clientUser->client->name;
+                        $data['client'] = $client->name;
                         // send mail to client
-                        Mail::to($clientUser->client->email)->send(new ClientUnAuthorisedUser($data));
+                        Mail::to($client->email)->send(new ClientUnAuthorisedUser($data));
 
                         $this->guard('clientuser')->logout();
                         Session::flush();

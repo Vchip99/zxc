@@ -202,8 +202,12 @@ class ClientChatMessage extends Model
         //     }
         //     $chatmessageusers = array_unique($chatmessageusers);
         // }
-        $chatusers['chat_users'] = implode(',', $chatmessageusers);
-        $userResult['chatusers'] = $chatusers;
+        if(count($chatmessageusers) > 0){
+            $chatusers['chat_users'] = implode(',', $chatmessageusers);
+            $userResult['chatusers'] = $chatusers;
+        } else {
+            $userResult['chatusers'] = [];
+        }
 
         $messageResult = static::where('receiver_id',  $clientId)->where('client_id', $clientId)->where('is_read', 0)->where('created_by_client', 0)->select('sender_id' , \DB::raw('count(*) as unread'))->groupBy('sender_id')->get();
         if(is_object($messageResult) && false == $messageResult->isEmpty()){

@@ -221,6 +221,10 @@
             </a>
             <ul class="treeview-menu">
               <li title="Manage Sub Admin"><a href="{{ url('admin/manageSubadminUser')}}"><i class="fa fa-circle-o"></i> Manage Sub Admin </a></li>
+              <li title="Sub Admin Courses"><a href="{{ url('admin/manageSubadminCourses')}}"><i class="fa fa-circle-o"></i> Sub Admin Courses</a></li>
+              <li title="Sub Admin Tests"><a href="{{ url('admin/manageSubadminSubCategories')}}"><i class="fa fa-circle-o"></i> Sub Admin Tests</a></li>
+              <li title="Sub Admin Vkits"><a href="{{ url('admin/manageSubadminProjects')}}"><i class="fa fa-circle-o"></i> Sub Admin Vkits</a></li>
+              <li title="Sub Admin Subjects"><a href="{{ url('admin/manageSubadminSubjects')}}"><i class="fa fa-circle-o"></i> Sub Admin Subjects</a></li>
             </ul>
           </li>
           <li class="treeview">
@@ -431,6 +435,7 @@
             <ul class="treeview-menu">
               <li title="Manage Subject"><a href="{{ url('admin/manageStudyMaterialSubject')}}"><i class="fa fa-circle-o"></i> Manage Subject </a></li>
               <li title="Manage Topic"><a href="{{ url('admin/manageStudyMaterialTopic')}}"><i class="fa fa-circle-o"></i> Manage Topic </a></li>
+              <li title="Manage Post"><a href="{{ url('admin/manageStudyMaterialPost')}}"><i class="fa fa-circle-o"></i> Manage Post </a></li>
             </ul>
           </li>
         @endif

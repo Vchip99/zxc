@@ -1166,6 +1166,7 @@ class ClientUserController extends BaseController
         $batchIds = [];
         $groupMessages = [];
         $individualMessages = [];
+        $myMessages = [];
         if(!empty($clientUser->batch_ids)){
             $batchIds = explode(',', $clientUser->batch_ids);
             $batches = ClientBatch::getBatchesByClientIdByBatchIds($clientId,$batchIds);
@@ -1215,8 +1216,10 @@ class ClientUserController extends BaseController
                     }
                 }
             }
+            if(count($myMessages) > 0){
+                krsort($myMessages);
+            }
         }
-        krsort($myMessages);
         if($clientUser->unread_messages > 0){
             DB::connection('mysql2')->beginTransaction();
             try

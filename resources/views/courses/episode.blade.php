@@ -127,7 +127,7 @@
             @if(count($courseVideos)>0)
               @foreach($courseVideos as $courseVideo)
                 <li class="list-group-item"  title="{{$courseVideo->name}}">
-                  @if('true' == $isCoursePurchased || 1 == $courseVideo->is_free || $videoCoursePrice <= 0)
+                  @if('true' == $isCoursePurchased || 1 == $courseVideo->is_free || $videoCoursePrice <= 0 || is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email)
                     <a class="ellipsis" href="{{url('episode')}}/{{$courseVideo->id}}">{{$courseVideo->name}} </a>
                   @else
                     <a class="ellipsis" onClick="purchaseCourse();">{{$courseVideo->name}} </a>

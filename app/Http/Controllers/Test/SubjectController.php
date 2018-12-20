@@ -10,8 +10,8 @@ use App\Models\TestSubject;
 use App\Models\UserSolution;
 use App\Models\Score;
 use App\Models\PaperSection;
-use Redirect;
-use Validator, Auth, DB;
+use App\Models\Admin;
+use Redirect,Validator, Auth, DB;
 use App\Libraries\InputSanitise;
 
 class SubjectController extends Controller
@@ -183,4 +183,14 @@ class SubjectController extends Controller
 	protected function isTestSubjectExist(Request $request){
 		return TestSubject::isTestSubjectExist($request);
 	}
+
+	protected function manageSubadminSubjects(Request $request){
+        $subjects = TestSubject::getSubAdminSubjectsWithPagination();
+        $admins = Admin::getSubAdmins();
+        return view('subadmin.subadminSubjects', compact('subjects','admins'));
+    }
+
+    protected function getSubAdminSubjects(Request $request){
+        return TestSubject::getSubAdminSubjects($request->get('admin_id'));
+    }
 }

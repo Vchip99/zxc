@@ -63,6 +63,7 @@ class QuizController extends Controller
                 }
             }
             if(count(array_keys($results['questions'])) > 0){
+                ksort($results['questions']);
                 $paperSections = Cache::remember('vchip:tests:paperSections:paperId-'.$paperId,30, function() use ($paperId) {
                     return PaperSection::where('test_subject_paper_id', $paperId)->get();
                 });
@@ -75,9 +76,7 @@ class QuizController extends Controller
                     }
                 }
             }
-
             $paper = $this->getPaperById($paperId);
-
     	   return view('quiz.questions', compact('results','paper', 'sections', 'checkVerificationCode'));
         } else {
             return Redirect::to('/');

@@ -121,20 +121,26 @@
                           <p id="1" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
                             1. {!! $post->answer1 !!}
                             @if(1 == $post->answer)
-                              <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                              <span class="hide" id="right_answer_image_{{$post->id}}_1"> <img src="{{ url('images/accept.png')}}"></span>
+                            @else
+                              <span class="hide" id="wrong_answer_image_{{$post->id}}_1"> <img src="{{ url('images/delete1.png')}}"></span>
                             @endif
                           </p>
                           <p id="2" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
                             2. {!! $post->answer2 !!}
                             @if(2 == $post->answer)
-                              <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                              <span class="hide" id="right_answer_image_{{$post->id}}_2"> <img src="{{ url('images/accept.png')}}"></span>
+                            @else
+                              <span class="hide" id="wrong_answer_image_{{$post->id}}_2"> <img src="{{ url('images/delete1.png')}}"></span>
                             @endif
                           </p>
                           @if($post->answer3)
                           <p id="3" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
                             3. {!! $post->answer3 !!}
                             @if(3 == $post->answer)
-                              <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                              <span class="hide" id="right_answer_image_{{$post->id}}_3"> <img src="{{ url('images/accept.png')}}"></span>
+                            @else
+                              <span class="hide" id="wrong_answer_image_{{$post->id}}_3"> <img src="{{ url('images/delete1.png')}}"></span>
                             @endif
                           </p>
                           @endif
@@ -142,7 +148,9 @@
                           <p id="4" role="button" data-post_id="{{$post->id}}" onClick="checkAnswer(this)">
                             4. {!! $post->answer4 !!}
                             @if(4 == $post->answer)
-                              <span class="hide" id="right_answer_image_{{$post->id}}"> <img src="{{ url('images/accept.png')}}"></span>
+                              <span class="hide" id="right_answer_image_{{$post->id}}_4"> <img src="{{ url('images/accept.png')}}"></span>
+                            @else
+                              <span class="hide" id="wrong_answer_image_{{$post->id}}_4"> <img src="{{ url('images/delete1.png')}}"></span>
                             @endif
                           </p>
                           @endif
@@ -607,9 +615,12 @@
       $(ele).prop('style', 'color:green;');
       $('#answer_'+postId).removeClass('hide');
       $('#solution_'+postId).removeClass('hide');
-      $('#right_answer_image_'+postId).removeClass('hide');
+      $('#right_answer_image_'+postId+'_'+answer).removeClass('hide');
+      $('#wrong_answer_image_'+postId+'_'+answer).addClass('hide');
     } else {
       $(ele).prop('style', 'color:grey;');
+      $('#right_answer_image_'+postId+'_'+answer).addClass('hide');
+      $('#wrong_answer_image_'+postId+'_'+answer).removeClass('hide');
     }
   }
 
@@ -1383,7 +1394,7 @@
           editDeleteInnerHtml = '<button class="btn dropdown-toggle btn-box-tool "  id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button>';
           editDeleteInnerHtml += '<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">';
           if(  userId == obj.user_id || userId == commentUserId || userId == postUserId ){
-            editDeleteInnerHtml += '<li><a id="'+obj.discussion_comment_id+'_'+obj.id+'" onclick="confirmSubCommentDelete(this);">Delete</a></li>';
+            editDeleteInnerHtml += '<li><a id="'+obj.discussion_comment_id+'_'+obj.id+'" data-subcomment_id="'+ obj.id +'" onclick="confirmSubCommentDelete(this);">Delete</a></li>';
           }
           if( userId == obj.user_id ){
             editDeleteInnerHtml += '<li><a id="'+obj.id+'" onclick="editSubComment(this);">Edit</a></li>';

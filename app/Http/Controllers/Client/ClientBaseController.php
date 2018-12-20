@@ -895,7 +895,11 @@ class ClientBaseController extends BaseController
 
     protected function allChatMessages($subdomainName){
         $result = ClientChatMessage::showClientChatUsers($subdomainName);
-        $users = $result['chatusers'];
+        if(isset($result['chatusers'])){
+            $users = $result['chatusers'];
+        } else {
+            $users = [];
+        }
         if(isset($result['unreadCount'])){
             $unreadCount = $result['unreadCount'];
         }

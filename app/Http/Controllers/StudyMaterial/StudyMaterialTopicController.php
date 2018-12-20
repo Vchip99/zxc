@@ -8,6 +8,12 @@ use App\Models\CourseSubCategory;
 use App\Models\CourseCategory;
 use App\Models\StudyMaterialSubject;
 use App\Models\StudyMaterialTopic;
+use App\Models\StudyMaterialPost;
+use App\Models\StudyMaterialPostLike;
+use App\Models\StudyMaterialComment;
+use App\Models\StudyMaterialCommentLike;
+use App\Models\StudyMaterialSubComment;
+use App\Models\StudyMaterialSubCommentLike;
 use Redirect;
 use Validator, Auth, DB;
 use App\Libraries\InputSanitise;
@@ -36,7 +42,7 @@ class StudyMaterialTopicController extends Controller
     protected $validateCreateTopic = [
             'category' => 'required|integer',
             'subcategory' => 'required|integer',
-            'subject' => 'required|string',
+            'subject' => 'required|integer',
             'topic' => 'required|string',
     ];
 
@@ -146,6 +152,12 @@ class StudyMaterialTopicController extends Controller
 					DB::beginTransaction();
 			        try
 			        {
+			        	StudyMaterialPost::deletePostsByTopicId($topic->id);
+			        	StudyMaterialPostLike::deleteLikesByTopicId($topic->id);
+						StudyMaterialComment::deleteCommentsByTopicId($topic->id);
+						StudyMaterialCommentLike::deleteLikesByTopicId($topic->id);
+						StudyMaterialSubComment::deleteSubCommentsByTopicId($topic->id);
+						StudyMaterialSubCommentLike::deleteLikesByTopicId($topic->id);
 						$topic->delete();
 						DB::commit();
 						return Redirect::to('admin/manageStudyMaterialTopic')->with('message', 'Topic deleted successfully!');
@@ -163,5 +175,12 @@ class StudyMaterialTopicController extends Controller
 
 	protected function isStudyMaterialTopicExist(Request $request){
 		return StudyMaterialTopic::isStudyMaterialTopicExist($request);
+	}
+
+	protected function getStudyMaterialTopicsByCategoryIdBySubCategoryIdBySubjectId(Request $request){
+		$categoryId = $request->get('category');
+		$subcategoryId = $request->get('subcategory');
+		$subjectId = $request->get('subject');
+		return StudyMaterialTopic::getStudyMaterialTopicsByCategoryIdBySubCategoryIdBySubjectId($categoryId,$subcategoryId,$subjectId);
 	}
 }

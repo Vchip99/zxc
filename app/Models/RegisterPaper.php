@@ -12,7 +12,7 @@ class RegisterPaper extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'test_subject_paper_id','payment_id','payment_request_id','price'];
+    protected $fillable = ['user_id', 'test_subject_paper_id','payment_id','payment_request_id','price','test_sub_category_id'];
 
     protected static function registerTestPaper($userId, $paperId){
     	if(isset($userId) && isset($paperId)){
@@ -27,6 +27,10 @@ class RegisterPaper extends Model
 
     protected static function getRegisteredPapersByUserId($userId){
         return static::where('user_id', $userId)->get();
+    }
+
+    protected static function getRegisteredSubCategoryByUserIdBySubCategoryId($userId,$subCategoryId){
+        return static::where('user_id', $userId)->where('test_sub_category_id',$subCategoryId)->first();
     }
 
     protected static function getRegisteredPapers(){
@@ -50,6 +54,7 @@ class RegisterPaper extends Model
         $purchasedPaper->payment_id = $paymentArray['payment_id'];
         $purchasedPaper->payment_request_id = $paymentArray['payment_request_id'];
         $purchasedPaper->price = $paymentArray['price'];
+        $purchasedPaper->test_sub_category_id = $paymentArray['test_sub_category_id'];
         $purchasedPaper->save();
         return $purchasedPaper;
     }

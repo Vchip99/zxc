@@ -60,6 +60,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
                 }
             }
             if(count(array_keys($results['questions'])) > 0){
+                ksort($results['questions']);
                 $clientUser = Auth::guard('clientuser')->user();
                 if(is_object($clientUser)){
                     $clientId = $clientUser->client_id;
@@ -85,7 +86,7 @@ class ClientOnlineQuestionFrontController extends ClientHomeController
             } else {
                 $paper = ClientOnlineTestSubjectPaper::getPayablePaperById($paperId);
             }
-        	return view('client.front.question.questions', compact('results','paper', 'sections'));
+        	return view('client.front.question.questions', compact('results','paper','sections'));
         } else {
             return Redirect::to('/');
         }

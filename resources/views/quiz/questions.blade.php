@@ -58,22 +58,43 @@
 										<input type="hidden" id="timer_changed_{{$section->id}}" data-section="{{$section->name}}" value="{{$section->duration}}">
 									@endforeach
 								</div>
+								@if(1 == $paper->paper_pattern)
+									@php
+										$newIndexQue = 0;
+									@endphp
+								@endif
 								@foreach($sections as $index => $section)
 									<div id="section_{{ $section->name }}" class="hide">
 									@if(isset($results['questions']) && count($results['questions'][$section->id]) > 0)
 									@foreach($results['questions'][$section->id] as $index => $result)
-										@if( $index == 0)
-											<div class='cont' id='question_{{$result->id}}' value='{{$result->id}}'>
-												<div align="right" style="background-color: yellow">
-													<span>Marks for correct answer: {{$result->positive_marks}} |
-													Negative Marks: <span style="color: red">{{$result->negative_marks}}</span></span>&emsp;&emsp;&emsp;
-												</div>
+							  			@if(1 == $paper->paper_pattern)
+											@if( $newIndexQue == 0)
+												<div class='cont' id='question_{{$result->id}}' value='{{$result->id}}'>
+													<div align="right" style="background-color: yellow">
+														<span>Marks for correct answer: {{$result->positive_marks}} |
+														Negative Marks: <span style="color: red">{{$result->negative_marks}}</span></span>&emsp;&emsp;&emsp;
+													</div>
+											@else
+								  				<div class='cont hide' id='question_{{$result->id}}' value='{{$result->id}}'>
+								  					<div align="right" style="background-color: yellow">
+														<span>Marks for correct answer: {{$result->positive_marks}} |
+														Negative Marks: <span style="color: red">{{$result->negative_marks}}</span></span>&emsp;&emsp;&emsp;
+													</div>
+								  			@endif
 										@else
-							  				<div class='cont hide' id='question_{{$result->id}}' value='{{$result->id}}'>
-							  					<div align="right" style="background-color: yellow">
-													<span>Marks for correct answer: {{$result->positive_marks}} |
-													Negative Marks: <span style="color: red">{{$result->negative_marks}}</span></span>&emsp;&emsp;&emsp;
-												</div>
+											@if( $index == 0)
+												<div class='cont' id='question_{{$result->id}}' value='{{$result->id}}'>
+													<div align="right" style="background-color: yellow">
+														<span>Marks for correct answer: {{$result->positive_marks}} |
+														Negative Marks: <span style="color: red">{{$result->negative_marks}}</span></span>&emsp;&emsp;&emsp;
+													</div>
+											@else
+								  				<div class='cont hide' id='question_{{$result->id}}' value='{{$result->id}}'>
+								  					<div align="right" style="background-color: yellow">
+														<span>Marks for correct answer: {{$result->positive_marks}} |
+														Negative Marks: <span style="color: red">{{$result->negative_marks}}</span></span>&emsp;&emsp;&emsp;
+													</div>
+								  			@endif
 							  			@endif
 											<div class="bg-warning" style="height:400px" >
 										        <div class="panel-body"  >
@@ -83,7 +104,11 @@
 																<b>Common Data:</b><br/>
 																<span style="padding-left: 5px;">{!! trim($result->common_data) !!}</span><hr/>
 															@endif
-															<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
+															@if(1 == $paper->paper_pattern)
+																<span class="btn btn-sq-xs btn-info">{{$newIndexQue+1}}.</span>
+															@else
+																<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
+															@endif
 															{!! trim($result->name) !!}
 														</p>
 														@if( 1 == $result->question_type )
@@ -126,6 +151,11 @@
 								                <button id ="mark_{{$result->id}}" value='{{$result->id}}' data-next_ques="{{isset($results['questions'][$section->id][$index+1])?$results['questions'][$section->id][$index+1]->id:0}}" class='mark btn btn-success' title='Mark for Review' type='button'><i class='fa fa-check-square-o hidden-lg' aria-hidden='true'></i><div class='hidden-sm'>Mark for Review</div></button>
 											</div>
 										</div>
+										@if(1 == $paper->paper_pattern)
+											@php
+												$newIndexQue++;
+											@endphp
+										@endif
 									@endforeach
 									@endif
 									</div>
@@ -141,50 +171,91 @@
 					   		<div class="panel-body">
 					     		<table class="table" >
 					     		@if(count($results['questions']) > 0)
-						     		@foreach($sections as $index => $section)
-								  	<tr id="{{$section->name}}_palette">
-								  		<div class="row">
-				                   			<div class="col-lg-12">
-								  				<td height="200px"   overflow = "scroll" >
-											  	<div class="bg-warning" style="height:300px" >
-											      	<p id = "id1"></p>
-											      	@if(isset($results['questions']) && count($results['questions'][$section->id]) > 0)
-												    	@foreach($results['questions'][$section->id] as $index => $q)
-													 		<button type="button" id ="id_{{$q->id}}" data-type="{{$section->name}}" class="button1 btn btn-sq-xs btn-info" value="{{$q->id}}"  title='{{$index+1}}'>{{$index+1}}</button>
+					     			@if(1 == $paper->paper_pattern)
+									  	<tr>
+									  		<div class="row">
+					                   			<div class="col-lg-12">
+									  				<td height="200px"   overflow = "scroll" >
+												  	<div class="bg-warning" style="height:300px" >
+												      	<p id = "id1"></p>
+												      	@php
+										     				$newIndex = 1;
+										     			@endphp
+												      	@foreach($sections as $index => $section)
+													      	@if(isset($results['questions']) && count($results['questions'][$section->id]) > 0)
+														    	@foreach($results['questions'][$section->id] as $index => $q)
+															 		<button type="button" id ="id_{{$q->id}}" data-type="{{$section->name}}" class="button1 btn btn-sq-xs btn-info" value="{{$q->id}}"  title='{{$newIndex}}'>{{$newIndex}}</button>
+															 		@php
+													     				$newIndex++;
+													     			@endphp
+														      	@endforeach
+													      	@endif
 												      	@endforeach
-											      	@endif
-											    </div>
-												</td>
+												    </div>
+													</td>
+												</div>
+									  		</div>
+									  	</tr>
+					                    <tr >
+										    <div class="row" >
+												<div class="col-lg-12"  >
+													<td>
+												  		<p>
+															<a data-path="{{ url('instructions1') }}" class="btn btn-sq-sm btn-primary load-ajax-modal" role="button" data-toggle="modal" data-target="#dynamic-modal">Instruction</a>
+															<a class="btn btn-sq-sm btn-success" role="button" data-toggle="modal" data-target="#user-profile">Profile</a >
+															<button id="btn1" type="button" class="btn btn-sq-sm btn-warning next btn btn-success" onClick="submitForm();">Submit</button >
+															<a class="btn btn-sq-sm btn-danger load-ajax-modal" role="button" data-toggle="modal" data-target="#questions">Que paper</a >
+												  		</p>
+												  	</td>
+												</div>
 											</div>
-								  		</div>
-								  	</tr>
-								  	@endforeach
-				                    <tr >
+									  	</tr>
+					     			@else
+							     		@foreach($sections as $index => $section)
+										  	<tr id="{{$section->name}}_palette">
+										  		<div class="row">
+						                   			<div class="col-lg-12">
+										  				<td height="200px"   overflow = "scroll" >
+													  	<div class="bg-warning" style="height:300px" >
+													      	<p id = "id1"></p>
+													      	@if(isset($results['questions']) && count($results['questions'][$section->id]) > 0)
+														    	@foreach($results['questions'][$section->id] as $index => $q)
+															 		<button type="button" id ="id_{{$q->id}}" data-type="{{$section->name}}" class="button1 btn btn-sq-xs btn-info" value="{{$q->id}}"  title='{{$index+1}}'>{{$index+1}}</button>
+														      	@endforeach
+													      	@endif
+													    </div>
+														</td>
+													</div>
+										  		</div>
+										  	</tr>
+									  	@endforeach
+					                    <tr >
+										    <div class="row" >
+												<div class="col-lg-12"  >
+													<td>
+												  		<p>
+															<a data-path="{{ url('instructions1') }}" class="btn btn-sq-sm btn-primary load-ajax-modal" role="button" data-toggle="modal" data-target="#dynamic-modal">Instruction</a>
+															<a class="btn btn-sq-sm btn-success" role="button" data-toggle="modal" data-target="#user-profile">Profile</a >
+															<button id="btn1" type="button" class="btn btn-sq-sm btn-warning next btn btn-success" onClick="submitForm();">Submit</button >
+															<a class="btn btn-sq-sm btn-danger load-ajax-modal" role="button" data-toggle="modal" data-target="#questions">Que paper</a >
+												  		</p>
+												  	</td>
+												</div>
+											</div>
+									  	</tr>
+									@endif
+							  	@else
+									<tr >
 									    <div class="row" >
 											<div class="col-lg-12"  >
 												<td>
-											  		<p>
-														<a data-path="{{ url('instructions1') }}" class="btn btn-sq-sm btn-primary load-ajax-modal" role="button" data-toggle="modal" data-target="#dynamic-modal">Instruction</a>
-														<a class="btn btn-sq-sm btn-success" role="button" data-toggle="modal" data-target="#user-profile">Profile</a >
-														<button id="btn1" type="button" class="btn btn-sq-sm btn-warning next btn btn-success" onClick="submitForm();">Submit</button >
-														<a class="btn btn-sq-sm btn-danger load-ajax-modal" role="button" data-toggle="modal" data-target="#questions">Que paper</a >
+											  		<p >
+														<button id="btn1" type="button" class="btn btn-sq-sm btn-warning next btn btn-success" onclick="window.close();">Close</button >
 											  		</p>
 											  	</td>
 											</div>
 										</div>
 								  	</tr>
-							  	@else
-								<tr >
-								    <div class="row" >
-										<div class="col-lg-12"  >
-											<td>
-										  		<p >
-													<button id="btn1" type="button" class="btn btn-sq-sm btn-warning next btn btn-success" onclick="window.close();">Close</button >
-										  		</p>
-										  	</td>
-										</div>
-									</div>
-							  	</tr>
 							  	@endif
 								</table>
 						  	</div>
@@ -257,6 +328,7 @@
 	        </div>
 	      </div>
 	    </div>
+	    <input type="hidden" id="paperPattern" value="{{$paper->paper_pattern}}">
 <script type="text/javascript">
 	// Set NumPad defaults for jQuery mobile.
 	// These defaults will be applied to all NumPads within this document!
@@ -373,6 +445,14 @@
 			$('div#section_'+sect).removeClass('hide');
 			$('div#section_'+sect+' > div').addClass('hide');
 			$('div#section_'+sect+' > div:first').removeClass('hide');
+			//highlight/show first question of sec
+			firstQueId = $('div#section_'+sect+' > div:first').attr('value');
+			if($('#radio1_'+firstQueId).prop("checked") || $('#radio2_'+firstQueId).prop("checked") || $('#radio3_'+firstQueId).prop("checked") || $('#radio4_'+firstQueId).prop("checked") || $('#radio5_'+firstQueId).prop("checked") || $('#radio6_'+firstQueId).prop("checked") || $('#numpad_'+firstQueId).val() ){
+				$('#id_'+firstQueId).css('background', 'green');
+			} else {
+				$('#id_'+firstQueId).css('background', 'red');
+			}
+
 			if(0 == timeOutBy){
 				var sessionId = $('#'+sect).data('session_id');
 				$('button#timer_'+sessionId).removeClass('hide');
@@ -402,11 +482,23 @@
 		$(document).on("click",".next",function(){
 		    questionId=parseInt($(this).attr('value'));
 		    nex = parseInt($(this).data('next_ques'));
-		    if( nex == 0){
+			if( nex == 0){
 		    	var allSections= document.getElementById('all_sections').value;
-				$.each(allSections.split(','), function(idx, obj) {
+		    	var sectionNames = allSections.split(',');
+				$.each(sectionNames, function(idx, obj) {
 					if( 'question_'+questionId == $('div#section_'+obj+' > div:last').attr('id')){
-				    	nex= $('div#section_'+obj+' > div:first').attr('value');
+						if(1 == $('#paperPattern').val()){
+							if(sectionNames[(idx + 1)]){
+								nex= $('div#section_'+sectionNames[(idx + 1)]+' > div:first').attr('value');
+								$('div#section_'+sectionNames[(idx + 1)]).removeClass('hide');
+								$('div#section_'+sectionNames[(idx - 1)]).addClass('hide');
+							} else {
+								nex= $('div#section_'+sectionNames[0]+' > div:first').attr('value');
+								$('div#section_'+sectionNames[0]).removeClass('hide');
+							}
+						} else {
+				    		nex= $('div#section_'+obj+' > div:first').attr('value');
+						}
 				    }
 				});
 			}
@@ -429,13 +521,37 @@
 		$(document).on("click",".prev",function(){
 		    questionId=parseInt($(this).attr('value'));
 		    prev = parseInt($(this).data('prev_ques'));
-		    if( prev == 0){
-		    	var allSections= document.getElementById('all_sections').value;
-				$.each(allSections.split(','), function(idx, obj) {
-					if( 'question_'+questionId == $('div#section_'+obj+' > div:first').attr('id')){
-				    	prev= $('div#section_'+obj+' > div:last').attr('value');
-				    }
-				});
+			if( prev == 0){
+				if(1 == $('#paperPattern').val()){
+					var sectName = $('#id_'+questionId).data('type');
+					var prevAllSections= document.getElementById('all_sections').value;
+			    	var prevSectionNames = prevAllSections.split(',');
+					$.each(prevSectionNames, function(idx, obj) {
+						if(sectName == obj){
+							if(0 < (idx-1)){
+								$('div#section_'+prevSectionNames[(idx-1)]).removeClass('hide');
+								prev= $('div#section_'+prevSectionNames[(idx-1)]+' > div:last').attr('value');
+							} else if(0 == (idx-1)){
+								$('div#section_'+prevSectionNames[0]).removeClass('hide');
+								prev= $('div#section_'+prevSectionNames[0]+' > div:last').attr('value');
+							} else {
+								var newSect = prevAllSections.split(',').reverse()[0];
+								$('div#section_'+newSect).removeClass('hide');
+								prev= $('div#section_'+newSect+' > div:last').attr('value');
+							}
+						} else {
+							$('div#section_'+obj).removeClass('hide');
+						}
+					});
+				} else {
+					var allSections= document.getElementById('all_sections').value;
+			    	var sectionNames = allSections.split(',');
+					$.each(sectionNames, function(idx, obj) {
+						if( 'question_'+questionId == $('div#section_'+obj+' > div:first').attr('id')){
+					    	prev= $('div#section_'+obj+' > div:last').attr('value');
+					    }
+					});
+				}
 			}
 			$('#question_'+questionId).addClass('hide');
 		    $('#question_'+prev).removeClass('hide');
@@ -458,11 +574,24 @@
 		$(document).on('click','.mark',function(){
 		    last=parseInt($(this).attr('value'));
 		    nex = parseInt($(this).data('next_ques'));
-
-		    var allSections= document.getElementById('all_sections').value;
-			$.each(allSections.split(','), function(idx, obj) {
+			var allSections= document.getElementById('all_sections').value;
+	    	var sectionNames = allSections.split(',');
+			$.each(sectionNames, function(idx, obj) {
 				if( 'question_'+last == $('div#section_'+obj+' > div:last').attr('id')){
-			    	nex= $('div#section_'+obj+' > div:first').attr('value');
+			    	if( 'question_'+last == $('div#section_'+obj+' > div:last').attr('id')){
+						if(1 == $('#paperPattern').val()){
+							if(sectionNames[(idx + 1)]){
+								nex= $('div#section_'+sectionNames[(idx + 1)]+' > div:first').attr('value');
+								$('div#section_'+sectionNames[(idx + 1)]).removeClass('hide');
+								$('div#section_'+sectionNames[(idx - 1)]).addClass('hide');
+							} else {
+								nex= $('div#section_'+sectionNames[0]+' > div:first').attr('value');
+								$('div#section_'+sectionNames[0]).removeClass('hide');
+							}
+						} else {
+				    		nex= $('div#section_'+obj+' > div:first').attr('value');
+						}
+				    }
 			    }
 			});
 
@@ -499,6 +628,26 @@
 		$(document).on('click','.button1',function(){
 		    var questionId = parseInt($(this).attr('value'));
 			var section = $(this).attr('data-type');
+			var allSections= document.getElementById('all_sections').value;
+			if(1 == $('#paperPattern').val()){
+				$.each(allSections.split(','), function(idx, obj) {
+					if(section == obj){
+						$('div#section_'+obj).removeClass('hide');
+						$('div#section_'+obj+' > div').removeClass('hide');
+					} else {
+						$('div#section_'+obj).addClass('hide');
+						$('div#section_'+obj+' > div').addClass('hide');
+					}
+				});
+			}
+			$.each(allSections.split(','), function(idx, obj) {
+				if(section == obj){
+					document.getElementById('selected_section').value = obj;
+					$('#'+obj).removeClass('btn-default').addClass('btn-primary');
+				} else {
+					$('#'+obj).addClass('btn-default').removeClass('btn-primary');
+				}
+			});
 			$.each($('div#section_'+section+' > .cont'), function(idx, obj) {
 				var divId = $(obj).attr('id');
 				if('question_'+questionId == divId){

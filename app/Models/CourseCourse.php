@@ -21,7 +21,7 @@ class CourseCourse extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'course_category_id', 'course_sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path','release_date','created_by','admin_id'];
+    protected $fillable = ['name', 'course_category_id', 'course_sub_category_id', 'author', 'author_introduction', 'author_image', 'description', 'price', 'difficulty_level', 'certified', 'image_path','release_date','created_by','admin_id','admin_approve'];
 
     /**
      *  create/update course
@@ -117,14 +117,14 @@ class CourseCourse extends Model
         $course->release_date = $release_date;
     	$course->save();
     	return $course;
-
     }
 
     /**
      *  display courses associated with videos
      */
     protected static function getCourseAssocaitedWithVideosWithPagination(){
-        return DB::table('course_courses')
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            return  DB::table('course_courses')
                 ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
                 ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
                 ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
@@ -132,6 +132,17 @@ class CourseCourse extends Model
                 ->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category')
                 ->groupBy('course_courses.id')
                 ->paginate(9);
+        } else {
+            return  DB::table('course_courses')
+                ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                ->where('course_sub_categories.created_for', 1)
+                ->where('course_courses.admin_approve', 1)
+                ->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category')
+                ->groupBy('course_courses.id')
+                ->paginate(9);
+        }
     }
 
     /**
@@ -198,10 +209,27 @@ class CourseCourse extends Model
     /**
      *  couses
      */
+    protected static function getCoursesWithPaginationForAdmin(){
+        $result = static::join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+            ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+            ->join('admins','admins.id','=', 'course_courses.admin_id')
+            ->where('course_sub_categories.created_for', 1);
+        if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
+            $result->where('course_courses.admin_id', Auth::guard('admin')->user()->id);
+        }
+        return $result->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category','admins.name as admin')
+            ->groupBy('course_courses.id')
+            ->paginate();
+    }
+
+    /**
+     *  couses
+     */
     protected static function getCoursesWithPagination(){
         $result = static::join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
-                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
-                ->where('course_sub_categories.created_for', 1);
+            ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+            ->where('course_sub_categories.created_for', 1)
+            ->where('course_courses.admin_approve', 1);
         if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
             $result->where('course_courses.admin_id', Auth::guard('admin')->user()->id);
         }
@@ -298,7 +326,8 @@ class CourseCourse extends Model
             /**
              *  return registered courses by category and sub category
              */
-            return DB::table('course_courses')
+            if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+                return DB::table('course_courses')
                     ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
                     ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
                     ->join('register_online_courses', 'register_online_courses.online_course_id', '=', 'course_courses.id')
@@ -309,11 +338,26 @@ class CourseCourse extends Model
                     ->select('course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category', 'register_online_courses.grade as grade')
                     ->groupBy('course_courses.id')
                     ->get() ;
+            } else {
+                return DB::table('course_courses')
+                    ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                    ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                    ->join('register_online_courses', 'register_online_courses.online_course_id', '=', 'course_courses.id')
+                    ->where('course_courses.course_category_id', $categoryId)
+                    ->where('course_courses.course_sub_category_id', $subcategoryId)
+                    ->where('register_online_courses.user_id', $userId)
+                    ->where('course_sub_categories.created_for', 1)
+                    ->where('course_courses.admin_approve', 1)
+                    ->select('course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category', 'register_online_courses.grade as grade')
+                    ->groupBy('course_courses.id')
+                    ->get() ;
+            }
         } else {
             /**
              *  display courses associated with videos by category and sub category
              */
-            return DB::table('course_courses')
+            if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+                return DB::table('course_courses')
                     ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
                     ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
                     ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
@@ -323,6 +367,19 @@ class CourseCourse extends Model
                     ->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category')
                     ->groupBy('course_courses.id')
                     ->get() ;
+            } else {
+                return DB::table('course_courses')
+                    ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                    ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                    ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
+                    ->where('course_courses.course_category_id', $categoryId)
+                    ->where('course_courses.course_sub_category_id', $subcategoryId)
+                    ->where('course_sub_categories.created_for', 1)
+                    ->where('course_courses.admin_approve', 1)
+                    ->select('course_courses.id','course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category')
+                    ->groupBy('course_courses.id')
+                    ->get() ;
+            }
         }
     }
 
@@ -359,11 +416,18 @@ class CourseCourse extends Model
         $latest = InputSanitise::inputInt($searchFilter['latest']);
         $categoryId = InputSanitise::inputInt($searchFilter['categoryId']);
         $subcategoryId = InputSanitise::inputInt($searchFilter['subcategoryId']);
-
-        $results = DB::table('course_courses')
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            $results = DB::table('course_courses')
                     ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
                     ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
                     ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id');
+        } else {
+            $results = DB::table('course_courses')
+                    ->join('course_videos', 'course_videos.course_id', '=', 'course_courses.id')
+                    ->join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                    ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                    ->where('course_courses.admin_approve', 1);
+        }
 
         if(count($difficulty) > 0){
             $results->whereIn('difficulty_level', $difficulty);
@@ -425,6 +489,7 @@ class CourseCourse extends Model
                 ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
                 ->where('course_sub_categories.created_for', 1)
                 ->where('register_online_courses.user_id', $userId)
+                ->where('course_courses.admin_approve', 1)
                 ->select('course_courses.*', 'course_categories.name as category', 'course_sub_categories.name as subCategory')->groupBy('course_courses.id')->get();
     }
 
@@ -629,6 +694,79 @@ class CourseCourse extends Model
 
     protected static function deleteCollegeCoursesAndCourseVideosByUserId($userId){
         $courses =  static::where('created_by', $userId)->get();
+        if(is_object($courses) && false == $courses->isEmpty()){
+            foreach($courses as $course){
+                if(true == is_object($course->videos) && false == $course->videos->isEmpty()){
+                    foreach($course->videos as $video){
+                        $video->deleteCommantsAndSubComments();
+                        if(true == preg_match('/courseVideos/',$video->video_path)){
+                            $courseVideoFolder = "courseVideos/".$video->course_id."/".$video->id;
+                            if(is_dir($courseVideoFolder)){
+                                InputSanitise::delFolder($courseVideoFolder);
+                            }
+                        }
+                        $video->delete();
+                    }
+                }
+                $course->deleteRegisteredCourses();
+                $course->deleteCourseImageFolder();
+                $courseVideoFolder = "courseVideos/".$course->id;
+                if(is_dir($courseVideoFolder)){
+                    InputSanitise::delFolder($courseVideoFolder);
+                }
+                $course->delete();
+            }
+        }
+        return;
+    }
+
+    /**
+     *  sub admin couses
+     */
+    protected static function getSubAdminCoursesWithPagination(){
+        return static::join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->join('admins','admins.id','=', 'course_courses.admin_id')
+                ->where('course_sub_categories.created_for', 1)
+                ->where('course_courses.admin_id','!=', 1)
+                ->select('course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category','admins.name as admin')
+                ->groupBy('course_courses.id')
+                ->orderBy('course_courses.id','desc')
+                ->paginate();
+    }
+
+    /**
+     *  sub admin couses
+     */
+    protected static function getSubAdminCourses($adminId){
+        return static::join('course_categories', 'course_categories.id', '=', 'course_courses.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_courses.course_sub_category_id')
+                ->join('admins','admins.id','=', 'course_courses.admin_id')
+                ->where('course_sub_categories.created_for', 1)
+                ->where('course_courses.admin_id', $adminId)
+                ->select('course_courses.*', 'course_sub_categories.name as subcategory', 'course_categories.name as category','admins.name as admin')
+                ->groupBy('course_courses.id')
+                ->orderBy('course_courses.id','desc')
+                ->get();
+    }
+
+    protected static function changeSubAdminCourseApproval($request){
+        $courseId = $request->get('course_id');
+        $course = static::find($courseId);
+        if(is_object($course)){
+            if(1 == $course->admin_approve){
+                $course->admin_approve = 0;
+            } else {
+                $course->admin_approve = 1;
+            }
+            $course->save();
+            return 'true';
+        }
+        return 'false';
+    }
+
+    protected static function deleteSubAdminCoursesAndCourseVideosByAdminId($adminId){
+        $courses =  static::where('admin_id', $adminId)->get();
         if(is_object($courses) && false == $courses->isEmpty()){
             foreach($courses as $course){
                 if(true == is_object($course->videos) && false == $course->videos->isEmpty()){

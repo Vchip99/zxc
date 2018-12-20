@@ -58,6 +58,10 @@
 		  text-align:center;
 		  overflow: visible;
 		}
+		.pay-now span {
+		    color: #fff;
+		    font-weight: bold;
+		}
   	</style>
 @stop
 @section('header-js')
@@ -118,7 +122,7 @@
 	  <div class="row label-primary">
 	    <div class="col-md-8  col-md-offset-2  ">
 	      <div class="row text-center">
-	        <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm  ">
+	        <div class="col-md-4 col-sm-4  col-xs-12 mrgn_10_top_btm  ">
 	          <select class="form-control" id="category" name="category" title="Category" onChange="selectSubcategory(this);">
           		<option>Select Category</option>
           		@foreach($testCategories as $testCategory)
@@ -132,19 +136,49 @@
           		@endforeach
           	</select>
 	        </div>
-	        <div class="col-md-6 col-sm-6  col-xs-12 mrgn_10_top_btm">
-	          <select class="form-control" id="subcategory" name="subcategory" title="Sub Category" onChange="selectPanel();">
+	        <div class="col-md-4 col-sm-4  col-xs-12 mrgn_10_top_btm">
+	          <select class="form-control" id="subcategory" name="subcategory" title="Sub Category" onChange="selectPanel(this);">
 	          		<option>Select Sub Category</option>
 	          		@foreach($testSubCategories as $testSubCategory)
 	          			@if($subcatId == $testSubCategory->id)
-	          				<option value="{{$testSubCategory->id}}" selected>
+	          				<option value="{{$testSubCategory->id}}" data-price="{{$testSubCategory->price}}" selected>
 	          			@else
-	          				<option value="{{$testSubCategory->id}}">
+	          				<option value="{{$testSubCategory->id}}" data-price="{{$testSubCategory->price}}">
 	          			@endif
 	          				{{$testSubCategory->name}}
 	          			</option>
 	          		@endforeach
 	          	</select>
+	        </div>
+	        <div class="col-md-4 col-sm-4 col-xs-12 mrgn_10_top_btm pay-now">
+	          	<span id="price">Price: {{$testSubCategory->price}} Rs.</span>
+              	@if(is_object(Auth::user()))
+	                @if(true == $isSubCategoryPurchased)
+	                  	<a id="paidStatus" class="btn btn-default" style="min-width: 100px;">Paid</a>
+	                  	<div id="pay-now-form"></div>
+	                @else
+	                  	@if($testSubCategory->price > 0)
+		                    <a id="paidStatus" class="btn btn-default" style="min-width: 100px;" onClick="purchaseSubCategory(this);">Pay Now</a>
+		                    <div id="pay-now-form">
+			                    <form id="purchaseSubCategory" method="POST" action="{{ url('purchaseTestSubCategory') }}">
+			                      {{ csrf_field() }}
+			                      <input type="hidden" name="category_id" value="{{$testSubCategory->test_category_id}}">
+			                      <input type="hidden" name="subcategory_id" value="{{$testSubCategory->id}}">
+			                    </form>
+			                </div>
+	                  	@else
+	                    	<a id="paidStatus" class="btn btn-default" style="min-width: 100px;">Free</a>
+	                    	<div id="pay-now-form"></div>
+                  		@endif
+	                @endif
+              	@else
+	                @if($testSubCategory->price > 0)
+	                  	<a id="paidStatus" class="btn btn-default" style="min-width: 100px;"  onClick="checkLogin();">Pay Now</a>
+	                @else
+	                  	<a id="paidStatus" class="btn btn-default" style="min-width: 100px;">Free</a>
+	                @endif
+	                <div id="pay-now-form"></div>
+              	@endif
 	        </div>
 	      </div>
 	    </div>
@@ -208,7 +242,7 @@
 							                    	@elseif(!is_object(Auth::user()))
 							                    		<td id="startTest_{{$testSubjectPaper->id}}"><button data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
 							                    	@else
-							                    		@if(in_array($testSubjectPaper->id, $registeredPaperIds))
+							                    		@if(in_array($testSubjectPaper->id, $registeredPaperIds) || true == $isSubCategoryPurchased)
 							                    			@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 									                    		<td id="startTest_{{$testSubjectPaper->id}}"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>
 										                    @else
@@ -251,7 +285,7 @@
 								                    		</button>
 								                    	</td>
 								                    @else
-								                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
+								                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds) || true == $isSubCategoryPurchased)
 								                    		@if($testSubjectPaper->price > 0)
 									                    		<td>Paid</td>
 									                    	@else
@@ -309,7 +343,7 @@
 										                    	@elseif(!is_object(Auth::user()))
 										                    		<li id="startTest_mobile_{{$testSubjectPaper->id}}" ><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Start</button></li>
 										                    	@else
-										                    		@if(in_array($testSubjectPaper->id, $registeredPaperIds))
+										                    		@if(in_array($testSubjectPaper->id, $registeredPaperIds) || true == $isSubCategoryPurchased)
 										                    			@if(in_array($testSubjectPaper->id, $alreadyGivenPapers))
 												                    		<li id="startTest_mobile_{{$testSubjectPaper->id}}" ><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" >Start</span></button></li>
 													                    @else
@@ -347,7 +381,7 @@
 											                    		@endif
 											                    	</button></li>
 											                    @else
-											                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds))
+											                    	@if(in_array($testSubjectPaper->id, $registeredPaperIds) || true == $isSubCategoryPurchased)
 												                    	<li><button  disabled="true" class="btn-magick btn-sm btn3d" data-toggle="tooltip">
 												                    		@if($testSubjectPaper->price > 0)
 												                    			Paid
@@ -456,8 +490,8 @@
             </div>
           </div>
         </div>
-      </div>
-      <div id="rating-model-{{$subcatId}}" class="modal fade" role="dialog">
+  	</div>
+  	<div id="rating-model-{{$subcatId}}" class="modal fade" role="dialog">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -484,7 +518,7 @@
             </div>
           </div>
         </div>
-      </div>
+  	</div>
 @stop
 @section('footer')
 	@include('footer.footer')
@@ -564,22 +598,44 @@
 					    var opt = document.createElement('option');
 					    opt.value = obj.id;
 					    opt.innerHTML = obj.name;
+					    opt.setAttribute('data-price', obj.price);
 					    select.appendChild(opt);
 					});
 				}
 	        });
 		}
 	}
-
-	function selectPanel(argument) {
+	function selectPanel(ele) {
 		var cat = parseInt($('select#category').val());
 		var subcat = parseInt($('select#subcategory').val());
 		var userId = parseInt(document.getElementById('user_id').value);
+
+		if($(ele).find(':selected').data('price') > 0){
+			$('#price').html('Price: '+$(ele).find(':selected').data('price')+' Rs.');
+			if( userId > 0 ){
+				document.getElementById('paidStatus').text = 'Pay Now';
+				document.getElementById('paidStatus').setAttribute('onClick', 'purchaseSubCategory(this);');
+				var payNowDiv = document.getElementById('pay-now-form');
+				var payUrl = "{{ url('purchaseTestSubCategory') }}";
+				var csrfField = '{{ csrf_field() }}';
+				payNowDiv.innerHTML = '<form id="purchaseSubCategory" method="POST" action="'+payUrl+'">'+csrfField +'<input type="hidden" name="category_id" value="'+cat+'"><input type="hidden" name="subcategory_id" value="'+subcat+'"></form>';
+			} else {
+				document.getElementById('paidStatus').setAttribute('onClick', 'checkLogin(this);');
+				document.getElementById('paidStatus').text = 'Pay Now';
+				document.getElementById('pay-now-form').innerHTML = '';
+			}
+		} else {
+			$('#price').html('Price: 0 Rs.');
+			document.getElementById('paidStatus').removeAttribute('onClick');
+			document.getElementById('paidStatus').text = 'Free';
+			document.getElementById('pay-now-form').innerHTML = '';
+		}
+
 		if( 0 < cat && 0 < subcat ){
 			$.ajax({
 	            method: "POST",
 	            url: "{{url('getDataByCatSubCat')}}",
-	            data: {cat:cat, subcat:subcat}
+	            data: {cat:cat, subcat:subcat,user_id:userId}
 	        })
 	        .done(function( msg ) {
 	        	divEle = document.getElementById('subjects');
@@ -649,7 +705,7 @@
 		                			} else if(true == isNaN(userId)) {
 		                				divInnerHtml += '<td id="startTest_'+obj.id+'"><button data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 		                			} else {
-		                				if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
+		                				if(true == (msg['registeredPaperIds'][obj.id] > 0) ||  true == msg['isSubCategoryPurchased']){
 		                					if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
 		                						divInnerHtml += '<td id="startTest_'+obj.id+'"><button disabled="true" data-toggle="tooltip" title="Already test is given."><i class="fa fa-arrow-circle-right" aria-hidden="true" ></i></button></td>';
 		                					} else {
@@ -694,7 +750,7 @@
 								    		divInnerHtml += '<td><button disabled="true" data-toggle="tooltip" title="Purchase test will be enabled on date to active">Free</button></td>';
 								    	}
 								    } else {
-									    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
+									    if(true == (msg['registeredPaperIds'][obj.id] > 0) ||  true == msg['isSubCategoryPurchased']){
 									    	if(obj.price > 1){
 									    		divInnerHtml += '<td>Paid</td>';
 									    	} else {
@@ -769,7 +825,7 @@
 		                			} else if(true == isNaN(userId)) {
 		                				ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" data-toggle="tooltip" title="Please login to give test." onClick="checkLogin();"><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 		                			} else {
-		                				if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
+		                				if(true == (msg['registeredPaperIds'][obj.id] > 0) ||  true == msg['isSubCategoryPurchased']){
 		                					if(msg['alreadyGivenPapers'].length > 0 && true == msg['alreadyGivenPapers'].indexOf(obj.id) > -1){
 		                						ulDivInnerHtml += '<li id="startTest_mobile_'+obj.id+'"><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Already test is given."><span class="fa fa-arrow-circle-right" aria-hidden="true" ></span>Strat</button></li>';
 		                					} else {
@@ -812,7 +868,7 @@
 								    		ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip" title="Purchase test will be enabled on date to active">Free</button></li>';
 								    	}
 								    } else {
-									    if(msg['registeredPaperIds'].length > 0 && true == msg['registeredPaperIds'].indexOf(obj.id) > -1){
+									    if(true == (msg['registeredPaperIds'][obj.id] > 0) ||  true == msg['isSubCategoryPurchased']){
 									    	if(obj.price > 1){
 									    		ulDivInnerHtml += '<li><button class="btn-magick btn-sm btn3d" disabled="true" data-toggle="tooltip">Paid</button></li>';
 									    	} else {
@@ -853,6 +909,13 @@
 
 			        	}
 			        });
+					if( userId > 0 ){
+						if(true == msg['isSubCategoryPurchased']){
+							document.getElementById('paidStatus').text = 'Paid';
+							document.getElementById('paidStatus').removeAttribute('onClick');
+							document.getElementById('pay-now-form').innerHTML = '';
+						}
+					}
 		    	} else {
 		    		var mainPanelDiv = document.createElement('div');
 	        		mainPanelDiv.className = "panel-group";
@@ -1006,10 +1069,8 @@
     		defaultPanelDiv.appendChild(firstMainDiv);
     		mainPanelDiv.appendChild(defaultPanelDiv);
 			divEle.appendChild(mainPanelDiv);
-
 		}
 	}
-
 	function showUserTestResult(ele){
 		$.confirm({
 		    title: 'Confirmation',
@@ -1030,7 +1091,6 @@
 		    }
 		});
 	}
-
 	function purchaseTest(ele){
 		$.confirm({
 		    title: 'Confirmation',
@@ -1051,7 +1111,6 @@
 		    }
 		});
 	}
-
 	function purchaseMobileTest(ele){
 		$.confirm({
 		    title: 'Confirmation',
@@ -1072,8 +1131,25 @@
 		    }
 		});
 	}
-
-
+	function purchaseSubCategory(ele){
+        $.confirm({
+          title: 'Confirmation',
+          content: 'Do you want to purchase this sub category?',
+          type: 'red',
+          typeAnimated: true,
+          buttons: {
+            Ok: {
+              text: 'Ok',
+              btnClass: 'btn-red',
+              action: function(){
+                document.getElementById('purchaseSubCategory').submit();
+              }
+            },
+            Cancle: function () {
+            }
+          }
+        });
+    }
 </script>
 <script >
 	function toggleIcon(e) {
@@ -1084,7 +1160,6 @@
   	}
 	$('.panel-group').on('hidden.bs.collapse', toggleIcon);
 	$('.panel-group').on('shown.bs.collapse', toggleIcon);
-
   	$(document).ready(function() {
 	    $('[id^=paper]').hide();
 	    $('.toggle').click(function() {

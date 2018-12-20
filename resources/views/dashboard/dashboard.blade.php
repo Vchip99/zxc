@@ -200,8 +200,7 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="{{ url('college/'.Session::get('college_user_url').'/myDocuments') }}"><i class="fa fa-circle-o"></i> All Articles</a></li>
-            <!-- <li><a href="{{ url('college/'.Session::get('college_user_url').'/myFavouriteArticles') }}"><i class="fa fa-circle-o"></i> Favourite Articles</a></li>
-            <li><a href="{{ url('documents') }}" target="_blank" ><i class="fa fa-circle-o"></i> More Articles</a></li> -->
+            <li><a href="{{ url('study-material') }}" target="_blank"><i class="fa fa-circle-o"></i> Study Materials</a></li>
           </ul>
         </li>
         @endif

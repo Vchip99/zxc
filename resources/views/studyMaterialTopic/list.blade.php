@@ -31,6 +31,7 @@
           <th>Category </th>
           <th>Sub Category </th>
           <th>Subject </th>
+          <th>Created By </th>
           <th>Edit </th>
           <th>Delete </th>
         </tr>
@@ -44,26 +45,25 @@
             <td>{{$topic->category->name}}</td>
             <td>{{$topic->subcategory->name}}</td>
             <td>{{$topic->subject->name}}</td>
+            <td>{{$topic->admin}}</td>
             <td>
               <a href="{{url('admin/studyMaterialTopic')}}/{{$topic->id}}/edit"
                     ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$topic->name}}" />
                 </a>
             </td>
             <td>
-              @if($topic->admin_id == Auth::guard('admin')->user()->id)
-                <a id="{{$topic->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$topic->name}}" />
-                </a>
-                <form id="deleteStudyMaterialTopic_{{$topic->id}}" action="{{url('admin/deleteStudyMaterialTopic')}}" method="POST" style="display: none;">
-                    {{ csrf_field() }}
-                    {{ method_field('DELETE') }}
-                    <input type="hidden" name="topic_id" value="{{$topic->id}}">
-                </form>
-              @endif
+              <a id="{{$topic->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$topic->name}}" />
+              </a>
+              <form id="deleteStudyMaterialTopic_{{$topic->id}}" action="{{url('admin/deleteStudyMaterialTopic')}}" method="POST" style="display: none;">
+                  {{ csrf_field() }}
+                  {{ method_field('DELETE') }}
+                  <input type="hidden" name="topic_id" value="{{$topic->id}}">
+              </form>
             </td>
           </tr>
           @endforeach
         @else
-            <tr><td colspan="6">No topic is created.</td></tr>
+          <tr><td colspan="6">No topic is created.</td></tr>
         @endif
       </tbody>
     </table>

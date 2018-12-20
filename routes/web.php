@@ -53,6 +53,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/getCourseSubCategories', 'Course\CourseCourseController@getCourseSubCategories');
 	Route::post('admin/isCourseCourseExist', 'Course\CourseCourseController@isCourseCourseExist');
 	Route::post('admin/getCourseByCatIdBySubCatIdForAdmin', 'Course\CourseCourseController@getCourseByCatIdBySubCatIdForAdmin');
+	Route::get('admin/manageSubadminCourses', 'Course\CourseCourseController@manageSubadminCourses');
+	Route::post('admin/getSubAdminCourses', 'Course\CourseCourseController@getSubAdminCourses');
+	Route::post('admin/changeSubAdminCourseApproval', 'Course\CourseCourseController@changeSubAdminCourseApproval');
 
 	// admin course video
 	Route::get('admin/manageCourseVideo', 'Course\CourseVideoController@show');
@@ -154,6 +157,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/createSubAdmin', 'Admin\SubadminController@store');
 	Route::get('admin/subadmin/{id}/edit', 'Admin\SubadminController@edit');
 	Route::put('admin/updateSubAdmin', 'Admin\SubadminController@update');
+	Route::delete('admin/deleteSubAdmin', 'Admin\SubadminController@delete');
 
 	// admin test category
 	Route::get('admin/manageCategory', 'Test\CategoryController@show');
@@ -190,6 +194,10 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/getSubCategories', [ 'as' => 'admin/getSubCategories', 'uses' => 'Test\SubCategoryController@getSubCategories' ]);
 	Route::post('admin/isTestSubCategoryExist', 'Test\SubCategoryController@isTestSubCategoryExist');
 
+	Route::get('admin/manageSubadminSubCategories', 'Test\SubCategoryController@manageSubadminSubCategories');
+	Route::post('admin/getSubAdminSubCategories', 'Test\SubCategoryController@getSubAdminSubCategories');
+	Route::post('admin/changeSubAdminSubCategoryApproval', 'Test\SubCategoryController@changeSubAdminSubCategoryApproval');
+
 	// admin question bank sub category
 	Route::get('admin/manageQuestionBankSubCategory', 'QuestionBank\QuestionBankSubCategoryController@show');
 	Route::get('admin/createQuestionBankSubCategory', 'QuestionBank\QuestionBankSubCategoryController@create');
@@ -218,6 +226,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteSubject', 'Test\SubjectController@delete');
 	Route::post('admin/isTestSubjectExist', 'Test\SubjectController@isTestSubjectExist');
 
+	Route::get('admin/manageSubadminSubjects', 'Test\SubjectController@manageSubadminSubjects');
+	Route::post('admin/getSubAdminSubjects', 'Test\SubjectController@getSubAdminSubjects');
+
 	// admin payable subject
 	Route::get('admin/managePayableSubject', 'PayableTest\PayableSubjectController@show');
 	Route::get('admin/createPayableSubject', 'PayableTest\PayableSubjectController@create');
@@ -238,6 +249,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/getSubjectsByCatIdBySubcatId', [ 'as' => 'admin/getSubjectsByCatIdBySubcatId','uses' => 'Test\PaperController@getSubjectsByCatIdBySubcatId' ]);
 	Route::post('admin/getPaperSectionsByPaperId', [ 'as' => 'admin/getPaperSectionsByPaperId','uses' => 'Test\PaperController@getPaperSectionsByPaperId' ]);
 	Route::post('admin/isTestPaperExist', 'Test\PaperController@isTestPaperExist');
+	Route::get('admin/manageSubadminPapers', 'Test\PaperController@manageSubadminPapers');
+	Route::post('admin/getSubAdminPapers', 'Test\PaperController@getSubAdminPapers');
 
 	// admin payable paper
 	Route::get('admin/managePayablePaper', 'PayableTest\PayablePaperController@show');
@@ -339,6 +352,16 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('faq', 'HomeController@faq');
 	Route::get('study-material', 'HomeController@studyMaterial');
 	Route::get('study-material/{subcategoryId}/{subjectName}/{topicId}', 'HomeController@studyMaterialDetails');
+	Route::post('studyMaterialLikePost', 'HomeController@studyMaterialLikePost');
+	Route::post('createStudyMaterialComment', 'HomeController@createStudyMaterialComment');
+	Route::post('studyMaterialLikeComment', 'HomeController@studyMaterialLikeComment');
+	Route::post('createStudyMaterialSubComment', 'HomeController@createStudyMaterialSubComment');
+	Route::post('studyMaterialLikeSubComment', 'HomeController@studyMaterialLikeSubComment');
+	Route::post('updateStudyMaterialComment', 'HomeController@updateStudyMaterialComment');
+	Route::post('updateStudyMaterialSubComment', 'HomeController@updateStudyMaterialSubComment');
+	Route::post('deleteStudyMaterialComment', 'HomeController@deleteStudyMaterialComment');
+	Route::post('deleteStudyMaterialSubComment', 'HomeController@deleteStudyMaterialSubComment');
+
 
 	// online courses front
 	Route::get('courses', 'CourseController@courses');
@@ -396,6 +419,10 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateVkitProject', 'Vkit\VkitProjectController@update');
 	Route::delete('admin/deleteVkitProject','Vkit\VkitProjectController@delete');
 	Route::post('admin/isVkitProjectExist', 'Vkit\VkitProjectController@isVkitProjectExist');
+
+	Route::get('admin/manageSubadminProjects', 'Vkit\VkitProjectController@manageSubadminProjects');
+	Route::post('admin/getSubAdminProjects', 'Vkit\VkitProjectController@getSubAdminProjects');
+	Route::post('admin/changeSubAdminProjectApproval', 'Vkit\VkitProjectController@changeSubAdminProjectApproval');
 
 	// vkits user
 	Route::get('vkits', 'VkitController@show');
@@ -660,6 +687,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('webhookCollegePurchaseSms', 'AccountController@webhookCollegePurchaseSms');
 	Route::get('/college/{college}/myPayments', 'AccountController@myPayments');
 	Route::get('/college/{college}/receipt/{type}/{id}', 'AccountController@showMyReceipt');
+	Route::post('purchaseTestSubCategory', 'AccountController@purchaseTestSubCategory');
+	Route::get('thankyouPurchaseTestSubCategory', 'AccountController@thankyouPurchaseTestSubCategory');
+	Route::post('webhookPurchaseTestSubCategory', 'AccountController@webhookPurchaseTestSubCategory');
 
 	// like- dis-like count front
 	Route::post('likePost', 'CourseController@likePost');
@@ -1186,6 +1216,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::delete('admin/deleteStudyMaterialSubject', 'StudyMaterial\StudyMaterialSubjectController@delete');
 	Route::post('admin/isStudyMaterialSubjectExist', 'StudyMaterial\StudyMaterialSubjectController@isStudyMaterialSubjectExist');
 	Route::post('admin/getStudyMaterialSubjectsByCategoryIdBySubCategoryId', 'StudyMaterial\StudyMaterialSubjectController@getStudyMaterialSubjectsByCategoryIdBySubCategoryId');
+	Route::get('admin/manageSubadminSubjects', 'StudyMaterial\StudyMaterialSubjectController@manageSubadminSubjects');
+	Route::post('admin/getSubAdminSubjects', 'StudyMaterial\StudyMaterialSubjectController@getSubAdminSubjects');
+	Route::post('admin/changeSubAdminSubjectApproval', 'StudyMaterial\StudyMaterialSubjectController@changeSubAdminSubjectApproval');
 
 	// admin study material topic
 	Route::get('admin/manageStudyMaterialTopic', 'StudyMaterial\StudyMaterialTopicController@show');
@@ -1195,6 +1228,15 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::put('admin/updateStudyMaterialTopic', 'StudyMaterial\StudyMaterialTopicController@update');
 	Route::delete('admin/deleteStudyMaterialTopic', 'StudyMaterial\StudyMaterialTopicController@delete');
 	Route::post('admin/isStudyMaterialTopicExist', 'StudyMaterial\StudyMaterialTopicController@isStudyMaterialTopicExist');
+	Route::post('admin/getStudyMaterialTopicsByCategoryIdBySubCategoryIdBySubjectId', 'StudyMaterial\StudyMaterialTopicController@getStudyMaterialTopicsByCategoryIdBySubCategoryIdBySubjectId');
+
+	// admin study material post
+	Route::get('admin/manageStudyMaterialPost', 'StudyMaterial\StudyMaterialPostController@show');
+	Route::get('admin/createStudyMaterialPost', 'StudyMaterial\StudyMaterialPostController@create');
+	Route::post('admin/createStudyMaterialPost', 'StudyMaterial\StudyMaterialPostController@store');
+	Route::get('admin/studyMaterialPost/{id}/edit', 'StudyMaterial\StudyMaterialPostController@edit');
+	Route::put('admin/updateStudyMaterialPost', 'StudyMaterial\StudyMaterialPostController@update');
+	Route::delete('admin/deleteStudyMaterialPost', 'StudyMaterial\StudyMaterialPostController@delete');
 });
 
 Route::group(['domain' => '{client}.localvchip.com'], function () {

@@ -29,6 +29,8 @@
           <th>#</th>
           <th>Sub Category </th>
           <th>Category </th>
+          <th>Price </th>
+          <th>Admin </th>
           <th>Edit </th>
           <th>Delete </th>
         </tr>
@@ -40,19 +42,19 @@
             <th scope="row">{{$index + $testSubCategories->firstItem()}}</th>
             <td>{{$testSubCategory->name}}</td>
             <td>{{$testSubCategory->category}}</td>
+            <td>{{$testSubCategory->price}}</td>
+            <td>{{$testSubCategory->admin}}</td>
             <td>
               <a href="{{url('admin/subCategory')}}/{{$testSubCategory->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testSubCategory->name}}" />
                 </a>
             </td>
             <td>
-              @if(1 == $testSubCategory->created_for && $testSubCategory->created_by == Auth::guard('admin')->user()->id)
-                <a id="{{$testSubCategory->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testSubCategory->name}}" />
-                <form id="deleteSubCategory_{{$testSubCategory->id}}" action="{{url('admin/deleteSubCategory')}}" method="POST" style="display: none;">
-                    {{ csrf_field() }}
-                    {{ method_field('DELETE') }}
-                    <input type="hidden" name="subcat_id" value="{{$testSubCategory->id}}">
-                </form>
-              @endif
+              <a id="{{$testSubCategory->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testSubCategory->name}}" />
+              <form id="deleteSubCategory_{{$testSubCategory->id}}" action="{{url('admin/deleteSubCategory')}}" method="POST" style="display: none;">
+                  {{ csrf_field() }}
+                  {{ method_field('DELETE') }}
+                  <input type="hidden" name="subcat_id" value="{{$testSubCategory->id}}">
+              </form>
             </td>
           </tr>
           @endforeach

@@ -8,6 +8,7 @@ use Redirect;
 use App\Models\CourseSubCategory;
 use App\Models\CourseCategory;
 use App\Models\CourseCourse;
+use App\Models\Admin;
 use Validator, Session, Auth, DB;
 use App\Libraries\InputSanitise;
 
@@ -50,7 +51,7 @@ class CourseCourseController extends Controller
      *  show list of courses
      */
     protected function show(){
-    	$courseCourses = CourseCourse::getCoursesWithPagination();
+    	$courseCourses = CourseCourse::getCoursesWithPaginationForAdmin();
     	return view('courseCourse.list', compact('courseCourses'));
     }
 
@@ -200,6 +201,21 @@ class CourseCourseController extends Controller
         $categoryId = InputSanitise::inputInt($request->get('category'));
         $subcategoryId = InputSanitise::inputInt($request->get('subcategory'));
         return CourseCourse::getCourseByCatIdBySubCatIdForAdmin($categoryId,$subcategoryId);
+    }
+
+    protected function manageSubadminCourses(Request $request){
+        $courseCourses = CourseCourse::getSubAdminCoursesWithPagination();
+        $admins = Admin::getSubAdmins();
+        return view('subadmin.subadminCourses', compact('courseCourses','admins'));
+    }
+
+    protected function getSubAdminCourses(Request $request){
+        return CourseCourse::getSubAdminCourses($request->get('admin_id'));
+    }
+
+    protected function changeSubAdminCourseApproval(Request $request){
+        InputSanitise::deleteCacheByString('vchip:courses*');
+        return CourseCourse::changeSubAdminCourseApproval($request);
     }
 }
 

@@ -57,10 +57,13 @@ class VkitController extends Controller
         } else {
             $page = $request->getQueryString();
         }
-        $projects = Cache::remember('vchip:projects:projects-'.$page,60, function() {
-            return VkitProject::getVkitProjectsWithPagination();
-        });
-
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            $projects = VkitProject::getVkitProjectsWithPagination();
+        } else {
+            $projects = Cache::remember('vchip:projects:projects-'.$page,60, function() {
+                return VkitProject::getVkitProjectsWithPagination();
+            });
+        }
         $vkitCategories= Cache::remember('vchip:projects:vkitCategories',60, function() {
             return VkitCategory::getProjectCategoriesAssociatedWithProject();
         });
@@ -101,13 +104,30 @@ class VkitController extends Controller
      *  show vkits project by Id
      */
     protected function vkitproject($id,$subcommentId=NULL){
-        $project = Cache::remember('vchip:projects:project-'.$id,60, function() use ($id){
-            return VkitProject::getVkitProjectsById(json_decode($id));
-        });
-        if(is_object($project)){
-            $projects = Cache::remember('vchip:projects:projects:'.$project->category_id,60, function() use($project) {
-                return VkitProject::getVkitProjectsByCategoryId($project->category_id);
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            $project = VkitProject::getVkitProjectsById(json_decode($id));
+        } else {
+            $project = Cache::remember('vchip:projects:project-'.$id,60, function() use ($id){
+                return VkitProject::getVkitProjectsById(json_decode($id));
             });
+        }
+        if(is_object($project)){
+            if(is_object(Auth::user())){
+                if('ceo@vchiptech.com' != Auth::user()->email && 0 == $project->admin_approve){
+                    return Redirect::to('vkits');
+                }
+            } else {
+                if(0 == $project->admin_approve){
+                    return Redirect::to('vkits');
+                }
+            }
+            if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+                $projects = VkitProject::getVkitProjectsByCategoryId($project->category_id);
+            } else {
+                $projects = Cache::remember('vchip:projects:projects:'.$project->category_id,60, function() use($project) {
+                    return VkitProject::getVkitProjectsByCategoryId($project->category_id);
+                });
+            }
             $comments = VkitProjectComment::where('vkit_project_id', $id)->orderBy('id', 'desc')->get();
             $isPurchasedProjectItems = 'false';
             $registeredProjectIds = $this->getRegisteredProjectIds();
@@ -200,9 +220,13 @@ class VkitController extends Controller
         $result = [];
         if(isset($categoryId) && empty($userId)){
             if(true == $rating){
-                $result['projects'] = Cache::remember('vchip:projects:projects:cat-'.$categoryId, 60, function() use ($categoryId){
-                    return VkitProject::getVkitProjectsByCategoryId($categoryId);
-                });
+                if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+                    $result['projects'] = VkitProject::getVkitProjectsByCategoryId($categoryId);
+                } else {
+                    $result['projects'] = Cache::remember('vchip:projects:projects:cat-'.$categoryId, 60, function() use ($categoryId){
+                        return VkitProject::getVkitProjectsByCategoryId($categoryId);
+                    });
+                }
             } else {
                 return Cache::remember('vchip:projects:projects:cat-'.$categoryId, 60, function() use ($categoryId){
                     return VkitProject::getVkitProjectsByCategoryId($categoryId);

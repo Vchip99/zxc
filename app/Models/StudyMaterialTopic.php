@@ -8,6 +8,12 @@ use App\Libraries\InputSanitise;
 use App\Models\CourseSubCategory;
 use App\Models\CourseCategory;
 use App\Models\StudyMaterialSubject;
+use App\Models\StudyMaterialPost;
+use App\Models\StudyMaterialPostLike;
+use App\Models\StudyMaterialComment;
+use App\Models\StudyMaterialCommentLike;
+use App\Models\StudyMaterialSubComment;
+use App\Models\StudyMaterialSubCommentLike;
 use DB,Auth;
 
 class StudyMaterialTopic extends Model
@@ -97,26 +103,52 @@ class StudyMaterialTopic extends Model
     }
 
     protected static function getCategoriesAndSubcategoriesAssocaitedWithStudyMaterialTopics(){
-        return static::join('course_categories', 'course_categories.id','=','study_material_topics.course_category_id')
-            ->join('course_sub_categories', 'course_sub_categories.id','=','study_material_topics.course_sub_category_id')
-            ->join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
-            ->select('study_material_topics.course_category_id','study_material_topics.course_sub_category_id','course_categories.name as category','course_sub_categories.name as subcategory','study_material_topics.study_material_subject_id','study_material_subjects.name as subject','study_material_topics.id')
-            ->groupBy('study_material_topics.course_category_id','study_material_topics.course_sub_category_id')
-            ->get();
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            return static::join('course_categories', 'course_categories.id','=','study_material_topics.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id','=','study_material_topics.course_sub_category_id')
+                ->join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
+                ->select('study_material_topics.course_category_id','study_material_topics.course_sub_category_id','course_categories.name as category','course_sub_categories.name as subcategory','study_material_topics.study_material_subject_id','study_material_subjects.name as subject','study_material_topics.id')
+                ->groupBy('study_material_topics.course_category_id','study_material_topics.course_sub_category_id')
+                ->get();
+        } else {
+            return static::join('course_categories', 'course_categories.id','=','study_material_topics.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id','=','study_material_topics.course_sub_category_id')
+                ->join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
+                ->where('study_material_subjects.admin_approve', 1)
+                ->select('study_material_topics.course_category_id','study_material_topics.course_sub_category_id','course_categories.name as category','course_sub_categories.name as subcategory','study_material_topics.study_material_subject_id','study_material_subjects.name as subject','study_material_topics.id')
+                ->groupBy('study_material_topics.course_category_id','study_material_topics.course_sub_category_id')
+                ->get();
+        }
     }
     protected static function getStudymMaterialTopicsBySubCategoryId($subCategoryId){
-        return static::join('course_categories', 'course_categories.id','=','study_material_topics.course_category_id')
-            ->join('course_sub_categories', 'course_sub_categories.id','=','study_material_topics.course_sub_category_id')
-            ->join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
-            ->select('study_material_topics.course_category_id','study_material_topics.course_sub_category_id','course_categories.name as category','course_sub_categories.name as subcategory','study_material_topics.study_material_subject_id','study_material_subjects.name as subject','study_material_topics.id','study_material_topics.name','study_material_topics.content','study_material_subjects.admin_id')
-            ->where('study_material_topics.course_sub_category_id',$subCategoryId)
-            ->get();
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            return static::join('course_categories', 'course_categories.id','=','study_material_topics.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id','=','study_material_topics.course_sub_category_id')
+                ->join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
+                ->where('study_material_topics.course_sub_category_id',$subCategoryId)
+                ->select('study_material_topics.course_category_id','study_material_topics.course_sub_category_id','course_categories.name as category','course_sub_categories.name as subcategory','study_material_topics.study_material_subject_id','study_material_subjects.name as subject','study_material_topics.id','study_material_topics.name','study_material_topics.content','study_material_subjects.admin_id')
+                ->get();
+        } else {
+            return static::join('course_categories', 'course_categories.id','=','study_material_topics.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id','=','study_material_topics.course_sub_category_id')
+                ->join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
+                ->where('study_material_subjects.admin_approve', 1)
+                ->where('study_material_topics.course_sub_category_id',$subCategoryId)
+                ->select('study_material_topics.course_category_id','study_material_topics.course_sub_category_id','course_categories.name as category','course_sub_categories.name as subcategory','study_material_topics.study_material_subject_id','study_material_subjects.name as subject','study_material_topics.id','study_material_topics.name','study_material_topics.content','study_material_subjects.admin_id')
+                ->get();
+        }
     }
 
     protected static function deleteStudyMaterialTopicsBySubjectId($subjectId){
         $topics =  static::where('study_material_subject_id', $subjectId)->get();
         if(is_object($topics) && false == $topics->isEmpty()){
             foreach($topics as $topic){
+                StudyMaterialPost::deletePostsByTopicId($topic->id);
+                StudyMaterialPostLike::deleteLikesByTopicId($topic->id);
+                StudyMaterialComment::deleteCommentsByTopicId($topic->id);
+                StudyMaterialCommentLike::deleteLikesByTopicId($topic->id);
+                StudyMaterialSubComment::deleteSubCommentsByTopicId($topic->id);
+                StudyMaterialSubCommentLike::deleteLikesByTopicId($topic->id);
                 $topic->delete();
             }
         }
@@ -127,6 +159,12 @@ class StudyMaterialTopic extends Model
         $topics =  static::where('course_sub_category_id', $subCategoryId)->get();
         if(is_object($topics) && false == $topics->isEmpty()){
             foreach($topics as $topic){
+                StudyMaterialPost::deletePostsByTopicId($topic->id);
+                StudyMaterialPostLike::deleteLikesByTopicId($topic->id);
+                StudyMaterialComment::deleteCommentsByTopicId($topic->id);
+                StudyMaterialCommentLike::deleteLikesByTopicId($topic->id);
+                StudyMaterialSubComment::deleteSubCommentsByTopicId($topic->id);
+                StudyMaterialSubCommentLike::deleteLikesByTopicId($topic->id);
                 $topic->delete();
             }
         }
@@ -137,6 +175,12 @@ class StudyMaterialTopic extends Model
         $topics =  static::where('course_category_id', $categoryId)->get();
         if(is_object($topics) && false == $topics->isEmpty()){
             foreach($topics as $topic){
+                StudyMaterialPost::deletePostsByTopicId($topic->id);
+                StudyMaterialPostLike::deleteLikesByTopicId($topic->id);
+                StudyMaterialComment::deleteCommentsByTopicId($topic->id);
+                StudyMaterialCommentLike::deleteLikesByTopicId($topic->id);
+                StudyMaterialSubComment::deleteSubCommentsByTopicId($topic->id);
+                StudyMaterialSubCommentLike::deleteLikesByTopicId($topic->id);
                 $topic->delete();
             }
         }
@@ -144,17 +188,19 @@ class StudyMaterialTopic extends Model
     }
 
     protected static function getStudyMaterialTopicsWithPagination(){
+        $result = static::join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
+            ->join('admins','admins.id','=','study_material_subjects.admin_id');
         if(Auth::guard('admin')->user()->hasRole('sub-admin')){
-            return static::join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
-                ->where('study_material_subjects.admin_id',Auth::guard('admin')->user()->id)
-                ->select('study_material_topics.*','study_material_subjects.admin_id')
-                ->groupBy('study_material_topics.id')
-                ->paginate();
-        } else {
-            return static::join('study_material_subjects', 'study_material_subjects.id','=','study_material_topics.study_material_subject_id')
-                ->select('study_material_topics.*','study_material_subjects.admin_id')
-                ->groupBy('study_material_topics.id')
-                ->paginate();
+            $result->where('study_material_subjects.admin_id',Auth::guard('admin')->user()->id);
         }
+        return $result->select('study_material_topics.*','study_material_subjects.admin_id','admins.name as admin')
+                ->groupBy('study_material_topics.id')
+                ->paginate();
+    }
+
+    protected static function getStudyMaterialTopicsByCategoryIdBySubCategoryIdBySubjectId($categoryId,$subcategoryId,$subjectId){
+        return static::where('study_material_topics.course_category_id',$categoryId)->where('study_material_topics.course_sub_category_id',$subcategoryId)->where('study_material_topics.study_material_subject_id',$subjectId)
+            ->select('study_material_topics.id','study_material_topics.name')
+            ->get();
     }
 }

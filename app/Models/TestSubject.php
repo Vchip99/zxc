@@ -401,12 +401,13 @@ class TestSubject extends Model
     protected static function getSubjectsWithPagination(){
         $result = static::join('test_categories', 'test_categories.id', '=', 'test_subjects.test_category_id')
                 ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subjects.test_sub_category_id')
+                ->join('admins','admins.id','=','test_sub_categories.created_by')
                 ->where('test_sub_categories.created_for', 1);
         if(Auth::guard('admin')->user()->hasRole('sub-admin')){
             $result->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id);
         }
-        return $result->select('test_subjects.*','test_categories.name as category','test_sub_categories.name as subcategory','test_sub_categories.created_by as subcategory_by')
-                ->groupBy('test_subjects.id')->paginate();
+        return $result->select('test_subjects.*','test_categories.name as category','test_sub_categories.name as subcategory','test_sub_categories.created_by as subcategory_by','admins.name as admin')
+            ->groupBy('test_subjects.id')->paginate();
     }
 
     protected static function deleteCollegeSubjectAndPapersByUserId($userId){
@@ -432,4 +433,25 @@ class TestSubject extends Model
         }
         return;
     }
+
+    protected static function getSubAdminSubjectsWithPagination(){
+        return static::join('test_categories', 'test_categories.id', '=', 'test_subjects.test_category_id')
+                ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subjects.test_sub_category_id')
+                ->join('admins','admins.id','=', 'test_sub_categories.created_by')
+                ->where('test_sub_categories.created_for', 1)
+                ->where('test_sub_categories.created_by','!=', 1)
+                ->select('test_subjects.*','test_categories.name as category','test_sub_categories.name as subcategory','test_sub_categories.created_by as subcategory_by','admins.name as admin')
+                ->groupBy('test_subjects.id')->paginate();
+    }
+
+    protected static function getSubAdminSubjects($adminId){
+        return static::join('test_categories', 'test_categories.id', '=', 'test_subjects.test_category_id')
+                ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subjects.test_sub_category_id')
+                ->join('admins','admins.id','=', 'test_sub_categories.created_by')
+                ->where('test_sub_categories.created_for', 1)
+                ->where('test_sub_categories.created_by', $adminId)
+                ->select('test_subjects.*','test_categories.name as category','test_sub_categories.name as subcategory','test_sub_categories.created_by as subcategory_by','admins.name as admin')
+                ->groupBy('test_subjects.id')->get();
+    }
+
 }

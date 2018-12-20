@@ -57,9 +57,13 @@ class CourseController extends Controller
         } else {
             $page = $request->getQueryString();
         }
-        $courses = Cache::remember('vchip:courses:courses-'.$page,60, function() {
-            return CourseCourse::getCourseAssocaitedWithVideosWithPagination();
-        });
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            $courses = CourseCourse::getCourseAssocaitedWithVideosWithPagination();
+        } else {
+            $courses = Cache::remember('vchip:courses:courses-'.$page,60, function() {
+                return CourseCourse::getCourseAssocaitedWithVideosWithPagination();
+            });
+        }
         $date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
         $userPurchasedCourses = $this->getRegisteredCourseIds();
@@ -104,9 +108,13 @@ class CourseController extends Controller
         $userId = $request->get('userId');
         $rating = $request->get('rating');
         if(isset($categoryId) && isset($subcategoryId) && empty($userId)){
-            $result['courses'] = Cache::remember('vchip:courses:courses:cat-'.$categoryId.':subcat-'.$subcategoryId,30, function() use ($categoryId,$subcategoryId){
-                return CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId);
-            });
+            if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+                $result['courses'] = CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId);
+            } else {
+                $result['courses'] = Cache::remember('vchip:courses:courses:cat-'.$categoryId.':subcat-'.$subcategoryId,30, function() use ($categoryId,$subcategoryId){
+                    return CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId);
+                });
+            }
             $result['userPurchasedCourses'] = $this->getRegisteredCourseIds();
         } else {
             $result['courses'] = CourseCourse::getCourseByCatIdBySubCatId($categoryId,$subcategoryId,$userId);
@@ -174,13 +182,30 @@ class CourseController extends Controller
      */
     protected function courseDetails($id){
         $courseId = json_decode(trim($id));
-        $course = Cache::remember('vchip:courses:Course-'.$courseId,30, function() use ($courseId){
-            return CourseCourse::find($courseId);
-        });
-        if(is_object($course)){
-            $videos = Cache::remember('vchip:courses:videos:courseId-'.$courseId,30, function() use ($courseId){
-                return CourseVideo::getCourseVideosByCourseId($courseId);
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            $course = CourseCourse::find($courseId);
+        } else {
+            $course = Cache::remember('vchip:courses:Course-'.$courseId,30, function() use ($courseId){
+                return CourseCourse::find($courseId);
             });
+        }
+        if(is_object($course)){
+            if(is_object(Auth::user())){
+                if('ceo@vchiptech.com' != Auth::user()->email && 0 == $course->admin_approve){
+                    return Redirect::to('courses');
+                }
+            } else {
+                if(0 == $course->admin_approve){
+                    return Redirect::to('courses');
+                }
+            }
+            if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+                $videos = CourseVideo::getCourseVideosByCourseId($courseId);
+            } else {
+                $videos = Cache::remember('vchip:courses:videos:courseId-'.$courseId,30, function() use ($courseId){
+                    return CourseVideo::getCourseVideosByCourseId($courseId);
+                });
+            }
             $isCourseRegistered = RegisterOnlineCourse::isCourseRegistered($courseId);
 
             $reviewData = [];
@@ -222,66 +247,80 @@ class CourseController extends Controller
         $currentUser = Auth::user();
         $videoId = json_decode(trim($id));
         if(isset($videoId)){
-            $video = Cache::remember('vchip:courses:video-'.$videoId,30, function() use ($videoId){
-                return CourseVideo::find($videoId);
-            });
+            if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+                $video = CourseVideo::find($videoId);
+            } else {
+                $video = Cache::remember('vchip:courses:video-'.$videoId,30, function() use ($videoId){
+                    return CourseVideo::find($videoId);
+                });
+            }
             if(is_object($video)){
-
                 $videoCourse = $video->videoCourse;
-                $courseId = $videoCourse->id;
-                $videoCoursePrice = $videoCourse->price;
-
-                if(0 == $video->is_free && $videoCoursePrice > 0 ){
-                    if(is_object($currentUser)){
-                        $isCoursePurchased = RegisterOnlineCourse::isCourseRegistered($courseId);
-                        if( 'false' ==  $isCoursePurchased){
+                if(is_object($videoCourse)){
+                    if(is_object(Auth::user())){
+                        if('ceo@vchiptech.com' != Auth::user()->email && 0 == $videoCourse->admin_approve){
                             return Redirect::to('courses');
                         }
                     } else {
-                        return Redirect::to('courses');
+                        if(0 == $videoCourse->admin_approve){
+                            return Redirect::to('courses');
+                        }
                     }
-                }
-
-                $courseVideos = Cache::remember('vchip:courses:videos:courseId-'.$courseId,30, function() use ($courseId){
-                    return CourseVideo::getCourseVideosByCourseId($courseId);
-                });
-                $comments = CourseComment::where('course_video_id', $id)->orderBy('id', 'desc')->get();
-                $likesCount = CourseVideoLike::getLikesByVideoId($videoId);
-                $commentLikesCount = CourseCommentLike::getLikesByVideoId($videoId);
-                $subcommentLikesCount = CourseSubCommentLike::getLikesByVideoId($videoId);
-
-                if(is_object($currentUser)){
-                    if($videoId > 0 || $subcomment > 0){
-                        DB::beginTransaction();
-                        try
-                        {
-                            if($videoId > 0 && $subcomment == NULL){
-                                $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINCOURSEVIDEO,$videoId,$currentUser->id);
-                                if(is_object($readNotification)){
-                                    DB::commit();
+                    $courseId = $videoCourse->id;
+                    $videoCoursePrice = $videoCourse->price;
+                    if(0 == $video->is_free && $videoCoursePrice > 0 ){
+                        if(is_object($currentUser)){
+                            if('ceo@vchiptech.com' != Auth::user()->email){
+                                $isCoursePurchased = RegisterOnlineCourse::isCourseRegistered($courseId);
+                                if( 'false' ==  $isCoursePurchased){
+                                    return Redirect::to('courses');
                                 }
-                            } else {
-                                Session::set('show_subcomment_area', $subcomment);
                             }
-                            Session::set('course_comment_area', 0);
+                        } else {
+                            return Redirect::to('courses');
                         }
-                        catch(\Exception $e)
-                        {
-                            DB::rollback();
-                            return redirect()->back()->withErrors('something went wrong.');
+                    }
+                    $courseVideos = Cache::remember('vchip:courses:videos:courseId-'.$courseId,30, function() use ($courseId){
+                        return CourseVideo::getCourseVideosByCourseId($courseId);
+                    });
+                    $comments = CourseComment::where('course_video_id', $id)->orderBy('id', 'desc')->get();
+                    $likesCount = CourseVideoLike::getLikesByVideoId($videoId);
+                    $commentLikesCount = CourseCommentLike::getLikesByVideoId($videoId);
+                    $subcommentLikesCount = CourseSubCommentLike::getLikesByVideoId($videoId);
+
+                    if(is_object($currentUser)){
+                        if($videoId > 0 || $subcomment > 0){
+                            DB::beginTransaction();
+                            try
+                            {
+                                if($videoId > 0 && $subcomment == NULL){
+                                    $readNotification = ReadNotification::readNotificationByModuleByModuleIdByUser(Notification::ADMINCOURSEVIDEO,$videoId,$currentUser->id);
+                                    if(is_object($readNotification)){
+                                        DB::commit();
+                                    }
+                                } else {
+                                    Session::set('show_subcomment_area', $subcomment);
+                                }
+                                Session::set('course_comment_area', 0);
+                            }
+                            catch(\Exception $e)
+                            {
+                                DB::rollback();
+                                return redirect()->back()->withErrors('something went wrong.');
+                            }
+                        } else {
+                            Session::set('show_subcomment_area', 0);
                         }
+                        $isCoursePurchased = RegisterOnlineCourse::isCourseRegistered($courseId);
                     } else {
-                        Session::set('show_subcomment_area', 0);
+                        $currentUser = NULL;
+                        $isCoursePurchased = 'false';
+                        if(0 == $video->is_free && $videoCoursePrice > 0){
+                            return Redirect::to('courses');
+                        }
                     }
-                    $isCoursePurchased = RegisterOnlineCourse::isCourseRegistered($courseId);
-                } else {
-                    $currentUser = NULL;
-                    $isCoursePurchased = 'false';
-                    if(0 == $video->is_free && $videoCoursePrice > 0){
-                        return Redirect::to('courses');
-                    }
+                    return view('courses.episode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount','isCoursePurchased','videoCoursePrice'));
                 }
-                return view('courses.episode', compact('video', 'courseVideos', 'comments', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount','isCoursePurchased','videoCoursePrice'));
             }
         }
         return Redirect::to('courses');

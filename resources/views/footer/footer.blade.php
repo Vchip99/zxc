@@ -163,6 +163,7 @@
     var password = document.getElementById('userpassword').value;
     var signInModelPhone = document.getElementById('signInModelPhone').value;
     var loginOtp = document.getElementById('login_model_otp').value;
+    document.getElementById('loginModelBtn').disabled = true;
     if((email && password)||(signInModelPhone && loginOtp)){
       $.ajax({
           method: "POST",
@@ -178,6 +179,7 @@
           } else {
             document.getElementById('loginErrorMsg').classList.remove('hide');
           }
+          document.getElementById('loginModelBtn').disabled = false;
           $('#userpassword').val('');
           $('#useremail').val('');
           $('#signInModelPhone').val('');

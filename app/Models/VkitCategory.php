@@ -42,6 +42,7 @@ class VkitCategory extends Model
     protected function getProjectCategoriesAssociatedWithProject(){
         return DB::table('vkit_categories')
             ->join('vkit_projects','vkit_projects.category_id', '=', 'vkit_categories.id')
+            ->where('vkit_projects.admin_approve', 1)
             ->select('vkit_categories.id', 'vkit_categories.name')->groupBy('vkit_categories.id')
             ->get();
     }

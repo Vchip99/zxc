@@ -89,7 +89,7 @@
                 <input type="radio" name="terms_condition" checked><a href="https://vchipedu.com/terms-and-conditions" target="_blank">Accepted Terms and Condition</a>
               </label>
             </div>
-            <button type="button" value="login" id="loginModelBtn" name="submit" class="btn btn-info btn-block signInModelEmail" onClick="loginUser(this);">Login</button>
+            <button type="button" value="login" id="loginModelBtn" name="submitBtn" class="btn btn-info btn-block signInModelEmail" onClick="loginUser(this);">Login</button>
             <button title="Send Otp" id="sendSignInModelOtpBtn" class="btn btn-info btn-block hide signInModelMobile" onclick="event.preventDefault(); sendSignInModelOtp();" >Send OTP</button>
             <br />
             <div class="form-group">
@@ -161,6 +161,7 @@
     var password = document.getElementById('password').value;
     var signInModelPhone = document.getElementById('signInModelPhone').value;
     var loginOtp = document.getElementById('login_model_otp').value;
+    document.getElementById('loginModelBtn').disabled = true;
     if((email && password)||(signInModelPhone && loginOtp)){
       $.ajax({
           method: "POST",
@@ -191,6 +192,7 @@
           document.getElementById('loginErrorMsg').classList.remove('hide');
           if('Try after some time.' == msg || 'Entered wrong otp' == msg){
             document.getElementById('loginErrorMsg').innerHTML = msg;
+            document.getElementById('loginModelBtn').disabled = false;
           } else {
             window.location.reload(true);
           }
@@ -348,6 +350,7 @@
       message = document.getElementById('message_'+id).value;
       clientId = document.getElementById('client_id').value;
       if(message != ''){
+          document.getElementById('message_'+id).value = '';
           var roomArr = [];
           roomArr.push(clientId);
           roomArr.push(document.getElementById('user_id').value);

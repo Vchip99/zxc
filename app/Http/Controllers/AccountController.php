@@ -117,6 +117,11 @@ class AccountController extends Controller
         'paper_id' => 'required',
     ];
 
+    protected $validatePurchaseSubCategory = [
+        'category_id' => 'required',
+        'subcategory_id' => 'required'
+    ];
+
     protected $validatePurchaseCourse = [
         'course_id' => 'required',
         'course_category_id' => 'required',
@@ -393,7 +398,8 @@ class AccountController extends Controller
         $currentDate = date('Y-m-d H:i:s');
         $testController = new TestController;
         $registeredPaperIds = $testController->getRegisteredPaperIds();
-        return view('dashboard.myVchipTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate','subcategories','registeredPaperIds'));
+        $purchasedSubCategories = $testController->getRegisteredPaperIds(true);
+        return view('dashboard.myVchipTest', compact('testSubjects', 'testSubjectPapers', 'testCategories', 'alreadyGivenPapers', 'currentDate','subcategories','registeredPaperIds','purchasedSubCategories'));
     }
     protected function myCollegeTest(Request $request){
         if( false == InputSanitise::checkCollegeUrl($request)){
@@ -2077,6 +2083,7 @@ class AccountController extends Controller
                     $paymentArray = [
                                         'user_id' => $userId,
                                         'test_subject_paper_id' => $paperId,
+                                        'test_sub_category_id' => 0,
                                         'payment_id' => $paymentId,
                                         'payment_request_id' => $paymentRequestId,
                                         'price' => $paperPrice
@@ -2636,7 +2643,9 @@ class AccountController extends Controller
                 }
             }
         }
-        krsort($myMessages);
+        if(count($myMessages) > 0){
+            krsort($myMessages);
+        }
         return view('dashboard.myMessage', compact('myMessages'));
     }
 
@@ -2885,5 +2894,162 @@ class AccountController extends Controller
         $tbl .= '
                 </table>';
         return $tbl;
+    }
+
+    protected function purchaseTestSubCategory(Request $request){
+        // Laravel validation
+        $validator = Validator::make($request->all(), $this->validatePurchaseSubCategory);
+        if ($validator->fails())
+        {
+            return redirect()->back()->withErrors($validator->errors());
+        }
+        $categoryId = $request->get('category_id');
+        $subcategoryId = $request->get('subcategory_id');
+        $subcategory = TestSubCategory::where('id',$subcategoryId)->where('test_category_id',$categoryId)->first();
+        if(!is_object($subcategory)){
+            return redirect()->back()->withErrors(['something went wrong while sub category purchase.']);
+        }
+        $loginUser = Auth::user();
+        Session::put('user_id', $loginUser->id);
+        Session::put('user_name', $loginUser->name);
+        Session::put('purchase_sub_category_id', $subcategory->id);
+        Session::put('purchase_sub_category_price', $subcategory->price);
+        Session::put('purchase_sub_category_name', $subcategory->name);
+        Session::save();
+
+        $price = $subcategory->price;
+        $name = $loginUser->name;
+        $phone = $loginUser->phone;
+        $email = $loginUser->email;
+        $purposeStr = substr($subcategory->name.' Purchased', 0, 29) ;
+
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        try {
+            $response = $api->paymentRequestCreate(array(
+                "purpose" => trim($purposeStr),
+                "amount" => $price,
+                "buyer_name" => $name,
+                "phone" => $phone,
+                "send_email" => true,
+                "send_sms" => false,
+                "email" => $email,
+                'allow_repeated_payments' => false,
+                "redirect_url" => url('thankyouPurchaseTestSubCategory'),
+                "webhook" => url('webhookPurchaseTestSubCategory')
+                ));
+
+            $pay_ulr = $response['longurl'];
+            header("Location: $pay_ulr");
+            exit();
+        }
+        catch (Exception $e) {
+            return redirect()->back()->withErrors([$e->getMessage()]);
+        }
+    }
+
+    protected function thankyouPurchaseTestSubCategory(Request $request){
+        if('local' == \Config::get('app.env')){
+            $api = new Instamojo('4a6718254b142b18f154158d73ec5e51', '370f403cdfc0a5f12eb6395f110b8da9','https://test.instamojo.com/api/1.1/');
+        } else {
+            $api = new Instamojo('ce4d49e4727024a22fedc93e040ecac6', '1aa2a1f088aa98d264f614a80fa8a248','https://www.instamojo.com/api/1.1/');
+        }
+
+        $payid = $request->get('payment_request_id');
+
+        try {
+            $response = $api->paymentRequestStatus($payid);
+
+            if( 'Credit' == $response['payments'][0]['status']){
+                // create a client
+                $paymentRequestId = $response['id'];
+                $paymentId = $response['payments'][0]['payment_id'];
+                $email = $response['payments'][0]['buyer_email'];
+                $status = $response['payments'][0]['status'];
+                $price = $response['payments'][0]['amount'];
+
+                $userId = Session::get('user_id');
+                $userName = Session::get('user_name');
+                $subcategoryId = Session::get('purchase_sub_category_id');
+                $subcategoryPrice = Session::get('purchase_sub_category_price');
+                $subcategoryName = Session::get('purchase_sub_category_name');
+
+                DB::beginTransaction();
+                try
+                {
+                    $paymentArray = [
+                                        'user_id' => $userId,
+                                        'test_subject_paper_id' => 0,
+                                        'test_sub_category_id' => $subcategoryId,
+                                        'payment_id' => $paymentId,
+                                        'payment_request_id' => $paymentRequestId,
+                                        'price' => $subcategoryPrice
+                                    ];
+                    RegisterPaper::addPurchasedPaper($paymentArray);
+                    DB::commit();
+                }
+                catch(Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors([$e->getMessage()]);
+                }
+                Session::remove('user_id');
+                Session::remove('purchase_sub_category_id');
+                Session::remove('purchase_sub_category_price');
+                Session::remove('user_name');
+                Session::remove('purchase_sub_category_name');
+                // user email
+                $to = $email;
+                if('local' == \Config::get('app.env')){
+                    $subject = 'Successfully purchased test sub category-' .$subcategoryName.' on local';
+                } else {
+                    $subject = 'Successfully purchased test sub category-' .$subcategoryName.'';
+                }
+                $message = 'Dear '.$userName.',<br>';
+                $message .= "You have successfully purcahsed a test sub category -".$subcategoryName;
+                $message .= "<h1>Payment Details</h1>";
+                $message .= "<hr>";
+                $message .= '<p><b>Payment Id:</b> '.$paymentId.'</p>';
+                $message .= '<p><b>Payment Status:</b> '.$status.'</p>';
+                $message .= '<p><b>Amount:</b> '.$price.'</p>';
+                $message .= "<p>Thanks and Regards</p><p>Vchipedu</p>";
+
+                // send email
+                Mail::to($to)->send(new PaymentReceived($message,$subject));
+
+                $to = 'vchipdesign@gmail.com';
+                if('local' == \Config::get('app.env')){
+                    $subject = 'Purchased test sub category By:' .$userName.' on local';
+                } else {
+                    $subject = 'Purchased test sub category By:' .$userName.'';
+                }
+                $message = "<h1>Payment Details</h1>";
+                $message .= "<hr>";
+                $message .= '<p><b>Payment Id:</b> '.$paymentId.'</p>';
+                $message .= '<p><b>Payment Status:</b> '.$status.'</p>';
+                $message .= '<p><b>Amount:</b> '.$price.'</p>';
+                $message .= "<hr>";
+                $message .= '<p><b>Name:</b> '.$userName.'</p>';
+                $message .= '<p><b>Email:</b> '.$email.'</p>';
+                $message .= '<p><b>Paper:</b> '.$subcategoryName.'</p>';
+                $message .= "<hr>";
+                // send email
+                Mail::to($to)->send(new PaymentReceived($message,$subject));
+                return redirect()->back()->with('message', 'your have successfully purchased test sub category.');
+            } else {
+                return redirect()->back()->with('message', 'Payment is failed.');
+            }
+        }
+        catch (Exception $e) {
+            return redirect()->back()->withErrors([$e->getMessage()]);
+        }
+    }
+
+    public function webhookPurchaseTestSubCategory(Request $request){
+        return;
     }
 }

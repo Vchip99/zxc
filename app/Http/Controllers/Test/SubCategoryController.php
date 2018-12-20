@@ -9,6 +9,7 @@ use App\Models\TestSubCategory;
 use App\Models\UserSolution;
 use App\Models\Score;
 use App\Models\PaperSection;
+use App\Models\Admin;
 use Redirect;
 use Validator, Auth, DB;
 use App\Libraries\InputSanitise;
@@ -143,7 +144,7 @@ class SubCategoryController extends Controller
     	if(isset($subcat_id)){
     		$testSubcategory = TestSubCategory::find($subcat_id);
     		if(is_object($testSubcategory)){
-                if($testSubcategory->created_by == Auth::guard('admin')->user()->id){
+                if($testSubcategory->created_by == Auth::guard('admin')->user()->id && $testSubcategory->created_for == 1 ){
                     DB::beginTransaction();
                     try
                     {
@@ -194,6 +195,21 @@ class SubCategoryController extends Controller
 
     protected function isTestSubCategoryExist(Request $request){
         return TestSubCategory::isTestSubCategoryExist($request);
+    }
+
+    protected function manageSubadminSubCategories(Request $request){
+        $subCategories = TestSubCategory::getSubAdminSubcategoriesWithPagination();
+        $admins = Admin::getSubAdmins();
+        return view('subadmin.subadminSubCategories', compact('subCategories','admins'));
+    }
+
+    protected function getSubAdminSubCategories(Request $request){
+        return TestSubCategory::getSubAdminSubCategories($request->get('admin_id'));
+    }
+
+    protected function changeSubAdminSubCategoryApproval(Request $request){
+        InputSanitise::deleteCacheByString('vchip:tests*');
+        return TestSubCategory::changeSubAdminSubCategoryApproval($request);
     }
 
 }

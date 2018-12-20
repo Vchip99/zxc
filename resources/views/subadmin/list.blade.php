@@ -27,34 +27,31 @@
       <thead class="thead-inverse">
         <tr>
           <th>#</th>
-          <th>Sub Admin Name</th>
-          <th>Edit Sub Admin</th>
-          <!-- <th>Delete Sub Admin</th> -->
+          <th>Sub Admin</th>
+          <th>Edit </th>
+          <th>Delete </th>
         </tr>
       </thead>
       <tbody>
         @if(count($subadmins) > 0)
         @foreach($subadmins as $index => $subadmin)
-          @if(1 != $subadmin->id)
-            <tr style="overflow: auto;">
-              <th scope="row">{{$subadmin->id}}</th>
-              <td>{{$subadmin->name}}</td>
-              <td>
-                <a href="{{url('admin/subadmin')}}/{{$subadmin->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$subadmin->name}}" />
-                  </a>
-              </td>
-             <!--  <td>
+          <tr style="overflow: auto;">
+            <th scope="row">{{$subadmin->id}}</th>
+            <td>{{$subadmin->name}}</td>
+            <td>
+              <a href="{{url('admin/subadmin')}}/{{$subadmin->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$subadmin->name}}" />
+                </a>
+            </td>
+            <td>
               <a id="{{$subadmin->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30'/>
-                  </a>
-                  <form id="deleteSubadmin_{{$subadmin->id}}" action="{{url('admin/deleteSubadmin')}}" method="POST" style="display: none;">
-                      {{ csrf_field() }}
-                      {{ method_field('DELETE') }}
-                      <input type="hidden" name="subadmin_id" value="{{$subadmin->id}}">
-                  </form>
-
-              </td> -->
-            </tr>
-          @endif
+              </a>
+              <form id="deleteSubadmin_{{$subadmin->id}}" action="{{url('admin/deleteSubAdmin')}}" method="POST" style="display: none;">
+                {{ csrf_field() }}
+                {{ method_field('DELETE') }}
+                <input type="hidden" name="subadmin_id" value="{{$subadmin->id}}">
+              </form>
+            </td>
+          </tr>
         @endforeach
         @endif
       </tbody>
@@ -69,7 +66,7 @@
     function confirmDelete(ele){
       $.confirm({
           title: 'Confirmation',
-          content: 'You want to delete this subadmin?',
+          content: 'If you delete this subadmin, then all courses, sub categories, projects and study materials assocaited with this subadmin will be deleted',
           type: 'red',
           typeAnimated: true,
           buttons: {

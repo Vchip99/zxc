@@ -21,7 +21,7 @@ class TestSubjectPaper extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'test_category_id', 'test_sub_category_id', 'test_subject_id', 'price','date_to_active','time', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'verification_code_count', 'verification_code'];
+    protected $fillable = ['name', 'test_category_id', 'test_sub_category_id', 'test_subject_id', 'price','date_to_active','time', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'verification_code_count', 'verification_code','paper_pattern'];
 
     /**
      *  add/update paper
@@ -47,7 +47,7 @@ class TestSubjectPaper extends Model
         $verificationCodeCount = InputSanitise::inputInt($request->get('verification_code_count'));
         $addVerificationCodeCount = InputSanitise::inputInt($request->get('add_verification_code_count'));
         $timeOutBy = $request->get('time_out_by');
-
+        $paperPattern = $request->get('paper_pattern');
 
         if($isUpdate && isset($paperId)){
             $paper = static::find($paperId);
@@ -100,7 +100,7 @@ class TestSubjectPaper extends Model
         $paper->option_count = $optionCount;
         $paper->time_out_by = $timeOutBy;
         $paper->time = $time;
-
+        $paper->paper_pattern = $paperPattern;
         $paper->save();
 
         if( $isUpdate && isset($paperId)){
@@ -634,11 +634,12 @@ class TestSubjectPaper extends Model
         $result = static::join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
                 ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
                 ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+                ->join('admins','admins.id','=','test_sub_categories.created_by')
                 ->where('test_sub_categories.created_for', 1);
         if(is_object(Auth::guard('admin')->user()) && Auth::guard('admin')->user()->hasRole('sub-admin')){
             $result->where('test_sub_categories.created_by', Auth::guard('admin')->user()->id);
         }
-        return $result->select('test_subject_papers.*','test_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject','test_sub_categories.created_by as subcategory_by')
+        return $result->select('test_subject_papers.*','test_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject','test_sub_categories.created_by as subcategory_by','admins.name as admin')
                 ->groupBy('test_subject_papers.id')->paginate();
     }
 
@@ -681,5 +682,27 @@ class TestSubjectPaper extends Model
         }
         return $result->select('register_papers.id','test_subject_papers.name','test_subject_papers.price','register_papers.user_id','register_papers.updated_at')
                 ->first();
+    }
+
+    protected static function getSubAdminPapersWithPagination(){
+        return static::join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+            ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+            ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+            ->join('admins','admins.id','=', 'test_sub_categories.created_by')
+            ->where('test_sub_categories.created_for', 1)
+            ->where('test_sub_categories.created_by','!=', 1)
+            ->select('test_subject_papers.*','test_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject','test_sub_categories.created_by as subcategory_by','admins.name as admin')
+            ->groupBy('test_subject_papers.id')->paginate();
+    }
+
+    protected static function getSubAdminPapers($adminId){
+        return static::join('test_categories', 'test_categories.id', '=', 'test_subject_papers.test_category_id')
+            ->join('test_sub_categories', 'test_sub_categories.id', '=', 'test_subject_papers.test_sub_category_id')
+            ->join('test_subjects', 'test_subjects.id', '=', 'test_subject_papers.test_subject_id')
+            ->join('admins','admins.id','=', 'test_sub_categories.created_by')
+            ->where('test_sub_categories.created_for', 1)
+            ->where('test_sub_categories.created_by', $adminId)
+            ->select('test_subject_papers.*','test_categories.name as category', 'test_sub_categories.name as subcategory','test_subjects.name as subject','test_sub_categories.created_by as subcategory_by','admins.name as admin')
+            ->groupBy('test_subject_papers.id')->get();
     }
 }

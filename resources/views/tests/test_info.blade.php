@@ -54,6 +54,23 @@
 <section id="sidemenuindex"  class="v_container">
   <div class="container ">
     <div class="row">
+      @if(Session::has('message'))
+        <div class="alert alert-success" id="message">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+          {{ Session::get('message') }}
+        </div>
+      @endif
+      @if(count($errors) > 0)
+        <div class="alert alert-danger">
+          <ul>
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+    </div>
+    <div class="row">
       <div class="col-sm-3 hidden-div ">
         <h4 class="v_h4_subtitle"> Filter By</h4>
         <div class="dropdown mrgn_20_top_btm" id="cat">
@@ -86,6 +103,31 @@
                         <li>{{$testSubCategory->name}}</li>
                       </ul>
                     </a>
+                    <div class="categoery" style="padding-left: 18px;">
+                      <span style="color: #e91e63;">Price: {{$testSubCategory->price}} Rs.</span>
+                      @if(is_object(Auth::user()))
+                        @if(true == in_array($testSubCategory->id, $purchasedSubCategories))
+                          <a class="btn btn-primary" title="Paid" style="min-width: 100px;">Paid</a>
+                        @else
+                          @if($testSubCategory->price > 0)
+                            <a data-id="{{$testSubCategory->id}}" class="btn btn-primary" title="Pay Now" style="min-width: 100px;" onClick="purchaseSubCategory(this);">Pay Now</a>
+                            <form id="purchaseSubCategory_{{$testSubCategory->id}}" method="POST" action="{{ url('purchaseTestSubCategory') }}">
+                              {{ csrf_field() }}
+                              <input type="hidden" name="category_id" value="{{$testSubCategory->test_category_id}}">
+                              <input type="hidden" name="subcategory_id" value="{{$testSubCategory->id}}">
+                            </form>
+                          @else
+                            <a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>
+                          @endif
+                        @endif
+                      @else
+                        @if($testSubCategory->price > 0)
+                          <a class="btn btn-primary" title="Pay Now" style="min-width: 100px;"  onClick="checkLogin();">Pay Now</a>
+                        @else
+                          <a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>
+                        @endif
+                      @endif
+                    </div>
                     <div class="row text-center">
                       <a data-toggle="modal" data-target="#review-model-{{$testSubCategory->id}}" style="cursor: pointer;">
                         <div style="display: inline-block;">
@@ -331,8 +373,33 @@
                 eleUl.className="mrgn_5_top vchip_categories list-inline";
                 eleUl.innerHTML='<li>'+ obj.name +'</li>';
                 ancDiv.appendChild(eleUl);
-
                 productDiv.appendChild(ancDiv);
+
+                var priceDiv = document.createElement('a');
+                priceDiv.className = 'categoery';
+                priceDiv.setAttribute('style', 'padding-left: 18px;');
+                priceDiv.innerHTML = '';
+                priceDiv.innerHTML += '<span style="color: #e91e63;">Price: '+ obj.price+' Rs.</span>';
+                if(userId > 0){
+                  if(msg['purchasedSubCategories'][obj.id]){
+                    priceDiv.innerHTML += '<a class="btn btn-primary" title="Paid" style="min-width: 100px;">Paid</a>';
+                  } else {
+                    if(obj.price > 0){
+                      var purchaseUrl = "{{url('purchaseTestSubCategory')}}";
+                      var csrfField = '{{ csrf_field() }}';
+                      priceDiv.innerHTML += '<a data-id="'+obj.id+'" onClick="purchaseSubCategory(this);" class="btn btn-primary" title="Pay Now" style="min-width: 100px;">Pay Now</a><form id="purchaseSubCategory_'+obj.id+'" method="POST" action="'+purchaseUrl+'">'+csrfField+'<input type="hidden" name="category_id" value="'+obj.test_category_id+'"><input type="hidden" name="subcategory_id" value="'+obj.id+'"></form>';
+                    } else {
+                      priceDiv.innerHTML += '<a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>';
+                    }
+                  }
+                } else {
+                  if(obj.price > 0){
+                    priceDiv.innerHTML += '<a class="btn btn-primary" title="Pay Now" style="min-width: 100px;"  onClick="checkLogin();">Pay Now</a>';
+                  } else {
+                    priceDiv.innerHTML += '<a class="btn btn-primary" title="Free" style="min-width: 100px;">Free</a>';
+                  }
+                }
+                productDiv.appendChild(priceDiv);
 
                 var ratingDiv = document.createElement('div');
                 ratingDiv.className = "row text-center";
@@ -423,6 +490,26 @@
             }
           });
         }
+      }
+      function purchaseSubCategory(ele){
+        $.confirm({
+          title: 'Confirmation',
+          content: 'Do you want to purchase this sub category?',
+          type: 'red',
+          typeAnimated: true,
+          buttons: {
+            Ok: {
+              text: 'Ok',
+              btnClass: 'btn-red',
+              action: function(){
+                var subcategoryId = parseInt($(ele).data('id'));
+                document.getElementById('purchaseSubCategory_'+subcategoryId).submit();
+              }
+            },
+            Cancle: function () {
+            }
+          }
+        });
       }
     </script>
     <script >

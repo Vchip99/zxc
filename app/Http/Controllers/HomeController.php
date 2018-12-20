@@ -45,6 +45,12 @@ use App\Models\StudyMaterialTopic;
 use App\Models\StudyMaterialSubject;
 use App\Models\Advertisement;
 use App\Models\Rating;
+use App\Models\StudyMaterialPost;
+use App\Models\StudyMaterialPostLike;
+use App\Models\StudyMaterialComment;
+use App\Models\StudyMaterialCommentLike;
+use App\Models\StudyMaterialSubComment;
+use App\Models\StudyMaterialSubCommentLike;
 
 class HomeController extends Controller
 {
@@ -738,7 +744,13 @@ class HomeController extends Controller
         $isTopicTrue = false;
         $images = '';
 
-        $menuResults = StudyMaterialTopic::getCategoriesAndSubcategoriesAssocaitedWithStudyMaterialTopics();
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            $menuResults = StudyMaterialTopic::getCategoriesAndSubcategoriesAssocaitedWithStudyMaterialTopics();
+        } else {
+            $menuResults = Cache::remember('vchip:studyMaterial:menu',60, function() {
+                return StudyMaterialTopic::getCategoriesAndSubcategoriesAssocaitedWithStudyMaterialTopics();
+            });
+        }
         if(is_object($menuResults) && false == $menuResults->isEmpty()){
             foreach($menuResults as $result){
                 if(!isset($categories[$result->course_category_id])){
@@ -753,7 +765,13 @@ class HomeController extends Controller
                 }
             }
         }
-        $results = StudyMaterialTopic::getStudymMaterialTopicsBySubCategoryId($subcategoryId);
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+            $results = StudyMaterialTopic::getStudymMaterialTopicsBySubCategoryId($subcategoryId);
+        } else {
+            $results = Cache::remember('vchip:studyMaterial:topics',60, function() use($subcategoryId){
+                return StudyMaterialTopic::getStudymMaterialTopicsBySubCategoryId($subcategoryId);
+            });
+        }
         if(is_object($results) && false == $results->isEmpty()){
             foreach($results as $result){
                 if(!isset($subjects[$result->study_material_subject_id])){
@@ -761,6 +779,7 @@ class HomeController extends Controller
                 }
                 if($subjectName == $result->subject){
                     $isSubjectTrue = true;
+                    $selectedSubjectId = $result->study_material_subject_id;
                     $advertisements = Advertisement::where('admin_id',$result->admin_id)->get();
                     if(is_object($advertisements) && false == $advertisements->isEmpty()){
                         foreach($advertisements as $index => $advertisement){
@@ -782,7 +801,7 @@ class HomeController extends Controller
                 }
             }
         }
-        if(true == $isSubcategoryTrue && true == $isSubjectTrue && true == $isSubjectTrue){
+        if(true == $isSubcategoryTrue && true == $isSubjectTrue && true == $isTopicTrue){
             $reviewData = [];
             $ratingUsers = [];
             $userNames = [];
@@ -810,8 +829,244 @@ class HomeController extends Controller
                     }
                 }
             }
-            return view('studyMaterial.studyMaterialDetails', compact('categories','subcategories','subjects','topics','topicContent','subcategoryId','topicName','subcategoryName','images','reviewData','userNames'));
+            $currentUser = Auth::user();
+            $posts = StudyMaterialPost::getPostsByTopicId($topicId);
+            $likesCount = StudyMaterialPostLike::getLikes($topicId);
+            $commentLikesCount = StudyMaterialCommentLike::getLiksByPosts($posts);
+            $subcommentLikesCount = StudyMaterialSubCommentLike::getLiksByPosts($posts);
+            return view('studyMaterial.studyMaterialDetails', compact('categories','subcategories','subjects','topics','topicContent','subcategoryId','topicName','subcategoryName','images','reviewData','userNames','posts','currentUser','topicId','likesCount','commentLikesCount','subcommentLikesCount','selectedSubjectId'));
         }
         return redirect('study-material');
+    }
+
+    protected function studyMaterialLikePost(Request $request){
+        return StudyMaterialPostLike::getLikePost($request);
+    }
+
+    protected static function studyMaterialLikeComment(Request $request){
+        return StudyMaterialCommentLike::getLikeComment($request);
+    }
+
+    protected static function studyMaterialLikeSubComment(Request $request){
+        return StudyMaterialSubCommentLike::getLikeSubComment($request);
+    }
+
+    /**
+     *  create post comment
+     */
+    protected function createStudyMaterialComment(Request $request){
+        DB::beginTransaction();
+        try
+        {
+            StudyMaterialComment::createComment($request);
+            DB::commit();
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+        }
+        return $this->getPosts($request->get('topic_id'));
+    }
+
+     /**
+     *  return posts
+     */
+    protected function getPosts($topicId){
+        $allPosts = [];
+        $posts = StudyMaterialPost::getPostsByTopicId($topicId);
+        if(is_object($posts) && false == $posts->isEmpty()){
+            foreach ($posts as $post) {
+                $allPosts['posts'][$post->id]['body'] = $post->body;
+                $allPosts['posts'][$post->id]['id'] = $post->id;
+                $allPosts['posts'][$post->id]['answer1'] = $post->answer1;
+                $allPosts['posts'][$post->id]['answer2'] = $post->answer2;
+                $allPosts['posts'][$post->id]['answer3'] = $post->answer3;
+                $allPosts['posts'][$post->id]['answer4'] = $post->answer4;
+                $allPosts['posts'][$post->id]['answer'] = $post->answer;
+                $allPosts['posts'][$post->id]['solution'] = $post->solution;
+                if($post->descComments){
+                    $allPosts['posts'][$post->id]['comments'] = $this->getComments($post->descComments);
+                }
+            }
+        }
+        $allPosts['likesCount'] = StudyMaterialPostLike::getLikes($topicId);
+        $allPosts['commentLikesCount'] = StudyMaterialCommentLike::getLiksByPosts($posts);
+        $allPosts['subcommentLikesCount'] = StudyMaterialSubCommentLike::getLiksByPosts($posts);
+        return $allPosts;
+    }
+
+    /**
+     *  return post comments
+     */
+    protected function getComments($comments){
+        $postComments = [];
+        $commentComments = [];
+        foreach($comments as $comment){
+            $postComments[$comment->id]['body'] = $comment->body;
+            $postComments[$comment->id]['id'] = $comment->id;
+            $postComments[$comment->id]['study_material_post_id'] = $comment->study_material_post_id;
+            $postComments[$comment->id]['user_id'] = $comment->user_id;
+            $postComments[$comment->id]['user_name'] = $comment->getUser($comment->user_id)->name;
+            $postComments[$comment->id]['updated_at'] = $comment->updated_at->diffForHumans();
+            $postComments[$comment->id]['user_image'] = $comment->getUser($comment->user_id)->photo;
+            if(is_file($comment->getUser($comment->user_id)->photo) && true == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($comment->getUser($comment->user_id)->photo) && false == preg_match('/userStorage/',$comment->getUser($comment->user_id)->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $postComments[$comment->id]['image_exist'] = $isImageExist;
+
+            if($comment->children){
+                $postComments[$comment->id]['subcomments'] = $this->getSubComments($comment->children);
+            }
+        }
+        return $postComments;
+    }
+
+        /**
+     *  return child comments
+     */
+    protected function getSubComments($subComments){
+        $postChildComments = [];
+        foreach($subComments as $subComment){
+            $postChildComments[$subComment->id]['body'] = $subComment->body;
+            $postChildComments[$subComment->id]['id'] = $subComment->id;
+            $postChildComments[$subComment->id]['study_material_post_id'] = $subComment->study_material_post_id;
+            $postChildComments[$subComment->id]['study_material_comment_id'] = $subComment->study_material_comment_id;
+            $postChildComments[$subComment->id]['user_name'] = $subComment->getUser($subComment->user_id)->name;
+            $postChildComments[$subComment->id]['user_id'] = $subComment->user_id;
+            $postChildComments[$subComment->id]['updated_at'] = $subComment->updated_at->diffForHumans();
+            $postChildComments[$subComment->id]['user_image'] = $subComment->getUser($subComment->user_id)->photo;
+            if(is_file($subComment->getUser($subComment->user_id)->photo) && true == preg_match('/userStorage/',$subComment->getUser($subComment->user_id)->photo)){
+                $isImageExist = 'system';
+            } else if(!empty($subComment->getUser($subComment->user_id)->photo) && false == preg_match('/userStorage/',$subComment->getUser($subComment->user_id)->photo)){
+                $isImageExist = 'other';
+            } else {
+                $isImageExist = 'false';
+            }
+            $postChildComments[$subComment->id]['image_exist'] = $isImageExist;
+            if($subComment->children){
+                $postChildComments[$subComment->id]['subcomments'] = $this->getSubComments($subComment->children);
+            }
+        }
+        return $postChildComments;
+    }
+
+    /**
+     *  create post child comment
+     */
+    protected function createStudyMaterialSubComment(Request $request){
+        DB::beginTransaction();
+        try
+        {
+            StudyMaterialSubComment::createSubComment($request);
+            DB::commit();
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+        }
+        return $this->getPosts($request->get('topic_id'));
+    }
+
+    protected function updateStudyMaterialComment(Request $request){
+        $postId = $request->get('post_id');
+        $commentId = $request->get('comment_id');
+        $commentBody = $request->get('comment');
+        if(!empty($postId) && !empty($commentId) && !empty($commentBody)){
+            $comment = StudyMaterialComment::where('study_material_post_id', $postId)->where('id', $commentId)->first();
+            if(is_object($comment)){
+                DB::beginTransaction();
+                try
+                {
+                    $comment->body = $commentBody;
+                    $comment->study_material_post_id = $postId;
+                    $comment->save();
+                    DB::commit();
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                }
+            }
+        }
+        return $this->getPosts($request->get('topic_id'));
+    }
+
+    protected function updateStudyMaterialSubComment(Request $request){
+        $postId = $request->get('post_id');
+        $commentId = $request->get('comment_id');
+        $subcommentId = $request->get('subcomment_id');
+        $commentBody = $request->get('comment');
+        if(!empty($postId) && !empty($commentId) && !empty($commentBody)){
+            $comment = StudyMaterialSubComment::where('study_material_post_id', $postId)->where('study_material_comment_id', $commentId)->where('id', $subcommentId)->first();
+            if(is_object($comment)){
+                DB::beginTransaction();
+                try
+                {
+                    $comment->body = $commentBody;
+                    $parentSubComment = StudyMaterialSubComment::find($comment->parent_id);
+
+                    if(is_object($parentSubComment) && $parentSubComment->user_id !== Auth::user()->id){
+                        $comment->body = $commentBody;
+                        $user = User::find($comment->user_id);
+                        if(is_object($user)){
+                            $comment->body = '<b>'.$user->name.'</b> '.$commentBody;
+                        }
+                    } else {
+                        $comment->body = $commentBody;
+                    }
+                    $comment->study_material_post_id = $postId;
+                    $comment->study_material_comment_id = $commentId;
+                    $comment->save();
+                    DB::commit();
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                }
+            }
+        }
+        return $this->getPosts($request->get('topic_id'));
+    }
+
+    protected function deleteStudyMaterialSubComment(Request $request){
+        $subcomment = StudyMaterialSubComment::find(json_decode($request->get('subcomment_id')));
+        if(is_object($subcomment)){
+            DB::beginTransaction();
+            try
+            {
+                StudyMaterialSubCommentLike::deleteLikesBySubCommentId($subcomment->id);
+                $subcomment->delete();
+                DB::commit();
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+            }
+        }
+        return $this->getPosts($request->get('topic_id'));
+    }
+
+    protected function deleteStudyMaterialComment(Request $request){
+        $comment = StudyMaterialComment::find(json_decode($request->get('comment_id')));
+        if(is_object($comment)){
+            DB::beginTransaction();
+            try
+            {
+                StudyMaterialSubComment::deleteSubCommentByCommentId($comment->id);
+                StudyMaterialSubCommentLike::deleteLikesByCommentId($comment->id);
+                StudyMaterialCommentLike::deleteLikesByCommentId($comment->id);
+                $comment->delete();
+                DB::commit();
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+            }
+        }
+        return $this->getPosts($request->get('topic_id'));
     }
 }

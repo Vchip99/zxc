@@ -379,6 +379,7 @@
       var id = $(ele).data('send_id');
       message = document.getElementById('message_'+id).value;
       if(message != ''){
+          document.getElementById('message_'+id).value = '';
           var roomArr = [];
           roomArr.push(id);
           roomArr.push(document.getElementById('user_id').value);

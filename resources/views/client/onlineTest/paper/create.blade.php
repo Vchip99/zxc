@@ -164,6 +164,18 @@
       @if($errors->has('time_out_by')) <p class="help-block">{{ $errors->first('time_out_by') }}</p> @endif
     </div>
   </div>
+  <div class="form-group row @if ($errors->has('paper_pattern')) has-error @endif ">
+    <label for="paper" class="col-sm-2 col-form-label">Paper Pattern:</label>
+    <div class="col-sm-3">
+      @if(isset($paper->id))
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="0" @if(0 == $paper->paper_pattern) checked="true" @endif> General Pattern</label>
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="1" @if(1 == $paper->paper_pattern) checked="true" @endif> IIT JEE Pattern</label>
+      @else
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="0" checked> General Pattern</label>
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="1"> IIT JEE Pattern</label>
+      @endif
+    </div>
+  </div>
   <div class="form-group row @if ($errors->has('time')) has-error @endif paper_duration">
     <label for="name" class="col-sm-2 col-form-label">Paper Time:</label>
     <div class="col-sm-3">

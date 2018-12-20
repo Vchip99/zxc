@@ -20,7 +20,7 @@
   @endif
     {{ csrf_field() }}
     <div class="form-group row @if ($errors->has('category')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Category Name:</label>
+      <label class="col-sm-2 col-form-label">Category:</label>
       <div class="col-sm-3">
       @if(isset($topic->id))
         @if(count($courseCategories) > 0)
@@ -45,7 +45,7 @@
       </div>
     </div>
     <div class="form-group row @if ($errors->has('subcategory')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Sub Category Name:</label>
+      <label class="col-sm-2 col-form-label">Sub Category:</label>
       <div class="col-sm-3">
         @if(isset($topic->id) && count($courseSubCategories) > 0)
             @foreach($courseSubCategories as $courseSubCategory)
@@ -63,7 +63,7 @@
       </div>
     </div>
     <div class="form-group row @if ($errors->has('subject')) has-error @endif">
-      <label class="col-sm-2 col-form-label">Subject Name:</label>
+      <label class="col-sm-2 col-form-label">Subject:</label>
       <div class="col-sm-3">
         @if(isset($topic->id) && count($subjects) > 0)
             @foreach($subjects as $subject)
@@ -81,7 +81,7 @@
       </div>
     </div>
     <div class="form-group row @if ($errors->has('topic')) has-error @endif">
-      <label for="topic" class="col-sm-2 col-form-label">Topic Name:</label>
+      <label for="topic" class="col-sm-2 col-form-label">Topic:</label>
       <div class="col-sm-3">
         @if(isset($topic->id))
           <input type="text" class="form-control" name="topic" id="topic" value="{{$topic->name}}" required="true">
@@ -101,7 +101,22 @@
           @endif
         </textarea>
         <script type="text/javascript">
-          CKEDITOR.replace( 'content', { enterMode: CKEDITOR.ENTER_BR } );
+          var Full = [
+                { name: 'document', items: [ 'Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
+                { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+                { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+                { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+                '/',
+                { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'CopyFormatting', 'RemoveFormat' ] },
+                { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+                { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                { name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe', 'Youtube', 'EqnEditor' ] },
+                '/',
+                { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+                { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+                { name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] }
+              ];
+          CKEDITOR.replace( 'content', { enterMode: CKEDITOR.ENTER_BR, toolbar: Full});
           CKEDITOR.on('dialogDefinition', function (ev) {
                   var dialogName = ev.data.name,
                   dialogDefinition = ev.data.definition;

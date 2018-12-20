@@ -27,9 +27,14 @@ class TestController extends Controller
 		$testCategories = Cache::remember('vchip:tests:testCategoriesWithQuestions',60, function() {
             return TestCategory::getTestCategoriesAssociatedWithQuestion();
         });
-		$testSubCategories = Cache::remember('vchip:tests:testSubCategories',60, function() {
-            return TestSubCategory::getTestSubCategoriesAssociatedWithQuestion();
-        });
+        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+        	$testSubCategories = TestSubCategory::getTestSubCategoriesAssociatedWithQuestion();
+        } else {
+			$testSubCategories = Cache::remember('vchip:tests:testSubCategories',60, function() {
+	            return TestSubCategory::getTestSubCategoriesAssociatedWithQuestion();
+	        });
+        }
+
 		$catId = 0;
 		$date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
@@ -60,7 +65,8 @@ class TestController extends Controller
                 }
             }
         }
-		return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads','reviewData','userNames'));
+        $purchasedSubCategories = $this->getRegisteredPaperIds(true);
+		return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads','reviewData','userNames','purchasedSubCategories'));
 	}
 
 	/**
@@ -76,9 +82,13 @@ class TestController extends Controller
 				$testCategories = Cache::remember('vchip:tests:testCategoriesWithQuestions',60, function() {
 		            return TestCategory::getTestCategoriesAssociatedWithQuestion();
 		        });
-				$testSubCategories = Cache::remember('vchip:tests:testSubCategories:cat-'.$catId,30, function() use ($catId) {
-		            return TestSubCategory::getSubcategoriesByCategoryId($catId);
-		        });
+		        if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+		        	$testSubCategories = TestSubCategory::getSubcategoriesByCategoryId($catId);
+		        } else {
+					$testSubCategories = Cache::remember('vchip:tests:testSubCategories:cat-'.$catId,30, function() use ($catId) {
+			            return TestSubCategory::getSubcategoriesByCategoryId($catId);
+			        });
+			    }
 				$date = date('Y-m-d');
         		$ads = Add::getAdds($request->url(),$date);
         		$reviewData = [];
@@ -108,7 +118,8 @@ class TestController extends Controller
 		                }
 		            }
 		        }
-				return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads','reviewData','userNames'));
+		        $purchasedSubCategories = $this->getRegisteredPaperIds(true);
+				return view('tests.test_info', compact('catId','testCategories', 'testSubCategories', 'ads','reviewData','userNames','purchasedSubCategories'));
 			}
 		}
 		return Redirect::to('/');
@@ -120,11 +131,26 @@ class TestController extends Controller
 	protected function getTest($id,$subject=NULL,$paper=NULL){
 		$subcatId = json_decode($id);
 		$testSubjectPaperIds = [];
+		$isSubCategoryPurchased = false;
 		if(isset($subcatId)){
-			$subcategory = Cache::remember('vchip:tests:testSubCategory-'.$subcatId,30, function() use ($subcatId) {
-	            return TestSubCategory::find($subcatId);
-	        });
+			if(is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email){
+				$subcategory = TestSubCategory::find($subcatId);
+		    } else {
+		    	$subcategory = Cache::remember('vchip:tests:testSubCategory-'.$subcatId,30, function() use ($subcatId) {
+		            return TestSubCategory::find($subcatId);
+		        });
+		    }
 			if(is_object($subcategory)){
+				if(is_object(Auth::user())){
+	                if('ceo@vchiptech.com' != Auth::user()->email && 0 == $subcategory->admin_approve){
+	                    return Redirect::to('online-tests');
+	                }
+	            } else {
+	                if(0 == $subcategory->admin_approve){
+	                    return Redirect::to('online-tests');
+	                }
+	            }
+
 				$catId = $subcategory->test_category_id;
 				$testCategories = Cache::remember('vchip:tests:testCategoriesWithQuestions',60, function() {
 		            return TestCategory::getTestCategoriesAssociatedWithQuestion();
@@ -168,6 +194,10 @@ class TestController extends Controller
                             return redirect()->back()->withErrors('something went wrong.');
                         }
                     }
+                    $registeredSubCategory = RegisterPaper::getRegisteredSubCategoryByUserIdBySubCategoryId($loginUser->id,$subcatId);
+                    if(is_object($registeredSubCategory)){
+                    	$isSubCategoryPurchased = true;
+                    }
                 }
 				$currentDate = date('Y-m-d H:i:s');
 				$reviewData = [];
@@ -197,10 +227,10 @@ class TestController extends Controller
 		                }
 		            }
 		        }
-				return view('tests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'subject', 'paper','reviewData','userNames'));
+				return view('tests.show_tests', compact('catId', 'subcatId', 'testCategories','testSubCategories', 'testSubjects','testSubjectPapers', 'registeredPaperIds', 'alreadyGivenPapers', 'currentDate', 'subject', 'paper','reviewData','userNames','isSubCategoryPurchased'));
 			}
 		}
-		return Redirect::to('/');
+		return Redirect::to('online-tests');
 	}
 
 	protected function getTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds){
@@ -237,10 +267,11 @@ class TestController extends Controller
 		if($request->ajax()){
 			$result = [];
 			$categoryId = $request->get('id');
-			$userId = $request->get('userId');
+			$userId = $request->get('user_id');
 			$rating = $request->get('rating');
 		    if(true == $rating){
 			    $result['subcategories'] = TestSubCategory::getSubcategoriesByCategoryId($categoryId);
+			    $result['purchasedSubCategories'] = $this->getRegisteredPaperIds(true);
 	            $ratingUsers = [];
 	            $allRatings = Rating::getRatingsByModuleType(Rating::SubCategory);
 	            if(is_object($allRatings) && false == $allRatings->isEmpty()){
@@ -304,19 +335,16 @@ class TestController extends Controller
 		$testSubjectPaperIds = [];
 		$catId = $request->get('cat');
 		$subcatId = $request->get('subcat');
-		$userId = $request->get('userId');
-		// if(empty($userId)){
-			$result['subjects'] = Cache::remember('vchip:tests:testSubjects:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
-	            return TestSubject::getSubjectsByCatIdBySubcatid($catId, $subcatId);
-	        });
-			$result['papers'] = Cache::remember('vchip:tests:testSubjectPapers:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
-	            return TestSubjectPaper::getSubjectPapersByCatIdBySubCatId($catId, $subcatId);
-	        });
-			$result['registeredPaperIds'] = $this->getRegisteredPaperIds();
-		// } else {
-		// 	$result['subjects'] = TestSubject::getRegisteredSubjectsByCatIdBySubcatIdByUserId($catId, $subcatId,$userId);
-		// 	$result['papers'] = TestSubjectPaper::getRegisteredSubjectPapersByCatIdBySubCatIdByUserId($catId, $subcatId,$userId);
-		// }
+		$userId = $request->get('user_id');
+		$result['isSubCategoryPurchased'] = false;
+		$result['subjects'] = Cache::remember('vchip:tests:testSubjects:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
+            return TestSubject::getSubjectsByCatIdBySubcatid($catId, $subcatId);
+        });
+		$result['papers'] = Cache::remember('vchip:tests:testSubjectPapers:cat-'.$catId.':subcat-'.$subcatId,30, function() use ($catId, $subcatId) {
+            return TestSubjectPaper::getSubjectPapersByCatIdBySubCatId($catId, $subcatId);
+        });
+		$result['registeredPaperIds'] = $this->getRegisteredPaperIds();
+		$result['purchasedSubCategories'] = $this->getRegisteredPaperIds(true);
 		if(is_array($result['papers'])){
 			foreach($result['papers'] as $testPapers){
 				foreach($testPapers as $testPaper){
@@ -325,7 +353,12 @@ class TestController extends Controller
 			}
 			$testSubjectPaperIds = array_values($testSubjectPaperIds);
 		}
-
+		if($userId > 0){
+			$registeredSubCategory = RegisterPaper::getRegisteredSubCategoryByUserIdBySubCategoryId($userId,$subcatId);
+            if(is_object($registeredSubCategory)){
+            	$result['isSubCategoryPurchased'] = true;
+            }
+		}
 		$result['alreadyGivenPapers'] = $this->getTestUserScoreByCategoryIdBySubcatIdByPaperIds($catId, $subcatId, $testSubjectPaperIds);
 		$result['currentDate'] = date('Y-m-d H:i:s');
 
@@ -444,7 +477,7 @@ class TestController extends Controller
     	return RegisterPaper::registerTestPaper($userId, $paperId);
     }
 
-    public function getRegisteredPaperIds(){
+    public function getRegisteredPaperIds($returnSubCategoryIds = false){
     	$registeredPaperIds = [];
     	$loginUser = Auth::user();
     	if(is_object($loginUser)){
@@ -452,7 +485,15 @@ class TestController extends Controller
 			$registeredPapers = RegisterPaper::getRegisteredPapersByUserId($userId);
 			if(false == $registeredPapers->isEmpty()){
 				foreach($registeredPapers as $registeredPaper){
-					$registeredPaperIds[] = $registeredPaper->test_subject_paper_id;
+					if(true == $returnSubCategoryIds){
+						if($registeredPaper->test_sub_category_id > 0){
+							$registeredPaperIds[$registeredPaper->test_sub_category_id] = $registeredPaper->test_sub_category_id;
+						}
+					} else {
+						if($registeredPaper->test_subject_paper_id > 0){
+							$registeredPaperIds[$registeredPaper->test_subject_paper_id] = $registeredPaper->test_subject_paper_id;
+						}
+					}
 				}
 			}
 		}

@@ -143,11 +143,12 @@ class CourseVideo extends Model
         $result = static::join('course_categories', 'course_categories.id', '=', 'course_videos.course_category_id')
             ->join('course_sub_categories', 'course_sub_categories.id', '=', 'course_videos.course_sub_category_id')
             ->join('course_courses', 'course_courses.id', '=', 'course_videos.course_id')
+            ->join('admins','admins.id','=', 'course_courses.admin_id')
             ->where('course_sub_categories.created_for', 1);
         if(Auth::guard('admin')->user()->hasRole('sub-admin')){
             $result->where('course_courses.admin_id', Auth::guard('admin')->user()->id);
         }
-        return $result->select('course_videos.id', 'course_videos.name', 'course_categories.name as category', 'course_sub_categories.name as subcategory', 'course_courses.name as course','course_courses.admin_id')
+        return $result->select('course_videos.id', 'course_videos.name', 'course_categories.name as category', 'course_sub_categories.name as subcategory', 'course_courses.name as course','course_courses.admin_id','admins.name as admin')
             ->groupBy('course_videos.id')
             ->paginate();
     }

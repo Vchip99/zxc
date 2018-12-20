@@ -103,9 +103,9 @@
       <label for="price" class="col-sm-2 col-form-label">Price:</label>
       <div class="col-sm-3">
         @if(isset($paper->id))
-          <input type="text" class="form-control" name="price" value="{{$paper->price}}" required="true">
+          <input type="text" class="form-control" name="price" id="price" value="{{$paper->price}}" required="true">
         @else
-          <input type="text" class="form-control" name="price" value="" placeholder="price" required="true">
+          <input type="text" class="form-control" name="price" id="price" value="" placeholder="price" required="true">
         @endif
         @if($errors->has('price')) <p class="help-block">{{ $errors->first('price') }}</p> @endif
       </div>
@@ -144,6 +144,18 @@
         <label class="radio-inline"><input type="radio" name="time_out_by" value="0" onClick="selectedSession(this);"> Session Wise</label>
       @endif
       @if($errors->has('time_out_by')) <p class="help-block">{{ $errors->first('time_out_by') }}</p> @endif
+    </div>
+  </div>
+    <div class="form-group row @if ($errors->has('paper_pattern')) has-error @endif ">
+    <label for="paper" class="col-sm-2 col-form-label">Paper Pattern:</label>
+    <div class="col-sm-3">
+      @if(isset($paper->id))
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="0" @if(0 == $paper->paper_pattern) checked="true" @endif> General Pattern</label>
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="1" @if(1 == $paper->paper_pattern) checked="true" @endif> IIT JEE Pattern</label>
+      @else
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="0" checked> General Pattern</label>
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="1"> IIT JEE Pattern</label>
+      @endif
     </div>
   </div>
   <div class="form-group row @if ($errors->has('time')) has-error @endif paper_duration">
@@ -420,6 +432,7 @@
                     var opt = document.createElement('option');
                     opt.value = obj.id;
                     opt.innerHTML = obj.name;
+                    opt.setAttribute('price',obj.price);
                     select.appendChild(opt);
                 });
               }
@@ -430,28 +443,36 @@
     function selectSubject(ele){
       subcatId = parseInt($(ele).val());
       catId = parseInt(document.getElementById('category').value);
+      var subCatPrice = $('#subcategory option:selected').attr('price');
+      if( 0 == subCatPrice ){
+        $('#price').val(0);
+        $('#price').prop('readonly', true);
+      } else {
+        $('#price').val(0);
+        $('#price').prop('readonly', false);
+      }
       if( 0 < catId && 0 < subcatId ){
         $.ajax({
                 method: "POST",
                 url: "{{url('admin/getSubjectsByCatIdBySubcatId')}}",
                 data: {catId:catId, subcatId:subcatId}
-            })
-            .done(function( msg ) {
-              selectSub = document.getElementById('subject');
-              selectSub.innerHTML = '';
-              var opt = document.createElement('option');
-              opt.value = '';
-              opt.innerHTML = 'Select Subject';
-              selectSub.appendChild(opt);
-              if( 0 < msg.length){
-                $.each(msg, function(idx, obj) {
-                    var opt = document.createElement('option');
-                    opt.value = obj.id;
-                    opt.innerHTML = obj.name;
-                    selectSub.appendChild(opt);
-                });
-              }
+        })
+        .done(function( msg ) {
+          selectSub = document.getElementById('subject');
+          selectSub.innerHTML = '';
+          var opt = document.createElement('option');
+          opt.value = '';
+          opt.innerHTML = 'Select Subject';
+          selectSub.appendChild(opt);
+          if( 0 < msg.length){
+            $.each(msg, function(idx, obj) {
+                var opt = document.createElement('option');
+                opt.value = obj.id;
+                opt.innerHTML = obj.name;
+                selectSub.appendChild(opt);
             });
+          }
+        });
       }
     }
     $( document ).ready(function() {
@@ -517,9 +538,7 @@
         $('.verification_code_count').addClass('hide');
         $('.verification_code').addClass('hide');
         $('.add_verification_code_count').addClass('hide');
-
       }
-
     }
 </script>
 @stop

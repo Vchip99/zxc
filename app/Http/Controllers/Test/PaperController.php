@@ -12,6 +12,7 @@ use App\Models\Notification;
 use App\Models\UserSolution;
 use App\Models\PaperSection;
 use App\Models\Score;
+use App\Models\Admin;
 use Redirect,Validator, Auth, DB;
 use App\Libraries\InputSanitise;
 use App\Mail\MailToSubscribedUser;
@@ -202,5 +203,15 @@ class PaperController extends Controller
 
     protected function isTestPaperExist(Request $request){
         return TestSubjectPaper::isTestPaperExist($request);
+    }
+
+    protected function manageSubadminPapers(Request $request){
+        $papers = TestSubjectPaper::getSubAdminPapersWithPagination();
+        $admins = Admin::getSubAdmins();
+        return view('subadmin.subadminPapers', compact('papers','admins'));
+    }
+
+    protected function getSubAdminPapers(Request $request){
+        return TestSubjectPaper::getSubAdminPapers($request->get('admin_id'));
     }
 }

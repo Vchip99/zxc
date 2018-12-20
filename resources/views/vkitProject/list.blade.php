@@ -29,6 +29,7 @@
           <th>#</th>
           <th>Project </th>
           <th>Category </th>
+          <th>Created By </th>
           <th>Edit </th>
           <th>Delete </th>
         </tr>
@@ -40,25 +41,24 @@
             <th scope="row">{{$index + $projects->firstItem() }}</th>
             <td>{{$project->name}}</td>
             <td>{{$project->category}}</td>
+            <td>{{$project->admin}}</td>
             <td>
               <a href="{{url('admin/vkitProject')}}/{{$project->id}}/edit"><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$project->name}}" />
                 </a>
             </td>
             <td>
-            @if($project->created_by == Auth::guard('admin')->user()->id)
               <a id="{{$project->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$project->name}}" />
-                </a>
-                <form id="deleteProject_{{$project->id}}" action="{{url('admin/deleteVkitProject')}}" method="POST" style="display: none;">
-                    {{ csrf_field() }}
-                    {{ method_field('DELETE') }}
-                    <input type="hidden" name="project_id" value="{{$project->id}}">
-                </form>
-            @endif
+              </a>
+              <form id="deleteProject_{{$project->id}}" action="{{url('admin/deleteVkitProject')}}" method="POST" style="display: none;">
+                {{ csrf_field() }}
+                {{ method_field('DELETE') }}
+                <input type="hidden" name="project_id" value="{{$project->id}}">
+              </form>
             </td>
           </tr>
           @endforeach
         @else
-          <tr><td colspan="5">No project is created.</td></tr>
+          <tr><td colspan="6">No project is created.</td></tr>
         @endif
       </tbody>
     </table>

@@ -81,4 +81,12 @@ class Admin extends Authenticatable
                 ->select('permissions.id')
                 ->get()->toArray();
     }
+
+    protected static function getSubAdmins(){
+        return static::where('id','!=',1)->get();
+    }
+
+    protected static function getSubAdminsWithPagination(){
+        return static::where('id','!=',1)->paginate();
+    }
 }

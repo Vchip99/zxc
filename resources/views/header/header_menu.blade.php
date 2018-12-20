@@ -36,7 +36,7 @@
       </div>
       @php
         if('local' == \Config::get('app.env')){
-          $onlineUrl = 'https://online.localvchip.com/';
+          $onlineUrl = 'http://online.localvchip.com/';
         } else {
           $onlineUrl = 'https://online.vchipedu.com/';
         }
@@ -50,18 +50,18 @@
         </button>
         <div class="pull-right dropdown " >
           @if(Auth::user())
-          <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User">
-            @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
-              <img src="{{asset(Auth::user()->photo)}}" id="currentUserImage" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
-            @else
-              <img src="{{ asset('images/user1.png') }}" id="currentUserImage" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
-            @endif
-            @if(Auth::user()->userNotificationCount() > 0)
-              <b style="color: red;" id="userCnt_{{Auth::user()->id}}">{{Auth::user()->userNotificationCount()}}</b>
-            @else
-              <b style="color: red;" id="userCnt_{{Auth::user()->id}}"></b>
-            @endif
-          </a>
+            <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User">
+              @if(is_file(Auth::user()->photo) || (!empty(Auth::user()->photo) && false == preg_match('/userStorage/',Auth::user()->photo)))
+                <img src="{{asset(Auth::user()->photo)}}" id="currentUserImage" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
+              @else
+                <img src="{{ asset('images/user1.png') }}" id="currentUserImage" class="img-circle user-profile" alt="user name" aria-haspopup="true"   aria-expanded="true"/>&nbsp;
+              @endif
+              @if(Auth::user()->userNotificationCount() > 0)
+                <b style="color: red;" id="userCnt_{{Auth::user()->id}}">{{Auth::user()->userNotificationCount()}}</b>
+              @else
+                <b style="color: red;" id="userCnt_{{Auth::user()->id}}"></b>
+              @endif
+            </a>
             <ul class="dropdown-menu user-dropdown ">
                 <li>
                   <a href="{{ url('college/'.Session::get('college_user_url').'/profile')}}" target="_blank" data-toggle="tooltip" title="DASHBOARD">
@@ -90,16 +90,19 @@
                   </form>
                 </li>
             </ul>
-            @else
-              <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>
-              </a>
-              <ul class="dropdown-menu" role="menu">
-                <div class="navbar-content">
-                  <li>
-                    <a href="{{ url('/')}}"><i class="fa fa-tachometer" aria-hidden="true"></i> Login</a>
-                  </li>
-                </div>
-              </ul>
+          @else
+            <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User"><img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <div class="navbar-content">
+                <li>
+                  <a onClick="checkLogin();" style="cursor: pointer;"> Login</a>
+                </li>
+                <li>
+                  <a href="{{ url('signup')}}"> SignUp</a>
+                </li>
+              </div>
+            </ul>
           @endif
         </div>
       </div>

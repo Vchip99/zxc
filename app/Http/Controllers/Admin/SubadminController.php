@@ -7,8 +7,13 @@ use App\Http\Controllers\Controller;
 use Redirect;
 use App\Models\Admin;
 use App\Models\SubDomainHome;
+use App\Models\CourseCourse;
+use App\Models\TestSubCategory;
+use App\Models\StudyMaterialSubject;
+use App\Models\VkitProject;
 use Validator, Session, Auth, DB;
 use Illuminate\Support\Facades\Route;
+use App\Libraries\InputSanitise;
 
 class SubadminController extends Controller
 {
@@ -47,7 +52,7 @@ class SubadminController extends Controller
      * show all admins
      */
     protected function show(){
-        $subadmins = Admin::paginate();
+        $subadmins = Admin::getSubAdminsWithPagination();
         return view('subadmin.list', compact('subadmins'));
     }
 
@@ -128,6 +133,42 @@ class SubadminController extends Controller
         return Redirect::to('admin/manageSubadminUser');
     }
 
+    /**
+     *  delete sub admin
+     */
+    protected function delete(Request $request){
+        InputSanitise::deleteCacheByString('vchip:courses*');
+        InputSanitise::deleteCacheByString('vchip:tests*');
+        InputSanitise::deleteCacheByString('vchip:studyMaterial*');
+        InputSanitise::deleteCacheByString('vchip:projects*');
+        $adminId = InputSanitise::inputInt($request->get('subadmin_id'));
+        if(isset($adminId)){
+            $admin = Admin::find($adminId);
+            if(is_object($admin) && 1 != $admin->id){
+                DB::beginTransaction();
+                try
+                {
+                    // delete courses,videos and purchased courses
+                    CourseCourse::deleteSubAdminCoursesAndCourseVideosByAdminId($admin->id);
+                    // delete sub category, subjects, papers, user purchased paper/test,delete questions
+                    TestSubCategory::deleteSubAdminSubCategoriesAndSubjectsAndPapersAndQuestionsByAdminId($admin->id);
+                    // delete study material subjects,topics,comments ( compelete comment module)
+                    StudyMaterialSubject::deleteSubAdminStudyMaterialSubjectsByAdminId($admin->id);
+                    // delete vkit projects && purchased items(vkit) - from user purchased table
+                    VkitProject::deleteSubAdminProjectsByAdminId($admin->id);
+                    $admin->delete();
+                    DB::commit();
+                    return Redirect::to('admin/manageSubadminUser')->with('message', 'Sub Admin deleted successfully!');
+                }
+                catch(\Exception $e)
+                {
+                    DB::rollback();
+                    return redirect()->back()->withErrors('something went wrong.');
+                }
+            }
+        }
+        return Redirect::to('admin/manageSubadminUser');
+    }
 
     protected function showSubAdminHome(){
         $subdomain = SubDomainHome::where('subdomain', 'vchip')->first();

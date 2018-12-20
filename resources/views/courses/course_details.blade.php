@@ -201,7 +201,7 @@ margin: 0px 5px;
               @foreach($videos as $index => $video)
               <div class="row mrgn_30_top border_box padding_10">
                 <div class="col-md-3" title="{{$video->name}}">
-                  @if('true' == $isCourseRegistered || 1 == $video->is_free || $course->price <= 0)
+                  @if('true' == $isCourseRegistered || 1 == $video->is_free || $course->price <= 0 || is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email)
                     <a href="{{ url('episode')}}/{{$video->id}}">
                   @else
                     <a>
@@ -213,7 +213,7 @@ margin: 0px 5px;
                   <span class="divider">&#9679;</span>
                   <span class="running-time">Run Time- {{ gmdate('H:i:s', $video->duration)}}</span>
                   <h4 class="v_h4_subtitle" title="{{$video->name}}">
-                    @if('true' == $isCourseRegistered || 1 == $video->is_free || $course->price <= 0)
+                    @if('true' == $isCourseRegistered || 1 == $video->is_free || $course->price <= 0 || is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email)
                       <a href="{{ url('episode')}}/{{$video->id}}">
                     @else
                       <a>

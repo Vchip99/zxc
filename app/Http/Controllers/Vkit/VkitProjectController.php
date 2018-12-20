@@ -13,6 +13,7 @@ use App\Libraries\InputSanitise;
 use App\Mail\MailToSubscribedUser;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
+use App\Models\Admin;
 
 class VkitProjectController extends Controller
 {
@@ -62,7 +63,7 @@ class VkitProjectController extends Controller
      *  show list of vkit projects
      */
     protected function show(){
-        $projects = VkitProject::getVkitProjectsWithPagination();
+        $projects = VkitProject::getVkitProjectsWithPaginationForAdmin();
         return view('vkitProject.list', compact('projects'));
     }
 
@@ -199,5 +200,20 @@ class VkitProjectController extends Controller
 
     protected function isVkitProjectExist(Request $request){
         return VkitProject::isVkitProjectExist($request);
+    }
+
+    protected function manageSubadminProjects(Request $request){
+        $projects = VkitProject::getSubAdminProjectsWithPagination();
+        $admins = Admin::getSubAdmins();
+        return view('subadmin.subadminProjects', compact('projects','admins'));
+    }
+
+    protected function getSubAdminProjects(Request $request){
+        return VkitProject::getSubAdminProjects($request->get('admin_id'));
+    }
+
+    protected function changeSubAdminProjectApproval(Request $request){
+        InputSanitise::deleteCacheByString('vchip:projects*');
+        return VkitProject::changeSubAdminProjectApproval($request);
     }
 }

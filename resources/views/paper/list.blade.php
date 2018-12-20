@@ -33,6 +33,7 @@
           <th>Sub Category </th>
           <th>Subject </th>
           <th>Verification Code</th>
+          <th>Created By </th>
           <th>Edit </th>
           <th>Delete </th>
         </tr>
@@ -71,19 +72,18 @@
                 No
               @endif
             </td>
+            <td>{{$testPaper->admin}}</td>
             <td>
               <a href="{{url('admin/paper')}}/{{$testPaper->id}}/edit" ><img src="{{asset('images/edit1.png')}}" width='30' height='30' title="Edit {{$testPaper->name}}" />
                 </a>
             </td>
             <td>
-              @if($testPaper->subcategory_by == Auth::guard('admin')->user()->id)
-                <a id="{{$testPaper->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testPaper->name}}" />
-                <form id="deletePaper_{{$testPaper->id}}" action="{{url('admin/deletePaper')}}" method="POST" style="display: none;">
-                    {{ csrf_field() }}
-                    {{ method_field('DELETE') }}
-                    <input type="hidden" name="paper_id" value="{{$testPaper->id}}">
-                </form>
-              @endif
+              <a id="{{$testPaper->id}}" onclick="confirmDelete(this);"><img src="{{asset('images/delete2.png')}}" width='30' height='30' title="Delete {{$testPaper->name}}" />
+              <form id="deletePaper_{{$testPaper->id}}" action="{{url('admin/deletePaper')}}" method="POST" style="display: none;">
+                  {{ csrf_field() }}
+                  {{ method_field('DELETE') }}
+                  <input type="hidden" name="paper_id" value="{{$testPaper->id}}">
+              </form>
             </td>
           </tr>
           @endforeach

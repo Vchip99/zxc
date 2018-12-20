@@ -22,7 +22,7 @@ class ClientOnlineTestSubjectPaper extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'category_id', 'sub_category_id', 'subject_id', 'date_to_active', 'time','client_id', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'is_free', 'allowed_unauthorised_user','created_by'];
+    protected $fillable = ['name', 'category_id', 'sub_category_id', 'subject_id', 'date_to_active', 'time','client_id', 'date_to_inactive', 'show_calculator', 'show_solution', 'option_count', 'time_out_by', 'is_free', 'allowed_unauthorised_user','created_by','paper_pattern'];
 
     /**
      *  add/update paper
@@ -45,6 +45,7 @@ class ClientOnlineTestSubjectPaper extends Model
         $isFree = InputSanitise::inputInt($request->get('is_free'));
         $unauthorisedUser = InputSanitise::inputInt($request->get('allowed_unauthorised_user'));
         $timeOutBy = $request->get('time_out_by');
+        $paperPattern = $request->get('paper_pattern');
         $resultArr = InputSanitise::getClientIdAndCretedBy();
         $clientId = $resultArr[0];
         $createdBy = $resultArr[1];
@@ -79,6 +80,7 @@ class ClientOnlineTestSubjectPaper extends Model
             $paper->is_free = $isFree;
         }
         $paper->allowed_unauthorised_user = $unauthorisedUser;
+        $paper->paper_pattern = $paperPattern;
         $paper->save();
 
         if( $isUpdate && isset($paperId)){
@@ -161,7 +163,6 @@ class ClientOnlineTestSubjectPaper extends Model
                 }
             }
         }
-
         return $paper;
     }
 
