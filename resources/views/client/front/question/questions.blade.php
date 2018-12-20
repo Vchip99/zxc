@@ -173,7 +173,7 @@
 					     		<table class="table" >
 						     		@if(count($results['questions']) > 0)
 						     			@if(1 == $paper->paper_pattern)
-										  	<tr>
+										  	<tr id="palette">
 										  		<div class="row">
 						                   			<div class="col-lg-12">
 										  				<td height="200px" overflow = "scroll" >
@@ -423,7 +423,11 @@
 		    	$('div#section_'+id).addClass('hide');
 		    	document.getElementById('all_sections').value = document.getElementById('all_sections').value +','+id;
 		    }
-		    $('tr#'+id+'_palette > td > div > button:first').css('background', 'red');
+		    if(1 == $('#paperPattern').val()){
+		    	$('tr#palette > td > div > button:first').css('background', 'red');
+		    } else {
+		    	$('tr#'+id+'_palette > td > div > button:first').css('background', 'red');
+		    }
 		});
 
 		$(document).on('click', '.section', function(){

@@ -98,9 +98,15 @@ class TestSubjectPaper extends Model
         $paper->show_calculator = $showCalculator;
         $paper->show_solution = $showSolution;
         $paper->option_count = $optionCount;
-        $paper->time_out_by = $timeOutBy;
-        $paper->time = $time;
-        $paper->paper_pattern = $paperPattern;
+        if(1 == $paperPattern){
+            $paper->paper_pattern = $paperPattern;
+            $paper->time_out_by = 1;
+            $paper->time = ('' == $time)? '1200':$time;
+        } else {
+            $paper->paper_pattern = $paperPattern;
+            $paper->time_out_by = $timeOutBy;
+            $paper->time = '';
+        }
         $paper->save();
 
         if( $isUpdate && isset($paperId)){
@@ -125,7 +131,11 @@ class TestSubjectPaper extends Model
                             if(isset($updatePaperSessions[$paperSession->id]) && !empty($updatePaperSessions[$paperSession->id]['session'])){
                                 if(isset($updatePaperSessions[$paperSession->id])){
                                     $paperSession->name = str_replace(" ", "_", $updatePaperSessions[$paperSession->id]['session']);
-                                    $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
+                                    if(0 == $paperPattern){
+                                        $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
+                                    } else {
+                                        $paperSession->duration = '';
+                                    }
                                     $paperSession->test_category_id = $catId;
                                     $paperSession->test_sub_category_id =$subcatId;
                                     $paperSession->test_subject_id = $subjectId;
@@ -144,7 +154,11 @@ class TestSubjectPaper extends Model
                         if(!empty($updatePaperSession['session'])){
                             $paperSession = new PaperSection;
                             $paperSession->name = str_replace(" ", "_", $updatePaperSession['session']);
-                            $paperSession->duration = $updatePaperSession['duration'];
+                            if(0 == $paperPattern){
+                                $paperSession->duration = $updatePaperSession['duration'];
+                            } else {
+                                $paperSession->duration = '';
+                            }
                             $paperSession->test_category_id = $catId;
                             $paperSession->test_sub_category_id =$subcatId;
                             $paperSession->test_subject_id = $subjectId;
@@ -159,7 +173,11 @@ class TestSubjectPaper extends Model
             if($allSessionCount > 0){
                 for($i=1; $i<=$allSessionCount; $i++){
                     $session = $request->get('session_'.$i);
-                    $duration = $request->get('duration_'.$i);
+                    if(0 == $paperPattern){
+                        $duration = $request->get('duration_'.$i);
+                    } else {
+                        $duration = '';
+                    }
                     if(!empty($session)){
                         $sessions[] = [
                                     'name' => str_replace(" ", "_", $session),

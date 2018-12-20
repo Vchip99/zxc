@@ -151,7 +151,19 @@
         });
     </script>
   </div>
-  <div class="form-group row @if ($errors->has('time_out_by')) has-error @endif ">
+  <div class="form-group row @if ($errors->has('paper_pattern')) has-error @endif ">
+    <label for="paper" class="col-sm-2 col-form-label">Paper Pattern:</label>
+    <div class="col-sm-3">
+      @if(isset($paper->id))
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="0"  onClick="togglePapperPattern(this)" @if(0 == $paper->paper_pattern) checked="true" @endif> General Pattern</label>
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="1"  onClick="togglePapperPattern(this)" @if(1 == $paper->paper_pattern) checked="true" @endif> IIT JEE Pattern</label>
+      @else
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="0"  onClick="togglePapperPattern(this)" checked> General Pattern</label>
+        <label class="radio-inline"><input type="radio" name="paper_pattern" value="1"   onClick="togglePapperPattern(this)" > IIT JEE Pattern</label>
+      @endif
+    </div>
+  </div>
+  <div class="form-group row @if ($errors->has('time_out_by')) has-error @endif " id="paperTimeOut">
     <label for="paper" class="col-sm-2 col-form-label">Total Time Out By:</label>
     <div class="col-sm-3">
       @if(isset($paper->id))
@@ -162,18 +174,6 @@
         <label class="radio-inline"><input type="radio" name="time_out_by" value="0" onClick="selectedSession(this);"> Session Wise</label>
       @endif
       @if($errors->has('time_out_by')) <p class="help-block">{{ $errors->first('time_out_by') }}</p> @endif
-    </div>
-  </div>
-  <div class="form-group row @if ($errors->has('paper_pattern')) has-error @endif ">
-    <label for="paper" class="col-sm-2 col-form-label">Paper Pattern:</label>
-    <div class="col-sm-3">
-      @if(isset($paper->id))
-        <label class="radio-inline"><input type="radio" name="paper_pattern" value="0" @if(0 == $paper->paper_pattern) checked="true" @endif> General Pattern</label>
-        <label class="radio-inline"><input type="radio" name="paper_pattern" value="1" @if(1 == $paper->paper_pattern) checked="true" @endif> IIT JEE Pattern</label>
-      @else
-        <label class="radio-inline"><input type="radio" name="paper_pattern" value="0" checked> General Pattern</label>
-        <label class="radio-inline"><input type="radio" name="paper_pattern" value="1"> IIT JEE Pattern</label>
-      @endif
     </div>
   </div>
   <div class="form-group row @if ($errors->has('time')) has-error @endif paper_duration">
@@ -318,7 +318,7 @@
     var thirdTd = document.createElement('td');
 
     var thirdButton = document.createElement('button');
-    thirdButton.setAttribute("onClick", "addSessions();");
+    thirdButton.setAttribute("onClick", "addSessions(event);");
     thirdButton.innerHTML = '<i class="fa fa-plus-circle" aria-hidden="true"></i>';
     thirdTd.appendChild(thirdButton);
     firstTr.appendChild(thirdTd);
@@ -529,6 +529,21 @@
       alert('please select subject.');
     } else if(!paper){
       alert('please enter paper name.');
+    }
+  }
+
+  function togglePapperPattern(ele){
+    if(1 == $(ele).val()){
+      $('#paperTimeOut').addClass('hide');
+      // hide session code
+      document.getElementById('selected_time_out').value = $(ele).val();
+      $('.duration').addClass('hide');
+      $('.paper_duration').removeClass('hide');
+      $.each($('.duration > input'), function(idx, obj){ $(obj).prop('required', false); });
+      $('#time').prop('required', true);
+    } else {
+      $('#paperTimeOut').removeClass('hide');
+      $('#time').prop('required', false);
     }
   }
 </script>

@@ -214,7 +214,14 @@
             });
         </script>
       </div>
-      <div class="form-group row @if ($errors->has('time_out_by')) has-error @endif ">
+      <div class="form-group row @if ($errors->has('paper_pattern')) has-error @endif ">
+        <label for="paper" class="col-sm-2 col-form-label">Paper Pattern:</label>
+        <div class="col-sm-3">
+            <label class="radio-inline"><input type="radio" name="paper_pattern" value="0"  onClick="togglePapperPattern(this)" checked> General Pattern</label>
+            <label class="radio-inline"><input type="radio" name="paper_pattern" value="1"   onClick="togglePapperPattern(this)" > IIT JEE Pattern</label>
+        </div>
+      </div>
+      <div class="form-group row @if ($errors->has('time_out_by')) has-error @endif " id="paperTimeOut">
         <label for="paper" class="col-sm-2 col-form-label">Total Time Out By:</label>
         <div class="col-sm-3">
             <label class="radio-inline"><input type="radio" name="time_out_by" value="1" onClick="selectedSession(this);" checked> Paper Wise</label>
@@ -244,7 +251,7 @@
               <tr id="tr_1">
                 <td class="col-sm-3"><input type="text" class="form-control" name="session_1" value="Section_1" required="true"></td>
                 <td class="col-sm-3 duration"><input type="text" class="form-control " name="duration_1" value=""></td>
-                <td class=""><button type="button" onClick="addSessions();"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
+                <td class=""><button type="button" onClick="addSessions(event);"> <i class="fa fa-plus-circle" aria-hidden="true"></i></button></td>
                 <td class=""></td>
               </tr>
           </tbody>
@@ -392,8 +399,8 @@
       alert('please enter subject name.');
     }
   }
-  function addSessions(){
-    // event.preventDefault();
+  function addSessions(event){
+    event.preventDefault();
     var allSession = document.getElementById('all_session');
     var count = parseInt(document.getElementById('all_session_count').value) + 1;
 
@@ -434,7 +441,7 @@
     var thirdTd = document.createElement('td');
 
     var thirdButton = document.createElement('button');
-    thirdButton.setAttribute("onClick", "addSessions();");
+    thirdButton.setAttribute("onClick", "addSessions(event);");
     thirdButton.innerHTML = '<i class="fa fa-plus-circle" aria-hidden="true"></i>';
     thirdTd.appendChild(thirdButton);
     firstTr.appendChild(thirdTd);
@@ -621,6 +628,20 @@
       alert('please select subject.');
     } else if(!paper){
       alert('please enter paper name.');
+    }
+  }
+  function togglePapperPattern(ele){
+    if(1 == $(ele).val()){
+      $('#paperTimeOut').addClass('hide');
+      // hide session code
+      document.getElementById('selected_time_out').value = $(ele).val();
+      $('.duration').addClass('hide');
+      $('.paper_duration').removeClass('hide');
+      $.each($('.duration > input'), function(idx, obj){ $(obj).prop('required', false); });
+      $('#time').prop('required', true);
+    } else {
+      $('#paperTimeOut').removeClass('hide');
+      $('#time').prop('required', false);
     }
   }
 </script>

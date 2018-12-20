@@ -65,13 +65,11 @@ class ClientOnlineTestSubjectPaper extends Model
         $paper->sub_category_id = $subcatId;
         $paper->subject_id = $subjectId;
         $paper->date_to_active =  $dateToActive;
-        $paper->time = $time;
         $paper->client_id = $clientId;
         $paper->date_to_inactive = $dateToInactive;
         $paper->show_calculator = $showCalculator;
         $paper->show_solution = $showSolution;
         $paper->option_count = $optionCount;
-        $paper->time_out_by = $timeOutBy;
         $paper->created_by = $createdBy;
         $subCat = ClientOnlineTestSubCategory::find($subcatId);
         if(is_object($subCat) && $subCat->price <=0){
@@ -80,7 +78,15 @@ class ClientOnlineTestSubjectPaper extends Model
             $paper->is_free = $isFree;
         }
         $paper->allowed_unauthorised_user = $unauthorisedUser;
-        $paper->paper_pattern = $paperPattern;
+        if(1 == $paperPattern){
+            $paper->paper_pattern = $paperPattern;
+            $paper->time_out_by = 1;
+            $paper->time = ('' == $time)? '1200':$time;
+        } else {
+            $paper->paper_pattern = $paperPattern;
+            $paper->time_out_by = $timeOutBy;
+            $paper->time = '';
+        }
         $paper->save();
 
         if( $isUpdate && isset($paperId)){
@@ -106,7 +112,11 @@ class ClientOnlineTestSubjectPaper extends Model
                             if(isset($updatePaperSessions[$paperSession->id]) && !empty($updatePaperSessions[$paperSession->id]['session'])){
                                 if(isset($updatePaperSessions[$paperSession->id])){
                                     $paperSession->name =  str_replace(" ", "_", $updatePaperSessions[$paperSession->id]['session']);
-                                    $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
+                                    if(0 == $paperPattern){
+                                        $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
+                                    } else {
+                                        $paperSession->duration = '';
+                                    }
                                     $paperSession->category_id = $catId;
                                     $paperSession->sub_category_id =$subcatId;
                                     $paperSession->subject_id = $subjectId;
@@ -127,7 +137,11 @@ class ClientOnlineTestSubjectPaper extends Model
                         if(!empty($updatePaperSession['session'])){
                             $paperSession = new ClientOnlinePaperSection;
                             $paperSession->name = str_replace(" ", "_", $updatePaperSession['session']);
-                            $paperSession->duration = $updatePaperSession['duration'];
+                            if(0 == $paperPattern){
+                                $paperSession->duration = $updatePaperSession['duration'];
+                            } else {
+                                $paperSession->duration = '';
+                            }
                             $paperSession->category_id = $catId;
                             $paperSession->sub_category_id =$subcatId;
                             $paperSession->subject_id = $subjectId;
@@ -144,7 +158,11 @@ class ClientOnlineTestSubjectPaper extends Model
             if($allSessionCount > 0){
                 for($i=1; $i<=$allSessionCount; $i++){
                     $session = $request->get('session_'.$i);
-                    $duration = $request->get('duration_'.$i);
+                    if(0 == $paperPattern){
+                        $duration = $request->get('duration_'.$i);
+                    } else {
+                        $duration = '';
+                    }
                     if(!empty($session)){
                         $sessions[] = [
                                     'name' => str_replace(" ", "_", $session),
