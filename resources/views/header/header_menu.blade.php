@@ -37,8 +37,10 @@
       @php
         if('local' == \Config::get('app.env')){
           $onlineUrl = 'http://online.localvchip.com/';
+          $mentorUrl = 'http://mentor.localvchip.com/';
         } else {
           $onlineUrl = 'https://online.vchipedu.com/';
+          $mentorUrl = 'https://mentor.vchipedu.com/';
         }
       @endphp
       <div class="navbar-header pull-right">
@@ -159,7 +161,7 @@
             </ul>
           </li>
           <li><a href="{{url('blog')}}" title="Blog">Blog</a></li>
-          <li><a href="{{url('heros')}}" title="Zero To Hero">Z To H</a></li>
+          <li><a href="{{$mentorUrl}}" target="_blank" title="Mentor">Mentor</a></li>
           <li><a href="{{url('discussion')}}" title="Discussion">Discussion</a></li>
           <!-- <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" title="Discussion">Discussion <span class="caret"></span>

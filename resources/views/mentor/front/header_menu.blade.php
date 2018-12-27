@@ -1,4 +1,4 @@
-<nav class="navbar navbar-fixed-top" style="background: black;">
+<nav class="navbar navbar-fixed-top" style="background: #0c1a1e;">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">

@@ -44,6 +44,7 @@ trait AuthenticatesUsers
         if(!empty($request->route()->getParameter('client')) && !empty($userMobile) && !empty($loginOtp)){
             $serverOtp = Cache::get($userMobile);
             if($loginOtp == $serverOtp){
+                // mentor login
                 if($request->is('mentor/login')){
                     $mentor = Mentor::where('mobile','=', $userMobile)->whereNotNull('mobile')->first();
                     if(!is_object($mentor)){
@@ -52,6 +53,7 @@ trait AuthenticatesUsers
                     Auth::guard('mentor')->login($mentor);
                     return Redirect::to('/')->with('message', 'Welcome '. $mentor->name);
                 } else {
+                    // client user login
                     $client = Client::where('subdomain', $request->getHost())->first();
                     $clientUser = Clientuser::where('number_verified', 1)->where('phone','=', $userMobile)->whereNotNull('phone')->where('client_id', $client->id)->where('client_approve', 1)->first();
                     if(!is_object($clientUser)){
@@ -69,6 +71,7 @@ trait AuthenticatesUsers
             }
         } else if(empty($request->route()->getParameter('client')) && !empty($userMobile) && !empty($loginOtp)){
             $serverOtp = Cache::get($userMobile);
+            // vchip user login
             if($loginOtp == $serverOtp){
                 $user = User::where('number_verified', 1)->whereNotNull('phone')->where('phone','=', $userMobile)->where('admin_approve', 1)->first();
                 if(!is_object($user)){
@@ -132,11 +135,13 @@ trait AuthenticatesUsers
         $isValidUser = 'true';
 
         if(empty($request->route()->getParameter('client'))){
+            // admin login
             if ($request->is('admin/login')) {
                 if (!$this->guard('admin')->attempt($credentials, $request->has('remember'))) {
                     $isValidUser = 'false';
                 }
             } else {
+                // vhip user login
                 if (!$this->guard('user')->attempt($credentials, $request->has('remember'))) {
                     if (! $lockedOut) {
                         $this->incrementLoginAttempts($request);
@@ -175,6 +180,7 @@ trait AuthenticatesUsers
                 return $this->sendLoginResponse($request);
             }
         } else {
+            // client login
             if($request->is('client/login')){
                 if($this->guard('client')->attempt($credentials, $request->has('remember'))) {
                     $sessionId = str_random(10);
@@ -190,9 +196,11 @@ trait AuthenticatesUsers
                     return redirect()->back()->withErrors('Given credential doesnot match with subdomain.');
                 }
             } else {
+                // mentor login
                 if('mentor' == $request->route()->getParameter('client') && $request->is('mentor/login') && $this->guard('mentor')->attempt($credentials)){
                     return $this->sendLoginResponse($request);
                 } else if($this->guard('clientuser')->attempt($credentials, $request->has('remember'))) {
+                    // client user login
                     $clientUser = Auth::guard('clientuser')->user();
                     if(0 == $clientUser->client_approve){
                         $this->guard('clientuser')->logout();
