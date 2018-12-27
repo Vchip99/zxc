@@ -36,6 +36,11 @@ return [
     */
 
     'guards' => [
+        'mentor' => [
+            'driver' => 'session',
+            'provider' => 'mentors',
+        ],
+
         'clientuser' => [
             'driver' => 'session',
             'provider' => 'clientusers',
@@ -79,6 +84,11 @@ return [
     */
 
     'providers' => [
+        'mentors' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Mentor::class,
+        ],
+
         'clientusers' => [
             'driver' => 'eloquent',
             'model' => App\Models\Clientuser::class,
@@ -123,6 +133,13 @@ return [
     */
 
     'passwords' => [
+        'mentors' => [
+            'provider' => 'mentors',
+            'table' => 'mentor_password_resets',
+            'connection' => 'mysql',
+            'expire' => 60,
+        ],
+
         'clientusers' => [
             'provider' => 'clientusers',
             'table' => 'clientuser_password_resets',

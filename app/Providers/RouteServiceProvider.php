@@ -39,6 +39,8 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
+        $this->mapMentorRoutes();
+
         $this->mapClientuserRoutes();
 
         $this->mapClientRoutes();
@@ -103,6 +105,25 @@ class RouteServiceProvider extends ServiceProvider
             'namespace' => $this->namespace,
         ], function ($router) {
             require base_path('routes/clientuser.php');
+        });
+    }
+
+    /**
+     * Define the "mentor" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapMentorRoutes()
+    {
+        Route::group([
+            'middleware' => ['web', 'mentor', 'auth:mentor'],
+            'prefix' => 'mentor',
+            'as' => 'mentor.',
+            'namespace' => $this->namespace,
+        ], function ($router) {
+            require base_path('routes/mentor.php');
         });
     }
 

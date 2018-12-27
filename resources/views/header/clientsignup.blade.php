@@ -180,7 +180,7 @@
         }
       document.getElementById('subdomain_exist').classList.add('hide');
       if( 0 == error){
-        if('online' == subdomain){
+        if('online' == subdomain || 'mentor' == subdomain){
           document.getElementById('subdomain_exist').classList.remove('hide');
           document.getElementById('registerBtn').disabled = true;
         } else {

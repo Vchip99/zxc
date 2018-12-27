@@ -77,6 +77,17 @@ class RegisterController extends Controller
         }
     }
 
+    protected function validateMantee(array $data)
+    {
+        return Validator::make($data, [
+            'name' => 'required|max:255',
+            'phone' => 'required|regex:/[0-9]{10}/|unique:users',
+            'email' => 'required|email|max:255|unique:users',
+            'password' => 'required',
+            'confirm_password' => 'required|same:password'
+        ]);
+    }
+
     /**
      * Create a new user instance after a valid registration.
      *
@@ -153,6 +164,35 @@ class RegisterController extends Controller
                 'assigned_college_depts' => $assignedCollegeDepts,
             ]);
         }
+        return $user;
+    }
+
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param  array  $data
+     * @return User
+     */
+    protected function createMantee(array $data)
+    {
+
+        $user = User::create([
+            'name' => $data['name'],
+            'phone' => $data['phone'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password']),
+            'user_type' => 2,
+            'admin_approve' => 1,
+            'degree' => 1,
+            'college_id' => 'other',
+            'college_dept_id' => '',
+            'year' =>  '',
+            'roll_no' =>  '',
+            'other_source' => 'other',
+            'email_token' => str_random(60),
+            'number_verified' => 0,
+            'assigned_college_depts' => '',
+        ]);
         return $user;
     }
 
@@ -300,6 +340,55 @@ class RegisterController extends Controller
             return redirect('login')->with('message', 'please login with credentials.');
         } else {
             return redirect('login')->withErrors('These credentials do not exist.');
+        }
+    }
+
+    /**
+    *  Over-ridden the register method from the "RegistersUsers" trait
+    *  Remember to take care while upgrading laravel
+    */
+    public function registerMentee(Request $request)
+    {
+        // Laravel validation
+        $v = $this->validateMantee($request->all());
+        if($v->fails())
+        {
+            return redirect()->back()->withErrors($v->errors());
+        }
+        // Using database transactions is useful here because stuff happening is actually a transaction
+        DB::beginTransaction();
+        try
+        {
+            $user = $this->createMantee($request->all());
+            if( !is_object($user)){
+                return redirect('/')->withErrors($user);
+            }
+            DB::commit();
+            if(!empty($user->email) && 0 == $user->number_verified){
+                // After creating the user send an email with the random token generated in the create method above
+                $email = new EmailVerification(new User(['email_token' => $user->email_token, 'name' => $user->name]));
+                Mail::to($user->email)->send($email);
+            }
+            $data['name'] = $user->name;
+            $data['email'] = $user->email;
+            $data['user_type'] = 2;
+            $data['degree'] = 1;
+
+            $data['college'] = '';
+            $data['department'] = '';
+            $data['year'] = '';
+            $data['roll_no'] = '';
+            $data['domain'] = '';
+            $data['other_source'] = $request->get('other_source')?:'';
+
+            // send mail to admin after new registration
+            Mail::to('vchipdesigng8@gmail.com')->send(new NewRegisteration($data));
+            return redirect('/')->with('message', 'Verify your email for your account activation.');
+        }
+        catch(Exception $e)
+        {
+            DB::rollback();
+            return back();
         }
     }
 }

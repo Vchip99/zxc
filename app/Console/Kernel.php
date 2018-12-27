@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
         Commands\SendOfflineDueSms::class,
         Commands\DeleteClientEvents::class,
         Commands\DeleteCollegeEvents::class,
+        Commands\SendMentorScheduleMessages::class,
     ];
 
     /**
@@ -41,6 +42,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('sendofflineduesms:cron');
         $schedule->command('deleteclientevents:command');
         $schedule->command('deletecollegeevents:command');
+        $schedule->command('sendmentorschedulemessages:cron');
     }
 
     /**

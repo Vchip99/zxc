@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ClientuserAuth;
 
 use App\Models\Clientuser;
 use App\Models\Client;
+use App\Models\User;
 use Validator, Redirect,DB,Mail,Cache;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -218,12 +219,22 @@ class RegisterController extends Controller
     {
         // The verified method has been added to the user model and chained here
         // for better readability
-        $user = Clientuser::where('email_token',$token)->first();
-        if(is_object($user)){
-            $user->verified();
-            return redirect('/')->with('message', 'please login with credentials.');
+        if('mentor' == $subdomain){
+            $user = User::where('email_token',$token)->first();
+            if(is_object($user)){
+                $user->verified();
+                return redirect('/')->with('message', 'please login with credentials.');
+            } else {
+                return redirect('/')->withErrors('These credentials do not exist.');
+            }
         } else {
-            return redirect('/')->withErrors('These credentials do not exist.');
+            $user = Clientuser::where('email_token',$token)->first();
+            if(is_object($user)){
+                $user->verified();
+                return redirect('/')->with('message', 'please login with credentials.');
+            } else {
+                return redirect('/')->withErrors('These credentials do not exist.');
+            }
         }
     }
 

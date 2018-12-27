@@ -1237,6 +1237,26 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/studyMaterialPost/{id}/edit', 'StudyMaterial\StudyMaterialPostController@edit');
 	Route::put('admin/updateStudyMaterialPost', 'StudyMaterial\StudyMaterialPostController@update');
 	Route::delete('admin/deleteStudyMaterialPost', 'StudyMaterial\StudyMaterialPostController@delete');
+
+	// admin mentor area
+	Route::get('admin/manageMentorArea', 'Mentor\MentorAreaController@show');
+	Route::get('admin/createMentorArea', 'Mentor\MentorAreaController@create');
+	Route::post('admin/createMentorArea', 'Mentor\MentorAreaController@store');
+	Route::get('admin/mentorArea/{id}/edit', 'Mentor\MentorAreaController@edit');
+	Route::put('admin/updateMentorArea', 'Mentor\MentorAreaController@update');
+	Route::delete('admin/deleteMentorArea', 'Mentor\MentorAreaController@delete');
+	Route::post('admin/isMentorAreaExist', 'Mentor\MentorAreaController@isMentorAreaExist');
+	Route::get('admin/manageMentors', 'Mentor\MentorAreaController@manageMentors');
+	Route::delete('admin/deleteMentor', 'Mentor\MentorAreaController@deleteMentor');
+
+	// admin mentor skill
+	Route::get('admin/manageMentorSkill', 'Mentor\MentorSkillController@show');
+	Route::get('admin/createMentorSkill', 'Mentor\MentorSkillController@create');
+	Route::post('admin/createMentorSkill', 'Mentor\MentorSkillController@store');
+	Route::get('admin/mentorSkill/{id}/edit', 'Mentor\MentorSkillController@edit');
+	Route::put('admin/updateMentorSkill', 'Mentor\MentorSkillController@update');
+	Route::delete('admin/deleteMentorSkill', 'Mentor\MentorSkillController@delete');
+	Route::post('admin/isMentorSkillExist', 'Mentor\MentorSkillController@isMentorSkillExist');
 });
 
 Route::group(['domain' => '{client}.localvchip.com'], function () {
@@ -1281,6 +1301,52 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::get('thankyouclient', 'Client\OnlineClientController@thankyouclient');
 	Route::any('webhookclient', 'Client\OnlineClientController@webhookclient');
 	Route::post('freeRegister', 'Client\OnlineClientController@freeRegister');
+
+	// mentor
+	Route::get('mentors', 'Client\MentorHomeController@mentors');
+	Route::get('faq', 'Client\MentorHomeController@faq');
+	Route::get('mentorinfo/{id}', 'Client\MentorHomeController@mentorinfo');
+	Route::get('mentor/signup', 'Client\MentorHomeController@mentorSignup');
+	Route::post('getMentorSkillsByAreaId', 'Client\MentorHomeController@getMentorSkillsByAreaId');
+	Route::post('registerMentor', 'MentorAuth\RegisterController@register');
+	Route::get('mentor/login', 'Client\MentorHomeController@mentorSignin');
+	Route::post('mentor/login', 'MentorAuth\LoginController@login');
+	Route::post('sendMentorSignInOtp', 'Client\MentorHomeController@sendMentorSignInOtp');
+	Route::post('mentor/logout', 'MentorAuth\LoginController@logout');
+	Route::post('getMentorsByAreaIdBySkillId', 'Client\MentorHomeController@getMentorsByAreaIdBySkillId');
+	Route::post('userLogin', 'Client\MentorHomeController@userLogin');
+	Route::post('userLogout', 'Client\MentorHomeController@userLogout');
+	Route::get('schedules', 'Client\MentorHomeController@schedules');
+	Route::post('getMentorsBySkillId', 'Client\MentorHomeController@getMentorsBySkillId');
+	Route::post('createUserSchedule', 'Client\MentorHomeController@createUserSchedule');
+	Route::get('messages', 'Client\MentorHomeController@messages');
+	Route::post('giveMentorRating', 'Client\MentorHomeController@giveMentorRating');
+
+	Route::post('privatechatByUser', 'Client\MentorChatController@privatechatByUser');
+	Route::post('userMentorPrivateChat', 'Client\MentorChatController@userMentorPrivateChat');
+	Route::post('userMentorSendMessage', 'Client\MentorChatController@userMentorSendMessage');
+	Route::get('mentee/signup', 'Client\MentorHomeController@menteeSignup');
+	Route::post('registerMentee', 'UserAuth\RegisterController@registerMentee');
+
+	//   Route::get('/login', 'MentorAuth\LoginController@showLoginForm')->name('login');
+	//   Route::post('/login', 'MentorAuth\LoginController@login');
+	//   Route::post('/logout', 'MentorAuth\LoginController@logout')->name('logout');
+
+	//   Route::get('/register', 'MentorAuth\RegisterController@showRegistrationForm')->name('register');
+	//   Route::post('/register', 'MentorAuth\RegisterController@register');
+
+	//   Route::post('/password/email', 'MentorAuth\ForgotPasswordController@sendResetLinkEmail')->name('password.request');
+	//   Route::post('/password/reset', 'MentorAuth\ResetPasswordController@reset')->name('password.email');
+	//   Route::get('/password/reset', 'MentorAuth\ForgotPasswordController@showLinkRequestForm')->name('password.reset');
+	//   Route::get('/password/reset/{token}', 'MentorAuth\ResetPasswordController@showResetForm');
+
+	Route::get('mentor/profile', 'Mentor\MentorController@mentorProfile');
+	Route::put('mentor/updateProfile', 'Mentor\MentorController@updateMentorProfile');
+	Route::get('mentor/calendar', 'Mentor\MentorController@mentorCalendar');
+	Route::post('mentor/getStudentByEmail', 'Mentor\MentorController@getStudentByEmail');
+	Route::post('mentor/createSchedule', 'Mentor\MentorController@createSchedule');
+	Route::post('mentor/changeMeetingTypeById', 'Mentor\MentorController@changeMeetingTypeById');
+	Route::get('mentor/messages', 'Mentor\MentorController@messages');
 
   	// client users info
   	Route::get('allUsers', 'Client\ClientUsersInfoController@allUsers');

@@ -14,6 +14,9 @@ use App\Models\ClientTeam;
 use App\Models\ClientCustomer;
 use App\Models\Clientuser;
 use App\Models\Client;
+use App\Models\Mentor;
+use App\Models\MentorRating;
+use App\Models\User;
 use App\Models\ClientChatMessage;
 use App\Models\ClientGalleryType;
 use App\Models\ClientGalleryImage;
@@ -47,11 +50,43 @@ class ClientHomeController extends Controller
     protected function clientHome($subdomainName,Request $request){
         if('local' == \Config::get('app.env')){
             $onlineClientUrl = 'online.localvchip.com';
+            $mentorUrl = 'mentor.localvchip.com';
         } else {
             $onlineClientUrl = 'online.vchipedu.com';
+            $mentorUrl = 'mentor.vchipedu.com';
         }
         if( $onlineClientUrl == $request->getHost()){
             return view('client.online.digitaleducation');
+        } else if( $mentorUrl == $request->getHost()){
+            $mentors = Mentor::all();
+            $reviewData = [];
+            $ratingUsers = [];
+            $userNames = [];
+            $allRatings = MentorRating::all();
+            if(is_object($allRatings) && false == $allRatings->isEmpty()){
+                foreach($allRatings as $rating){
+                    $reviewData[$rating->mentor_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id, 'updated_at' => $rating->updated_at->diffForHumans()];
+                    $ratingUsers[] = $rating->user_id;
+                }
+                foreach($reviewData as $dataId => $rating){
+                    $ratingSum = 0.0;
+                    foreach($rating as $userRatings){
+                        foreach($userRatings as $userId => $userRating){
+                            $ratingSum = (double) $ratingSum + (double) $userRating['rating'];
+                        }
+                        $reviewData[$dataId]['avg']  = $ratingSum/count($userRatings);
+                    }
+                }
+            }
+            if(count($ratingUsers) > 0){
+                $users = User::find($ratingUsers);
+                if(is_object($users) && false == $users->isEmpty()){
+                    foreach($users as $user){
+                        $userNames[$user->id] = [ 'name' => $user->name,'photo' => $user->photo];
+                    }
+                }
+            }
+            return view('mentor.front.home', compact('mentors','reviewData','userNames'));
         } else {
             $subdomain = ClientHomePage::where('subdomain', $request->getHost())->first();
 

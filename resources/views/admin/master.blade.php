@@ -439,6 +439,21 @@
             </ul>
           </li>
         @endif
+        @if($adminUser->hasRole('admin'))
+          <li class="treeview">
+            <a href="#" title="Mentor">
+              <i class="fa fa-graduation-cap"></i> <span>Mentor</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li title="Mentor Area"><a href="{{ url('admin/manageMentorArea')}}"><i class="fa fa-circle-o"></i> Mentor Area </a></li>
+              <li title="Mentor Skill"><a href="{{ url('admin/manageMentorSkill')}}"><i class="fa fa-circle-o"></i> Mentor Skill </a></li>
+              <li title="MentorS"><a href="{{ url('admin/manageMentors')}}"><i class="fa fa-circle-o"></i> Mentors </a></li>
+            </ul>
+          </li>
+        @endif
         <li class="header">LABELS</li>
         <li>
           <a onclick="event.preventDefault(); document.getElementById('logout-form').submit();" title="Logout">

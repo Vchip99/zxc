@@ -37,6 +37,7 @@ class SocialiteController extends Controller
     {
         Session::put('subdomainReferer', $request->server('HTTP_REFERER'));
         Session::put('subdomainUrl', $request->server('HTTP_HOST'));
+        Session::put('mentorClient', $request->route()->getParameter('client'));
         Session::save();
         return Socialite::driver($provider)->redirect();
     }
@@ -127,7 +128,7 @@ class SocialiteController extends Controller
                 return Redirect::to('/');
             }
         }
-        if(!empty($domainUrl) && empty($subdomainUrl) && empty($subdomainReferer)){
+        if((!empty($domainUrl) && empty($subdomainUrl) && empty($subdomainReferer)) || (Session::has('mentorClient') && 'mentor' == Session::get('mentorClient'))){
             if(is_object($authUser)){
                 if( 0 == $authUser->admin_approve ){
                     return Redirect::to($domainUrl)->withErrors('Your account is not approve. you can contact at info@vchiptech.com to approve your account.');
@@ -149,7 +150,12 @@ class SocialiteController extends Controller
                         if(true == Session::has('subdomainReferer')){
                             Session::remove('subdomainReferer');
                         }
-                        return Redirect::to($domainUrl)->with('message', 'Welcome '. $authUser->name);
+
+                        if(Session::has('mentorClient') && 'mentor' == Session::get('mentorClient')){
+                            return Redirect::to($subdomainReferer)->with('message', 'Welcome '. $authUser->name);
+                        } else {
+                            return Redirect::to($domainUrl)->with('message', 'Welcome '. $authUser->name);
+                        }
                     }
                 }
             } else {
@@ -206,7 +212,7 @@ class SocialiteController extends Controller
      */
     public function findOrCreateUser($user, $provider)
     {
-        if(true == Session::has('domainUrl') && false == Session::has('subdomainUrl') && false == Session::has('subdomainReferer')){
+        if((true == Session::has('domainUrl') && false == Session::has('subdomainUrl') && false == Session::has('subdomainReferer')) || (Session::has('mentorClient') && 'mentor' == Session::get('mentorClient'))){
         	$authUser = User::where('email', $user->email)->first();
             DB::beginTransaction();
             try

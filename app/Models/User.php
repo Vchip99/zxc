@@ -51,6 +51,8 @@ use App\Models\CourseCourse;
 use App\Models\TestSubject;
 use App\Models\VkitProject;
 use App\Models\CollegeSubject;
+use App\Models\MentorSchedule;
+use App\Models\MentorChatMessage;
 use Auth, DB, Cache;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -454,6 +456,8 @@ class User extends Authenticatable
         ChatMessage::deleteChatMessagesByUserId($userId);
         Notification::deleteUserNotificationByUserId($userId);
         PlacementExperiance::deletePlacementExperiancesByUserId($userId);
+        MentorSchedule::deleteMentoSchedulesByUserId($userId);
+        MentorChatMessage::deleteMentoChatMessagesByUserId($userId);
 
         // delete college related data
         CourseCourse::deleteCollegeCoursesAndCourseVideosByUserId($userId);
@@ -830,5 +834,9 @@ class User extends Authenticatable
             ->where('admin_approve', 1)
             ->where('verified', 1)
             ->select('id','name','phone')->get();
+    }
+
+    protected function getUserByEmailId($emailId){
+        return static::where('email', $emailId)->select('id','email')->first();
     }
 }

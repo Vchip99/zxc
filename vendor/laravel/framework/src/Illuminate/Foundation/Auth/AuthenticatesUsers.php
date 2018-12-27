@@ -10,6 +10,7 @@ use App\Mail\ClientUnAuthorisedUser;
 use App\Models\Clientuser;
 use App\Models\Client;
 use App\Models\User;
+use App\Models\Mentor;
 use App\Models\ClientLoginActivity;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
@@ -43,17 +44,26 @@ trait AuthenticatesUsers
         if(!empty($request->route()->getParameter('client')) && !empty($userMobile) && !empty($loginOtp)){
             $serverOtp = Cache::get($userMobile);
             if($loginOtp == $serverOtp){
-                $client = Client::where('subdomain', $request->getHost())->first();
-                $clientUser = Clientuser::where('number_verified', 1)->where('phone','=', $userMobile)->whereNotNull('phone')->where('client_id', $client->id)->where('client_approve', 1)->first();
-                if(!is_object($clientUser)){
-                    return Redirect::to('/')->withErrors('User does not exists or not client approve.');
+                if($request->is('mentor/login')){
+                    $mentor = Mentor::where('mobile','=', $userMobile)->whereNotNull('mobile')->first();
+                    if(!is_object($mentor)){
+                        return Redirect::to('/')->withErrors('Mentor does not exists.');
+                    }
+                    Auth::guard('mentor')->login($mentor);
+                    return Redirect::to('/')->with('message', 'Welcome '. $mentor->name);
+                } else {
+                    $client = Client::where('subdomain', $request->getHost())->first();
+                    $clientUser = Clientuser::where('number_verified', 1)->where('phone','=', $userMobile)->whereNotNull('phone')->where('client_id', $client->id)->where('client_approve', 1)->first();
+                    if(!is_object($clientUser)){
+                        return Redirect::to('/')->withErrors('User does not exists or not client approve.');
+                    }
+                    Auth::guard('clientuser')->login($clientUser);
+                    if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
+                        Cache::forget($userMobile);
+                        Cache::forget('mobile-'.$userMobile);
+                    }
+                    return redirect()->back()->with('message', 'Welcome '. $clientUser->name);
                 }
-                Auth::guard('clientuser')->login($clientUser);
-                if(Cache::has($userMobile) && Cache::has('mobile-'.$userMobile)){
-                    Cache::forget($userMobile);
-                    Cache::forget('mobile-'.$userMobile);
-                }
-                return redirect()->back()->with('message', 'Welcome '. $clientUser->name);
             } else {
                 return redirect()->back()->withErrors('Entered otp is wrong.');
             }
@@ -166,7 +176,7 @@ trait AuthenticatesUsers
             }
         } else {
             if($request->is('client/login')){
-                if ($this->guard('client')->attempt($credentials, $request->has('remember'))) {
+                if($this->guard('client')->attempt($credentials, $request->has('remember'))) {
                     $sessionId = str_random(10);
                     if(!Session::has('client_session_id')){
                         Session::put('client_session_id',$sessionId);
@@ -180,7 +190,9 @@ trait AuthenticatesUsers
                     return redirect()->back()->withErrors('Given credential doesnot match with subdomain.');
                 }
             } else {
-                if($this->guard('clientuser')->attempt($credentials, $request->has('remember'))) {
+                if('mentor' == $request->route()->getParameter('client') && $request->is('mentor/login') && $this->guard('mentor')->attempt($credentials)){
+                    return $this->sendLoginResponse($request);
+                } else if($this->guard('clientuser')->attempt($credentials, $request->has('remember'))) {
                     $clientUser = Auth::guard('clientuser')->user();
                     if(0 == $clientUser->client_approve){
                         $this->guard('clientuser')->logout();
@@ -287,6 +299,11 @@ trait AuthenticatesUsers
                         'admin_approve' => 1,
                         'subdomain' => (string) $request->getHost(),
                     ];
+            } else if($request->is('mentor/login')){
+                return [
+                    'email' => $request->email,
+                    'password' => $request->password
+                ];
             } else {
                 $client = Client::where('subdomain', $request->getHost())->first();
                 return [
