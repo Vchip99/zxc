@@ -74,27 +74,27 @@
 													<p class="questions" id="qname{{$result->id}}">
 														@if(!empty($result->common_data))
 															<b>Common Data:</b><br/>
-															<span style="padding-left: 5px;">{!! trim($result->common_data) !!}</span><hr/>
+															<span style="padding-left: 5px;">{!! strip_tags($result->common_data,'&nbsp;') !!}</span><hr/>
 														@endif
 														<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
-														{!! trim($result->name) !!}
+														{!! strip_tags($result->name,'&nbsp;') !!}
 													</p>
 													@if( 1 == $result->question_type )
 														<div class="row answer">A.<input type="radio" value="1" class="radio1 radio1_{{$result->id}}" id="radio1_{{$result->id}}" name="{{$result->id}}" />
-															{!! trim($result->answer1) !!}
+															{!! strip_tags($result->answer1,'&nbsp;') !!}
 														</div>
 														<div class="row answer">B.<input type="radio" value="2" class="radio1 radio1_{{$result->id}}" id="radio2_{{$result->id}}" name="{{$result->id}}" />
-															{!! trim($result->answer2) !!}
+															{!! strip_tags($result->answer2,'&nbsp;') !!}
 														</div>
 														<div class="row answer">C.<input type="radio" value="3" class="radio1 radio1_{{$result->id}}" id="radio3_{{$result->id}}" name="{{$result->id}}" />
-															{!! trim($result->answer3) !!}
+															{!! strip_tags($result->answer3,'&nbsp;') !!}
 														</div>
 														<div class="row answer">D.<input type="radio" value="4" class="radio1 radio1_{{$result->id}}" id="radio4_{{$result->id}}" name="{{$result->id}}" />
-															{!! trim($result->answer4) !!}
+															{!! strip_tags($result->answer4,'&nbsp;') !!}
 														</div>
 														@if(!empty($result->answer5))
 														<div class="row answer">E.<input type="radio" value="5" class="radio1 radio1_{{$result->id}}" id="radio5_{{$result->id}}" name="{{$result->id}}" />
-															{!! trim($result->answer5) !!}
+															{!! strip_tags($result->answer5,'&nbsp;') !!}
 														</div>
 														@endif
 														<input type="radio" checked='checked' style='display:none' value="unsolved" id='radio7_{{$result->id}}' name='{{$result->id}}' />

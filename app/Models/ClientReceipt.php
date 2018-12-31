@@ -66,4 +66,14 @@ class ClientReceipt extends Model
         $receipt->save();
         return $receipt;
     }
+
+    protected static function deleteClientReceiptsByClientId($clientId){
+        $receipts = static::where('client_id', $clientId)->get();
+        if(is_object($receipts) && false == $receipts->isEmpty()){
+            foreach($receipts as $receipt){
+                $receipt->delete();
+            }
+        }
+        return;
+    }
 }

@@ -38,4 +38,14 @@ class ClientLoginActivity extends Model
         $activity->save();
         return $activity;
     }
+
+    protected static function deleteClientLoginActivitiesByClientId($clientId){
+        $activities = static::where('client_id', $clientId)->get();
+        if(is_object($activities) && false == $activities->isEmpty()){
+            foreach($activities as $activity){
+                $activity->delete();
+            }
+        }
+        return;
+    }
 }

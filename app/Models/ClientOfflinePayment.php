@@ -89,4 +89,14 @@ class ClientOfflinePayment extends Model
             }
         }
     }
+
+    protected static function deleteClientOfflinePaymentsByClientId($clientId){
+        $payments = static::where('client_id', $clientId)->get();
+        if(is_object($payments) && false == $payments->isEmpty()){
+            foreach($payments as $payment){
+                $payment->delete();
+            }
+        }
+        return;
+    }
 }

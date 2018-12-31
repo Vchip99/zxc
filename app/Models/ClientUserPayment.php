@@ -17,4 +17,14 @@ class ClientUserPayment extends Model
      * @var array
      */
     protected $fillable = ['client_id', 'clientuser_id' ,'payment_request_id', 'payment_id'];
+
+    protected static function deleteClientUserPaymentsByClientId($clientId){
+        $payments = static::where('client_id', $clientId)->get();
+        if(is_object($payments) && false == $payments->isEmpty()){
+            foreach($payments as $payment){
+                $payment->delete();
+            }
+        }
+        return;
+    }
 }

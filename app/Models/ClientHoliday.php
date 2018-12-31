@@ -47,4 +47,14 @@ class ClientHoliday extends Model
     protected static function deleteClientHolidaysByBtachIdByClientId($batchId,$clientId){
         return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->delete();
     }
+
+    protected static function deleteClientHolidayesByClientId($clientId){
+        $holidays = static::where('client_id', $clientId)->get();
+        if(is_object($holidays) && false == $holidays->isEmpty()){
+            foreach($holidays as $holiday){
+                $holiday->delete();
+            }
+        }
+        return;
+    }
 }

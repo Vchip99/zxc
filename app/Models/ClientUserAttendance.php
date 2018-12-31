@@ -84,4 +84,14 @@ class ClientUserAttendance extends Model
             }
         }
     }
+
+    protected static function deleteClientUserAttendancesByClientId($clientId){
+        $transactions = static::where('client_id', $clientId)->get();
+        if(is_object($transactions) && false == $transactions->isEmpty()){
+            foreach($transactions as $transaction){
+                $transaction->delete();
+            }
+        }
+        return;
+    }
 }

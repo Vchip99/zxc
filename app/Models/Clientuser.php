@@ -104,8 +104,12 @@ class Clientuser extends Authenticatable
 
     protected static function searchUsers($request){
         $results = [];
-        $resultArr = InputSanitise::getClientIdAndCretedBy();
-        $clientId = $resultArr[0];
+        if($request->get('client_id') > 0){
+            $clientId = $request->get('client_id');
+        } else {
+            $resultArr = InputSanitise::getClientIdAndCretedBy();
+            $clientId = $resultArr[0];
+        }
         $result = static::where('client_id', $clientId)->where('user_type', self::Student);
 
         if(!empty($request->get('student'))){

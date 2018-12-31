@@ -49,4 +49,14 @@ class ClientNotice extends Model
     protected static function deleteClientNoticesByBtachIdByClientId($batchId,$clientId){
         return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->delete();
     }
+
+    protected static function deleteClientNoticesByClientId($clientId){
+        $notices = static::where('client_id', $clientId)->get();
+        if(is_object($notices) && false == $notices->isEmpty()){
+            foreach($notices as $notice){
+                $notice->delete();
+            }
+        }
+        return;
+    }
 }

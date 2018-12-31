@@ -87,7 +87,11 @@ class QuestionController extends Controller
         } else {
             $paperSections = [];
         }
-    	$questions = [];
+        if(Session::has('search_selected_category') && Session::has('search_selected_subcategory') && Session::has('search_selected_subject') && Session::has('search_selected_paper') && Session::has('search_selected_section')){
+    	   $questions = Question::getQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType(Session::get('search_selected_category'),Session::get('search_selected_subcategory'),Session::get('search_selected_subject'), Session::get('search_selected_paper'), Session::get('search_selected_section'));
+        } else {
+            $questions = [];
+        }
 
     	return view('question.list', compact('testCategories','testSubCategories','testSubjects', 'questions', 'papers', 'paperSections'));
     }
@@ -353,6 +357,11 @@ class QuestionController extends Controller
                     DB::beginTransaction();
                     try
                     {
+                        Session::put('search_selected_category', $testQuestion->category_id);
+                        Session::put('search_selected_subcategory', $testQuestion->subcat_id);
+                        Session::put('search_selected_subject', $testQuestion->subject_id);
+                        Session::put('search_selected_paper', $testQuestion->paper_id);
+                        Session::put('search_selected_section', $testQuestion->section_type);
                         UserSolution::deleteUserSolutionsByQuestionId($testQuestion->id);
             			$testQuestion->delete();
                         DB::commit();

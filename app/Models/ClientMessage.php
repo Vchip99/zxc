@@ -116,4 +116,14 @@ class ClientMessage extends Model
             }
         }
     }
+
+    protected static function deleteClientMessagesByClientId($clientId){
+        $messages = static::where('client_id', $clientId)->get();
+        if(is_object($messages) && false == $messages->isEmpty()){
+            foreach($messages as $message){
+                $message->delete();
+            }
+        }
+        return;
+    }
 }

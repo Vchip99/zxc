@@ -334,11 +334,11 @@
     .done(function( msg ) {
       body = document.getElementById('otherStudents');
       body.innerHTML = '';
-      renderRecords(msg, body);
+      renderRecords(msg, body,'otherStudents');
     });
   }
 
-  function renderRecords(msg, body){
+  function renderRecords(msg, body, bodyId=''){
     if(msg['users'].length > 0){
       $.each(msg['users'], function(idx, obj) {
         var eleTr = document.createElement('tr');
@@ -371,14 +371,16 @@
           var eleDept = document.createElement('td');
           eleDept.innerHTML = obj.other_source;
           eleTr.appendChild(eleDept);
-          if(msg['depts']){
-            var eleRollNo = document.createElement('td');
-            eleRollNo.innerHTML = obj.roll_no;
-            eleTr.appendChild(eleRollNo);
-          } else if(obj.roll_no){
-            var eleRollNo = document.createElement('td');
-            eleRollNo.innerHTML = obj.roll_no;
-            eleTr.appendChild(eleRollNo);
+          if('otherStudents' != bodyId){
+            if(msg['depts']){
+              var eleRollNo = document.createElement('td');
+              eleRollNo.innerHTML = obj.roll_no;
+              eleTr.appendChild(eleRollNo);
+            } else if(obj.roll_no){
+              var eleRollNo = document.createElement('td');
+              eleRollNo.innerHTML = obj.roll_no;
+              eleTr.appendChild(eleRollNo);
+            }
           }
         }
 
@@ -447,6 +449,26 @@
     var department_id = $(ele).data('college_dept_id');
     var user_type = $(ele).data('user_type');
     var selected_year = $(ele).data('year');
+    if(document.getElementById('college')){
+      var selected_college = document.getElementById('college').value;
+    } else {
+      var selected_college = '';
+    }
+    if(document.getElementById('user')){
+      var selected_user = document.getElementById('user').value;
+    } else {
+      var selected_user = '';
+    }
+    if(document.getElementById('selected_dept')){
+      var selected_dept = document.getElementById('selected_dept').value;
+    } else {
+      var selected_dept = '';
+    }
+    if(document.getElementById('selected_year')){
+      var selected_dd_year = document.getElementById('selected_year').value;
+    } else {
+      var selected_dd_year = '';
+    }
     if(2 == user_type){
       message = 'Are you sure. you want to permanently delete this student?'
     } else {
@@ -466,20 +488,20 @@
                     $.ajax({
                       method: "POST",
                       url: "{{url('admin/deleteStudent')}}",
-                      data:{student_id:studentId,college_id:college_id,department_id:department_id,user_type:user_type,selected_year:selected_year}
+                      data:{student_id:studentId,college_id:college_id,department_id:department_id,user_type:user_type,selected_year:selected_year,selected_college:selected_college,selected_user:selected_user,selected_dept:selected_dept,selected_dd_year:selected_dd_year}
                     })
                     .done(function( msg ) {
                       if('other' == college_id && 2 == user_type){
                         body = document.getElementById('otherStudents');
-                      } else if(college_id > 0 && 2 == user_type){
+                      } else if(2 == user_type){
                         body = document.getElementById('students');
-                      } else if(college_id > 0 && (3 == user_type || 4 == user_type)){
+                      } else if(3 == user_type || 4 == user_type){
                         body = document.getElementById('lecture_hods');
-                      }  else if(college_id > 0 && (5 == user_type || 6 == user_type)){
+                      }  else if(5 == user_type || 6 == user_type){
                         body = document.getElementById('principal_tnp');
                       }
                       body.innerHTML = '';
-                      renderRecords(msg['students'], body);
+                      renderRecords(msg, body);
                     });
                   }
               },
@@ -496,6 +518,26 @@
     var department_id = $(ele).data('college_dept_id');
     var user_type = $(ele).data('user_type');
     var selected_year = $(ele).data('year');
+    if(document.getElementById('college')){
+      var selected_college = document.getElementById('college').value;
+    } else {
+      var selected_college = '';
+    }
+    if(document.getElementById('user')){
+      var selected_user = document.getElementById('user').value;
+    } else {
+      var selected_user = '';
+    }
+    if(document.getElementById('selected_dept')){
+      var selected_dept = document.getElementById('selected_dept').value;
+    } else {
+      var selected_dept = '';
+    }
+    if(document.getElementById('selected_year')){
+      var selected_dd_year = document.getElementById('selected_year').value;
+    } else {
+      var selected_dd_year = '';
+    }
     if(studentId > 0){
       $.confirm({
         title: 'Confirmation',
@@ -510,7 +552,7 @@
                     $.ajax({
                       method: "POST",
                       url: "{{url('admin/changeUserApproveStatus')}}",
-                      data: {student_id:studentId,college_id:college_id,department_id:department_id,user_type:user_type,selected_year:selected_year}
+                      data: {student_id:studentId,college_id:college_id,department_id:department_id,user_type:user_type,selected_year:selected_year,selected_college:selected_college,selected_user:selected_user,selected_dept:selected_dept,selected_dd_year:selected_dd_year}
                     })
                     .done(function( msg ) {
                       if('other' == college_id && 2 == user_type){

@@ -108,4 +108,14 @@ class ClientOfflinePaperMark extends Model
             }
         }
     }
+
+    protected static function deleteClientOfflinePaperMarksByClientId($clientId){
+        $marks = static::where('client_id', $clientId)->get();
+        if(is_object($marks) && false == $marks->isEmpty()){
+            foreach($marks as $mark){
+                $mark->delete();
+            }
+        }
+        return;
+    }
 }

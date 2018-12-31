@@ -69,4 +69,14 @@ class ClientClass extends Model
     protected static function deleteClientClassesByBtachIdByClientId($batchId,$clientId){
         return static::where('client_batch_id', $batchId)->where('client_id', $clientId)->delete();
     }
+
+    protected static function deleteClientClassesByClientId($clientId){
+        $classes = static::where('client_id', $clientId)->get();
+        if(is_object($classes) && false == $classes->isEmpty()){
+            foreach($classes as $class){
+                $class->delete();
+            }
+        }
+        return;
+    }
 }

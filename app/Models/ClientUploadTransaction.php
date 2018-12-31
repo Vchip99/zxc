@@ -78,4 +78,14 @@ class ClientUploadTransaction extends Model
             }
         }
     }
+
+    protected static function deleteClientUploadTransactionsByClientId($clientId){
+        $transactions = static::where('client_id', $clientId)->get();
+        if(is_object($transactions) && false == $transactions->isEmpty()){
+            foreach($transactions as $transaction){
+                $transaction->delete();
+            }
+        }
+        return;
+    }
 }

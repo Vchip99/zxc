@@ -44,11 +44,11 @@
                           <td>{{$client->name}}</td>
                           <td>{{$client->subdomain}}</td>
                           <td>
-                            <input type="checkbox" value="" data-client_id="{{$client->id}}" data-permission_type="admin_approve" onclick="changePermissionStatus(this);"
                             @if(1 == $client->admin_approve)
-                              checked = checked
+                              <input type="checkbox" value="" data-client_id="{{$client->id}}" data-permission_type="admin_approve" onclick="changePermissionStatus(this);" checked="checked">
+                            @else
+                              <input type="checkbox" value="" data-client_id="{{$client->id}}" data-permission_type="admin_approve" onclick="changePermissionStatus(this);">
                             @endif
-                            >
                           </td>
                           <td><button class="btn btn-danger btn-xs delet-bt delet-btn" data-title="Delete" data-toggle="modal" data-target="#delete" data-client_id="{{$client->id}}" onclick="deleteClient(this);" ><span class="fa fa-trash-o" data-placement="top" data-toggle="tooltip" title="Delete"></span></button>
                           <form id="deleteClient_{{$client->id}}" action="{{url('admin/deleteClient')}}" method="POST" style="display: none;">

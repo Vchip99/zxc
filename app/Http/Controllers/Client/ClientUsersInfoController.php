@@ -62,23 +62,26 @@ class ClientUsersInfoController extends BaseController
     protected function allUsers($subdomainName,Request $request){
         $purchasedPayableSubCategories = [];
         $clientPurchasedSubCategories = [];
-        $clientId = Auth::guard('client')->user()->id;
-        $clientusers = Clientuser::getAllStudentsByClientId($clientId);
-        $courses = ClientOnlineCourse::getPaidCourseAssocaitedWithVideos($subdomainName);
-        $userPurchasedCourses = ClientUserPurchasedCourse::getClientUserCourses($clientId);
-        $userPurchasedTestSubCategories = ClientUserPurchasedTestSubCategory::getClientUserTestSubCategories($clientId);
-        $testSubCategories = ClientOnlineTestSubCategory::showPaidSubCategoriesAssociatedWithQuestion($request);
-        $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId($clientId);
-        if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
-            foreach($payableSubCategories as $payableSubCategory){
-                $purchasedPayableSubCategories[$payableSubCategory->sub_category_id] = $payableSubCategory;
+        if(is_object(Auth::guard('client')->user())){
+            $clientId = Auth::guard('client')->user()->id;
+            $clientusers = Clientuser::getAllStudentsByClientId($clientId);
+            $courses = ClientOnlineCourse::getPaidCourseAssocaitedWithVideos($subdomainName);
+            $userPurchasedCourses = ClientUserPurchasedCourse::getClientUserCourses($clientId);
+            $userPurchasedTestSubCategories = ClientUserPurchasedTestSubCategory::getClientUserTestSubCategories($clientId);
+            $testSubCategories = ClientOnlineTestSubCategory::showPaidSubCategoriesAssociatedWithQuestion($request);
+            $payableSubCategories = PayableClientSubCategory::getPayableSubCategoryByClientId($clientId);
+            if(is_object($payableSubCategories) && false == $payableSubCategories->isEmpty()){
+                foreach($payableSubCategories as $payableSubCategory){
+                    $purchasedPayableSubCategories[$payableSubCategory->sub_category_id] = $payableSubCategory;
+                }
             }
+            if(count(array_keys($purchasedPayableSubCategories)) > 0){
+                $clientPurchasedSubCategories = ClientOnlineTestSubCategory::showPayableSubcategoriesByIdesAssociatedWithQuestion(array_keys($purchasedPayableSubCategories));
+            }
+            $batches = ClientBatch::getBatchesByClientId($clientId);
+            return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories', 'clientPurchasedSubCategories', 'purchasedPayableSubCategories', 'subdomainName','batches'));
         }
-        if(count(array_keys($purchasedPayableSubCategories)) > 0){
-            $clientPurchasedSubCategories = ClientOnlineTestSubCategory::showPayableSubcategoriesByIdesAssociatedWithQuestion(array_keys($purchasedPayableSubCategories));
-        }
-        $batches = ClientBatch::getBatchesByClientId($clientId);
-        return view('client.allUsers.allUsers', compact('clientusers', 'courses', 'userPurchasedCourses', 'userPurchasedTestSubCategories', 'testSubCategories', 'clientPurchasedSubCategories', 'purchasedPayableSubCategories', 'subdomainName','batches'));
+        return Redirect::to('/');
     }
 
     protected function searchUsers($subdomainName,Request $request){

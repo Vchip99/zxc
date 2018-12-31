@@ -69,10 +69,16 @@ class AllUsersInfoController extends Controller
         {
             DB::rollback();
         }
+        $allDepts = CollegeDept::all();
+        if(is_object($allDepts) && false == $allDepts->isEmpty()){
+            foreach($allDepts as $dept){
+                $result['depts'][$dept->id] = $dept->name;
+            }
+        }
         if('other' == $request->college_id){
-            $result['students'] = User::showOtherStudents();
+            $result['users'] = User::showOtherStudents();
         } else {
-            $result['students'] = User::searchUsers($request);
+            $result['users'] = User::searchSelectedUsers($request);
         }
         return $result;
     }
@@ -88,7 +94,14 @@ class AllUsersInfoController extends Controller
         {
             DB::rollback();
         }
-        $result['users'] = User::searchUsers($request);
+        $result = [];
+        $allDepts = CollegeDept::all();
+        if(is_object($allDepts) && false == $allDepts->isEmpty()){
+            foreach($allDepts as $dept){
+                $result['depts'][$dept->id] = $dept->name;
+            }
+        }
+        $result['users'] = User::searchSelectedUsers($request);
         return $result;
     }
 

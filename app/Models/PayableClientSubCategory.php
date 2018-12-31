@@ -142,4 +142,14 @@ class PayableClientSubCategory extends Model
     protected static function getPayableClientSubCategoryByUpdatedDate($searchDate){
         return static::whereDate('updated_at','>=',$searchDate)->get();
     }
+
+    protected static function deletePayableClientSubCategoriesByClientId($clientId){
+        $payables = static::where('client_id', $clientId)->get();
+        if(is_object($payables) && false == $payables->isEmpty()){
+            foreach($payables as $payable){
+                $payable->delete();
+            }
+        }
+        return;
+    }
 }

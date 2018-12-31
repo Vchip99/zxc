@@ -32,4 +32,14 @@ class ClientGalleryType extends Model
         $galleryType->save();
         return $galleryType;
     }
+
+    protected static function deleteClientGalleryTypesByClientId($clientId){
+        $types = static::where('client_id', $clientId)->get();
+        if(is_object($types) && false == $types->isEmpty()){
+            foreach($types as $type){
+                $type->delete();
+            }
+        }
+        return;
+    }
 }

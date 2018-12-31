@@ -59,4 +59,14 @@ class ClientGalleryImage extends Model
     protected static function getGalleryImagesByClientIdByTypeId($clientId,$typeId){
         return static::where('client_id', $clientId)->where('client_gallery_type_id', $typeId)->get();
     }
+
+    protected static function deleteClientGalleryImagesByClientId($clientId){
+        $images = static::where('client_id', $clientId)->get();
+        if(is_object($images) && false == $images->isEmpty()){
+            foreach($images as $image){
+                $image->delete();
+            }
+        }
+        return;
+    }
 }

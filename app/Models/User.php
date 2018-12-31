@@ -514,6 +514,28 @@ class User extends Authenticatable
         }
     }
 
+    protected static function searchSelectedUsers(Request $request){
+        $collegeId = $request->selected_college;
+        $departmentId = $request->selected_dept;
+        $userType = $request->selected_user;
+        $year = $request->selected_dd_year;
+
+        $student = static::select('users.id','users.name','users.roll_no','users.college_dept_id','users.college_id','users.user_type','users.year','users.email','users.phone','users.admin_approve', 'users.recorded_video','users.college_dept_id','users.other_source');
+        if($collegeId > 0){
+            $student->where('users.college_id', $collegeId);
+        }
+        if($departmentId > 0){
+            $student->where('users.college_dept_id', $departmentId);
+        }
+        if($userType > 0){
+            $student->where('users.user_type', $userType);
+        }
+        if($year > 0){
+            $student->where('users.year', $year);
+        }
+        return $student->get();
+    }
+
     protected static function searchUsersForAdmin(Request $request){
         $collegeId = $request->college_id;
         $departmentId = $request->department_id;

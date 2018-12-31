@@ -417,7 +417,7 @@
 
 		        var showUserResultMobileBtn = document.getElementById('showUserResultMobileBtn_'+paper);
 		        showUserResultMobileBtn.innerHTML = '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+paper+'" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
-
+		        window.location.reload();
         	}
         });
 	}

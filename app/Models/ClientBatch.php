@@ -87,4 +87,14 @@ class ClientBatch extends Model
         return static::whereDate('updated_at','>=',$searchDate)->get();
     }
 
+    protected static function deleteClientBatchesByClientId($clientId){
+        $batches = static::where('client_id', $clientId)->get();
+        if(is_object($batches) && false == $batches->isEmpty()){
+            foreach($batches as $batch){
+                $batch->delete();
+            }
+        }
+        return;
+    }
+
 }

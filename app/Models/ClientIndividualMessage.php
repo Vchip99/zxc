@@ -43,4 +43,14 @@ class ClientIndividualMessage extends Model
     protected static function getIndividualMessagesByClientIdByBatchIds($clientId,$batchIds){
     	return static::where('client_id', $clientId)->whereIn('client_batch_id', $batchIds)->orderBy('id','desc')->get();
     }
+
+    protected static function deleteClientIndividualMessagesByClientId($clientId){
+        $messages = static::where('client_id', $clientId)->get();
+        if(is_object($messages) && false == $messages->isEmpty()){
+            foreach($messages as $message){
+                $message->delete();
+            }
+        }
+        return;
+    }
 }

@@ -69,4 +69,14 @@ class ClientExam extends Model
             return static::where('client_id', $clientId)->where('client_batch_id','<=',$clientBatchId)->where('exam_type', 0)->get();
         }
     }
+
+    protected static function deleteClientExamsByClientId($clientId){
+        $exams = static::where('client_id', $clientId)->get();
+        if(is_object($exams) && false == $exams->isEmpty()){
+            foreach($exams as $exam){
+                $exam->delete();
+            }
+        }
+        return;
+    }
 }

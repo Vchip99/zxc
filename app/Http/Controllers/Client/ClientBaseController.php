@@ -107,22 +107,25 @@ class ClientBaseController extends BaseController
         }
         $existingAmount = 0;
         $loginUser = Auth::guard('client')->user();
-        $currentPlan = ClientPlan::getClientPlanByPlanId($loginUser->plan_id);
-        if(is_object($currentPlan)){
-            $dateDiff = date_diff( new DateTime(date('Y-m-d')), new DateTime($currentPlan->start_date));
-            $days = $dateDiff->d + 1;
-            $planTotalDays = date_diff(new DateTime($currentPlan->end_date),new DateTime($currentPlan->start_date))->days;
-            if('Credit' == $currentPlan->payment_status){
-                if($planTotalDays > 0){
-                    $existingAmount = -floor((($planTotalDays - $days)/$planTotalDays)*$currentPlan->plan_amount);
+        if(is_object($loginUser)){
+            $currentPlan = ClientPlan::getClientPlanByPlanId($loginUser->plan_id);
+            if(is_object($currentPlan)){
+                $dateDiff = date_diff( new DateTime(date('Y-m-d')), new DateTime($currentPlan->start_date));
+                $days = $dateDiff->d + 1;
+                $planTotalDays = date_diff(new DateTime($currentPlan->end_date),new DateTime($currentPlan->start_date))->days;
+                if('Credit' == $currentPlan->payment_status){
+                    if($planTotalDays > 0){
+                        $existingAmount = -floor((($planTotalDays - $days)/$planTotalDays)*$currentPlan->plan_amount);
+                    } else {
+                        $existingAmount = -$currentPlan->plan_amount;
+                    }
                 } else {
-                    $existingAmount = -$currentPlan->plan_amount;
+                    $existingAmount = +ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
                 }
-            } else {
-                $existingAmount = +ceil(($days*$currentPlan->plan_amount)/$planTotalDays);
             }
+            return view('client.plansAndBilling.plans', compact('allPlan', 'subdomainName','existingAmount'));
         }
-        return view('client.plansAndBilling.plans', compact('allPlan', 'subdomainName','existingAmount'));
+        return redirect('/');
     }
 
     protected function manageBillings($subdomainName){

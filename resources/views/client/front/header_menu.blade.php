@@ -15,9 +15,9 @@
           @if(is_object(Auth::guard('clientuser')->user()))
             <a href="#" class="dropdown-toggle pull-right user_menu" data-toggle="dropdown" role="button" aria-expanded="false" title="User">
             @if(!empty(Auth::guard('clientuser')->user()->photo) && is_file(Auth::guard('clientuser')->user()->photo))
-              <img src="{{ asset(Auth::guard('clientuser')->user()->photo) }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
+              <img src="{{ asset(Auth::guard('clientuser')->user()->photo) }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>
             @else
-              <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
+              <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile" alt="user name" aria-haspopup="true" aria-expanded="true"/>
             @endif
             @if(Auth::guard('clientuser')->user()->userNotificationCount() > 0)
             <b style="color: red;">
@@ -29,9 +29,9 @@
               <li>
                 <a href="{{ url('profile')}}" title="Dashbord" target="_blank">
                   @if(!empty(Auth::guard('clientuser')->user()->photo) && is_file(Auth::guard('clientuser')->user()->photo))
-                    <img src="{{ asset(Auth::guard('clientuser')->user()->photo) }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
+                    <img src="{{ asset(Auth::guard('clientuser')->user()->photo) }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true" aria-expanded="true"/>
                   @else
-                    <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true" aria-expanded="true"/>&nbsp;
+                    <img src="{{ asset('images/user1.png') }}" class="img-circle user-profile1" alt="user name" aria-haspopup="true" aria-expanded="true"/>
                   @endif
                   {{Auth::guard('clientuser')->user()->name}}
                 </a>

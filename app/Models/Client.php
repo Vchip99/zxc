@@ -36,6 +36,24 @@ use App\Models\ClientReadNotification;
 use App\Models\ClientNotification;
 use App\Models\BankDetail;
 use App\Models\ClientChatMessage;
+use App\Models\ClientBatch;
+use App\Models\ClientClass;
+use App\Models\ClientExam;
+use App\Models\ClientGalleryType;
+use App\Models\ClientGalleryImage;
+use App\Models\ClientHoliday;
+use App\Models\ClientIndividualMessage;
+use App\Models\ClientLoginActivity;
+use App\Models\ClientMessage;
+use App\Models\ClientNotice;
+use App\Models\ClientOfflinePaperMark;
+use App\Models\ClientOfflinePayment;
+use App\Models\ClientReceipt;
+use App\Models\ClientUploadTransaction;
+use App\Models\ClientUserAttendance;
+use App\Models\ClientUserPayment;
+use App\Models\PayableClientSubCategory;
+use App\Models\UserBasedAuthentication;
 use Auth;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -116,6 +134,13 @@ class Client extends Authenticatable
         if(is_dir($clientUserFolder)){
             InputSanitise::delFolder($clientUserFolder);
         }
+        $clientCourseVideos = "clientCourseVideos/".str_replace(' ', '_', $client->name);
+        if(is_dir($clientCourseVideos)){
+            InputSanitise::delFolder($clientCourseVideos);
+        }
+        if(is_dir("clientAssignmentStorage/".$client->id)){
+            InputSanitise::delFolder("clientAssignmentStorage/".$client->id);
+        }
         $clientHomePage = ClientHomePage::where('client_id',$client->id)->first();
         if(is_object($clientHomePage)){
             $clientHomePage->delete();
@@ -162,7 +187,24 @@ class Client extends Authenticatable
         ClientNotification::deleteClientNotification($client->id);
         BankDetail::deleteBankDetails($client->id);
         ClientChatMessage::deleteClientChatMessagesByClientId($client->id);
-        InputSanitise::delFolder("clientAssignmentStorage/".$client->id);
+        ClientBatch::deleteClientBatchesByClientId($client->id);
+        ClientClass::deleteClientClassesByClientId($client->id);
+        ClientExam::deleteClientExamsByClientId($client->id);
+        ClientGalleryType::deleteClientGalleryTypesByClientId($client->id);
+        ClientGalleryImage::deleteClientGalleryImagesByClientId($client->id);
+        ClientHoliday::deleteClientHolidayesByClientId($client->id);
+        ClientIndividualMessage::deleteClientIndividualMessagesByClientId($client->id);
+        ClientLoginActivity::deleteClientLoginActivitiesByClientId($client->id);
+        ClientMessage::deleteClientMessagesByClientId($client->id);
+        ClientNotice::deleteClientNoticesByClientId($client->id);
+        ClientOfflinePaperMark::deleteClientOfflinePaperMarksByClientId($client->id);
+        ClientOfflinePayment::deleteClientOfflinePaymentsByClientId($client->id);
+        ClientReceipt::deleteClientReceiptsByClientId($client->id);
+        ClientUploadTransaction::deleteClientUploadTransactionsByClientId($client->id);
+        ClientUserAttendance::deleteClientUserAttendancesByClientId($client->id);
+        ClientUserPayment::deleteClientUserPaymentsByClientId($client->id);
+        PayableClientSubCategory::deletePayableClientSubCategoriesByClientId($client->id);
+        UserBasedAuthentication::deleteUserBasedAuthenticationsByClientId($client->id);
         return;
     }
 

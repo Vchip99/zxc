@@ -88,11 +88,17 @@ class ClientOnlineTestQuestionController extends ClientBaseController
         } else {
            $papers = [];
         }
-        $questions = new ClientOnlineTestQuestion();
+
         if(Session::has('client_search_selected_paper')){
             $sessions = ClientOnlinePaperSection::paperSectionsByPaperId(Session::get('client_search_selected_paper'), $clientId);
         } else {
             $sessions = [];
+        }
+
+        if(Session::has('client_search_selected_category') && Session::has('client_search_selected_subcategory') && Session::has('client_search_selected_subject') && Session::has('client_search_selected_paper') && Session::has('client_search_selected_section')){
+           $questions = ClientOnlineTestQuestion::getClientQuestionsByCategoryIdBySubcategoryIdBySubjectIdByPaperIdBySectionType(Session::get('client_search_selected_category'),Session::get('client_search_selected_subcategory'),Session::get('client_search_selected_subject'), Session::get('client_search_selected_paper'), Session::get('client_search_selected_section'));
+        } else {
+            $questions = new ClientOnlineTestQuestion();
         }
 
     	return view('client.onlineTest.question.list', compact('instituteCourses', 'testCategories', 'testSubCategories', 'testSubjects', 'questions', 'papers', 'sessions', 'subdomainName','loginUser'));
