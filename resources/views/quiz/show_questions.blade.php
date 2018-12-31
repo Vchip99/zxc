@@ -10,24 +10,24 @@
 						<div >
 							<p class="questions">
 								@if(!empty($question->common_data))
-									<span style="padding-left: 5px;"><b>Common Data:</b> {!! strip_tags($question->common_data,'&nbsp;') !!}</span><br/>
+									<span style="padding-left: 5px;"><b>Common Data:</b> {!! preg_replace('/(<br \/>)+$/', '', $question->common_data); !!}</span><br/>
 								@endif
 								<br/>
 								<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
-								{!! strip_tags($question->name,'&nbsp;') !!}
+								{!! preg_replace('/(<br \/>)+$/', '', $question->name); !!}
 							</p>
 							<p>
 							@if( 1 == $question->question_type )
-								<div class="row answer">A. {!! strip_tags($question->answer1,'&nbsp;') !!}
+								<div class="row answer">A. {!! preg_replace('/(<br \/>)+$/', '', $question->answer1); !!}
 								</div><br/>
-								<div class="row answer">B. {!! strip_tags($question->answer2,'&nbsp;') !!}
+								<div class="row answer">B. {!! preg_replace('/(<br \/>)+$/', '', $question->answer2); !!}
 								</div><br/>
-								<div class="row answer">C. {!! strip_tags($question->answer3,'&nbsp;') !!}
+								<div class="row answer">C. {!! preg_replace('/(<br \/>)+$/', '', $question->answer3); !!}
 								</div><br/>
-								<div class="row answer">D. {!! strip_tags($question->answer4,'&nbsp;') !!}
+								<div class="row answer">D. {!! preg_replace('/(<br \/>)+$/', '', $question->answer4); !!}
 								</div>
 								@if(!empty($question->answer5) && $optionCount > 4)
-								<div class="row answer">E. {!! strip_tags($question->answer5,'&nbsp;') !!}
+								<div class="row answer">E. {!! preg_replace('/(<br \/>)+$/', '', $question->answer5); !!}
 								</div>
 								@endif
 							@else

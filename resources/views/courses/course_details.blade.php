@@ -204,7 +204,7 @@ margin: 0px 5px;
                   @if('true' == $isCourseRegistered || 1 == $video->is_free || $course->price <= 0 || is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email)
                     <a href="{{ url('episode')}}/{{$video->id}}">
                   @else
-                    <a>
+                    <a class="curser" onClick="checkLogin();">
                   @endif
                     <h1 class="video_id">{{ $index + 1}}</h1>
                   </a>
@@ -216,7 +216,7 @@ margin: 0px 5px;
                     @if('true' == $isCourseRegistered || 1 == $video->is_free || $course->price <= 0 || is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email)
                       <a href="{{ url('episode')}}/{{$video->id}}">
                     @else
-                      <a>
+                      <a class="curser" onClick="checkLogin();">
                     @endif
                     {{$video->name}}</a>
                   </h4>

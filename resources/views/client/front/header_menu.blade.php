@@ -58,7 +58,10 @@
               <ul class="dropdown-menu" role="menu">
                 <div class="navbar-content">
                   <li title="Login">
-                    <a href="{{ url('/')}}"><i class="fa fa-tachometer" aria-hidden="true" ></i> Login</a>
+                    <a href="{{ url('/')}}">Login</a>
+                  </li>
+                  <li title="SignUp">
+                    <a href="{{ url('/')}}">SignUp</a>
                   </li>
                 </div>
               </ul>

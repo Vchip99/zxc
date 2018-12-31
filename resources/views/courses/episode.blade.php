@@ -130,7 +130,11 @@
                   @if('true' == $isCoursePurchased || 1 == $courseVideo->is_free || $videoCoursePrice <= 0 || is_object(Auth::user()) && 'ceo@vchiptech.com' == Auth::user()->email)
                     <a class="ellipsis" href="{{url('episode')}}/{{$courseVideo->id}}">{{$courseVideo->name}} </a>
                   @else
-                    <a class="ellipsis" onClick="purchaseCourse();">{{$courseVideo->name}} </a>
+                    @if(!is_object(Auth::user()))
+                      <a class="ellipsis" onClick="checkLogin();">{{$courseVideo->name}} </a>
+                    @else
+                      <a class="ellipsis" onClick="purchaseCourse();">{{$courseVideo->name}} </a>
+                    @endif
                   @endif
                   <!-- <a class="ellipsis" href="{{url('episode')}}/{{$courseVideo->id}}" data-toggle="tooltip" title="{{$courseVideo->name}}">{{$courseVideo->name}} </a> -->
                   <span class="running-time"> {{ gmdate('H:i:s', $courseVideo->duration)}} </span>

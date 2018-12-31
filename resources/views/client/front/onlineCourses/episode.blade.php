@@ -133,7 +133,11 @@ hr{
                   @if('true' == $isCoursePurchased || 1 == $courseVideo->is_free || $videoCoursePrice <= 0)
                     <a class="ellipsis" href="{{url('episode')}}/{{$courseVideo->id}}">{{$courseVideo->name}} </a>
                   @else
-                    <a class="ellipsis" onClick="purchaseCourse();">{{$courseVideo->name}} </a>
+                    @if(!is_object(Auth::guard('clientuser')->user()))
+                      <a class="ellipsis" onClick="checkLogin();">{{$courseVideo->name}} </a>
+                    @else
+                      <a class="ellipsis" onClick="purchaseCourse();">{{$courseVideo->name}} </a>
+                    @endif
                   @endif
                   <span class="running-time"> {{ gmdate('H:i:s', $courseVideo->duration)}}</span>
                 </li>
@@ -337,6 +341,9 @@ hr{
 @section('footer')
   @include('footer.client-footer')
   <script type="text/javascript">
+  function checkLogin(){
+    $('#loginUserModel').modal();
+  }
   function purchaseCourse(){
     $.alert({
         title: 'Alert!',

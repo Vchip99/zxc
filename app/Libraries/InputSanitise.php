@@ -10,6 +10,12 @@ use DB, Cache, File,LRedis,Auth,Session;
 
 class InputSanitise{
 
+    public static function cleanSpecial($string) {
+       $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
+
+       return preg_replace('/[^A-Za-z0-9\-_]/', '', $string); // Removes special chars.
+    }
+
 	public static function stripTrim($str){
 		return strip_tags(trim($str));
 	}

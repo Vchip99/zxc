@@ -227,7 +227,9 @@
 @section('footer')
 	@include('footer.client-footer')
   <script type="text/javascript">
-
+  function checkLogin(){
+    $('#loginUserModel').modal();
+  }
   function purchaseCourse(){
     $.alert({
         title: 'Alert!',

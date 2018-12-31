@@ -60,8 +60,6 @@ class AddIndexesToMainDb extends Migration
         DB::statement('ALTER TABLE `mentor_schedules` ADD INDEX `idx_mentor_id` (`mentor_id`)');
         DB::statement('ALTER TABLE `mentor_schedules` ADD INDEX `idx_user_id` (`user_id`)');
         DB::statement('ALTER TABLE `mentor_skills` ADD INDEX `idx_mentor_area_id` (`mentor_area_id`)');
-        DB::statement('ALTER TABLE `mock_interview_reviews` ADD INDEX `idx_user_data_id` (`user_data_id`)');
-        DB::statement('ALTER TABLE `mock_interview_reviews` ADD INDEX `idx_user_id` (`user_id`)');
         DB::statement('ALTER TABLE `payments` ADD INDEX `idx_client_plan_id` (`client_plan_id`)');
         DB::statement('ALTER TABLE `placement_companies` ADD INDEX `idx_placement_area_id` (`placement_area_id`)');
         DB::statement('ALTER TABLE `placement_experiances` ADD INDEX `idx_placement_area_id` (`placement_area_id`)');

@@ -1072,24 +1072,8 @@
 		}
 	}
 	function showUserTestResult(ele){
-		$.confirm({
-		    title: 'Confirmation',
-		    content: 'Do you want to see result?',
-		    type: 'red',
-		    typeAnimated: true,
-		    buttons: {
-		        	Ok: {
-			            text: 'Ok',
-			            btnClass: 'btn-red',
-			            action: function(){
-							var paperId = parseInt($(ele).data('paper_id'));
-							document.getElementById('showUserTestResult_'+paperId).submit();
-					}
-		        },
-		        Cancle: function () {
-		        }
-		    }
-		});
+		var paperId = parseInt($(ele).data('paper_id'));
+		document.getElementById('showUserTestResult_'+paperId).submit();
 	}
 	function purchaseTest(ele){
 		$.confirm({

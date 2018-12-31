@@ -105,7 +105,11 @@ class TestSubjectPaper extends Model
         } else {
             $paper->paper_pattern = $paperPattern;
             $paper->time_out_by = $timeOutBy;
-            $paper->time = '';
+            if(1 == $timeOutBy){
+                $paper->time = ('' == $time)? '1200':$time;
+            } else {
+                $paper->time = '';
+            }
         }
         $paper->save();
 
@@ -130,7 +134,7 @@ class TestSubjectPaper extends Model
                         if(false == in_array($paperSession->id, $addPaperSessions)){
                             if(isset($updatePaperSessions[$paperSession->id]) && !empty($updatePaperSessions[$paperSession->id]['session'])){
                                 if(isset($updatePaperSessions[$paperSession->id])){
-                                    $paperSession->name = str_replace(" ", "_", $updatePaperSessions[$paperSession->id]['session']);
+                                    $paperSession->name = InputSanitise::cleanSpecial($updatePaperSessions[$paperSession->id]['session']);
                                     if(0 == $paperPattern){
                                         $paperSession->duration = $updatePaperSessions[$paperSession->id]['duration'];
                                     } else {
@@ -153,7 +157,7 @@ class TestSubjectPaper extends Model
                     if(true == in_array($index, $addPaperSessions)){
                         if(!empty($updatePaperSession['session'])){
                             $paperSession = new PaperSection;
-                            $paperSession->name = str_replace(" ", "_", $updatePaperSession['session']);
+                            $paperSession->name = InputSanitise::cleanSpecial($updatePaperSession['session']);
                             if(0 == $paperPattern){
                                 $paperSession->duration = $updatePaperSession['duration'];
                             } else {
@@ -180,7 +184,7 @@ class TestSubjectPaper extends Model
                     }
                     if(!empty($session)){
                         $sessions[] = [
-                                    'name' => str_replace(" ", "_", $session),
+                                    'name' => InputSanitise::cleanSpecial($session),
                                     'duration' => $duration,
                                     'test_category_id' => $catId,
                                     'test_sub_category_id' => $subcatId,

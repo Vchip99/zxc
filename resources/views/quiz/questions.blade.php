@@ -102,36 +102,36 @@
 														<p class="questions" id="qname{{$result->id}}">
 															@if(!empty($result->common_data))
 																<b>Common Data:</b><br/>
-																<span style="padding-left: 5px;">{!! strip_tags($result->common_data,'&nbsp;') !!}</span><hr/>
+																<span style="padding-left: 5px;">{!! preg_replace('/(<br \/>)+$/', '', $result->common_data); !!}</span><hr/>
 															@endif
 															@if(1 == $paper->paper_pattern)
 																<span class="btn btn-sq-xs btn-info">{{$newIndexQue+1}}.</span>
 															@else
 																<span class="btn btn-sq-xs btn-info">{{$index+1}}.</span>
 															@endif
-															{!! strip_tags($result->name,'&nbsp;') !!}
+															{!! preg_replace('/(<br \/>)+$/', '', $result->name); !!}
 														</p>
 														@if( 1 == $result->question_type )
 															<div class="row answer">A.<input type="radio" value="1" class="radio1 radio1_{{$result->id}}" id="radio1_{{$result->id}}" name="{{$result->id}}" />
-																{!! strip_tags($result->answer1,'&nbsp;') !!}
+																{!! preg_replace('/(<br \/>)+$/', '', $result->answer1); !!}
 															</div>
 															<div class="row answer">B.<input type="radio" value="2" class="radio1 radio1_{{$result->id}}" id="radio2_{{$result->id}}" name="{{$result->id}}" />
-																{!! strip_tags($result->answer2,'&nbsp;') !!}
+																{!! preg_replace('/(<br \/>)+$/', '', $result->answer2); !!}
 															</div>
 															<div class="row answer">C.<input type="radio" value="3" class="radio1 radio1_{{$result->id}}" id="radio3_{{$result->id}}" name="{{$result->id}}" />
-																{!! strip_tags($result->answer3,'&nbsp;') !!}
+																{!! preg_replace('/(<br \/>)+$/', '', $result->answer3); !!}
 															</div>
 															<div class="row answer">D.<input type="radio" value="4" class="radio1 radio1_{{$result->id}}" id="radio4_{{$result->id}}" name="{{$result->id}}" />
-																{!! strip_tags($result->answer4,'&nbsp;') !!}
+																{!! preg_replace('/(<br \/>)+$/', '', $result->answer4); !!}
 															</div>
 															@if(5 == $paper->option_count)
 																<div class="row answer">E.<input type="radio" value="5" class="radio1 radio1_{{$result->id}}" id="radio5_{{$result->id}}" name="{{$result->id}}" />
-																{!! strip_tags($result->answer5,'&nbsp;') !!}
+																{!! preg_replace('/(<br \/>)+$/', '', $result->answer5); !!}
 																</div>
 															@endif
 															@if(isset( $result->answer6 ) && !empty( $result->answer6 ))
 																<div class="row">F.<input type="radio" value="6" class="radio1 radio1_{{$result->id}}" id="radio6_{{$result->id}}" name="{{$result->id}}" />
-																{!! strip_tags($result->answer6,'&nbsp;') !!}
+																{!! preg_replace('/(<br \/>)+$/', '', $result->answer6); !!}
 																</div>
 															@endif
 															<input type="radio" checked='checked' style='display:none' value="unsolved" id='radio7_{{$result->id}}' name='{{$result->id}}' />
