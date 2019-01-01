@@ -51,19 +51,19 @@
   <div class="row ">
     <div style="margin-left: 35px;">
       <a data-toggle="modal" data-target="#review-model-{{$subcategoryId}}" style="cursor: pointer;">
-        <div style="display: inline-block;">
+        <span style= "position:relative; top:7px;">
           @if(isset($reviewData[$subcategoryId])) {{$reviewData[$subcategoryId]['avg']}} @else 0 @endif
-        </div>
+        </span>
         <div style="display: inline-block;">
           <input id="rating_input{{$subcategoryId}}" name="input-{{$subcategoryId}}" class="rating rating-loading" value="@if(isset($reviewData[$subcategoryId])) {{$reviewData[$subcategoryId]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
         </div>
-        <div style="display: inline-block;">
+        <span style= "position:relative; top:7px;">
           @if(isset($reviewData[$subcategoryId]))
             {{count($reviewData[$subcategoryId]['rating'])}} <i class="fa fa-group"></i>
           @else
             0 <i class="fa fa-group"></i>
           @endif
-        </div>
+        </span>
       </a>
     </div>
     <div id="review-model-{{$subcategoryId}}" class="modal fade" role="dialog">
@@ -73,19 +73,19 @@
             &nbsp;&nbsp;&nbsp;
             <button class="close" data-dismiss="modal">×</button>
             <div class="form-group row ">
-              <div  style="display: inline-block;">
+              <span style= "position:relative; top:7px;">
                 @if(isset($reviewData[$subcategoryId])) {{$reviewData[$subcategoryId]['avg']}} @else 0 @endif
-              </div>
+              </span>
               <div  style="display: inline-block;">
                 <input name="input-{{$subcategoryId}}" class="rating rating-loading" value="@if(isset($reviewData[$subcategoryId])) {{$reviewData[$subcategoryId]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
               </div>
-              <div  style="display: inline-block;">
+              <span style= "position:relative; top:7px;">
                 @if(isset($reviewData[$subcategoryId]))
                   {{count($reviewData[$subcategoryId]['rating'])}} <i class="fa fa-group"></i>
                 @else
                   0 <i class="fa fa-group"></i>
                 @endif
-              </div>
+              </span>
               @if(is_object(Auth::user()))
                 <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$subcategoryId}}">
                 @if(isset($reviewData[$subcategoryId]) && isset($reviewData[$subcategoryId]['rating'][Auth::user()->id]))
@@ -169,7 +169,11 @@
                   <div class="collapse" id="{{$subjectId}}">
                 @endif
                   @foreach($topics[$subjectId] as $intTopicId => $topic)
-                    <a href="{{ url('study-material')}}/{{$subcategoryId}}/{{$subject}}/{{$intTopicId}}" class="list-group-item" style="color: #f4645f;">{{$topic}}</a>
+                    @if($topicId == $intTopicId)
+                      <a href="{{ url('study-material')}}/{{$subcategoryId}}/{{$subject}}/{{$intTopicId}}" class="list-group-item" style="color: #f4645f;"><b>{{$topic}}</b></a>
+                    @else
+                      <a href="{{ url('study-material')}}/{{$subcategoryId}}/{{$subject}}/{{$intTopicId}}" class="list-group-item" style="color: #f4645f;">{{$topic}}</a>
+                    @endif
                   @endforeach
                 </div>
               @endif

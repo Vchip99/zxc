@@ -50,11 +50,15 @@
         <div class="col-sm-3 hidden-div" id="sidemenuindex">
           <h4 class="v_h4_subtitle"> Sort By</h4>
           <div class="dropdown mrgn_20_top_btm" id="cat">
-            <select id="category" class="form-control" name="category" title="Category" onChange="showPosts(this);" required>
+            <select id="category" class="form-control" name="category" title="Category" onchange="location = this.value;" required>
               <option value = "0"> Select Category</option>
               @if(count($discussionCategories) > 0)
                 @foreach($discussionCategories as $discussionCategory)
-                  <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
+                  @if($selectedCategoryId == $discussionCategory->id)
+                    <option value ="{{ url($discussionCategory->id.'/discussion')}}/{{$discussionCategory->name}}" selected data-id="{{$discussionCategory->id}}">{{$discussionCategory->name}}</option>
+                  @else
+                    <option value ="{{ url($discussionCategory->id.'/discussion')}}/{{$discussionCategory->name}}" data-id="{{$discussionCategory->id}}">{{$discussionCategory->name}}</option>
+                  @endif
                 @endforeach
               @endif
             </select>
@@ -486,11 +490,15 @@
           <div class="hidden-div1" id="sidemenuindex">
             <h4 class="v_h4_subtitle"> Sort By</h4>
             <div class="dropdown mrgn_20_top_btm" id="cat">
-              <select id="category" class="form-control" name="category" title="Category" onChange="showPosts(this);" required>
+              <select id="category" class="form-control" name="category" title="Category" onchange="location = this.value;" required>
                 <option value = "0"> Select Category</option>
                 @if(count($discussionCategories) > 0)
                   @foreach($discussionCategories as $discussionCategory)
-                    <option value = "{{$discussionCategory->id}}"> {{$discussionCategory->name}} </option>
+                    @if($selectedCategoryId == $discussionCategory->id)
+                      <option value = "{{ url($discussionCategory->id.'/discussion')}}/{{$discussionCategory->name}}" selected data-id="{{$discussionCategory->id}}">{{$discussionCategory->name}}</option>
+                    @else
+                      <option value ="{{ url($discussionCategory->id.'/discussion')}}/{{$discussionCategory->name}}" data-id="{{$discussionCategory->id}}">{{$discussionCategory->name}}</option>
+                    @endif
                   @endforeach
                 @endif
               </select>
@@ -795,10 +803,11 @@
               btnClass: 'btn-red',
               action: function(){
                 var subcommentId = $(ele).data('subcomment_id');
+                var categoryId = $('#category option:selected').data('id');
                 $.ajax({
                     method: "POST",
                     url: "{{url('deleteSubComment')}}",
-                    data: {subcomment_id:subcommentId}
+                    data: {subcomment_id:subcommentId,category_id:categoryId}
                 })
                 .done(function( msg ) {
                   renderPosts(msg);
@@ -814,13 +823,14 @@
   function confirmSubmitReplytoComment(ele){
     var userId = parseInt(document.getElementById('user_id').value);
     if(0 < userId){
+        var categoryId = $('#category option:selected').data('id');
         var postId = $(ele).data('post_id');
         var commentId = $(ele).data('comment_id');
         var subcomment = document.getElementById('subcomment_'+postId+'_'+commentId).value;
         $.ajax({
             method: "POST",
             url: "{{url('createSubComment')}}",
-            data: {discussion_post_id:postId,comment_id:commentId,subcomment:subcomment}
+            data: {discussion_post_id:postId,comment_id:commentId,subcomment:subcomment,category_id:categoryId}
         })
         .done(function( msg ) {
           renderPosts(msg);
@@ -833,6 +843,7 @@
   function confirmSubmitReplytoSubComment(ele){
     var userId = parseInt(document.getElementById('user_id').value);
     if(0 < userId){
+        var categoryId = $('#category option:selected').data('id');
         var postId = $(ele).data('post_id');
         var commentId = $(ele).data('comment_id');
         var parentId = $(ele).data('parent_id');
@@ -840,7 +851,7 @@
         $.ajax({
             method: "POST",
             url: "{{url('createSubComment')}}",
-            data: {discussion_post_id:postId,comment_id:commentId,parent_id:parentId,subcomment:subcomment}
+            data: {discussion_post_id:postId,comment_id:commentId,parent_id:parentId,subcomment:subcomment,category_id:categoryId}
         })
         .done(function( msg ) {
           renderPosts(msg);
@@ -852,12 +863,13 @@
   function confirmSubmitReplytoPost(ele){
     var userId = parseInt(document.getElementById('user_id').value);
     if(0 < userId){
+      var categoryId = $('#category option:selected').data('id');
       var postId = $(ele).data('post_id');
       var comment = document.getElementById('comment_'+postId).value
       $.ajax({
           method: "POST",
           url: "{{url('createComment')}}",
-          data: {discussion_post_id:postId, comment:comment}
+          data: {discussion_post_id:postId, comment:comment,category_id:categoryId}
       })
       .done(function( msg ) {
         renderPosts(msg);
@@ -870,13 +882,14 @@
   function updateComment(ele){
     var userId = parseInt(document.getElementById('user_id').value);
     if(0 < userId){
+      var categoryId = $('#category option:selected').data('id');
       var postId = $(ele).data('post_id');
       var commentId = $(ele).data('comment_id');
       var comment = document.getElementById('comment_'+postId+'_'+commentId).value;
       $.ajax({
           method: "POST",
           url: "{{url('updateComment')}}",
-          data: {post_id:postId,comment_id:commentId,comment:comment}
+          data: {post_id:postId,comment_id:commentId,comment:comment,category_id:categoryId}
       })
       .done(function( msg ) {
         renderPosts(msg);
@@ -889,6 +902,7 @@
   function updateSubComment(ele){
     var userId = parseInt(document.getElementById('user_id').value);
     if(0 < userId){
+      var categoryId = $('#category option:selected').data('id');
       var postId = $(ele).data('post_id');
       var commentId = $(ele).data('comment_id');
       var subcommentId = $(ele).data('subcomment_id');
@@ -896,7 +910,7 @@
       $.ajax({
           method: "POST",
           url: "{{url('updateSubComment')}}",
-          data: {post_id:postId,comment_id:commentId,subcomment_id:subcommentId,comment:comment}
+          data: {post_id:postId,comment_id:commentId,subcomment_id:subcommentId,comment:comment,category_id:categoryId}
       })
       .done(function( msg ) {
         renderPosts(msg);
@@ -918,10 +932,11 @@
                   btnClass: 'btn-red',
                   action: function(){
                     var id = $(ele).attr('id');
+                    var categoryId = $('#category option:selected').data('id');
                     $.ajax({
                         method: "POST",
                         url: "{{url('deleteComment')}}",
-                        data: {comment_id:id}
+                        data: {comment_id:id,category_id:categoryId}
                     })
                     .done(function( msg ) {
                       renderPosts(msg);
@@ -946,11 +961,12 @@
                   btnClass: 'btn-red',
                   action: function(){
                     var id = $(ele).attr('id');
+                    var categoryId = $('#category option:selected').data('id');
                     if( 0 < id ){
                        $.ajax({
                           method: "POST",
                           url: "{{url('deletePost')}}",
-                          data: {post_id:id}
+                          data: {post_id:id,category_id:categoryId}
                       })
                       .done(function( msg ) {
                         renderPosts(msg);
@@ -998,10 +1014,11 @@
       var updatedAnswer = '';
     }
     var isUpdatedFromDiscussion = 'true';
+    var categoryId = $('#category option:selected').data('id');
     $.ajax({
         method: "POST",
         url: "{{url('updatePost')}}",
-        data: {post_id:postId,update_question:updateQuestion,updated_solution:updateSolution,updated_answer1:updatedAnswer1,updated_answer2:updatedAnswer2,updated_answer3:updatedAnswer3,updated_answer4:updatedAnswer4,updated_answer:updatedAnswer,isUpdatedFromDiscussion:isUpdatedFromDiscussion}
+        data: {post_id:postId,update_question:updateQuestion,updated_solution:updateSolution,updated_answer1:updatedAnswer1,updated_answer2:updatedAnswer2,updated_answer3:updatedAnswer3,updated_answer4:updatedAnswer4,updated_answer:updatedAnswer,isUpdatedFromDiscussion:isUpdatedFromDiscussion,category_id:categoryId}
     })
     .done(function( msg ) {
       renderPosts(msg);

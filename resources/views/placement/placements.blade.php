@@ -228,19 +228,19 @@ ul.table_list{ margin-left: -30px; }
                 @if($selectedArea == $placementArea->id)
                   <option value="{{$placementArea->id}}" selected="true">{{$placementArea->name}}</option>
                 @else
-                  <option value="{{$placementArea->id}}">{{$placementArea->name}}</option>
+                  <option value="{{$placementArea->id}}">{{$placementArea->name}} </option>
                 @endif
               @endforeach
             @endif
           </select>
-          <select id="company" class="form-control" name="company" data-toggle="tooltip" title="Company" onChange="getPlacementCompany(this);" required>
+          <select id="company" class="form-control" name="company" data-toggle="tooltip" title="Company" onchange="location = this.value;" required>
             <option value="0">Select Company</option>
             @if(count($placementCompanies) > 0)
               @foreach($placementCompanies as $placementCompany)
                 @if($selectedCompany == $placementCompany->id)
-                  <option value="{{$placementCompany->id}}" selected="true">{{$placementCompany->name}}</option>
+                  <option value="{{ url('placements')}}/{{$placementCompany->name}}" selected="true">{{$placementCompany->name}}</option>
                 @else
-                  <option value="{{$placementCompany->id}}">{{$placementCompany->name}}</option>
+                  <option value="{{ url('placements')}}/{{$placementCompany->name}}">{{$placementCompany->name}} </option>
                 @endif
               @endforeach
             @endif
@@ -615,7 +615,7 @@ ul.table_list{ margin-left: -30px; }
                                   </script>
                                   <input type="hidden" name="area" value="" id="post_area_id">
                                   <input type="hidden" name="company_id" value="" id="post_company_id">
-                                  <button type="button" class="btn btn-success btn-circle text-uppercase" onclick=" confirmSubmit(this);" id="createPostBtn" title="Share"><i class="fa fa-share"></i> Share</button>
+                                  <button type="button" class="btn btn-success btn-circle text-uppercase" onclick=" confirmSubmit(this);" data-id="createPost" title="Share"><i class="fa fa-share"></i> Share</button>
                               </form>
                           </div>
                       </div>
@@ -656,14 +656,14 @@ ul.table_list{ margin-left: -30px; }
               @endforeach
             @endif
           </select>
-          <select id="company2" class="form-control mrgn_20_top_btm" name="company" data-toggle="tooltip" title="Company" onChange="getPlacementCompany(this);"  required>
+          <select id="company2" class="form-control mrgn_20_top_btm" name="company" data-toggle="tooltip" title="Company" onchange="location = this.value;"  required>
             <option value="0">Select Company</option>
             @if(count($placementCompanies) > 0)
               @foreach($placementCompanies as $placementCompany)
                 @if($selectedCompany == $placementCompany->id)
-                  <option value="{{$placementCompany->id}}" selected="true">{{$placementCompany->name}}</option>
+                  <option value="{{ url('placements')}}/{{$placementCompany->name}}" selected="true">{{$placementCompany->name}}</option>
                 @else
-                  <option value="{{$placementCompany->id}}">{{$placementCompany->name}}</option>
+                  <option value="{{ url('placements')}}/{{$placementCompany->name}}">{{$placementCompany->name}} </option>
                 @endif
               @endforeach
             @endif
@@ -1280,7 +1280,7 @@ ul.table_list{ margin-left: -30px; }
         area.value= areaId;
         var company = document.getElementById('post_company_id');
         company.value= companyId;
-        formId = $(ele).attr('id');
+        formId = $(ele).attr('data-id');
         form = document.getElementById(formId);
         form.submit();
     } else if( isNaN(userId)) {
@@ -1323,10 +1323,11 @@ ul.table_list{ margin-left: -30px; }
         opt.value = 0;
         opt.innerHTML = 'Select Company';
         select.appendChild(opt);
+        var urlStr = "{{ url('placements') }}/";
         if( 0 < msg.length){
           $.each(msg, function(idx, obj) {
               var opt = document.createElement('option');
-              opt.value = obj.id;
+              opt.value = urlStr+obj.name;
               opt.innerHTML = obj.name;
               select.appendChild(opt);
           });
@@ -1354,7 +1355,7 @@ ul.table_list{ margin-left: -30px; }
         if( 0 < msg.length){
           $.each(msg, function(idx, obj) {
               var opt = document.createElement('option');
-              opt.value = obj.id;
+              opt.value = urlStr+obj.name;
               opt.innerHTML = obj.name;
               select2.appendChild(opt);
           });

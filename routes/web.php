@@ -522,6 +522,7 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('getFavouriteDocumentsByUserId', 'DocumentsController@getFavouriteDocumentsByUserId');
 
 	// discussion and comments front
+	Route::get('{categoryId}/discussion/{category}', 'DiscussionController@discussionByCategory');
 	Route::get('discussion/{commentId?}/{subcommentId?}', 'DiscussionController@discussion');
 	Route::post('createPost', 'DiscussionController@createPost');
 	Route::post('createMyPost', 'DiscussionController@createMyPost');
@@ -838,8 +839,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 
 	// placement front
 	Route::get('jobUpdates', 'PlacementController@jobUpdates');
-	Route::get('placements', 'PlacementController@show');
-	Route::post('placements', 'PlacementController@showPlacements');
+	Route::get('placements/{company?}', 'PlacementController@show');
+	// Route::post('placements', 'PlacementController@showPlacements');
 	Route::post('getPlacementCompaniesByArea', 'PlacementController@getPlacementCompaniesByArea');
 	Route::post('getPlacementCompaniesByAreaForFront', 'PlacementController@getPlacementCompaniesByAreaForFront');
 	Route::post('createPlacementExperiance', 'PlacementController@createPlacementExperiance');

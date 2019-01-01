@@ -640,7 +640,7 @@
 
 		        var showUserResultMobileBtn = document.getElementById('showUserResultMobileBtn_'+paper);
 		        showUserResultMobileBtn.innerHTML= '<button class="btn-magick btn-sm btn3d" onClick="showUserTestResult(this);" data-paper_id="'+paper+'" data-toggle="tooltip" title="Result!"><span class="fa fa-bar-chart" aria-hidden="true"></span>Result</button>';
-
+		        window.location.reload();
         	}
         });
 	}
@@ -716,24 +716,8 @@
 		}
 	}
 	function showUserTestResult(ele){
-		$.confirm({
-		    title: 'Confirmation',
-		    content: 'Do you want to see result?',
-		    type: 'red',
-		    typeAnimated: true,
-		    buttons: {
-		        	Ok: {
-			            text: 'Ok',
-			            btnClass: 'btn-red',
-			            action: function(){
-							var paperId = parseInt($(ele).data('paper_id'));
-							document.getElementById('showUserTestResult_'+paperId).submit();
-					}
-		        },
-		        Cancle: function () {
-		        }
-		    }
-		});
+		var paperId = parseInt($(ele).data('paper_id'));
+		document.getElementById('showUserTestResult_'+paperId).submit();
 	}
 
 	window.onclick = function(event) {

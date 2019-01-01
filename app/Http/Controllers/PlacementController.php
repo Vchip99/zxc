@@ -34,16 +34,21 @@ class PlacementController extends Controller
         parent::__construct();
     }
 
-    protected function show(Request $request){
-        $companyId = Session::get('front_selected_company_id');
-        if($companyId > 0){
-            $companyDetails = Cache::remember('vchip:placements:companyDetails:company-'.$companyId,60, function() use ($companyId){
-                return CompanyDetails::where('placement_company_id', $companyId)->first();
-            });
-        } else {
-            $companyDetails = Cache::remember('vchip:placements:companyDetails:company-first',60, function() use ($companyId){
+    protected function show(Request $request, $company=NULL){
+        if(empty($company)){
+            $companyDetails = Cache::remember('vchip:placements:companyDetails:company-first',60, function(){
                 return CompanyDetails::first();
             });
+        } else {
+            $placementCompany = PlacementCompany::where('name', $company)->first();
+            if(is_object($placementCompany)){
+                $companyDetails = Cache::remember('vchip:placements:companyDetails:'.$company,60, function() use ($placementCompany){
+                    return CompanyDetails::where('placement_company_id',$placementCompany->id)->first();
+                });
+            } else {
+                return redirect('placements');
+            }
+
         }
         $placementAreas= Cache::remember('vchip:placements:placementAreas',60, function() {
             return PlacementArea::getPlacementAreas();
@@ -68,9 +73,11 @@ class PlacementController extends Controller
                 $examPatterns = [];
                 $placementExperiances = [];
             }
-            $placementCompanies = [];
-            $selectedCompany = 0;
-            $selectedArea = 0;
+            $selectedCompany = $companyId;
+            $selectedArea = $companyDetails->placement_area_id;
+            $placementCompanies = Cache::remember('vchip:placements:placementCompanies:areaId-'.$selectedArea,60, function() use ($selectedArea){
+                return PlacementCompany::where('placement_area_id',$selectedArea)->get();
+            });
             $commentLikesCount = PlacementProcessCommentLike::getLikesByCompanyId($companyDetails->placement_company_id);
             $subcommentLikesCount = PlacementProcessSubCommentLike::getLikesByCompanyId($companyDetails->placement_company_id);
             $likesCount = PlacementProcessLike::getLikesByCompanyId($companyDetails->placement_company_id);
@@ -186,15 +193,17 @@ class PlacementController extends Controller
         {
             PlacementExperiance::createPlacementExperiance($request);
             DB::commit();
-            if($companyId > 0){
-                Session::put('front_selected_company_id', $companyId);
-            }
+            InputSanitise::deleteCacheByString('vchip:placements');
 
         }
         catch(\Exception $e)
         {
             DB::rollback();
             return redirect()->back()->withErrors('something went wrong.');
+        }
+        $placementCompany = PlacementCompany::find($companyId);
+        if(is_object($placementCompany)){
+            return Redirect::to('placements/'.$placementCompany->name);
         }
         return Redirect::to('placements');
     }
@@ -285,9 +294,6 @@ class PlacementController extends Controller
         {
             PlacementProcessComment::createPlacementProcessComment($request);
             DB::commit();
-            // if($companyId > 0){
-            //     Session::put('front_selected_company_id', $companyId);
-            // }
         }
         catch(\Exception $e)
         {
@@ -306,9 +312,6 @@ class PlacementController extends Controller
             {
                 PlacementProcessSubComment::createPlacementProcessSubComment($request);
                 DB::commit();
-                // if($companyId > 0){
-                //     Session::put('front_selected_company_id', $companyId);
-                // }
             }
             catch(\Exception $e)
             {
@@ -333,10 +336,6 @@ class PlacementController extends Controller
                     $subcomment->body = $commentBody;
                     $subcomment->save();
                     DB::commit();
-                    // if($companyId > 0){
-                    //     Session::put('front_selected_company_id', $companyId);
-                    // }
-                    // return Redirect::to('placements');
                 }
                 catch(\Exception $e)
                 {
@@ -365,10 +364,6 @@ class PlacementController extends Controller
                     }
                     $subcomment->delete();
                     DB::commit();
-                    // if($companyId > 0){
-                    //     Session::put('front_selected_company_id', $companyId);
-                    // }
-                    // return Redirect::to('placements');
                 }
                 catch(\Exception $e)
                 {
@@ -407,10 +402,6 @@ class PlacementController extends Controller
                     }
                     $comment->delete();
                     DB::commit();
-                    // if($companyId > 0){
-                    //     Session::put('front_selected_company_id', $companyId);
-                    // }
-                    // return Redirect::to('placements');
                 }
                 catch(\Exception $e)
                 {

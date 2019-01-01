@@ -196,19 +196,19 @@
     </div>
     <div class="vchip-right-sidebar mrgn_10_top_btm text-center">
       <a data-toggle="modal" data-target="#review-model-{{$project->id}}" style="cursor: pointer;">
-        <div style="display: inline-block;">
+        <span style= "position:relative; top:7px;">
           @if(isset($reviewData[$project->id])) {{$reviewData[$project->id]['avg']}} @else 0 @endif
-        </div>
+        </span>
         <div style="display: inline-block;">
           <input id="rating_input{{$project->id}}" name="input-{{$project->id}}" class="rating rating-loading" value="@if(isset($reviewData[$project->id])) {{$reviewData[$project->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
         </div>
-        <div style="display: inline-block;">
+        <span style= "position:relative; top:7px;">
             @if(isset($reviewData[$project->id]))
               {{count($reviewData[$project->id]['rating'])}} <i class="fa fa-group"></i>
             @else
               0 <i class="fa fa-group"></i>
             @endif
-        </div>
+        </span>
       </a>
     </div>
     <div id="review-model-{{$project->id}}" class="modal fade" role="dialog">
@@ -218,19 +218,19 @@
             &nbsp;&nbsp;&nbsp;
             <button class="close" data-dismiss="modal">×</button>
             <div class="form-group row ">
-              <div  style="display: inline-block;">
+              <span style= "position:relative; top:7px;">
                 @if(isset($reviewData[$project->id])) {{$reviewData[$project->id]['avg']}} @else 0 @endif
-              </div>
+              </span>
               <div  style="display: inline-block;">
                 <input name="input-{{$project->id}}" class="rating rating-loading" value="@if(isset($reviewData[$project->id])) {{$reviewData[$project->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
               </div>
-              <div  style="display: inline-block;">
+              <span style= "position:relative; top:7px;">
                 @if(isset($reviewData[$project->id]))
                   {{count($reviewData[$project->id]['rating'])}} <i class="fa fa-group"></i>
                 @else
                   0 <i class="fa fa-group"></i>
                 @endif
-              </div>
+              </span>
               @if(is_object(Auth::user()))
                 <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$project->id}}">
                 @if(isset($reviewData[$project->id]) && isset($reviewData[$project->id]['rating'][Auth::user()->id]))

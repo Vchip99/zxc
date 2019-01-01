@@ -75,6 +75,7 @@ class StudyMaterialTopicController extends Controller
         {
             return redirect()->back()->withErrors($v->errors());
         }
+        InputSanitise::deleteCacheByString('vchip:studyMaterial');
         DB::beginTransaction();
         try
         {
@@ -120,6 +121,7 @@ class StudyMaterialTopicController extends Controller
             return redirect()->back()->withErrors($v->errors());
         }
 		$topicId = InputSanitise::inputInt($request->get('topic_id'));
+		InputSanitise::deleteCacheByString('vchip:studyMaterial');
 		if(isset($topicId)){
 			DB::beginTransaction();
 	        try
@@ -144,6 +146,7 @@ class StudyMaterialTopicController extends Controller
 	 */
 	protected function delete(Request $request){
 		$topicId = InputSanitise::inputInt($request->get('topic_id'));
+		InputSanitise::deleteCacheByString('vchip:studyMaterial');
 		if(isset($topicId)){
 			$topic = StudyMaterialTopic::find($topicId);
 			if(is_object($topic)){

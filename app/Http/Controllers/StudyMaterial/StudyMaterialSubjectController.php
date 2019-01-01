@@ -61,7 +61,7 @@ class StudyMaterialSubjectController extends Controller
 	 *	store subject
 	 */
 	protected function store(Request $request){
-		InputSanitise::deleteCacheByString('vchip:studyMaterial*');
+		InputSanitise::deleteCacheByString('vchip:studyMaterial');
 		$v = Validator::make($request->all(), $this->validateCreateSubject);
         if ($v->fails())
         {
@@ -104,7 +104,7 @@ class StudyMaterialSubjectController extends Controller
 	 *	update subject
 	 */
 	protected function update(Request $request){
-		InputSanitise::deleteCacheByString('vchip:studyMaterial*');
+		InputSanitise::deleteCacheByString('vchip:studyMaterial');
 		$v = Validator::make($request->all(), $this->validateCreateSubject);
         if ($v->fails())
         {
@@ -134,7 +134,7 @@ class StudyMaterialSubjectController extends Controller
 	 *	delete subject
 	 */
 	protected function delete(Request $request){
-		InputSanitise::deleteCacheByString('vchip:studyMaterial*');
+		InputSanitise::deleteCacheByString('vchip:studyMaterial');
 		$subjectId = InputSanitise::inputInt($request->get('subject_id'));
 		if(isset($subjectId)){
 			$subject = StudyMaterialSubject::find($subjectId);

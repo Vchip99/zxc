@@ -102,19 +102,19 @@
                       @endif
                       <div class="row">
                         <a data-toggle="modal" data-target="#review-model-{{$mentor->id}}" style="cursor: pointer;">
-                          <div style="display: inline-block;">
+                          <span style= "position:relative; top:7px;">
                             @if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif
-                          </div>
+                          </span>
                           <div style="display: inline-block;">
                             <input id="rating_input{{$mentor->id}}" name="input-{{$mentor->id}}" class="rating rating-loading" value="@if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
                           </div>
-                          <div style="display: inline-block;">
+                          <span style= "position:relative; top:7px;">
                               @if(isset($reviewData[$mentor->id]))
                                 {{count($reviewData[$mentor->id]['rating'])}} <i class="fa fa-group"></i>
                               @else
                                 0 <i class="fa fa-group"></i>
                               @endif
-                          </div>
+                          </span>
                         </a>
                       </div>
                       <div id="review-model-{{$mentor->id}}" class="modal fade" role="dialog">
@@ -124,19 +124,19 @@
                               &nbsp;&nbsp;&nbsp;
                               <button class="close" data-dismiss="modal">×</button>
                               <div class="form-group row ">
-                                <div  style="display: inline-block;">
+                                <span style= "position:relative; top:7px;">
                                   @if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif
-                                </div>
+                                </span>
                                 <div  style="display: inline-block;">
                                   <input name="input-{{$mentor->id}}" class="rating rating-loading" value="@if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
                                 </div>
-                                <div  style="display: inline-block;">
+                                <span style= "position:relative; top:7px;">
                                   @if(isset($reviewData[$mentor->id]))
                                     {{count($reviewData[$mentor->id]['rating'])}} <i class="fa fa-group"></i>
                                   @else
                                     0 <i class="fa fa-group"></i>
                                   @endif
-                                </div>
+                                </span>
                                 @if(is_object(Auth::user()))
                                   <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$mentor->id}}">
                                   @if(isset($reviewData[$mentor->id]) && isset($reviewData[$mentor->id]['rating'][Auth::user()->id]))
@@ -455,9 +455,9 @@
               }
 
             if(msg['ratingData'] && msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['avg']){
-              mentorsHTML += '<div class="row"><a data-toggle="modal" data-target="#review-model-'+obj.id+'" style="cursor: pointer;"><div style="display: inline-block;">'+msg['ratingData'][obj.id]['avg']+'</div><div style="display: inline-block;"><input id="rating_input'+obj.id+'" name="input-" class="rating rating-loading" value="'+msg['ratingData'][obj.id]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;">'+Object.keys(msg['ratingData'][obj.id]['rating']).length+' <i class="fa fa-group"></i></div></a></div></div>';
+              mentorsHTML += '<div class="row"><a data-toggle="modal" data-target="#review-model-'+obj.id+'" style="cursor: pointer;"><span style= "position:relative; top:7px;">'+msg['ratingData'][obj.id]['avg']+'</span><div style="display: inline-block;"><input id="rating_input'+obj.id+'" name="input-" class="rating rating-loading" value="'+msg['ratingData'][obj.id]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><span style= "position:relative; top:7px;">'+Object.keys(msg['ratingData'][obj.id]['rating']).length+' <i class="fa fa-group"></i></div></a></span></div>';
             } else {
-              mentorsHTML += '<div class="row"><a data-toggle="modal" data-target="#review-model-'+obj.id+'" style="cursor: pointer;"><div style="display: inline-block;">0</div><div style="display: inline-block;"><input id="rating_input'+obj.id+'" name="input-" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div style="display: inline-block;">0 <i class="fa fa-group"></i></div></a></div></div>';
+              mentorsHTML += '<div class="row"><a data-toggle="modal" data-target="#review-model-'+obj.id+'" style="cursor: pointer;"><span style= "position:relative; top:7px;">0</span><div style="display: inline-block;"><input id="rating_input'+obj.id+'" name="input-" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><span style= "position:relative; top:7px;">0 <i class="fa fa-group"></i></div></a></span></div>';
             }
 
               mentorsHTML += '<div class="col-md-8 topcontent"><p><strong>Name:</strong>'+ obj.name +'</p><p><strong>Designation:</strong> '+ obj.designation+'</p><p><strong>Education:</strong> '+ obj.education+'</p><p><strong>Key Areas:</strong>';
@@ -494,9 +494,9 @@
 
               mentorsHTML += '<div id="review-model-'+obj.id+'" class="modal fade" role="dialog">';
               if(msg['ratingData'] && msg['ratingData'][obj.id] && msg['ratingData'][obj.id]['avg']){
-                mentorsHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">'+msg['ratingData'][obj.id]['avg']+'</div><div  style="display: inline-block;"><input name="input-'+obj.id+'" class="rating rating-loading" value="'+msg['ratingData'][obj.id]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> '+Object.keys(msg['ratingData'][obj.id]['rating']).length+' <i class="fa fa-group"></i></div>';
+                mentorsHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><span style= "position:relative; top:7px;">'+msg['ratingData'][obj.id]['avg']+'</span><div  style="display: inline-block;"><input name="input-'+obj.id+'" class="rating rating-loading" value="'+msg['ratingData'][obj.id]['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><span style= "position:relative; top:7px;"> '+Object.keys(msg['ratingData'][obj.id]['rating']).length+' <i class="fa fa-group"></i></span>';
               } else {
-                mentorsHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">0</div><div  style="display: inline-block;"><input name="input-'+obj.id+'" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> 0 <i class="fa fa-group"></i></div>';
+                mentorsHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><span style= "position:relative; top:7px;">0</span><div  style="display: inline-block;"><input name="input-'+obj.id+'" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><span style= "position:relative; top:7px;"> 0 <i class="fa fa-group"></i></span>';
               }
               if(currentUser > 0){
                 mentorsHTML += '<button class="pull-right" data-toggle="modal" data-target="#rating-model-'+obj.id+'">';

@@ -115,19 +115,19 @@
 
               <div class="row">
                 <a data-toggle="modal" data-target="#review-model-{{$mentor->id}}" style="cursor: pointer;">
-                  <div style="display: inline-block;">
+                  <span style= "position:relative; top:7px;">
                     @if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif
-                  </div>
+                  </span>
                   <div style="display: inline-block;">
                     <input id="rating_input{{$mentor->id}}" name="input-{{$mentor->id}}" class="rating rating-loading" value="@if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
                   </div>
-                  <div style="display: inline-block;">
+                  <span style= "position:relative; top:7px;">
                       @if(isset($reviewData[$mentor->id]))
                         {{count($reviewData[$mentor->id]['rating'])}} <i class="fa fa-group"></i>
                       @else
                         0 <i class="fa fa-group"></i>
                       @endif
-                  </div>
+                  </span>
                 </a>
               </div>
               <div id="review-model-{{$mentor->id}}" class="modal fade" role="dialog">
@@ -137,19 +137,19 @@
                       &nbsp;&nbsp;&nbsp;
                       <button class="close" data-dismiss="modal">×</button>
                       <div class="form-group row ">
-                        <div  style="display: inline-block;">
+                        <span style= "position:relative; top:7px;">
                           @if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif
-                        </div>
+                        </span>
                         <div  style="display: inline-block;">
                           <input name="input-{{$mentor->id}}" class="rating rating-loading" value="@if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
                         </div>
-                        <div  style="display: inline-block;">
+                        <span style= "position:relative; top:7px;">
                           @if(isset($reviewData[$mentor->id]))
                             {{count($reviewData[$mentor->id]['rating'])}} <i class="fa fa-group"></i>
                           @else
                             0 <i class="fa fa-group"></i>
                           @endif
-                        </div>
+                        </span>
                         @if(is_object(Auth::user()))
                           <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$mentor->id}}">
                           @if(isset($reviewData[$mentor->id]) && isset($reviewData[$mentor->id]['rating'][Auth::user()->id]))

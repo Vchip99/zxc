@@ -213,19 +213,19 @@
                   @endif
                   <div class="row">
                     <a data-toggle="modal" data-target="#review-model-{{$userData->id}}" style="cursor: pointer;">
-                      <div style="display: inline-block;">
+                      <span style= "position:relative; top:7px;">
                         @if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif
-                      </div>
+                      </span>
                       <div style="display: inline-block;">
                         <input id="rating_input{{$userData->id}}" name="input-{{$userData->id}}" class="rating rating-loading" value="@if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
                       </div>
-                      <div style="display: inline-block;">
+                      <span style= "position:relative; top:7px;">
                         @if(isset($reviewData[$userData->id]))
                           {{count($reviewData[$userData->id]['rating'])}} <i class="fa fa-group"></i>
                         @else
                           0 <i class="fa fa-group"></i>
                         @endif
-                      </div>
+                      </span>
                     </a>
                   </div>
                 </div>
@@ -239,19 +239,19 @@
                     &nbsp;&nbsp;&nbsp;
                     <button class="close" data-dismiss="modal">×</button>
                     <div class="form-group row ">
-                      <div  style="display: inline-block;">
+                      <span style= "position:relative; top:7px;">
                         @if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif
-                      </div>
+                      </span>
                       <div  style="display: inline-block;">
                         <input name="input-{{$userData->id}}" class="rating rating-loading" value="@if(isset($reviewData[$userData->id])) {{$reviewData[$userData->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
                       </div>
-                      <div  style="display: inline-block;">
+                      <span style= "position:relative; top:7px;">
                         @if(isset($reviewData[$userData->id]))
                           {{count($reviewData[$userData->id]['rating'])}} <i class="fa fa-group"></i>
                         @else
                           0 <i class="fa fa-group"></i>
                         @endif
-                      </div>
+                      </span>
                       @if(is_object(Auth::user()))
                         <button class="pull-right" data-toggle="modal" data-target="#rating-model-{{$userData->id}}">
                         @if(isset($reviewData[$userData->id]) && isset($reviewData[$userData->id]['rating'][Auth::user()->id]))
@@ -517,8 +517,8 @@
         ancTag.setAttribute('data-target','#review-model-'+id);
         ancTag.setAttribute('style',"cursor: pointer;");
 
-        var avgDiv = document.createElement('div');
-        avgDiv.setAttribute('style','display: inline-block;');
+        var avgDiv = document.createElement('span');
+        avgDiv.setAttribute('style','position:relative; top:7px;');
         if(data['ratingData'] && data['ratingData']['avg']){
           avgDiv.innerHTML = data['ratingData']['avg'];
         } else {
@@ -549,8 +549,8 @@
         starDiv.appendChild(ratingInput);
         ancTag.appendChild(starDiv);
 
-        var grpDiv = document.createElement('div');
-        grpDiv.setAttribute('style','display: inline-block;');
+        var grpDiv = document.createElement('span');
+        grpDiv.setAttribute('style','position:relative; top:7px;');
         if(data['ratingData'] && data['ratingData']['rating']){
           grpDiv.innerHTML = Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i>';
         } else {
@@ -574,13 +574,13 @@
 
         reviewModelInnerHTML = '';
         if(data['ratingData'] && data['ratingData']['rating']){
-          reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">'+data['ratingData']['avg']+'</div><div  style="display: inline-block;"><input name="input-'+id+'" class="rating rating-loading" value="'+data['ratingData']['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> '+Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i></div>';
+          reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><span style= "position:relative; top:7px;">'+data['ratingData']['avg']+'</span><div  style="display: inline-block;"><input name="input-'+id+'" class="rating rating-loading" value="'+data['ratingData']['avg']+'" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><span style= "position:relative; top:7px;"> '+Object.keys(data['ratingData']['rating']).length+' <i class="fa fa-group"></i></span>';
         } else {
-          reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><div  style="display: inline-block;">0</div><div  style="display: inline-block;"><input name="input-'+id+'" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><div  style="display: inline-block;"> 0 <i class="fa fa-group"></i></div>';
+          reviewModelInnerHTML += '<div class="modal-dialog"><div class="modal-content"><div class="modal-header">&nbsp;&nbsp;&nbsp;<button class="close" data-dismiss="modal">×</button><div class="form-group row "><span style= "position:relative; top:7px;">0</span><div  style="display: inline-block;"><input name="input-'+id+'" class="rating rating-loading" value="0" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly></div><span style= "position:relative; top:7px;"> 0 <i class="fa fa-group"></i></span>';
         }
         if(userId > 0){
           reviewModelInnerHTML += '<button class="pull-right" data-toggle="modal" data-target="#rating-model-'+id+'">';
-          if(data['ratingData']['rating'][userId]){
+          if(data['ratingData'] && data['ratingData']['rating'] && data['ratingData']['rating'][userId]){
             reviewModelInnerHTML += 'Edit Rating';
           } else {
             reviewModelInnerHTML += 'Give Rating';

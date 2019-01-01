@@ -97,7 +97,34 @@ class DiscussionController extends Controller
         }
         $date = date('Y-m-d');
         $ads = Add::getAdds($request->url(),$date);
-        return view('discussion.discussion', compact('discussionCategories','posts', 'postCategoryIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'ads'));
+        $selectedCategoryId = 0;
+        return view('discussion.discussion', compact('discussionCategories','posts', 'postCategoryIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'ads','selectedCategoryId'));
+    }
+
+     /**
+     *  show list of discussionByCategory
+     */
+    protected function discussionByCategory(Request $request,$categoryId,$categoryName ){
+        $postCategoryIds = [];
+        $discussionCategories = Cache::remember('vchip:discussions:discussionCategories',60, function() {
+            return DiscussionCategory::all();
+        });
+        $posts = DiscussionPost::where('category_id', $categoryId)->orderBy('id', 'desc')->get();
+        if(is_object($posts) && false == $posts->isEmpty()){
+            foreach($posts as $post){
+                $postCategoryIds[] = $post->category_id;
+            }
+            $postCategoryIds = array_unique($postCategoryIds);
+        }
+        $user = new User;
+        $likesCount = DiscussionPostLike::getLikes();
+        $commentLikesCount = DiscussionCommentLike::getLiksByPosts($posts);
+        $subcommentLikesCount = DiscussionSubCommentLike::getLiksByPosts($posts);
+        $currentUser = Auth::user();
+        $date = date('Y-m-d');
+        $ads = Add::getAdds($request->url(),$date);
+        $selectedCategoryId = $categoryId;
+        return view('discussion.discussion', compact('discussionCategories','posts', 'postCategoryIds', 'likesCount', 'commentLikesCount', 'currentUser', 'subcommentLikesCount', 'ads','selectedCategoryId'));
     }
 
     /**
@@ -117,7 +144,7 @@ class DiscussionController extends Controller
             DB::rollback();
             return back()->withErrors('something went wrong.');
         }
-        return $this->getPosts();
+        return $this->getPosts($request->get('category_id'));
     }
 
     /**
@@ -137,7 +164,7 @@ class DiscussionController extends Controller
             DB::rollback();
             return back()->withErrors('something went wrong.');
         }
-        return $this->getMyPosts();
+        return $this->getPosts($request->get('category_id'));
     }
 
     /**
@@ -160,7 +187,7 @@ class DiscussionController extends Controller
         {
             DB::rollback();
         }
-        return $this->getPosts();
+        return $this->getPosts($request->get('category_id'));
     }
 
     /**
@@ -189,7 +216,7 @@ class DiscussionController extends Controller
         {
             DB::rollback();
         }
-        return $this->getPosts();
+        return $this->getPosts($request->get('category_id'));
     }
 
     /**
@@ -297,12 +324,16 @@ class DiscussionController extends Controller
     /**
      *  return posts
      */
-    protected function getPosts(){
+    protected function getPosts($categoryId){
         Session::set('show_post_area', 0);
         Session::set('show_comment_area', 0);
         Session::set('show_subcomment_area', 0);
         $allPosts = [];
-        $posts = DiscussionPost::orderBy('id', 'desc')->get();
+        if($categoryId > 0){
+            $posts = DiscussionPost::where('category_id', $categoryId)->orderBy('id', 'desc')->get();
+        } else {
+            $posts = DiscussionPost::orderBy('id', 'desc')->get();
+        }
         if(is_object($posts) && false == $posts->isEmpty()){
             foreach ($posts as $post) {
                 $allPosts['posts'][$post->id]['title'] = $post->title;
@@ -452,7 +483,7 @@ class DiscussionController extends Controller
                 DB::rollback();
             }
         }
-        return $this->getPosts();
+        return $this->getPosts($request->get('category_id'));
     }
 
     protected function deleteComment(Request $request){
@@ -484,7 +515,7 @@ class DiscussionController extends Controller
                 DB::rollback();
             }
         }
-        return $this->getPosts();
+        return $this->getPosts($request->get('category_id'));
     }
 
     protected function deletePost(Request $request){
@@ -503,7 +534,7 @@ class DiscussionController extends Controller
                 DB::rollback();
             }
         }
-        return $this->getPosts();
+        return $this->getPosts($request->get('category_id'));
     }
 
     protected function updatePost(Request $request){
@@ -539,7 +570,7 @@ class DiscussionController extends Controller
             }
         }
         if('true' == $isUpdatedFromDiscussion){
-            return $this->getPosts();
+            return $this->getPosts($request->get('category_id'));
         } else {
             return $this->getMyPosts();
         }
@@ -566,7 +597,7 @@ class DiscussionController extends Controller
                 }
             }
         }
-        return $this->getPosts();
+        return $this->getPosts($request->get('category_id'));
     }
 
     protected function updateSubComment(Request $request){
@@ -603,7 +634,7 @@ class DiscussionController extends Controller
                 }
             }
         }
-        return $this->getPosts();
+        return $this->getPosts($request->get('category_id'));
     }
 
     function goToPost(Request $request){
