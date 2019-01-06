@@ -209,7 +209,7 @@
 					      	});
 					    }
 	                },
-	                Cancle: function () {
+	                Cancel: function () {
 	                }
 	            }
 	      	});

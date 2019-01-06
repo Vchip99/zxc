@@ -813,7 +813,7 @@
             document.getElementById('purchaseCourse_'+courseId).submit();
           }
         },
-        Cancle: function () {
+        Cancel: function () {
         }
       }
     });

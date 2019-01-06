@@ -387,7 +387,7 @@
 					        document.getElementById('quiz_form').submit();
 						}
 			        },
-			        Cancle: function () {
+			        Cancel: function () {
 			        }
 			    }
 			});

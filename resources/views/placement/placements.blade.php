@@ -890,7 +890,7 @@ ul.table_list{ margin-left: -30px; }
                     });
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });
@@ -921,7 +921,7 @@ ul.table_list{ margin-left: -30px; }
                     });
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });

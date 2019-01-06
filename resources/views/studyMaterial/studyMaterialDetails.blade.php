@@ -355,7 +355,7 @@
 </div>
 <input type="hidden" id="images" value="{{$images}}">
 <input type="hidden" id="topic_id" value="{{$topicId}}">
-<input type="hidden" id="user_id" value="@if(is_object(Auth::user())) {{Auth::user()->id}} @endif">
+<input type="hidden" id="user_id" value="{{(is_object(Auth::user()))?Auth::user()->id:''}}">
 @stop
 @section('footer')
   @include('footer.footer')
@@ -560,7 +560,7 @@
                 });
               }
           },
-          Cancle: function () {
+          Cancel: function () {
           }
       }
     });
@@ -589,7 +589,7 @@
                     });
                   }
           },
-          Cancle: function () {
+          Cancel: function () {
           }
       }
     });

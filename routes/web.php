@@ -1238,6 +1238,8 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::get('admin/studyMaterialPost/{id}/edit', 'StudyMaterial\StudyMaterialPostController@edit');
 	Route::put('admin/updateStudyMaterialPost', 'StudyMaterial\StudyMaterialPostController@update');
 	Route::delete('admin/deleteStudyMaterialPost', 'StudyMaterial\StudyMaterialPostController@delete');
+	Route::post('admin/showPosts', 'StudyMaterial\StudyMaterialPostController@showPosts');
+
 
 	// admin mentor area
 	Route::get('admin/manageMentorArea', 'Mentor\MentorAreaController@show');
@@ -1249,6 +1251,9 @@ Route::group(['domain' => 'localvchip.com'], function () {
 	Route::post('admin/isMentorAreaExist', 'Mentor\MentorAreaController@isMentorAreaExist');
 	Route::get('admin/manageMentors', 'Mentor\MentorAreaController@manageMentors');
 	Route::delete('admin/deleteMentor', 'Mentor\MentorAreaController@deleteMentor');
+	Route::post('admin/getMentorsByAreaId', 'Mentor\MentorAreaController@getMentorsByAreaId');
+	Route::post('admin/changeMentorApproveStatus', 'Mentor\MentorAreaController@changeMentorApproveStatus');
+	Route::post('admin/getMentorsByAreaIdBySkillId', 'Mentor\MentorAreaController@getMentorsByAreaIdBySkillId');
 
 	// admin mentor skill
 	Route::get('admin/manageMentorSkill', 'Mentor\MentorSkillController@show');
@@ -1328,6 +1333,7 @@ Route::group(['domain' => '{client}.localvchip.com'], function () {
 	Route::post('userMentorSendMessage', 'Client\MentorChatController@userMentorSendMessage');
 	Route::get('mentee/signup', 'Client\MentorHomeController@menteeSignup');
 	Route::post('registerMentee', 'UserAuth\RegisterController@registerMentee');
+	Route::get('register/mentorVerify/{token}', 'MentorAuth\RegisterController@verify');
 
 	//   Route::get('/login', 'MentorAuth\LoginController@showLoginForm')->name('login');
 	//   Route::post('/login', 'MentorAuth\LoginController@login');

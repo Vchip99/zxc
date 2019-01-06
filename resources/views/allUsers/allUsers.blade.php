@@ -505,7 +505,7 @@
                     });
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });
@@ -569,7 +569,7 @@
                     });
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
                 if('checked' == $(ele).attr('checked')){
                   $(ele).prop('checked', 'checked');
                 } else {

@@ -198,7 +198,7 @@
 	                      window.location="{{url('/home')}}";
 	                    }
 	                },
-	                Cancle: function () {
+	                Cancel: function () {
 	                }
 	            }
 	          });

@@ -92,7 +92,7 @@
                         @if(!empty($mentor->photo))
                           <img src="{{asset($mentor->photo)}}" alt="member" class="image img-circle">
                         @else
-                          <img src="{{asset('images/mark.jpg')}}" alt="member" class="image img-circle">
+                          <img src="{{asset('images/user1.png')}}" alt="member" class="image img-circle">
                         @endif
                       </div><br>
                       @if($mentor->fees > 0)
@@ -374,11 +374,115 @@
                     @if(!empty($mentor->photo))
                       <img src="{{asset($mentor->photo)}}" alt="member" class="user-prof" />
                     @else
-                      <img src="{{asset('images/mark.jpg')}}" alt="member" class="user-prof" />
+                      <img src="{{asset('images/user1.png')}}" alt="member" class="user-prof" />
                     @endif
                   </div>
                   <p><b>Name: {{$mentor->name}}</b></p>
-                  <p><strong>Reviews: </strong></p>
+                  <p>
+                    <div class="row">
+                      <a data-toggle="modal" data-target="#review-model_{{$mentor->id}}" style="cursor: pointer;">
+                        <span style= "position:relative; top:7px;">
+                          @if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif
+                        </span>
+                        <div style="display: inline-block;">
+                          <input id="ratingInput{{$mentor->id}}" name="input-{{$mentor->id}}" class="rating rating-loading" value="@if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                        </div>
+                        <span style= "position:relative; top:7px;">
+                            @if(isset($reviewData[$mentor->id]))
+                              {{count($reviewData[$mentor->id]['rating'])}} <i class="fa fa-group"></i>
+                            @else
+                              0 <i class="fa fa-group"></i>
+                            @endif
+                        </span>
+                      </a>
+                    </div>
+                  </p>
+                  <div id="review-model_{{$mentor->id}}" class="modal fade" role="dialog">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            &nbsp;&nbsp;&nbsp;
+                            <button class="close" data-dismiss="modal">×</button>
+                            <div class="form-group row ">
+                              <span style= "position:relative; top:7px;">
+                                @if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif
+                              </span>
+                              <div  style="display: inline-block;">
+                                <input name="rinput-{{$mentor->id}}" class="rating rating-loading" value="@if(isset($reviewData[$mentor->id])) {{$reviewData[$mentor->id]['avg']}} @else 0 @endif" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                              </div>
+                              <span style= "position:relative; top:7px;">
+                                @if(isset($reviewData[$mentor->id]))
+                                  {{count($reviewData[$mentor->id]['rating'])}} <i class="fa fa-group"></i>
+                                @else
+                                  0 <i class="fa fa-group"></i>
+                                @endif
+                              </span>
+                              @if(is_object(Auth::user()))
+                                <button class="pull-right" data-toggle="modal" data-target="#rating-model_{{$mentor->id}}">
+                                @if(isset($reviewData[$mentor->id]) && isset($reviewData[$mentor->id]['rating'][Auth::user()->id]))
+                                  Edit Rating
+                                @else
+                                  Give Rating
+                                @endif
+                                </button>
+                              @else
+                                <button class="pull-right" onClick="checkLogin();">Give Rating</button>
+                              @endif
+                            </div>
+                          </div>
+                          <div class="modal-body row">
+                            <div class="form-group row" style="overflow: auto;">
+                              @if(isset($reviewData[$mentor->id]))
+                                @foreach($reviewData[$mentor->id]['rating'] as $userId => $review)
+                                  <div class="user-block cmt-left-margin">
+                                    @if(is_file($userNames[$userId]['photo']) || (!empty($userNames[$userId]['photo']) && false == preg_match('/userStorage/',$userNames[$userId]['photo'])))
+                                      <img src="{{ asset($userNames[$userId]['photo'])}} " class="img-circle" alt="User Image">
+                                    @else
+                                      <img src="{{ url('images/user1.png')}}" class="img-circle" alt="User Image">
+                                    @endif
+                                    <span class="username">{{ $userNames[$userId]['name'] }} </span>
+                                    <span class="description">Shared publicly - {{$review['updated_at']}}</span>
+                                  </div>
+                                  <br>
+                                  <input id="ratingInput-{{$mentor->id}}-{{$userId}}" name="input-{{$mentor->id}}" class="rating rating-loading" value="{{$review['rating']}}" data-min="0" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false" readonly>
+                                  {{$review['review']}}
+                                  <hr>
+                                @endforeach
+                              @else
+                                Please give ratings
+                              @endif
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div id="rating-model_{{$mentor->id}}" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button class="close" data-dismiss="modal">×</button>
+                          Rate and Review
+                        </div>
+                        <div class="modal-body row">
+                          <form action="{{ url('giveMentorRating')}}" method="POST">
+                            <div class="form-group row ">
+                              {{ csrf_field() }}
+                              @if(isset($reviewData[$mentor->id]) && is_object(Auth::user()) && isset($reviewData[$mentor->id]['rating'][Auth::user()->id]))
+                                <input id="ratingInput-{{$mentor->id}}" name="input-{{$mentor->id}}" class="rating rating-loading" value="{{$reviewData[$mentor->id]['rating'][Auth::user()->id]['rating']}}" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                              @else
+                                <input id="ratingInput-{{$mentor->id}}" name="input-{{$mentor->id}}" class="rating rating-loading" value="0" data-min="1" data-max="5" data-step="0.1" data-size="xs" data-show-clear="false" data-show-caption="false">
+                              @endif
+                              Review:<input type="text" name="review-text" class="form-control" value="@if(isset($reviewData[$mentor->id])  && is_object(Auth::user()) && isset($reviewData[$mentor->id]['rating'][Auth::user()->id])) {{trim($reviewData[$mentor->id]['rating'][Auth::user()->id]['review'])}} @endif">
+                              <br>
+                              <input type="hidden" name="mentor_id" value="{{$mentor->id}}">
+                              <input type="hidden" name="rating_id" value="@if(isset($reviewData[$mentor->id]) && is_object(Auth::user()) && isset($reviewData[$mentor->id]['rating'][Auth::user()->id])) {{$reviewData[$mentor->id]['rating'][Auth::user()->id]['review_id']}} @endif">
+                              <button type="submit" class="pull-right">Submit</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </a>
             </div>
@@ -446,7 +550,7 @@
               if(obj.photo){
                 mentorsHTML += '<img src="'+assetStr+'" alt="member" class="image img-circle">';
               }else{
-                mentorsHTML += '<img src="images/mark.jpg" alt="member" class="image img-circle">';
+                mentorsHTML += '<img src="images/user1.png" alt="member" class="image img-circle">';
               }
               if(obj.fees > 0){
                 mentorsHTML += '</div><br><div><strong>Fees: '+ obj.fees +'/Hour </strong></div>';

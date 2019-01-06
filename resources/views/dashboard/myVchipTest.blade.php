@@ -359,7 +359,7 @@
                       window.location="{{url('/home')}}";
                     }
                 },
-                Cancle: function () {
+                Cancel: function () {
                 }
             }
           });
@@ -411,7 +411,7 @@
                       document.getElementById('showUserTestResult_'+paperId).submit();
                     }
                 },
-                Cancle: function () {
+                Cancel: function () {
                 }
             }
           });
@@ -808,7 +808,7 @@
                 document.getElementById('purchaseTest_'+paperId).submit();
             }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
       });
@@ -829,7 +829,7 @@
                 document.getElementById('purchaseTest_mobile_'+paperId).submit();
             }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
       });
@@ -849,7 +849,7 @@
                 document.getElementById('purchaseSubCategory').submit();
               }
             },
-            Cancle: function () {
+            Cancel: function () {
             }
           }
         });

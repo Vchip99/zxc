@@ -769,7 +769,7 @@
                     document.getElementById('deleteCollegeUser_'+studentId).submit();
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });

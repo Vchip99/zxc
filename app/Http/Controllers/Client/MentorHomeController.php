@@ -104,7 +104,7 @@ class MentorHomeController extends Controller
         $reviewData = [];
         $ratingUsers = [];
         $userNames = [];
-        $allRatings = MentorRating::where('mentor_id', $id)->get();
+        $allRatings = MentorRating::all();
         if(is_object($allRatings) && false == $allRatings->isEmpty()){
             foreach($allRatings as $rating){
                 $reviewData[$rating->mentor_id]['rating'][$rating->user_id] = [ 'rating' => $rating->rating,'review' => $rating->review, 'review_id' => $rating->id, 'updated_at' => $rating->updated_at->diffForHumans()];

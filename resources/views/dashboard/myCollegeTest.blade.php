@@ -257,7 +257,7 @@
                       window.location="{{url('/home')}}";
                     }
                 },
-                Cancle: function () {
+                Cancel: function () {
                 }
             }
           });
@@ -309,7 +309,7 @@
                       document.getElementById('showUserTestResult_'+paperId).submit();
                     }
                 },
-                Cancle: function () {
+                Cancel: function () {
                 }
             }
           });

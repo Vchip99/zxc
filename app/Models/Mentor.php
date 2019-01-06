@@ -19,7 +19,7 @@ class Mentor extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name','mobile','email','password','photo','designation','education','mentor_area_id','skills','linked_in','twitter','youtube','facebook','fees','about','experiance','achievement',
+        'name','mobile','email','password','photo','designation','education','mentor_area_id','skills','linked_in','twitter','youtube','facebook','fees','about','experiance','achievement','admin_approve','verified','email_token'
     ];
 
     /**
@@ -121,12 +121,44 @@ class Mentor extends Authenticatable
         if($skill > 0){
             $result->whereRaw("find_in_set($skill , skills)");
         }
-        return $result->select('id','name','designation','education','photo','fees','skills','linked_in','twitter','facebook','youtube')->get();
+        return $result->select('id','name','designation','education','photo','fees','skills','linked_in','twitter','facebook','youtube','admin_approve')->get();
     }
 
     protected static function getMentorsBySkillId($request){
         $skill = $request->get('skill');
         return DB::table('mentors')->whereRaw("find_in_set($skill , skills)")->select('id','name')->get();
+    }
+
+    protected static function getMentorsByAreaId($request){
+        $areaId = $request->get('area_id');
+        if($areaId > 0){
+            return DB::table('mentors')->where('mentor_area_id', $areaId)->select('id','name','admin_approve')->get();
+        } else {
+            return DB::table('mentors')->select('id','name','admin_approve')->get();
+        }
+    }
+
+    // Set the verified status to true and make the email token null
+    public function verified()
+    {
+        $this->verified = 1;
+        $this->email_token = null;
+        $this->save();
+        return;
+    }
+
+    protected static function changeMentorApproveStatus($request){
+        $mentorId = $request->get('mentor_id');
+        $mentor = Mentor::find($mentorId);
+        if(is_object($mentor)){
+            if(1 == $mentor->admin_approve){
+                $mentor->admin_approve = 0;
+            } else {
+                $mentor->admin_approve = 1;
+            }
+            $mentor->save();
+        }
+        return;
     }
 
 }

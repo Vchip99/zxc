@@ -202,7 +202,7 @@ hr{
                       window.location="{{url('/home')}}";
                     }
                 },
-                Cancle: function () {
+                Cancel: function () {
                 }
             }
           });
@@ -229,7 +229,7 @@ hr{
                       window.location="{{url('/home')}}";
                     }
                 },
-                Cancle: function () {
+                Cancel: function () {
                 }
             }
           });
@@ -264,7 +264,7 @@ hr{
                     document.getElementById(formId).submit();
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });
@@ -297,7 +297,7 @@ hr{
                     document.getElementById(formId).submit();
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });
@@ -330,7 +330,7 @@ hr{
                     document.getElementById(formId).submit();
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });
@@ -359,7 +359,7 @@ hr{
                       window.location="{{url('/home')}}";
                     }
                 },
-                Cancle: function () {
+                Cancel: function () {
                 }
             }
           });
@@ -404,7 +404,7 @@ hr{
                       window.location="{{url('/home')}}";
                     }
                 },
-                Cancle: function () {
+                Cancel: function () {
                 }
             }
           });
@@ -450,7 +450,7 @@ hr{
                       window.location="{{url('/home')}}";
                     }
                 },
-                Cancle: function () {
+                Cancel: function () {
                 }
             }
           });

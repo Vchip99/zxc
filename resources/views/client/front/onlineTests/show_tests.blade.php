@@ -887,7 +887,7 @@
 					      	});
 				    	}
 			        },
-			        Cancle: function () {
+			        Cancel: function () {
 			        }
 			    }
 			});

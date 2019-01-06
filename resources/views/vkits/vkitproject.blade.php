@@ -525,7 +525,7 @@
             document.getElementById('purchaseVkitComponent_'+projectId).submit();
           }
         },
-        Cancle: function () {
+        Cancel: function () {
         }
       }
     });
@@ -946,7 +946,7 @@
                   });
                 }
             },
-            Cancle: function () {
+            Cancel: function () {
             }
         }
     });
@@ -1024,7 +1024,7 @@
                   });
                 }
             },
-            Cancle: function () {
+            Cancel: function () {
             }
         }
     });

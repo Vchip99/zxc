@@ -17,12 +17,112 @@
           {{ Session::get('message') }}
       </div>
     @endif
-    <div class="form-group row">
+    @php
+    if(Session::has('selected_post_category')){
+      $selectedCategoryId = Session::get('selected_post_category');
+    } else {
+      $selectedCategoryId = 0;
+    }
+    if(Session::has('selected_post_subcategory')){
+      $selectedSubCategoryId = Session::get('selected_post_subcategory');
+    } else {
+      $selectedSubCategoryId = 0;
+    }
+    if(Session::has('selected_post_subject')){
+      $selectedSubjectId = Session::get('selected_post_subject');
+    } else {
+      $selectedSubjectId = 0;
+    }
+    if(Session::has('selected_post_topic')){
+      $selectedTopicId = Session::get('selected_post_topic');
+    } else {
+      $selectedTopicId = 0;
+    }
+  @endphp
+  <div>
+  <div  class="admin_div">
+    <form id="questionForm" action="{{url('admin/showPosts')}}" method="POST">
+      {{csrf_field()}}
+      <div class="form-group row ">
+          <label class="col-sm-2 col-form-label">Category Name:</label>
+          <div class="col-sm-3">
+            <select id="category" class="form-control" name="category" onChange="selectSubcategory(this);" required title="Category">
+              <option value="0">Select Category</option>
+              @if(count($courseCategories) > 0)
+                @foreach($courseCategories as $courseCategory)
+                  @if($selectedCategoryId == $courseCategory->id)
+                    <option value="{{$courseCategory->id}}" selected>{{$courseCategory->name}}</option>
+                  @else
+                    <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
+                  @endif
+                @endforeach
+              @endif
+            </select>
+          </div>
+        </div>
+        <div class="form-group row ">
+          <label class="col-sm-2 col-form-label">Sub Category Name:</label>
+          <div class="col-sm-3">
+            <select id="subcategory" class="form-control" name="subcategory" required title="Sub Category" onChange="selectSubject(this);">
+              <option value="0">Select Sub Category</option>
+              @if(count($courseSubCategories) > 0)
+                @foreach($courseSubCategories as $courseSubCategory)
+                  @if($selectedSubCategoryId == $courseSubCategory->id)
+                    <option value="{{$courseSubCategory->id}}" selected>{{$courseSubCategory->name}}</option>
+                  @else
+                    <option value="{{$courseSubCategory->id}}" >{{$courseSubCategory->name}}</option>
+                  @endif
+                @endforeach
+              @endif
+            </select>
+          </div>
+        </div>
+      <div class="form-group row ">
+        <label class="col-sm-2 col-form-label">Subject Name:</label>
+          <div class="col-sm-3">
+              <select id="subject" class="form-control" name="subject" required title="Subject" onChange="selectTopic(this);">
+                <option value="0">Select Sub Category</option>
+                @if(count($courseSubCategories) > 0)
+                  @foreach($courseSubCategories as $courseSubCategory)
+                    @if($selectedSubCategoryId == $courseSubCategory->id)
+                      <option value="{{$courseSubCategory->id}}" selected>{{$courseSubCategory->name}}</option>
+                    @else
+                      <option value="{{$courseSubCategory->id}}" >{{$courseSubCategory->name}}</option>
+                    @endif
+                  @endforeach
+                @endif
+              </select>
+          </div>
+        </div>
+        <div class="form-group row ">
+          <label class="col-sm-2 col-form-label">Topic:</label>
+          <div class="col-sm-3">
+            <select id="topic" class="form-control" name="topic" required title="Topic">
+              <option value="0">Select Topic</option>
+              @if(count($topics) > 0)
+                @foreach($topics as $topic)
+                  @if($selectedTopicId == $topic->id)
+                    <option value="{{$topic->id}}" selected>{{$topic->name}}</option>
+                  @else
+                    <option value="{{$topic->id}}" >{{$topic->name}}</option>
+                  @endif
+                @endforeach
+              @endif
+            </select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="offset-sm-2 col-sm-10" title="Submit">
+            <button id="submitButton" type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+    </form>
+  </div>
+  <div class="form-group row">
       <div >
         <a href="{{url('admin/createStudyMaterialPost')}}" type="button" class="btn btn-primary" style="float: right;" title="Add New Post"> Add New Post</a>&nbsp;&nbsp;&nbsp;&nbsp;
       </div>
     </div>
-  <div>
     <table class="table admin_table">
       <thead class="thead-inverse">
         <tr>
@@ -41,7 +141,7 @@
         @if(count($posts) > 0)
           @foreach($posts as $index => $post)
           <tr style="overflow: auto;">
-            <th scope="row">{{$index + $posts->firstItem()}}</th>
+            <th scope="row">{{$index + 1}}</th>
             <td>{!! mb_strimwidth($post->body, 0, 400, "...") !!}</td>
             <td>{{$post->category}}</td>
             <td>{{$post->subcategory}}</td>
@@ -69,9 +169,6 @@
         @endif
       </tbody>
     </table>
-    <div style="float: right;">
-      {{$posts->links()}}
-    </div>
   </div>
   </div>
 <script type="text/javascript">
@@ -91,10 +188,93 @@
                   document.getElementById(formId).submit();
                 }
             },
-            Cancle: function () {
+            Cancel: function () {
             }
         }
       });
+  }
+  function selectSubcategory(ele){
+    var id = parseInt($(ele).val());
+    if(id > 0){
+      $.ajax({
+              method: "POST",
+              url: "{{url('admin/getCourseSubCategories')}}",
+              data: {id:id}
+          })
+          .done(function( msg ) {
+            select = document.getElementById('subcategory');
+            select.innerHTML = '';
+            var opt = document.createElement('option');
+            opt.value = '0';
+            opt.innerHTML = 'Select Sub Category';
+            select.appendChild(opt);
+            if( 0 < msg.length){
+              $.each(msg, function(idx, obj) {
+                  var opt = document.createElement('option');
+                  opt.value = obj.id;
+                  opt.innerHTML = obj.name;
+                  select.appendChild(opt);
+              });
+            }
+          });
+    }
+  }
+
+  function selectSubject(ele){
+    var category = document.getElementById('category').value;
+    var subcategory = parseInt($(ele).val());
+    if(category > 0 && subcategory > 0){
+      $.ajax({
+              method: "POST",
+              url: "{{url('admin/getStudyMaterialSubjectsByCategoryIdBySubCategoryId')}}",
+              data: {category:category,subcategory:subcategory}
+          })
+          .done(function( msg ) {
+            select = document.getElementById('subject');
+            select.innerHTML = '';
+            var opt = document.createElement('option');
+            opt.value = '0';
+            opt.innerHTML = 'Select Subject';
+            select.appendChild(opt);
+            if( 0 < msg.length){
+              $.each(msg, function(idx, obj) {
+                  var opt = document.createElement('option');
+                  opt.value = obj.id;
+                  opt.innerHTML = obj.name;
+                  select.appendChild(opt);
+              });
+            }
+          });
+    }
+  }
+
+  function selectTopic(ele){
+    var category = document.getElementById('category').value;
+    var subcategory = document.getElementById('subcategory').value;
+    var subject = parseInt($(ele).val());
+    if(category > 0 && subcategory > 0 && subject > 0){
+      $.ajax({
+              method: "POST",
+              url: "{{url('admin/getStudyMaterialTopicsByCategoryIdBySubCategoryIdBySubjectId')}}",
+              data: {category:category,subcategory:subcategory,subject:subject}
+          })
+          .done(function( msg ) {
+            select = document.getElementById('topic');
+            select.innerHTML = '';
+            var opt = document.createElement('option');
+            opt.value = '0';
+            opt.innerHTML = 'Select Topic';
+            select.appendChild(opt);
+            if( 0 < msg.length){
+              $.each(msg, function(idx, obj) {
+                  var opt = document.createElement('option');
+                  opt.value = obj.id;
+                  opt.innerHTML = obj.name;
+                  select.appendChild(opt);
+              });
+            }
+          });
+    }
   }
 </script>
 @stop

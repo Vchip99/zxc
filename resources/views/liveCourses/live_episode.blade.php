@@ -651,7 +651,7 @@ hr{
                     });
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });
@@ -693,7 +693,7 @@ hr{
                     });
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });

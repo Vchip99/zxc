@@ -117,7 +117,7 @@
               document.getElementById(formId).submit();
             }
         },
-        Cancle: function () {
+        Cancel: function () {
         }
       }
     });

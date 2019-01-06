@@ -58,6 +58,9 @@ class ClientHomeController extends Controller
         if( $onlineClientUrl == $request->getHost()){
             return view('client.online.digitaleducation');
         } else if( $mentorUrl == $request->getHost()){
+            if(is_object(Auth::guard('mentor')->user())){
+                return Redirect::to('mentor/profile');
+            }
             $mentors = Mentor::all();
             $reviewData = [];
             $ratingUsers = [];

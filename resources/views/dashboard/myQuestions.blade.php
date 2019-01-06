@@ -553,7 +553,7 @@
                     }
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });
@@ -895,7 +895,7 @@
                         window.location="{{url('/home')}}";
                       }
                   },
-                  Cancle: function () {
+                  Cancel: function () {
                   }
               }
           });

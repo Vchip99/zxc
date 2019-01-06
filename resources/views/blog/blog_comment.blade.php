@@ -809,7 +809,7 @@ border-radius: 0px!important
                     });
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });
@@ -890,7 +890,7 @@ border-radius: 0px!important
                       });
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });

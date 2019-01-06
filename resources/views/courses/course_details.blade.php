@@ -246,14 +246,14 @@ margin: 0px 5px;
                  <p class="mrgn_20_top_btm">
                   {!! $course->description !!}
                 </p>
-                <h2 class="v_h2_title mrgn_20_top_btm">Meet The Auther</h2>
+                <h2 class="v_h2_title mrgn_20_top_btm">Meet The Author</h2>
                 <hr class="border_bottom"/>
                 <div class="row">
                   <div class="col-md-4">
                     @if(!empty($course->author_image))
-                      <img class="author-img img-responsive" src="{{ asset($course->author_image)}}" alt="Auther">
+                      <img class="author-img img-responsive" src="{{ asset($course->author_image)}}" alt="Author">
                     @else
-                      <img class="author-img img-responsive" src="{{ asset('images/default_author_image.png')}}" alt="Auther">
+                      <img class="author-img img-responsive" src="{{ asset('images/default_author_image.png')}}" alt="Author">
                     @endif
                   </div>
                   <div class="col-md-8 meet-the-author-description">
@@ -387,7 +387,7 @@ margin: 0px 5px;
             document.getElementById('purchaseCourse_'+courseId).submit();
           }
         },
-        Cancle: function () {
+        Cancel: function () {
         }
       }
     });

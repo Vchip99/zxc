@@ -590,7 +590,7 @@
                     }
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });

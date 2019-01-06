@@ -84,6 +84,21 @@
             <div class="tab">
               <div class="tab-content">
                 <div class="tab-content-inner active" data-content="signup">
+                @if(count($errors) > 0)
+                    <div class="alert alert-danger">
+                      <ul>
+                        @foreach ($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                        @endforeach
+                      </ul>
+                    </div>
+                  @endif
+                  @if(Session::has('message'))
+                    <div class="alert alert-success" id="message">
+                      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        {{ Session::get('message') }}
+                    </div>
+                  @endif
                   <ul class=" nav-tabs v_login_reg text-center">
                     <li class="active"><a data-toggle="tab" href="#home">Mentor Sign In</a></li>
                   </ul>

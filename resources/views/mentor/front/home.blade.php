@@ -244,13 +244,14 @@
 @stop
 @section('content')
     @include('mentor.front.header_menu')
+
     <section style="height: 300px; width: 100%; background: yellow;">
       <div class="container" style="text-align: center;">
         <div style="font-size: 30px; padding-top: 100px;"><b>MENTOR</b></div>
         <p >Connect with experts to become a experts.  </p><br>
-        @if(!is_object(Auth::user()))
-        <a class="btn btn-primary" href="{{ url('mentor/login')}}">Mentor Login</a>
-        <a class="btn btn-primary" href="{{ url('mentor/signup')}}">Mentor Sign-up</a>
+        @if(!is_object(Auth::user()) )
+          <a class="btn btn-primary" href="{{ url('mentor/login')}}">Mentor Login</a>
+          <a class="btn btn-primary" href="{{ url('mentor/signup')}}">Mentor Sign-up</a>
         @endif
       </div>
     </section>
@@ -270,7 +271,7 @@
             {{ Session::get('message') }}
         </div>
       @endif
-      <h1 style="text-align: center;">About</h1>
+      <h1 style="text-align: center;">About </h1>
       <p style="text-align: justify;">As an entrepreneur, it's exciting to go it alone and create something on your own. However, the reality is that, while you have a great idea, you may not know exactly what you should be doing with your business at which times to develop it into a sustainable business. I've had several mentors over the years and learned a large amount of valuable lessons from each and every one of them. From not making certain business decisions to fostering certain partnerships, a mentor can help guide you through your entrepreneurial journey.</p>
     </section><hr>
     <section class="container">
@@ -303,7 +304,7 @@
                     @if(!empty($mentor->photo))
                       <img src="{{asset($mentor->photo)}}" alt="member" class="user-prof" />
                     @else
-                      <img src="{{asset('images/mark.jpg')}}" alt="member" class="user-prof" />
+                      <img src="{{asset('images/user1.png')}}" alt="member" class="user-prof" />
                     @endif
                   </div>
                   <p><b>Name: {{$mentor->name}}</b></p>

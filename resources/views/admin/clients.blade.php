@@ -133,7 +133,7 @@
                   });
                 }
             },
-            Cancle: function () {
+            Cancel: function () {
               if('checked' == $(ele).attr('checked')){
                 $(ele).prop('checked', 'checked');
               } else {
@@ -162,7 +162,7 @@
                     document.getElementById('deleteClient_'+clientId).submit();
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });

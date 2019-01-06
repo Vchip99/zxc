@@ -681,7 +681,7 @@
                     });
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });
@@ -740,7 +740,7 @@
                     });
                   }
               },
-              Cancle: function () {
+              Cancel: function () {
               }
           }
         });

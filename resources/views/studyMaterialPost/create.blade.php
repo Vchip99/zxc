@@ -1,21 +1,92 @@
 @extends('admin.master')
 @section('module_title')
   <section class="content-header">
-    <h1> Manage Topic </h1>
+    <h1> Manage Post </h1>
     <ol class="breadcrumb">
       <li><i class="fa fa-file-pdf-o"></i> Study Material </li>
-      <li class="active"> Manage Topic </li>
+      <li class="active"> Manage Post </li>
     </ol>
   </section>
   <style type="text/css">
     .red-color{
       color: red;
     }
+    ul#ul {
+      /*width:1200px;*/
+      list-style-type: none;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0;
+      overflow: hidden;
+      background-color: #333;
+    }
+
+    ul#ul > li {
+        float: left;
+    }
+
+    ul#ul > li > a {
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+    }
+
+    ul#ul > li > a:hover:not(.active) {
+        background-color: #111;
+    }
+
+    .active {
+        background-color: #4CAF50;
+    }
   </style>
 @stop
 @section('admin_content')
   <script src="{{asset('templateEditor/ckeditor/ckeditor.js')}}"></script>
+  @php
+    if(Session::has('selected_post_category')){
+      $selectedCategoryId = Session::get('selected_post_category');
+    } else {
+      $selectedCategoryId = 0;
+    }
+    if(Session::has('selected_post_subcategory')){
+      $selectedSubCategoryId = Session::get('selected_post_subcategory');
+    } else {
+      $selectedSubCategoryId = 0;
+    }
+    if(Session::has('selected_post_subject')){
+      $selectedSubjectId = Session::get('selected_post_subject');
+    } else {
+      $selectedSubjectId = 0;
+    }
+    if(Session::has('selected_post_topic')){
+      $selectedTopicId = Session::get('selected_post_topic');
+    } else {
+      $selectedTopicId = 0;
+    }
+  @endphp
   <div class="container admin_div">
+  <ul id ="ul">
+    @if(Session::has('message'))
+      <div class="alert alert-success" id="message">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+          {{ Session::get('message') }}
+      </div>
+    @endif
+      @if($prevPostId > 0)
+        <li title="Prev Post"><a class="btn" id="prev_ques" href="{{url('admin/studyMaterialPost')}}/{{$prevPostId}}/edit">Prev Post</a></li>
+      @else
+        <li title="No Prev Post"><a class="btn" id="prev_ques">No Prev Post</a></li>
+      @endif
+      @if($nextPostId > 0)
+        <li title="Next Post"><a class="btn" id="next_ques" href="{{url('admin/studyMaterialPost')}}/{{$nextPostId}}/edit">Next Post</a></li>
+      @elseif(( $prevPostId > 0 || null == $prevPostId ) && null == $nextPostId )
+        <li title="Add Post"><a class="btn" id="next_ques" href="{{url('admin/createStudyMaterialPost')}}">Add Post </a></li>
+      @else
+        <li title="No Next Post"><a class="btn" id="next_ques">No Next Post</a></li>
+      @endif
+  </ul>
   @if(isset($post->id))
     <form action="{{url('admin/updateStudyMaterialPost')}}" method="POST" enctype="multipart/form-data" id="submitForm">
     {{method_field('PUT')}}
@@ -41,7 +112,11 @@
             <option value="0">Select Category</option>
             @if(count($courseCategories) > 0)
               @foreach($courseCategories as $courseCategory)
-                <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
+                @if($selectedCategoryId == $courseCategory->id)
+                  <option value="{{$courseCategory->id}}" selected>{{$courseCategory->name}}</option>
+                @else
+                  <option value="{{$courseCategory->id}}">{{$courseCategory->name}}</option>
+                @endif
               @endforeach
             @endif
         </select>
@@ -62,6 +137,15 @@
         @else
           <select id="subcategory" class="form-control" name="subcategory" required title="Sub Category" onChange="selectSubject(this);">
             <option value="0">Select Sub Category</option>
+            @if(count($courseSubCategories) > 0)
+              @foreach($courseSubCategories as $courseSubCategory)
+                @if($selectedSubCategoryId == $courseSubCategory->id)
+                  <option value="{{$courseSubCategory->id}}" selected>{{$courseSubCategory->name}}</option>
+                @else
+                  <option value="{{$courseSubCategory->id}}" >{{$courseSubCategory->name}}</option>
+                @endif
+              @endforeach
+            @endif
           </select>
         @endif
         @if($errors->has('subcategory')) <p class="help-block">{{ $errors->first('subcategory') }}</p> @endif
@@ -80,6 +164,15 @@
         @else
           <select id="subject" class="form-control" name="subject" required title="Subject" onChange="selectTopic(this);">
             <option value="0">Select Subject</option>
+            @if(count($subjects) > 0)
+              @foreach($subjects as $subject)
+                @if($selectedSubjectId == $subject->id)
+                  <option value="{{$subject->id}}" selected>{{$subject->name}}</option>
+                @else
+                  <option value="{{$subject->id}}" >{{$subject->name}}</option>
+                @endif
+              @endforeach
+            @endif
           </select>
         @endif
         @if($errors->has('subject')) <p class="help-block">{{ $errors->first('subject') }}</p> @endif
@@ -98,6 +191,15 @@
         @else
           <select id="topic" class="form-control" name="topic" required title="Topic">
             <option value="0">Select Topic</option>
+            @if(count($topics) > 0)
+              @foreach($topics as $topic)
+                @if($selectedTopicId == $topic->id)
+                  <option value="{{$topic->id}}" selected>{{$topic->name}}</option>
+                @else
+                  <option value="{{$topic->id}}" >{{$topic->name}}</option>
+                @endif
+              @endforeach
+            @endif
           </select>
         @endif
         @if($errors->has('topic')) <p class="help-block">{{ $errors->first('topic') }}</p> @endif

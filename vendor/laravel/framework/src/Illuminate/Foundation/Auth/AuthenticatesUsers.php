@@ -46,12 +46,12 @@ trait AuthenticatesUsers
             if($loginOtp == $serverOtp){
                 // mentor login
                 if($request->is('mentor/login')){
-                    $mentor = Mentor::where('mobile','=', $userMobile)->whereNotNull('mobile')->first();
+                    $mentor = Mentor::where('mobile','=', $userMobile)->whereNotNull('mobile')->where('admin_approve', 1)->first();
                     if(!is_object($mentor)){
-                        return Redirect::to('/')->withErrors('Mentor does not exists.');
+                        return Redirect::to('/')->withErrors('Mentor does not exists or not admin approve.');
                     }
                     Auth::guard('mentor')->login($mentor);
-                    return Redirect::to('/')->with('message', 'Welcome '. $mentor->name);
+                    return Redirect::to('mentor/profile')->with('message', 'Welcome '. $mentor->name);
                 } else {
                     // client user login
                     $client = Client::where('subdomain', $request->getHost())->first();
@@ -198,6 +198,27 @@ trait AuthenticatesUsers
             } else {
                 // mentor login
                 if('mentor' == $request->route()->getParameter('client') && $request->is('mentor/login') && $this->guard('mentor')->attempt($credentials)){
+                    // mentor login
+                    $mentor = Auth::guard('mentor')->user();
+                    if(0 == $mentor->admin_approve){
+                        $this->guard('mentor')->logout();
+                        Session::flush();
+                        Session::regenerate();
+                        if (! $lockedOut) {
+                            $this->incrementLoginAttempts($request);
+                        }
+                        $errorMessage = 'Your account is not approve. you can contact at info@vchiptech.com to approve your account.';
+                        return redirect()->back()->withErrors([$errorMessage]);
+                    } elseif(0 == $mentor->verified){
+                        $this->guard('mentor')->logout();
+                        Session::flush();
+                        Session::regenerate();
+                        if (! $lockedOut) {
+                            $this->incrementLoginAttempts($request);
+                        }
+                        $errorMessage = 'Please verify your account and then login';
+                        return redirect()->back()->withErrors([$errorMessage]);
+                    }
                     return $this->sendLoginResponse($request);
                 } else if($this->guard('clientuser')->attempt($credentials, $request->has('remember'))) {
                     // client user login
@@ -331,6 +352,7 @@ trait AuthenticatesUsers
      */
     protected function sendLoginResponse(Request $request)
     {
+
         $request->session()->regenerate();
 
         $this->clearLoginAttempts($request);

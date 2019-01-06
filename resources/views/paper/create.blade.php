@@ -174,11 +174,11 @@
     </div>
   </div>
   <div class="form-group row">
-    <label for="" class="col-sm-2 col-form-label">Session And Its Time:</label>
+    <label for="" class="col-sm-2 col-form-label">Section And Its Time:</label>
     <table class="">
       <thead class="">
         <tr>
-          <th class="col-sm-4">Session Name</th>
+          <th class="col-sm-4">Section Name</th>
           <th class="col-sm-4 duration">Duration(In Sec.)</th>
           <th class="col-sm">Add</th>
           <th class="col-sm">Delete</th>

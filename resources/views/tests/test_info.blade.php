@@ -506,7 +506,7 @@
                 document.getElementById('purchaseSubCategory_'+subcategoryId).submit();
               }
             },
-            Cancle: function () {
+            Cancel: function () {
             }
           }
         });

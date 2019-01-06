@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Redirect;
 use App\Models\MentorArea;
+use App\Models\MentorSkill;
 use App\Models\Mentor;
 use App\Models\MentorChatMessage;
 use App\Models\MentorSchedule;
@@ -155,8 +156,10 @@ class MentorAreaController extends Controller
      *  show list of mentors
      */
     protected function manageMentors(){
+        $areas = MentorArea::all();
+        $skills = MentorSkill::all();
         $mentors = Mentor::paginate();
-        return view('mentorArea.mentors', compact('mentors'));
+        return view('mentorArea.mentors', compact('mentors','areas','skills'));
     }
 
     /**
@@ -189,4 +192,31 @@ class MentorAreaController extends Controller
         }
         return Redirect::to('admin/manageMentors');
     }
+
+    protected function getMentorsByAreaId(Request $request){
+        $result['skills'] = MentorSkill::getMentorSkillsByAreaId($request->get('area_id'));
+        $result['mentors'] = Mentor::getMentorsByAreaId($request);
+        return $result;
+    }
+
+    protected function changeMentorApproveStatus(Request $request){
+        DB::beginTransaction();
+        try
+        {
+            Mentor::changeMentorApproveStatus($request);
+            DB::commit();
+        }
+        catch(\Exception $e)
+        {
+            DB::rollback();
+        }
+        return;
+    }
+
+
+    protected function getMentorsByAreaIdBySkillId(Request $request){
+        $result['mentors'] = Mentor::getMentorsByAreaIdBySkillId($request);
+        return $result;
+    }
+
 }

@@ -709,7 +709,7 @@
 					      	});
 		    			}
 			        },
-			        Cancle: function () {
+			        Cancel: function () {
 			        }
 			    }
 			});

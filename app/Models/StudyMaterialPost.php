@@ -131,4 +131,57 @@ class StudyMaterialPost extends Model
             }
         }
     }
+
+    protected static function getPostsByCategoryIdBySubcategoryIdBySubjectIdByTopicId($categoryId,$subcategoryId,$subjectId,$topicId){
+        if(Auth::guard('admin')->user()->hasRole('sub-admin')){
+            return static::join('course_categories', 'course_categories.id','=','study_material_posts.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id','=','study_material_posts.course_sub_category_id')
+                ->join('study_material_subjects', 'study_material_subjects.id','=','study_material_posts.study_material_subject_id')
+                ->join('study_material_topics', 'study_material_topics.id','=','study_material_posts.study_material_topic_id')
+                ->where('study_material_subjects.admin_id',Auth::guard('admin')->user()->id)
+                ->where('study_material_posts.course_category_id', $categoryId)
+                ->where('study_material_posts.course_sub_category_id', $subcategoryId)
+                ->where('study_material_posts.study_material_subject_id', $subjectId)
+                ->where('study_material_posts.study_material_topic_id', $topicId)
+                ->select('study_material_posts.*','study_material_subjects.admin_id','course_categories.name as category','course_sub_categories.name as subcategory','study_material_subjects.name as subject','study_material_topics.name as topic')
+                ->groupBy('study_material_posts.id')
+                ->get();
+        } else {
+            return static::join('course_categories', 'course_categories.id','=','study_material_posts.course_category_id')
+                ->join('course_sub_categories', 'course_sub_categories.id','=','study_material_posts.course_sub_category_id')
+                ->join('study_material_subjects', 'study_material_subjects.id','=','study_material_posts.study_material_subject_id')
+                ->join('study_material_topics', 'study_material_topics.id','=','study_material_posts.study_material_topic_id')
+                ->where('study_material_posts.course_category_id', $categoryId)
+                ->where('study_material_posts.course_sub_category_id', $subcategoryId)
+                ->where('study_material_posts.study_material_subject_id', $subjectId)
+                ->where('study_material_posts.study_material_topic_id', $topicId)
+                ->select('study_material_posts.*','study_material_subjects.admin_id','course_categories.name as category','course_sub_categories.name as subcategory','study_material_subjects.name as subject','study_material_topics.name as topic')
+                ->groupBy('study_material_posts.id')
+                ->get();
+        }
+    }
+
+    protected static function getPrevPostByCategoryIdBySubcategoryIdBySubjectIdByTopicId($categoryId,$subcategoryId,$subjectId,$topicId,$postId){
+        $query = DB::table('study_material_posts')
+            ->where('course_category_id', $categoryId)
+            ->where('course_sub_category_id', $subcategoryId)
+            ->where('study_material_subject_id', $subjectId)
+            ->where('study_material_topic_id', $topicId);
+            if($postId > 0){
+                $query->where('id', '<', $postId);
+            }
+        return $query->orderBy('id','desc')->first();
+    }
+
+    protected static function getNextPostByCategoryIdBySubcategoryIdBySubjectIdByTopicId($categoryId,$subcategoryId,$subjectId,$topicId,$postId){
+        $query = DB::table('study_material_posts')
+            ->where('course_category_id', $categoryId)
+            ->where('course_sub_category_id', $subcategoryId)
+            ->where('study_material_subject_id', $subjectId)
+            ->where('study_material_topic_id', $topicId);
+            if($postId > 0){
+                $query->where('id', '>', $postId);
+            }
+        return $query->first();
+    }
 }

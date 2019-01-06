@@ -11,6 +11,7 @@ use App\Models\MentorArea;
 use App\Models\MentorSkill;
 use App\Models\Mentor;
 use App\Mail\MentorSignUp;
+use App\Mail\MentorEmailVerification;
 use Redirect,View,DB,Mail,Session,Cache,File;
 
 class RegisterController extends Controller
@@ -87,6 +88,8 @@ class RegisterController extends Controller
                 'designation' => $data['designation'],
                 'education' => $data['education'],
                 'mentor_area_id' => $data['area'],
+                'email_token' => str_random(60),
+                'admin_approve' => 1,
                 'skills' => $skills
             ]);
     }
@@ -121,7 +124,7 @@ class RegisterController extends Controller
         $validator = $this->validator($request->all());
         if ($validator->fails())
         {
-            return redirect()->back()->withErrors($validator->errors());
+            return redirect()->back()->withErrors($validator->errors())->withInput();
         }
         // Using database transactions is useful here because stuff happening is actually a transaction
         DB::beginTransaction();
@@ -132,6 +135,11 @@ class RegisterController extends Controller
                 return redirect()->back()->withErrors($mentor);
             }
             DB::commit();
+            if(!empty($mentor->email)){
+                // After creating the mentor send an email with the random token generated in the create method above
+                $email = new MentorEmailVerification(new Mentor(['email_token' => $mentor->email_token, 'name' => $mentor->name]));
+                Mail::to($mentor->email)->send($email);
+            }
             $data = [];
             $data['name'] = $request->get('name');
             $data['mobile'] = $request->get('mobile');
@@ -144,6 +152,31 @@ class RegisterController extends Controller
         {
             DB::rollback();
             return back();
+        }
+    }
+
+     // Get the mentor who has the same token and change his/her status to verified i.e. 1
+    public function verify($subdomain,$token)
+    {
+        // Using database transactions is useful here because stuff happening is actually a transaction
+        DB::beginTransaction();
+        try
+        {
+            // The verified method has been added to the mentor model and chained here
+            // for better readability
+            $mentor = Mentor::where('email_token',$token)->first();
+            if(is_object($mentor)){
+                $mentor->verified();
+                DB::commit();
+                return redirect('mentor/login')->with('message', 'please login with credentials.');
+            } else {
+                return redirect('mentor/login')->withErrors('These credentials do not exist.');
+            }
+        }
+        catch(Exception $e)
+        {
+            DB::rollback();
+            return redirect('mentor/login');
         }
     }
 }
