@@ -272,7 +272,9 @@
         </div>
       @endif
       <h1 style="text-align: center;">About </h1>
-      <p style="text-align: justify;">As an entrepreneur, it's exciting to go it alone and create something on your own. However, the reality is that, while you have a great idea, you may not know exactly what you should be doing with your business at which times to develop it into a sustainable business. I've had several mentors over the years and learned a large amount of valuable lessons from each and every one of them. From not making certain business decisions to fostering certain partnerships, a mentor can help guide you through your entrepreneurial journey.</p>
+      <p style="text-align: justify;">We developed Mentor-Mentee platform with prior motive of connecting mentee with mentors. Mentors play important role to choose student’s career. Also, Mentors play great role in development of students future. Mentors can help students to decide their career and make them suitable for industry. Most of successful peoples have mentor and others are searching  for a great mentor. The mentors have experience and you can learn lots from them within short period of time. </p>
+      <p style="text-align: justify;">It is important to connect with right person to solve the problem with in time. Also, mentor play great role in success of every-one, that mentor might be in the form of parent, teacher, spouse, friends, siblings etc. Some time we wanna do something different, at that time, we need advice from person(mentor), who has experience in same field. </p>
+      <p style="text-align: justify;">As an entrepreneur, you can have great idea and also you know, how to execute it. But at the same time, you need someone to advice you to run the business smoothly. Time to time, mentor will guide you from his/her rich experience, that will help you to not making certain business decisions to fostering certain partnerships. </p>
     </section><hr>
     <section class="container">
       <div class="row">
@@ -285,6 +287,7 @@
             <li>Massage your query to Mentors.</li>
             <li>Mentor will respond accordingly. Also he will provide detail about available time, how to pay money etc.</li>
             <li>Last but not least, please review to mentor accordingly to your experience with their positive and negative (if any) points, so it will be helpful for other mentees. </li>
+            <li><b>Disclaimer:</b> Our motive is to connect right person(mentor) with you (mentee). We don’t take any payment, you have to transfer  mentor’s fee to his/her account. Also, both of you (mentor and mentee) can decide online or offline meeting, according to your convenience. </li>
           </ul>
         </div>
         <div class="col-sm-6">
@@ -292,6 +295,16 @@
         </div>
       </div>
     </section><hr>
+    <!-- <section class="container">
+      <h1>Need of Mentors:</h1>
+      <ul style="text-align: justify;">
+        <li>To get direction to your career</li>
+        <li>To grow your career</li>
+        <li>To enhance your skill to become industry stand-able</li>
+        <li>To make you familiar with unfamiliar domain</li>
+        <li>Get advice, that helps to take decisions </li>
+      </ul>
+    </section><hr /> -->
     <section class="container">
       <h1 style="text-align: center;">Popular Mentors</h1>
       <div class="scrolling-wrapper">
@@ -423,14 +436,11 @@
         @endif
       </div>
     </section><hr>
-<!--     <section>
-      <h1 style="text-align: center;">Our Testimonial</h1>
-    </section><hr> -->
     <section class=" section" >
       <div class="container block" >
         <div class="row">
           <div class="col-md-8 col-md-offset-2 text-center ">
-            <h2 class="v_h2_title">TESTIMONIALS</h2>
+            <h2 class="v_h2_title">OUR TESTIMONIALS</h2>
             <hr class="section-dash-dark"/>
             <h3 class="v_h3_title ">Happy customers...Successful adventure.</h3>
           </div>
@@ -453,11 +463,11 @@
                       <blockquote>
                         <div class="row">
                           <div class="col-sm-3 text-center">
-                            <img class="img-circle" src="{{ asset('images/testimonial/testimonial-1.jpg') }}" style="width: 100px;height:100px;" alt="Testimonial" />
+                            <img class="img-circle" src="{{ asset('images/user1.png') }}" style="width: 100px;height:100px;" alt="Testimonial" />
                           </div>
                           <div class="col-sm-9">
-                            <p>Thanks to Vchip-edu, i was able to start my online classes on Vchip-edu platform within a day and now growth  of my institute is nearly double.</p>
-                            <h6>Ajay Joshi</h6>
+                            <p>This platform help me to find the great mentors like Priya ma’am. She help me to enhance my knowledge and clear my doubts in Java. Today, I am happily working in Mastercard.</p>
+                            <h6>Sheetal Gadodiya</h6>
                           </div>
                         </div>
                       </blockquote>
@@ -467,11 +477,11 @@
                       <blockquote>
                         <div class="row">
                           <div class="col-sm-3 text-center">
-                            <img class="img-circle" src="{{ asset('images/testimonial/testimonial-2.jpg') }}" style="width: 100px;height:100px;">
+                            <img class="img-circle" src="{{ asset('images/user1.png') }}" style="width: 100px;height:100px;">
                           </div>
                           <div class="col-sm-9">
-                            <p>Vchip-edu platform help to my student at the time of preparation of placement</p>
-                            <h6>Vishal Langote</h6>
+                            <p>Good medium to connect with experts… I personally recommend it.</p>
+                            <h6>Rashmi Raut</h6>
                           </div>
                         </div>
                       </blockquote>
@@ -481,11 +491,11 @@
                       <blockquote>
                         <div class="row">
                           <div class="col-sm-3 text-center">
-                            <img class="img-circle" src="{{ asset('images/testimonial/testimonial-3.jpg') }}" style="width: 100px;height:100px;">
+                            <img class="img-circle" src="{{ asset('images/user1.png') }}" style="width: 100px;height:100px;">
                           </div>
                           <div class="col-sm-9">
-                            <p>One of the great digital education platform. It helped me for preparation of placement.</p>
-                            <h6>Rashmi Raut</h6>
+                            <p>I am B.E. final year student. I connect with mentor on this platform. My mentor help me to decide, which technology is better to make career, thank you.</p>
+                            <h6>Vinay</h6>
                           </div>
                         </div>
                       </blockquote>
